@@ -8,8 +8,8 @@ buildscript {
         maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
-        classpath "com.github.asbyth:ForgeGradle:6f53277"
-        classpath 'com.github.LxGaming:MixinGradle:d75e32e'
+        classpath "com.github.asbyth:ForgeGradle:8708bf3e01"
+        classpath 'com.github.xcfrg:MixinGradle:0.6-SNAPSHOT'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
     }
 }
