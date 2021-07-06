@@ -25,11 +25,7 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
             } else {
                 strVal = Float.toString(floatVal);
             }
-            textField =
-                new GuiElementTextField(
-                    strVal,
-                    GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY | GuiElementTextField.SCALE_TEXT
-                );
+            textField = new GuiElementTextField(strVal, GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY | GuiElementTextField.SCALE_TEXT);
         }
 
         slider =

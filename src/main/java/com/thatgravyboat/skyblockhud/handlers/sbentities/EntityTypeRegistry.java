@@ -17,9 +17,7 @@ public class EntityTypeRegistry {
 
     public static String getEntityId(Entity entity) {
         if (!entities.containsKey(entity.getClass())) return null;
-        for (SkyBlockEntity skyBlockEntity : entities.get(entity.getClass())) if (
-            skyBlockEntity.isEntity(entity)
-        ) return skyBlockEntity.getName();
+        for (SkyBlockEntity skyBlockEntity : entities.get(entity.getClass())) if (skyBlockEntity.isEntity(entity)) return skyBlockEntity.getName();
         return null;
     }
 }

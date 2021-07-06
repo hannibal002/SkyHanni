@@ -72,8 +72,7 @@ public class DwarvenMineHandler {
             } else if (DwarvenMineHandler.currentEvent == Event.GOBLIN) {
                 if (event.formattedLine.toLowerCase().contains("remaining:")) {
                     try {
-                        eventMax =
-                            Integer.parseInt(event.formattedLine.toLowerCase().replace("goblins", "").replace("remaining:", "").trim());
+                        eventMax = Integer.parseInt(event.formattedLine.toLowerCase().replace("goblins", "").replace("remaining:", "").trim());
                     } catch (Exception ignored) {}
                 } else if (event.formattedLine.toLowerCase().contains("your kills:") && !event.formattedLine.toLowerCase().contains("(")) {
                     try {

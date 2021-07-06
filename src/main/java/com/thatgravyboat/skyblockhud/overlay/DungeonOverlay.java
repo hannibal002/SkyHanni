@@ -54,38 +54,18 @@ public class DungeonOverlay extends Gui {
         mc.renderEngine.bindTexture(GuiTextures.dungeon);
         drawTexturedModalRect((width / 2) - 7, offset + (bossBarVisible ? 20 : 3), 16, 50, 3, 8);
         drawTexturedModalRect((width / 2) - 7, offset + (bossBarVisible ? 30 : 13), 19, 50, 3, 8);
-        String dungeonTimeElapsed =
-            (dungeonTimeMin > 9 ? String.valueOf(dungeonTimeMin) : "0" + dungeonTimeMin) +
-            ":" +
-            (dungeonTimeSec > 9 ? String.valueOf(dungeonTimeSec) : "0" + dungeonTimeSec);
+        String dungeonTimeElapsed = (dungeonTimeMin > 9 ? String.valueOf(dungeonTimeMin) : "0" + dungeonTimeMin) + ":" + (dungeonTimeSec > 9 ? String.valueOf(dungeonTimeSec) : "0" + dungeonTimeSec);
         drawCenteredString(font, dungeonTimeElapsed, (width / 2), offset + (bossBarVisible ? 40 : 23), 0xFFFF55);
         //KEYS
-        drawString(
-            font,
-            (DungeonHandler.hasBloodkey() ? "\u2714" : "x"),
-            (width / 2),
-            offset + (bossBarVisible ? 19 : 2),
-            (DungeonHandler.hasBloodkey() ? 0x55FF55 : 0xAA0000)
-        );
+        drawString(font, (DungeonHandler.hasBloodkey() ? "\u2714" : "x"), (width / 2), offset + (bossBarVisible ? 19 : 2), (DungeonHandler.hasBloodkey() ? 0x55FF55 : 0xAA0000));
         drawString(font, DungeonHandler.getWitherKeys() + "x", (width / 2), offset + (bossBarVisible ? 30 : 13), 0x555555);
         //CLEARED PERCENTAGE
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(GuiTextures.overlay);
         int clearPercent = DungeonHandler.getDungeonCleared();
-        String clearPercentage =
-            "Dungeon Cleared: \u00A7" +
-            (clearPercent <= 20 ? "4" : clearPercent <= 50 ? "6" : clearPercent <= 80 ? "e" : "a") +
-            clearPercent +
-            "%";
+        String clearPercentage = "Dungeon Cleared: \u00A7" + (clearPercent <= 20 ? "4" : clearPercent <= 50 ? "6" : clearPercent <= 80 ? "e" : "a") + clearPercent + "%";
         drawTexturedModalRect((width / 2) + 17, offset + (bossBarVisible ? 20 : 3), 2, 34, font.getStringWidth(clearPercentage) + 3, 14);
-        drawTexturedModalRect(
-            ((width / 2) + 17) + font.getStringWidth(clearPercentage) + 3,
-            offset + (bossBarVisible ? 20 : 3),
-            252,
-            34,
-            4,
-            14
-        );
+        drawTexturedModalRect(((width / 2) + 17) + font.getStringWidth(clearPercentage) + 3, offset + (bossBarVisible ? 20 : 3), 252, 34, 4, 14);
         drawString(font, clearPercentage, (width / 2) + 18, offset + (bossBarVisible ? 23 : 6), 0xAAAAAA);
 
         //DEATHS
@@ -105,14 +85,7 @@ public class DungeonOverlay extends Gui {
         int totalSecrets = DungeonHandler.getTotalSecrets();
         String secretsText = "Secrets: " + secrets + "/" + maxSecrets + " (" + totalSecrets + ")";
         drawTexturedModalRect((width / 2) - 17 - (font.getStringWidth(secretsText)) - 4, offset + (bossBarVisible ? 20 : 3), 0, 34, 2, 14);
-        drawTexturedModalRect(
-            ((width / 2) - 17 - (font.getStringWidth(secretsText))) - 2,
-            offset + (bossBarVisible ? 20 : 3),
-            2,
-            34,
-            font.getStringWidth(secretsText) + 2,
-            14
-        );
+        drawTexturedModalRect(((width / 2) - 17 - (font.getStringWidth(secretsText))) - 2, offset + (bossBarVisible ? 20 : 3), 2, 34, font.getStringWidth(secretsText) + 2, 14);
         drawString(font, secretsText, (width / 2) - 17 - (font.getStringWidth(secretsText)), offset + (bossBarVisible ? 23 : 6), 0xAAAAAA);
 
         //CRYPTS
@@ -121,14 +94,7 @@ public class DungeonOverlay extends Gui {
         int crypts = DungeonHandler.getCrypts();
         String cryptText = "Crypts: " + crypts;
         drawTexturedModalRect((width / 2) - 17 - (font.getStringWidth(cryptText)) - 4, offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
-        drawTexturedModalRect(
-            ((width / 2) - 17 - (font.getStringWidth(cryptText))) - 2,
-            offset + (bossBarVisible ? 35 : 18),
-            2,
-            34,
-            font.getStringWidth(cryptText) + 2,
-            14
-        );
+        drawTexturedModalRect(((width / 2) - 17 - (font.getStringWidth(cryptText))) - 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(cryptText) + 2, 14);
         drawString(font, cryptText, (width / 2) - 17 - (font.getStringWidth(cryptText)), offset + (bossBarVisible ? 38 : 21), 0xAAAAAA);
     }
 
@@ -141,29 +107,14 @@ public class DungeonOverlay extends Gui {
             int x = position.getAbsX(resolution, 182);
             int y = position.getAbsY(resolution, 5);
 
-            GenericOverlays.drawLargeBar(
-                mc,
-                x - 91,
-                y,
-                percentage,
-                0.999f,
-                SpecialColour.specialToChromaRGB(dungeonHud.barLoadColor),
-                SpecialColour.specialToChromaRGB(dungeonHud.barFullColor),
-                dungeonHud.barStyle
-            );
+            GenericOverlays.drawLargeBar(mc, x - 91, y, percentage, 0.999f, SpecialColour.specialToChromaRGB(dungeonHud.barLoadColor), SpecialColour.specialToChromaRGB(dungeonHud.barFullColor), dungeonHud.barStyle);
         }
     }
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (
-            Utils.overlayShouldRender(
-                event.type,
-                SkyblockHud.hasSkyblockScoreboard(),
-                LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)
-            )
-        ) {
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS))) {
             bossBarVisible = BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
             GlStateManager.enableBlend();
             drawUltimateBar(mc, event.resolution);
@@ -171,12 +122,7 @@ public class DungeonOverlay extends Gui {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             if (!SkyblockHud.config.dungeon.hideDungeonPlayers) {
                 int[] hardCodedPos = new int[] { 5, 42, 79, 116 };
-                Position[] positions = new Position[] {
-                    SkyblockHud.config.dungeon.dungeonPlayer1,
-                    SkyblockHud.config.dungeon.dungeonPlayer2,
-                    SkyblockHud.config.dungeon.dungeonPlayer3,
-                    SkyblockHud.config.dungeon.dungeonPlayer4
-                };
+                Position[] positions = new Position[] { SkyblockHud.config.dungeon.dungeonPlayer1, SkyblockHud.config.dungeon.dungeonPlayer2, SkyblockHud.config.dungeon.dungeonPlayer3, SkyblockHud.config.dungeon.dungeonPlayer4 };
                 for (int i = 0; i < Math.min(DungeonHandler.getDungeonPlayers().values().size(), 4); i++) {
                     DungeonPlayer player = (DungeonPlayer) DungeonHandler.getDungeonPlayers().values().toArray()[i];
                     int posX;

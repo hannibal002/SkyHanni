@@ -28,10 +28,7 @@ public class IslandHandler {
     }
 
     public static boolean checkFlightDuration(String formatedScoreboardLine) {
-        if (
-            LocationHandler.getCurrentLocation() == Locations.YOURISLAND &&
-            Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()).contains("flight duration:")
-        ) {
+        if (LocationHandler.getCurrentLocation() == Locations.YOURISLAND && Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()).contains("flight duration:")) {
             String timeString = formatedScoreboardLine.toLowerCase().replace("flight duration:", "").replace(" ", "");
             String[] times = timeString.split(":");
             if (times.length == 2) {
@@ -65,10 +62,7 @@ public class IslandHandler {
         if (LocationHandler.getCurrentLocation() == Locations.YOURISLAND) {
             if (formatedScoreboardLine.toLowerCase().contains("redstone:")) return true;
             try {
-                redstone =
-                    formatedScoreboardLine.toLowerCase().contains("redstone:")
-                        ? Integer.parseInt(Utils.removeWhiteSpaceAndRemoveWord(formatedScoreboardLine, "redstone:"))
-                        : 0;
+                redstone = formatedScoreboardLine.toLowerCase().contains("redstone:") ? Integer.parseInt(Utils.removeWhiteSpaceAndRemoveWord(formatedScoreboardLine, "redstone:")) : 0;
             } catch (Exception ignored) {}
         }
         return false;

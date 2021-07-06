@@ -12,14 +12,7 @@ public class SidebarLineUpdateEvent extends Event {
     public Scoreboard scoreboard;
     public ScoreObjective objective;
 
-    public SidebarLineUpdateEvent(
-        String rawLine,
-        String formattedLine,
-        int score,
-        int max,
-        Scoreboard scoreboard,
-        ScoreObjective objective
-    ) {
+    public SidebarLineUpdateEvent(String rawLine, String formattedLine, int score, int max, Scoreboard scoreboard, ScoreObjective objective) {
         this.rawLine = rawLine;
         this.formattedLine = formattedLine;
         this.position = max - score;

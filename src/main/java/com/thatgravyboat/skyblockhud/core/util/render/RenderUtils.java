@@ -23,16 +23,7 @@ public class RenderUtils {
 
         if (OpenGlHelper.isFramebufferEnabled()) {
             ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-            BackgroundBlur.renderBlurredBackground(
-                15,
-                scaledResolution.getScaledWidth(),
-                scaledResolution.getScaledHeight(),
-                x,
-                y,
-                width,
-                height,
-                true
-            );
+            BackgroundBlur.renderBlurredBackground(15, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(), x, y, width, height, true);
         } else {
             alpha = 0xff000000;
         }
@@ -95,17 +86,7 @@ public class RenderUtils {
         drawTexturedRect(x, y, width, height, uMin, uMax, vMin, vMax, GL11.GL_NEAREST);
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height,
-        float uMin,
-        float uMax,
-        float vMin,
-        float vMax,
-        int filter
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height, float uMin, float uMax, float vMin, float vMax, int filter) {
         GlStateManager.enableBlend();
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -114,17 +95,7 @@ public class RenderUtils {
         GlStateManager.disableBlend();
     }
 
-    public static void drawTexturedRectNoBlend(
-        float x,
-        float y,
-        float width,
-        float height,
-        float uMin,
-        float uMax,
-        float vMin,
-        float vMax,
-        int filter
-    ) {
+    public static void drawTexturedRectNoBlend(float x, float y, float width, float height, float uMin, float uMax, float vMin, float vMax, int filter) {
         GlStateManager.enableTexture2D();
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filter);

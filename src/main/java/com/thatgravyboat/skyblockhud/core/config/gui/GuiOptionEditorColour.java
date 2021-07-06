@@ -50,14 +50,7 @@ public class GuiOptionEditorColour extends GuiOptionEditor {
     public boolean mouseInput(int x, int y, int width, int mouseX, int mouseY) {
         int height = getHeight();
 
-        if (
-            Mouse.getEventButtonState() &&
-            Mouse.getEventButton() == 0 &&
-            mouseX > x + width / 6 - 24 &&
-            mouseX < x + width / 6 + 24 &&
-            mouseY > y + height - 7 - 14 &&
-            mouseY < y + height - 7 + 2
-        ) {
+        if (Mouse.getEventButtonState() && Mouse.getEventButton() == 0 && mouseX > x + width / 6 - 24 && mouseX < x + width / 6 + 24 && mouseY > y + height - 7 - 14 && mouseY < y + height - 7 + 2) {
             colourElement =
                 new GuiElementColour(
                     mouseX,

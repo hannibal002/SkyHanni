@@ -19,12 +19,7 @@ public class MixinEntityArrow {
 
     @ModifyVariable(method = "onUpdate", at = @At(value = "STORE", ordinal = 1))
     public MovingObjectPosition onUpdate(MovingObjectPosition position) {
-        if (
-            position != null &&
-            position.entityHit != null &&
-            this.shootingEntity != null &&
-            this.shootingEntity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())
-        ) {
+        if (position != null && position.entityHit != null && this.shootingEntity != null && this.shootingEntity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())) {
             KillTrackerHandler.attackedEntities.add(position.entityHit.getUniqueID());
         }
         return position;

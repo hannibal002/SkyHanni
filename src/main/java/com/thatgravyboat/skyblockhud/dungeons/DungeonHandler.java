@@ -124,11 +124,7 @@ public class DungeonHandler {
 
     public static void parseDeaths(String playerName) {
         if (playerName.toLowerCase().contains("deaths:")) {
-            String death = Utils
-                .removeColor(playerName.toLowerCase().replace("deaths:", ""))
-                .replace("(", "")
-                .replace(")", "")
-                .replace(" ", "");
+            String death = Utils.removeColor(playerName.toLowerCase().replace("deaths:", "")).replace("(", "").replace(")", "").replace(" ", "");
             try {
                 deaths = Integer.parseInt(death);
             } catch (NumberFormatException ignored) {}

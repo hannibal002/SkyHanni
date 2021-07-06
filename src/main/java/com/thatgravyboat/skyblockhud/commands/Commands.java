@@ -15,8 +15,7 @@ public class Commands {
     private static final SimpleCommand.ProcessCommandRunnable settingsRunnable = new SimpleCommand.ProcessCommandRunnable() {
         public void processCommand(ICommandSender sender, String[] args) {
             if (args.length > 0) {
-                SkyblockHud.screenToOpen =
-                    new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, StringUtils.join(args, " ")));
+                SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, StringUtils.join(args, " ")));
             } else {
                 SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config));
             }
@@ -31,8 +30,7 @@ public class Commands {
         "sbhmap",
         new SimpleCommand.ProcessCommandRunnable() {
             public void processCommand(ICommandSender sender, String[] args) {
-                if (LocationHandler.getCurrentLocation().getCategory().getMap() != null) SkyblockHud.screenToOpen =
-                    new MapHandler.MapScreen();
+                if (LocationHandler.getCurrentLocation().getCategory().getMap() != null) SkyblockHud.screenToOpen = new MapHandler.MapScreen();
             }
         }
     );

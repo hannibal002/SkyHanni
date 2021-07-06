@@ -10,16 +10,7 @@ import net.minecraft.client.renderer.GlStateManager;
 
 public class GenericOverlays extends Gui {
 
-    public static void drawLargeBar(
-        Minecraft mc,
-        int x,
-        int y,
-        float percentage,
-        float max,
-        int fullColor,
-        int loadingColor,
-        int barStyle
-    ) {
+    public static void drawLargeBar(Minecraft mc, int x, int y, float percentage, float max, int fullColor, int loadingColor, int barStyle) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(GuiTextures.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);
@@ -34,16 +25,7 @@ public class GenericOverlays extends Gui {
         }
     }
 
-    public static void drawSmallBar(
-        Minecraft mc,
-        int x,
-        int y,
-        double percentage,
-        double max,
-        int fullColor,
-        int loadingColor,
-        int barStyle
-    ) {
+    public static void drawSmallBar(Minecraft mc, int x, int y, double percentage, double max, int fullColor, int loadingColor, int barStyle) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(GuiTextures.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);

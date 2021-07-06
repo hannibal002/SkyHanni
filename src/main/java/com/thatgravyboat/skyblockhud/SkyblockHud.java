@@ -86,9 +86,7 @@ public class SkyblockHud {
         configFile = new File(event.getModConfigurationDirectory(), "sbh-config.json");
 
         if (configFile.exists()) {
-            try (
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))
-            ) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 config = gson.fromJson(reader, SBHConfig.class);
             } catch (Exception ignored) {}
         }
@@ -108,9 +106,7 @@ public class SkyblockHud {
         try {
             configFile.createNewFile();
 
-            try (
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))
-            ) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(config));
             }
         } catch (IOException ignored) {}

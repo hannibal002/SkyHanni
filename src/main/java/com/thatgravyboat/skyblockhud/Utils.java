@@ -38,9 +38,7 @@ public class Utils {
 
     public static boolean isPlayerHoldingRedstone(EntityPlayerSP player) {
         if (!SkyblockHud.config.main.requireRedstone) return true;
-        ArrayList<Item> redstoneItems = new ArrayList<>(
-            Arrays.asList(Items.redstone, Items.repeater, Items.comparator, Item.getByNameOrId("minecraft:redstone_torch"))
-        );
+        ArrayList<Item> redstoneItems = new ArrayList<>(Arrays.asList(Items.redstone, Items.repeater, Items.comparator, Item.getByNameOrId("minecraft:redstone_torch")));
         if (player.getHeldItem() != null) return redstoneItems.contains(player.getHeldItem().getItem());
         return false;
     }
@@ -107,12 +105,7 @@ public class Utils {
         return overlayShouldRender(false, type, RenderGameOverlayEvent.ElementType.HOTBAR, booleans);
     }
 
-    public static boolean overlayShouldRender(
-        boolean hideOnf3,
-        RenderGameOverlayEvent.ElementType type,
-        RenderGameOverlayEvent.ElementType checkType,
-        boolean... booleans
-    ) {
+    public static boolean overlayShouldRender(boolean hideOnf3, RenderGameOverlayEvent.ElementType type, RenderGameOverlayEvent.ElementType checkType, boolean... booleans) {
         Minecraft mc = Minecraft.getMinecraft();
         boolean shouldRender;
         if (booleans.length > 1) {
@@ -120,13 +113,7 @@ public class Utils {
             shouldRender = true;
         } else shouldRender = booleans.length != 1 || booleans[0];
         if (hideOnf3) {
-            if (
-                mc.gameSettings.showDebugInfo ||
-                (
-                    mc.gameSettings.keyBindPlayerList.isKeyDown() &&
-                    (!mc.isIntegratedServerRunning() || mc.thePlayer.sendQueue.getPlayerInfoMap().size() > 1)
-                )
-            ) {
+            if (mc.gameSettings.showDebugInfo || (mc.gameSettings.keyBindPlayerList.isKeyDown() && (!mc.isIntegratedServerRunning() || mc.thePlayer.sendQueue.getPlayerInfoMap().size() > 1))) {
                 return false;
             }
         }
@@ -155,17 +142,7 @@ public class Utils {
         drawStringScaled(str, fr, x - len / 2f, y - fontHeight / 2f, shadow, colour, factor);
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height,
-        float uMin,
-        float uMax,
-        float vMin,
-        float vMax,
-        int filter
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height, float uMin, float uMax, float vMin, float vMax, int filter) {
         GlStateManager.enableTexture2D();
         GlStateManager.enableBlend();
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -240,14 +217,7 @@ public class Utils {
             GlStateManager.viewport(0, 0, Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
             GlStateManager.matrixMode(GL11.GL_PROJECTION);
             GlStateManager.loadIdentity();
-            GlStateManager.ortho(
-                0.0D,
-                scaledresolution.getScaledWidth_double(),
-                scaledresolution.getScaledHeight_double(),
-                0.0D,
-                1000.0D,
-                3000.0D
-            );
+            GlStateManager.ortho(0.0D, scaledresolution.getScaledWidth_double(), scaledresolution.getScaledHeight_double(), 0.0D, 1000.0D, 3000.0D);
             GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.loadIdentity();
             GlStateManager.translate(0.0F, 0.0F, -2000.0F);
@@ -260,14 +230,7 @@ public class Utils {
             } else {
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.loadIdentity();
-                GlStateManager.ortho(
-                    0.0D,
-                    scaledresolution.getScaledWidth_double(),
-                    scaledresolution.getScaledHeight_double(),
-                    0.0D,
-                    1000.0D,
-                    3000.0D
-                );
+                GlStateManager.ortho(0.0D, scaledresolution.getScaledWidth_double(), scaledresolution.getScaledHeight_double(), 0.0D, 1000.0D, 3000.0D);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
                 GlStateManager.loadIdentity();
                 GlStateManager.translate(0.0F, 0.0F, -2000.0F);

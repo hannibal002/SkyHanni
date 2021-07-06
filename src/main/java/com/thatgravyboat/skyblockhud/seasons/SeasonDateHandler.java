@@ -15,10 +15,7 @@ public class SeasonDateHandler {
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
         if (Season.get(SeasonDateHandler.removeDate(event.formattedLine.toLowerCase()).toUpperCase()) != Season.ERROR) {
-            SeasonDateHandler.setCurrentDateAndSeason(
-                SeasonDateHandler.removeSeason(Utils.removeColor(event.formattedLine.toLowerCase().trim())),
-                SeasonDateHandler.removeDate(Utils.removeColor(event.formattedLine.toLowerCase().trim())).toUpperCase()
-            );
+            SeasonDateHandler.setCurrentDateAndSeason(SeasonDateHandler.removeSeason(Utils.removeColor(event.formattedLine.toLowerCase().trim())), SeasonDateHandler.removeDate(Utils.removeColor(event.formattedLine.toLowerCase().trim())).toUpperCase());
         }
     }
 

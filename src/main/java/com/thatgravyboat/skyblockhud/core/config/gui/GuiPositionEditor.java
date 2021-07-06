@@ -26,14 +26,7 @@ public class GuiPositionEditor extends GuiScreen {
 
     private int guiScaleOverride = -1;
 
-    public GuiPositionEditor(
-        Position position,
-        int elementWidth,
-        int elementHeight,
-        Runnable renderCallback,
-        Runnable positionChangedCallback,
-        Runnable closedCallback
-    ) {
+    public GuiPositionEditor(Position position, int elementWidth, int elementHeight, Runnable renderCallback, Runnable positionChangedCallback, Runnable closedCallback) {
         this.position = position;
         this.originalPosition = position.clone();
         this.elementWidth = elementWidth == -1 ? this.width : elementWidth;
@@ -90,22 +83,8 @@ public class GuiPositionEditor extends GuiScreen {
         }
 
         scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        Utils.drawStringCentered(
-            "Position Editor",
-            Minecraft.getMinecraft().fontRendererObj,
-            scaledResolution.getScaledWidth() / 2f,
-            8,
-            true,
-            0xffffff
-        );
-        Utils.drawStringCentered(
-            "R to Reset - Arrow keys/mouse to move",
-            Minecraft.getMinecraft().fontRendererObj,
-            scaledResolution.getScaledWidth() / 2f,
-            18,
-            true,
-            0xffffff
-        );
+        Utils.drawStringCentered("Position Editor", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2f, 8, true, 0xffffff);
+        Utils.drawStringCentered("R to Reset - Arrow keys/mouse to move", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2f, 18, true, 0xffffff);
     }
 
     @Override

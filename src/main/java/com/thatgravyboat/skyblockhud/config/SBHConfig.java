@@ -12,18 +12,7 @@ import net.minecraft.client.Minecraft;
 public class SBHConfig extends Config {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft
-            .getMinecraft()
-            .displayGuiScreen(
-                new GuiPositionEditor(
-                    position,
-                    width,
-                    height,
-                    () -> {},
-                    () -> {},
-                    () -> SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, activeConfig))
-                )
-            );
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, activeConfig))));
     }
 
     @Override
@@ -121,10 +110,7 @@ public class SBHConfig extends Config {
         public boolean bossShiftHud = true;
 
         @Expose
-        @ConfigOption(
-            name = "Require Redstone",
-            desc = "Allows to make it so that the redstone percentage requires you to hold a redstone item to show."
-        )
+        @ConfigOption(name = "Require Redstone", desc = "Allows to make it so that the redstone percentage requires you to hold a redstone item to show.")
         @ConfigEditorBoolean
         public boolean requireRedstone = true;
     }
@@ -230,10 +216,7 @@ public class SBHConfig extends Config {
     public static class Renderer {
 
         @Expose
-        @ConfigOption(
-            name = "Hide Boss Bar",
-            desc = "Hides Boss Bar when certain conditions are met such as the name is just wither or it starts with objective:"
-        )
+        @ConfigOption(name = "Hide Boss Bar", desc = "Hides Boss Bar when certain conditions are met such as the name is just wither or it starts with objective:")
         @ConfigEditorBoolean
         public boolean hideBossBar = true;
 
@@ -271,18 +254,12 @@ public class SBHConfig extends Config {
     public static class Map {
 
         @Expose
-        @ConfigOption(
-            name = "Show Player Location",
-            desc = "This feature is off by default as Hypixel's rules are so vague that this would fall under their disallowed modifications."
-        )
+        @ConfigOption(name = "Show Player Location", desc = "This feature is off by default as Hypixel's rules are so vague that this would fall under their disallowed modifications.")
         @ConfigEditorBoolean
         public boolean showPlayerLocation = false;
 
         @Expose
-        @ConfigOption(
-            name = "Show Mini-Map",
-            desc = "Shows the Mini-Map on your overlay if turned off you can still use /sbhmap to see the map in fullscreen."
-        )
+        @ConfigOption(name = "Show Mini-Map", desc = "Shows the Mini-Map on your overlay if turned off you can still use /sbhmap to see the map in fullscreen.")
         @ConfigEditorBoolean
         public boolean showMiniMap = false;
 

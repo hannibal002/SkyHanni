@@ -34,16 +34,10 @@ public class CurrencyHandler {
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
-        if (
-            Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("purse:") ||
-            Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("piggy:")
-        ) {
+        if (Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("purse:") || Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("piggy:")) {
             CurrencyHandler.checkCoins(event.formattedLine);
         }
-        if (
-            Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("bits:") &&
-            !event.formattedLine.toLowerCase().contains("(")
-        ) {
+        if (Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("bits:") && !event.formattedLine.toLowerCase().contains("(")) {
             CurrencyHandler.checkBits(event.formattedLine);
         }
     }
@@ -69,12 +63,7 @@ public class CurrencyHandler {
     }
 
     public static void checkCoins(String formatedScoreboardLine) {
-        String purse = Utils
-            .removeWhiteSpaceAndRemoveWord(
-                Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()),
-                Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()).contains("purse:") ? "purse:" : "piggy:"
-            )
-            .replace(",", "");
+        String purse = Utils.removeWhiteSpaceAndRemoveWord(Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()), Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()).contains("purse:") ? "purse:" : "piggy:").replace(",", "");
         if (!purse.contains("(") && !purse.contains("+")) {
             try {
                 double coins = Double.parseDouble(Pattern.compile("[^0-9.]").matcher(purse).replaceAll(""));
@@ -86,9 +75,7 @@ public class CurrencyHandler {
     }
 
     public static void checkBits(String formatedScoreboardLine) {
-        String bits = Utils
-            .removeWhiteSpaceAndRemoveWord(Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()), "bits:")
-            .replace(",", "");
+        String bits = Utils.removeWhiteSpaceAndRemoveWord(Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()), "bits:").replace(",", "");
         try {
             int bit = Integer.parseInt(Pattern.compile("[^0-9]").matcher(bits).replaceAll(""));
             CurrencyHandler.setBits(bit);

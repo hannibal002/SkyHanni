@@ -52,14 +52,7 @@ public class RPGHud extends Gui {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (
-            Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.renderer.hideXpBar)
-        ) MinecraftForge.EVENT_BUS.post(
-            new RenderGameOverlayEvent.Post(
-                new RenderGameOverlayEvent(event.partialTicks, event.resolution),
-                RenderGameOverlayEvent.ElementType.EXPERIENCE
-            )
-        );
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.renderer.hideXpBar)) MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Post(new RenderGameOverlayEvent(event.partialTicks, event.resolution), RenderGameOverlayEvent.ElementType.EXPERIENCE));
         if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.rpg.showRpgHud)) {
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.enableBlend();
@@ -101,22 +94,10 @@ public class RPGHud extends Gui {
                 drawTexturedModalRect(rightAligned ? x + 19 : 41 + x, 33 + y, rightAligned ? 196 : 0, 88, (int) airWidth, 4);
             }
             GlStateManager.scale(0.75f, 0.75f, 1);
-            drawCenteredString(
-                mc.fontRendererObj,
-                "" + mc.thePlayer.experienceLevel,
-                (rightAligned ? 130 : 0) + (int) (15 + x / 0.75f),
-                (int) (45 + y / 0.75f),
-                8453920
-            );
+            drawCenteredString(mc.fontRendererObj, "" + mc.thePlayer.experienceLevel, (rightAligned ? 130 : 0) + (int) (15 + x / 0.75f), (int) (45 + y / 0.75f), 8453920);
             GlStateManager.scale(1 / 0.75f, 1 / 0.75f, 1);
             GlStateManager.scale(0.75f, 0.75f, 1);
-            font.drawString(
-                ChatFormatting.RED + " \u2764 " + health + "/" + maxHealth,
-                (rightAligned ? -40 : 0) + (int) (64 + x / 0.75f),
-                (int) (8 + y / 0.75f),
-                0xffffff,
-                true
-            );
+            font.drawString(ChatFormatting.RED + " \u2764 " + health + "/" + maxHealth, (rightAligned ? -40 : 0) + (int) (64 + x / 0.75f), (int) (8 + y / 0.75f), 0xffffff, true);
             GlStateManager.scale(1 / 0.75f, 1 / 0.75f, 1);
             GlStateManager.color(255, 255, 255);
             GlStateManager.disableBlend();

@@ -78,10 +78,7 @@ public class TrackerFileLoader {
                 TrackerHandler.trackers.putIfAbsent(location, new TrackerHandler.TrackerData(events));
             }
 
-            tracker
-                .get("location")
-                .getAsJsonArray()
-                .forEach(loc -> TrackerHandler.trackerIds.put(Locations.get(loc.getAsString()), location));
+            tracker.get("location").getAsJsonArray().forEach(loc -> TrackerHandler.trackerIds.put(Locations.get(loc.getAsString()), location));
         }
     }
 
@@ -127,9 +124,7 @@ public class TrackerFileLoader {
                 return true;
             }
 
-            try (
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))
-            ) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 JsonObject json = gson.fromJson(reader, JsonObject.class);
                 if (json.has("trackerStats")) {
                     json
@@ -169,9 +164,7 @@ public class TrackerFileLoader {
         try {
             configFile.createNewFile();
 
-            try (
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))
-            ) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 JsonObject json = new JsonObject();
                 json.add("trackerStats", getTrackerFile());
                 writer.write(gson.toJson(json));

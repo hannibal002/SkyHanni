@@ -82,14 +82,7 @@ public class TrackerHandler {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (
-            Utils.overlayShouldRender(
-                event.type,
-                SkyblockHud.hasSkyblockScoreboard(),
-                trackerIds.containsKey(LocationHandler.getCurrentLocation()),
-                !SkyblockHud.config.trackers.hideTracker
-            )
-        ) {
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), trackerIds.containsKey(LocationHandler.getCurrentLocation()), !SkyblockHud.config.trackers.hideTracker)) {
             String trackerId = trackerIds.get(LocationHandler.getCurrentLocation());
             Minecraft mc = Minecraft.getMinecraft();
             TrackerData tracked = trackers.get(trackerId);
@@ -103,13 +96,7 @@ public class TrackerHandler {
                 Gui.drawRect(startPos, y, startPos + 120, y + 10, -1072689136);
                 mc.fontRendererObj.drawString("Tracker", startPos + 4, y + 1, 0xffffff, false);
                 y += 10;
-                Gui.drawRect(
-                    startPos,
-                    y,
-                    startPos + (tracker.size() >= 6 ? 120 : tracker.size() * 20),
-                    (int) (y + (Math.ceil(tracker.size() / 5d) * 20)),
-                    1610612736
-                );
+                Gui.drawRect(startPos, y, startPos + (tracker.size() >= 6 ? 120 : tracker.size() * 20), (int) (y + (Math.ceil(tracker.size() / 5d) * 20)), 1610612736);
                 int x = startPos;
                 for (ItemStack stack : tracker.values()) {
                     String s = String.valueOf(stack.stackSize);
@@ -118,12 +105,7 @@ public class TrackerHandler {
                     drawItemStack(stack, x, y);
                     GlStateManager.disableDepth();
                     GlStateManager.disableBlend();
-                    mc.fontRendererObj.drawStringWithShadow(
-                        s,
-                        (float) (x + 19 - 2 - mc.fontRendererObj.getStringWidth(s)),
-                        (float) (y + 9),
-                        stack.stackSize < 1 ? 16733525 : 16777215
-                    );
+                    mc.fontRendererObj.drawStringWithShadow(s, (float) (x + 19 - 2 - mc.fontRendererObj.getStringWidth(s)), (float) (y + 9), stack.stackSize < 1 ? 16733525 : 16777215);
                     GlStateManager.enableBlend();
                     GlStateManager.enableDepth();
 

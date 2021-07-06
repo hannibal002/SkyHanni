@@ -22,11 +22,7 @@ public class BossbarHandler {
                 bossBarRendered = false;
             }
             String bossName = Utils.removeColor(BossStatus.bossName);
-            if (
-                SkyblockHud.config.renderer.hideBossBar &&
-                DwarvenMineHandler.currentEvent == DwarvenMineHandler.Event.NONE &&
-                !LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)
-            ) {
+            if (SkyblockHud.config.renderer.hideBossBar && DwarvenMineHandler.currentEvent == DwarvenMineHandler.Event.NONE && !LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)) {
                 if (bossName.equalsIgnoreCase("wither")) {
                     event.setCanceled(true);
                     bossBarRendered = false;

@@ -43,26 +43,12 @@ public class LeaderboardGetter {
                     scores.forEach(
                         (score, name) -> {
                             if (cachedScores.get(score) == null || !cachedScores.get(score).equals(name)) {
-                                MinecraftForge.EVENT_BUS.post(
-                                    new SidebarLineUpdateEvent(
-                                        name,
-                                        SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim(),
-                                        score,
-                                        scores.size(),
-                                        scoreboard,
-                                        sidebarObjective
-                                    )
-                                );
+                                MinecraftForge.EVENT_BUS.post(new SidebarLineUpdateEvent(name, SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim(), score, scores.size(), scoreboard, sidebarObjective));
                             }
                         }
                     );
                     cachedScores = scores;
-                    cachedScoresList =
-                        scores
-                            .values()
-                            .stream()
-                            .map(name -> SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim())
-                            .collect(Collectors.toList());
+                    cachedScoresList = scores.values().stream().map(name -> SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim()).collect(Collectors.toList());
                 }
                 MinecraftForge.EVENT_BUS.post(new SidebarPostEvent(scoreboard, sidebarObjective, cachedScoresList));
             }

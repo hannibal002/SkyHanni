@@ -37,15 +37,7 @@ public class GuiOptionEditorButton extends GuiOptionEditor {
         RenderUtils.drawTexturedRect(x + width / 6 - 24, y + height - 7 - 14, 48, 16);
 
         if (buttonText != null) {
-            TextRenderUtils.drawStringCenteredScaledMaxWidth(
-                buttonText,
-                Minecraft.getMinecraft().fontRendererObj,
-                x + width / 6,
-                y + height - 7 - 6,
-                false,
-                44,
-                0xFF303030
-            );
+            TextRenderUtils.drawStringCenteredScaledMaxWidth(buttonText, Minecraft.getMinecraft().fontRendererObj, x + width / 6, y + height - 7 - 6, false, 44, 0xFF303030);
         }
     }
 

@@ -6,4 +6,4 @@ overrides:
       trailingComma: none
       tabWidth: 4
       endOfLine: lf
-      printWidth: 140
+      printWidth: 999999999 # >:c fine gravy

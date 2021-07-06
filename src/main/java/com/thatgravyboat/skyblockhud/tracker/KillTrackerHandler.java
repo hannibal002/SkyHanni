@@ -26,47 +26,21 @@ public class KillTrackerHandler {
     public void onDeath(LivingDeathEvent event) {
         if (false) {
             //Used for testing
-            System.out.println(
-                "----------------------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("----------------------------------------------------------------------------------------------------------------");
             System.out.println("Name : " + event.entity.getName());
             System.out.println("UUID : " + event.entity.getUniqueID());
             NBTTagCompound tag = new NBTTagCompound();
             event.entity.writeToNBT(tag);
             System.out.println("Tag : " + tag);
             System.out.println("Damage : " + getDamageSourceString(event.source));
-            System.out.println(
-                "----------------------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("----------------------------------------------------------------------------------------------------------------");
         }
 
         attackedEntities.remove(event.entity.getUniqueID());
     }
 
     public static String getDamageSourceString(DamageSource source) {
-        return (
-            "{ " +
-            source.getDamageType() +
-            ", " +
-            source.isDamageAbsolute() +
-            ", " +
-            source.isDifficultyScaled() +
-            ", " +
-            source.isFireDamage() +
-            ", " +
-            source.isProjectile() +
-            ", " +
-            source.isUnblockable() +
-            ", " +
-            source.isExplosion() +
-            ", " +
-            source.isMagicDamage() +
-            ", " +
-            source.isCreativePlayer() +
-            ", " +
-            source.getSourceOfDamage() +
-            " }"
-        );
+        return ("{ " + source.getDamageType() + ", " + source.isDamageAbsolute() + ", " + source.isDifficultyScaled() + ", " + source.isFireDamage() + ", " + source.isProjectile() + ", " + source.isUnblockable() + ", " + source.isExplosion() + ", " + source.isMagicDamage() + ", " + source.isCreativePlayer() + ", " + source.getSourceOfDamage() + " }");
     }
 
     @SubscribeEvent

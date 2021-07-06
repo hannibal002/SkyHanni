@@ -60,15 +60,7 @@ public class SlayerHandler {
     public void onSidebarPost(SidebarPostEvent event) {
         String arrayString = Arrays.toString(event.arrayScores);
         isDoingSlayer = Arrays.toString(event.arrayScores).contains("Slayer Quest");
-        if (
-            isDoingSlayer &&
-            (
-                currentSlayer.equals(slayerTypes.NONE) ||
-                !arrayString
-                    .replace(" ", "")
-                    .contains(currentSlayer.getDisplayName().replace(" ", "") + Utils.intToRomanNumeral(slayerTier))
-            )
-        ) {
+        if (isDoingSlayer && (currentSlayer.equals(slayerTypes.NONE) || !arrayString.replace(" ", "").contains(currentSlayer.getDisplayName().replace(" ", "") + Utils.intToRomanNumeral(slayerTier)))) {
             for (int i = 0; i < event.scores.size(); i++) {
                 String line = event.scores.get(i);
                 if (line.contains("Slayer Quest") && event.scores.size() > 3) {
@@ -81,8 +73,7 @@ public class SlayerHandler {
                         }
                     }
                     SlayerHandler.currentSlayer = selectedSlayer;
-                    SlayerHandler.slayerTier =
-                        Utils.whatRomanNumeral(slayer.replace(selectedSlayer.getDisplayName().toLowerCase(), "").replace(" ", ""));
+                    SlayerHandler.slayerTier = Utils.whatRomanNumeral(slayer.replace(selectedSlayer.getDisplayName().toLowerCase(), "").replace(" ", ""));
                     break;
                 }
             }
@@ -118,9 +109,7 @@ public class SlayerHandler {
                     progress = Integer.parseInt(xpMatcher.group(1));
                 } catch (Exception ignored) {}
                 try {
-                    maxKills =
-                        Integer.parseInt(xpMatcher.group(2).replace("k", "")) *
-                        (xpMatcher.group(2).contains("k") ? 1000 : xpMatcher.group(2).contains("m") ? 1000000 : 1);
+                    maxKills = Integer.parseInt(xpMatcher.group(2).replace("k", "")) * (xpMatcher.group(2).contains("k") ? 1000 : xpMatcher.group(2).contains("m") ? 1000000 : 1);
                 } catch (Exception ignored) {}
             } else if (line.contains("slay the boss")) {
                 SlayerHandler.bossSlain = false;

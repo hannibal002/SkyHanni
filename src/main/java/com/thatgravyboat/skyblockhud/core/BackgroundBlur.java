@@ -153,13 +153,7 @@ public class BackgroundBlur {
         }
 
         try {
-            blurShaderHorz =
-                new Shader(
-                    Minecraft.getMinecraft().getResourceManager(),
-                    "blur",
-                    Minecraft.getMinecraft().getFramebuffer(),
-                    blurOutputHorz
-                );
+            blurShaderHorz = new Shader(Minecraft.getMinecraft().getResourceManager(), "blur", Minecraft.getMinecraft().getFramebuffer(), blurOutputHorz);
             blurShaderHorz.getShaderManager().getShaderUniform("BlurDir").set(1, 0);
             blurShaderHorz.setProjectionMatrix(createProjectionMatrix(width, height));
         } catch (Exception ignored) {}
@@ -193,15 +187,7 @@ public class BackgroundBlur {
         }
     }
 
-    public static void renderBlurredBackground(
-        float blurStrength,
-        int screenWidth,
-        int screenHeight,
-        int x,
-        int y,
-        int blurWidth,
-        int blurHeight
-    ) {
+    public static void renderBlurredBackground(float blurStrength, int screenWidth, int screenHeight, int x, int y, int blurWidth, int blurHeight) {
         renderBlurredBackground(blurStrength, screenWidth, screenHeight, x, y, blurWidth, blurHeight, false);
     }
 
@@ -209,16 +195,7 @@ public class BackgroundBlur {
      * Renders a subsection of the blurred framebuffer on to the corresponding section of the screen.
      * Essentially, this method will "blur" the background inside the bounds specified by [x->x+blurWidth, y->y+blurHeight]
      */
-    public static void renderBlurredBackground(
-        float blurStrength,
-        int screenWidth,
-        int screenHeight,
-        int x,
-        int y,
-        int blurWidth,
-        int blurHeight,
-        boolean forcedUpdate
-    ) {
+    public static void renderBlurredBackground(float blurStrength, int screenWidth, int screenHeight, int x, int y, int blurWidth, int blurHeight, boolean forcedUpdate) {
         if (!OpenGlHelper.isFramebufferEnabled() || !OpenGlHelper.areShadersSupported()) return;
         if (blurStrength < 0.5) return;
         requestedBlurs.add(blurStrength);

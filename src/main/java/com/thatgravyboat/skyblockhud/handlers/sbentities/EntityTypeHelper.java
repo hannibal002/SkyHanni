@@ -12,10 +12,7 @@ public class EntityTypeHelper {
         if (entity instanceof EntityEnderman) {
             EntityEnderman enderman = ((EntityEnderman) entity);
             double maxHealthBase = enderman.getAttributeMap().getAttributeInstanceByName("generic.maxHealth").getBaseValue();
-            if (
-                maxHealthBase == 13000d ||
-                (maxHealthBase == 2000d && enderman.getHeldBlockState().getBlock().equals(Blocks.end_portal_frame))
-            ) {
+            if (maxHealthBase == 13000d || (maxHealthBase == 2000d && enderman.getHeldBlockState().getBlock().equals(Blocks.end_portal_frame))) {
                 return LocationHandler.getCurrentLocation().equals(Locations.DRAGONSNEST);
             }
         }

@@ -27,16 +27,7 @@ public class GuiElementSlider extends GuiElement {
 
     private boolean clicked = false;
 
-    public GuiElementSlider(
-        int x,
-        int y,
-        int width,
-        float minValue,
-        float maxValue,
-        float minStep,
-        float value,
-        Consumer<Float> setCallback
-    ) {
+    public GuiElementSlider(int x, int y, int width, float minValue, float maxValue, float minStep, float value, Consumer<Float> setCallback) {
         if (minStep < 0) minStep = 0.01f;
 
         this.x = x;

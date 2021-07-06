@@ -24,9 +24,7 @@ public class ActionBarParsing {
     private static final Pattern ManaRegex = Pattern.compile("([0-9]+)/([0-9]+)\u270E Mana");
     private static final Pattern ManaOverflowRegex = Pattern.compile("([0-9]+)/([0-9]+)\u270E ([0-9]+)\u02AC");
     private static final Pattern ManaDecreaseRegex = Pattern.compile("-([0-9]+) Mana \\(");
-    private static final Pattern XpGainRegex = Pattern.compile(
-        "\\+(\\d*\\.?\\d*) (Farming|Mining|Combat|Foraging|Fishing|Enchanting|Alchemy|Carpentry|Runecrafting) \\((\\d*\\.?\\d*)%\\)"
-    );
+    private static final Pattern XpGainRegex = Pattern.compile("\\+(\\d*\\.?\\d*) (Farming|Mining|Combat|Foraging|Fishing|Enchanting|Alchemy|Carpentry|Runecrafting) \\((\\d*\\.?\\d*)%\\)");
 
     private static final Pattern HealthReplaceRegex = Pattern.compile("\u00A7c([0-9]+)/([0-9]+)\u2764");
     private static final Pattern HealingReplaceRegex = Pattern.compile("\\+\u00A7c([0-9]+)[\u2586\u2585\u2584\u2583\u2582\u2581]");
