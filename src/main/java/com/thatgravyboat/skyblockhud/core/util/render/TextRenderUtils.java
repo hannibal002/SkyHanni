@@ -46,15 +46,7 @@ public class TextRenderUtils {
         }
     }
 
-    public static void drawStringScaledMaxWidth(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int len,
-        int colour
-    ) {
+    public static void drawStringScaledMaxWidth(String str, FontRenderer fr, float x, float y, boolean shadow, int len, int colour) {
         int strLen = fr.getStringWidth(str);
         float factor = len / (float) strLen;
         factor = Math.min(1, factor);
@@ -73,15 +65,7 @@ public class TextRenderUtils {
         GL11.glTranslatef(-x2, -y2, 0);
     }
 
-    public static void drawStringScaled(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int colour,
-        float factor
-    ) {
+    public static void drawStringScaled(String str, FontRenderer fr, float x, float y, boolean shadow, int colour, float factor) {
         GlStateManager.scale(factor, factor, 1);
         fr.drawString(str, x / factor, y / factor, colour, shadow);
         GlStateManager.scale(1 / factor, 1 / factor, 1);
@@ -106,14 +90,7 @@ public class TextRenderUtils {
         drawStringScaled(str, fr, x - newLen / 2, y - fontHeight / 2, shadow, colour, factor);
     }
 
-    public static void renderToolTip(
-        ItemStack stack,
-        int mouseX,
-        int mouseY,
-        int screenWidth,
-        int screenHeight,
-        FontRenderer fontStd
-    ) {
+    public static void renderToolTip(ItemStack stack, int mouseX, int mouseY, int screenWidth, int screenHeight, FontRenderer fontStd) {
         List<String> list = stack.getTooltip(
             Minecraft.getMinecraft().thePlayer,
             Minecraft.getMinecraft().gameSettings.advancedItemTooltips

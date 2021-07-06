@@ -30,10 +30,7 @@ import org.lwjgl.opengl.GL11;
 public class SBHConfigEditor extends GuiElement {
 
     private static final ResourceLocation[] socialsIco = new ResourceLocation[] { DISCORD, TWITTER };
-    private static final String[] socialsLink = new String[] {
-        "https://discord.gg/moulberry",
-        "https://twitter.com/thatgravytboat/"
-    };
+    private static final String[] socialsLink = new String[] { "https://discord.gg/moulberry", "https://twitter.com/thatgravytboat/" };
 
     private final long openedMillis;
 
@@ -89,9 +86,7 @@ public class SBHConfigEditor extends GuiElement {
         return new LinkedHashMap<>(processedConfig);
     }
 
-    private LinkedHashMap<String, ConfigProcessor.ProcessedOption> getOptionsInCategory(
-        ConfigProcessor.ProcessedCategory cat
-    ) {
+    private LinkedHashMap<String, ConfigProcessor.ProcessedOption> getOptionsInCategory(ConfigProcessor.ProcessedCategory cat) {
         return new LinkedHashMap<>(cat.options);
     }
 
@@ -217,10 +212,7 @@ public class SBHConfigEditor extends GuiElement {
             TextRenderUtils.drawStringCenteredScaledMaxWidth(catName, fr, x + 75, y + 70 + catY, false, 100, -1);
             catY += 15;
             if (catY > 0) {
-                catBarSize =
-                    LerpUtils.clampZeroOne(
-                        (float) (innerBottom - innerTop - 2) / (catY + 5 + categoryScroll.getValue())
-                    );
+                catBarSize = LerpUtils.clampZeroOne((float) (innerBottom - innerTop - 2) / (catY + 5 + categoryScroll.getValue()));
             }
         }
 
@@ -231,16 +223,12 @@ public class SBHConfigEditor extends GuiElement {
             if (categoryScroll.getTarget() / (float) (catY + categoryScroll.getValue()) + catBarSize < 1) {
                 int target = optionsScroll.getTarget();
                 categoryScroll.setValue(
-                    (int) Math.ceil(
-                        (catY + 5 + categoryScroll.getValue()) - catBarSize * (catY + 5 + categoryScroll.getValue())
-                    )
+                    (int) Math.ceil((catY + 5 + categoryScroll.getValue()) - catBarSize * (catY + 5 + categoryScroll.getValue()))
                 );
                 categoryScroll.setTarget(target);
             } else {
                 categoryScroll.setValue(
-                    (int) Math.ceil(
-                        (catY + 5 + categoryScroll.getValue()) - catBarSize * (catY + 5 + categoryScroll.getValue())
-                    )
+                    (int) Math.ceil((catY + 5 + categoryScroll.getValue()) - catBarSize * (catY + 5 + categoryScroll.getValue()))
                 );
             }
         }
@@ -322,10 +310,7 @@ public class SBHConfigEditor extends GuiElement {
             }
             GlStateManager.disableDepth();
             if (optionY > 0) {
-                barSize =
-                    LerpUtils.clampZeroOne(
-                        (float) (innerBottom - innerTop - 2) / (optionY + 5 + optionsScroll.getValue())
-                    );
+                barSize = LerpUtils.clampZeroOne((float) (innerBottom - innerTop - 2) / (optionY + 5 + optionsScroll.getValue()));
             }
         }
 
@@ -360,15 +345,8 @@ public class SBHConfigEditor extends GuiElement {
                     }
                 }
                 int optionHeight = editor.getHeight();
-                if (
-                    innerTop + 5 + optionYOverlay + optionHeight > innerTop + 1 &&
-                    innerTop + 5 + optionYOverlay < innerBottom - 1
-                ) {
-                    editor.renderOverlay(
-                        (innerLeft + innerRight - optionWidth) / 2 - 5,
-                        innerTop + 5 + optionYOverlay,
-                        optionWidth
-                    );
+                if (innerTop + 5 + optionYOverlay + optionHeight > innerTop + 1 && innerTop + 5 + optionYOverlay < innerBottom - 1) {
+                    editor.renderOverlay((innerLeft + innerRight - optionWidth) / 2 - 5, innerTop + 5 + optionYOverlay, optionWidth);
                 }
                 optionYOverlay += optionHeight + 5;
             }
@@ -384,16 +362,12 @@ public class SBHConfigEditor extends GuiElement {
             if (optionsScroll.getTarget() / (float) (optionY + optionsScroll.getValue()) + barSize < 1) {
                 int target = optionsScroll.getTarget();
                 optionsScroll.setValue(
-                    (int) Math.ceil(
-                        (optionY + 5 + optionsScroll.getValue()) - barSize * (optionY + 5 + optionsScroll.getValue())
-                    )
+                    (int) Math.ceil((optionY + 5 + optionsScroll.getValue()) - barSize * (optionY + 5 + optionsScroll.getValue()))
                 );
                 optionsScroll.setTarget(target);
             } else {
                 optionsScroll.setValue(
-                    (int) Math.ceil(
-                        (optionY + 5 + optionsScroll.getValue()) - barSize * (optionY + 5 + optionsScroll.getValue())
-                    )
+                    (int) Math.ceil((optionY + 5 + optionsScroll.getValue()) - barSize * (optionY + 5 + optionsScroll.getValue()))
                 );
             }
         }
@@ -415,9 +389,7 @@ public class SBHConfigEditor extends GuiElement {
 
             if (mouseX >= socialLeft && mouseX <= socialLeft + 16 && mouseY >= y + 6 && mouseY <= y + 23) {
                 tooltipToDisplay =
-                    Lists.newArrayList(
-                        EnumChatFormatting.YELLOW + "Go to: " + EnumChatFormatting.RESET + socialsLink[socialIndex]
-                    );
+                    Lists.newArrayList(EnumChatFormatting.YELLOW + "Go to: " + EnumChatFormatting.RESET + socialsLink[socialIndex]);
             }
         }
 
@@ -465,16 +437,14 @@ public class SBHConfigEditor extends GuiElement {
 
                 float catBarSize = 1;
                 int catY = -newTarget;
-                for (Map.Entry<String, ConfigProcessor.ProcessedCategory> entry : getCurrentConfigEditing()
-                    .entrySet()) {
+                for (Map.Entry<String, ConfigProcessor.ProcessedCategory> entry : getCurrentConfigEditing().entrySet()) {
                     if (getSelectedCategory() == null) {
                         setSelectedCategory(entry.getKey());
                     }
 
                     catY += 15;
                     if (catY > 0) {
-                        catBarSize =
-                            LerpUtils.clampZeroOne((float) (innerBottom - innerTop - 2) / (catY + 5 + newTarget));
+                        catBarSize = LerpUtils.clampZeroOne((float) (innerBottom - innerTop - 2) / (catY + 5 + newTarget));
                     }
                 }
 
@@ -519,10 +489,7 @@ public class SBHConfigEditor extends GuiElement {
                         optionY += editor.getHeight() + 5;
 
                         if (optionY > 0) {
-                            barSize =
-                                LerpUtils.clampZeroOne(
-                                    (float) (innerBottom - innerTop - 2) / (optionY + 5 + newTarget)
-                                );
+                            barSize = LerpUtils.clampZeroOne((float) (innerBottom - innerTop - 2) / (optionY + 5 + newTarget));
                         }
                     }
                 }
@@ -531,26 +498,18 @@ public class SBHConfigEditor extends GuiElement {
                 if (newTarget > barMax) {
                     newTarget = barMax;
                 }
-                optionsScroll.setTimeToReachTarget(
-                    Math.min(150, Math.max(10, 5 * Math.abs(newTarget - optionsScroll.getValue())))
-                );
+                optionsScroll.setTimeToReachTarget(Math.min(150, Math.max(10, 5 * Math.abs(newTarget - optionsScroll.getValue()))));
                 optionsScroll.resetTimer();
                 optionsScroll.setTarget(newTarget);
             }
         } else if (Mouse.getEventButtonState() && Mouse.getEventButton() == 0) {
             if (getCurrentConfigEditing() != null) {
                 int catY = -categoryScroll.getValue();
-                for (Map.Entry<String, ConfigProcessor.ProcessedCategory> entry : getCurrentConfigEditing()
-                    .entrySet()) {
+                for (Map.Entry<String, ConfigProcessor.ProcessedCategory> entry : getCurrentConfigEditing().entrySet()) {
                     if (getSelectedCategory() == null) {
                         setSelectedCategory(entry.getKey());
                     }
-                    if (
-                        mouseX >= x + 5 &&
-                        mouseX <= x + 145 &&
-                        mouseY >= y + 70 + catY - 7 &&
-                        mouseY <= y + 70 + catY + 7
-                    ) {
+                    if (mouseX >= x + 5 && mouseX <= x + 145 && mouseY >= y + 70 + catY - 7 && mouseY <= y + 70 + catY + 7) {
                         setSelectedCategory(entry.getKey());
                         return true;
                     }

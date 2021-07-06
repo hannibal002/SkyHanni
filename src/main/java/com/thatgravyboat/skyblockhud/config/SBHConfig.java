@@ -21,9 +21,7 @@ public class SBHConfig extends Config {
                     height,
                     () -> {},
                     () -> {},
-                    () ->
-                        SkyblockHud.screenToOpen =
-                            new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, activeConfig))
+                    () -> SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, activeConfig))
                 )
             );
     }
@@ -113,10 +111,7 @@ public class SBHConfig extends Config {
         public Position mainHudPos = new Position(0, 1, true, false);
 
         @Expose
-        @ConfigOption(
-            name = "Twelve Hour Clock",
-            desc = "Allows you to change the clock to be 12 hour instead of 24 hour."
-        )
+        @ConfigOption(name = "Twelve Hour Clock", desc = "Allows you to change the clock to be 12 hour instead of 24 hour.")
         @ConfigEditorBoolean
         public boolean twelveHourClock = false;
 
@@ -196,10 +191,7 @@ public class SBHConfig extends Config {
         public boolean hideDungeonPlayers = false;
 
         @Expose
-        @ConfigOption(
-            name = "Dungeon Player Opacity",
-            desc = "Allows you to change the opacity of the dungeon players."
-        )
+        @ConfigOption(name = "Dungeon Player Opacity", desc = "Allows you to change the opacity of the dungeon players.")
         @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
         @ConfigAccordionId(id = 1)
         public int dungeonPlayerOpacity = 0;

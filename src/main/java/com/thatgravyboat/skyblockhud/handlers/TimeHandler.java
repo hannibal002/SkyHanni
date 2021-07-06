@@ -17,12 +17,9 @@ public class TimeHandler {
         if (Pattern.matches("([0-9]*):([0-9]*)(pm|am)", event.formattedLine.toLowerCase().trim())) {
             boolean isPm = event.formattedLine.toLowerCase().trim().endsWith("pm");
             SimpleDateFormat parseFormat = new SimpleDateFormat("hh:mm a", Locale.CANADA);
-            String currentTimeString = event.formattedLine
-                .replace(" ", "")
-                .replace(isPm ? "pm" : "am", isPm ? " pm" : " am");
+            String currentTimeString = event.formattedLine.replace(" ", "").replace(isPm ? "pm" : "am", isPm ? " pm" : " am");
             try {
-                time =
-                    (parseFormat.parse(currentTimeString).getTime() - parseFormat.parse("00:00 am").getTime()) / 1000L;
+                time = (parseFormat.parse(currentTimeString).getTime() - parseFormat.parse("00:00 am").getTime()) / 1000L;
             } catch (ParseException ignored) {
                 LogManager.getLogger().warn("timeformat error: " + currentTimeString);
             }

@@ -27,12 +27,7 @@ public class TrackerHandler {
         }
 
         public String getDropId(String event) {
-            if (
-                event == null ||
-                event.isEmpty() ||
-                !eventGoing() ||
-                !dropTrackers.containsKey(event.toLowerCase().trim())
-            ) return null;
+            if (event == null || event.isEmpty() || !eventGoing() || !dropTrackers.containsKey(event.toLowerCase().trim())) return null;
             return event.toLowerCase().trim();
         }
 
@@ -99,9 +94,7 @@ public class TrackerHandler {
             Minecraft mc = Minecraft.getMinecraft();
             TrackerData tracked = trackers.get(trackerId);
 
-            Map<String, ItemStack> tracker = tracked.dropTrackers.get(
-                tracked.getDropId(SeasonDateHandler.getCurrentEvent())
-            );
+            Map<String, ItemStack> tracker = tracked.dropTrackers.get(tracked.getDropId(SeasonDateHandler.getCurrentEvent()));
             if (tracker != null) {
                 Position pos = SkyblockHud.config.trackers.trackerPosition;
                 int startPos = pos.getAbsX(event.resolution, (tracker.size() >= 6 ? 120 : tracker.size() * 20));

@@ -56,12 +56,7 @@ public class DungeonHandler {
                         healthNum = Integer.parseInt(health);
                     } catch (NumberFormatException ignored) {}
                 }
-                DungeonPlayer player = new DungeonPlayer(
-                    playerClass,
-                    displayName,
-                    healthNum,
-                    health.equalsIgnoreCase("dead")
-                );
+                DungeonPlayer player = new DungeonPlayer(playerClass, displayName, healthNum, health.equalsIgnoreCase("dead"));
                 dungeonPlayersMap.put(displayName.toLowerCase(), player);
             }
         }
@@ -82,12 +77,7 @@ public class DungeonHandler {
 
     public static void checkForDungeonCleared(String scoreline) {
         if (scoreline.toLowerCase().trim().contains("dungeon cleared:")) {
-            String dungeonClearedText = scoreline
-                .toLowerCase()
-                .trim()
-                .replace("dungeon cleared:", "")
-                .replace(" ", "")
-                .replace("%", "");
+            String dungeonClearedText = scoreline.toLowerCase().trim().replace("dungeon cleared:", "").replace(" ", "").replace("%", "");
             try {
                 dungeonCleared = Integer.parseInt(dungeonClearedText);
             } catch (NumberFormatException ignored) {}
@@ -96,12 +86,7 @@ public class DungeonHandler {
 
     public static void checkForDungeonKeys(String scoreline, String rawString) {
         if (scoreline.toLowerCase().trim().contains("keys:")) {
-            String dungeonClearedText = scoreline
-                .toLowerCase()
-                .trim()
-                .replace("keys:", "")
-                .replace(" ", "")
-                .replace("x", "");
+            String dungeonClearedText = scoreline.toLowerCase().trim().replace("keys:", "").replace(" ", "").replace("x", "");
             bloodKey = rawString.contains("\u2713");
             try {
                 witherKeys = Integer.parseInt(dungeonClearedText);
@@ -130,9 +115,7 @@ public class DungeonHandler {
 
     public static void parseTotalSecrets(String playerName) {
         if (playerName.toLowerCase().contains("secrets found:")) {
-            String totalSecret = Utils
-                .removeColor(playerName.toLowerCase().replace("secrets found:", ""))
-                .replace(" ", "");
+            String totalSecret = Utils.removeColor(playerName.toLowerCase().replace("secrets found:", "")).replace(" ", "");
             try {
                 totalSecrets = Integer.parseInt(totalSecret);
             } catch (NumberFormatException ignored) {}

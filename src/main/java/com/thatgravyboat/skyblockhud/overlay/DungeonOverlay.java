@@ -67,13 +67,7 @@ public class DungeonOverlay extends Gui {
             offset + (bossBarVisible ? 19 : 2),
             (DungeonHandler.hasBloodkey() ? 0x55FF55 : 0xAA0000)
         );
-        drawString(
-            font,
-            DungeonHandler.getWitherKeys() + "x",
-            (width / 2),
-            offset + (bossBarVisible ? 30 : 13),
-            0x555555
-        );
+        drawString(font, DungeonHandler.getWitherKeys() + "x", (width / 2), offset + (bossBarVisible ? 30 : 13), 0x555555);
         //CLEARED PERCENTAGE
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(GuiTextures.overlay);
@@ -83,14 +77,7 @@ public class DungeonOverlay extends Gui {
             (clearPercent <= 20 ? "4" : clearPercent <= 50 ? "6" : clearPercent <= 80 ? "e" : "a") +
             clearPercent +
             "%";
-        drawTexturedModalRect(
-            (width / 2) + 17,
-            offset + (bossBarVisible ? 20 : 3),
-            2,
-            34,
-            font.getStringWidth(clearPercentage) + 3,
-            14
-        );
+        drawTexturedModalRect((width / 2) + 17, offset + (bossBarVisible ? 20 : 3), 2, 34, font.getStringWidth(clearPercentage) + 3, 14);
         drawTexturedModalRect(
             ((width / 2) + 17) + font.getStringWidth(clearPercentage) + 3,
             offset + (bossBarVisible ? 20 : 3),
@@ -106,22 +93,8 @@ public class DungeonOverlay extends Gui {
         mc.renderEngine.bindTexture(GuiTextures.overlay);
         int deaths = DungeonHandler.getDeaths();
         String deathText = "Deaths: " + deaths;
-        drawTexturedModalRect(
-            (width / 2) + 17,
-            offset + (bossBarVisible ? 35 : 18),
-            2,
-            34,
-            font.getStringWidth(deathText) + 3,
-            14
-        );
-        drawTexturedModalRect(
-            ((width / 2) + 17) + font.getStringWidth(deathText) + 3,
-            offset + (bossBarVisible ? 35 : 18),
-            252,
-            34,
-            4,
-            14
-        );
+        drawTexturedModalRect((width / 2) + 17, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(deathText) + 3, 14);
+        drawTexturedModalRect(((width / 2) + 17) + font.getStringWidth(deathText) + 3, offset + (bossBarVisible ? 35 : 18), 252, 34, 4, 14);
         drawString(font, deathText, (width / 2) + 18, offset + (bossBarVisible ? 38 : 21), 0xAAAAAA);
 
         //SECRETS
@@ -131,14 +104,7 @@ public class DungeonOverlay extends Gui {
         int secrets = DungeonHandler.getSecrets();
         int totalSecrets = DungeonHandler.getTotalSecrets();
         String secretsText = "Secrets: " + secrets + "/" + maxSecrets + " (" + totalSecrets + ")";
-        drawTexturedModalRect(
-            (width / 2) - 17 - (font.getStringWidth(secretsText)) - 4,
-            offset + (bossBarVisible ? 20 : 3),
-            0,
-            34,
-            2,
-            14
-        );
+        drawTexturedModalRect((width / 2) - 17 - (font.getStringWidth(secretsText)) - 4, offset + (bossBarVisible ? 20 : 3), 0, 34, 2, 14);
         drawTexturedModalRect(
             ((width / 2) - 17 - (font.getStringWidth(secretsText))) - 2,
             offset + (bossBarVisible ? 20 : 3),
@@ -147,27 +113,14 @@ public class DungeonOverlay extends Gui {
             font.getStringWidth(secretsText) + 2,
             14
         );
-        drawString(
-            font,
-            secretsText,
-            (width / 2) - 17 - (font.getStringWidth(secretsText)),
-            offset + (bossBarVisible ? 23 : 6),
-            0xAAAAAA
-        );
+        drawString(font, secretsText, (width / 2) - 17 - (font.getStringWidth(secretsText)), offset + (bossBarVisible ? 23 : 6), 0xAAAAAA);
 
         //CRYPTS
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(GuiTextures.overlay);
         int crypts = DungeonHandler.getCrypts();
         String cryptText = "Crypts: " + crypts;
-        drawTexturedModalRect(
-            (width / 2) - 17 - (font.getStringWidth(cryptText)) - 4,
-            offset + (bossBarVisible ? 35 : 18),
-            0,
-            34,
-            2,
-            14
-        );
+        drawTexturedModalRect((width / 2) - 17 - (font.getStringWidth(cryptText)) - 4, offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
         drawTexturedModalRect(
             ((width / 2) - 17 - (font.getStringWidth(cryptText))) - 2,
             offset + (bossBarVisible ? 35 : 18),
@@ -176,13 +129,7 @@ public class DungeonOverlay extends Gui {
             font.getStringWidth(cryptText) + 2,
             14
         );
-        drawString(
-            font,
-            cryptText,
-            (width / 2) - 17 - (font.getStringWidth(cryptText)),
-            offset + (bossBarVisible ? 38 : 21),
-            0xAAAAAA
-        );
+        drawString(font, cryptText, (width / 2) - 17 - (font.getStringWidth(cryptText)), offset + (bossBarVisible ? 38 : 21), 0xAAAAAA);
     }
 
     public void drawUltimateBar(Minecraft mc, ScaledResolution resolution) {
@@ -217,8 +164,7 @@ public class DungeonOverlay extends Gui {
                 LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)
             )
         ) {
-            bossBarVisible =
-                BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
+            bossBarVisible = BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
             GlStateManager.enableBlend();
             drawUltimateBar(mc, event.resolution);
 
@@ -245,21 +191,10 @@ public class DungeonOverlay extends Gui {
                     } catch (ArrayIndexOutOfBoundsException ignored) {
                         posY = 0;
                     }
-                    drawDungeonPlayer(
-                        player.getName(),
-                        player.getHealth(),
-                        player.isDead(),
-                        player.getDungeonClass(),
-                        posX,
-                        posY
-                    );
+                    drawDungeonPlayer(player.getName(), player.getHealth(), player.isDead(), player.getDungeonClass(), posX, posY);
                 }
             }
-            drawDungeonClock(
-                event.resolution.getScaledWidth(),
-                SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34),
-                mc
-            );
+            drawDungeonClock(event.resolution.getScaledWidth(), SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
         }
     }
 }

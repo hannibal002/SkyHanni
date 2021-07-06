@@ -14,13 +14,7 @@ public class HeldItemHandler extends Gui {
 
     public void drawFuelBar(Minecraft mc, int current, int max) {
         GenericOverlays.drawSmallBar(mc, 100, 100, (double) current / (double) max, 1.0d, 0xff00ff, 0xffff00, 0);
-        drawString(
-            mc.fontRendererObj,
-            "Fuel - " + Math.round(((double) current / (double) max) * 100) + "%",
-            100,
-            100,
-            0xffffff
-        );
+        drawString(mc.fontRendererObj, "Fuel - " + Math.round(((double) current / (double) max) * 100) + "%", 100, 100, 0xffffff);
     }
 
     public boolean isDrill(ItemStack stack) {

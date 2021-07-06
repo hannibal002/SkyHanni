@@ -33,8 +33,7 @@ public class ComponentHandler {
         boolean eventPass = false;
         if (mc.theWorld != null) {
             List<NetworkPlayerInfo> players = sortingList.sortedCopy(mc.thePlayer.sendQueue.getPlayerInfoMap());
-            GuiIngameForge.renderObjective =
-                !SkyblockHud.hasSkyblockScoreboard() || !SkyblockHud.config.misc.hideScoreboard;
+            GuiIngameForge.renderObjective = !SkyblockHud.hasSkyblockScoreboard() || !SkyblockHud.config.misc.hideScoreboard;
             if (players != null && SkyblockHud.hasSkyblockScoreboard()) {
                 if (ticksExisted % 60 == 0) {
                     for (NetworkPlayerInfo player : players) {
@@ -43,33 +42,24 @@ public class ComponentHandler {
                                 .matcher(Utils.removeColor(player.getDisplayName().getFormattedText()))
                                 .replaceAll("");
                             if (LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)) {
-                                if (
-                                    formattedTabListPlayer.toLowerCase().contains("secrets found:")
-                                ) DungeonHandler.parseTotalSecrets(formattedTabListPlayer);
-                                if (
-                                    formattedTabListPlayer.toLowerCase().contains("deaths:")
-                                ) DungeonHandler.parseDeaths(formattedTabListPlayer);
-                                if (
-                                    formattedTabListPlayer.toLowerCase().contains("crypts:")
-                                ) DungeonHandler.parseCrypts(formattedTabListPlayer);
-                            } else if (
-                                LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)
-                            ) {
+                                if (formattedTabListPlayer.toLowerCase().contains("secrets found:")) DungeonHandler.parseTotalSecrets(
+                                    formattedTabListPlayer
+                                );
+                                if (formattedTabListPlayer.toLowerCase().contains("deaths:")) DungeonHandler.parseDeaths(
+                                    formattedTabListPlayer
+                                );
+                                if (formattedTabListPlayer.toLowerCase().contains("crypts:")) DungeonHandler.parseCrypts(
+                                    formattedTabListPlayer
+                                );
+                            } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
                                 if (formattedTabListPlayer.toLowerCase().contains("mithril powder:")) {
                                     DwarvenMineHandler.parseMithril(formattedTabListPlayer);
                                 }
-                            } else if (
-                                LocationHandler
-                                    .getCurrentLocation()
-                                    .getCategory()
-                                    .equals(LocationCategory.MUSHROOMDESERT)
-                            ) {
+                            } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.MUSHROOMDESERT)) {
                                 if (formattedTabListPlayer.toLowerCase().contains("pelts:")) {
                                     try {
                                         FarmingIslandHandler.pelts =
-                                            Integer.parseInt(
-                                                formattedTabListPlayer.toLowerCase().replace("pelts:", "").trim()
-                                            );
+                                            Integer.parseInt(formattedTabListPlayer.toLowerCase().replace("pelts:", "").trim());
                                     } catch (Exception ignored) {}
                                 }
                             }
@@ -85,16 +75,9 @@ public class ComponentHandler {
                                     if (i < 80) {
                                         if (players.get(i + 1).getDisplayName() != null) {
                                             String secondLine = SCOREBOARD_CHARACTERS
-                                                .matcher(
-                                                    Utils.removeColor(
-                                                        players.get(i + 1).getDisplayName().getFormattedText()
-                                                    )
-                                                )
+                                                .matcher(Utils.removeColor(players.get(i + 1).getDisplayName().getFormattedText()))
                                                 .replaceAll("");
-                                            SeasonDateHandler.setCurrentEvent(
-                                                formattedTabListPlayer.replace("Event:", ""),
-                                                secondLine
-                                            );
+                                            SeasonDateHandler.setCurrentEvent(formattedTabListPlayer.replace("Event:", ""), secondLine);
                                             eventPass = true;
                                         }
                                     }

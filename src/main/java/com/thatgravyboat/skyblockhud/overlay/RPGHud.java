@@ -53,24 +53,14 @@ public class RPGHud extends Gui {
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
         if (
-            Utils.overlayShouldRender(
-                event.type,
-                SkyblockHud.hasSkyblockScoreboard(),
-                SkyblockHud.config.renderer.hideXpBar
-            )
+            Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.renderer.hideXpBar)
         ) MinecraftForge.EVENT_BUS.post(
             new RenderGameOverlayEvent.Post(
                 new RenderGameOverlayEvent(event.partialTicks, event.resolution),
                 RenderGameOverlayEvent.ElementType.EXPERIENCE
             )
         );
-        if (
-            Utils.overlayShouldRender(
-                event.type,
-                SkyblockHud.hasSkyblockScoreboard(),
-                SkyblockHud.config.rpg.showRpgHud
-            )
-        ) {
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.rpg.showRpgHud)) {
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.enableBlend();
             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -90,35 +80,14 @@ public class RPGHud extends Gui {
             drawTexturedModalRect(x, y, rightAligned ? 131 : 5, 6, 120, 47);
 
             float manaWidth = Math.min(57 * ((float) mana / (float) maxMana), 57);
-            drawTexturedModalRect(
-                rightAligned ? x + 16 : 47 + x,
-                17 + y,
-                rightAligned ? 199 : 0,
-                64,
-                (int) manaWidth,
-                4
-            );
+            drawTexturedModalRect(rightAligned ? x + 16 : 47 + x, 17 + y, rightAligned ? 199 : 0, 64, (int) manaWidth, 4);
 
             float healthWidth = Math.min(70 * ((float) health / (float) maxHealth), 70);
-            drawTexturedModalRect(
-                rightAligned ? x + 3 : 47 + x,
-                22 + y,
-                rightAligned ? 186 : 0,
-                68,
-                (int) healthWidth,
-                5
-            );
+            drawTexturedModalRect(rightAligned ? x + 3 : 47 + x, 22 + y, rightAligned ? 186 : 0, 68, (int) healthWidth, 5);
 
             if (health > maxHealth) {
                 float absorptionWidth = Math.min(70 * ((float) (health - maxHealth) / (float) maxHealth), 70);
-                drawTexturedModalRect(
-                    rightAligned ? x + 3 : 47 + x,
-                    22 + y,
-                    rightAligned ? 186 : 0,
-                    77,
-                    (int) absorptionWidth,
-                    5
-                );
+                drawTexturedModalRect(rightAligned ? x + 3 : 47 + x, 22 + y, rightAligned ? 186 : 0, 77, (int) absorptionWidth, 5);
             }
 
             float xpWidth = 67 * mc.thePlayer.experience;
@@ -129,14 +98,7 @@ public class RPGHud extends Gui {
             if (mc.thePlayer.getAir() < 300) {
                 float airWidth = 60 * ((float) mc.thePlayer.getAir() / 300);
                 drawTexturedModalRect(rightAligned ? x + 17 : 39 + x, 33 + y, rightAligned ? 192 : 0, 82, 64, 6);
-                drawTexturedModalRect(
-                    rightAligned ? x + 19 : 41 + x,
-                    33 + y,
-                    rightAligned ? 196 : 0,
-                    88,
-                    (int) airWidth,
-                    4
-                );
+                drawTexturedModalRect(rightAligned ? x + 19 : 41 + x, 33 + y, rightAligned ? 196 : 0, 88, (int) airWidth, 4);
             }
             GlStateManager.scale(0.75f, 0.75f, 1);
             drawCenteredString(

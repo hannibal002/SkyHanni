@@ -13,12 +13,7 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
     private final GuiElementSlider slider;
     private final GuiElementTextField textField;
 
-    public GuiOptionEditorSlider(
-        ConfigProcessor.ProcessedOption option,
-        float minValue,
-        float maxValue,
-        float minStep
-    ) {
+    public GuiOptionEditorSlider(ConfigProcessor.ProcessedOption option, float minValue, float maxValue, float minStep) {
         super(option);
         if (minStep < 0) minStep = 0.01f;
 
@@ -81,9 +76,7 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
             textField.setSize(Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10, 16);
         } else {
             textField.setSize(textFieldWidth, 16);
-            textField.setOptions(
-                GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY | GuiElementTextField.SCALE_TEXT
-            );
+            textField.setOptions(GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY | GuiElementTextField.SCALE_TEXT);
         }
 
         textField.render(x + width / 6 - fullWidth / 2 + sliderWidth + 5, y + height - 7 - 14);
@@ -114,12 +107,7 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
         textField.setSize(textFieldWidth, 16);
 
         if (Mouse.getEventButtonState() && (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1)) {
-            if (
-                mouseX > textFieldX &&
-                mouseX < textFieldX + textFieldWidth &&
-                mouseY > textFieldY &&
-                mouseY < textFieldY + 16
-            ) {
+            if (mouseX > textFieldX && mouseX < textFieldX + textFieldWidth && mouseY > textFieldY && mouseY < textFieldY + 16) {
                 textField.mouseClicked(mouseX, mouseY, Mouse.getEventButton());
                 return true;
             }

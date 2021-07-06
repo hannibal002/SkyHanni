@@ -43,20 +43,10 @@ public class OverlayHud extends Gui {
         String militaryTime = timeHour + ":" + (timeMin == 0 ? timeMin + "0" : timeMin);
         int time12Hour = timeHour >= 12 ? timeHour - 12 : timeHour;
         String normalTime =
-            (time12Hour == 0 ? "00" : String.valueOf(time12Hour)) +
-            ":" +
-            (timeMin == 0 ? "00" : timeMin) +
-            (timeHour >= 12 ? "pm" : "am");
+            (time12Hour == 0 ? "00" : String.valueOf(time12Hour)) + ":" + (timeMin == 0 ? "00" : timeMin) + (timeHour >= 12 ? "pm" : "am");
 
         drawTexturedModalRect((width / 2) - 17, offset + (bossBarVisible ? 17 : 0), 0, 0, 34, 34);
-        drawTexturedModalRect(
-            (width / 2) - 4,
-            offset + (bossBarVisible ? 24 : 7),
-            (timeHour > 19 || timeHour < 4) ? 43 : 43 + 8,
-            0,
-            8,
-            8
-        );
+        drawTexturedModalRect((width / 2) - 4, offset + (bossBarVisible ? 24 : 7), (timeHour > 19 || timeHour < 4) ? 43 : 43 + 8, 0, 8, 8);
         if (SkyblockHud.config.main.twelveHourClock) drawScaledString(
             0.8f,
             width / 2,
@@ -94,10 +84,7 @@ public class OverlayHud extends Gui {
             } else {
                 drawMithril(width, offset, mc);
             }
-        } else if (
-            LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.PARK) &&
-            ParkIslandHandler.isRaining()
-        ) {
+        } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.PARK) && ParkIslandHandler.isRaining()) {
             if (LocationHandler.getCurrentLocation().equals(Locations.HOWLINGCAVE)) {
                 drawSlayer(width, offset, mc);
             } else drawRainDuration(width, offset, mc);
@@ -114,19 +101,9 @@ public class OverlayHud extends Gui {
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             String dateText = SeasonDateHandler.getFancySeasonAndDate();
             if (
-                eventToggle &&
-                !SeasonDateHandler.getCurrentEvent().isEmpty() &&
-                !SeasonDateHandler.getCurrentEventTime().isEmpty()
-            ) dateText =
-                SeasonDateHandler.getCurrentEvent().trim() + " " + SeasonDateHandler.getCurrentEventTime().trim();
-            drawTexturedModalRect(
-                (width / 2) + 17,
-                offset + (bossBarVisible ? 20 : 3),
-                2,
-                34,
-                font.getStringWidth(dateText) + 9,
-                14
-            );
+                eventToggle && !SeasonDateHandler.getCurrentEvent().isEmpty() && !SeasonDateHandler.getCurrentEventTime().isEmpty()
+            ) dateText = SeasonDateHandler.getCurrentEvent().trim() + " " + SeasonDateHandler.getCurrentEventTime().trim();
+            drawTexturedModalRect((width / 2) + 17, offset + (bossBarVisible ? 20 : 3), 2, 34, font.getStringWidth(dateText) + 9, 14);
             drawTexturedModalRect(
                 ((width / 2) + 17) + font.getStringWidth(dateText) + 9,
                 offset + (bossBarVisible ? 20 : 3),
@@ -233,13 +210,7 @@ public class OverlayHud extends Gui {
                 14
             );
             drawTexturedModalRect(xPos + 1, offset + (bossBarVisible ? 37 : 20), 75, 0, 8, 8);
-            drawString(
-                font,
-                CurrencyHandler.getBitsFormatted(),
-                xPos + 10,
-                offset + (bossBarVisible ? 38 : 21),
-                0x55FFFF
-            );
+            drawString(font, CurrencyHandler.getBitsFormatted(), xPos + 10, offset + (bossBarVisible ? 38 : 21), 0x55FFFF);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             xPos += font.getStringWidth(CurrencyHandler.getBitsFormatted()) + 11;
@@ -262,14 +233,7 @@ public class OverlayHud extends Gui {
             ) duration = flightFormat.format((double) IslandHandler.flightTime / 86400) + "day"; else duration =
                 flightFormat.format((double) IslandHandler.flightTime / 86400) + "days";
             mc.renderEngine.bindTexture(GuiTextures.overlay);
-            drawTexturedModalRect(
-                (width / 2) - 33 - (font.getStringWidth(duration)),
-                offset + (bossBarVisible ? 35 : 18),
-                0,
-                34,
-                2,
-                14
-            );
+            drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(
                 ((width / 2) - 33 - (font.getStringWidth(duration))) + 2,
                 offset + (bossBarVisible ? 35 : 18),
@@ -286,13 +250,7 @@ public class OverlayHud extends Gui {
                 8,
                 8
             );
-            drawString(
-                font,
-                duration,
-                (width / 2) - 19 - (font.getStringWidth(duration)),
-                offset + (bossBarVisible ? 38 : 21),
-                0xFFFFFF
-            );
+            drawString(font, duration, (width / 2) - 19 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
         }
     }
 
@@ -301,14 +259,7 @@ public class OverlayHud extends Gui {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             String duration = "Rain: " + ParkIslandHandler.getRainTime();
-            drawTexturedModalRect(
-                (width / 2) - 33 - (font.getStringWidth(duration)),
-                offset + (bossBarVisible ? 35 : 18),
-                0,
-                34,
-                2,
-                14
-            );
+            drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(
                 ((width / 2) - 33 - (font.getStringWidth(duration))) + 2,
                 offset + (bossBarVisible ? 35 : 18),
@@ -325,13 +276,7 @@ public class OverlayHud extends Gui {
                 8,
                 8
             );
-            drawString(
-                font,
-                duration,
-                (width / 2) - 19 - (font.getStringWidth(duration)),
-                offset + (bossBarVisible ? 38 : 21),
-                0xFFFFFF
-            );
+            drawString(font, duration, (width / 2) - 19 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
         }
     }
 
@@ -366,14 +311,7 @@ public class OverlayHud extends Gui {
                     stringBuilder.append(maxKills);
                 }
                 String text = stringBuilder.toString();
-                drawTexturedModalRect(
-                    (width / 2) - 33 - (font.getStringWidth(text)),
-                    offset + (bossBarVisible ? 35 : 18),
-                    0,
-                    34,
-                    2,
-                    14
-                );
+                drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(text)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
                 drawTexturedModalRect(
                     ((width / 2) - 33 - (font.getStringWidth(text))) + 2,
                     offset + (bossBarVisible ? 35 : 18),
@@ -390,13 +328,7 @@ public class OverlayHud extends Gui {
                     8,
                     8
                 );
-                drawString(
-                    font,
-                    text,
-                    (width / 2) - 19 - (font.getStringWidth(text)),
-                    offset + (bossBarVisible ? 38 : 21),
-                    0xFFFFFF
-                );
+                drawString(font, text, (width / 2) - 19 - (font.getStringWidth(text)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
             }
         }
     }
@@ -406,14 +338,7 @@ public class OverlayHud extends Gui {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             String mithril = DwarvenMineHandler.getMithrilFormatted();
-            drawTexturedModalRect(
-                (width / 2) - 33 - (font.getStringWidth(mithril)),
-                offset + (bossBarVisible ? 35 : 18),
-                0,
-                34,
-                2,
-                14
-            );
+            drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(mithril)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(
                 ((width / 2) - 33 - (font.getStringWidth(mithril))) + 2,
                 offset + (bossBarVisible ? 35 : 18),
@@ -430,13 +355,7 @@ public class OverlayHud extends Gui {
                 8,
                 8
             );
-            drawString(
-                font,
-                mithril,
-                (width / 2) - 19 - (font.getStringWidth(mithril)),
-                offset + (bossBarVisible ? 38 : 21),
-                0x00C896
-            );
+            drawString(font, mithril, (width / 2) - 19 - (font.getStringWidth(mithril)), offset + (bossBarVisible ? 38 : 21), 0x00C896);
         }
     }
 
@@ -447,14 +366,7 @@ public class OverlayHud extends Gui {
             String duration = FarmingIslandHandler.location != Locations.NONE
                 ? FarmingIslandHandler.location.getDisplayName()
                 : "" + FarmingIslandHandler.pelts;
-            drawTexturedModalRect(
-                (width / 2) - 33 - (font.getStringWidth(duration)),
-                offset + (bossBarVisible ? 35 : 18),
-                0,
-                34,
-                2,
-                14
-            );
+            drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(
                 ((width / 2) - 33 - (font.getStringWidth(duration))) + 2,
                 offset + (bossBarVisible ? 35 : 18),
@@ -471,13 +383,7 @@ public class OverlayHud extends Gui {
                 8,
                 8
             );
-            drawString(
-                font,
-                duration,
-                (width / 2) - 19 - (font.getStringWidth(duration)),
-                offset + (bossBarVisible ? 38 : 21),
-                0xFFFFFF
-            );
+            drawString(font, duration, (width / 2) - 19 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
         }
     }
 
@@ -520,14 +426,7 @@ public class OverlayHud extends Gui {
                 );
             } else {
                 String text = DwarvenMineHandler.currentEvent.displayName;
-                drawTexturedModalRect(
-                    (width / 2) - 33 - (font.getStringWidth(text)),
-                    offset + (bossBarVisible ? 35 : 18),
-                    0,
-                    34,
-                    2,
-                    14
-                );
+                drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(text)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
                 drawTexturedModalRect(
                     ((width / 2) - 33 - (font.getStringWidth(text))) + 2,
                     offset + (bossBarVisible ? 35 : 18),
@@ -544,13 +443,7 @@ public class OverlayHud extends Gui {
                     8,
                     8
                 );
-                drawString(
-                    font,
-                    text,
-                    (width / 2) - 19 - (font.getStringWidth(text)),
-                    offset + (bossBarVisible ? 38 : 21),
-                    0xFFFFFF
-                );
+                drawString(font, text, (width / 2) - 19 - (font.getStringWidth(text)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
             }
         }
     }
@@ -558,16 +451,11 @@ public class OverlayHud extends Gui {
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
         if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard())) {
-            bossBarVisible =
-                BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
+            bossBarVisible = BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             if (LocationHandler.getCurrentLocation() != Locations.CATACOMBS) {
-                drawClock(
-                    event.resolution.getScaledWidth(),
-                    SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34),
-                    mc
-                );
+                drawClock(event.resolution.getScaledWidth(), SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
             }
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }

@@ -26,8 +26,7 @@ public class GuiOptionEditorText extends GuiOptionEditor {
 
         int textFieldX = x + width / 6 - fullWidth / 2;
         if (textField.getFocus()) {
-            fullWidth =
-                Math.max(fullWidth, Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10);
+            fullWidth = Math.max(fullWidth, Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10);
         }
 
         textField.setSize(fullWidth, 16);
@@ -44,20 +43,14 @@ public class GuiOptionEditorText extends GuiOptionEditor {
         int textFieldX = x + width / 6 - fullWidth / 2;
 
         if (textField.getFocus()) {
-            fullWidth =
-                Math.max(fullWidth, Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10);
+            fullWidth = Math.max(fullWidth, Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10);
         }
 
         int textFieldY = y + height - 7 - 14;
         textField.setSize(fullWidth, 16);
 
         if (Mouse.getEventButtonState() && (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1)) {
-            if (
-                mouseX > textFieldX &&
-                mouseX < textFieldX + fullWidth &&
-                mouseY > textFieldY &&
-                mouseY < textFieldY + 16
-            ) {
+            if (mouseX > textFieldX && mouseX < textFieldX + fullWidth && mouseY > textFieldY && mouseY < textFieldY + 16) {
                 textField.mouseClicked(mouseX, mouseY, Mouse.getEventButton());
                 return true;
             }

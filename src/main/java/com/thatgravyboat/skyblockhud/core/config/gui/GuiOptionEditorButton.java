@@ -17,12 +17,7 @@ public class GuiOptionEditorButton extends GuiOptionEditor {
     private String buttonText;
     private Config config;
 
-    public GuiOptionEditorButton(
-        ConfigProcessor.ProcessedOption option,
-        String runnableId,
-        String buttonText,
-        Config config
-    ) {
+    public GuiOptionEditorButton(ConfigProcessor.ProcessedOption option, String runnableId, String buttonText, Config config) {
         super(option);
         this.runnableId = runnableId;
         this.config = config;
@@ -58,12 +53,7 @@ public class GuiOptionEditorButton extends GuiOptionEditor {
     public boolean mouseInput(int x, int y, int width, int mouseX, int mouseY) {
         if (Mouse.getEventButtonState()) {
             int height = getHeight();
-            if (
-                mouseX > x + width / 6 - 24 &&
-                mouseX < x + width / 6 + 24 &&
-                mouseY > y + height - 7 - 14 &&
-                mouseY < y + height - 7 + 2
-            ) {
+            if (mouseX > x + width / 6 - 24 && mouseX < x + width / 6 + 24 && mouseY > y + height - 7 - 14 && mouseY < y + height - 7 + 2) {
                 config.executeRunnable(runnableId);
                 return true;
             }

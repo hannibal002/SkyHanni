@@ -249,10 +249,7 @@ public class GuiElementTextField {
                     int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(textNCBeforeCursor, "\u00B6");
                     String textBeforeCursor = text.substring(0, textField.getSelectionEnd() + colorCodes * 2);
 
-                    int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(
-                        textBeforeCursor,
-                        "\n"
-                    );
+                    int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(textBeforeCursor, "\n");
 
                     String[] split = textBeforeCursor.split("\n");
                     int textBeforeCursorWidth;
@@ -265,14 +262,11 @@ public class GuiElementTextField {
                     } else if (split.length > 1) {
                         thisLineBeforeCursor = split[split.length - 1];
                         lineBefore = split[split.length - 2];
-                        textBeforeCursorWidth =
-                            Minecraft.getMinecraft().fontRendererObj.getStringWidth(thisLineBeforeCursor);
+                        textBeforeCursorWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(thisLineBeforeCursor);
                     } else {
                         return;
                     }
-                    String trimmed = Minecraft
-                        .getMinecraft()
-                        .fontRendererObj.trimStringToWidth(lineBefore, textBeforeCursorWidth);
+                    String trimmed = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(lineBefore, textBeforeCursorWidth);
                     int linePos = strLenNoColor(trimmed);
                     if (linePos != strLenNoColor(lineBefore)) {
                         char after = lineBefore.charAt(linePos);
@@ -283,11 +277,7 @@ public class GuiElementTextField {
                         }
                     }
                     int newPos =
-                        textField.getSelectionEnd() -
-                        strLenNoColor(thisLineBeforeCursor) -
-                        strLenNoColor(lineBefore) -
-                        1 +
-                        linePos;
+                        textField.getSelectionEnd() - strLenNoColor(thisLineBeforeCursor) - strLenNoColor(lineBefore) - 1 + linePos;
 
                     if (GuiScreen.isShiftKeyDown()) {
                         textField.setSelectionPos(newPos);
@@ -299,10 +289,7 @@ public class GuiElementTextField {
                     int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(textNCBeforeCursor, "\u00B6");
                     String textBeforeCursor = text.substring(0, textField.getSelectionEnd() + colorCodes * 2);
 
-                    int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(
-                        textBeforeCursor,
-                        "\n"
-                    );
+                    int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(textBeforeCursor, "\n");
 
                     String[] split = textBeforeCursor.split("\n");
                     String thisLineBeforeCursor;
@@ -312,8 +299,7 @@ public class GuiElementTextField {
                         textBeforeCursorWidth = 0;
                     } else if (split.length > 0) {
                         thisLineBeforeCursor = split[split.length - 1];
-                        textBeforeCursorWidth =
-                            Minecraft.getMinecraft().fontRendererObj.getStringWidth(thisLineBeforeCursor);
+                        textBeforeCursorWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(thisLineBeforeCursor);
                     } else {
                         return;
                     }
@@ -321,9 +307,7 @@ public class GuiElementTextField {
                     String[] split2 = textNoColour.split("\n");
                     if (split2.length > numLinesBeforeCursor + 1) {
                         String lineAfter = split2[numLinesBeforeCursor + 1];
-                        String trimmed = Minecraft
-                            .getMinecraft()
-                            .fontRendererObj.trimStringToWidth(lineAfter, textBeforeCursorWidth);
+                        String trimmed = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(lineAfter, textBeforeCursorWidth);
                         int linePos = strLenNoColor(trimmed);
                         if (linePos != strLenNoColor(lineAfter)) {
                             char after = lineAfter.charAt(linePos);
@@ -447,13 +431,8 @@ public class GuiElementTextField {
         for (int yOffI = 0; yOffI < texts.length; yOffI++) {
             int yOff = yOffI * extraSize;
 
-            if (
-                isScaling() &&
-                Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]) > searchBarXSize - 10
-            ) {
-                scale =
-                    (searchBarXSize - 2) /
-                    (float) Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]);
+            if (isScaling() && Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]) > searchBarXSize - 10) {
+                scale = (searchBarXSize - 2) / (float) Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]);
                 if (scale > 1) scale = 1;
                 float newLen = Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]) * scale;
                 xStartOffset = (int) ((searchBarXSize - newLen) / 2f);
@@ -495,8 +474,7 @@ public class GuiElementTextField {
             if (split.length <= numLinesBeforeCursor || split.length == 0) {
                 textBeforeCursorWidth = 0;
             } else {
-                textBeforeCursorWidth =
-                    (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth(split[split.length - 1]) * scale);
+                textBeforeCursorWidth = (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth(split[split.length - 1]) * scale);
             }
             Gui.drawRect(
                 x + xStartOffset + textBeforeCursorWidth,

@@ -91,16 +91,7 @@ public class RenderUtils {
         drawTexturedRect(x, y, width, height, 0, 1, 0, 1, filter);
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height,
-        float uMin,
-        float uMax,
-        float vMin,
-        float vMax
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height, float uMin, float uMax, float vMin, float vMax) {
         drawTexturedRect(x, y, width, height, uMin, uMax, vMin, vMax, GL11.GL_NEAREST);
     }
 
@@ -116,12 +107,7 @@ public class RenderUtils {
         int filter
     ) {
         GlStateManager.enableBlend();
-        GL14.glBlendFuncSeparate(
-            GL11.GL_SRC_ALPHA,
-            GL11.GL_ONE_MINUS_SRC_ALPHA,
-            GL11.GL_ONE,
-            GL11.GL_ONE_MINUS_SRC_ALPHA
-        );
+        GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         drawTexturedRectNoBlend(x, y, width, height, uMin, uMax, vMin, vMax, filter);
 
@@ -157,15 +143,7 @@ public class RenderUtils {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
     }
 
-    public static void drawGradientRect(
-        int zLevel,
-        int left,
-        int top,
-        int right,
-        int bottom,
-        int startColor,
-        int endColor
-    ) {
+    public static void drawGradientRect(int zLevel, int left, int top, int right, int bottom, int startColor, int endColor) {
         float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
         float startRed = (float) (startColor >> 16 & 255) / 255.0F;
         float startGreen = (float) (startColor >> 8 & 255) / 255.0F;

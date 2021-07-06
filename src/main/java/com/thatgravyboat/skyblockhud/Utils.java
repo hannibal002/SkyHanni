@@ -39,12 +39,7 @@ public class Utils {
     public static boolean isPlayerHoldingRedstone(EntityPlayerSP player) {
         if (!SkyblockHud.config.main.requireRedstone) return true;
         ArrayList<Item> redstoneItems = new ArrayList<>(
-            Arrays.asList(
-                Items.redstone,
-                Items.repeater,
-                Items.comparator,
-                Item.getByNameOrId("minecraft:redstone_torch")
-            )
+            Arrays.asList(Items.redstone, Items.repeater, Items.comparator, Item.getByNameOrId("minecraft:redstone_torch"))
         );
         if (player.getHeldItem() != null) return redstoneItems.contains(player.getHeldItem().getItem());
         return false;
@@ -138,15 +133,7 @@ public class Utils {
         return (shouldRender && ((type == null && Loader.isModLoaded("labymod")) || type == checkType));
     }
 
-    public static void drawStringScaledMaxWidth(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int len,
-        int colour
-    ) {
+    public static void drawStringScaledMaxWidth(String str, FontRenderer fr, float x, float y, boolean shadow, int len, int colour) {
         int strLen = fr.getStringWidth(str);
         float factor = len / (float) strLen;
         factor = Math.min(1, factor);
@@ -154,29 +141,13 @@ public class Utils {
         drawStringScaled(str, fr, x, y, shadow, colour, factor);
     }
 
-    public static void drawStringScaled(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int colour,
-        float factor
-    ) {
+    public static void drawStringScaled(String str, FontRenderer fr, float x, float y, boolean shadow, int colour, float factor) {
         GlStateManager.scale(factor, factor, 1);
         fr.drawString(str, x / factor, y / factor, colour, shadow);
         GlStateManager.scale(1 / factor, 1 / factor, 1);
     }
 
-    public static void drawStringCenteredScaled(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int len,
-        int colour
-    ) {
+    public static void drawStringCenteredScaled(String str, FontRenderer fr, float x, float y, boolean shadow, int len, int colour) {
         int strLen = fr.getStringWidth(str);
         float factor = len / (float) strLen;
         float fontHeight = 8 * factor;
@@ -197,12 +168,7 @@ public class Utils {
     ) {
         GlStateManager.enableTexture2D();
         GlStateManager.enableBlend();
-        GL14.glBlendFuncSeparate(
-            GL11.GL_SRC_ALPHA,
-            GL11.GL_ONE_MINUS_SRC_ALPHA,
-            GL11.GL_ONE,
-            GL11.GL_ONE_MINUS_SRC_ALPHA
-        );
+        GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filter);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filter);
@@ -230,16 +196,7 @@ public class Utils {
         drawTexturedRect(x, y, width, height, 0, 1, 0, 1, filter);
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height,
-        float uMin,
-        float uMax,
-        float vMin,
-        float vMax
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height, float uMin, float uMax, float vMin, float vMax) {
         drawTexturedRect(x, y, width, height, uMin, uMax, vMin, vMax, GL11.GL_LINEAR);
     }
 
@@ -271,9 +228,7 @@ public class Utils {
             }
         }
 
-        int newScale = guiScales.size() > 0
-            ? Math.max(0, Math.min(4, guiScales.peek()))
-            : Minecraft.getMinecraft().gameSettings.guiScale;
+        int newScale = guiScales.size() > 0 ? Math.max(0, Math.min(4, guiScales.peek())) : Minecraft.getMinecraft().gameSettings.guiScale;
         if (newScale == 0) newScale = Minecraft.getMinecraft().gameSettings.guiScale;
 
         int oldScale = Minecraft.getMinecraft().gameSettings.guiScale;
@@ -282,12 +237,7 @@ public class Utils {
         Minecraft.getMinecraft().gameSettings.guiScale = oldScale;
 
         if (guiScales.size() > 0) {
-            GlStateManager.viewport(
-                0,
-                0,
-                Minecraft.getMinecraft().displayWidth,
-                Minecraft.getMinecraft().displayHeight
-            );
+            GlStateManager.viewport(0, 0, Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
             GlStateManager.matrixMode(GL11.GL_PROJECTION);
             GlStateManager.loadIdentity();
             GlStateManager.ortho(

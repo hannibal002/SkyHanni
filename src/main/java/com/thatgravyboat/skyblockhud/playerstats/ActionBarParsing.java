@@ -29,15 +29,11 @@ public class ActionBarParsing {
     );
 
     private static final Pattern HealthReplaceRegex = Pattern.compile("\u00A7c([0-9]+)/([0-9]+)\u2764");
-    private static final Pattern HealingReplaceRegex = Pattern.compile(
-        "\\+\u00A7c([0-9]+)[\u2586\u2585\u2584\u2583\u2582\u2581]"
-    );
+    private static final Pattern HealingReplaceRegex = Pattern.compile("\\+\u00A7c([0-9]+)[\u2586\u2585\u2584\u2583\u2582\u2581]");
     private static final Pattern HealthAbsorptionReplaceRegex = Pattern.compile("\u00A76([0-9]+)/([0-9]+)\u2764");
     private static final Pattern DefenseReplaceRegex = Pattern.compile("\u00A7a([0-9]+)\u00A7a\u2748 Defense");
     private static final Pattern ManaReplaceRegex = Pattern.compile("\u00A7b([0-9]+)/([0-9]+)\u270E Mana");
-    private static final Pattern ManaOverflowReplaceRegex = Pattern.compile(
-        "\u00A7b([0-9]+)/([0-9]+)\u270E \u00A73([0-9]+)\u02AC"
-    );
+    private static final Pattern ManaOverflowReplaceRegex = Pattern.compile("\u00A7b([0-9]+)/([0-9]+)\u270E \u00A73([0-9]+)\u02AC");
 
     private static int ticksSinceLastPrediction = 0;
     private static boolean predict = false;
@@ -99,10 +95,7 @@ public class ActionBarParsing {
 
             if (healthFound) {
                 try {
-                    RPGHud.updateHealth(
-                        Integer.parseInt(HealthMatcher.group(1)),
-                        Integer.parseInt(HealthMatcher.group(2))
-                    );
+                    RPGHud.updateHealth(Integer.parseInt(HealthMatcher.group(1)), Integer.parseInt(HealthMatcher.group(2)));
                 } catch (Exception ignored) {}
             }
             if (defenseFound) {
@@ -119,10 +112,7 @@ public class ActionBarParsing {
             }
             if (!manaFound && manaOverflowFound) {
                 try {
-                    RPGHud.updateMana(
-                        Integer.parseInt(ManaOverflowMatcher.group(1)),
-                        Integer.parseInt(ManaOverflowMatcher.group(2))
-                    );
+                    RPGHud.updateMana(Integer.parseInt(ManaOverflowMatcher.group(1)), Integer.parseInt(ManaOverflowMatcher.group(2)));
                     RPGHud.updateOverflow(Integer.parseInt(ManaOverflowMatcher.group(3)));
                 } catch (Exception ignored) {}
             }

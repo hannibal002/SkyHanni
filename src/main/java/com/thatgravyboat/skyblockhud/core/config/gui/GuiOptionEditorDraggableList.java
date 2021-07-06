@@ -74,9 +74,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
         );
 
         long currentTime = System.currentTimeMillis();
-        float greenBlue = LerpUtils.clampZeroOne(
-            ((trashHoverTime < 0 ? 250 : 0) + trashHoverTime - currentTime) / 250f
-        );
+        float greenBlue = LerpUtils.clampZeroOne(((trashHoverTime < 0 ? 250 : 0) + trashHoverTime - currentTime) / 250f);
         GlStateManager.color(1, greenBlue, greenBlue, 1);
         Minecraft.getMinecraft().getTextureManager().bindTexture(DELETE);
         Utils.drawTexturedRect(x + width / 6f + 27, y + 45 - 7 - 13, 11, 14, GL11.GL_NEAREST);
@@ -106,9 +104,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
                         0xffffffff
                     );
                 }
-                Minecraft
-                    .getMinecraft()
-                    .fontRendererObj.drawString("\u2261", x + 10, y + 50 + yOff + ySize / 2f - 4, 0xffffff, true);
+                Minecraft.getMinecraft().fontRendererObj.drawString("\u2261", x + 10, y + 50 + yOff + ySize / 2f - 4, 0xffffff, true);
             }
 
             yOff += ySize;
@@ -202,13 +198,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
             Minecraft
                 .getMinecraft()
-                .fontRendererObj.drawString(
-                    "\u2261",
-                    dragOffsetX + mouseX,
-                    dragOffsetY + mouseY + ySize / 2f - 4,
-                    0xffffff,
-                    true
-                );
+                .fontRendererObj.drawString("\u2261", dragOffsetX + mouseX, dragOffsetY + mouseY + ySize / 2f - 4, 0xffffff, true);
         }
     }
 
@@ -292,13 +282,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
                 return true;
             }
 
-            if (
-                Mouse.getEventButton() == 0 &&
-                mouseX > x + 5 &&
-                mouseX < x + width - 5 &&
-                mouseY > y + 45 &&
-                mouseY < y + height - 6
-            ) {
+            if (Mouse.getEventButton() == 0 && mouseX > x + 5 && mouseX < x + width - 5 && mouseY > y + 45 && mouseY < y + height - 6) {
                 int yOff = 0;
                 int i = 0;
                 for (int strIndex : activeText) {

@@ -67,12 +67,7 @@ public class SeasonDateHandler {
     }
 
     public static String removeDate(String seasonDate) {
-        return Pattern
-            .compile("[^a-zA-Z]")
-            .matcher(seasonDate.toLowerCase())
-            .replaceAll("")
-            .replaceAll("st|nd|rd|th", "")
-            .trim();
+        return Pattern.compile("[^a-zA-Z]").matcher(seasonDate.toLowerCase()).replaceAll("").replaceAll("st|nd|rd|th", "").trim();
     }
 
     public static int removeSeason(String seasonDate) {

@@ -86,10 +86,7 @@ public class GuiElementSlider extends GuiElement {
 
         for (int i = 1; i < 4; i++) {
             int notchX = x + width * i / 4 - 1;
-            Minecraft
-                .getMinecraft()
-                .getTextureManager()
-                .bindTexture(notchX > x + sliderAmountI ? slider_off_notch : slider_on_notch);
+            Minecraft.getMinecraft().getTextureManager().bindTexture(notchX > x + sliderAmountI ? slider_off_notch : slider_on_notch);
             Utils.drawTexturedRect(notchX, y + (HEIGHT - 4) / 2f, 2, 4, GL11.GL_NEAREST);
         }
 
@@ -104,8 +101,7 @@ public class GuiElementSlider extends GuiElement {
         }
 
         if (Mouse.getEventButton() == 0) {
-            clicked =
-                Mouse.getEventButtonState() && mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + HEIGHT;
+            clicked = Mouse.getEventButtonState() && mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + HEIGHT;
             if (clicked) {
                 value = (mouseX - x) * (maxValue - minValue) / width + minValue;
                 value = Math.max(minValue, Math.min(maxValue, value));

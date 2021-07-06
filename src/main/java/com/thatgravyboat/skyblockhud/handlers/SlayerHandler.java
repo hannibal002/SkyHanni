@@ -82,9 +82,7 @@ public class SlayerHandler {
                     }
                     SlayerHandler.currentSlayer = selectedSlayer;
                     SlayerHandler.slayerTier =
-                        Utils.whatRomanNumeral(
-                            slayer.replace(selectedSlayer.getDisplayName().toLowerCase(), "").replace(" ", "")
-                        );
+                        Utils.whatRomanNumeral(slayer.replace(selectedSlayer.getDisplayName().toLowerCase(), "").replace(" ", ""));
                     break;
                 }
             }

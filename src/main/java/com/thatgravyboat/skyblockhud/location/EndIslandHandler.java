@@ -31,9 +31,7 @@ public class EndIslandHandler {
         public static dragonTypes findDragon(String input) {
             if (input.contains(" ")) {
                 try {
-                    return dragonTypes.valueOf(
-                        input.toLowerCase().replace("dragon", "").replace(" ", "").toUpperCase()
-                    );
+                    return dragonTypes.valueOf(input.toLowerCase().replace("dragon", "").replace(" ", "").toUpperCase());
                 } catch (IllegalArgumentException ignored) {
                     return NODRAGON;
                 }

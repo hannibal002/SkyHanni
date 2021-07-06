@@ -18,26 +18,14 @@ import org.lwjgl.opengl.GL11;
 
 public class GuiElementColour extends GuiElement {
 
-    public static final ResourceLocation colour_selector_dot = new ResourceLocation(
-        "skyblockhud:core/colour_selector_dot.png"
-    );
-    public static final ResourceLocation colour_selector_bar = new ResourceLocation(
-        "skyblockhud:core/colour_selector_bar.png"
-    );
-    public static final ResourceLocation colour_selector_bar_alpha = new ResourceLocation(
-        "skyblockhud:core/colour_selector_bar_alpha.png"
-    );
-    public static final ResourceLocation colour_selector_chroma = new ResourceLocation(
-        "skyblockhud:core/colour_selector_chroma.png"
-    );
+    public static final ResourceLocation colour_selector_dot = new ResourceLocation("skyblockhud:core/colour_selector_dot.png");
+    public static final ResourceLocation colour_selector_bar = new ResourceLocation("skyblockhud:core/colour_selector_bar.png");
+    public static final ResourceLocation colour_selector_bar_alpha = new ResourceLocation("skyblockhud:core/colour_selector_bar_alpha.png");
+    public static final ResourceLocation colour_selector_chroma = new ResourceLocation("skyblockhud:core/colour_selector_chroma.png");
 
     private static final ResourceLocation colourPickerLocation = new ResourceLocation("mbcore:dynamic/colourpicker");
-    private static final ResourceLocation colourPickerBarValueLocation = new ResourceLocation(
-        "mbcore:dynamic/colourpickervalue"
-    );
-    private static final ResourceLocation colourPickerBarOpacityLocation = new ResourceLocation(
-        "mbcore:dynamic/colourpickeropacity"
-    );
+    private static final ResourceLocation colourPickerBarValueLocation = new ResourceLocation("mbcore:dynamic/colourpickervalue");
+    private static final ResourceLocation colourPickerBarOpacityLocation = new ResourceLocation("mbcore:dynamic/colourpickeropacity");
     private final GuiElementTextField hexField = new GuiElementTextField(
         "",
         GuiElementTextField.SCALE_TEXT | GuiElementTextField.FORCE_CAPS | GuiElementTextField.NO_SPACE
@@ -57,13 +45,7 @@ public class GuiElementColour extends GuiElement {
     private Runnable closeCallback;
     private String colour;
 
-    public GuiElementColour(
-        int x,
-        int y,
-        String initialColour,
-        Consumer<String> colourChangedCallback,
-        Runnable closeCallback
-    ) {
+    public GuiElementColour(int x, int y, String initialColour, Consumer<String> colourChangedCallback, Runnable closeCallback) {
         final ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
 
         this.y = Math.max(10, Math.min(scaledResolution.getScaledHeight() - ySize - 10, y));
@@ -147,18 +129,12 @@ public class GuiElementColour extends GuiElement {
         GlStateManager.color(1, 1, 1, 1);
         RenderUtils.drawTexturedRect(x + 5 + 64 + 5 + 10 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
 
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .loadTexture(colourPickerBarValueLocation, new DynamicTexture(bufferedImageValue));
+        Minecraft.getMinecraft().getTextureManager().loadTexture(colourPickerBarValueLocation, new DynamicTexture(bufferedImageValue));
         Minecraft.getMinecraft().getTextureManager().bindTexture(colourPickerBarValueLocation);
         GlStateManager.color(1, 1, 1, 1);
         RenderUtils.drawTexturedRect(x + 5 + 64 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
 
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .loadTexture(colourPickerBarOpacityLocation, new DynamicTexture(bufferedImageOpacity));
+        Minecraft.getMinecraft().getTextureManager().loadTexture(colourPickerBarOpacityLocation, new DynamicTexture(bufferedImageOpacity));
         Minecraft.getMinecraft().getTextureManager().bindTexture(colourPickerBarOpacityLocation);
         GlStateManager.color(1, 1, 1, 1);
         RenderUtils.drawTexturedRect(x + 5 + 64 + 5 + 10 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
@@ -182,11 +158,7 @@ public class GuiElementColour extends GuiElement {
                 y + 5 + 27 + 1,
                 x + 5 + 64 + 5 + 10 + 5 + 10 + 5 + 10 - 1,
                 y + 5 + 37 - 1,
-                Color.HSBtoRGB(
-                    (hsvChroma[0] + (System.currentTimeMillis() - ChromaColour.startTime) / 1000f) % 1,
-                    0.8f,
-                    0.8f
-                )
+                Color.HSBtoRGB((hsvChroma[0] + (System.currentTimeMillis() - ChromaColour.startTime) / 1000f) % 1, 0.8f, 0.8f)
             );
         }
 
@@ -226,10 +198,7 @@ public class GuiElementColour extends GuiElement {
             );
         }
 
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .loadTexture(colourPickerLocation, new DynamicTexture(bufferedImage));
+        Minecraft.getMinecraft().getTextureManager().loadTexture(colourPickerLocation, new DynamicTexture(bufferedImage));
         Minecraft.getMinecraft().getTextureManager().bindTexture(colourPickerLocation);
         GlStateManager.color(1, 1, 1, 1);
         RenderUtils.drawTexturedRect(x + 1, y + 1, 72, 72, GL11.GL_LINEAR);
@@ -283,9 +252,7 @@ public class GuiElementColour extends GuiElement {
 
     public boolean mouseInput(int mouseX, int mouseY) {
         ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        float mouseXF = (float) (
-            Mouse.getX() * scaledResolution.getScaledWidth_double() / Minecraft.getMinecraft().displayWidth
-        );
+        float mouseXF = (float) (Mouse.getX() * scaledResolution.getScaledWidth_double() / Minecraft.getMinecraft().displayWidth);
         float mouseYF = (float) (
             scaledResolution.getScaledHeight_double() -
             Mouse.getY() *
@@ -366,9 +333,7 @@ public class GuiElementColour extends GuiElement {
                 float angle = (float) Math.toDegrees(Math.atan((32 - xWheel) / (yWheel - 32 + 1E-5)) + Math.PI / 2);
                 xWheel = Math.max(0, Math.min(64, xWheel));
                 yWheel = Math.max(0, Math.min(64, yWheel));
-                float radius = (float) Math.sqrt(
-                    ((xWheel - 32) * (xWheel - 32) + (yWheel - 32) * (yWheel - 32)) / 1024f
-                );
+                float radius = (float) Math.sqrt(((xWheel - 32) * (xWheel - 32) + (yWheel - 32) * (yWheel - 32)) / 1024f);
                 if (yWheel < 32) angle += 180;
 
                 this.wheelAngle = angle;
@@ -391,8 +356,7 @@ public class GuiElementColour extends GuiElement {
             }
 
             if (clickedComponent == 2) {
-                colour =
-                    ChromaColour.special(ChromaColour.getSpeed(colour), 255 - Math.round(y / 64f * 255), currentColour);
+                colour = ChromaColour.special(ChromaColour.getSpeed(colour), 255 - Math.round(y / 64f * 255), currentColour);
                 colourChangedCallback.accept(colour);
                 return true;
             }

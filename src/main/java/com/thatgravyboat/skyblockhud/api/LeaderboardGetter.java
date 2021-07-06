@@ -35,14 +35,9 @@ public class LeaderboardGetter {
             Scoreboard scoreboard = mc.theWorld.getScoreboard();
             ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1);
 
-            if (
-                sidebarObjective != null &&
-                !MinecraftForge.EVENT_BUS.post(new SidebarPreGetEvent(scoreboard, sidebarObjective))
-            ) {
+            if (sidebarObjective != null && !MinecraftForge.EVENT_BUS.post(new SidebarPreGetEvent(scoreboard, sidebarObjective))) {
                 Collection<Score> scoreList = sidebarObjective.getScoreboard().getSortedScores(sidebarObjective);
-                Map<Integer, String> scores = scoreList
-                    .stream()
-                    .collect(Collectors.toMap(Score::getScorePoints, this::getLine));
+                Map<Integer, String> scores = scoreList.stream().collect(Collectors.toMap(Score::getScorePoints, this::getLine));
 
                 if (!cachedScores.equals(scores)) {
                     scores.forEach(

@@ -68,72 +68,12 @@ public class MapHandler {
 
     public enum Maps {
         HUB(0.5f, 494, 444, 294, 218, 294, 224, new ResourceLocation("skyblockhud", "maps/hub.png"), HubIcons.hubIcons),
-        MUSHROOM(
-            1.0f,
-            318,
-            316,
-            -84,
-            605,
-            -84,
-            612,
-            new ResourceLocation("skyblockhud", "maps/mushroom.png"),
-            Collections.emptyList()
-        ),
-        SPIDERS(
-            1.0f,
-            270,
-            238,
-            400,
-            362,
-            400,
-            364,
-            new ResourceLocation("skyblockhud", "maps/spidersden.png"),
-            Collections.emptyList()
-        ),
-        NETHER(
-            0.5f,
-            257,
-            371,
-            436,
-            732,
-            433,
-            736,
-            new ResourceLocation("skyblockhud", "maps/fort.png"),
-            Collections.emptyList()
-        ),
-        BARN(
-            1.5f,
-            135,
-            130,
-            -82,
-            320,
-            -81,
-            318,
-            new ResourceLocation("skyblockhud", "maps/barn.png"),
-            Collections.emptyList()
-        ),
-        DWARVEN(
-            0.5f,
-            409,
-            461,
-            206,
-            160,
-            202,
-            166,
-            new ResourceLocation("skyblockhud", "maps/dwarven.png"),
-            DwarvenIcons.dwarvenIcons
-        ),
-        PARK(
-            1.0f,
-            211,
-            230,
-            480,
-            133,
-            478,
-            134,
-            new ResourceLocation("skyblockhud", "maps/park.png"),
-            Collections.emptyList()
-        );
+        MUSHROOM(1.0f, 318, 316, -84, 605, -84, 612, new ResourceLocation("skyblockhud", "maps/mushroom.png"), Collections.emptyList()),
+        SPIDERS(1.0f, 270, 238, 400, 362, 400, 364, new ResourceLocation("skyblockhud", "maps/spidersden.png"), Collections.emptyList()),
+        NETHER(0.5f, 257, 371, 436, 732, 433, 736, new ResourceLocation("skyblockhud", "maps/fort.png"), Collections.emptyList()),
+        BARN(1.5f, 135, 130, -82, 320, -81, 318, new ResourceLocation("skyblockhud", "maps/barn.png"), Collections.emptyList()),
+        DWARVEN(0.5f, 409, 461, 206, 160, 202, 166, new ResourceLocation("skyblockhud", "maps/dwarven.png"), DwarvenIcons.dwarvenIcons),
+        PARK(1.0f, 211, 230, 480, 133, 478, 134, new ResourceLocation("skyblockhud", "maps/park.png"), Collections.emptyList());
 
         public float scaleFactor;
         public int width;
@@ -170,13 +110,7 @@ public class MapHandler {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (
-            Utils.overlayShouldRender(
-                event.type,
-                SkyblockHud.hasSkyblockScoreboard(),
-                SkyblockHud.config.map.showMiniMap
-            )
-        ) {
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.map.showMiniMap)) {
             Minecraft mc = Minecraft.getMinecraft();
             if (mc.currentScreen instanceof MapScreen) return;
             if (LocationHandler.getCurrentLocation().getCategory().getMap() == null) return;
@@ -298,12 +232,7 @@ public class MapHandler {
             if (this.mc.thePlayer != null && SkyblockHud.config.map.showPlayerLocation) {
                 int x = this.mc.thePlayer.getPosition().getX() + map.xOffset;
                 int z = this.mc.thePlayer.getPosition().getZ() + map.yOffset;
-                fontRendererObj.drawString(
-                    "\u2022",
-                    (int) (x * map.scaleFactor + mapX),
-                    (int) (z * map.scaleFactor + mapY),
-                    0xff0000
-                );
+                fontRendererObj.drawString("\u2022", (int) (x * map.scaleFactor + mapX), (int) (z * map.scaleFactor + mapY), 0xff0000);
             }
             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
             onTooltip(mouseX, mouseY, (int) mapX, (int) mapY);

@@ -20,27 +20,13 @@ public class GuiTextures {
     public static final ResourceLocation THREE = new ResourceLocation("skyblockhud:core/toggle_3.png");
     public static final ResourceLocation ON = new ResourceLocation("skyblockhud:core/toggle_on.png");
 
-    public static final ResourceLocation slider_off_cap = new ResourceLocation(
-        "skyblockhud:core/slider/slider_off_cap.png"
-    );
-    public static final ResourceLocation slider_off_notch = new ResourceLocation(
-        "skyblockhud:core/slider/slider_off_notch.png"
-    );
-    public static final ResourceLocation slider_off_segment = new ResourceLocation(
-        "skyblockhud:core/slider/slider_off_segment.png"
-    );
-    public static final ResourceLocation slider_on_cap = new ResourceLocation(
-        "skyblockhud:core/slider/slider_on_cap.png"
-    );
-    public static final ResourceLocation slider_on_notch = new ResourceLocation(
-        "skyblockhud:core/slider/slider_on_notch.png"
-    );
-    public static final ResourceLocation slider_on_segment = new ResourceLocation(
-        "skyblockhud:core/slider/slider_on_segment.png"
-    );
-    public static final ResourceLocation slider_button_new = new ResourceLocation(
-        "skyblockhud:core/slider/slider_button.png"
-    );
+    public static final ResourceLocation slider_off_cap = new ResourceLocation("skyblockhud:core/slider/slider_off_cap.png");
+    public static final ResourceLocation slider_off_notch = new ResourceLocation("skyblockhud:core/slider/slider_off_notch.png");
+    public static final ResourceLocation slider_off_segment = new ResourceLocation("skyblockhud:core/slider/slider_off_segment.png");
+    public static final ResourceLocation slider_on_cap = new ResourceLocation("skyblockhud:core/slider/slider_on_cap.png");
+    public static final ResourceLocation slider_on_notch = new ResourceLocation("skyblockhud:core/slider/slider_on_notch.png");
+    public static final ResourceLocation slider_on_segment = new ResourceLocation("skyblockhud:core/slider/slider_on_segment.png");
+    public static final ResourceLocation slider_button_new = new ResourceLocation("skyblockhud:core/slider/slider_button.png");
 
     public static final ResourceLocation overlay = new ResourceLocation("skyblockhud", "stats.png");
     public static final ResourceLocation dungeon = new ResourceLocation("skyblockhud", "dungeon.png");

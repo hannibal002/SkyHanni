@@ -25,12 +25,7 @@ public class GenericOverlays extends Gui {
             Color color = new Color(percentage == max ? fullColor : loadingColor);
 
             RenderUtils.drawTexturedModalRect(x, y, 0, 0, 182, 5);
-            GlStateManager.color(
-                color.getRed() / 255f,
-                color.getGreen() / 255f,
-                color.getBlue() / 255f,
-                color.getAlpha() / 255f
-            );
+            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
             RenderUtils.drawTexturedModalRect(x, y, 0, 30, 182, 5);
             RenderUtils.drawTexturedModalRect(x, y, 0, 5, (int) (182 * percentage), 5);
             if (barStyle != 0) {
@@ -54,12 +49,7 @@ public class GenericOverlays extends Gui {
             Color color = new Color(percentage == max ? fullColor : loadingColor);
             GlStateManager.enableBlend();
             RenderUtils.drawTexturedModalRect(x, y, 0, 35, 62, 5);
-            GlStateManager.color(
-                color.getRed() / 255f,
-                color.getGreen() / 255f,
-                color.getBlue() / 255f,
-                color.getAlpha() / 255f
-            );
+            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
             RenderUtils.drawTexturedModalRect(x, y, 0, 65, 62, 5);
             RenderUtils.drawTexturedModalRect(x, y, 0, 40, (int) (62 * percentage), 5);
             if (barStyle != 0) {

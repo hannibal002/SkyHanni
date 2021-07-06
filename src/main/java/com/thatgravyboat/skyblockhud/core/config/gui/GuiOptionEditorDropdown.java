@@ -17,12 +17,7 @@ public class GuiOptionEditorDropdown extends GuiOptionEditor {
     private int selected;
     private boolean open = false;
 
-    public GuiOptionEditorDropdown(
-        ConfigProcessor.ProcessedOption option,
-        String[] values,
-        int selected,
-        boolean useOrdinal
-    ) {
+    public GuiOptionEditorDropdown(ConfigProcessor.ProcessedOption option, String[] values, int selected, boolean useOrdinal) {
         super(option);
         if (selected >= values.length) selected = values.length;
         this.values = values;
@@ -48,25 +43,9 @@ public class GuiOptionEditorDropdown extends GuiOptionEditor {
             }
 
             RenderUtils.drawFloatingRectDark(left, top, dropdownWidth, 14, false);
-            TextRenderUtils.drawStringScaled(
-                "\u25BC",
-                fr,
-                left + dropdownWidth - 10,
-                y + height - 7 - 15,
-                false,
-                0xffa0a0a0,
-                2
-            );
+            TextRenderUtils.drawStringScaled("\u25BC", fr, left + dropdownWidth - 10, y + height - 7 - 15, false, 0xffa0a0a0, 2);
 
-            TextRenderUtils.drawStringScaledMaxWidth(
-                selectedString,
-                fr,
-                left + 3,
-                top + 3,
-                false,
-                dropdownWidth - 16,
-                0xffa0a0a0
-            );
+            TextRenderUtils.drawStringScaledMaxWidth(selectedString, fr, left + 3, top + 3, false, dropdownWidth - 16, 0xffa0a0a0);
         }
     }
 
@@ -102,37 +81,13 @@ public class GuiOptionEditorDropdown extends GuiOptionEditor {
                 if (option.isEmpty()) {
                     option = "<NONE>";
                 }
-                TextRenderUtils.drawStringScaledMaxWidth(
-                    option,
-                    fr,
-                    left + 3,
-                    top + 3 + dropdownY,
-                    false,
-                    dropdownWidth - 6,
-                    0xffa0a0a0
-                );
+                TextRenderUtils.drawStringScaledMaxWidth(option, fr, left + 3, top + 3 + dropdownY, false, dropdownWidth - 6, 0xffa0a0a0);
                 dropdownY += 12;
             }
 
-            TextRenderUtils.drawStringScaled(
-                "\u25B2",
-                fr,
-                left + dropdownWidth - 10,
-                y + height - 7 - 15,
-                false,
-                0xffa0a0a0,
-                2
-            );
+            TextRenderUtils.drawStringScaled("\u25B2", fr, left + dropdownWidth - 10, y + height - 7 - 15, false, 0xffa0a0a0, 2);
 
-            TextRenderUtils.drawStringScaledMaxWidth(
-                selectedString,
-                fr,
-                left + 3,
-                top + 3,
-                false,
-                dropdownWidth - 16,
-                0xffa0a0a0
-            );
+            TextRenderUtils.drawStringScaledMaxWidth(selectedString, fr, left + 3, top + 3, false, dropdownWidth - 16, 0xffa0a0a0);
         }
     }
 

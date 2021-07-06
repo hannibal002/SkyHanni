@@ -51,10 +51,7 @@ public class SkyblockHud {
 
     private File configFile;
 
-    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet(
-        "SKYBLOCK",
-        "\u7A7A\u5C9B\u751F\u5B58"
-    );
+    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet("SKYBLOCK", "\u7A7A\u5C9B\u751F\u5B58");
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
@@ -90,9 +87,7 @@ public class SkyblockHud {
 
         if (configFile.exists()) {
             try (
-                BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)
-                )
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))
             ) {
                 config = gson.fromJson(reader, SBHConfig.class);
             } catch (Exception ignored) {}
@@ -114,9 +109,7 @@ public class SkyblockHud {
             configFile.createNewFile();
 
             try (
-                BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8)
-                )
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))
             ) {
                 writer.write(gson.toJson(config));
             }
@@ -181,13 +174,7 @@ public class SkyblockHud {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onStatusBar(ClientChatReceivedEvent event) {
-        if (
-            Utils
-                .removeColor(event.message.getUnformattedText())
-                .toLowerCase()
-                .trim()
-                .startsWith("your profile was changed to:")
-        ) {
+        if (Utils.removeColor(event.message.getUnformattedText()).toLowerCase().trim().startsWith("your profile was changed to:")) {
             MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent());
         }
     }

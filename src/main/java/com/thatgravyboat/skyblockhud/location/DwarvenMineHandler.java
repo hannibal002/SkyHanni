@@ -30,10 +30,7 @@ public class DwarvenMineHandler {
     public static int eventProgress;
     public static Event currentEvent;
 
-    private static final DecimalFormat formatter = new DecimalFormat(
-        "#,###",
-        DecimalFormatSymbols.getInstance(Locale.CANADA)
-    );
+    private static final DecimalFormat formatter = new DecimalFormat("#,###", DecimalFormatSymbols.getInstance(Locale.CANADA));
 
     public static String getMithrilFormatted() {
         String output = formatter.format(mithril);
@@ -62,44 +59,25 @@ public class DwarvenMineHandler {
             }
         }
         if (DwarvenMineHandler.currentEvent != Event.NONE) {
-            if (
-                DwarvenMineHandler.currentEvent == Event.TICKET &&
-                event.formattedLine.toLowerCase().contains("tickets:")
-            ) {
+            if (DwarvenMineHandler.currentEvent == Event.TICKET && event.formattedLine.toLowerCase().contains("tickets:")) {
                 if (event.formattedLine.toLowerCase().contains("pool:")) {
                     try {
-                        eventMax =
-                            Integer.parseInt(
-                                event.formattedLine.toLowerCase().replace("pool:", "").trim().split("/")[0].trim()
-                            );
+                        eventMax = Integer.parseInt(event.formattedLine.toLowerCase().replace("pool:", "").trim().split("/")[0].trim());
                     } catch (Exception ignored) {}
                 } else if (event.formattedLine.toLowerCase().contains("tickets:")) {
                     try {
-                        eventProgress =
-                            Integer.parseInt(
-                                event.formattedLine.toLowerCase().replace("tickets:", "").split("\\(")[0].trim()
-                            );
+                        eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("tickets:", "").split("\\(")[0].trim());
                     } catch (Exception ignored) {}
                 }
             } else if (DwarvenMineHandler.currentEvent == Event.GOBLIN) {
                 if (event.formattedLine.toLowerCase().contains("remaining:")) {
                     try {
                         eventMax =
-                            Integer.parseInt(
-                                event.formattedLine
-                                    .toLowerCase()
-                                    .replace("goblins", "")
-                                    .replace("remaining:", "")
-                                    .trim()
-                            );
+                            Integer.parseInt(event.formattedLine.toLowerCase().replace("goblins", "").replace("remaining:", "").trim());
                     } catch (Exception ignored) {}
-                } else if (
-                    event.formattedLine.toLowerCase().contains("your kills:") &&
-                    !event.formattedLine.toLowerCase().contains("(")
-                ) {
+                } else if (event.formattedLine.toLowerCase().contains("your kills:") && !event.formattedLine.toLowerCase().contains("(")) {
                     try {
-                        eventProgress =
-                            Integer.parseInt(event.formattedLine.toLowerCase().replace("your kills:", "").trim());
+                        eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("your kills:", "").trim());
                     } catch (Exception ignored) {}
                 }
             }

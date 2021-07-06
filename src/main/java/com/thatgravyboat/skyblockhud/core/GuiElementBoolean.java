@@ -96,12 +96,7 @@ public class GuiElementBoolean extends GuiElement {
 
     @Override
     public boolean mouseInput(int mouseX, int mouseY) {
-        if (
-            mouseX > x - clickRadius &&
-            mouseX < x + xSize + clickRadius &&
-            mouseY > y - clickRadius &&
-            mouseY < y + ySize + clickRadius
-        ) {
+        if (mouseX > x - clickRadius && mouseX < x + xSize + clickRadius && mouseY > y - clickRadius && mouseY < y + ySize + clickRadius) {
             if (Mouse.getEventButton() == 0) {
                 if (Mouse.getEventButtonState()) {
                     previewValue = !value;

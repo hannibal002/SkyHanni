@@ -21,15 +21,7 @@ public abstract class GuiOptionEditor {
 
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         RenderUtils.drawFloatingRectDark(x, y, width, height, true);
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            option.name,
-            fr,
-            x + width / 6f,
-            y + 13,
-            true,
-            width / 3 - 10,
-            0xc0c0c0
-        );
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(option.name, fr, x + width / 6f, y + 13, true, width / 3 - 10, 0xc0c0c0);
 
         int maxLines = 5;
         float scale = 1;

@@ -82,9 +82,7 @@ public class MiscUtils {
         }
         currentCursor = loc.getResourcePath();
         try {
-            BufferedImage image = ImageIO.read(
-                Minecraft.getMinecraft().getResourceManager().getResource(loc).getInputStream()
-            );
+            BufferedImage image = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(loc).getInputStream());
             int maxSize = Cursor.getMaxCursorSize();
             IntBuffer buffer = BufferUtils.createIntBuffer(maxSize * maxSize);
             for (int i = 0; i < maxSize * maxSize; i++) {
