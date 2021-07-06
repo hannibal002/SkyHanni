@@ -1,11 +1,10 @@
 package com.thatgravyboat.skyblockhud.commands;
 
+import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
-
-import java.util.List;
 
 /**
  @author Moulberry
@@ -28,10 +27,12 @@ public class SimpleCommand extends CommandBase {
     }
 
     public abstract static class ProcessCommandRunnable {
+
         public abstract void processCommand(ICommandSender sender, String[] args);
     }
 
     public abstract static class TabCompleteRunnable {
+
         public abstract List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos);
     }
 
@@ -52,7 +53,7 @@ public class SimpleCommand extends CommandBase {
     }
 
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        if(tabRunnable != null) return tabRunnable.tabComplete(sender, args, pos);
+        if (tabRunnable != null) return tabRunnable.tabComplete(sender, args, pos);
         return null;
     }
 }

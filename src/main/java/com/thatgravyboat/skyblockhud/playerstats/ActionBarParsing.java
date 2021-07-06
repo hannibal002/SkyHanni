@@ -3,15 +3,14 @@ package com.thatgravyboat.skyblockhud.playerstats;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ActionBarParsing {
 
@@ -38,7 +37,7 @@ public class ActionBarParsing {
     private static boolean predict = false;
 
     @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event){
+    public void tick(TickEvent.ClientTickEvent event) {
         if (predict) {
             ticksSinceLastPrediction++;
             if (ticksSinceLastPrediction == 20 && SkyblockHud.config.rpg.showRpgHud) {
@@ -49,18 +48,17 @@ public class ActionBarParsing {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onStatusBarHigh(ClientChatReceivedEvent event){
-        if (event.type == 2 && SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud){
+    public void onStatusBarHigh(ClientChatReceivedEvent event) {
+        if (event.type == 2 && SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
             parseActionBar(event.message.getUnformattedText());
         }
     }
 
-
     @SubscribeEvent(priority = EventPriority.LOW)
-    public void onStatusBarLow(ClientChatReceivedEvent event){
-        if (event.type == 2 && SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud){
+    public void onStatusBarLow(ClientChatReceivedEvent event) {
+        if (event.type == 2 && SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
             String message = event.message.getUnformattedText();
-            if (lastLowEditedActionBar == null || !lastLowActionBar.equals(message)){
+            if (lastLowEditedActionBar == null || !lastLowActionBar.equals(message)) {
                 lastLowActionBar = message;
                 message = HealthReplaceRegex.matcher(message).replaceAll("");
                 message = HealthAbsorptionReplaceRegex.matcher(message).replaceAll("");
@@ -74,7 +72,7 @@ public class ActionBarParsing {
         }
     }
 
-    public static void parseActionBar(String input){
+    public static void parseActionBar(String input) {
         if (!lastActionBar.equals(input)) {
             lastActionBar = input;
             String bar = Utils.removeColor(input);
@@ -93,31 +91,30 @@ public class ActionBarParsing {
             boolean manaOverflowFound = ManaOverflowMatcher.find();
             boolean xpFound = XpGainMatcher.find();
 
-
             if (healthFound) {
                 try {
                     RPGHud.updateHealth(Integer.parseInt(HealthMatcher.group(1)), Integer.parseInt(HealthMatcher.group(2)));
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {}
             }
             if (defenseFound) {
                 try {
                     RPGHud.updateDefense(Integer.parseInt(DefenseMatcher.group(1)));
-                }catch (Exception ignored){}
-            }else if (!xpFound && !manaUseFound){
-                    RPGHud.updateDefense(0);
+                } catch (Exception ignored) {}
+            } else if (!xpFound && !manaUseFound) {
+                RPGHud.updateDefense(0);
             }
             if (manaFound) {
                 try {
                     RPGHud.updateMana(Integer.parseInt(ManaMatcher.group(1)), Integer.parseInt(ManaMatcher.group(2)));
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {}
             }
-            if (!manaFound && manaOverflowFound){
+            if (!manaFound && manaOverflowFound) {
                 try {
                     RPGHud.updateMana(Integer.parseInt(ManaOverflowMatcher.group(1)), Integer.parseInt(ManaOverflowMatcher.group(2)));
                     RPGHud.updateOverflow(Integer.parseInt(ManaOverflowMatcher.group(3)));
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {}
             }
-            if (!manaFound){
+            if (!manaFound) {
                 if (manaUseFound) {
                     try {
                         RPGHud.manaPredictionUpdate(false, Integer.parseInt(ManaUseMatcher.group(1)));

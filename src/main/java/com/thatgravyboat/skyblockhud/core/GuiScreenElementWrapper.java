@@ -1,9 +1,8 @@
 package com.thatgravyboat.skyblockhud.core;
 
+import java.io.IOException;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
-
-import java.io.IOException;
 
 public class GuiScreenElementWrapper extends GuiScreen {
 

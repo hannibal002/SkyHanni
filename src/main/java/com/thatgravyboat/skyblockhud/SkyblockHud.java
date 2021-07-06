@@ -19,6 +19,11 @@ import com.thatgravyboat.skyblockhud.overlay.OverlayHud;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
 import com.thatgravyboat.skyblockhud.playerstats.ActionBarParsing;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -36,15 +41,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
-
 @Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
-public class SkyblockHud
-{
+public class SkyblockHud {
+
     public static final String MODID = "skyblockhud";
     public static final String VERSION = "1.12";
 
@@ -52,14 +51,14 @@ public class SkyblockHud
 
     private File configFile;
 
-    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet("SKYBLOCK","\u7A7A\u5C9B\u751F\u5B58");
+    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet("SKYBLOCK", "\u7A7A\u5C9B\u751F\u5B58");
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
     private static File configDirectory;
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event){
+    public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
         MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
@@ -86,14 +85,13 @@ public class SkyblockHud
 
         configFile = new File(event.getModConfigurationDirectory(), "sbh-config.json");
 
-        if(configFile.exists()) {
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
+        if (configFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 config = gson.fromJson(reader, SBHConfig.class);
-            } catch(Exception ignored) { }
+            } catch (Exception ignored) {}
         }
 
-
-        if(config == null) {
+        if (config == null) {
             config = new SBHConfig();
             saveConfig();
         }
@@ -108,14 +106,14 @@ public class SkyblockHud
         try {
             configFile.createNewFile();
 
-            try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(config));
             }
-        } catch(IOException ignored) {}
+        } catch (IOException ignored) {}
     }
 
     @EventHandler
-    public void postInit(FMLPostInitializationEvent event){
+    public void postInit(FMLPostInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new OverlayHud());
         MinecraftForge.EVENT_BUS.register(new RPGHud());
         MinecraftForge.EVENT_BUS.register(new DungeonOverlay());
@@ -161,19 +159,18 @@ public class SkyblockHud
     }
 
     @SubscribeEvent
-    public void onTooltip(ItemTooltipEvent event){
+    public void onTooltip(ItemTooltipEvent event) {
         if (event.itemStack != null && Keyboard.isKeyDown(Keyboard.KEY_BACKSLASH)) {
             try {
                 StringSelection clipboard = new StringSelection(event.itemStack.serializeNBT().toString());
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboard, clipboard);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onStatusBar(ClientChatReceivedEvent event){
-        if (Utils.removeColor(event.message.getUnformattedText()).toLowerCase().trim().startsWith("your profile was changed to:")){
+    public void onStatusBar(ClientChatReceivedEvent event) {
+        if (Utils.removeColor(event.message.getUnformattedText()).toLowerCase().trim().startsWith("your profile was changed to:")) {
             MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent());
         }
     }
@@ -182,10 +179,10 @@ public class SkyblockHud
     private static int screenTicks = 0;
 
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event){
-        if (screenToOpen != null){
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (screenToOpen != null) {
             screenTicks++;
-            if (screenTicks == 5){
+            if (screenTicks == 5) {
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen);
                 screenTicks = 0;
                 screenToOpen = null;

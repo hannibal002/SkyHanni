@@ -1,10 +1,9 @@
 package com.thatgravyboat.skyblockhud.api.events;
 
+import java.util.List;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraftforge.fml.common.eventhandler.Event;
-
-import java.util.List;
 
 public class SidebarPostEvent extends Event {
 
@@ -17,6 +16,6 @@ public class SidebarPostEvent extends Event {
         this.scoreboard = scoreboard;
         this.objective = objective;
         this.scores = scores;
-        this.arrayScores = scores.toArray(new String[]{});
+        this.arrayScores = scores.toArray(new String[] {});
     }
 }

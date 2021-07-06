@@ -1,6 +1,8 @@
 package com.thatgravyboat.skyblockhud.core.util.render;
 
 import com.thatgravyboat.skyblockhud.core.util.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -9,13 +11,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TextRenderUtils {
 
     public static int getCharVertLen(char c) {
-        if("acegmnopqrsuvwxyz".indexOf(c) >= 0) {
+        if ("acegmnopqrsuvwxyz".indexOf(c) >= 0) {
             return 5;
         } else {
             return 7;
@@ -25,9 +24,9 @@ public class TextRenderUtils {
     public static float getVerticalHeight(String str) {
         str = StringUtils.cleanColour(str);
         float height = 0;
-        for(int i=0; i<str.length(); i++) {
+        for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
-            int charHeight =  getCharVertLen(c);
+            int charHeight = getCharVertLen(c);
             height += charHeight + 1.5f;
         }
         return height;
@@ -36,12 +35,12 @@ public class TextRenderUtils {
     public static void drawStringVertical(String str, FontRenderer fr, float x, float y, boolean shadow, int colour) {
         String format = FontRenderer.getFormatFromString(str);
         str = StringUtils.cleanColour(str);
-        for(int i=0; i<str.length(); i++) {
+        for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
 
-            int charHeight =  getCharVertLen(c);
+            int charHeight = getCharVertLen(c);
             int charWidth = fr.getCharWidth(c);
-            fr.drawString(format+c, x+(5-charWidth)/2f, y-7+charHeight, colour, shadow);
+            fr.drawString(format + c, x + (5 - charWidth) / 2f, y - 7 + charHeight, colour, shadow);
 
             y += charHeight + 1.5f;
         }
@@ -49,7 +48,7 @@ public class TextRenderUtils {
 
     public static void drawStringScaledMaxWidth(String str, FontRenderer fr, float x, float y, boolean shadow, int len, int colour) {
         int strLen = fr.getStringWidth(str);
-        float factor = len/(float)strLen;
+        float factor = len / (float) strLen;
         factor = Math.min(1, factor);
 
         drawStringScaled(str, fr, x, y, shadow, colour, factor);
@@ -58,8 +57,8 @@ public class TextRenderUtils {
     public static void drawStringCentered(String str, FontRenderer fr, float x, float y, boolean shadow, int colour) {
         int strLen = fr.getStringWidth(str);
 
-        float x2 = x - strLen/2f;
-        float y2 = y - fr.FONT_HEIGHT/2f;
+        float x2 = x - strLen / 2f;
+        float y2 = y - fr.FONT_HEIGHT / 2f;
 
         GL11.glTranslatef(x2, y2, 0);
         fr.drawString(str, 0, 0, colour, shadow);
@@ -68,24 +67,23 @@ public class TextRenderUtils {
 
     public static void drawStringScaled(String str, FontRenderer fr, float x, float y, boolean shadow, int colour, float factor) {
         GlStateManager.scale(factor, factor, 1);
-        fr.drawString(str, x/factor, y/factor, colour, shadow);
-        GlStateManager.scale(1/factor, 1/factor, 1);
+        fr.drawString(str, x / factor, y / factor, colour, shadow);
+        GlStateManager.scale(1 / factor, 1 / factor, 1);
     }
 
     public static void drawStringCenteredScaledMaxWidth(String str, FontRenderer fr, float x, float y, boolean shadow, int len, int colour) {
         int strLen = fr.getStringWidth(str);
-        float factor = len/(float)strLen;
+        float factor = len / (float) strLen;
         factor = Math.min(1, factor);
         int newLen = Math.min(strLen, len);
 
-        float fontHeight = 8*factor;
+        float fontHeight = 8 * factor;
 
-        drawStringScaled(str, fr, x-newLen/2, y-fontHeight/2, shadow, colour, factor);
+        drawStringScaled(str, fr, x - newLen / 2, y - fontHeight / 2, shadow, colour, factor);
     }
 
     public static void renderToolTip(ItemStack stack, int mouseX, int mouseY, int screenWidth, int screenHeight, FontRenderer fontStd) {
-        List<String> list = stack.getTooltip(Minecraft.getMinecraft().thePlayer,
-                Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+        List<String> list = stack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
 
         for (int i = 0; i < list.size(); ++i) {
             if (i == 0) {
@@ -96,7 +94,7 @@ public class TextRenderUtils {
         }
 
         FontRenderer font = stack.getItem().getFontRenderer(stack);
-        drawHoveringText(list, mouseX, mouseY, screenWidth, screenHeight, -1,  font == null ? fontStd : font);
+        drawHoveringText(list, mouseX, mouseY, screenWidth, screenHeight, -1, font == null ? fontStd : font);
     }
 
     public static void drawHoveringText(List<String> textLines, final int mouseX, final int mouseY, final int screenWidth, final int screenHeight, final int maxTextWidth, FontRenderer font) {
@@ -121,8 +119,7 @@ public class TextRenderUtils {
             int tooltipX = mouseX + 12;
             if (tooltipX + tooltipTextWidth + 4 > screenWidth) {
                 tooltipX = mouseX - 16 - tooltipTextWidth;
-                if (tooltipX < 4) // if the tooltip doesn't fit on the screen
-                {
+                if (tooltipX < 4) { // if the tooltip doesn't fit on the screen
                     if (mouseX > screenWidth / 2) {
                         tooltipTextWidth = mouseX - 12 - 8;
                     } else {
@@ -211,5 +208,4 @@ public class TextRenderUtils {
         }
         GlStateManager.disableLighting();
     }
-
 }

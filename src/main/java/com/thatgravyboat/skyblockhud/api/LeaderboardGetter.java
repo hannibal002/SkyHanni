@@ -1,9 +1,13 @@
 package com.thatgravyboat.skyblockhud.api;
 
+import static com.thatgravyboat.skyblockhud.ComponentHandler.SCOREBOARD_CHARACTERS;
+
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPreGetEvent;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -13,11 +17,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.thatgravyboat.skyblockhud.ComponentHandler.SCOREBOARD_CHARACTERS;
-
 public class LeaderboardGetter {
 
     private static Map<Integer, String> cachedScores = new HashMap<>();
@@ -26,7 +25,7 @@ public class LeaderboardGetter {
     private static int ticks = 0;
 
     @SubscribeEvent
-    public void onClientUpdate(TickEvent.ClientTickEvent event){
+    public void onClientUpdate(TickEvent.ClientTickEvent event) {
         if (event.phase.equals(TickEvent.Phase.START)) return;
         ticks++;
         if (ticks % 5 != 0) return;
@@ -41,11 +40,13 @@ public class LeaderboardGetter {
                 Map<Integer, String> scores = scoreList.stream().collect(Collectors.toMap(Score::getScorePoints, this::getLine));
 
                 if (!cachedScores.equals(scores)) {
-                    scores.forEach((score, name) -> {
-                        if (cachedScores.get(score) == null || !cachedScores.get(score).equals(name)) {
-                            MinecraftForge.EVENT_BUS.post(new SidebarLineUpdateEvent(name, SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim(), score, scores.size(), scoreboard, sidebarObjective));
+                    scores.forEach(
+                        (score, name) -> {
+                            if (cachedScores.get(score) == null || !cachedScores.get(score).equals(name)) {
+                                MinecraftForge.EVENT_BUS.post(new SidebarLineUpdateEvent(name, SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim(), score, scores.size(), scoreboard, sidebarObjective));
+                            }
                         }
-                    });
+                    );
                     cachedScores = scores;
                     cachedScoresList = scores.values().stream().map(name -> SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim()).collect(Collectors.toList());
                 }
@@ -58,6 +59,4 @@ public class LeaderboardGetter {
         ScorePlayerTeam scorePlayerTeam = score.getScoreScoreboard().getPlayersTeam(score.getPlayerName());
         return Utils.removeColor(ScorePlayerTeam.formatPlayerName(scorePlayerTeam, score.getPlayerName()));
     }
-
-
 }

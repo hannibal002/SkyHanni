@@ -3,16 +3,14 @@ package com.thatgravyboat.skyblockhud.overlay;
 import com.thatgravyboat.skyblockhud.GuiTextures;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
+import java.awt.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 
-import java.awt.Color;
-
-
 public class GenericOverlays extends Gui {
 
-    public static void drawLargeBar(Minecraft mc, int x, int y, float percentage, float max, int fullColor, int loadingColor, int barStyle){
+    public static void drawLargeBar(Minecraft mc, int x, int y, float percentage, float max, int fullColor, int loadingColor, int barStyle) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(GuiTextures.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);
@@ -27,7 +25,7 @@ public class GenericOverlays extends Gui {
         }
     }
 
-    public static void drawSmallBar(Minecraft mc, int x, int y, double percentage, double max, int fullColor, int loadingColor, int barStyle){
+    public static void drawSmallBar(Minecraft mc, int x, int y, double percentage, double max, int fullColor, int loadingColor, int barStyle) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(GuiTextures.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);

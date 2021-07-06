@@ -12,11 +12,13 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(EntityArrow.class)
 public class MixinEntityArrow {
+
     //Disabled as kill tracker stuff not fully added yet.
-    @Shadow public Entity shootingEntity;
+    @Shadow
+    public Entity shootingEntity;
 
     @ModifyVariable(method = "onUpdate", at = @At(value = "STORE", ordinal = 1))
-    public MovingObjectPosition onUpdate(MovingObjectPosition position){
+    public MovingObjectPosition onUpdate(MovingObjectPosition position) {
         if (position != null && position.entityHit != null && this.shootingEntity != null && this.shootingEntity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())) {
             KillTrackerHandler.attackedEntities.add(position.entityHit.getUniqueID());
         }

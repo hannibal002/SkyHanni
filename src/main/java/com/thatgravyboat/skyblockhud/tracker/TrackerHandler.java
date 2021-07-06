@@ -6,6 +6,7 @@ import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,29 +16,28 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.*;
-
 public class TrackerHandler {
 
     public static class TrackerData {
-        public Map<String, Map<String,ItemStack>> dropTrackers;
 
-        public TrackerData(Map<String, Map<String,ItemStack>> trackers) {
+        public Map<String, Map<String, ItemStack>> dropTrackers;
+
+        public TrackerData(Map<String, Map<String, ItemStack>> trackers) {
             this.dropTrackers = trackers;
         }
 
-        public String getDropId(String event){
+        public String getDropId(String event) {
             if (event == null || event.isEmpty() || !eventGoing() || !dropTrackers.containsKey(event.toLowerCase().trim())) return null;
             return event.toLowerCase().trim();
         }
 
-        private boolean eventGoing(){
+        private boolean eventGoing() {
             return SeasonDateHandler.getCurrentEventTime().trim().toLowerCase().contains("ends in");
         }
     }
 
     public static Map<String, TrackerData> trackers = new HashMap<>();
-    public static Map<Locations,String> trackerIds = new HashMap<>();
+    public static Map<Locations, String> trackerIds = new HashMap<>();
 
     public static Map<String, ItemStack> sortTrackers(Map<String, ItemStack> map) {
         List<Map.Entry<String, ItemStack>> list = new ArrayList<>(map.entrySet());
@@ -51,18 +51,18 @@ public class TrackerHandler {
         return result;
     }
 
-    public static void onItemAdded(String id, int amount, String enchant, int level){
-        if (SkyblockHud.hasSkyblockScoreboard() && trackerIds.containsKey(LocationHandler.getCurrentLocation())){
+    public static void onItemAdded(String id, int amount, String enchant, int level) {
+        if (SkyblockHud.hasSkyblockScoreboard() && trackerIds.containsKey(LocationHandler.getCurrentLocation())) {
             String trackerId = trackerIds.get(LocationHandler.getCurrentLocation());
             TrackerData tracked = trackers.get(trackerId);
             String dropTrackerId = tracked.getDropId(SeasonDateHandler.getCurrentEvent());
-            Map<String,ItemStack> tracker = tracked.dropTrackers.get(dropTrackerId);
+            Map<String, ItemStack> tracker = tracked.dropTrackers.get(dropTrackerId);
             String dropId = id;
-            if (enchant != null){
+            if (enchant != null) {
                 dropId = enchant.toUpperCase() + ";" + level;
             }
 
-            if (tracker != null && tracker.containsKey(dropId)){
+            if (tracker != null && tracker.containsKey(dropId)) {
                 ItemStack stack = tracker.get(dropId);
                 stack.stackSize += amount;
                 tracked.dropTrackers.put(dropTrackerId, sortTrackers(tracker));
@@ -71,7 +71,7 @@ public class TrackerHandler {
     }
 
     public static void drawItemStack(ItemStack stack, int x, int y) {
-        if(stack == null)return;
+        if (stack == null) return;
         RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
         RenderHelper.enableGUIStandardItemLighting();
         itemRender.zLevel = -145;
@@ -119,6 +119,4 @@ public class TrackerHandler {
             }
         }
     }
-
-
 }

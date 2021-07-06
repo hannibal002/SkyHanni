@@ -15,29 +15,33 @@ public enum Season {
     LATEWINTER("latewinter", "Late Winter", 58, 341),
     ERROR("error", "Error", 0, -1);
 
-
-
-
     private final String name;
     private final String displayName;
     private final int textureX;
     private final int yearStartDay;
 
-    Season(String name, String displayName, int textureX, int yearStartDay){
+    Season(String name, String displayName, int textureX, int yearStartDay) {
         this.name = name;
         this.displayName = displayName;
         this.textureX = textureX;
         this.yearStartDay = yearStartDay;
     }
 
-    public String getName(){
+    public String getName() {
         return this.name;
     }
-    public String getDisplayName(){
+
+    public String getDisplayName() {
         return this.displayName;
     }
-    public int getTextureX() { return this.textureX; }
-    public int getYearStartDay() { return yearStartDay; }
+
+    public int getTextureX() {
+        return this.textureX;
+    }
+
+    public int getYearStartDay() {
+        return yearStartDay;
+    }
 
     public static Season get(String id) {
         try {
@@ -46,5 +50,4 @@ public enum Season {
             return ERROR;
         }
     }
-
 }

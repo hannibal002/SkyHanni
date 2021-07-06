@@ -1,12 +1,5 @@
 package com.thatgravyboat.skyblockhud.core.util;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.input.Cursor;
-import org.lwjgl.input.Mouse;
-
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
@@ -18,21 +11,27 @@ import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.imageio.ImageIO;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.input.Cursor;
+import org.lwjgl.input.Mouse;
 
 public class MiscUtils {
 
     public static void copyToClipboard(String str) {
-        Toolkit.getDefaultToolkit().getSystemClipboard()
-                .setContents(new StringSelection(str), null);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(str), null);
     }
+
     private static void unzip(InputStream src, File dest) {
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
         try {
             ZipInputStream zis = new ZipInputStream(src);
             ZipEntry ze = zis.getNextEntry();
-            while(ze != null){
-                if(!ze.isDirectory()) {
+            while (ze != null) {
+                if (!ze.isDirectory()) {
                     String fileName = ze.getName();
                     File newFile = new File(dest, fileName);
                     //create directories for sub directories in zip
@@ -57,8 +56,8 @@ public class MiscUtils {
     }
 
     public static void recursiveDelete(File file) {
-        if(file.isDirectory() && !Files.isSymbolicLink(file.toPath())) {
-            for(File child : file.listFiles()) {
+        if (file.isDirectory() && !Files.isSymbolicLink(file.toPath())) {
+            for (File child : file.listFiles()) {
                 recursiveDelete(child);
             }
         }
@@ -68,36 +67,36 @@ public class MiscUtils {
     private static String currentCursor = null;
 
     public static void resetCursor() {
-        if(currentCursor == null) {
+        if (currentCursor == null) {
             return;
         }
         currentCursor = null;
-        try { Mouse.setNativeCursor(null); } catch(Exception ignored) {}
+        try {
+            Mouse.setNativeCursor(null);
+        } catch (Exception ignored) {}
     }
 
     public static void setCursor(ResourceLocation loc, int hotspotX, int hotspotY) {
-        if(currentCursor != null && loc.getResourcePath().equals(currentCursor)) {
+        if (currentCursor != null && loc.getResourcePath().equals(currentCursor)) {
             return;
         }
         currentCursor = loc.getResourcePath();
         try {
-            BufferedImage image = ImageIO.read(Minecraft.getMinecraft()
-                    .getResourceManager().getResource(loc).getInputStream());
+            BufferedImage image = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(loc).getInputStream());
             int maxSize = Cursor.getMaxCursorSize();
-            IntBuffer buffer = BufferUtils.createIntBuffer(maxSize*maxSize);
-            for(int i=0; i<maxSize*maxSize; i++) {
-                int cursorX = i%maxSize;
-                int cursorY = i/maxSize;
-                if(cursorX >= image.getWidth() || cursorY >= image.getHeight()) {
+            IntBuffer buffer = BufferUtils.createIntBuffer(maxSize * maxSize);
+            for (int i = 0; i < maxSize * maxSize; i++) {
+                int cursorX = i % maxSize;
+                int cursorY = i / maxSize;
+                if (cursorX >= image.getWidth() || cursorY >= image.getHeight()) {
                     buffer.put(0x00000000);
                 } else {
-                    buffer.put(image.getRGB(cursorX, image.getHeight()-1-cursorY));
+                    buffer.put(image.getRGB(cursorX, image.getHeight() - 1 - cursorY));
                 }
             }
             buffer.flip();
-            Mouse.setNativeCursor(new Cursor(maxSize, maxSize, hotspotX, hotspotY, 1,
-                    buffer, null));
-        } catch(Exception e) {
+            Mouse.setNativeCursor(new Cursor(maxSize, maxSize, hotspotX, hotspotY, 1, buffer, null));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -1,6 +1,7 @@
 package com.thatgravyboat.skyblockhud.location;
 
 public class EndIslandHandler {
+
     public enum dragonTypes {
         PROTECTOR("Protector Dragon", 9000000),
         OLD("Old Dragon", 15000000),
@@ -14,12 +15,12 @@ public class EndIslandHandler {
         private final String displayName;
         private final int maxHealth;
 
-        dragonTypes(String displayName, int maxHealth){
+        dragonTypes(String displayName, int maxHealth) {
             this.displayName = displayName;
             this.maxHealth = maxHealth;
         }
 
-        public String getDisplayName(){
+        public String getDisplayName() {
             return this.displayName;
         }
 
@@ -27,20 +28,26 @@ public class EndIslandHandler {
             return this.maxHealth;
         }
 
-        public static dragonTypes findDragon(String input){
-            if (input.contains(" ")){
+        public static dragonTypes findDragon(String input) {
+            if (input.contains(" ")) {
                 try {
                     return dragonTypes.valueOf(input.toLowerCase().replace("dragon", "").replace(" ", "").toUpperCase());
-                } catch(IllegalArgumentException ignored) {
+                } catch (IllegalArgumentException ignored) {
                     return NODRAGON;
                 }
             } else {
-                try { return dragonTypes.valueOf(input); } catch(IllegalArgumentException ignored) { return NODRAGON; }
+                try {
+                    return dragonTypes.valueOf(input);
+                } catch (IllegalArgumentException ignored) {
+                    return NODRAGON;
+                }
             }
         }
     }
 
     private static dragonTypes currentDragon = dragonTypes.NODRAGON;
 
-    public static void setCurrentDragon(dragonTypes dragon) { currentDragon = dragon; }
+    public static void setCurrentDragon(dragonTypes dragon) {
+        currentDragon = dragon;
+    }
 }

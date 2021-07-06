@@ -14,7 +14,7 @@ public class Commands {
 
     private static final SimpleCommand.ProcessCommandRunnable settingsRunnable = new SimpleCommand.ProcessCommandRunnable() {
         public void processCommand(ICommandSender sender, String[] args) {
-            if(args.length > 0) {
+            if (args.length > 0) {
                 SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, StringUtils.join(args, " ")));
             } else {
                 SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config));
@@ -26,14 +26,16 @@ public class Commands {
     private static final SimpleCommand settingsCommand2 = new SimpleCommand("sbhsettings", settingsRunnable);
     private static final SimpleCommand settingsCommand3 = new SimpleCommand("sbhud", settingsRunnable);
 
-    private static final SimpleCommand mapCommand = new SimpleCommand("sbhmap", new SimpleCommand.ProcessCommandRunnable() {
-        public void processCommand(ICommandSender sender, String[] args) {
-            if (LocationHandler.getCurrentLocation().getCategory().getMap() != null)
-                SkyblockHud.screenToOpen = new MapHandler.MapScreen();
+    private static final SimpleCommand mapCommand = new SimpleCommand(
+        "sbhmap",
+        new SimpleCommand.ProcessCommandRunnable() {
+            public void processCommand(ICommandSender sender, String[] args) {
+                if (LocationHandler.getCurrentLocation().getCategory().getMap() != null) SkyblockHud.screenToOpen = new MapHandler.MapScreen();
+            }
         }
-    });
+    );
 
-    public static void init(){
+    public static void init() {
         ClientCommandHandler.instance.registerCommand(settingsCommand);
         ClientCommandHandler.instance.registerCommand(settingsCommand2);
         ClientCommandHandler.instance.registerCommand(settingsCommand3);
