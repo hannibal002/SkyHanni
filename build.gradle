@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        jcenter()
         maven {
             name = "jitpack"
             url = "https://jitpack.io/"
@@ -35,7 +34,6 @@ minecraft {
 }
 
 repositories {
-    jcenter()
     maven { url 'https://repo.spongepowered.org/maven/' }
     flatDir {
         dirs 'deps'
