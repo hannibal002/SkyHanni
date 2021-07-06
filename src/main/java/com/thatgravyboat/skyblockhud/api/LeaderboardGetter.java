@@ -25,8 +25,6 @@ public class LeaderboardGetter {
 
     private static int ticks = 0;
 
-    //This is really bad and should use the packet instead.
-
     @SubscribeEvent
     public void onClientUpdate(TickEvent.ClientTickEvent event){
         if (event.phase.equals(TickEvent.Phase.START)) return;

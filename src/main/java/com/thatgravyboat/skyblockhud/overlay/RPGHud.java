@@ -69,8 +69,10 @@ public class RPGHud extends Gui {
             boolean rightAligned = position.rightAligned(event.resolution, 120);
 
             drawTexturedModalRect(x,y,rightAligned ? 131 : 5,6,120,47);
+
             float manaWidth = Math.min(57 * ((float)mana/(float)maxMana), 57);
             drawTexturedModalRect(rightAligned ? x + 16 : 47 + x,17 + y,rightAligned ? 199 : 0,64,(int)manaWidth,4);
+
             float healthWidth = Math.min(70 * ((float)health/(float)maxHealth), 70);
             drawTexturedModalRect(rightAligned ? x + 3 : 47+ x,22+ y,rightAligned ? 186 : 0,68,(int)healthWidth,5);
 
@@ -93,7 +95,7 @@ public class RPGHud extends Gui {
             drawCenteredString(mc.fontRendererObj, ""+mc.thePlayer.experienceLevel, (rightAligned ? 130 : 0) + (int)(15+ x/0.75f), (int)(45+ y/0.75f), 8453920);
             GlStateManager.scale(1/0.75f, 1/0.75f, 1);
             GlStateManager.scale(0.75f, 0.75f, 1);
-            font.drawString( ChatFormatting.RED + " \u2764 " + health +"/"+maxHealth,(rightAligned ? -40 : 0) + (int)(64+ x/0.75f), (int)(8+ y/0.75f), 0xffffff, false);
+            font.drawString( ChatFormatting.RED + " \u2764 " + health +"/"+maxHealth,(rightAligned ? -40 : 0) + (int)(64+ x/0.75f), (int)(8+ y/0.75f), 0xffffff, true);
             GlStateManager.scale(1/0.75f, 1/0.75f, 1);
             GlStateManager.color(255,255,255);
             GlStateManager.disableBlend();

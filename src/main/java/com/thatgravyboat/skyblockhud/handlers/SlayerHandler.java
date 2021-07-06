@@ -7,8 +7,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SlayerHandler {
+    //Optional Characters are required because Hypixel dumb and cuts off text
+    private static final Pattern COMBAT_XP_REGEX = Pattern.compile("\\(([\\d,]+)/([\\dkm]+)\\) comb?a?t? x?p?");
+    private static final Pattern KILLS_REGEX = Pattern.compile("(\\d+)/(\\d+) kills?");
 
     public enum slayerTypes {
 
@@ -77,25 +82,32 @@ public class SlayerHandler {
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event){
+        if (!isDoingSlayer && event.formattedLine.equals("Slayer Quest")) isDoingSlayer = true;
+
         if (isDoingSlayer){
             String line = event.formattedLine.toLowerCase();
-            if (line.contains("/") && (line.contains("kills") || (line.contains("xp")))){
+            Matcher killMatcher = KILLS_REGEX.matcher(line);
+            Matcher xpMatcher = COMBAT_XP_REGEX.matcher(line);
+
+            if (killMatcher.find()){
                 SlayerHandler.bossSlain = false;
                 SlayerHandler.isKillingBoss = false;
-                String[] killsText = line.replace(" ", "").replace("kills", "").split("/");
-                if (line.contains("xp"))
-                    killsText = line.replace(" ", "")
-                                    .replace("(", "")
-                                    .replace(")", "")
-                                    .replace("combatxp", "")
-                                    .split("/");
                 try {
-                    progress = Integer.parseInt(killsText[0]);
+                    progress = Integer.parseInt(killMatcher.group(1));
                 } catch (Exception ignored){}
                 try {
-                    maxKills = Integer.parseInt(killsText[1]);
+                    maxKills = Integer.parseInt(killMatcher.group(2));
                 } catch (Exception ignored){}
-            }else if(line.contains("slay the boss")) {
+            }else if (xpMatcher.find()){
+                SlayerHandler.bossSlain = false;
+                SlayerHandler.isKillingBoss = false;
+                try {
+                    progress = Integer.parseInt(xpMatcher.group(1));
+                } catch (Exception ignored){}
+                try {
+                    maxKills = Integer.parseInt(xpMatcher.group(2).replace("k", "")) * (xpMatcher.group(2).contains("k") ? 1000 : xpMatcher.group(2).contains("m") ? 1000000 : 1);
+                } catch (Exception ignored){}
+            } else if(line.contains("slay the boss")) {
                 SlayerHandler.bossSlain = false;
                 SlayerHandler.isKillingBoss = true;
                 SlayerHandler.maxKills = 0;
