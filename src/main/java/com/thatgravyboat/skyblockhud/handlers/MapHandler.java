@@ -139,7 +139,7 @@ public class MapHandler {
                 Utils.drawStringCenteredScaled(keyCode, mc.fontRendererObj, pos.getAbsX(event.resolution, 64) + 58,pos.getAbsY(event.resolution, 72) + 66, false, 6,0xFFFFFF);
                 BlockPos playerPos = mc.thePlayer.getPosition();
                 String position = String.format("%d/%d/%d", playerPos.getX(), playerPos.getY(), playerPos.getZ());
-                Utils.drawStringCenteredScaled(position, mc.fontRendererObj, pos.getAbsX(event.resolution, 64) + 30,pos.getAbsY(event.resolution, 72) + 66, false, 36,0xFFFFFF);
+                Utils.drawStringCenteredScaled(position, mc.fontRendererObj, pos.getAbsX(event.resolution, 64) + 29,pos.getAbsY(event.resolution, 72) + 66, false, 36,0xFFFFFF);
                 GlStateManager.color(1.0f,1.0f, 1.0f,1.0f);
             }
         }
