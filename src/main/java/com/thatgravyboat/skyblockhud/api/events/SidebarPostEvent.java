@@ -7,19 +7,19 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 
 public class SidebarPostEvent extends Event {
 
-  public Scoreboard scoreboard;
-  public ScoreObjective objective;
-  public List<String> scores;
-  public String[] arrayScores;
+    public Scoreboard scoreboard;
+    public ScoreObjective objective;
+    public List<String> scores;
+    public String[] arrayScores;
 
-  public SidebarPostEvent(
-    Scoreboard scoreboard,
-    ScoreObjective objective,
-    List<String> scores
-  ) {
-    this.scoreboard = scoreboard;
-    this.objective = objective;
-    this.scores = scores;
-    this.arrayScores = scores.toArray(new String[] {});
-  }
+    public SidebarPostEvent(
+        Scoreboard scoreboard,
+        ScoreObjective objective,
+        List<String> scores
+    ) {
+        this.scoreboard = scoreboard;
+        this.objective = objective;
+        this.scores = scores;
+        this.arrayScores = scores.toArray(new String[] {});
+    }
 }

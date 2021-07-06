@@ -44,105 +44,105 @@ import org.lwjgl.input.Keyboard;
 @Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
 public class SkyblockHud {
 
-  public static final String MODID = "skyblockhud";
-  public static final String VERSION = "1.12";
+    public static final String MODID = "skyblockhud";
+    public static final String VERSION = "1.12";
 
-  public static SBHConfig config;
+    public static SBHConfig config;
 
-  private File configFile;
+    private File configFile;
 
-  private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet(
-    "SKYBLOCK",
-    "\u7A7A\u5C9B\u751F\u5B58"
-  );
+    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet(
+        "SKYBLOCK",
+        "\u7A7A\u5C9B\u751F\u5B58"
+    );
 
-  private final Gson gson = new GsonBuilder()
-    .setPrettyPrinting()
-    .excludeFieldsWithoutExposeAnnotation()
-    .create();
+    private final Gson gson = new GsonBuilder()
+        .setPrettyPrinting()
+        .excludeFieldsWithoutExposeAnnotation()
+        .create();
 
-  private static File configDirectory;
+    private static File configDirectory;
 
-  @EventHandler
-  public void preInit(FMLPreInitializationEvent event) {
-    MinecraftForge.EVENT_BUS.register(this);
-    MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
-    MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
-    MinecraftForge.EVENT_BUS.register(new LocationHandler());
-    MinecraftForge.EVENT_BUS.register(new IslandHandler());
-    MinecraftForge.EVENT_BUS.register(new TimeHandler());
-    MinecraftForge.EVENT_BUS.register(new CurrencyHandler());
-    MinecraftForge.EVENT_BUS.register(new SlayerHandler());
-    MinecraftForge.EVENT_BUS.register(new DungeonHandler());
-    MinecraftForge.EVENT_BUS.register(new DwarvenMineHandler());
-    MinecraftForge.EVENT_BUS.register(new FarmingIslandHandler());
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
+        MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
+        MinecraftForge.EVENT_BUS.register(new LocationHandler());
+        MinecraftForge.EVENT_BUS.register(new IslandHandler());
+        MinecraftForge.EVENT_BUS.register(new TimeHandler());
+        MinecraftForge.EVENT_BUS.register(new CurrencyHandler());
+        MinecraftForge.EVENT_BUS.register(new SlayerHandler());
+        MinecraftForge.EVENT_BUS.register(new DungeonHandler());
+        MinecraftForge.EVENT_BUS.register(new DwarvenMineHandler());
+        MinecraftForge.EVENT_BUS.register(new FarmingIslandHandler());
 
-    /* DISABLE UNTIL NEW SYSTEM
+        /* DISABLE UNTIL NEW SYSTEM
         MinecraftForge.EVENT_BUS.register(new TrackerHandler());
         MinecraftForge.EVENT_BUS.register(new KillTrackerHandler());
          */
-    MinecraftForge.EVENT_BUS.register(new HeldItemHandler());
+        MinecraftForge.EVENT_BUS.register(new HeldItemHandler());
 
-    ClientRegistry.registerKeyBinding(KeyBindings.map);
+        ClientRegistry.registerKeyBinding(KeyBindings.map);
 
-    MinecraftForge.EVENT_BUS.register(new ComponentHandler());
-    MinecraftForge.EVENT_BUS.register(new ActionBarParsing());
-    Commands.init();
+        MinecraftForge.EVENT_BUS.register(new ComponentHandler());
+        MinecraftForge.EVENT_BUS.register(new ActionBarParsing());
+        Commands.init();
 
-    configFile =
-      new File(event.getModConfigurationDirectory(), "sbh-config.json");
+        configFile =
+            new File(event.getModConfigurationDirectory(), "sbh-config.json");
 
-    if (configFile.exists()) {
-      try (
-        BufferedReader reader = new BufferedReader(
-          new InputStreamReader(
-            new FileInputStream(configFile),
-            StandardCharsets.UTF_8
-          )
-        )
-      ) {
-        config = gson.fromJson(reader, SBHConfig.class);
-      } catch (Exception ignored) {}
+        if (configFile.exists()) {
+            try (
+                BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(
+                        new FileInputStream(configFile),
+                        StandardCharsets.UTF_8
+                    )
+                )
+            ) {
+                config = gson.fromJson(reader, SBHConfig.class);
+            } catch (Exception ignored) {}
+        }
+
+        if (config == null) {
+            config = new SBHConfig();
+            saveConfig();
+        }
+
+        configDirectory = event.getModConfigurationDirectory();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
+        //Runtime.getRuntime().addShutdownHook(new Thread(() -> TrackerFileLoader.saveTrackerStatsFile(event.getModConfigurationDirectory())));
     }
 
-    if (config == null) {
-      config = new SBHConfig();
-      saveConfig();
+    public void saveConfig() {
+        try {
+            configFile.createNewFile();
+
+            try (
+                BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(
+                        new FileOutputStream(configFile),
+                        StandardCharsets.UTF_8
+                    )
+                )
+            ) {
+                writer.write(gson.toJson(config));
+            }
+        } catch (IOException ignored) {}
     }
 
-    configDirectory = event.getModConfigurationDirectory();
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(new OverlayHud());
+        MinecraftForge.EVENT_BUS.register(new RPGHud());
+        MinecraftForge.EVENT_BUS.register(new DungeonOverlay());
+        MinecraftForge.EVENT_BUS.register(new BossbarHandler());
+        MinecraftForge.EVENT_BUS.register(new MapHandler());
+    }
 
-    Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
-    //Runtime.getRuntime().addShutdownHook(new Thread(() -> TrackerFileLoader.saveTrackerStatsFile(event.getModConfigurationDirectory())));
-  }
-
-  public void saveConfig() {
-    try {
-      configFile.createNewFile();
-
-      try (
-        BufferedWriter writer = new BufferedWriter(
-          new OutputStreamWriter(
-            new FileOutputStream(configFile),
-            StandardCharsets.UTF_8
-          )
-        )
-      ) {
-        writer.write(gson.toJson(config));
-      }
-    } catch (IOException ignored) {}
-  }
-
-  @EventHandler
-  public void postInit(FMLPostInitializationEvent event) {
-    MinecraftForge.EVENT_BUS.register(new OverlayHud());
-    MinecraftForge.EVENT_BUS.register(new RPGHud());
-    MinecraftForge.EVENT_BUS.register(new DungeonOverlay());
-    MinecraftForge.EVENT_BUS.register(new BossbarHandler());
-    MinecraftForge.EVENT_BUS.register(new MapHandler());
-  }
-
-  /* DISABLE UNTIL NEW SYSTEM
+    /* DISABLE UNTIL NEW SYSTEM
 
     @EventHandler
     public void loadComplete(FMLLoadCompleteEvent event){
@@ -160,67 +160,72 @@ public class SkyblockHud {
 
      */
 
-  public static boolean hasSkyblockScoreboard() {
-    Minecraft mc = Minecraft.getMinecraft();
+    public static boolean hasSkyblockScoreboard() {
+        Minecraft mc = Minecraft.getMinecraft();
 
-    if (mc != null && mc.theWorld != null) {
-      Scoreboard scoreboard = mc.theWorld.getScoreboard();
-      ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1);
-      if (sidebarObjective != null) {
-        String objectiveName = sidebarObjective
-          .getDisplayName()
-          .replaceAll("(?i)\\u00A7.", "");
-        for (String skyblock : SKYBLOCK_IN_ALL_LANGUAGES) {
-          if (objectiveName.startsWith(skyblock)) {
-            return true;
-          }
+        if (mc != null && mc.theWorld != null) {
+            Scoreboard scoreboard = mc.theWorld.getScoreboard();
+            ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(
+                1
+            );
+            if (sidebarObjective != null) {
+                String objectiveName = sidebarObjective
+                    .getDisplayName()
+                    .replaceAll("(?i)\\u00A7.", "");
+                for (String skyblock : SKYBLOCK_IN_ALL_LANGUAGES) {
+                    if (objectiveName.startsWith(skyblock)) {
+                        return true;
+                    }
+                }
+            }
         }
-      }
+
+        return false;
     }
 
-    return false;
-  }
-
-  @SubscribeEvent
-  public void onTooltip(ItemTooltipEvent event) {
-    if (event.itemStack != null && Keyboard.isKeyDown(Keyboard.KEY_BACKSLASH)) {
-      try {
-        StringSelection clipboard = new StringSelection(
-          event.itemStack.serializeNBT().toString()
-        );
-        Toolkit
-          .getDefaultToolkit()
-          .getSystemClipboard()
-          .setContents(clipboard, clipboard);
-      } catch (Exception ignored) {}
+    @SubscribeEvent
+    public void onTooltip(ItemTooltipEvent event) {
+        if (
+            event.itemStack != null &&
+            Keyboard.isKeyDown(Keyboard.KEY_BACKSLASH)
+        ) {
+            try {
+                StringSelection clipboard = new StringSelection(
+                    event.itemStack.serializeNBT().toString()
+                );
+                Toolkit
+                    .getDefaultToolkit()
+                    .getSystemClipboard()
+                    .setContents(clipboard, clipboard);
+            } catch (Exception ignored) {}
+        }
     }
-  }
 
-  @SubscribeEvent(priority = EventPriority.HIGHEST)
-  public void onStatusBar(ClientChatReceivedEvent event) {
-    if (
-      Utils
-        .removeColor(event.message.getUnformattedText())
-        .toLowerCase()
-        .trim()
-        .startsWith("your profile was changed to:")
-    ) {
-      MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent());
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onStatusBar(ClientChatReceivedEvent event) {
+        if (
+            Utils
+                .removeColor(event.message.getUnformattedText())
+                .toLowerCase()
+                .trim()
+                .startsWith("your profile was changed to:")
+        ) {
+            MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent());
+        }
     }
-  }
 
-  public static GuiScreen screenToOpen = null;
-  private static int screenTicks = 0;
+    public static GuiScreen screenToOpen = null;
+    private static int screenTicks = 0;
 
-  @SubscribeEvent
-  public void onClientTick(TickEvent.ClientTickEvent event) {
-    if (screenToOpen != null) {
-      screenTicks++;
-      if (screenTicks == 5) {
-        Minecraft.getMinecraft().displayGuiScreen(screenToOpen);
-        screenTicks = 0;
-        screenToOpen = null;
-      }
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (screenToOpen != null) {
+            screenTicks++;
+            if (screenTicks == 5) {
+                Minecraft.getMinecraft().displayGuiScreen(screenToOpen);
+                screenTicks = 0;
+                screenToOpen = null;
+            }
+        }
     }
-  }
 }

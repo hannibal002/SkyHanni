@@ -13,72 +13,74 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class KillTrackerHandler {
 
-  public static final Set<UUID> attackedEntities = new HashSet<>();
+    public static final Set<UUID> attackedEntities = new HashSet<>();
 
-  @SubscribeEvent
-  public void onAttack(AttackEntityEvent event) {
-    if (event.target != null) {
-      attackedEntities.add(event.target.getUniqueID());
-    }
-  }
-
-  @SubscribeEvent
-  public void onDeath(LivingDeathEvent event) {
-    if (false) {
-      //Used for testing
-      System.out.println(
-        "----------------------------------------------------------------------------------------------------------------"
-      );
-      System.out.println("Name : " + event.entity.getName());
-      System.out.println("UUID : " + event.entity.getUniqueID());
-      NBTTagCompound tag = new NBTTagCompound();
-      event.entity.writeToNBT(tag);
-      System.out.println("Tag : " + tag);
-      System.out.println("Damage : " + getDamageSourceString(event.source));
-      System.out.println(
-        "----------------------------------------------------------------------------------------------------------------"
-      );
+    @SubscribeEvent
+    public void onAttack(AttackEntityEvent event) {
+        if (event.target != null) {
+            attackedEntities.add(event.target.getUniqueID());
+        }
     }
 
-    attackedEntities.remove(event.entity.getUniqueID());
-  }
+    @SubscribeEvent
+    public void onDeath(LivingDeathEvent event) {
+        if (false) {
+            //Used for testing
+            System.out.println(
+                "----------------------------------------------------------------------------------------------------------------"
+            );
+            System.out.println("Name : " + event.entity.getName());
+            System.out.println("UUID : " + event.entity.getUniqueID());
+            NBTTagCompound tag = new NBTTagCompound();
+            event.entity.writeToNBT(tag);
+            System.out.println("Tag : " + tag);
+            System.out.println(
+                "Damage : " + getDamageSourceString(event.source)
+            );
+            System.out.println(
+                "----------------------------------------------------------------------------------------------------------------"
+            );
+        }
 
-  public static String getDamageSourceString(DamageSource source) {
-    return (
-      "{ " +
-      source.getDamageType() +
-      ", " +
-      source.isDamageAbsolute() +
-      ", " +
-      source.isDifficultyScaled() +
-      ", " +
-      source.isFireDamage() +
-      ", " +
-      source.isProjectile() +
-      ", " +
-      source.isUnblockable() +
-      ", " +
-      source.isExplosion() +
-      ", " +
-      source.isMagicDamage() +
-      ", " +
-      source.isCreativePlayer() +
-      ", " +
-      source.getSourceOfDamage() +
-      " }"
-    );
-  }
-
-  @SubscribeEvent
-  public void onWorldChange(EntityJoinWorldEvent event) {
-    if (event.entity != null) {
-      if (
-        event.entity
-          .getUniqueID()
-          .equals(Minecraft.getMinecraft().thePlayer.getUniqueID())
-      ) {
-        attackedEntities.clear();
-      }
+        attackedEntities.remove(event.entity.getUniqueID());
     }
-  }
+
+    public static String getDamageSourceString(DamageSource source) {
+        return (
+            "{ " +
+            source.getDamageType() +
+            ", " +
+            source.isDamageAbsolute() +
+            ", " +
+            source.isDifficultyScaled() +
+            ", " +
+            source.isFireDamage() +
+            ", " +
+            source.isProjectile() +
+            ", " +
+            source.isUnblockable() +
+            ", " +
+            source.isExplosion() +
+            ", " +
+            source.isMagicDamage() +
+            ", " +
+            source.isCreativePlayer() +
+            ", " +
+            source.getSourceOfDamage() +
+            " }"
+        );
+    }
+
+    @SubscribeEvent
+    public void onWorldChange(EntityJoinWorldEvent event) {
+        if (event.entity != null) {
+            if (
+                event.entity
+                    .getUniqueID()
+                    .equals(Minecraft.getMinecraft().thePlayer.getUniqueID())
+            ) {
+                attackedEntities.clear();
+            }
+        }
+    }
 }

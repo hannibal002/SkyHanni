@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(NetHandlerPlayClient.class)
 public class MixinNetHandlerPlayClient {
 
-  /* DISABLE UNTIL NEW SYSTEM
+    /* DISABLE UNTIL NEW SYSTEM
     @Inject(method = "handleSetSlot", at = @At("HEAD"))
     public void onHandleSetSlot(S2FPacketSetSlot packetIn, CallbackInfo ci){
         if (SkyblockHud.hasSkyblockScoreboard()) {
@@ -44,26 +44,26 @@ public class MixinNetHandlerPlayClient {
     }
      */
 
-  @Inject(
-    method = "handleTeams",
-    locals = LocalCapture.CAPTURE_FAILHARD,
-    at = @At(
-      value = "INVOKE",
-      target = "Lnet/minecraft/network/play/server/S3EPacketTeams;getAction()I",
-      ordinal = 0,
-      shift = At.Shift.BEFORE
-    ),
-    cancellable = true
-  )
-  public void handleTeams(
-    S3EPacketTeams packetIn,
-    CallbackInfo ci,
-    Scoreboard scoreboard
-  ) {
-    //This stops Hypixel from being stupid and spamming our logs because they dont have different ids for things.
-    if (
-      scoreboard.getTeam(packetIn.getName()) != null &&
-      packetIn.getAction() == 0
-    ) ci.cancel();
-  }
+    @Inject(
+        method = "handleTeams",
+        locals = LocalCapture.CAPTURE_FAILHARD,
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/network/play/server/S3EPacketTeams;getAction()I",
+            ordinal = 0,
+            shift = At.Shift.BEFORE
+        ),
+        cancellable = true
+    )
+    public void handleTeams(
+        S3EPacketTeams packetIn,
+        CallbackInfo ci,
+        Scoreboard scoreboard
+    ) {
+        //This stops Hypixel from being stupid and spamming our logs because they dont have different ids for things.
+        if (
+            scoreboard.getTeam(packetIn.getName()) != null &&
+            packetIn.getAction() == 0
+        ) ci.cancel();
+    }
 }

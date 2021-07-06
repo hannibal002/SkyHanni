@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ConfigOption {
-  String name();
+    String name();
 
-  String desc();
+    String desc();
 
-  int subcategoryId() default -1;
+    int subcategoryId() default -1;
 }

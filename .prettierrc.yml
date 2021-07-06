@@ -4,3 +4,5 @@ overrides:
     options:
       useTabs: false
       trailingComma: none
+      tabWidth: 4
+      endOfLine: lf

@@ -9,20 +9,22 @@ import net.minecraft.entity.monster.EntityEnderman;
 
 public class EntityTypeRegistry {
 
-  private static final Map<Class<? extends Entity>, List<SkyBlockEntity>> entities = Maps.newHashMap();
+    private static final Map<Class<? extends Entity>, List<SkyBlockEntity>> entities = Maps.newHashMap();
 
-  static {
-    entities.put(
-      EntityEnderman.class,
-      ImmutableList.of(SkyBlockEntity.of("zealot", EntityTypeHelper::isZealot))
-    );
-  }
+    static {
+        entities.put(
+            EntityEnderman.class,
+            ImmutableList.of(
+                SkyBlockEntity.of("zealot", EntityTypeHelper::isZealot)
+            )
+        );
+    }
 
-  public static String getEntityId(Entity entity) {
-    if (!entities.containsKey(entity.getClass())) return null;
-    for (SkyBlockEntity skyBlockEntity : entities.get(entity.getClass())) if (
-      skyBlockEntity.isEntity(entity)
-    ) return skyBlockEntity.getName();
-    return null;
-  }
+    public static String getEntityId(Entity entity) {
+        if (!entities.containsKey(entity.getClass())) return null;
+        for (SkyBlockEntity skyBlockEntity : entities.get(
+            entity.getClass()
+        )) if (skyBlockEntity.isEntity(entity)) return skyBlockEntity.getName();
+        return null;
+    }
 }
