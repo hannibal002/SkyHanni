@@ -1,14 +1,14 @@
 buildscript {
     repositories {
         maven {
-            name = "jitpack"
-            url = "https://jitpack.io/"
+            name = 'jitpack'
+            url = 'https://jitpack.io/'
         }
-        maven { url = "https://maven.minecraftforge.net/" }
-        maven { url = "https://repo.spongepowered.org/maven" }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
     }
     dependencies {
-        classpath "com.github.asbyth:ForgeGradle:8708bf3e01"
+        classpath 'com.github.asbyth:ForgeGradle:8708bf3e01'
         classpath 'com.github.xcfrg:MixinGradle:0.6-SNAPSHOT'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
     }
@@ -22,15 +22,15 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = "1.13"
-group= "com.thatgravyboat.skyblockhud"
-archivesBaseName = "SkyBlockHud"
-String mixinClassifier = "dep"
+version = '1.13'
+group= 'com.thatgravyboat.skyblockhud'
+archivesBaseName = 'SkyBlockHud'
+String mixinClassifier = 'dep'
 
 minecraft {
-    version = "1.8.9-11.15.1.2318-1.8.9"
-    runDir = "run"
-    mappings = "stable_22"
+    version = '1.8.9-11.15.1.2318-1.8.9'
+    runDir = 'run'
+    mappings = 'stable_22'
 }
 
 repositories {
@@ -46,15 +46,15 @@ dependencies {
 }
 
 mixin {
-    add sourceSets.main, "mixins.skyblockhud.refmap.json"
+    add sourceSets.main, 'mixins.skyblockhud.refmap.json'
 }
 
 jar {
     manifest.attributes(
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-            'MixinConfigs': "mixins.skyblockhud.json",
+            'MixinConfigs': 'mixins.skyblockhud.json',
             'FMLCorePluginContainsFMLMod': true,
-            "ForceLoadAsMod": true
+            'ForceLoadAsMod': true
     )
 }
 
@@ -80,8 +80,8 @@ runClient.dependsOn(build)
 
 processResources
         {
-            inputs.property "version", project.version
-            inputs.property "mcversion", project.minecraft.version
+            inputs.property 'version', project.version
+            inputs.property 'mcversion', project.minecraft.version
 
             from(sourceSets.main.resources.srcDirs) {
                 include 'mcmod.info'
