@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        jcenter()
         maven {
             name = "jitpack"
             url = "https://jitpack.io/"
