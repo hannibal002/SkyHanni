@@ -1,0 +1,6 @@
+overrides:
+  - files:
+      - "*.java"
+    options:
+      useTabs: false
+      trailingComma: none

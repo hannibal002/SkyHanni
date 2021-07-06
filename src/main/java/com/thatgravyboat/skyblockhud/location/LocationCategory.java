@@ -1,46 +1,49 @@
 package com.thatgravyboat.skyblockhud.location;
 
-import com.thatgravyboat.skyblockhud.handlers.MapHandler;
 import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
 
+import com.thatgravyboat.skyblockhud.handlers.MapHandler;
+
 public enum LocationCategory {
+  ERROR("error", 34),
+  ISLAND("island", 43),
+  HUB("hub", 34, Maps.HUB),
+  BARN("barn", 67, Maps.BARN),
+  MUSHROOMDESERT("mushroomdesert", 75, Maps.MUSHROOM),
+  GOLDMINE("gold_mine", 83),
+  DEEPCAVERNS("deepcaverns", 91),
+  SPIDERSDEN("spiders_den", 99, Maps.SPIDERS),
+  PARK("park", 51, Maps.PARK),
+  FORTRESS("fortress", 107, Maps.NETHER),
+  DUNGEONHUB("dungeonhub", 115),
+  JERRY("jerry", 59),
+  THEEND("the_end", 123),
+  DWARVENMINES("dwarven_mines", 131, Maps.DWARVEN),
+  CRYSTALHOLLOWS("crystal_hollows", 131);
 
-    ERROR("error", 34),
-    ISLAND("island",43),
-    HUB("hub",34, Maps.HUB),
-    BARN("barn",67, Maps.BARN),
-    MUSHROOMDESERT("mushroomdesert",75, Maps.MUSHROOM),
-    GOLDMINE("gold_mine",83),
-    DEEPCAVERNS("deepcaverns",91),
-    SPIDERSDEN("spiders_den",99, Maps.SPIDERS),
-    PARK("park",51, Maps.PARK),
-    FORTRESS("fortress",107, Maps.NETHER),
-    DUNGEONHUB("dungeonhub",115),
-    JERRY("jerry",59),
-    THEEND("the_end",123),
-    DWARVENMINES("dwarven_mines", 131, Maps.DWARVEN),
-    CRYSTALHOLLOWS("crystal_hollows", 131);
+  private final String name;
+  private final int texturePos;
+  private final MapHandler.Maps map;
 
+  LocationCategory(String name, int texturePos) {
+    this(name, texturePos, null);
+  }
 
-    private final String name;
-    private final int texturePos;
-    private final MapHandler.Maps map;
+  LocationCategory(String name, int texturePos, MapHandler.Maps map) {
+    this.name = name;
+    this.texturePos = texturePos;
+    this.map = map;
+  }
 
-    LocationCategory(String name, int texturePos){
-        this(name, texturePos, null);
-    }
+  public String getName() {
+    return this.name;
+  }
 
-    LocationCategory(String name, int texturePos, MapHandler.Maps map){
-        this.name = name;
-        this.texturePos = texturePos;
-        this.map = map;
-    }
+  public int getTexturePos() {
+    return this.texturePos;
+  }
 
-    public String getName(){
-        return this.name;
-    }
-    public int getTexturePos(){
-        return this.texturePos;
-    }
-    public MapHandler.Maps getMap() { return this.map; }
+  public MapHandler.Maps getMap() {
+    return this.map;
+  }
 }

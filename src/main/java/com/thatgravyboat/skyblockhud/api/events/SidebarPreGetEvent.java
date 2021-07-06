@@ -8,11 +8,11 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 @Cancelable
 public class SidebarPreGetEvent extends Event {
 
-    public Scoreboard scoreboard;
-    public ScoreObjective objective;
+  public Scoreboard scoreboard;
+  public ScoreObjective objective;
 
-    public SidebarPreGetEvent(Scoreboard scoreboard, ScoreObjective objective) {
-        this.scoreboard = scoreboard;
-        this.objective = objective;
-    }
+  public SidebarPreGetEvent(Scoreboard scoreboard, ScoreObjective objective) {
+    this.scoreboard = scoreboard;
+    this.objective = objective;
+  }
 }

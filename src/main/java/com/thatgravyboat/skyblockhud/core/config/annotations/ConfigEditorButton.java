@@ -8,8 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ConfigEditorButton {
+  String runnableId();
 
-    String runnableId();
-    String buttonText() default "";
-
+  String buttonText() default "";
 }
