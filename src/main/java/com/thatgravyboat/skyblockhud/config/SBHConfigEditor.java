@@ -36,7 +36,7 @@ public class SBHConfigEditor extends GuiElement {
     };
     private static final String[] socialsLink = new String[] {
             "https://discord.gg/moulberry",
-            "https://twitter.com/thatgravtboat/"
+            "https://twitter.com/thatgravytboat/"
     };
 
     private final long openedMillis;
