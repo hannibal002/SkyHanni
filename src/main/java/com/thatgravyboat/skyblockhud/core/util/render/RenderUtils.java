@@ -14,28 +14,15 @@ import org.lwjgl.opengl.GL14;
 
 public class RenderUtils {
 
-    public static void drawFloatingRectDark(
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public static void drawFloatingRectDark(int x, int y, int width, int height) {
         drawFloatingRectDark(x, y, width, height, true);
     }
 
-    public static void drawFloatingRectDark(
-        int x,
-        int y,
-        int width,
-        int height,
-        boolean shadow
-    ) {
+    public static void drawFloatingRectDark(int x, int y, int width, int height, boolean shadow) {
         int alpha = 0xf0000000;
 
         if (OpenGlHelper.isFramebufferEnabled()) {
-            ScaledResolution scaledResolution = new ScaledResolution(
-                Minecraft.getMinecraft()
-            );
+            ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
             BackgroundBlur.renderBlurredBackground(
                 15,
                 scaledResolution.getScaledWidth(),
@@ -59,20 +46,8 @@ public class RenderUtils {
         Gui.drawRect(x + 1, y + height - 1, x + width - 1, y + height, dark); //Bottom
         Gui.drawRect(x + 1, y + 1, x + width - 1, y + height - 1, main); //Middle
         if (shadow) {
-            Gui.drawRect(
-                x + width,
-                y + 2,
-                x + width + 2,
-                y + height + 2,
-                0x70000000
-            ); //Right shadow
-            Gui.drawRect(
-                x + 2,
-                y + height,
-                x + width,
-                y + height + 2,
-                0x70000000
-            ); //Bottom shadow
+            Gui.drawRect(x + width, y + 2, x + width + 2, y + height + 2, 0x70000000); //Right shadow
+            Gui.drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000); //Bottom shadow
         }
     }
 
@@ -80,14 +55,7 @@ public class RenderUtils {
         drawFloatingRectWithAlpha(x, y, width, height, 0xFF, true);
     }
 
-    public static void drawFloatingRectWithAlpha(
-        int x,
-        int y,
-        int width,
-        int height,
-        int alpha,
-        boolean shadow
-    ) {
+    public static void drawFloatingRectWithAlpha(int x, int y, int width, int height, int alpha, boolean shadow) {
         int main = (alpha << 24) | 0xc0c0c0;
         int light = (alpha << 24) | 0xf0f0f0;
         int dark = (alpha << 24) | 0x909090;
@@ -97,71 +65,29 @@ public class RenderUtils {
         Gui.drawRect(x + 1, y + height - 1, x + width - 1, y + height, dark); //Bottom
         Gui.drawRect(x + 1, y + 1, x + width - 1, y + height - 1, main); //Middle
         if (shadow) {
-            Gui.drawRect(
-                x + width,
-                y + 2,
-                x + width + 2,
-                y + height + 2,
-                (alpha * 3 / 5) << 24
-            ); //Right shadow
-            Gui.drawRect(
-                x + 2,
-                y + height,
-                x + width,
-                y + height + 2,
-                (alpha * 3 / 5) << 24
-            ); //Bottom shadow
+            Gui.drawRect(x + width, y + 2, x + width + 2, y + height + 2, (alpha * 3 / 5) << 24); //Right shadow
+            Gui.drawRect(x + 2, y + height, x + width, y + height + 2, (alpha * 3 / 5) << 24); //Bottom shadow
         }
     }
 
-    public static void drawTexturedModalRect(
-        int x,
-        int y,
-        int textureX,
-        int textureY,
-        int width,
-        int height
-    ) {
+    public static void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height) {
         double f = 0.00390625;
         double f1 = 0.00390625;
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer
-            .pos(x + 0.0, y + height, 0.0)
-            .tex((textureX + 0.0) * f, (textureY + height) * f1)
-            .endVertex();
-        worldrenderer
-            .pos(x + width, y + height, 0.0)
-            .tex((textureX + width) * f, (textureY + height) * f1)
-            .endVertex();
-        worldrenderer
-            .pos(x + width, y + 0.0, 0.0)
-            .tex((textureX + width) * f, (textureY + 0.0) * f1)
-            .endVertex();
-        worldrenderer
-            .pos(x + 0.0, y + 0.0, 0.0)
-            .tex((textureX + 0.0) * f, (textureY + 0.0) * f1)
-            .endVertex();
+        worldrenderer.pos(x + 0.0, y + height, 0.0).tex((textureX + 0.0) * f, (textureY + height) * f1).endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0).tex((textureX + width) * f, (textureY + height) * f1).endVertex();
+        worldrenderer.pos(x + width, y + 0.0, 0.0).tex((textureX + width) * f, (textureY + 0.0) * f1).endVertex();
+        worldrenderer.pos(x + 0.0, y + 0.0, 0.0).tex((textureX + 0.0) * f, (textureY + 0.0) * f1).endVertex();
         tessellator.draw();
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height) {
         drawTexturedRect(x, y, width, height, 0, 1, 0, 1);
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height,
-        int filter
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height, int filter) {
         drawTexturedRect(x, y, width, height, 0, 1, 0, 1, filter);
     }
 
@@ -175,17 +101,7 @@ public class RenderUtils {
         float vMin,
         float vMax
     ) {
-        drawTexturedRect(
-            x,
-            y,
-            width,
-            height,
-            uMin,
-            uMax,
-            vMin,
-            vMax,
-            GL11.GL_NEAREST
-        );
+        drawTexturedRect(x, y, width, height, uMin, uMax, vMin, vMax, GL11.GL_NEAREST);
     }
 
     public static void drawTexturedRect(
@@ -207,17 +123,7 @@ public class RenderUtils {
             GL11.GL_ONE_MINUS_SRC_ALPHA
         );
 
-        drawTexturedRectNoBlend(
-            x,
-            y,
-            width,
-            height,
-            uMin,
-            uMax,
-            vMin,
-            vMax,
-            filter
-        );
+        drawTexturedRectNoBlend(x, y, width, height, uMin, uMax, vMin, vMax, filter);
 
         GlStateManager.disableBlend();
     }
@@ -235,39 +141,20 @@ public class RenderUtils {
     ) {
         GlStateManager.enableTexture2D();
 
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MIN_FILTER,
-            filter
-        );
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MAG_FILTER,
-            filter
-        );
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filter);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filter);
 
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
         worldrenderer.pos(x, y + height, 0.0D).tex(uMin, vMax).endVertex();
-        worldrenderer
-            .pos(x + width, y + height, 0.0D)
-            .tex(uMax, vMax)
-            .endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0D).tex(uMax, vMax).endVertex();
         worldrenderer.pos(x + width, y, 0.0D).tex(uMax, vMin).endVertex();
         worldrenderer.pos(x, y, 0.0D).tex(uMin, vMin).endVertex();
         tessellator.draw();
 
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MIN_FILTER,
-            GL11.GL_NEAREST
-        );
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MAG_FILTER,
-            GL11.GL_NEAREST
-        );
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
     }
 
     public static void drawGradientRect(
@@ -297,22 +184,10 @@ public class RenderUtils {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer
-            .pos(right, top, zLevel)
-            .color(startRed, startGreen, startBlue, startAlpha)
-            .endVertex();
-        worldrenderer
-            .pos(left, top, zLevel)
-            .color(startRed, startGreen, startBlue, startAlpha)
-            .endVertex();
-        worldrenderer
-            .pos(left, bottom, zLevel)
-            .color(endRed, endGreen, endBlue, endAlpha)
-            .endVertex();
-        worldrenderer
-            .pos(right, bottom, zLevel)
-            .color(endRed, endGreen, endBlue, endAlpha)
-            .endVertex();
+        worldrenderer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        worldrenderer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        worldrenderer.pos(left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        worldrenderer.pos(right, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
         tessellator.draw();
 
         GlStateManager.shadeModel(7424);
@@ -325,19 +200,7 @@ public class RenderUtils {
         Gui.drawRect(left, top, left + width, top + height, 0x6008080E); //Middle
         Gui.drawRect(left, top, left + 1, top + height, 0xff08080E); //Left
         Gui.drawRect(left, top, left + width, top + 1, 0xff08080E); //Top
-        Gui.drawRect(
-            left + width - 1,
-            top,
-            left + width,
-            top + height,
-            0xff28282E
-        ); //Right
-        Gui.drawRect(
-            left,
-            top + height - 1,
-            left + width,
-            top + height,
-            0xff28282E
-        ); //Bottom
+        Gui.drawRect(left + width - 1, top, left + width, top + height, 0xff28282E); //Right
+        Gui.drawRect(left, top + height - 1, left + width, top + height, 0xff28282E); //Bottom
     }
 }

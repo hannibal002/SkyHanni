@@ -44,22 +44,11 @@ public class MapHandler {
         public String command;
         public MapIconTypes type;
 
-        public MapIcon(
-            Vector2f pos,
-            ResourceLocation icon,
-            String tooltip,
-            MapIconTypes type
-        ) {
+        public MapIcon(Vector2f pos, ResourceLocation icon, String tooltip, MapIconTypes type) {
             this(pos, icon, tooltip, type, "");
         }
 
-        public MapIcon(
-            Vector2f pos,
-            ResourceLocation icon,
-            String tooltip,
-            MapIconTypes type,
-            String command
-        ) {
+        public MapIcon(Vector2f pos, ResourceLocation icon, String tooltip, MapIconTypes type, String command) {
             this.position = pos;
             this.icon = icon;
             this.tooltip = tooltip;
@@ -69,32 +58,16 @@ public class MapHandler {
 
         public boolean canRender() {
             SBHConfig.Map mapConfig = SkyblockHud.config.map;
-            if (
-                mapConfig.showInfoIcons && type.equals(MapIconTypes.INFO)
-            ) return true; else if (
+            if (mapConfig.showInfoIcons && type.equals(MapIconTypes.INFO)) return true; else if (
                 mapConfig.showMiscIcons && type.equals(MapIconTypes.MISC)
-            ) return true; else if (
-                mapConfig.showNpcIcons && type.equals(MapIconTypes.NPC)
-            ) return true; else if (
+            ) return true; else if (mapConfig.showNpcIcons && type.equals(MapIconTypes.NPC)) return true; else if (
                 mapConfig.showQuestIcons && type.equals(MapIconTypes.QUEST)
-            ) return true; else return (
-                mapConfig.showShopIcons && type.equals(MapIconTypes.SHOPS)
-            );
+            ) return true; else return (mapConfig.showShopIcons && type.equals(MapIconTypes.SHOPS));
         }
     }
 
     public enum Maps {
-        HUB(
-            0.5f,
-            494,
-            444,
-            294,
-            218,
-            294,
-            224,
-            new ResourceLocation("skyblockhud", "maps/hub.png"),
-            HubIcons.hubIcons
-        ),
+        HUB(0.5f, 494, 444, 294, 218, 294, 224, new ResourceLocation("skyblockhud", "maps/hub.png"), HubIcons.hubIcons),
         MUSHROOM(
             1.0f,
             318,
@@ -206,15 +179,9 @@ public class MapHandler {
         ) {
             Minecraft mc = Minecraft.getMinecraft();
             if (mc.currentScreen instanceof MapScreen) return;
-            if (
-                LocationHandler.getCurrentLocation().getCategory().getMap() ==
-                null
-            ) return;
+            if (LocationHandler.getCurrentLocation().getCategory().getMap() == null) return;
             if (mc.thePlayer != null) {
-                MapHandler.Maps map = LocationHandler
-                    .getCurrentLocation()
-                    .getCategory()
-                    .getMap();
+                MapHandler.Maps map = LocationHandler.getCurrentLocation().getCategory().getMap();
                 mc.renderEngine.bindTexture(mapOverlay);
                 GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
                 Position pos = SkyblockHud.config.map.miniMapPosition;
@@ -235,16 +202,8 @@ public class MapHandler {
                 float u = (x / (map.width / 256f)) - 33f;
                 float v = (z / (map.height / 256f)) - 28f;
 
-                GL11.glTexParameteri(
-                    GL11.GL_TEXTURE_2D,
-                    GL11.GL_TEXTURE_WRAP_S,
-                    GL11.GL_CLAMP
-                );
-                GL11.glTexParameteri(
-                    GL11.GL_TEXTURE_2D,
-                    GL11.GL_TEXTURE_WRAP_T,
-                    GL11.GL_CLAMP
-                );
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
 
                 Gui.drawModalRectWithCustomSizedTexture(
                     pos.getAbsX(event.resolution, 72) + 4,
@@ -279,9 +238,7 @@ public class MapHandler {
                     256,
                     256
                 );
-                String keyCode = GameSettings.getKeyDisplayString(
-                    KeyBindings.map.getKeyCode()
-                );
+                String keyCode = GameSettings.getKeyDisplayString(KeyBindings.map.getKeyCode());
                 Utils.drawStringCenteredScaled(
                     keyCode,
                     mc.fontRendererObj,
@@ -292,12 +249,7 @@ public class MapHandler {
                     0xFFFFFF
                 );
                 BlockPos playerPos = mc.thePlayer.getPosition();
-                String position = String.format(
-                    "%d/%d/%d",
-                    playerPos.getX(),
-                    playerPos.getY(),
-                    playerPos.getZ()
-                );
+                String position = String.format("%d/%d/%d", playerPos.getX(), playerPos.getY(), playerPos.getZ());
                 Utils.drawStringCenteredScaled(
                     position,
                     mc.fontRendererObj,
@@ -316,18 +268,14 @@ public class MapHandler {
     public void clientTick(TickEvent.ClientTickEvent event) {
         if (
             KeyBindings.map.isPressed() &&
-            LocationHandler.getCurrentLocation().getCategory().getMap() !=
-            null &&
+            LocationHandler.getCurrentLocation().getCategory().getMap() != null &&
             SkyblockHud.hasSkyblockScoreboard()
         ) SkyblockHud.screenToOpen = new MapScreen();
     }
 
     public static class MapScreen extends GuiScreen {
 
-        public MapHandler.Maps map = LocationHandler
-            .getCurrentLocation()
-            .getCategory()
-            .getMap();
+        public MapHandler.Maps map = LocationHandler.getCurrentLocation().getCategory().getMap();
 
         @Override
         public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -347,10 +295,7 @@ public class MapHandler {
                 (int) (map.height * map.scaleFactor)
             );
             drawIcons((int) mapX, (int) mapY);
-            if (
-                this.mc.thePlayer != null &&
-                SkyblockHud.config.map.showPlayerLocation
-            ) {
+            if (this.mc.thePlayer != null && SkyblockHud.config.map.showPlayerLocation) {
                 int x = this.mc.thePlayer.getPosition().getX() + map.xOffset;
                 int z = this.mc.thePlayer.getPosition().getZ() + map.yOffset;
                 fontRendererObj.drawString(
@@ -371,24 +316,9 @@ public class MapHandler {
                 GlStateManager.enableBlend();
                 GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
                 this.mc.renderEngine.bindTexture(icon.icon);
-                float x =
-                    ((icon.position.x + map.xOffset) * map.scaleFactor) +
-                    startX -
-                    4;
-                float y =
-                    ((icon.position.y + map.yOffset) * map.scaleFactor) +
-                    startY -
-                    4;
-                Gui.drawModalRectWithCustomSizedTexture(
-                    (int) x,
-                    (int) y,
-                    0,
-                    0,
-                    8,
-                    8,
-                    8,
-                    8
-                );
+                float x = ((icon.position.x + map.xOffset) * map.scaleFactor) + startX - 4;
+                float y = ((icon.position.y + map.yOffset) * map.scaleFactor) + startY - 4;
+                Gui.drawModalRectWithCustomSizedTexture((int) x, (int) y, 0, 0, 8, 8, 8, 8);
                 GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
             }
         }
@@ -400,36 +330,16 @@ public class MapHandler {
                 if (
                     Utils.inRangeInclusive(
                         mouseX,
-                        (int) (
-                            (icon.position.x + map.xOffset) * map.scaleFactor
-                        ) +
-                        startX -
-                        4,
-                        (int) (
-                            (icon.position.x + map.xOffset) * map.scaleFactor
-                        ) +
-                        startX +
-                        4
+                        (int) ((icon.position.x + map.xOffset) * map.scaleFactor) + startX - 4,
+                        (int) ((icon.position.x + map.xOffset) * map.scaleFactor) + startX + 4
                     ) &&
                     Utils.inRangeInclusive(
                         mouseY,
-                        (int) (
-                            (icon.position.y + map.yOffset) * map.scaleFactor
-                        ) +
-                        startY -
-                        4,
-                        (int) (
-                            (icon.position.y + map.yOffset) * map.scaleFactor
-                        ) +
-                        startY +
-                        4
+                        (int) ((icon.position.y + map.yOffset) * map.scaleFactor) + startY - 4,
+                        (int) ((icon.position.y + map.yOffset) * map.scaleFactor) + startY + 4
                     )
                 ) {
-                    drawHoveringText(
-                        Arrays.asList(icon.tooltip.split("\n")),
-                        mouseX,
-                        mouseY
-                    );
+                    drawHoveringText(Arrays.asList(icon.tooltip.split("\n")), mouseX, mouseY);
                     break;
                 }
             }
@@ -437,40 +347,20 @@ public class MapHandler {
 
         @Override
         protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-            int mapX = (int) (
-                (width / 2f) - ((map.width / 2f) * map.scaleFactor)
-            );
-            int mapY = (int) (
-                (height / 2f) - ((map.height / 2f) * map.scaleFactor)
-            );
+            int mapX = (int) ((width / 2f) - ((map.width / 2f) * map.scaleFactor));
+            int mapY = (int) ((height / 2f) - ((map.height / 2f) * map.scaleFactor));
             for (MapIcon icon : map.icons) {
                 if (!icon.canRender()) continue;
                 if (
                     Utils.inRangeInclusive(
                         mouseX,
-                        (int) (
-                            (icon.position.x + map.xOffset) * map.scaleFactor
-                        ) +
-                        mapX -
-                        4,
-                        (int) (
-                            (icon.position.x + map.xOffset) * map.scaleFactor
-                        ) +
-                        mapX +
-                        4
+                        (int) ((icon.position.x + map.xOffset) * map.scaleFactor) + mapX - 4,
+                        (int) ((icon.position.x + map.xOffset) * map.scaleFactor) + mapX + 4
                     ) &&
                     Utils.inRangeInclusive(
                         mouseY,
-                        (int) (
-                            (icon.position.y + map.yOffset) * map.scaleFactor
-                        ) +
-                        mapY -
-                        4,
-                        (int) (
-                            (icon.position.y + map.yOffset) * map.scaleFactor
-                        ) +
-                        mapY +
-                        4
+                        (int) ((icon.position.y + map.yOffset) * map.scaleFactor) + mapY - 4,
+                        (int) ((icon.position.y + map.yOffset) * map.scaleFactor) + mapY + 4
                     )
                 ) {
                     if (!icon.command.isEmpty()) {

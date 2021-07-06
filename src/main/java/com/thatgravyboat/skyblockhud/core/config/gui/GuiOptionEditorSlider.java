@@ -33,9 +33,7 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
             textField =
                 new GuiElementTextField(
                     strVal,
-                    GuiElementTextField.NO_SPACE |
-                    GuiElementTextField.NUM_ONLY |
-                    GuiElementTextField.SCALE_TEXT
+                    GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY | GuiElementTextField.SCALE_TEXT
                 );
         }
 
@@ -56,8 +54,7 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
                         strVal = Integer.toString(val.intValue());
                     } else {
                         strVal = Float.toString(val);
-                        strVal =
-                            strVal.replaceAll("(\\.\\d\\d\\d)(?:\\d)+", "$1");
+                        strVal = strVal.replaceAll("(\\.\\d\\d\\d)(?:\\d)+", "$1");
                         strVal = strVal.replaceAll("0+$", "");
                     }
                     textField.setText(strVal);
@@ -80,29 +77,16 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
         slider.render();
 
         if (textField.getFocus()) {
-            textField.setOptions(
-                GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY
-            );
-            textField.setSize(
-                Minecraft
-                    .getMinecraft()
-                    .fontRendererObj.getStringWidth(textField.getText()) +
-                10,
-                16
-            );
+            textField.setOptions(GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY);
+            textField.setSize(Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10, 16);
         } else {
             textField.setSize(textFieldWidth, 16);
             textField.setOptions(
-                GuiElementTextField.NO_SPACE |
-                GuiElementTextField.NUM_ONLY |
-                GuiElementTextField.SCALE_TEXT
+                GuiElementTextField.NO_SPACE | GuiElementTextField.NUM_ONLY | GuiElementTextField.SCALE_TEXT
             );
         }
 
-        textField.render(
-            x + width / 6 - fullWidth / 2 + sliderWidth + 5,
-            y + height - 7 - 14
-        );
+        textField.render(x + width / 6 - fullWidth / 2 + sliderWidth + 5, y + height - 7 - 14);
     }
 
     @Override
@@ -122,21 +106,14 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
         }
 
         if (textField.getFocus()) {
-            textFieldWidth =
-                Minecraft
-                    .getMinecraft()
-                    .fontRendererObj.getStringWidth(textField.getText()) +
-                10;
+            textFieldWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10;
         }
 
         int textFieldX = x + width / 6 - fullWidth / 2 + sliderWidth + 5;
         int textFieldY = y + height - 7 - 14;
         textField.setSize(textFieldWidth, 16);
 
-        if (
-            Mouse.getEventButtonState() &&
-            (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1)
-        ) {
+        if (Mouse.getEventButtonState() && (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1)) {
             if (
                 mouseX > textFieldX &&
                 mouseX < textFieldX + textFieldWidth &&
@@ -155,10 +132,7 @@ public class GuiOptionEditorSlider extends GuiOptionEditor {
     @Override
     public boolean keyboardInput() {
         if (Keyboard.getEventKeyState() && textField.getFocus()) {
-            textField.keyTyped(
-                Keyboard.getEventCharacter(),
-                Keyboard.getEventKey()
-            );
+            textField.keyTyped(Keyboard.getEventCharacter(), Keyboard.getEventKey());
 
             try {
                 textField.setCustomBorderColour(0xffffffff);

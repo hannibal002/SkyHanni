@@ -12,10 +12,8 @@ public class ParkIslandHandler {
             isRaining = false;
             rainTime = "";
         } else if (tabLine.toLowerCase().contains("rain:")) {
-            if (tabLine.toLowerCase().contains("no rain")) isRaining =
-                false; else {
-                rainTime =
-                    tabLine.toLowerCase().replace("rain:", "").replace(" ", "");
+            if (tabLine.toLowerCase().contains("no rain")) isRaining = false; else {
+                rainTime = tabLine.toLowerCase().replace("rain:", "").replace(" ", "");
                 isRaining = true;
             }
         }

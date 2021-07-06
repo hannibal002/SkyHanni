@@ -35,13 +35,7 @@ public class ConfigProcessor {
         private final Field field;
         private final Object container;
 
-        public ProcessedOption(
-            String name,
-            String desc,
-            int subcategoryId,
-            Field field,
-            Object container
-        ) {
+        public ProcessedOption(String name, String desc, int subcategoryId, Field field, Object container) {
             this.name = name;
             this.desc = desc;
             this.subcategoryId = subcategoryId;
@@ -73,17 +67,11 @@ public class ConfigProcessor {
         }
     }
 
-    public static LinkedHashMap<String, ProcessedCategory> create(
-        Config config
-    ) {
+    public static LinkedHashMap<String, ProcessedCategory> create(Config config) {
         LinkedHashMap<String, ProcessedCategory> processedConfig = new LinkedHashMap<>();
         for (Field categoryField : config.getClass().getDeclaredFields()) {
-            boolean exposePresent = categoryField.isAnnotationPresent(
-                Expose.class
-            );
-            boolean categoryPresent = categoryField.isAnnotationPresent(
-                Category.class
-            );
+            boolean exposePresent = categoryField.isAnnotationPresent(Expose.class);
+            boolean categoryPresent = categoryField.isAnnotationPresent(Category.class);
 
             if (exposePresent && categoryPresent) {
                 Object categoryObj;
@@ -94,26 +82,15 @@ public class ConfigProcessor {
                     continue;
                 }
 
-                Category categoryAnnotation = categoryField.getAnnotation(
-                    Category.class
-                );
-                ProcessedCategory cat = new ProcessedCategory(
-                    categoryAnnotation.name(),
-                    categoryAnnotation.desc()
-                );
+                Category categoryAnnotation = categoryField.getAnnotation(Category.class);
+                ProcessedCategory cat = new ProcessedCategory(categoryAnnotation.name(), categoryAnnotation.desc());
                 processedConfig.put(categoryField.getName(), cat);
 
-                for (Field optionField : categoryObj
-                    .getClass()
-                    .getDeclaredFields()) {
-                    boolean optionPresent = optionField.isAnnotationPresent(
-                        ConfigOption.class
-                    );
+                for (Field optionField : categoryObj.getClass().getDeclaredFields()) {
+                    boolean optionPresent = optionField.isAnnotationPresent(ConfigOption.class);
 
                     if (optionPresent) {
-                        ConfigOption optionAnnotation = optionField.getAnnotation(
-                            ConfigOption.class
-                        );
+                        ConfigOption optionAnnotation = optionField.getAnnotation(ConfigOption.class);
                         ProcessedOption option = new ProcessedOption(
                             optionAnnotation.name(),
                             optionAnnotation.desc(),
@@ -121,24 +98,14 @@ public class ConfigProcessor {
                             optionField,
                             categoryObj
                         );
-                        if (
-                            optionField.isAnnotationPresent(
-                                ConfigAccordionId.class
-                            )
-                        ) {
-                            ConfigAccordionId annotation = optionField.getAnnotation(
-                                ConfigAccordionId.class
-                            );
+                        if (optionField.isAnnotationPresent(ConfigAccordionId.class)) {
+                            ConfigAccordionId annotation = optionField.getAnnotation(ConfigAccordionId.class);
                             option.accordionId = annotation.id();
                         }
 
                         GuiOptionEditor editor = null;
                         Class<?> optionType = optionField.getType();
-                        if (
-                            optionField.isAnnotationPresent(
-                                ConfigEditorButton.class
-                            )
-                        ) {
+                        if (optionField.isAnnotationPresent(ConfigEditorButton.class)) {
                             ConfigEditorButton configEditorAnnotation = optionField.getAnnotation(
                                 ConfigEditorButton.class
                             );
@@ -152,33 +119,21 @@ public class ConfigProcessor {
                         }
                         if (
                             optionType.isAssignableFrom(boolean.class) &&
-                            optionField.isAnnotationPresent(
-                                ConfigEditorBoolean.class
-                            )
+                            optionField.isAnnotationPresent(ConfigEditorBoolean.class)
                         ) {
                             editor = new GuiOptionEditorBoolean(option);
                         }
                         if (
                             optionType.isAssignableFrom(boolean.class) &&
-                            optionField.isAnnotationPresent(
-                                ConfigEditorAccordion.class
-                            )
+                            optionField.isAnnotationPresent(ConfigEditorAccordion.class)
                         ) {
                             ConfigEditorAccordion configEditorAnnotation = optionField.getAnnotation(
                                 ConfigEditorAccordion.class
                             );
-                            editor =
-                                new GuiOptionEditorAccordion(
-                                    option,
-                                    configEditorAnnotation.id()
-                                );
+                            editor = new GuiOptionEditorAccordion(option, configEditorAnnotation.id());
                         }
                         if (optionType.isAssignableFrom(int.class)) {
-                            if (
-                                optionField.isAnnotationPresent(
-                                    ConfigEditorDropdown.class
-                                )
-                            ) {
+                            if (optionField.isAnnotationPresent(ConfigEditorDropdown.class)) {
                                 ConfigEditorDropdown configEditorAnnotation = optionField.getAnnotation(
                                     ConfigEditorDropdown.class
                                 );
@@ -192,27 +147,15 @@ public class ConfigProcessor {
                             }
                         }
                         if (optionType.isAssignableFrom(List.class)) {
-                            if (
-                                optionField.isAnnotationPresent(
-                                    ConfigEditorDraggableList.class
-                                )
-                            ) {
+                            if (optionField.isAnnotationPresent(ConfigEditorDraggableList.class)) {
                                 ConfigEditorDraggableList configEditorAnnotation = optionField.getAnnotation(
                                     ConfigEditorDraggableList.class
                                 );
-                                editor =
-                                    new GuiOptionEditorDraggableList(
-                                        option,
-                                        configEditorAnnotation.exampleText()
-                                    );
+                                editor = new GuiOptionEditorDraggableList(option, configEditorAnnotation.exampleText());
                             }
                         }
                         if (optionType.isAssignableFrom(String.class)) {
-                            if (
-                                optionField.isAnnotationPresent(
-                                    ConfigEditorDropdown.class
-                                )
-                            ) {
+                            if (optionField.isAnnotationPresent(ConfigEditorDropdown.class)) {
                                 ConfigEditorDropdown configEditorAnnotation = optionField.getAnnotation(
                                     ConfigEditorDropdown.class
                                 );
@@ -223,17 +166,9 @@ public class ConfigProcessor {
                                         configEditorAnnotation.initialIndex(),
                                         false
                                     );
-                            } else if (
-                                optionField.isAnnotationPresent(
-                                    ConfigEditorColour.class
-                                )
-                            ) {
+                            } else if (optionField.isAnnotationPresent(ConfigEditorColour.class)) {
                                 editor = new GuiOptionEditorColour(option);
-                            } else if (
-                                optionField.isAnnotationPresent(
-                                    ConfigEditorText.class
-                                )
-                            ) {
+                            } else if (optionField.isAnnotationPresent(ConfigEditorText.class)) {
                                 editor = new GuiOptionEditorText(option);
                             }
                         }
@@ -242,11 +177,7 @@ public class ConfigProcessor {
                             optionType.isAssignableFrom(float.class) ||
                             optionType.isAssignableFrom(double.class)
                         ) {
-                            if (
-                                optionField.isAnnotationPresent(
-                                    ConfigEditorSlider.class
-                                )
-                            ) {
+                            if (optionField.isAnnotationPresent(ConfigEditorSlider.class)) {
                                 ConfigEditorSlider configEditorAnnotation = optionField.getAnnotation(
                                     ConfigEditorSlider.class
                                 );
@@ -260,21 +191,11 @@ public class ConfigProcessor {
                             }
                         }
                         if (optionType.isAssignableFrom(String.class)) {
-                            if (
-                                optionField.isAnnotationPresent(
-                                    ConfigEditorDropdown.class
-                                )
-                            ) {
+                            if (optionField.isAnnotationPresent(ConfigEditorDropdown.class)) {
                                 ConfigEditorDropdown configEditorAnnotation = optionField.getAnnotation(
                                     ConfigEditorDropdown.class
                                 );
-                                editor =
-                                    new GuiOptionEditorDropdown(
-                                        option,
-                                        configEditorAnnotation.values(),
-                                        0,
-                                        false
-                                    );
+                                editor = new GuiOptionEditorDropdown(option, configEditorAnnotation.values(), 0, false);
                             }
                         }
                         if (editor == null) {

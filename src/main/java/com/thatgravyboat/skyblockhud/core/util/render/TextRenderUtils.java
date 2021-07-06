@@ -32,14 +32,7 @@ public class TextRenderUtils {
         return height;
     }
 
-    public static void drawStringVertical(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int colour
-    ) {
+    public static void drawStringVertical(String str, FontRenderer fr, float x, float y, boolean shadow, int colour) {
         String format = FontRenderer.getFormatFromString(str);
         str = StringUtils.cleanColour(str);
         for (int i = 0; i < str.length(); i++) {
@@ -47,13 +40,7 @@ public class TextRenderUtils {
 
             int charHeight = getCharVertLen(c);
             int charWidth = fr.getCharWidth(c);
-            fr.drawString(
-                format + c,
-                x + (5 - charWidth) / 2f,
-                y - 7 + charHeight,
-                colour,
-                shadow
-            );
+            fr.drawString(format + c, x + (5 - charWidth) / 2f, y - 7 + charHeight, colour, shadow);
 
             y += charHeight + 1.5f;
         }
@@ -75,14 +62,7 @@ public class TextRenderUtils {
         drawStringScaled(str, fr, x, y, shadow, colour, factor);
     }
 
-    public static void drawStringCentered(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int colour
-    ) {
+    public static void drawStringCentered(String str, FontRenderer fr, float x, float y, boolean shadow, int colour) {
         int strLen = fr.getStringWidth(str);
 
         float x2 = x - strLen / 2f;
@@ -123,15 +103,7 @@ public class TextRenderUtils {
 
         float fontHeight = 8 * factor;
 
-        drawStringScaled(
-            str,
-            fr,
-            x - newLen / 2,
-            y - fontHeight / 2,
-            shadow,
-            colour,
-            factor
-        );
+        drawStringScaled(str, fr, x - newLen / 2, y - fontHeight / 2, shadow, colour, factor);
     }
 
     public static void renderToolTip(
@@ -156,15 +128,7 @@ public class TextRenderUtils {
         }
 
         FontRenderer font = stack.getItem().getFontRenderer(stack);
-        drawHoveringText(
-            list,
-            mouseX,
-            mouseY,
-            screenWidth,
-            screenHeight,
-            -1,
-            font == null ? fontStd : font
-        );
+        drawHoveringText(list, mouseX, mouseY, screenWidth, screenHeight, -1, font == null ? fontStd : font);
     }
 
     public static void drawHoveringText(
@@ -217,10 +181,7 @@ public class TextRenderUtils {
                 List<String> wrappedTextLines = new ArrayList<String>();
                 for (int i = 0; i < textLines.size(); i++) {
                     String textLine = textLines.get(i);
-                    List<String> wrappedLine = font.listFormattedStringToWidth(
-                        textLine,
-                        tooltipTextWidth
-                    );
+                    List<String> wrappedLine = font.listFormattedStringToWidth(textLine, tooltipTextWidth);
                     if (i == 0) {
                         titleLinesCount = wrappedLine.size();
                     }
@@ -305,10 +266,7 @@ public class TextRenderUtils {
                 backgroundColor
             );
             final int borderColorStart = 0x505000FF;
-            final int borderColorEnd =
-                (borderColorStart & 0xFEFEFE) >> 1 |
-                borderColorStart &
-                0xFF000000;
+            final int borderColorEnd = (borderColorStart & 0xFEFEFE) >> 1 | borderColorStart & 0xFF000000;
             RenderUtils.drawGradientRect(
                 zLevel,
                 tooltipX - 3,
@@ -346,18 +304,9 @@ public class TextRenderUtils {
                 borderColorEnd
             );
 
-            for (
-                int lineNumber = 0;
-                lineNumber < textLines.size();
-                ++lineNumber
-            ) {
+            for (int lineNumber = 0; lineNumber < textLines.size(); ++lineNumber) {
                 String line = textLines.get(lineNumber);
-                font.drawStringWithShadow(
-                    line,
-                    (float) tooltipX,
-                    (float) tooltipY,
-                    -1
-                );
+                font.drawStringWithShadow(line, (float) tooltipX, (float) tooltipY, -1);
 
                 if (lineNumber + 1 == titleLinesCount) {
                     tooltipY += 2;

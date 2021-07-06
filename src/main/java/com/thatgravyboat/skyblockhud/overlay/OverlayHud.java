@@ -25,8 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class OverlayHud extends Gui {
 
-    private static final FontRenderer font = Minecraft.getMinecraft()
-        .fontRendererObj;
+    private static final FontRenderer font = Minecraft.getMinecraft().fontRendererObj;
 
     //STATS
     private static boolean eventToggle;
@@ -41,8 +40,7 @@ public class OverlayHud extends Gui {
         int timeMin = (int) (TimeHandler.time / 60);
         int timeHour = timeMin / 60;
         timeMin = timeMin - (timeHour * 60);
-        String militaryTime =
-            timeHour + ":" + (timeMin == 0 ? timeMin + "0" : timeMin);
+        String militaryTime = timeHour + ":" + (timeMin == 0 ? timeMin + "0" : timeMin);
         int time12Hour = timeHour >= 12 ? timeHour - 12 : timeHour;
         String normalTime =
             (time12Hour == 0 ? "00" : String.valueOf(time12Hour)) +
@@ -50,14 +48,7 @@ public class OverlayHud extends Gui {
             (timeMin == 0 ? "00" : timeMin) +
             (timeHour >= 12 ? "pm" : "am");
 
-        drawTexturedModalRect(
-            (width / 2) - 17,
-            offset + (bossBarVisible ? 17 : 0),
-            0,
-            0,
-            34,
-            34
-        );
+        drawTexturedModalRect((width / 2) - 17, offset + (bossBarVisible ? 17 : 0), 0, 0, 34, 34);
         drawTexturedModalRect(
             (width / 2) - 4,
             offset + (bossBarVisible ? 24 : 7),
@@ -94,43 +85,20 @@ public class OverlayHud extends Gui {
 
         //EXTRA SLOT
         if (LocationHandler.getCurrentLocation().equals(Locations.YOURISLAND)) {
-            if (IslandHandler.flightTime > 0) drawFlightDuration(
-                width,
-                offset,
-                mc
-            );
-        } else if (
-            LocationHandler
-                .getCurrentLocation()
-                .getCategory()
-                .equals(LocationCategory.MUSHROOMDESERT)
-        ) {
+            if (IslandHandler.flightTime > 0) drawFlightDuration(width, offset, mc);
+        } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.MUSHROOMDESERT)) {
             drawTrapperOrPelts(width, offset, mc);
-        } else if (
-            LocationHandler
-                .getCurrentLocation()
-                .getCategory()
-                .equals(LocationCategory.DWARVENMINES)
-        ) {
-            if (
-                DwarvenMineHandler.currentEvent != DwarvenMineHandler.Event.NONE
-            ) {
+        } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
+            if (DwarvenMineHandler.currentEvent != DwarvenMineHandler.Event.NONE) {
                 drawDwarvenEvent(width, offset, mc);
             } else {
                 drawMithril(width, offset, mc);
             }
         } else if (
-            LocationHandler
-                .getCurrentLocation()
-                .getCategory()
-                .equals(LocationCategory.PARK) &&
+            LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.PARK) &&
             ParkIslandHandler.isRaining()
         ) {
-            if (
-                LocationHandler
-                    .getCurrentLocation()
-                    .equals(Locations.HOWLINGCAVE)
-            ) {
+            if (LocationHandler.getCurrentLocation().equals(Locations.HOWLINGCAVE)) {
                 drawSlayer(width, offset, mc);
             } else drawRainDuration(width, offset, mc);
         } else if (SlayerHandler.isDoingSlayer) {
@@ -141,9 +109,7 @@ public class OverlayHud extends Gui {
     public void drawSeasonAndDate(int width, int offset, Minecraft mc) {
         if (SeasonDateHandler.getCurrentSeason() != Season.ERROR) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            if (
-                mc.thePlayer.ticksExisted % 100 == 0 && eventToggle
-            ) eventToggle = false;
+            if (mc.thePlayer.ticksExisted % 100 == 0 && eventToggle) eventToggle = false;
             if (mc.thePlayer.ticksExisted % 600 == 0) eventToggle = true;
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             String dateText = SeasonDateHandler.getFancySeasonAndDate();
@@ -152,9 +118,7 @@ public class OverlayHud extends Gui {
                 !SeasonDateHandler.getCurrentEvent().isEmpty() &&
                 !SeasonDateHandler.getCurrentEventTime().isEmpty()
             ) dateText =
-                SeasonDateHandler.getCurrentEvent().trim() +
-                " " +
-                SeasonDateHandler.getCurrentEventTime().trim();
+                SeasonDateHandler.getCurrentEvent().trim() + " " + SeasonDateHandler.getCurrentEventTime().trim();
             drawTexturedModalRect(
                 (width / 2) + 17,
                 offset + (bossBarVisible ? 20 : 3),
@@ -179,13 +143,7 @@ public class OverlayHud extends Gui {
                 8,
                 8
             );
-            drawString(
-                font,
-                dateText,
-                (width / 2) + 18,
-                offset + (bossBarVisible ? 23 : 6),
-                0xffffff
-            );
+            drawString(font, dateText, (width / 2) + 18, offset + (bossBarVisible ? 23 : 6), 0xffffff);
         }
     }
 
@@ -193,13 +151,7 @@ public class OverlayHud extends Gui {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(GuiTextures.overlay);
         drawTexturedModalRect(
-            (width / 2) -
-            33 -
-            (
-                font.getStringWidth(
-                    LocationHandler.getCurrentLocation().getDisplayName()
-                )
-            ),
+            (width / 2) - 33 - (font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName())),
             offset + (bossBarVisible ? 20 : 3),
             0,
             34,
@@ -207,36 +159,15 @@ public class OverlayHud extends Gui {
             14
         );
         drawTexturedModalRect(
-            (
-                (width / 2) -
-                33 -
-                (
-                    font.getStringWidth(
-                        LocationHandler.getCurrentLocation().getDisplayName()
-                    )
-                )
-            ) +
-            2,
+            ((width / 2) - 33 - (font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName()))) + 2,
             offset + (bossBarVisible ? 20 : 3),
             2,
             34,
-            font.getStringWidth(
-                LocationHandler.getCurrentLocation().getDisplayName()
-            ) +
-            14,
+            font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName()) + 14,
             14
         );
         drawTexturedModalRect(
-            (
-                (width / 2) -
-                33 -
-                (
-                    font.getStringWidth(
-                        LocationHandler.getCurrentLocation().getDisplayName()
-                    )
-                )
-            ) +
-            4,
+            ((width / 2) - 33 - (font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName()))) + 4,
             offset + (bossBarVisible ? 23 : 6),
             LocationHandler.getCurrentLocation().getCategory().getTexturePos(),
             8,
@@ -246,13 +177,7 @@ public class OverlayHud extends Gui {
         drawString(
             font,
             LocationHandler.getCurrentLocation().getDisplayName(),
-            (width / 2) -
-            19 -
-            (
-                font.getStringWidth(
-                    LocationHandler.getCurrentLocation().getDisplayName()
-                )
-            ),
+            (width / 2) - 19 - (font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName())),
             offset + (bossBarVisible ? 23 : 6),
             0xFFFFFF
         );
@@ -263,29 +188,10 @@ public class OverlayHud extends Gui {
         mc.renderEngine.bindTexture(GuiTextures.overlay);
         int redstoneColor = IslandHandler.redstone > 90
             ? 0xFF0000
-            : IslandHandler.redstone > 75
-                ? 0xC45B00
-                : IslandHandler.redstone > 50 ? 0xFFFF55 : 0x55FF55;
-        if (
-            IslandHandler.redstone > 0 &&
-            Utils.isPlayerHoldingRedstone(mc.thePlayer)
-        ) {
-            drawTexturedModalRect(
-                (width / 2) - 15,
-                offset + (bossBarVisible ? 51 : 34),
-                0,
-                48,
-                30,
-                18
-            );
-            drawTexturedModalRect(
-                (width / 2) - 4,
-                offset + (bossBarVisible ? 51 : 34),
-                59,
-                0,
-                8,
-                8
-            );
+            : IslandHandler.redstone > 75 ? 0xC45B00 : IslandHandler.redstone > 50 ? 0xFFFF55 : 0x55FF55;
+        if (IslandHandler.redstone > 0 && Utils.isPlayerHoldingRedstone(mc.thePlayer)) {
+            drawTexturedModalRect((width / 2) - 15, offset + (bossBarVisible ? 51 : 34), 0, 48, 30, 18);
+            drawTexturedModalRect((width / 2) - 4, offset + (bossBarVisible ? 51 : 34), 59, 0, 8, 8);
             drawCenteredString(
                 mc.fontRendererObj,
                 IslandHandler.redstone + "%",
@@ -310,21 +216,8 @@ public class OverlayHud extends Gui {
             font.getStringWidth(CurrencyHandler.getCoinsFormatted()) + 11,
             14
         );
-        drawTexturedModalRect(
-            xPos + 1,
-            offset + (bossBarVisible ? 37 : 20),
-            34,
-            0,
-            8,
-            8
-        );
-        drawString(
-            font,
-            CurrencyHandler.getCoinsFormatted(),
-            xPos + 10,
-            offset + (bossBarVisible ? 38 : 21),
-            0xFFAA00
-        );
+        drawTexturedModalRect(xPos + 1, offset + (bossBarVisible ? 37 : 20), 34, 0, 8, 8);
+        drawString(font, CurrencyHandler.getCoinsFormatted(), xPos + 10, offset + (bossBarVisible ? 38 : 21), 0xFFAA00);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(GuiTextures.overlay);
         xPos += font.getStringWidth(CurrencyHandler.getCoinsFormatted()) + 11;
@@ -339,14 +232,7 @@ public class OverlayHud extends Gui {
                 font.getStringWidth(CurrencyHandler.getBitsFormatted()) + 11,
                 14
             );
-            drawTexturedModalRect(
-                xPos + 1,
-                offset + (bossBarVisible ? 37 : 20),
-                75,
-                0,
-                8,
-                8
-            );
+            drawTexturedModalRect(xPos + 1, offset + (bossBarVisible ? 37 : 20), 75, 0, 8, 8);
             drawString(
                 font,
                 CurrencyHandler.getBitsFormatted(),
@@ -356,40 +242,25 @@ public class OverlayHud extends Gui {
             );
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
-            xPos +=
-                font.getStringWidth(CurrencyHandler.getBitsFormatted()) + 11;
+            xPos += font.getStringWidth(CurrencyHandler.getBitsFormatted()) + 11;
         }
 
-        drawTexturedModalRect(
-            xPos,
-            offset + (bossBarVisible ? 35 : 18),
-            252,
-            34,
-            4,
-            14
-        );
+        drawTexturedModalRect(xPos, offset + (bossBarVisible ? 35 : 18), 252, 34, 4, 14);
     }
 
     public void drawFlightDuration(int width, int offset, Minecraft mc) {
         if (LocationHandler.getCurrentLocation().equals(Locations.YOURISLAND)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            DecimalFormat flightFormat = new DecimalFormat(
-                "#.#",
-                DecimalFormatSymbols.getInstance(Locale.CANADA)
-            );
+            DecimalFormat flightFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.CANADA));
             String duration;
-            if (IslandHandler.flightTime < 60) duration =
-                IslandHandler.flightTime + "s"; else if (
+            if (IslandHandler.flightTime < 60) duration = IslandHandler.flightTime + "s"; else if (
                 IslandHandler.flightTime < 3600
-            ) duration =
-                flightFormat.format((double) IslandHandler.flightTime / 60) +
-                "m"; else if (IslandHandler.flightTime < 86400) duration =
-                flightFormat.format((double) IslandHandler.flightTime / 3600) +
-                "hr"; else if (IslandHandler.flightTime < 86460) duration =
-                flightFormat.format((double) IslandHandler.flightTime / 86400) +
-                "day"; else duration =
-                flightFormat.format((double) IslandHandler.flightTime / 86400) +
-                "days";
+            ) duration = flightFormat.format((double) IslandHandler.flightTime / 60) + "m"; else if (
+                IslandHandler.flightTime < 86400
+            ) duration = flightFormat.format((double) IslandHandler.flightTime / 3600) + "hr"; else if (
+                IslandHandler.flightTime < 86460
+            ) duration = flightFormat.format((double) IslandHandler.flightTime / 86400) + "day"; else duration =
+                flightFormat.format((double) IslandHandler.flightTime / 86400) + "days";
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             drawTexturedModalRect(
                 (width / 2) - 33 - (font.getStringWidth(duration)),
@@ -426,12 +297,7 @@ public class OverlayHud extends Gui {
     }
 
     public void drawRainDuration(int width, int offset, Minecraft mc) {
-        if (
-            LocationHandler
-                .getCurrentLocation()
-                .getCategory()
-                .equals(LocationCategory.PARK)
-        ) {
+        if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.PARK)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             String duration = "Rain: " + ParkIslandHandler.getRainTime();
@@ -536,12 +402,7 @@ public class OverlayHud extends Gui {
     }
 
     public void drawMithril(int width, int offset, Minecraft mc) {
-        if (
-            LocationHandler
-                .getCurrentLocation()
-                .getCategory()
-                .equals(LocationCategory.DWARVENMINES)
-        ) {
+        if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             String mithril = DwarvenMineHandler.getMithrilFormatted();
@@ -580,12 +441,7 @@ public class OverlayHud extends Gui {
     }
 
     public void drawTrapperOrPelts(int width, int offset, Minecraft mc) {
-        if (
-            LocationHandler
-                .getCurrentLocation()
-                .getCategory()
-                .equals(LocationCategory.MUSHROOMDESERT)
-        ) {
+        if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.MUSHROOMDESERT)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             String duration = FarmingIslandHandler.location != Locations.NONE
@@ -626,19 +482,11 @@ public class OverlayHud extends Gui {
     }
 
     public void drawDwarvenEvent(int width, int offset, Minecraft mc) {
-        if (
-            LocationHandler
-                .getCurrentLocation()
-                .getCategory()
-                .equals(LocationCategory.DWARVENMINES)
-        ) {
+        if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
             if (DwarvenMineHandler.eventMax > 0) {
-                String duration =
-                    DwarvenMineHandler.eventProgress +
-                    "/" +
-                    DwarvenMineHandler.eventMax;
+                String duration = DwarvenMineHandler.eventProgress + "/" + DwarvenMineHandler.eventMax;
                 drawTexturedModalRect(
                     (width / 2) - 33 - (font.getStringWidth(duration)),
                     offset + (bossBarVisible ? 35 : 18),
@@ -709,25 +557,15 @@ public class OverlayHud extends Gui {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (
-            Utils.overlayShouldRender(
-                event.type,
-                SkyblockHud.hasSkyblockScoreboard()
-            )
-        ) {
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard())) {
             bossBarVisible =
-                BossStatus.statusBarTime > 0 &&
-                GuiIngameForge.renderBossHealth &&
-                BossbarHandler.bossBarRendered;
+                BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             if (LocationHandler.getCurrentLocation() != Locations.CATACOMBS) {
                 drawClock(
                     event.resolution.getScaledWidth(),
-                    SkyblockHud.config.main.mainHudPos.getAbsY(
-                        event.resolution,
-                        34
-                    ),
+                    SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34),
                     mc
                 );
             }
@@ -735,21 +573,9 @@ public class OverlayHud extends Gui {
         }
     }
 
-    public void drawScaledString(
-        float factor,
-        int x,
-        int y,
-        String text,
-        int color
-    ) {
+    public void drawScaledString(float factor, int x, int y, String text, int color) {
         GlStateManager.scale(factor, factor, 1);
-        drawCenteredString(
-            font,
-            text,
-            (int) (x / factor),
-            (int) (y / factor),
-            color
-        );
+        drawCenteredString(font, text, (int) (x / factor), (int) (y / factor), color);
         GlStateManager.scale(1 / factor, 1 / factor, 1);
     }
 }

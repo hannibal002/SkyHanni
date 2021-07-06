@@ -17,17 +17,9 @@ public class EntityTypeHelper {
                 .getBaseValue();
             if (
                 maxHealthBase == 13000d ||
-                (
-                    maxHealthBase == 2000d &&
-                    enderman
-                        .getHeldBlockState()
-                        .getBlock()
-                        .equals(Blocks.end_portal_frame)
-                )
+                (maxHealthBase == 2000d && enderman.getHeldBlockState().getBlock().equals(Blocks.end_portal_frame))
             ) {
-                return LocationHandler
-                    .getCurrentLocation()
-                    .equals(Locations.DRAGONSNEST);
+                return LocationHandler.getCurrentLocation().equals(Locations.DRAGONSNEST);
             }
         }
         return false;

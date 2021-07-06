@@ -33,39 +33,25 @@ public class LeaderboardGetter {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.theWorld != null) {
             Scoreboard scoreboard = mc.theWorld.getScoreboard();
-            ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(
-                1
-            );
+            ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1);
 
             if (
                 sidebarObjective != null &&
-                !MinecraftForge.EVENT_BUS.post(
-                    new SidebarPreGetEvent(scoreboard, sidebarObjective)
-                )
+                !MinecraftForge.EVENT_BUS.post(new SidebarPreGetEvent(scoreboard, sidebarObjective))
             ) {
-                Collection<Score> scoreList = sidebarObjective
-                    .getScoreboard()
-                    .getSortedScores(sidebarObjective);
+                Collection<Score> scoreList = sidebarObjective.getScoreboard().getSortedScores(sidebarObjective);
                 Map<Integer, String> scores = scoreList
                     .stream()
-                    .collect(
-                        Collectors.toMap(Score::getScorePoints, this::getLine)
-                    );
+                    .collect(Collectors.toMap(Score::getScorePoints, this::getLine));
 
                 if (!cachedScores.equals(scores)) {
                     scores.forEach(
                         (score, name) -> {
-                            if (
-                                cachedScores.get(score) == null ||
-                                !cachedScores.get(score).equals(name)
-                            ) {
+                            if (cachedScores.get(score) == null || !cachedScores.get(score).equals(name)) {
                                 MinecraftForge.EVENT_BUS.post(
                                     new SidebarLineUpdateEvent(
                                         name,
-                                        SCOREBOARD_CHARACTERS
-                                            .matcher(name)
-                                            .replaceAll("")
-                                            .trim(),
+                                        SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim(),
                                         score,
                                         scores.size(),
                                         scoreboard,
@@ -80,35 +66,16 @@ public class LeaderboardGetter {
                         scores
                             .values()
                             .stream()
-                            .map(
-                                name ->
-                                    SCOREBOARD_CHARACTERS
-                                        .matcher(name)
-                                        .replaceAll("")
-                                        .trim()
-                            )
+                            .map(name -> SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim())
                             .collect(Collectors.toList());
                 }
-                MinecraftForge.EVENT_BUS.post(
-                    new SidebarPostEvent(
-                        scoreboard,
-                        sidebarObjective,
-                        cachedScoresList
-                    )
-                );
+                MinecraftForge.EVENT_BUS.post(new SidebarPostEvent(scoreboard, sidebarObjective, cachedScoresList));
             }
         }
     }
 
     public String getLine(Score score) {
-        ScorePlayerTeam scorePlayerTeam = score
-            .getScoreScoreboard()
-            .getPlayersTeam(score.getPlayerName());
-        return Utils.removeColor(
-            ScorePlayerTeam.formatPlayerName(
-                scorePlayerTeam,
-                score.getPlayerName()
-            )
-        );
+        ScorePlayerTeam scorePlayerTeam = score.getScoreScoreboard().getPlayersTeam(score.getPlayerName());
+        return Utils.removeColor(ScorePlayerTeam.formatPlayerName(scorePlayerTeam, score.getPlayerName()));
     }
 }

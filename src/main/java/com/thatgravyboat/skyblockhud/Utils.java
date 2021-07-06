@@ -23,25 +23,16 @@ import org.lwjgl.opengl.GL14;
 public class Utils {
 
     private static LinkedList<Integer> guiScales = new LinkedList<>();
-    private static ScaledResolution lastScale = new ScaledResolution(
-        Minecraft.getMinecraft()
-    );
+    private static ScaledResolution lastScale = new ScaledResolution(Minecraft.getMinecraft());
     //Labymod compatibility
-    private static FloatBuffer projectionMatrixOld = BufferUtils.createFloatBuffer(
-        16
-    );
-    private static FloatBuffer modelviewMatrixOld = BufferUtils.createFloatBuffer(
-        16
-    );
+    private static FloatBuffer projectionMatrixOld = BufferUtils.createFloatBuffer(16);
+    private static FloatBuffer modelviewMatrixOld = BufferUtils.createFloatBuffer(16);
 
     public static String removeColor(String input) {
         return input.replaceAll("(?i)\\u00A7.", "");
     }
 
-    public static String removeWhiteSpaceAndRemoveWord(
-        String input,
-        String replace
-    ) {
+    public static String removeWhiteSpaceAndRemoveWord(String input, String replace) {
         return input.toLowerCase().replace(" ", "").replace(replace, "");
     }
 
@@ -55,9 +46,7 @@ public class Utils {
                 Item.getByNameOrId("minecraft:redstone_torch")
             )
         );
-        if (player.getHeldItem() != null) return redstoneItems.contains(
-            player.getHeldItem().getItem()
-        );
+        if (player.getHeldItem() != null) return redstoneItems.contains(player.getHeldItem().getItem());
         return false;
     }
 
@@ -119,16 +108,8 @@ public class Utils {
         }
     }
 
-    public static boolean overlayShouldRender(
-        RenderGameOverlayEvent.ElementType type,
-        boolean... booleans
-    ) {
-        return overlayShouldRender(
-            false,
-            type,
-            RenderGameOverlayEvent.ElementType.HOTBAR,
-            booleans
-        );
+    public static boolean overlayShouldRender(RenderGameOverlayEvent.ElementType type, boolean... booleans) {
+        return overlayShouldRender(false, type, RenderGameOverlayEvent.ElementType.HOTBAR, booleans);
     }
 
     public static boolean overlayShouldRender(
@@ -148,22 +129,13 @@ public class Utils {
                 mc.gameSettings.showDebugInfo ||
                 (
                     mc.gameSettings.keyBindPlayerList.isKeyDown() &&
-                    (
-                        !mc.isIntegratedServerRunning() ||
-                        mc.thePlayer.sendQueue.getPlayerInfoMap().size() > 1
-                    )
+                    (!mc.isIntegratedServerRunning() || mc.thePlayer.sendQueue.getPlayerInfoMap().size() > 1)
                 )
             ) {
                 return false;
             }
         }
-        return (
-            shouldRender &&
-            (
-                (type == null && Loader.isModLoaded("labymod")) ||
-                type == checkType
-            )
-        );
+        return (shouldRender && ((type == null && Loader.isModLoaded("labymod")) || type == checkType));
     }
 
     public static void drawStringScaledMaxWidth(
@@ -209,15 +181,7 @@ public class Utils {
         float factor = len / (float) strLen;
         float fontHeight = 8 * factor;
 
-        drawStringScaled(
-            str,
-            fr,
-            x - len / 2f,
-            y - fontHeight / 2f,
-            shadow,
-            colour,
-            factor
-        );
+        drawStringScaled(str, fr, x - len / 2f, y - fontHeight / 2f, shadow, colour, factor);
     }
 
     public static void drawTexturedRect(
@@ -240,59 +204,29 @@ public class Utils {
             GL11.GL_ONE_MINUS_SRC_ALPHA
         );
 
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MIN_FILTER,
-            filter
-        );
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MAG_FILTER,
-            filter
-        );
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filter);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filter);
 
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
         worldrenderer.pos(x, y + height, 0.0D).tex(uMin, vMax).endVertex();
-        worldrenderer
-            .pos(x + width, y + height, 0.0D)
-            .tex(uMax, vMax)
-            .endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0D).tex(uMax, vMax).endVertex();
         worldrenderer.pos(x + width, y, 0.0D).tex(uMax, vMin).endVertex();
         worldrenderer.pos(x, y, 0.0D).tex(uMin, vMin).endVertex();
         tessellator.draw();
 
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MIN_FILTER,
-            GL11.GL_NEAREST
-        );
-        GL11.glTexParameteri(
-            GL11.GL_TEXTURE_2D,
-            GL11.GL_TEXTURE_MAG_FILTER,
-            GL11.GL_NEAREST
-        );
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
         GlStateManager.disableBlend();
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height) {
         drawTexturedRect(x, y, width, height, 0, 1, 0, 1);
     }
 
-    public static void drawTexturedRect(
-        float x,
-        float y,
-        float width,
-        float height,
-        int filter
-    ) {
+    public static void drawTexturedRect(float x, float y, float width, float height, int filter) {
         drawTexturedRect(x, y, width, height, 0, 1, 0, 1, filter);
     }
 
@@ -306,17 +240,7 @@ public class Utils {
         float vMin,
         float vMax
     ) {
-        drawTexturedRect(
-            x,
-            y,
-            width,
-            height,
-            uMin,
-            uMax,
-            vMin,
-            vMax,
-            GL11.GL_LINEAR
-        );
+        drawTexturedRect(x, y, width, height, uMin, uMax, vMin, vMax, GL11.GL_LINEAR);
     }
 
     public static void resetGuiScale() {
@@ -350,14 +274,11 @@ public class Utils {
         int newScale = guiScales.size() > 0
             ? Math.max(0, Math.min(4, guiScales.peek()))
             : Minecraft.getMinecraft().gameSettings.guiScale;
-        if (newScale == 0) newScale =
-            Minecraft.getMinecraft().gameSettings.guiScale;
+        if (newScale == 0) newScale = Minecraft.getMinecraft().gameSettings.guiScale;
 
         int oldScale = Minecraft.getMinecraft().gameSettings.guiScale;
         Minecraft.getMinecraft().gameSettings.guiScale = newScale;
-        ScaledResolution scaledresolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
+        ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft());
         Minecraft.getMinecraft().gameSettings.guiScale = oldScale;
 
         if (guiScales.size() > 0) {
@@ -381,11 +302,7 @@ public class Utils {
             GlStateManager.loadIdentity();
             GlStateManager.translate(0.0F, 0.0F, -2000.0F);
         } else {
-            if (
-                Loader.isModLoaded("labymod") &&
-                projectionMatrixOld.limit() > 0 &&
-                modelviewMatrixOld.limit() > 0
-            ) {
+            if (Loader.isModLoaded("labymod") && projectionMatrixOld.limit() > 0 && modelviewMatrixOld.limit() > 0) {
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GL11.glLoadMatrix(projectionMatrixOld);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
@@ -411,14 +328,7 @@ public class Utils {
         return scaledresolution;
     }
 
-    public static void drawStringCentered(
-        String str,
-        FontRenderer fr,
-        float x,
-        float y,
-        boolean shadow,
-        int colour
-    ) {
+    public static void drawStringCentered(String str, FontRenderer fr, float x, float y, boolean shadow, int colour) {
         int strLen = fr.getStringWidth(str);
 
         float x2 = x - strLen / 2f;

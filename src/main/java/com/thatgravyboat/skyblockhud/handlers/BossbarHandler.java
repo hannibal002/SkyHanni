@@ -16,10 +16,7 @@ public class BossbarHandler {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onBossbarRender(RenderGameOverlayEvent.Pre event) {
-        if (
-            event.type == RenderGameOverlayEvent.ElementType.BOSSHEALTH &&
-            BossStatus.bossName != null
-        ) {
+        if (event.type == RenderGameOverlayEvent.ElementType.BOSSHEALTH && BossStatus.bossName != null) {
             bossBarRendered = !event.isCanceled();
             if (!SkyblockHud.config.main.bossShiftHud) {
                 bossBarRendered = false;
@@ -27,11 +24,8 @@ public class BossbarHandler {
             String bossName = Utils.removeColor(BossStatus.bossName);
             if (
                 SkyblockHud.config.renderer.hideBossBar &&
-                DwarvenMineHandler.currentEvent ==
-                DwarvenMineHandler.Event.NONE &&
-                !LocationHandler
-                    .getCurrentLocation()
-                    .equals(Locations.CATACOMBS)
+                DwarvenMineHandler.currentEvent == DwarvenMineHandler.Event.NONE &&
+                !LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)
             ) {
                 if (bossName.equalsIgnoreCase("wither")) {
                     event.setCanceled(true);

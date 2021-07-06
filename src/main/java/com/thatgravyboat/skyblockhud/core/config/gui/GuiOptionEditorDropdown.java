@@ -47,13 +47,7 @@ public class GuiOptionEditorDropdown extends GuiOptionEditor {
                 selectedString = values[selected];
             }
 
-            RenderUtils.drawFloatingRectDark(
-                left,
-                top,
-                dropdownWidth,
-                14,
-                false
-            );
+            RenderUtils.drawFloatingRectDark(left, top, dropdownWidth, 14, false);
             TextRenderUtils.drawStringScaled(
                 "\u25BC",
                 fr,
@@ -97,35 +91,11 @@ public class GuiOptionEditorDropdown extends GuiOptionEditor {
             int blue = 0xff2355ad;
             Gui.drawRect(left, top, left + 1, top + dropdownHeight, blue); //Left
             Gui.drawRect(left + 1, top, left + dropdownWidth, top + 1, blue); //Top
-            Gui.drawRect(
-                left + dropdownWidth - 1,
-                top + 1,
-                left + dropdownWidth,
-                top + dropdownHeight,
-                blue
-            ); //Right
-            Gui.drawRect(
-                left + 1,
-                top + dropdownHeight - 1,
-                left + dropdownWidth - 1,
-                top + dropdownHeight,
-                blue
-            ); //Bottom
-            Gui.drawRect(
-                left + 1,
-                top + 1,
-                left + dropdownWidth - 1,
-                top + dropdownHeight - 1,
-                main
-            ); //Middle
+            Gui.drawRect(left + dropdownWidth - 1, top + 1, left + dropdownWidth, top + dropdownHeight, blue); //Right
+            Gui.drawRect(left + 1, top + dropdownHeight - 1, left + dropdownWidth - 1, top + dropdownHeight, blue); //Bottom
+            Gui.drawRect(left + 1, top + 1, left + dropdownWidth - 1, top + dropdownHeight - 1, main); //Middle
 
-            Gui.drawRect(
-                left + 1,
-                top + 14 - 1,
-                left + dropdownWidth - 1,
-                top + 14,
-                blue
-            ); //Bar
+            Gui.drawRect(left + 1, top + 14 - 1, left + dropdownWidth - 1, top + 14, blue); //Bar
 
             int dropdownY = 13;
             for (String option : values) {
@@ -174,12 +144,7 @@ public class GuiOptionEditorDropdown extends GuiOptionEditor {
         int top = y + height - 7 - 14;
 
         if (Mouse.getEventButtonState() && Mouse.getEventButton() == 0) {
-            if (
-                mouseX >= left &&
-                mouseX <= left + 80 &&
-                mouseY >= top &&
-                mouseY <= top + 14
-            ) {
+            if (mouseX >= left && mouseX <= left + 80 && mouseY >= top && mouseY <= top + 14) {
                 open = !open;
                 return true;
             }
@@ -189,36 +154,19 @@ public class GuiOptionEditorDropdown extends GuiOptionEditor {
     }
 
     @Override
-    public boolean mouseInputOverlay(
-        int x,
-        int y,
-        int width,
-        int mouseX,
-        int mouseY
-    ) {
+    public boolean mouseInputOverlay(int x, int y, int width, int mouseX, int mouseY) {
         int height = getHeight();
 
         int left = x + width / 6 - 40;
         int top = y + height - 7 - 14;
 
         if (Mouse.getEventButtonState() && Mouse.getEventButton() == 0) {
-            if (
-                !(
-                    mouseX >= left &&
-                    mouseX <= left + 80 &&
-                    mouseY >= top &&
-                    mouseY <= top + 14
-                ) &&
-                open
-            ) {
+            if (!(mouseX >= left && mouseX <= left + 80 && mouseY >= top && mouseY <= top + 14) && open) {
                 open = false;
                 if (mouseX >= left && mouseX <= left + 80) {
                     int dropdownY = 13;
                     for (int ordinal = 0; ordinal < values.length; ordinal++) {
-                        if (
-                            mouseY >= top + 3 + dropdownY &&
-                            mouseY <= top + 3 + dropdownY + 12
-                        ) {
+                        if (mouseY >= top + 3 + dropdownY && mouseY <= top + 3 + dropdownY + 12) {
                             selected = ordinal;
                             if (useOrdinal) {
                                 option.set(selected);

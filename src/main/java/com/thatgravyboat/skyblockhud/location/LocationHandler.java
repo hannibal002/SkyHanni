@@ -14,9 +14,7 @@ public class LocationHandler {
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
         if (event.rawLine.contains("\u23E3")) {
-            String objectiveName = event.objective
-                .getDisplayName()
-                .replaceAll("(?i)\\u00A7.", "");
+            String objectiveName = event.objective.getDisplayName().replaceAll("(?i)\\u00A7.", "");
             if (objectiveName.toLowerCase(Locale.ENGLISH).endsWith("guest")) {
                 LocationHandler.setCurrentLocation(Locations.GUESTISLAND);
             } else {
@@ -38,10 +36,7 @@ public class LocationHandler {
     }
 
     public static void handleLocation(String locationLine) {
-        String location = locationLine
-            .replace(" ", "")
-            .toUpperCase(Locale.ENGLISH)
-            .trim();
+        String location = locationLine.replace(" ", "").toUpperCase(Locale.ENGLISH).trim();
         if (location.startsWith("THECATACOMBS")) {
             currentLocation = Locations.CATACOMBS;
         } else setCurrentLocation(location.replaceAll("[^A-Za-z0-9]", ""));

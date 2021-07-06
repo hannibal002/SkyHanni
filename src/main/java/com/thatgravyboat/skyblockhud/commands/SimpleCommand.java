@@ -20,11 +20,7 @@ public class SimpleCommand extends CommandBase {
         this.runnable = runnable;
     }
 
-    public SimpleCommand(
-        String commandName,
-        ProcessCommandRunnable runnable,
-        TabCompleteRunnable tabRunnable
-    ) {
+    public SimpleCommand(String commandName, ProcessCommandRunnable runnable, TabCompleteRunnable tabRunnable) {
         this.commandName = commandName;
         this.runnable = runnable;
         this.tabRunnable = tabRunnable;
@@ -32,19 +28,12 @@ public class SimpleCommand extends CommandBase {
 
     public abstract static class ProcessCommandRunnable {
 
-        public abstract void processCommand(
-            ICommandSender sender,
-            String[] args
-        );
+        public abstract void processCommand(ICommandSender sender, String[] args);
     }
 
     public abstract static class TabCompleteRunnable {
 
-        public abstract List<String> tabComplete(
-            ICommandSender sender,
-            String[] args,
-            BlockPos pos
-        );
+        public abstract List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos);
     }
 
     public boolean canCommandSenderUseCommand(ICommandSender sender) {
@@ -59,21 +48,12 @@ public class SimpleCommand extends CommandBase {
         return "/" + commandName;
     }
 
-    public void processCommand(ICommandSender sender, String[] args)
-        throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         runnable.processCommand(sender, args);
     }
 
-    public List<String> addTabCompletionOptions(
-        ICommandSender sender,
-        String[] args,
-        BlockPos pos
-    ) {
-        if (tabRunnable != null) return tabRunnable.tabComplete(
-            sender,
-            args,
-            pos
-        );
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        if (tabRunnable != null) return tabRunnable.tabComplete(sender, args, pos);
         return null;
     }
 }

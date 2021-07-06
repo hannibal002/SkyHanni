@@ -7,12 +7,7 @@ public class DungeonPlayer {
     private final int health;
     private final boolean dead;
 
-    public DungeonPlayer(
-        Classes playersClass,
-        String playersName,
-        int playersHealth,
-        boolean isDead
-    ) {
+    public DungeonPlayer(Classes playersClass, String playersName, int playersHealth, boolean isDead) {
         this.dungeonClass = playersClass;
         this.name = playersName;
         this.health = isDead ? 0 : playersHealth;

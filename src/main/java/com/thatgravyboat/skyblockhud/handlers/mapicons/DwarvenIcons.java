@@ -27,9 +27,7 @@ public class DwarvenIcons {
                 new ComponentBuilder()
                     .nl("Puzzler", new char[] { 'a', 'l' })
                     .nl("Description", 'l')
-                    .nl(
-                        "The Puzzler gives you a small puzzle each day to solve and"
-                    )
+                    .nl("The Puzzler gives you a small puzzle each day to solve and")
                     .nl("gives you 1000 mithril powder.")
                     .build(),
                 MapHandler.MapIconTypes.NPC
@@ -47,12 +45,8 @@ public class DwarvenIcons {
                 new ComponentBuilder()
                     .nl("King", new char[] { 'a', 'l' })
                     .nl("Description", 'l')
-                    .nl(
-                        "The King allows you to first start commissions and if you click"
-                    )
-                    .nl(
-                        "each king which change every skyblock day you will get"
-                    )
+                    .nl("The King allows you to first start commissions and if you click")
+                    .nl("each king which change every skyblock day you will get")
                     .nl("the King Talisman.")
                     .nl()
                     .apd("Click to open HOTM", new char[] { '6', 'l' })
@@ -67,10 +61,7 @@ public class DwarvenIcons {
         dwarvenIcons.add(
             new MapHandler.MapIcon(
                 new Vector2f(4, 8),
-                new ResourceLocation(
-                    "skyblockhud",
-                    "maps/icons/blacksmith.png"
-                ),
+                new ResourceLocation("skyblockhud", "maps/icons/blacksmith.png"),
                 new ComponentBuilder()
                     .nl("Forge", new char[] { 'a', 'l' })
                     .nl("Description", 'l')
@@ -78,9 +69,7 @@ public class DwarvenIcons {
                     .nl("and fuel your drill.")
                     .nl("NPCS", new char[] { 'c', 'l' })
                     .nl(" Forger - Allows you to forge special items")
-                    .nl(
-                        " Jotraeline Greatforge - Allows you to refuel your drill."
-                    )
+                    .nl(" Jotraeline Greatforge - Allows you to refuel your drill.")
                     .nl()
                     .apd("Click to warp", new char[] { '6', 'l' })
                     .build(),

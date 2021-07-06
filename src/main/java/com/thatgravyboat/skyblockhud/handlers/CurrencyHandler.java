@@ -35,19 +35,13 @@ public class CurrencyHandler {
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
         if (
-            Utils
-                .removeColor(event.formattedLine.toLowerCase().trim())
-                .contains("purse:") ||
-            Utils
-                .removeColor(event.formattedLine.toLowerCase().trim())
-                .contains("piggy:")
+            Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("purse:") ||
+            Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("piggy:")
         ) {
             CurrencyHandler.checkCoins(event.formattedLine);
         }
         if (
-            Utils
-                .removeColor(event.formattedLine.toLowerCase().trim())
-                .contains("bits:") &&
+            Utils.removeColor(event.formattedLine.toLowerCase().trim()).contains("bits:") &&
             !event.formattedLine.toLowerCase().contains("(")
         ) {
             CurrencyHandler.checkBits(event.formattedLine);
@@ -56,81 +50,50 @@ public class CurrencyHandler {
 
     @SubscribeEvent
     public void onSidebarPost(SidebarPostEvent event) {
-        if (
-            !Arrays.toString(event.arrayScores).toLowerCase().contains("bits:")
-        ) {
+        if (!Arrays.toString(event.arrayScores).toLowerCase().contains("bits:")) {
             CurrencyHandler.setBits(0);
         }
     }
 
     public static String getCoinsFormatted() {
-        DecimalFormat formatter = new DecimalFormat(
-            "#,###.0",
-            DecimalFormatSymbols.getInstance(Locale.CANADA)
-        );
+        DecimalFormat formatter = new DecimalFormat("#,###.0", DecimalFormatSymbols.getInstance(Locale.CANADA));
         String output = formatter.format(coins);
-        if (output.equals(".0")) output = "0.0"; else if (
-            output.equals(",0")
-        ) output = "0,0";
+        if (output.equals(".0")) output = "0.0"; else if (output.equals(",0")) output = "0,0";
         return output;
     }
 
     public static String getBitsFormatted() {
-        DecimalFormat formatter = new DecimalFormat(
-            "#.#",
-            DecimalFormatSymbols.getInstance(Locale.CANADA)
-        );
+        DecimalFormat formatter = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.CANADA));
         formatter.setRoundingMode(RoundingMode.FLOOR);
-        return bits > 999
-            ? formatter.format((double) bits / 1000) + "k"
-            : String.valueOf(bits);
+        return bits > 999 ? formatter.format((double) bits / 1000) + "k" : String.valueOf(bits);
     }
 
     public static void checkCoins(String formatedScoreboardLine) {
         String purse = Utils
             .removeWhiteSpaceAndRemoveWord(
                 Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()),
-                Utils
-                        .removeColor(
-                            formatedScoreboardLine.toLowerCase().trim()
-                        )
-                        .contains("purse:")
-                    ? "purse:"
-                    : "piggy:"
+                Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()).contains("purse:") ? "purse:" : "piggy:"
             )
             .replace(",", "");
         if (!purse.contains("(") && !purse.contains("+")) {
             try {
-                double coins = Double.parseDouble(
-                    Pattern.compile("[^0-9.]").matcher(purse).replaceAll("")
-                );
+                double coins = Double.parseDouble(Pattern.compile("[^0-9.]").matcher(purse).replaceAll(""));
                 CurrencyHandler.setCoins(coins);
             } catch (IllegalArgumentException ex) {
-                System.out.println(
-                    "Failed to parse purse, please report to ThatGravyBoat. Purse Text: " +
-                    purse
-                );
+                System.out.println("Failed to parse purse, please report to ThatGravyBoat. Purse Text: " + purse);
             }
         }
     }
 
     public static void checkBits(String formatedScoreboardLine) {
         String bits = Utils
-            .removeWhiteSpaceAndRemoveWord(
-                Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()),
-                "bits:"
-            )
+            .removeWhiteSpaceAndRemoveWord(Utils.removeColor(formatedScoreboardLine.toLowerCase().trim()), "bits:")
             .replace(",", "");
         try {
-            int bit = Integer.parseInt(
-                Pattern.compile("[^0-9]").matcher(bits).replaceAll("")
-            );
+            int bit = Integer.parseInt(Pattern.compile("[^0-9]").matcher(bits).replaceAll(""));
             CurrencyHandler.setBits(bit);
         } catch (IllegalArgumentException ex) {
-            System.out.println(
-                "Failed to parse bits, please report to ThatGravyBoat. Bits Text: " +
-                bits
-            );
+            System.out.println("Failed to parse bits, please report to ThatGravyBoat. Bits Text: " + bits);
         }
     }
 }

@@ -21,9 +21,7 @@ import org.lwjgl.opengl.GL11;
 
 public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
-    private static final ResourceLocation DELETE = new ResourceLocation(
-        "notenoughupdates:core/delete.png"
-    );
+    private static final ResourceLocation DELETE = new ResourceLocation("notenoughupdates:core/delete.png");
 
     private String[] exampleText;
     private List<Integer> activeText;
@@ -37,10 +35,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
     private boolean dropdownOpen = false;
 
-    public GuiOptionEditorDraggableList(
-        ConfigProcessor.ProcessedOption option,
-        String[] exampleText
-    ) {
+    public GuiOptionEditorDraggableList(ConfigProcessor.ProcessedOption option, String[] exampleText) {
         super(option);
         this.exampleText = exampleText;
         this.activeText = (List<Integer>) option.get();
@@ -66,12 +61,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
         GlStateManager.color(1, 1, 1, 1);
         Minecraft.getMinecraft().getTextureManager().bindTexture(button_tex);
-        RenderUtils.drawTexturedRect(
-            x + width / 6f - 24,
-            y + 45 - 7 - 14,
-            48,
-            16
-        );
+        RenderUtils.drawTexturedRect(x + width / 6f - 24, y + 45 - 7 - 14, 48, 16);
 
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "Add",
@@ -85,18 +75,11 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
         long currentTime = System.currentTimeMillis();
         float greenBlue = LerpUtils.clampZeroOne(
-            ((trashHoverTime < 0 ? 250 : 0) + trashHoverTime - currentTime) /
-            250f
+            ((trashHoverTime < 0 ? 250 : 0) + trashHoverTime - currentTime) / 250f
         );
         GlStateManager.color(1, greenBlue, greenBlue, 1);
         Minecraft.getMinecraft().getTextureManager().bindTexture(DELETE);
-        Utils.drawTexturedRect(
-            x + width / 6f + 27,
-            y + 45 - 7 - 13,
-            11,
-            14,
-            GL11.GL_NEAREST
-        );
+        Utils.drawTexturedRect(x + width / 6f + 27, y + 45 - 7 - 13, 11, 14, GL11.GL_NEAREST);
 
         Gui.drawRect(x + 5, y + 45, x + width - 5, y + height - 5, 0xffdddddd);
         Gui.drawRect(x + 6, y + 46, x + width - 6, y + height - 6, 0xff000000);
@@ -111,11 +94,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
             int ySize = multilines.length * 10;
 
             if (i++ != dragStartIndex) {
-                for (
-                    int multilineIndex = 0;
-                    multilineIndex < multilines.length;
-                    multilineIndex++
-                ) {
+                for (int multilineIndex = 0; multilineIndex < multilines.length; multilineIndex++) {
                     String line = multilines[multilineIndex];
                     Utils.drawStringScaledMaxWidth(
                         line + EnumChatFormatting.RESET,
@@ -129,13 +108,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
                 }
                 Minecraft
                     .getMinecraft()
-                    .fontRendererObj.drawString(
-                        "\u2261",
-                        x + 10,
-                        y + 50 + yOff + ySize / 2f - 4,
-                        0xffffff,
-                        true
-                    );
+                    .fontRendererObj.drawString("\u2261", x + 10, y + 50 + yOff + ySize / 2f - 4, 0xffffff, true);
             }
 
             yOff += ySize;
@@ -164,27 +137,9 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
             int outline = 0xff404046;
             Gui.drawRect(left, top, left + 1, top + dropdownHeight, outline); //Left
             Gui.drawRect(left + 1, top, left + dropdownWidth, top + 1, outline); //Top
-            Gui.drawRect(
-                left + dropdownWidth - 1,
-                top + 1,
-                left + dropdownWidth,
-                top + dropdownHeight,
-                outline
-            ); //Right
-            Gui.drawRect(
-                left + 1,
-                top + dropdownHeight - 1,
-                left + dropdownWidth - 1,
-                top + dropdownHeight,
-                outline
-            ); //Bottom
-            Gui.drawRect(
-                left + 1,
-                top + 1,
-                left + dropdownWidth - 1,
-                top + dropdownHeight - 1,
-                main
-            ); //Middle
+            Gui.drawRect(left + dropdownWidth - 1, top + 1, left + dropdownWidth, top + dropdownHeight, outline); //Right
+            Gui.drawRect(left + 1, top + dropdownHeight - 1, left + dropdownWidth - 1, top + dropdownHeight, outline); //Bottom
+            Gui.drawRect(left + 1, top + 1, left + dropdownWidth - 1, top + dropdownHeight - 1, main); //Middle
 
             int dropdownY = -1;
             for (int strIndex : remaining) {
@@ -207,26 +162,17 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
             int opacity = 0x80;
             long currentTime = System.currentTimeMillis();
             if (trashHoverTime < 0) {
-                float greenBlue = LerpUtils.clampZeroOne(
-                    (currentTime + trashHoverTime) / 250f
-                );
+                float greenBlue = LerpUtils.clampZeroOne((currentTime + trashHoverTime) / 250f);
                 opacity = (int) (opacity * greenBlue);
             } else {
-                float greenBlue = LerpUtils.clampZeroOne(
-                    (250 + trashHoverTime - currentTime) / 250f
-                );
+                float greenBlue = LerpUtils.clampZeroOne((250 + trashHoverTime - currentTime) / 250f);
                 opacity = (int) (opacity * greenBlue);
             }
 
             if (opacity < 20) return;
 
-            ScaledResolution scaledResolution = new ScaledResolution(
-                Minecraft.getMinecraft()
-            );
-            int mouseX =
-                Mouse.getX() *
-                scaledResolution.getScaledWidth() /
-                Minecraft.getMinecraft().displayWidth;
+            ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+            int mouseX = Mouse.getX() * scaledResolution.getScaledWidth() / Minecraft.getMinecraft().displayWidth;
             int mouseY =
                 scaledResolution.getScaledHeight() -
                 Mouse.getY() *
@@ -239,11 +185,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
             String[] multilines = str.split("\n");
 
             GlStateManager.enableBlend();
-            for (
-                int multilineIndex = 0;
-                multilineIndex < multilines.length;
-                multilineIndex++
-            ) {
+            for (int multilineIndex = 0; multilineIndex < multilines.length; multilineIndex++) {
                 String line = multilines[multilineIndex];
                 Utils.drawStringScaledMaxWidth(
                     line + EnumChatFormatting.RESET,
@@ -291,8 +233,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
         if (!Mouse.isButtonDown(0) || dropdownOpen) {
             currentDragging = -1;
             dragStartIndex = -1;
-            if (trashHoverTime > 0) trashHoverTime =
-                -System.currentTimeMillis();
+            if (trashHoverTime > 0) trashHoverTime = -System.currentTimeMillis();
         } else if (
             currentDragging >= 0 &&
             mouseX >= x + width / 6 + 27 - 3 &&
@@ -302,8 +243,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
         ) {
             if (trashHoverTime < 0) trashHoverTime = System.currentTimeMillis();
         } else {
-            if (trashHoverTime > 0) trashHoverTime =
-                -System.currentTimeMillis();
+            if (trashHoverTime > 0) trashHoverTime = -System.currentTimeMillis();
         }
 
         if (Mouse.getEventButtonState()) {
@@ -322,12 +262,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
                 int dropdownHeight = -1 + 12 * remaining.size();
 
-                if (
-                    mouseX > left &&
-                    mouseX < left + dropdownWidth &&
-                    mouseY > top &&
-                    mouseY < top + dropdownHeight
-                ) {
+                if (mouseX > left && mouseX < left + dropdownWidth && mouseY > top && mouseY < top + dropdownHeight) {
                     int dropdownY = -1;
                     for (int strIndex : remaining) {
                         if (mouseY < top + dropdownY + 12) {

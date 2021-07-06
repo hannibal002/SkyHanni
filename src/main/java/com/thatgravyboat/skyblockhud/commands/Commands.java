@@ -16,45 +16,23 @@ public class Commands {
         public void processCommand(ICommandSender sender, String[] args) {
             if (args.length > 0) {
                 SkyblockHud.screenToOpen =
-                    new GuiScreenElementWrapper(
-                        new SBHConfigEditor(
-                            SkyblockHud.config,
-                            StringUtils.join(args, " ")
-                        )
-                    );
+                    new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config, StringUtils.join(args, " ")));
             } else {
-                SkyblockHud.screenToOpen =
-                    new GuiScreenElementWrapper(
-                        new SBHConfigEditor(SkyblockHud.config)
-                    );
+                SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.config));
             }
         }
     };
 
-    private static final SimpleCommand settingsCommand = new SimpleCommand(
-        "sbh",
-        settingsRunnable
-    );
-    private static final SimpleCommand settingsCommand2 = new SimpleCommand(
-        "sbhsettings",
-        settingsRunnable
-    );
-    private static final SimpleCommand settingsCommand3 = new SimpleCommand(
-        "sbhud",
-        settingsRunnable
-    );
+    private static final SimpleCommand settingsCommand = new SimpleCommand("sbh", settingsRunnable);
+    private static final SimpleCommand settingsCommand2 = new SimpleCommand("sbhsettings", settingsRunnable);
+    private static final SimpleCommand settingsCommand3 = new SimpleCommand("sbhud", settingsRunnable);
 
     private static final SimpleCommand mapCommand = new SimpleCommand(
         "sbhmap",
         new SimpleCommand.ProcessCommandRunnable() {
             public void processCommand(ICommandSender sender, String[] args) {
-                if (
-                    LocationHandler
-                        .getCurrentLocation()
-                        .getCategory()
-                        .getMap() !=
-                    null
-                ) SkyblockHud.screenToOpen = new MapHandler.MapScreen();
+                if (LocationHandler.getCurrentLocation().getCategory().getMap() != null) SkyblockHud.screenToOpen =
+                    new MapHandler.MapScreen();
             }
         }
     );

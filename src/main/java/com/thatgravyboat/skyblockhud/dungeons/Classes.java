@@ -36,9 +36,7 @@ public enum Classes {
             } catch (IllegalArgumentException ignored) {}
         } else if (input.length() == 3) {
             try {
-                return Classes.valueOf(
-                    input.replace("[", "").replace("]", "").toUpperCase()
-                );
+                return Classes.valueOf(input.replace("[", "").replace("]", "").toUpperCase());
             } catch (IllegalArgumentException ignored) {}
         } else {
             for (Classes clazz : Classes.values()) {

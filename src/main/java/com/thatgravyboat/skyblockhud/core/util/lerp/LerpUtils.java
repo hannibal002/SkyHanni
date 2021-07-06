@@ -11,10 +11,8 @@ public class LerpUtils {
     }
 
     private static final float sigmoidStr = 8;
-    private static final float sigmoidA =
-        -1 / (sigmoid(-0.5f * sigmoidStr) - sigmoid(0.5f * sigmoidStr));
-    private static final float sigmoidB =
-        sigmoidA * sigmoid(-0.5f * sigmoidStr);
+    private static final float sigmoidA = -1 / (sigmoid(-0.5f * sigmoidStr) - sigmoid(0.5f * sigmoidStr));
+    private static final float sigmoidB = sigmoidA * sigmoid(-0.5f * sigmoidStr);
 
     public static float sigmoidZeroOne(float f) {
         f = clampZeroOne(f);

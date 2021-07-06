@@ -24,22 +24,11 @@ public class GuiElementBoolean extends GuiElement {
     private static final int xSize = 48;
     private static final int ySize = 14;
 
-    public GuiElementBoolean(
-        int x,
-        int y,
-        boolean value,
-        Consumer<Boolean> toggleCallback
-    ) {
+    public GuiElementBoolean(int x, int y, boolean value, Consumer<Boolean> toggleCallback) {
         this(x, y, value, 0, toggleCallback);
     }
 
-    public GuiElementBoolean(
-        int x,
-        int y,
-        boolean value,
-        int clickRadius,
-        Consumer<Boolean> toggleCallback
-    ) {
+    public GuiElementBoolean(int x, int y, boolean value, int clickRadius, Consumer<Boolean> toggleCallback) {
         this.x = x;
         this.y = y;
         this.value = value;
@@ -54,10 +43,7 @@ public class GuiElementBoolean extends GuiElement {
     @Override
     public void render() {
         GlStateManager.color(1, 1, 1, 1);
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .bindTexture(GuiTextures.BAR);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(GuiTextures.BAR);
         RenderUtils.drawTexturedRect(x, y, xSize, ySize);
 
         ResourceLocation buttonLoc = GuiTextures.ON;
@@ -66,10 +52,7 @@ public class GuiElementBoolean extends GuiElement {
         lastMillis = currentMillis;
         boolean passedLimit = false;
         if (previewValue != value) {
-            if (
-                (previewValue && animation > 12) ||
-                (!previewValue && animation < 24)
-            ) {
+            if ((previewValue && animation > 12) || (!previewValue && animation < 24)) {
                 passedLimit = true;
             }
         }
@@ -96,9 +79,7 @@ public class GuiElementBoolean extends GuiElement {
             }
         }
 
-        int animation = (int) (
-            LerpUtils.sigmoidZeroOne(this.animation / 36f) * 36
-        );
+        int animation = (int) (LerpUtils.sigmoidZeroOne(this.animation / 36f) * 36);
         if (animation < 3) {
             buttonLoc = GuiTextures.OFF;
         } else if (animation < 13) {

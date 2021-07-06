@@ -40,24 +40,13 @@ public class GlScissorStack {
         public void set(ScaledResolution scaledResolution) {
             int height = Minecraft.getMinecraft().displayHeight;
             int scale = scaledResolution.getScaleFactor();
-            GL11.glScissor(
-                left * scale,
-                height - bottom * scale,
-                (right - left) * scale,
-                (bottom - top) * scale
-            );
+            GL11.glScissor(left * scale, height - bottom * scale, (right - left) * scale, (bottom - top) * scale);
         }
     }
 
     private static final LinkedList<Bounds> boundsStack = new LinkedList<>();
 
-    public static void push(
-        int left,
-        int top,
-        int right,
-        int bottom,
-        ScaledResolution scaledResolution
-    ) {
+    public static void push(int left, int top, int right, int bottom, ScaledResolution scaledResolution) {
         if (right < left) {
             int temp = right;
             right = left;
@@ -71,9 +60,7 @@ public class GlScissorStack {
         if (boundsStack.isEmpty()) {
             boundsStack.push(new Bounds(left, top, right, bottom));
         } else {
-            boundsStack.push(
-                boundsStack.peek().createSubBound(left, top, right, bottom)
-            );
+            boundsStack.push(boundsStack.peek().createSubBound(left, top, right, bottom));
         }
         if (!boundsStack.isEmpty()) {
             boundsStack.peek().set(scaledResolution);

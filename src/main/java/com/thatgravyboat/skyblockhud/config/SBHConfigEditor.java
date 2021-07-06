@@ -29,10 +29,7 @@ import org.lwjgl.opengl.GL11;
 
 public class SBHConfigEditor extends GuiElement {
 
-    private static final ResourceLocation[] socialsIco = new ResourceLocation[] {
-        DISCORD,
-        TWITTER
-    };
+    private static final ResourceLocation[] socialsIco = new ResourceLocation[] { DISCORD, TWITTER };
     private static final String[] socialsLink = new String[] {
         "https://discord.gg/moulberry",
         "https://twitter.com/thatgravytboat/"
@@ -71,12 +68,7 @@ public class SBHConfigEditor extends GuiElement {
             }
             if (selectedCategory == null) {
                 for (Map.Entry<String, ConfigProcessor.ProcessedCategory> category : processedConfig.entrySet()) {
-                    if (
-                        category
-                            .getValue()
-                            .name.toLowerCase()
-                            .startsWith(categoryOpen.toLowerCase())
-                    ) {
+                    if (category.getValue().name.toLowerCase().startsWith(categoryOpen.toLowerCase())) {
                         selectedCategory = category.getKey();
                         break;
                     }
@@ -84,12 +76,7 @@ public class SBHConfigEditor extends GuiElement {
             }
             if (selectedCategory == null) {
                 for (Map.Entry<String, ConfigProcessor.ProcessedCategory> category : processedConfig.entrySet()) {
-                    if (
-                        category
-                            .getValue()
-                            .name.toLowerCase()
-                            .contains(categoryOpen.toLowerCase())
-                    ) {
+                    if (category.getValue().name.toLowerCase().contains(categoryOpen.toLowerCase())) {
                         selectedCategory = category.getKey();
                         break;
                     }
@@ -130,19 +117,11 @@ public class SBHConfigEditor extends GuiElement {
         long currentTime = System.currentTimeMillis();
         long delta = currentTime - openedMillis;
 
-        ScaledResolution scaledResolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
+        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         int width = scaledResolution.getScaledWidth();
         int height = scaledResolution.getScaledHeight();
-        int mouseX =
-            Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
-        int mouseY =
-            height -
-            Mouse.getY() *
-            height /
-            Minecraft.getMinecraft().displayHeight -
-            1;
+        int mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
+        int mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1;
 
         float opacityFactor = LerpUtils.sigmoidZeroOne(delta / 500f);
         RenderUtils.drawGradientRect(
@@ -155,18 +134,8 @@ public class SBHConfigEditor extends GuiElement {
             (int) (0x90 * opacityFactor) << 24 | 0x101010
         );
 
-        int xSize = Math.min(
-            scaledResolution.getScaledWidth() -
-            100 /
-            scaledResolution.getScaleFactor(),
-            500
-        );
-        int ySize = Math.min(
-            scaledResolution.getScaledHeight() -
-            100 /
-            scaledResolution.getScaleFactor(),
-            400
-        );
+        int xSize = Math.min(scaledResolution.getScaledWidth() - 100 / scaledResolution.getScaleFactor(), 500);
+        int ySize = Math.min(scaledResolution.getScaledHeight() - 100 / scaledResolution.getScaleFactor(), 400);
 
         int x = (scaledResolution.getScaledWidth() - xSize) / 2;
         int y = (scaledResolution.getScaledHeight() - ySize) / 2;
@@ -215,62 +184,20 @@ public class SBHConfigEditor extends GuiElement {
             0xa0a0a0
         );
 
-        RenderUtils.drawFloatingRectDark(
-            x + 4,
-            y + 49 - 20,
-            140,
-            ySize - 54 + 20,
-            false
-        );
+        RenderUtils.drawFloatingRectDark(x + 4, y + 49 - 20, 140, ySize - 54 + 20, false);
 
         int innerPadding = 20 / adjScaleFactor;
         int innerLeft = x + 4 + innerPadding;
         int innerRight = x + 144 - innerPadding;
         int innerTop = y + 49 + innerPadding;
         int innerBottom = y + ySize - 5 - innerPadding;
-        Gui.drawRect(
-            innerLeft,
-            innerTop,
-            innerLeft + 1,
-            innerBottom,
-            0xff08080E
-        ); //Left
-        Gui.drawRect(
-            innerLeft + 1,
-            innerTop,
-            innerRight,
-            innerTop + 1,
-            0xff08080E
-        ); //Top
-        Gui.drawRect(
-            innerRight - 1,
-            innerTop + 1,
-            innerRight,
-            innerBottom,
-            0xff28282E
-        ); //Right
-        Gui.drawRect(
-            innerLeft + 1,
-            innerBottom - 1,
-            innerRight - 1,
-            innerBottom,
-            0xff28282E
-        ); //Bottom
-        Gui.drawRect(
-            innerLeft + 1,
-            innerTop + 1,
-            innerRight - 1,
-            innerBottom - 1,
-            0x6008080E
-        ); //Middle
+        Gui.drawRect(innerLeft, innerTop, innerLeft + 1, innerBottom, 0xff08080E); //Left
+        Gui.drawRect(innerLeft + 1, innerTop, innerRight, innerTop + 1, 0xff08080E); //Top
+        Gui.drawRect(innerRight - 1, innerTop + 1, innerRight, innerBottom, 0xff28282E); //Right
+        Gui.drawRect(innerLeft + 1, innerBottom - 1, innerRight - 1, innerBottom, 0xff28282E); //Bottom
+        Gui.drawRect(innerLeft + 1, innerTop + 1, innerRight - 1, innerBottom - 1, 0x6008080E); //Middle
 
-        GlScissorStack.push(
-            0,
-            innerTop + 1,
-            scaledResolution.getScaledWidth(),
-            innerBottom - 1,
-            scaledResolution
-        );
+        GlScissorStack.push(0, innerTop + 1, scaledResolution.getScaledWidth(), innerBottom - 1, scaledResolution);
 
         float catBarSize = 1;
         int catY = -categoryScroll.getValue();
@@ -278,79 +205,47 @@ public class SBHConfigEditor extends GuiElement {
         LinkedHashMap<String, ConfigProcessor.ProcessedCategory> currentConfigEditing = getCurrentConfigEditing();
         for (Map.Entry<String, ConfigProcessor.ProcessedCategory> entry : currentConfigEditing.entrySet()) {
             String selectedCategory = getSelectedCategory();
-            if (
-                selectedCategory == null ||
-                !currentConfigEditing.containsKey(selectedCategory)
-            ) {
+            if (selectedCategory == null || !currentConfigEditing.containsKey(selectedCategory)) {
                 setSelectedCategory(entry.getKey());
             }
             String catName = entry.getValue().name;
             if (entry.getKey().equals(getSelectedCategory())) {
-                catName =
-                    EnumChatFormatting.DARK_AQUA.toString() +
-                    EnumChatFormatting.UNDERLINE +
-                    catName;
+                catName = EnumChatFormatting.DARK_AQUA.toString() + EnumChatFormatting.UNDERLINE + catName;
             } else {
                 catName = EnumChatFormatting.GRAY + catName;
             }
-            TextRenderUtils.drawStringCenteredScaledMaxWidth(
-                catName,
-                fr,
-                x + 75,
-                y + 70 + catY,
-                false,
-                100,
-                -1
-            );
+            TextRenderUtils.drawStringCenteredScaledMaxWidth(catName, fr, x + 75, y + 70 + catY, false, 100, -1);
             catY += 15;
             if (catY > 0) {
                 catBarSize =
                     LerpUtils.clampZeroOne(
-                        (float) (innerBottom - innerTop - 2) /
-                        (catY + 5 + categoryScroll.getValue())
+                        (float) (innerBottom - innerTop - 2) / (catY + 5 + categoryScroll.getValue())
                     );
             }
         }
 
-        float catBarStart =
-            categoryScroll.getValue() /
-            (float) (catY + categoryScroll.getValue());
+        float catBarStart = categoryScroll.getValue() / (float) (catY + categoryScroll.getValue());
         float catBarEnd = catBarStart + catBarSize;
         if (catBarEnd > 1) {
             catBarEnd = 1;
-            if (
-                categoryScroll.getTarget() /
-                (float) (catY + categoryScroll.getValue()) +
-                catBarSize <
-                1
-            ) {
+            if (categoryScroll.getTarget() / (float) (catY + categoryScroll.getValue()) + catBarSize < 1) {
                 int target = optionsScroll.getTarget();
                 categoryScroll.setValue(
                     (int) Math.ceil(
-                        (catY + 5 + categoryScroll.getValue()) -
-                        catBarSize *
-                        (catY + 5 + categoryScroll.getValue())
+                        (catY + 5 + categoryScroll.getValue()) - catBarSize * (catY + 5 + categoryScroll.getValue())
                     )
                 );
                 categoryScroll.setTarget(target);
             } else {
                 categoryScroll.setValue(
                     (int) Math.ceil(
-                        (catY + 5 + categoryScroll.getValue()) -
-                        catBarSize *
-                        (catY + 5 + categoryScroll.getValue())
+                        (catY + 5 + categoryScroll.getValue()) - catBarSize * (catY + 5 + categoryScroll.getValue())
                     )
                 );
             }
         }
         int catDist = innerBottom - innerTop - 12;
-        Gui.drawRect(
-            innerLeft + 2,
-            innerTop + 5,
-            innerLeft + 7,
-            innerBottom - 5,
-            0xff101010
-        );
+        Gui.drawRect(innerLeft + 2, innerTop + 5, innerLeft + 7, innerBottom - 5, 0xff101010);
         Gui.drawRect(
             innerLeft + 3,
             innerTop + 6 + (int) (catDist * catBarStart),
@@ -361,23 +256,9 @@ public class SBHConfigEditor extends GuiElement {
 
         GlScissorStack.pop(scaledResolution);
 
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            "Categories",
-            fr,
-            x + 75,
-            y + 44,
-            false,
-            120,
-            0xa368ef
-        );
+        TextRenderUtils.drawStringCenteredScaledMaxWidth("Categories", fr, x + 75, y + 44, false, 120, 0xa368ef);
 
-        RenderUtils.drawFloatingRectDark(
-            x + 149,
-            y + 29,
-            xSize - 154,
-            ySize - 34,
-            false
-        );
+        RenderUtils.drawFloatingRectDark(x + 149, y + 29, xSize - 154, ySize - 34, false);
 
         innerLeft = x + 149 + innerPadding;
         innerRight = x + xSize - 5 - innerPadding;
@@ -386,13 +267,8 @@ public class SBHConfigEditor extends GuiElement {
         GlStateManager.color(1, 1, 1, 1);
         int rightStuffLen = 20;
 
-        if (
-            getSelectedCategory() != null &&
-            currentConfigEditing.containsKey(getSelectedCategory())
-        ) {
-            ConfigProcessor.ProcessedCategory cat = currentConfigEditing.get(
-                getSelectedCategory()
-            );
+        if (getSelectedCategory() != null && currentConfigEditing.containsKey(getSelectedCategory())) {
+            ConfigProcessor.ProcessedCategory cat = currentConfigEditing.get(getSelectedCategory());
 
             TextRenderUtils.drawStringScaledMaxWidth(
                 cat.desc,
@@ -405,65 +281,21 @@ public class SBHConfigEditor extends GuiElement {
             );
         }
 
-        Gui.drawRect(
-            innerLeft,
-            innerTop,
-            innerLeft + 1,
-            innerBottom,
-            0xff08080E
-        ); //Left
-        Gui.drawRect(
-            innerLeft + 1,
-            innerTop,
-            innerRight,
-            innerTop + 1,
-            0xff08080E
-        ); //Top
-        Gui.drawRect(
-            innerRight - 1,
-            innerTop + 1,
-            innerRight,
-            innerBottom,
-            0xff303036
-        ); //Right
-        Gui.drawRect(
-            innerLeft + 1,
-            innerBottom - 1,
-            innerRight - 1,
-            innerBottom,
-            0xff303036
-        ); //Bottom
-        Gui.drawRect(
-            innerLeft + 1,
-            innerTop + 1,
-            innerRight - 1,
-            innerBottom - 1,
-            0x6008080E
-        ); //Middle
+        Gui.drawRect(innerLeft, innerTop, innerLeft + 1, innerBottom, 0xff08080E); //Left
+        Gui.drawRect(innerLeft + 1, innerTop, innerRight, innerTop + 1, 0xff08080E); //Top
+        Gui.drawRect(innerRight - 1, innerTop + 1, innerRight, innerBottom, 0xff303036); //Right
+        Gui.drawRect(innerLeft + 1, innerBottom - 1, innerRight - 1, innerBottom, 0xff303036); //Bottom
+        Gui.drawRect(innerLeft + 1, innerTop + 1, innerRight - 1, innerBottom - 1, 0x6008080E); //Middle
 
-        GlScissorStack.push(
-            innerLeft + 1,
-            innerTop + 1,
-            innerRight - 1,
-            innerBottom - 1,
-            scaledResolution
-        );
+        GlScissorStack.push(innerLeft + 1, innerTop + 1, innerRight - 1, innerBottom - 1, scaledResolution);
         float barSize = 1;
         int optionY = -optionsScroll.getValue();
-        if (
-            getSelectedCategory() != null &&
-            currentConfigEditing.containsKey(getSelectedCategory())
-        ) {
-            ConfigProcessor.ProcessedCategory cat = currentConfigEditing.get(
-                getSelectedCategory()
-            );
+        if (getSelectedCategory() != null && currentConfigEditing.containsKey(getSelectedCategory())) {
+            ConfigProcessor.ProcessedCategory cat = currentConfigEditing.get(getSelectedCategory());
             int optionWidthDefault = innerRight - innerLeft - 20;
             GlStateManager.enableDepth();
             Set<Integer> activeAccordions = new HashSet<>();
-            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(
-                cat
-            )
-                .values()) {
+            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(cat).values()) {
                 int optionWidth = optionWidthDefault;
                 if (option.accordionId >= 0) {
                     if (!activeAccordions.contains(option.accordionId)) {
@@ -483,15 +315,8 @@ public class SBHConfigEditor extends GuiElement {
                     }
                 }
                 int optionHeight = editor.getHeight();
-                if (
-                    innerTop + 5 + optionY + optionHeight > innerTop + 1 &&
-                    innerTop + 5 + optionY < innerBottom - 1
-                ) {
-                    editor.render(
-                        (innerLeft + innerRight - optionWidth) / 2 - 5,
-                        innerTop + 5 + optionY,
-                        optionWidth
-                    );
+                if (innerTop + 5 + optionY + optionHeight > innerTop + 1 && innerTop + 5 + optionY < innerBottom - 1) {
+                    editor.render((innerLeft + innerRight - optionWidth) / 2 - 5, innerTop + 5 + optionY, optionWidth);
                 }
                 optionY += optionHeight + 5;
             }
@@ -499,8 +324,7 @@ public class SBHConfigEditor extends GuiElement {
             if (optionY > 0) {
                 barSize =
                     LerpUtils.clampZeroOne(
-                        (float) (innerBottom - innerTop - 2) /
-                        (optionY + 5 + optionsScroll.getValue())
+                        (float) (innerBottom - innerTop - 2) / (optionY + 5 + optionsScroll.getValue())
                     );
             }
         }
@@ -508,23 +332,15 @@ public class SBHConfigEditor extends GuiElement {
         GlScissorStack.pop(scaledResolution);
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        if (
-            getSelectedCategory() != null &&
-            currentConfigEditing.containsKey(getSelectedCategory())
-        ) {
+        if (getSelectedCategory() != null && currentConfigEditing.containsKey(getSelectedCategory())) {
             int optionYOverlay = -optionsScroll.getValue();
-            ConfigProcessor.ProcessedCategory cat = currentConfigEditing.get(
-                getSelectedCategory()
-            );
+            ConfigProcessor.ProcessedCategory cat = currentConfigEditing.get(getSelectedCategory());
             int optionWidthDefault = innerRight - innerLeft - 20;
 
             GlStateManager.translate(0, 0, 10);
             GlStateManager.enableDepth();
             Set<Integer> activeAccordions = new HashSet<>();
-            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(
-                cat
-            )
-                .values()) {
+            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(cat).values()) {
                 int optionWidth = optionWidthDefault;
                 if (option.accordionId >= 0) {
                     if (!activeAccordions.contains(option.accordionId)) {
@@ -545,12 +361,7 @@ public class SBHConfigEditor extends GuiElement {
                 }
                 int optionHeight = editor.getHeight();
                 if (
-                    innerTop +
-                    5 +
-                    optionYOverlay +
-                    optionHeight >
-                    innerTop +
-                    1 &&
+                    innerTop + 5 + optionYOverlay + optionHeight > innerTop + 1 &&
                     innerTop + 5 + optionYOverlay < innerBottom - 1
                 ) {
                     editor.renderOverlay(
@@ -566,45 +377,28 @@ public class SBHConfigEditor extends GuiElement {
         }
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
-        float barStart =
-            optionsScroll.getValue() /
-            (float) (optionY + optionsScroll.getValue());
+        float barStart = optionsScroll.getValue() / (float) (optionY + optionsScroll.getValue());
         float barEnd = barStart + barSize;
         if (barEnd > 1) {
             barEnd = 1;
-            if (
-                optionsScroll.getTarget() /
-                (float) (optionY + optionsScroll.getValue()) +
-                barSize <
-                1
-            ) {
+            if (optionsScroll.getTarget() / (float) (optionY + optionsScroll.getValue()) + barSize < 1) {
                 int target = optionsScroll.getTarget();
                 optionsScroll.setValue(
                     (int) Math.ceil(
-                        (optionY + 5 + optionsScroll.getValue()) -
-                        barSize *
-                        (optionY + 5 + optionsScroll.getValue())
+                        (optionY + 5 + optionsScroll.getValue()) - barSize * (optionY + 5 + optionsScroll.getValue())
                     )
                 );
                 optionsScroll.setTarget(target);
             } else {
                 optionsScroll.setValue(
                     (int) Math.ceil(
-                        (optionY + 5 + optionsScroll.getValue()) -
-                        barSize *
-                        (optionY + 5 + optionsScroll.getValue())
+                        (optionY + 5 + optionsScroll.getValue()) - barSize * (optionY + 5 + optionsScroll.getValue())
                     )
                 );
             }
         }
         int dist = innerBottom - innerTop - 12;
-        Gui.drawRect(
-            innerRight - 10,
-            innerTop + 5,
-            innerRight - 5,
-            innerBottom - 5,
-            0xff101010
-        );
+        Gui.drawRect(innerRight - 10, innerTop + 5, innerRight - 5, innerBottom - 5, 0xff101010);
         Gui.drawRect(
             innerRight - 9,
             innerTop + 6 + (int) (dist * barStart),
@@ -613,37 +407,16 @@ public class SBHConfigEditor extends GuiElement {
             0xff303030
         );
 
-        for (
-            int socialIndex = 0;
-            socialIndex < socialsIco.length;
-            socialIndex++
-        ) {
-            Minecraft
-                .getMinecraft()
-                .getTextureManager()
-                .bindTexture(socialsIco[socialIndex]);
+        for (int socialIndex = 0; socialIndex < socialsIco.length; socialIndex++) {
+            Minecraft.getMinecraft().getTextureManager().bindTexture(socialsIco[socialIndex]);
             GlStateManager.color(1, 1, 1, 1);
             int socialLeft = x + xSize - 23 - 18 * socialIndex;
-            RenderUtils.drawTexturedRect(
-                socialLeft,
-                y + 7,
-                16,
-                16,
-                GL11.GL_LINEAR
-            );
+            RenderUtils.drawTexturedRect(socialLeft, y + 7, 16, 16, GL11.GL_LINEAR);
 
-            if (
-                mouseX >= socialLeft &&
-                mouseX <= socialLeft + 16 &&
-                mouseY >= y + 6 &&
-                mouseY <= y + 23
-            ) {
+            if (mouseX >= socialLeft && mouseX <= socialLeft + 16 && mouseY >= y + 6 && mouseY <= y + 23) {
                 tooltipToDisplay =
                     Lists.newArrayList(
-                        EnumChatFormatting.YELLOW +
-                        "Go to: " +
-                        EnumChatFormatting.RESET +
-                        socialsLink[socialIndex]
+                        EnumChatFormatting.YELLOW + "Go to: " + EnumChatFormatting.RESET + socialsLink[socialIndex]
                     );
             }
         }
@@ -651,35 +424,19 @@ public class SBHConfigEditor extends GuiElement {
         GlScissorStack.clear();
 
         if (tooltipToDisplay != null) {
-            TextRenderUtils.drawHoveringText(
-                tooltipToDisplay,
-                mouseX,
-                mouseY,
-                width,
-                height,
-                -1,
-                fr
-            );
+            TextRenderUtils.drawHoveringText(tooltipToDisplay, mouseX, mouseY, width, height, -1, fr);
         }
 
         GlStateManager.translate(0, 0, -2);
     }
 
     public boolean mouseInput(int mouseX, int mouseY) {
-        ScaledResolution scaledResolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
+        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         int width = scaledResolution.getScaledWidth();
         int height = scaledResolution.getScaledHeight();
 
-        int xSize = Math.min(
-            width - 100 / scaledResolution.getScaleFactor(),
-            500
-        );
-        int ySize = Math.min(
-            height - 100 / scaledResolution.getScaleFactor(),
-            400
-        );
+        int xSize = Math.min(width - 100 / scaledResolution.getScaleFactor(), 500);
+        int ySize = Math.min(height - 100 / scaledResolution.getScaleFactor(), 400);
 
         int x = (scaledResolution.getScaledWidth() - xSize) / 2;
         int y = (scaledResolution.getScaledHeight() - ySize) / 2;
@@ -717,16 +474,11 @@ public class SBHConfigEditor extends GuiElement {
                     catY += 15;
                     if (catY > 0) {
                         catBarSize =
-                            LerpUtils.clampZeroOne(
-                                (float) (innerBottom - innerTop - 2) /
-                                (catY + 5 + newTarget)
-                            );
+                            LerpUtils.clampZeroOne((float) (innerBottom - innerTop - 2) / (catY + 5 + newTarget));
                     }
                 }
 
-                int barMax = (int) Math.floor(
-                    (catY + 5 + newTarget) - catBarSize * (catY + 5 + newTarget)
-                );
+                int barMax = (int) Math.floor((catY + 5 + newTarget) - catBarSize * (catY + 5 + newTarget));
                 if (newTarget > barMax) {
                     newTarget = barMax;
                 }
@@ -745,17 +497,11 @@ public class SBHConfigEditor extends GuiElement {
                     getCurrentConfigEditing() != null &&
                     getCurrentConfigEditing().containsKey(getSelectedCategory())
                 ) {
-                    ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing()
-                        .get(getSelectedCategory());
+                    ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing().get(getSelectedCategory());
                     Set<Integer> activeAccordions = new HashSet<>();
-                    for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(
-                        cat
-                    )
-                        .values()) {
+                    for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(cat).values()) {
                         if (option.accordionId >= 0) {
-                            if (
-                                !activeAccordions.contains(option.accordionId)
-                            ) {
+                            if (!activeAccordions.contains(option.accordionId)) {
                                 continue;
                             }
                         }
@@ -767,9 +513,7 @@ public class SBHConfigEditor extends GuiElement {
                         if (editor instanceof GuiOptionEditorAccordion) {
                             GuiOptionEditorAccordion accordion = (GuiOptionEditorAccordion) editor;
                             if (accordion.getToggled()) {
-                                activeAccordions.add(
-                                    accordion.getAccordionId()
-                                );
+                                activeAccordions.add(accordion.getAccordionId());
                             }
                         }
                         optionY += editor.getHeight() + 5;
@@ -777,29 +521,18 @@ public class SBHConfigEditor extends GuiElement {
                         if (optionY > 0) {
                             barSize =
                                 LerpUtils.clampZeroOne(
-                                    (float) (innerBottom - innerTop - 2) /
-                                    (optionY + 5 + newTarget)
+                                    (float) (innerBottom - innerTop - 2) / (optionY + 5 + newTarget)
                                 );
                         }
                     }
                 }
 
-                int barMax = (int) Math.floor(
-                    (optionY + 5 + newTarget) -
-                    barSize *
-                    (optionY + 5 + newTarget)
-                );
+                int barMax = (int) Math.floor((optionY + 5 + newTarget) - barSize * (optionY + 5 + newTarget));
                 if (newTarget > barMax) {
                     newTarget = barMax;
                 }
                 optionsScroll.setTimeToReachTarget(
-                    Math.min(
-                        150,
-                        Math.max(
-                            10,
-                            5 * Math.abs(newTarget - optionsScroll.getValue())
-                        )
-                    )
+                    Math.min(150, Math.max(10, 5 * Math.abs(newTarget - optionsScroll.getValue())))
                 );
                 optionsScroll.resetTimer();
                 optionsScroll.setTarget(newTarget);
@@ -825,23 +558,12 @@ public class SBHConfigEditor extends GuiElement {
                 }
             }
 
-            for (
-                int socialIndex = 0;
-                socialIndex < socialsLink.length;
-                socialIndex++
-            ) {
+            for (int socialIndex = 0; socialIndex < socialsLink.length; socialIndex++) {
                 int socialLeft = x + xSize - 23 - 18 * socialIndex;
 
-                if (
-                    mouseX >= socialLeft &&
-                    mouseX <= socialLeft + 16 &&
-                    mouseY >= y + 6 &&
-                    mouseY <= y + 23
-                ) {
+                if (mouseX >= socialLeft && mouseX <= socialLeft + 16 && mouseY >= y + 6 && mouseY <= y + 23) {
                     try {
-                        Desktop
-                            .getDesktop()
-                            .browse(new URI(socialsLink[socialIndex]));
+                        Desktop.getDesktop().browse(new URI(socialsLink[socialIndex]));
                     } catch (Exception ignored) {}
                     return true;
                 }
@@ -855,13 +577,9 @@ public class SBHConfigEditor extends GuiElement {
             getCurrentConfigEditing().containsKey(getSelectedCategory())
         ) {
             int optionWidthDefault = innerRight - innerLeft - 20;
-            ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing()
-                .get(getSelectedCategory());
+            ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing().get(getSelectedCategory());
             Set<Integer> activeAccordions = new HashSet<>();
-            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(
-                cat
-            )
-                .values()) {
+            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(cat).values()) {
                 int optionWidth = optionWidthDefault;
                 if (option.accordionId >= 0) {
                     if (!activeAccordions.contains(option.accordionId)) {
@@ -895,12 +613,7 @@ public class SBHConfigEditor extends GuiElement {
             }
         }
 
-        if (
-            mouseX > innerLeft &&
-            mouseX < innerRight &&
-            mouseY > innerTop &&
-            mouseY < innerBottom
-        ) {
+        if (mouseX > innerLeft && mouseX < innerRight && mouseY > innerTop && mouseY < innerBottom) {
             optionY = -optionsScroll.getValue();
             if (
                 getSelectedCategory() != null &&
@@ -908,13 +621,9 @@ public class SBHConfigEditor extends GuiElement {
                 getCurrentConfigEditing().containsKey(getSelectedCategory())
             ) {
                 int optionWidthDefault = innerRight - innerLeft - 20;
-                ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing()
-                    .get(getSelectedCategory());
+                ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing().get(getSelectedCategory());
                 Set<Integer> activeAccordions = new HashSet<>();
-                for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(
-                    cat
-                )
-                    .values()) {
+                for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(cat).values()) {
                     int optionWidth = optionWidthDefault;
                     if (option.accordionId >= 0) {
                         if (!activeAccordions.contains(option.accordionId)) {
@@ -953,15 +662,10 @@ public class SBHConfigEditor extends GuiElement {
     }
 
     public boolean keyboardInput() {
-        ScaledResolution scaledResolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
+        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         int width = scaledResolution.getScaledWidth();
 
-        int xSize = Math.min(
-            width - 100 / scaledResolution.getScaleFactor(),
-            500
-        );
+        int xSize = Math.min(width - 100 / scaledResolution.getScaleFactor(), 500);
 
         int adjScaleFactor = Math.max(2, scaledResolution.getScaleFactor());
 
@@ -973,13 +677,9 @@ public class SBHConfigEditor extends GuiElement {
             getCurrentConfigEditing() != null &&
             getCurrentConfigEditing().containsKey(getSelectedCategory())
         ) {
-            ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing()
-                .get(getSelectedCategory());
+            ConfigProcessor.ProcessedCategory cat = getCurrentConfigEditing().get(getSelectedCategory());
             Set<Integer> activeAccordions = new HashSet<>();
-            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(
-                cat
-            )
-                .values()) {
+            for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(cat).values()) {
                 if (option.accordionId >= 0) {
                     if (!activeAccordions.contains(option.accordionId)) {
                         continue;

@@ -31,9 +31,7 @@ public class GuiElementColour extends GuiElement {
         "skyblockhud:core/colour_selector_chroma.png"
     );
 
-    private static final ResourceLocation colourPickerLocation = new ResourceLocation(
-        "mbcore:dynamic/colourpicker"
-    );
+    private static final ResourceLocation colourPickerLocation = new ResourceLocation("mbcore:dynamic/colourpicker");
     private static final ResourceLocation colourPickerBarValueLocation = new ResourceLocation(
         "mbcore:dynamic/colourpickervalue"
     );
@@ -42,9 +40,7 @@ public class GuiElementColour extends GuiElement {
     );
     private final GuiElementTextField hexField = new GuiElementTextField(
         "",
-        GuiElementTextField.SCALE_TEXT |
-        GuiElementTextField.FORCE_CAPS |
-        GuiElementTextField.NO_SPACE
+        GuiElementTextField.SCALE_TEXT | GuiElementTextField.FORCE_CAPS | GuiElementTextField.NO_SPACE
     );
 
     private int x;
@@ -68,20 +64,10 @@ public class GuiElementColour extends GuiElement {
         Consumer<String> colourChangedCallback,
         Runnable closeCallback
     ) {
-        final ScaledResolution scaledResolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
+        final ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
 
-        this.y =
-            Math.max(
-                10,
-                Math.min(scaledResolution.getScaledHeight() - ySize - 10, y)
-            );
-        this.x =
-            Math.max(
-                10,
-                Math.min(scaledResolution.getScaledWidth() - xSize - 10, x)
-            );
+        this.y = Math.max(10, Math.min(scaledResolution.getScaledHeight() - ySize - 10, y));
+        this.x = Math.max(10, Math.min(scaledResolution.getScaledWidth() - xSize - 10, x));
 
         this.colour = initialColour;
         this.colourChangedCallback = colourChangedCallback;
@@ -89,12 +75,7 @@ public class GuiElementColour extends GuiElement {
 
         int colour = ChromaColour.specialToSimpleRGB(initialColour);
         Color c = new Color(colour);
-        float[] hsv = Color.RGBtoHSB(
-            c.getRed(),
-            c.getGreen(),
-            c.getBlue(),
-            null
-        );
+        float[] hsv = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
         updateAngleAndRadius(hsv);
     }
 
@@ -108,51 +89,25 @@ public class GuiElementColour extends GuiElement {
 
         int currentColour = ChromaColour.specialToSimpleRGB(colour);
         Color c = new Color(currentColour, true);
-        float[] hsv = Color.RGBtoHSB(
-            c.getRed(),
-            c.getGreen(),
-            c.getBlue(),
-            null
-        );
+        float[] hsv = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
 
-        BufferedImage bufferedImage = new BufferedImage(
-            288,
-            288,
-            BufferedImage.TYPE_INT_ARGB
-        );
+        BufferedImage bufferedImage = new BufferedImage(288, 288, BufferedImage.TYPE_INT_ARGB);
         float borderRadius = 0.05f;
         if (Keyboard.isKeyDown(Keyboard.KEY_N)) borderRadius = 0;
         for (int x = -16; x < 272; x++) {
             for (int y = -16; y < 272; y++) {
-                float radius = (float) Math.sqrt(
-                    ((x - 128) * (x - 128) + (y - 128) * (y - 128)) / 16384f
-                );
-                float angle = (float) Math.toDegrees(
-                    Math.atan((128 - x) / (y - 128 + 1E-5)) + Math.PI / 2
-                );
+                float radius = (float) Math.sqrt(((x - 128) * (x - 128) + (y - 128) * (y - 128)) / 16384f);
+                float angle = (float) Math.toDegrees(Math.atan((128 - x) / (y - 128 + 1E-5)) + Math.PI / 2);
                 if (y < 128) angle += 180;
                 if (radius <= 1) {
-                    int rgb = Color
-                        .getHSBColor(
-                            angle / 360f,
-                            (float) Math.pow(radius, 1.5f),
-                            hsv[2]
-                        )
-                        .getRGB();
+                    int rgb = Color.getHSBColor(angle / 360f, (float) Math.pow(radius, 1.5f), hsv[2]).getRGB();
                     bufferedImage.setRGB(x + 16, y + 16, rgb);
                 } else if (radius <= 1 + borderRadius) {
-                    float invBlackAlpha =
-                        Math.abs(radius - 1 - borderRadius / 2) /
-                        borderRadius *
-                        2;
+                    float invBlackAlpha = Math.abs(radius - 1 - borderRadius / 2) / borderRadius * 2;
                     float blackAlpha = 1 - invBlackAlpha;
 
                     if (radius > 1 + borderRadius / 2) {
-                        bufferedImage.setRGB(
-                            x + 16,
-                            y + 16,
-                            (int) (blackAlpha * 255) << 24
-                        );
+                        bufferedImage.setRGB(x + 16, y + 16, (int) (blackAlpha * 255) << 24);
                     } else {
                         Color col = Color.getHSBColor(angle / 360f, 1, hsv[2]);
                         int rgb = (int) (col.getRed() * invBlackAlpha) << 16 |
@@ -164,34 +119,22 @@ public class GuiElementColour extends GuiElement {
             }
         }
 
-        BufferedImage bufferedImageValue = new BufferedImage(
-            10,
-            64,
-            BufferedImage.TYPE_INT_ARGB
-        );
+        BufferedImage bufferedImageValue = new BufferedImage(10, 64, BufferedImage.TYPE_INT_ARGB);
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 64; y++) {
                 if ((x == 0 || x == 9) && (y == 0 || y == 63)) continue;
 
-                int rgb = Color
-                    .getHSBColor(wheelAngle / 360, wheelRadius, (64 - y) / 64f)
-                    .getRGB();
+                int rgb = Color.getHSBColor(wheelAngle / 360, wheelRadius, (64 - y) / 64f).getRGB();
                 bufferedImageValue.setRGB(x, y, rgb);
             }
         }
 
-        BufferedImage bufferedImageOpacity = new BufferedImage(
-            10,
-            64,
-            BufferedImage.TYPE_INT_ARGB
-        );
+        BufferedImage bufferedImageOpacity = new BufferedImage(10, 64, BufferedImage.TYPE_INT_ARGB);
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 64; y++) {
                 if ((x == 0 || x == 9) && (y == 0 || y == 63)) continue;
 
-                int rgb =
-                    (currentColour & 0x00FFFFFF) |
-                    (Math.min(255, (64 - y) * 4) << 24);
+                int rgb = (currentColour & 0x00FFFFFF) | (Math.min(255, (64 - y) * 4) << 24);
                 bufferedImageOpacity.setRGB(x, y, rgb);
             }
         }
@@ -200,68 +143,30 @@ public class GuiElementColour extends GuiElement {
         int selx = (int) (Math.cos(Math.toRadians(wheelAngle)) * selradius);
         int sely = (int) (Math.sin(Math.toRadians(wheelAngle)) * selradius);
 
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .bindTexture(colour_selector_bar_alpha);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(colour_selector_bar_alpha);
         GlStateManager.color(1, 1, 1, 1);
-        RenderUtils.drawTexturedRect(
-            x + 5 + 64 + 5 + 10 + 5,
-            y + 5,
-            10,
-            64,
-            GL11.GL_NEAREST
-        );
+        RenderUtils.drawTexturedRect(x + 5 + 64 + 5 + 10 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
 
         Minecraft
             .getMinecraft()
             .getTextureManager()
-            .loadTexture(
-                colourPickerBarValueLocation,
-                new DynamicTexture(bufferedImageValue)
-            );
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .bindTexture(colourPickerBarValueLocation);
+            .loadTexture(colourPickerBarValueLocation, new DynamicTexture(bufferedImageValue));
+        Minecraft.getMinecraft().getTextureManager().bindTexture(colourPickerBarValueLocation);
         GlStateManager.color(1, 1, 1, 1);
-        RenderUtils.drawTexturedRect(
-            x + 5 + 64 + 5,
-            y + 5,
-            10,
-            64,
-            GL11.GL_NEAREST
-        );
+        RenderUtils.drawTexturedRect(x + 5 + 64 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
 
         Minecraft
             .getMinecraft()
             .getTextureManager()
-            .loadTexture(
-                colourPickerBarOpacityLocation,
-                new DynamicTexture(bufferedImageOpacity)
-            );
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .bindTexture(colourPickerBarOpacityLocation);
+            .loadTexture(colourPickerBarOpacityLocation, new DynamicTexture(bufferedImageOpacity));
+        Minecraft.getMinecraft().getTextureManager().bindTexture(colourPickerBarOpacityLocation);
         GlStateManager.color(1, 1, 1, 1);
-        RenderUtils.drawTexturedRect(
-            x + 5 + 64 + 5 + 10 + 5,
-            y + 5,
-            10,
-            64,
-            GL11.GL_NEAREST
-        );
+        RenderUtils.drawTexturedRect(x + 5 + 64 + 5 + 10 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
 
         int chromaSpeed = ChromaColour.getSpeed(colour);
         int currentColourChroma = ChromaColour.specialToChromaRGB(colour);
         Color cChroma = new Color(currentColourChroma, true);
-        float hsvChroma[] = Color.RGBtoHSB(
-            cChroma.getRed(),
-            cChroma.getGreen(),
-            cChroma.getBlue(),
-            null
-        );
+        float hsvChroma[] = Color.RGBtoHSB(cChroma.getRed(), cChroma.getGreen(), cChroma.getBlue(), null);
 
         if (chromaSpeed > 0) {
             Gui.drawRect(
@@ -278,58 +183,23 @@ public class GuiElementColour extends GuiElement {
                 x + 5 + 64 + 5 + 10 + 5 + 10 + 5 + 10 - 1,
                 y + 5 + 37 - 1,
                 Color.HSBtoRGB(
-                    (
-                        hsvChroma[0] +
-                        (System.currentTimeMillis() - ChromaColour.startTime) /
-                        1000f
-                    ) %
-                    1,
+                    (hsvChroma[0] + (System.currentTimeMillis() - ChromaColour.startTime) / 1000f) % 1,
                     0.8f,
                     0.8f
                 )
             );
         }
 
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .bindTexture(colour_selector_bar);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(colour_selector_bar);
         GlStateManager.color(1, 1, 1, 1);
-        RenderUtils.drawTexturedRect(
-            x + 5 + 64 + 5,
-            y + 5,
-            10,
-            64,
-            GL11.GL_NEAREST
-        );
-        RenderUtils.drawTexturedRect(
-            x + 5 + 64 + 5 + 10 + 5,
-            y + 5,
-            10,
-            64,
-            GL11.GL_NEAREST
-        );
+        RenderUtils.drawTexturedRect(x + 5 + 64 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
+        RenderUtils.drawTexturedRect(x + 5 + 64 + 5 + 10 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
 
         if (chromaSpeed > 0) {
-            RenderUtils.drawTexturedRect(
-                x + 5 + 64 + 5 + 10 + 5 + 10 + 5,
-                y + 5,
-                10,
-                64,
-                GL11.GL_NEAREST
-            );
+            RenderUtils.drawTexturedRect(x + 5 + 64 + 5 + 10 + 5 + 10 + 5, y + 5, 10, 64, GL11.GL_NEAREST);
         } else {
-            Minecraft
-                .getMinecraft()
-                .getTextureManager()
-                .bindTexture(colour_selector_chroma);
-            RenderUtils.drawTexturedRect(
-                x + 5 + 64 + 5 + 10 + 5 + 10 + 5,
-                y + 5 + 27,
-                10,
-                10,
-                GL11.GL_NEAREST
-            );
+            Minecraft.getMinecraft().getTextureManager().bindTexture(colour_selector_chroma);
+            RenderUtils.drawTexturedRect(x + 5 + 64 + 5 + 10 + 5 + 10 + 5, y + 5 + 27, 10, 10, GL11.GL_NEAREST);
         }
 
         Gui.drawRect(
@@ -359,29 +229,14 @@ public class GuiElementColour extends GuiElement {
         Minecraft
             .getMinecraft()
             .getTextureManager()
-            .loadTexture(
-                colourPickerLocation,
-                new DynamicTexture(bufferedImage)
-            );
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .bindTexture(colourPickerLocation);
+            .loadTexture(colourPickerLocation, new DynamicTexture(bufferedImage));
+        Minecraft.getMinecraft().getTextureManager().bindTexture(colourPickerLocation);
         GlStateManager.color(1, 1, 1, 1);
         RenderUtils.drawTexturedRect(x + 1, y + 1, 72, 72, GL11.GL_LINEAR);
 
-        Minecraft
-            .getMinecraft()
-            .getTextureManager()
-            .bindTexture(colour_selector_dot);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(colour_selector_dot);
         GlStateManager.color(1, 1, 1, 1);
-        RenderUtils.drawTexturedRect(
-            x + 5 + 32 + selx - 4,
-            y + 5 + 32 + sely - 4,
-            8,
-            8,
-            GL11.GL_NEAREST
-        );
+        RenderUtils.drawTexturedRect(x + 5 + 32 + selx - 4, y + 5 + 32 + sely - 4, 8, 8, GL11.GL_NEAREST);
 
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             EnumChatFormatting.GRAY.toString() + Math.round(hsv[2] * 100) + "",
@@ -393,9 +248,7 @@ public class GuiElementColour extends GuiElement {
             -1
         );
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            EnumChatFormatting.GRAY.toString() +
-            Math.round(c.getAlpha() / 255f * 100) +
-            "",
+            EnumChatFormatting.GRAY.toString() + Math.round(c.getAlpha() / 255f * 100) + "",
             Minecraft.getMinecraft().fontRendererObj,
             x + 5 + 64 + 5 + 15 + 5,
             y + 5 + 64 + 5 + 5,
@@ -405,9 +258,7 @@ public class GuiElementColour extends GuiElement {
         );
         if (chromaSpeed > 0) {
             TextRenderUtils.drawStringCenteredScaledMaxWidth(
-                EnumChatFormatting.GRAY.toString() +
-                (int) ChromaColour.getSecondsForSpeed(chromaSpeed) +
-                "s",
+                EnumChatFormatting.GRAY.toString() + (int) ChromaColour.getSecondsForSpeed(chromaSpeed) + "s",
                 Minecraft.getMinecraft().fontRendererObj,
                 x + 5 + 64 + 5 + 30 + 6,
                 y + 5 + 64 + 5 + 5,
@@ -418,9 +269,7 @@ public class GuiElementColour extends GuiElement {
         }
 
         hexField.setSize(48, 10);
-        if (!hexField.getFocus()) hexField.setText(
-            Integer.toHexString(c.getRGB() & 0xFFFFFF).toUpperCase()
-        );
+        if (!hexField.getFocus()) hexField.setText(Integer.toHexString(c.getRGB() & 0xFFFFFF).toUpperCase());
 
         StringBuilder sb = new StringBuilder(EnumChatFormatting.GRAY + "#");
         for (int i = 0; i < 6 - hexField.getText().length(); i++) {
@@ -433,13 +282,9 @@ public class GuiElementColour extends GuiElement {
     }
 
     public boolean mouseInput(int mouseX, int mouseY) {
-        ScaledResolution scaledResolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
+        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         float mouseXF = (float) (
-            Mouse.getX() *
-            scaledResolution.getScaledWidth_double() /
-            Minecraft.getMinecraft().displayWidth
+            Mouse.getX() * scaledResolution.getScaledWidth_double() / Minecraft.getMinecraft().displayWidth
         );
         float mouseYF = (float) (
             scaledResolution.getScaledHeight_double() -
@@ -449,17 +294,10 @@ public class GuiElementColour extends GuiElement {
             1
         );
 
-        if (
-            (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1) &&
-            Mouse.getEventButtonState()
-        ) {
+        if ((Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1) && Mouse.getEventButtonState()) {
             if (mouseX > x + 5 + 8 && mouseX < x + 5 + 8 + 48) {
                 if (mouseY > y + 5 + 64 + 5 && mouseY < y + 5 + 64 + 5 + 10) {
-                    hexField.mouseClicked(
-                        mouseX,
-                        mouseY,
-                        Mouse.getEventButton()
-                    );
+                    hexField.mouseClicked(mouseX, mouseY, Mouse.getEventButton());
                     clickedComponent = -1;
                     return true;
                 }
@@ -469,12 +307,7 @@ public class GuiElementColour extends GuiElement {
             clickedComponent = -1;
         }
         if (Mouse.getEventButtonState() && Mouse.getEventButton() == 0) {
-            if (
-                mouseX >= x &&
-                mouseX <= x + 119 &&
-                mouseY >= y &&
-                mouseY <= y + 89
-            ) {
+            if (mouseX >= x && mouseX <= x + 119 && mouseY >= y && mouseY <= y + 89) {
                 hexField.unfocus();
 
                 int xWheel = mouseX - x - 5;
@@ -508,19 +341,10 @@ public class GuiElementColour extends GuiElement {
                         if (y > -5 && y <= 69) {
                             clickedComponent = 3;
                         }
-                    } else if (
-                        mouseY > this.y + 5 + 27 && mouseY < this.y + 5 + 37
-                    ) {
-                        int currentColour = ChromaColour.specialToSimpleRGB(
-                            colour
-                        );
+                    } else if (mouseY > this.y + 5 + 27 && mouseY < this.y + 5 + 37) {
+                        int currentColour = ChromaColour.specialToSimpleRGB(colour);
                         Color c = new Color(currentColour, true);
-                        colour =
-                            ChromaColour.special(
-                                200,
-                                c.getAlpha(),
-                                currentColour
-                            );
+                        colour = ChromaColour.special(200, c.getAlpha(), currentColour);
                         colourChangedCallback.accept(colour);
                     }
                 }
@@ -533,46 +357,24 @@ public class GuiElementColour extends GuiElement {
         if (Mouse.isButtonDown(0) && clickedComponent >= 0) {
             int currentColour = ChromaColour.specialToSimpleRGB(colour);
             Color c = new Color(currentColour, true);
-            float[] hsv = Color.RGBtoHSB(
-                c.getRed(),
-                c.getGreen(),
-                c.getBlue(),
-                null
-            );
+            float[] hsv = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
 
             float xWheel = mouseXF - x - 5;
             float yWheel = mouseYF - y - 5;
 
             if (clickedComponent == 0) {
-                float angle = (float) Math.toDegrees(
-                    Math.atan((32 - xWheel) / (yWheel - 32 + 1E-5)) +
-                    Math.PI /
-                    2
-                );
+                float angle = (float) Math.toDegrees(Math.atan((32 - xWheel) / (yWheel - 32 + 1E-5)) + Math.PI / 2);
                 xWheel = Math.max(0, Math.min(64, xWheel));
                 yWheel = Math.max(0, Math.min(64, yWheel));
                 float radius = (float) Math.sqrt(
-                    (
-                        (xWheel - 32) *
-                        (xWheel - 32) +
-                        (yWheel - 32) *
-                        (yWheel - 32)
-                    ) /
-                    1024f
+                    ((xWheel - 32) * (xWheel - 32) + (yWheel - 32) * (yWheel - 32)) / 1024f
                 );
                 if (yWheel < 32) angle += 180;
 
                 this.wheelAngle = angle;
                 this.wheelRadius = (float) Math.pow(Math.min(1, radius), 1.5f);
-                int rgb = Color
-                    .getHSBColor(angle / 360f, wheelRadius, hsv[2])
-                    .getRGB();
-                colour =
-                    ChromaColour.special(
-                        ChromaColour.getSpeed(colour),
-                        c.getAlpha(),
-                        rgb
-                    );
+                int rgb = Color.getHSBColor(angle / 360f, wheelRadius, hsv[2]).getRGB();
+                colour = ChromaColour.special(ChromaColour.getSpeed(colour), c.getAlpha(), rgb);
                 colourChangedCallback.accept(colour);
                 return true;
             }
@@ -582,37 +384,21 @@ public class GuiElementColour extends GuiElement {
             System.out.println(y);
 
             if (clickedComponent == 1) {
-                int rgb = Color
-                    .getHSBColor(wheelAngle / 360, wheelRadius, 1 - y / 64f)
-                    .getRGB();
-                colour =
-                    ChromaColour.special(
-                        ChromaColour.getSpeed(colour),
-                        c.getAlpha(),
-                        rgb
-                    );
+                int rgb = Color.getHSBColor(wheelAngle / 360, wheelRadius, 1 - y / 64f).getRGB();
+                colour = ChromaColour.special(ChromaColour.getSpeed(colour), c.getAlpha(), rgb);
                 colourChangedCallback.accept(colour);
                 return true;
             }
 
             if (clickedComponent == 2) {
                 colour =
-                    ChromaColour.special(
-                        ChromaColour.getSpeed(colour),
-                        255 - Math.round(y / 64f * 255),
-                        currentColour
-                    );
+                    ChromaColour.special(ChromaColour.getSpeed(colour), 255 - Math.round(y / 64f * 255), currentColour);
                 colourChangedCallback.accept(colour);
                 return true;
             }
 
             if (clickedComponent == 3) {
-                colour =
-                    ChromaColour.special(
-                        255 - Math.round(y / 64f * 255),
-                        c.getAlpha(),
-                        currentColour
-                    );
+                colour = ChromaColour.special(255 - Math.round(y / 64f * 255), c.getAlpha(), currentColour);
                 colourChangedCallback.accept(colour);
             }
             return true;
@@ -628,10 +414,7 @@ public class GuiElementColour extends GuiElement {
             }
             String old = hexField.getText();
 
-            hexField.keyTyped(
-                Keyboard.getEventCharacter(),
-                Keyboard.getEventKey()
-            );
+            hexField.keyTyped(Keyboard.getEventCharacter(), Keyboard.getEventKey());
 
             if (hexField.getText().length() > 6) {
                 hexField.setText(old);
@@ -640,23 +423,12 @@ public class GuiElementColour extends GuiElement {
                     String text = hexField.getText().toLowerCase();
 
                     int rgb = Integer.parseInt(text, 16);
-                    int alpha =
-                        (ChromaColour.specialToSimpleRGB(colour) >> 24) & 0xFF;
-                    colour =
-                        ChromaColour.special(
-                            ChromaColour.getSpeed(colour),
-                            alpha,
-                            rgb
-                        );
+                    int alpha = (ChromaColour.specialToSimpleRGB(colour) >> 24) & 0xFF;
+                    colour = ChromaColour.special(ChromaColour.getSpeed(colour), alpha, rgb);
                     colourChangedCallback.accept(colour);
 
                     Color c = new Color(rgb);
-                    float[] hsv = Color.RGBtoHSB(
-                        c.getRed(),
-                        c.getGreen(),
-                        c.getBlue(),
-                        null
-                    );
+                    float[] hsv = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
                     updateAngleAndRadius(hsv);
                 } catch (Exception e) {}
             }

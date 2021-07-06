@@ -22,8 +22,7 @@ public class LerpingFloat {
         int lastTimeSpent = timeSpent;
         this.timeSpent += System.currentTimeMillis() - lastMillis;
 
-        float lastDistPercentToTarget =
-            lastTimeSpent / (float) timeToReachTarget;
+        float lastDistPercentToTarget = lastTimeSpent / (float) timeToReachTarget;
         float distPercentToTarget = timeSpent / (float) timeToReachTarget;
         float fac = (1 - lastDistPercentToTarget) / lastDistPercentToTarget;
 

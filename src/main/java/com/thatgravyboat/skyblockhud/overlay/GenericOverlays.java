@@ -22,9 +22,7 @@ public class GenericOverlays extends Gui {
     ) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(GuiTextures.bars);
-            Color color = new Color(
-                percentage == max ? fullColor : loadingColor
-            );
+            Color color = new Color(percentage == max ? fullColor : loadingColor);
 
             RenderUtils.drawTexturedModalRect(x, y, 0, 0, 182, 5);
             GlStateManager.color(
@@ -34,23 +32,9 @@ public class GenericOverlays extends Gui {
                 color.getAlpha() / 255f
             );
             RenderUtils.drawTexturedModalRect(x, y, 0, 30, 182, 5);
-            RenderUtils.drawTexturedModalRect(
-                x,
-                y,
-                0,
-                5,
-                (int) (182 * percentage),
-                5
-            );
+            RenderUtils.drawTexturedModalRect(x, y, 0, 5, (int) (182 * percentage), 5);
             if (barStyle != 0) {
-                RenderUtils.drawTexturedModalRect(
-                    x,
-                    y,
-                    0,
-                    5 + (barStyle * 5),
-                    182,
-                    5
-                );
+                RenderUtils.drawTexturedModalRect(x, y, 0, 5 + (barStyle * 5), 182, 5);
             }
         }
     }
@@ -67,9 +51,7 @@ public class GenericOverlays extends Gui {
     ) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(GuiTextures.bars);
-            Color color = new Color(
-                percentage == max ? fullColor : loadingColor
-            );
+            Color color = new Color(percentage == max ? fullColor : loadingColor);
             GlStateManager.enableBlend();
             RenderUtils.drawTexturedModalRect(x, y, 0, 35, 62, 5);
             GlStateManager.color(
@@ -79,23 +61,9 @@ public class GenericOverlays extends Gui {
                 color.getAlpha() / 255f
             );
             RenderUtils.drawTexturedModalRect(x, y, 0, 65, 62, 5);
-            RenderUtils.drawTexturedModalRect(
-                x,
-                y,
-                0,
-                40,
-                (int) (62 * percentage),
-                5
-            );
+            RenderUtils.drawTexturedModalRect(x, y, 0, 40, (int) (62 * percentage), 5);
             if (barStyle != 0) {
-                RenderUtils.drawTexturedModalRect(
-                    x,
-                    y,
-                    0,
-                    45 + (barStyle * 5),
-                    62,
-                    5
-                );
+                RenderUtils.drawTexturedModalRect(x, y, 0, 45 + (barStyle * 5), 62, 5);
             }
         }
     }

@@ -21,10 +21,7 @@ import org.lwjgl.input.Mouse;
 public class MiscUtils {
 
     public static void copyToClipboard(String str) {
-        Toolkit
-            .getDefaultToolkit()
-            .getSystemClipboard()
-            .setContents(new StringSelection(str), null);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(str), null);
     }
 
     private static void unzip(InputStream src, File dest) {
@@ -79,52 +76,28 @@ public class MiscUtils {
         } catch (Exception ignored) {}
     }
 
-    public static void setCursor(
-        ResourceLocation loc,
-        int hotspotX,
-        int hotspotY
-    ) {
-        if (
-            currentCursor != null && loc.getResourcePath().equals(currentCursor)
-        ) {
+    public static void setCursor(ResourceLocation loc, int hotspotX, int hotspotY) {
+        if (currentCursor != null && loc.getResourcePath().equals(currentCursor)) {
             return;
         }
         currentCursor = loc.getResourcePath();
         try {
             BufferedImage image = ImageIO.read(
-                Minecraft
-                    .getMinecraft()
-                    .getResourceManager()
-                    .getResource(loc)
-                    .getInputStream()
+                Minecraft.getMinecraft().getResourceManager().getResource(loc).getInputStream()
             );
             int maxSize = Cursor.getMaxCursorSize();
             IntBuffer buffer = BufferUtils.createIntBuffer(maxSize * maxSize);
             for (int i = 0; i < maxSize * maxSize; i++) {
                 int cursorX = i % maxSize;
                 int cursorY = i / maxSize;
-                if (
-                    cursorX >= image.getWidth() || cursorY >= image.getHeight()
-                ) {
+                if (cursorX >= image.getWidth() || cursorY >= image.getHeight()) {
                     buffer.put(0x00000000);
                 } else {
-                    buffer.put(
-                        image.getRGB(cursorX, image.getHeight() - 1 - cursorY)
-                    );
+                    buffer.put(image.getRGB(cursorX, image.getHeight() - 1 - cursorY));
                 }
             }
             buffer.flip();
-            Mouse.setNativeCursor(
-                new Cursor(
-                    maxSize,
-                    maxSize,
-                    hotspotX,
-                    hotspotY,
-                    1,
-                    buffer,
-                    null
-                )
-            );
+            Mouse.setNativeCursor(new Cursor(maxSize, maxSize, hotspotX, hotspotY, 1, buffer, null));
         } catch (Exception e) {
             e.printStackTrace();
         }

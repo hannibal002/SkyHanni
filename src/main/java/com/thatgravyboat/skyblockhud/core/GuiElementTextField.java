@@ -34,14 +34,7 @@ public class GuiElementTextField {
 
     private String prependText = "";
 
-    private final GuiTextField textField = new GuiTextField(
-        0,
-        Minecraft.getMinecraft().fontRendererObj,
-        0,
-        0,
-        0,
-        0
-    );
+    private final GuiTextField textField = new GuiTextField(0, Minecraft.getMinecraft().fontRendererObj, 0, 0, 0, 0);
 
     private int customBorderColour = -1;
 
@@ -49,12 +42,7 @@ public class GuiElementTextField {
         this(initialText, 100, 20, options);
     }
 
-    public GuiElementTextField(
-        String initialText,
-        int sizeX,
-        int sizeY,
-        int options
-    ) {
+    public GuiElementTextField(String initialText, int sizeX, int sizeY, int options) {
         textField.setFocused(true);
         textField.setCanLoseFocus(false);
         textField.setMaxStringLength(999);
@@ -109,18 +97,10 @@ public class GuiElementTextField {
     }
 
     public int getHeight() {
-        ScaledResolution scaledresolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
-        int paddingUnscaled =
-            searchBarPadding / scaledresolution.getScaleFactor();
+        ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft());
+        int paddingUnscaled = searchBarPadding / scaledresolution.getScaleFactor();
 
-        int numLines =
-            org.apache.commons.lang3.StringUtils.countMatches(
-                textField.getText(),
-                "\n"
-            ) +
-            1;
+        int numLines = org.apache.commons.lang3.StringUtils.countMatches(textField.getText(), "\n") + 1;
         int extraSize = (searchBarYSize - 8) / 2 + 8;
         int bottomTextBox = searchBarYSize + extraSize * (numLines - 1);
 
@@ -128,21 +108,14 @@ public class GuiElementTextField {
     }
 
     public int getWidth() {
-        ScaledResolution scaledresolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
-        int paddingUnscaled =
-            searchBarPadding / scaledresolution.getScaleFactor();
+        ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft());
+        int paddingUnscaled = searchBarPadding / scaledresolution.getScaleFactor();
 
         return searchBarXSize + paddingUnscaled * 2;
     }
 
     private float getScaleFactor(String str) {
-        return Math.min(
-            1,
-            (searchBarXSize - 2) /
-            (float) Minecraft.getMinecraft().fontRendererObj.getStringWidth(str)
-        );
+        return Math.min(1, (searchBarXSize - 2) / (float) Minecraft.getMinecraft().fontRendererObj.getStringWidth(str));
     }
 
     private boolean isScaling() {
@@ -151,10 +124,7 @@ public class GuiElementTextField {
 
     private float getStringWidth(String str) {
         if (isScaling()) {
-            return (
-                Minecraft.getMinecraft().fontRendererObj.getStringWidth(str) *
-                getScaleFactor(str)
-            );
+            return (Minecraft.getMinecraft().fontRendererObj.getStringWidth(str) * getScaleFactor(str));
         } else {
             return Minecraft.getMinecraft().fontRendererObj.getStringWidth(str);
         }
@@ -168,13 +138,9 @@ public class GuiElementTextField {
 
         String renderText = prependText + textField.getText();
 
-        int lineNum = Math.round(
-            ((yComp - (searchBarYSize - 8) / 2)) / extraSize
-        );
+        int lineNum = Math.round(((yComp - (searchBarYSize - 8) / 2)) / extraSize);
 
-        Pattern patternControlCode = Pattern.compile(
-            "(?i)\\u00A7([^\\u00B6])(?!\\u00B6)"
-        );
+        Pattern patternControlCode = Pattern.compile("(?i)\\u00A7([^\\u00B6])(?!\\u00B6)");
         String text = renderText;
         String textNoColour = renderText;
         if ((options & COLOUR) != 0) {
@@ -202,28 +168,15 @@ public class GuiElementTextField {
         }
 
         String textNC = textNoColour.substring(0, cursorIndex);
-        int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(
-            textNC,
-            "\u00B6"
-        );
-        String line = text
-            .substring(
-                cursorIndex + (((options & COLOUR) != 0) ? colorCodes * 2 : 0)
-            )
-            .split("\n")[0];
+        int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(textNC, "\u00B6");
+        String line = text.substring(cursorIndex + (((options & COLOUR) != 0) ? colorCodes * 2 : 0)).split("\n")[0];
         int padding = Math.min(5, searchBarXSize - strLenNoColor(line)) / 2;
-        String trimmed = Minecraft
-            .getMinecraft()
-            .fontRendererObj.trimStringToWidth(line, xComp - padding);
+        String trimmed = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(line, xComp - padding);
         int linePos = strLenNoColor(trimmed);
         if (linePos != strLenNoColor(line)) {
             char after = line.charAt(linePos);
-            int trimmedWidth = Minecraft
-                .getMinecraft()
-                .fontRendererObj.getStringWidth(trimmed);
-            int charWidth = Minecraft
-                .getMinecraft()
-                .fontRendererObj.getCharWidth(after);
+            int trimmedWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(trimmed);
+            int charWidth = Minecraft.getMinecraft().fontRendererObj.getCharWidth(after);
             if (trimmedWidth + charWidth / 2 < xComp - padding) {
                 linePos++;
             }
@@ -258,12 +211,7 @@ public class GuiElementTextField {
         return str.replaceAll("(?i)\\u00A7.", "").length();
     }
 
-    public void mouseClickMove(
-        int mouseX,
-        int mouseY,
-        int clickedMouseButton,
-        long timeSinceLastClick
-    ) {
+    public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         if (focus) {
             textField.setSelectionPos(getCursorPos(mouseX, mouseY));
         }
@@ -272,9 +220,7 @@ public class GuiElementTextField {
     public void keyTyped(char typedChar, int keyCode) {
         if (focus) {
             if ((options & MULTILINE) != 0) { //Carriage return
-                Pattern patternControlCode = Pattern.compile(
-                    "(?i)\\u00A7([^\\u00B6\n])(?!\\u00B6)"
-                );
+                Pattern patternControlCode = Pattern.compile("(?i)\\u00A7([^\\u00B6\n])(?!\\u00B6)");
 
                 String text = textField.getText();
                 String textNoColour = textField.getText();
@@ -282,8 +228,7 @@ public class GuiElementTextField {
                     Matcher matcher = patternControlCode.matcher(text);
                     if (!matcher.find() || matcher.groupCount() < 1) break;
                     String code = matcher.group(1);
-                    text =
-                        matcher.replaceFirst("\u00A7" + code + "\u00B6" + code);
+                    text = matcher.replaceFirst("\u00A7" + code + "\u00B6" + code);
                 }
                 while (true) {
                     Matcher matcher = patternControlCode.matcher(textNoColour);
@@ -293,29 +238,16 @@ public class GuiElementTextField {
                 }
 
                 if (keyCode == 28) {
-                    String before = textField
-                        .getText()
-                        .substring(0, textField.getCursorPosition());
-                    String after = textField
-                        .getText()
-                        .substring(textField.getCursorPosition());
+                    String before = textField.getText().substring(0, textField.getCursorPosition());
+                    String after = textField.getText().substring(textField.getCursorPosition());
                     int pos = textField.getCursorPosition();
                     textField.setText(before + "\n" + after);
                     textField.setCursorPosition(pos + 1);
                     return;
                 } else if (keyCode == 200) { //Up
-                    String textNCBeforeCursor = textNoColour.substring(
-                        0,
-                        textField.getSelectionEnd()
-                    );
-                    int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(
-                        textNCBeforeCursor,
-                        "\u00B6"
-                    );
-                    String textBeforeCursor = text.substring(
-                        0,
-                        textField.getSelectionEnd() + colorCodes * 2
-                    );
+                    String textNCBeforeCursor = textNoColour.substring(0, textField.getSelectionEnd());
+                    int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(textNCBeforeCursor, "\u00B6");
+                    String textBeforeCursor = text.substring(0, textField.getSelectionEnd() + colorCodes * 2);
 
                     int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(
                         textBeforeCursor,
@@ -326,9 +258,7 @@ public class GuiElementTextField {
                     int textBeforeCursorWidth;
                     String lineBefore;
                     String thisLineBeforeCursor;
-                    if (
-                        split.length == numLinesBeforeCursor && split.length > 0
-                    ) {
+                    if (split.length == numLinesBeforeCursor && split.length > 0) {
                         textBeforeCursorWidth = 0;
                         lineBefore = split[split.length - 1];
                         thisLineBeforeCursor = "";
@@ -336,32 +266,19 @@ public class GuiElementTextField {
                         thisLineBeforeCursor = split[split.length - 1];
                         lineBefore = split[split.length - 2];
                         textBeforeCursorWidth =
-                            Minecraft
-                                .getMinecraft()
-                                .fontRendererObj.getStringWidth(
-                                    thisLineBeforeCursor
-                                );
+                            Minecraft.getMinecraft().fontRendererObj.getStringWidth(thisLineBeforeCursor);
                     } else {
                         return;
                     }
                     String trimmed = Minecraft
                         .getMinecraft()
-                        .fontRendererObj.trimStringToWidth(
-                            lineBefore,
-                            textBeforeCursorWidth
-                        );
+                        .fontRendererObj.trimStringToWidth(lineBefore, textBeforeCursorWidth);
                     int linePos = strLenNoColor(trimmed);
                     if (linePos != strLenNoColor(lineBefore)) {
                         char after = lineBefore.charAt(linePos);
-                        int trimmedWidth = Minecraft
-                            .getMinecraft()
-                            .fontRendererObj.getStringWidth(trimmed);
-                        int charWidth = Minecraft
-                            .getMinecraft()
-                            .fontRendererObj.getCharWidth(after);
-                        if (
-                            trimmedWidth + charWidth / 2 < textBeforeCursorWidth
-                        ) {
+                        int trimmedWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(trimmed);
+                        int charWidth = Minecraft.getMinecraft().fontRendererObj.getCharWidth(after);
+                        if (trimmedWidth + charWidth / 2 < textBeforeCursorWidth) {
                             linePos++;
                         }
                     }
@@ -378,18 +295,9 @@ public class GuiElementTextField {
                         textField.setCursorPosition(newPos);
                     }
                 } else if (keyCode == 208) { //Down
-                    String textNCBeforeCursor = textNoColour.substring(
-                        0,
-                        textField.getSelectionEnd()
-                    );
-                    int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(
-                        textNCBeforeCursor,
-                        "\u00B6"
-                    );
-                    String textBeforeCursor = text.substring(
-                        0,
-                        textField.getSelectionEnd() + colorCodes * 2
-                    );
+                    String textNCBeforeCursor = textNoColour.substring(0, textField.getSelectionEnd());
+                    int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(textNCBeforeCursor, "\u00B6");
+                    String textBeforeCursor = text.substring(0, textField.getSelectionEnd() + colorCodes * 2);
 
                     int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(
                         textBeforeCursor,
@@ -405,11 +313,7 @@ public class GuiElementTextField {
                     } else if (split.length > 0) {
                         thisLineBeforeCursor = split[split.length - 1];
                         textBeforeCursorWidth =
-                            Minecraft
-                                .getMinecraft()
-                                .fontRendererObj.getStringWidth(
-                                    thisLineBeforeCursor
-                                );
+                            Minecraft.getMinecraft().fontRendererObj.getStringWidth(thisLineBeforeCursor);
                     } else {
                         return;
                     }
@@ -419,25 +323,13 @@ public class GuiElementTextField {
                         String lineAfter = split2[numLinesBeforeCursor + 1];
                         String trimmed = Minecraft
                             .getMinecraft()
-                            .fontRendererObj.trimStringToWidth(
-                                lineAfter,
-                                textBeforeCursorWidth
-                            );
+                            .fontRendererObj.trimStringToWidth(lineAfter, textBeforeCursorWidth);
                         int linePos = strLenNoColor(trimmed);
                         if (linePos != strLenNoColor(lineAfter)) {
                             char after = lineAfter.charAt(linePos);
-                            int trimmedWidth = Minecraft
-                                .getMinecraft()
-                                .fontRendererObj.getStringWidth(trimmed);
-                            int charWidth = Minecraft
-                                .getMinecraft()
-                                .fontRendererObj.getCharWidth(after);
-                            if (
-                                trimmedWidth +
-                                charWidth /
-                                2 <
-                                textBeforeCursorWidth
-                            ) {
+                            int trimmedWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(trimmed);
+                            int charWidth = Minecraft.getMinecraft().fontRendererObj.getCharWidth(after);
+                            if (trimmedWidth + charWidth / 2 < textBeforeCursorWidth) {
                                 linePos++;
                             }
                         }
@@ -458,8 +350,7 @@ public class GuiElementTextField {
             }
 
             String old = textField.getText();
-            if ((options & FORCE_CAPS) != 0) typedChar =
-                Character.toUpperCase(typedChar);
+            if ((options & FORCE_CAPS) != 0) typedChar = Character.toUpperCase(typedChar);
             if ((options & NO_SPACE) != 0 && typedChar == ' ') return;
 
             textField.setFocused(true);
@@ -470,9 +361,7 @@ public class GuiElementTextField {
                     int pos = textField.getCursorPosition() - 2;
                     if (pos >= 0 && pos < textField.getText().length()) {
                         if (textField.getText().charAt(pos) == '&') {
-                            String before = textField
-                                .getText()
-                                .substring(0, pos);
+                            String before = textField.getText().substring(0, pos);
                             String after = "";
                             if (pos + 2 < textField.getText().length()) {
                                 after = textField.getText().substring(pos + 2);
@@ -484,25 +373,14 @@ public class GuiElementTextField {
                 }
             }
 
-            if (
-                (options & NUM_ONLY) != 0 &&
-                textField.getText().matches("[^0-9.]")
-            ) textField.setText(old);
+            if ((options & NUM_ONLY) != 0 && textField.getText().matches("[^0-9.]")) textField.setText(old);
         }
     }
 
     public void render(int x, int y) {
         this.x = x;
         this.y = y;
-        drawTextbox(
-            x,
-            y,
-            searchBarXSize,
-            searchBarYSize,
-            searchBarPadding,
-            textField,
-            focus
-        );
+        drawTextbox(x, y, searchBarXSize, searchBarYSize, searchBarPadding, textField, focus);
     }
 
     private void drawTextbox(
@@ -514,9 +392,7 @@ public class GuiElementTextField {
         GuiTextField textField,
         boolean focus
     ) {
-        ScaledResolution scaledresolution = new ScaledResolution(
-            Minecraft.getMinecraft()
-        );
+        ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft());
         String renderText = prependText + textField.getText();
 
         GlStateManager.disableLighting();
@@ -524,16 +400,10 @@ public class GuiElementTextField {
         /**
          * Search bar
          */
-        int paddingUnscaled =
-            searchBarPadding / scaledresolution.getScaleFactor();
+        int paddingUnscaled = searchBarPadding / scaledresolution.getScaleFactor();
         if (paddingUnscaled < 1) paddingUnscaled = 1;
 
-        int numLines =
-            org.apache.commons.lang3.StringUtils.countMatches(
-                renderText,
-                "\n"
-            ) +
-            1;
+        int numLines = org.apache.commons.lang3.StringUtils.countMatches(renderText, "\n") + 1;
         int extraSize = (searchBarYSize - 8) / 2 + 8;
         int bottomTextBox = y + searchBarYSize + extraSize * (numLines - 1);
 
@@ -549,18 +419,10 @@ public class GuiElementTextField {
             bottomTextBox + paddingUnscaled,
             borderColour
         );
-        Gui.drawRect(
-            x,
-            y,
-            x + searchBarXSize,
-            bottomTextBox,
-            Color.BLACK.getRGB()
-        );
+        Gui.drawRect(x, y, x + searchBarXSize, bottomTextBox, Color.BLACK.getRGB());
 
         //bar text
-        Pattern patternControlCode = Pattern.compile(
-            "(?i)\\u00A7([^\\u00B6\n])(?!\\u00B6)"
-        );
+        Pattern patternControlCode = Pattern.compile("(?i)\\u00A7([^\\u00B6\n])(?!\\u00B6)");
 
         String text = renderText;
         String textNoColor = renderText;
@@ -587,23 +449,13 @@ public class GuiElementTextField {
 
             if (
                 isScaling() &&
-                Minecraft
-                    .getMinecraft()
-                    .fontRendererObj.getStringWidth(texts[yOffI]) >
-                searchBarXSize -
-                10
+                Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]) > searchBarXSize - 10
             ) {
                 scale =
                     (searchBarXSize - 2) /
-                    (float) Minecraft
-                        .getMinecraft()
-                        .fontRendererObj.getStringWidth(texts[yOffI]);
+                    (float) Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]);
                 if (scale > 1) scale = 1;
-                float newLen =
-                    Minecraft
-                        .getMinecraft()
-                        .fontRendererObj.getStringWidth(texts[yOffI]) *
-                    scale;
+                float newLen = Minecraft.getMinecraft().fontRendererObj.getStringWidth(texts[yOffI]) * scale;
                 xStartOffset = (int) ((searchBarXSize - newLen) / 2f);
 
                 TextRenderUtils.drawStringCenteredScaledMaxWidth(
@@ -619,10 +471,7 @@ public class GuiElementTextField {
                 Minecraft
                     .getMinecraft()
                     .fontRendererObj.drawString(
-                        StringUtils.trimToWidth(
-                            texts[yOffI],
-                            searchBarXSize - 10
-                        ),
+                        StringUtils.trimToWidth(texts[yOffI], searchBarXSize - 10),
                         x + 5,
                         y + (searchBarYSize - 8) / 2 + yOff,
                         Color.WHITE.getRGB()
@@ -631,25 +480,14 @@ public class GuiElementTextField {
         }
 
         if (focus && System.currentTimeMillis() % 1000 > 500) {
-            String textNCBeforeCursor = textNoColor.substring(
-                0,
-                textField.getCursorPosition() + prependText.length()
-            );
-            int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(
-                textNCBeforeCursor,
-                "\u00B6"
-            );
+            String textNCBeforeCursor = textNoColor.substring(0, textField.getCursorPosition() + prependText.length());
+            int colorCodes = org.apache.commons.lang3.StringUtils.countMatches(textNCBeforeCursor, "\u00B6");
             String textBeforeCursor = text.substring(
                 0,
-                textField.getCursorPosition() +
-                prependText.length() +
-                (((options & COLOUR) != 0) ? colorCodes * 2 : 0)
+                textField.getCursorPosition() + prependText.length() + (((options & COLOUR) != 0) ? colorCodes * 2 : 0)
             );
 
-            int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(
-                textBeforeCursor,
-                "\n"
-            );
+            int numLinesBeforeCursor = org.apache.commons.lang3.StringUtils.countMatches(textBeforeCursor, "\n");
             int yOff = numLinesBeforeCursor * extraSize;
 
             String[] split = textBeforeCursor.split("\n");
@@ -658,14 +496,7 @@ public class GuiElementTextField {
                 textBeforeCursorWidth = 0;
             } else {
                 textBeforeCursorWidth =
-                    (int) (
-                        Minecraft
-                            .getMinecraft()
-                            .fontRendererObj.getStringWidth(
-                                split[split.length - 1]
-                            ) *
-                        scale
-                    );
+                    (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth(split[split.length - 1]) * scale);
             }
             Gui.drawRect(
                 x + xStartOffset + textBeforeCursorWidth,
@@ -701,16 +532,7 @@ public class GuiElementTextField {
 
                 char c = textNoColor.charAt(i);
                 if (sectionSignPrev) {
-                    if (
-                        c != 'k' &&
-                        c != 'K' &&
-                        c != 'm' &&
-                        c != 'M' &&
-                        c != 'n' &&
-                        c != 'N' &&
-                        c != 'o' &&
-                        c != 'O'
-                    ) {
+                    if (c != 'k' && c != 'K' && c != 'm' && c != 'M' && c != 'n' && c != 'N' && c != 'o' && c != 'O') {
                         bold = c == 'l' || c == 'L';
                     }
                     sectionSignPrev = false;
@@ -739,12 +561,8 @@ public class GuiElementTextField {
 
                 //String c2 = bold ? EnumChatFormatting.BOLD.toString() : "" + c;
 
-                System.out.println(
-                    "Adding len for char:" + c + ":" + Integer.toHexString(c)
-                );
-                int len = Minecraft
-                    .getMinecraft()
-                    .fontRendererObj.getStringWidth(String.valueOf(c));
+                System.out.println("Adding len for char:" + c + ":" + Integer.toHexString(c));
+                int len = Minecraft.getMinecraft().fontRendererObj.getStringWidth(String.valueOf(c));
                 if (bold) len++;
                 if (i >= leftIndex && i < rightIndex) {
                     Gui.drawRect(

@@ -93,11 +93,7 @@ public class Position {
         return ret;
     }
 
-    public int moveX(
-        int deltaX,
-        int objWidth,
-        ScaledResolution scaledResolution
-    ) {
+    public int moveX(int deltaX, int objWidth, ScaledResolution scaledResolution) {
         int screenWidth = scaledResolution.getScaledWidth();
         boolean wasPositiveX = this.x >= 0;
         this.x += deltaX;
@@ -146,11 +142,7 @@ public class Position {
         return deltaX;
     }
 
-    public int moveY(
-        int deltaY,
-        int objHeight,
-        ScaledResolution scaledResolution
-    ) {
+    public int moveY(int deltaY, int objHeight, ScaledResolution scaledResolution) {
         int screenHeight = scaledResolution.getScaledHeight();
         boolean wasPositiveY = this.y >= 0;
         this.y += deltaY;
@@ -199,13 +191,7 @@ public class Position {
         return deltaY;
     }
 
-    public boolean rightAligned(
-        ScaledResolution scaledResolution,
-        int objWidth
-    ) {
-        return (
-            this.getAbsX(scaledResolution, objWidth) >
-            (scaledResolution.getScaledWidth() / 2)
-        );
+    public boolean rightAligned(ScaledResolution scaledResolution, int objWidth) {
+        return (this.getAbsX(scaledResolution, objWidth) > (scaledResolution.getScaledWidth() / 2));
     }
 }

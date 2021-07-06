@@ -12,12 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class SlayerHandler {
 
     //Optional Characters are required because Hypixel dumb and cuts off text
-    private static final Pattern COMBAT_XP_REGEX = Pattern.compile(
-        "\\(([\\d,]+)/([\\dkm]+)\\) comb?a?t? x?p?"
-    );
-    private static final Pattern KILLS_REGEX = Pattern.compile(
-        "(\\d+)/(\\d+) kills?"
-    );
+    private static final Pattern COMBAT_XP_REGEX = Pattern.compile("\\(([\\d,]+)/([\\dkm]+)\\) comb?a?t? x?p?");
+    private static final Pattern KILLS_REGEX = Pattern.compile("(\\d+)/(\\d+) kills?");
 
     public enum slayerTypes {
         ZOMBIE(34, "Revenant Horror"),
@@ -63,32 +59,23 @@ public class SlayerHandler {
     @SubscribeEvent
     public void onSidebarPost(SidebarPostEvent event) {
         String arrayString = Arrays.toString(event.arrayScores);
-        isDoingSlayer =
-            Arrays.toString(event.arrayScores).contains("Slayer Quest");
+        isDoingSlayer = Arrays.toString(event.arrayScores).contains("Slayer Quest");
         if (
             isDoingSlayer &&
             (
                 currentSlayer.equals(slayerTypes.NONE) ||
                 !arrayString
                     .replace(" ", "")
-                    .contains(
-                        currentSlayer.getDisplayName().replace(" ", "") +
-                        Utils.intToRomanNumeral(slayerTier)
-                    )
+                    .contains(currentSlayer.getDisplayName().replace(" ", "") + Utils.intToRomanNumeral(slayerTier))
             )
         ) {
             for (int i = 0; i < event.scores.size(); i++) {
                 String line = event.scores.get(i);
                 if (line.contains("Slayer Quest") && event.scores.size() > 3) {
                     String slayer = event.scores.get(i - 1).toLowerCase();
-                    SlayerHandler.slayerTypes selectedSlayer =
-                        SlayerHandler.slayerTypes.NONE;
+                    SlayerHandler.slayerTypes selectedSlayer = SlayerHandler.slayerTypes.NONE;
                     for (slayerTypes types : slayerTypes.values()) {
-                        if (
-                            slayer.contains(
-                                types.displayName.toLowerCase(Locale.ENGLISH)
-                            )
-                        ) {
+                        if (slayer.contains(types.displayName.toLowerCase(Locale.ENGLISH))) {
                             selectedSlayer = types;
                             break;
                         }
@@ -96,14 +83,7 @@ public class SlayerHandler {
                     SlayerHandler.currentSlayer = selectedSlayer;
                     SlayerHandler.slayerTier =
                         Utils.whatRomanNumeral(
-                            slayer
-                                .replace(
-                                    selectedSlayer
-                                        .getDisplayName()
-                                        .toLowerCase(),
-                                    ""
-                                )
-                                .replace(" ", "")
+                            slayer.replace(selectedSlayer.getDisplayName().toLowerCase(), "").replace(" ", "")
                         );
                     break;
                 }
@@ -117,9 +97,7 @@ public class SlayerHandler {
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
-        if (
-            !isDoingSlayer && event.formattedLine.equals("Slayer Quest")
-        ) isDoingSlayer = true;
+        if (!isDoingSlayer && event.formattedLine.equals("Slayer Quest")) isDoingSlayer = true;
 
         if (isDoingSlayer) {
             String line = event.formattedLine.toLowerCase();
@@ -144,11 +122,7 @@ public class SlayerHandler {
                 try {
                     maxKills =
                         Integer.parseInt(xpMatcher.group(2).replace("k", "")) *
-                        (
-                            xpMatcher.group(2).contains("k")
-                                ? 1000
-                                : xpMatcher.group(2).contains("m") ? 1000000 : 1
-                        );
+                        (xpMatcher.group(2).contains("k") ? 1000 : xpMatcher.group(2).contains("m") ? 1000000 : 1);
                 } catch (Exception ignored) {}
             } else if (line.contains("slay the boss")) {
                 SlayerHandler.bossSlain = false;

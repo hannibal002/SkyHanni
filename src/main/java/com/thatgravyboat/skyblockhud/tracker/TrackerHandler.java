@@ -37,30 +37,16 @@ public class TrackerHandler {
         }
 
         private boolean eventGoing() {
-            return SeasonDateHandler
-                .getCurrentEventTime()
-                .trim()
-                .toLowerCase()
-                .contains("ends in");
+            return SeasonDateHandler.getCurrentEventTime().trim().toLowerCase().contains("ends in");
         }
     }
 
     public static Map<String, TrackerData> trackers = new HashMap<>();
     public static Map<Locations, String> trackerIds = new HashMap<>();
 
-    public static Map<String, ItemStack> sortTrackers(
-        Map<String, ItemStack> map
-    ) {
-        List<Map.Entry<String, ItemStack>> list = new ArrayList<>(
-            map.entrySet()
-        );
-        list.sort(
-            (entry1, entry2) ->
-                Integer.compare(
-                    entry2.getValue().stackSize,
-                    entry1.getValue().stackSize
-                )
-        );
+    public static Map<String, ItemStack> sortTrackers(Map<String, ItemStack> map) {
+        List<Map.Entry<String, ItemStack>> list = new ArrayList<>(map.entrySet());
+        list.sort((entry1, entry2) -> Integer.compare(entry2.getValue().stackSize, entry1.getValue().stackSize));
 
         Map<String, ItemStack> result = new LinkedHashMap<>();
         for (Map.Entry<String, ItemStack> entry : list) {
@@ -70,26 +56,12 @@ public class TrackerHandler {
         return result;
     }
 
-    public static void onItemAdded(
-        String id,
-        int amount,
-        String enchant,
-        int level
-    ) {
-        if (
-            SkyblockHud.hasSkyblockScoreboard() &&
-            trackerIds.containsKey(LocationHandler.getCurrentLocation())
-        ) {
-            String trackerId = trackerIds.get(
-                LocationHandler.getCurrentLocation()
-            );
+    public static void onItemAdded(String id, int amount, String enchant, int level) {
+        if (SkyblockHud.hasSkyblockScoreboard() && trackerIds.containsKey(LocationHandler.getCurrentLocation())) {
+            String trackerId = trackerIds.get(LocationHandler.getCurrentLocation());
             TrackerData tracked = trackers.get(trackerId);
-            String dropTrackerId = tracked.getDropId(
-                SeasonDateHandler.getCurrentEvent()
-            );
-            Map<String, ItemStack> tracker = tracked.dropTrackers.get(
-                dropTrackerId
-            );
+            String dropTrackerId = tracked.getDropId(SeasonDateHandler.getCurrentEvent());
+            Map<String, ItemStack> tracker = tracked.dropTrackers.get(dropTrackerId);
             String dropId = id;
             if (enchant != null) {
                 dropId = enchant.toUpperCase() + ";" + level;
@@ -123,9 +95,7 @@ public class TrackerHandler {
                 !SkyblockHud.config.trackers.hideTracker
             )
         ) {
-            String trackerId = trackerIds.get(
-                LocationHandler.getCurrentLocation()
-            );
+            String trackerId = trackerIds.get(LocationHandler.getCurrentLocation());
             Minecraft mc = Minecraft.getMinecraft();
             TrackerData tracked = trackers.get(trackerId);
 
@@ -134,29 +104,16 @@ public class TrackerHandler {
             );
             if (tracker != null) {
                 Position pos = SkyblockHud.config.trackers.trackerPosition;
-                int startPos = pos.getAbsX(
-                    event.resolution,
-                    (tracker.size() >= 6 ? 120 : tracker.size() * 20)
-                );
-                int y = pos.getAbsY(
-                    event.resolution,
-                    (int) (10 + Math.ceil(tracker.size() / 5d) * 20)
-                );
+                int startPos = pos.getAbsX(event.resolution, (tracker.size() >= 6 ? 120 : tracker.size() * 20));
+                int y = pos.getAbsY(event.resolution, (int) (10 + Math.ceil(tracker.size() / 5d) * 20));
 
                 Gui.drawRect(startPos, y, startPos + 120, y + 10, -1072689136);
-                mc.fontRendererObj.drawString(
-                    "Tracker",
-                    startPos + 4,
-                    y + 1,
-                    0xffffff,
-                    false
-                );
+                mc.fontRendererObj.drawString("Tracker", startPos + 4, y + 1, 0xffffff, false);
                 y += 10;
                 Gui.drawRect(
                     startPos,
                     y,
-                    startPos +
-                    (tracker.size() >= 6 ? 120 : tracker.size() * 20),
+                    startPos + (tracker.size() >= 6 ? 120 : tracker.size() * 20),
                     (int) (y + (Math.ceil(tracker.size() / 5d) * 20)),
                     1610612736
                 );
@@ -170,9 +127,7 @@ public class TrackerHandler {
                     GlStateManager.disableBlend();
                     mc.fontRendererObj.drawStringWithShadow(
                         s,
-                        (float) (
-                            x + 19 - 2 - mc.fontRendererObj.getStringWidth(s)
-                        ),
+                        (float) (x + 19 - 2 - mc.fontRendererObj.getStringWidth(s)),
                         (float) (y + 9),
                         stack.stackSize < 1 ? 16733525 : 16777215
                     );

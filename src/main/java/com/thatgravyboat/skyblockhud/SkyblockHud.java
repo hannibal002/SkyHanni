@@ -56,10 +56,7 @@ public class SkyblockHud {
         "\u7A7A\u5C9B\u751F\u5B58"
     );
 
-    private final Gson gson = new GsonBuilder()
-        .setPrettyPrinting()
-        .excludeFieldsWithoutExposeAnnotation()
-        .create();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
     private static File configDirectory;
 
@@ -89,16 +86,12 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new ActionBarParsing());
         Commands.init();
 
-        configFile =
-            new File(event.getModConfigurationDirectory(), "sbh-config.json");
+        configFile = new File(event.getModConfigurationDirectory(), "sbh-config.json");
 
         if (configFile.exists()) {
             try (
                 BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(
-                        new FileInputStream(configFile),
-                        StandardCharsets.UTF_8
-                    )
+                    new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)
                 )
             ) {
                 config = gson.fromJson(reader, SBHConfig.class);
@@ -122,10 +115,7 @@ public class SkyblockHud {
 
             try (
                 BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(
-                        new FileOutputStream(configFile),
-                        StandardCharsets.UTF_8
-                    )
+                    new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8)
                 )
             ) {
                 writer.write(gson.toJson(config));
@@ -165,13 +155,9 @@ public class SkyblockHud {
 
         if (mc != null && mc.theWorld != null) {
             Scoreboard scoreboard = mc.theWorld.getScoreboard();
-            ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(
-                1
-            );
+            ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1);
             if (sidebarObjective != null) {
-                String objectiveName = sidebarObjective
-                    .getDisplayName()
-                    .replaceAll("(?i)\\u00A7.", "");
+                String objectiveName = sidebarObjective.getDisplayName().replaceAll("(?i)\\u00A7.", "");
                 for (String skyblock : SKYBLOCK_IN_ALL_LANGUAGES) {
                     if (objectiveName.startsWith(skyblock)) {
                         return true;
@@ -185,18 +171,10 @@ public class SkyblockHud {
 
     @SubscribeEvent
     public void onTooltip(ItemTooltipEvent event) {
-        if (
-            event.itemStack != null &&
-            Keyboard.isKeyDown(Keyboard.KEY_BACKSLASH)
-        ) {
+        if (event.itemStack != null && Keyboard.isKeyDown(Keyboard.KEY_BACKSLASH)) {
             try {
-                StringSelection clipboard = new StringSelection(
-                    event.itemStack.serializeNBT().toString()
-                );
-                Toolkit
-                    .getDefaultToolkit()
-                    .getSystemClipboard()
-                    .setContents(clipboard, clipboard);
+                StringSelection clipboard = new StringSelection(event.itemStack.serializeNBT().toString());
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboard, clipboard);
             } catch (Exception ignored) {}
         }
     }

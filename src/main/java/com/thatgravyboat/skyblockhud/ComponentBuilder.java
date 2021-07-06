@@ -21,12 +21,7 @@ public class ComponentBuilder {
     }
 
     public ComponentBuilder apd(String text, char color) {
-        builder
-            .append("\u00A7")
-            .append(color)
-            .append(text)
-            .append("\u00A7")
-            .append('r');
+        builder.append("\u00A7").append(color).append(text).append("\u00A7").append('r');
         return this;
     }
 

@@ -22,12 +22,7 @@ public class GuiScreenElementWrapper extends GuiScreen {
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
         int i = Mouse.getEventX() * this.width / this.mc.displayWidth;
-        int j =
-            this.height -
-            Mouse.getEventY() *
-            this.height /
-            this.mc.displayHeight -
-            1;
+        int j = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
         element.mouseInput(i, j);
     }
 

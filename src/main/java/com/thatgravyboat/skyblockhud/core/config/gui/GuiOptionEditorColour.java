@@ -31,12 +31,7 @@ public class GuiOptionEditorColour extends GuiOptionEditor {
         int b = argb & 0xFF;
         GlStateManager.color(r / 255f, g / 255f, b / 255f, 1);
         Minecraft.getMinecraft().getTextureManager().bindTexture(button_white);
-        RenderUtils.drawTexturedRect(
-            x + width / 6f - 24,
-            y + height - 7 - 14,
-            48,
-            16
-        );
+        RenderUtils.drawTexturedRect(x + width / 6f - 24, y + height - 7 - 14, 48, 16);
     }
 
     @Override
@@ -47,16 +42,8 @@ public class GuiOptionEditorColour extends GuiOptionEditor {
     }
 
     @Override
-    public boolean mouseInputOverlay(
-        int x,
-        int y,
-        int width,
-        int mouseX,
-        int mouseY
-    ) {
-        return (
-            colourElement != null && colourElement.mouseInput(mouseX, mouseY)
-        );
+    public boolean mouseInputOverlay(int x, int y, int width, int mouseX, int mouseY) {
+        return (colourElement != null && colourElement.mouseInput(mouseX, mouseY));
     }
 
     @Override

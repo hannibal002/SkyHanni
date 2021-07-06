@@ -27,13 +27,7 @@ public class GuiOptionEditorText extends GuiOptionEditor {
         int textFieldX = x + width / 6 - fullWidth / 2;
         if (textField.getFocus()) {
             fullWidth =
-                Math.max(
-                    fullWidth,
-                    Minecraft
-                        .getMinecraft()
-                        .fontRendererObj.getStringWidth(textField.getText()) +
-                    10
-                );
+                Math.max(fullWidth, Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10);
         }
 
         textField.setSize(fullWidth, 16);
@@ -51,22 +45,13 @@ public class GuiOptionEditorText extends GuiOptionEditor {
 
         if (textField.getFocus()) {
             fullWidth =
-                Math.max(
-                    fullWidth,
-                    Minecraft
-                        .getMinecraft()
-                        .fontRendererObj.getStringWidth(textField.getText()) +
-                    10
-                );
+                Math.max(fullWidth, Minecraft.getMinecraft().fontRendererObj.getStringWidth(textField.getText()) + 10);
         }
 
         int textFieldY = y + height - 7 - 14;
         textField.setSize(fullWidth, 16);
 
-        if (
-            Mouse.getEventButtonState() &&
-            (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1)
-        ) {
+        if (Mouse.getEventButtonState() && (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1)) {
             if (
                 mouseX > textFieldX &&
                 mouseX < textFieldX + fullWidth &&
@@ -86,10 +71,7 @@ public class GuiOptionEditorText extends GuiOptionEditor {
     public boolean keyboardInput() {
         if (Keyboard.getEventKeyState() && textField.getFocus()) {
             Keyboard.enableRepeatEvents(true);
-            textField.keyTyped(
-                Keyboard.getEventCharacter(),
-                Keyboard.getEventKey()
-            );
+            textField.keyTyped(Keyboard.getEventCharacter(), Keyboard.getEventKey());
 
             try {
                 textField.setCustomBorderColour(0xffffffff);

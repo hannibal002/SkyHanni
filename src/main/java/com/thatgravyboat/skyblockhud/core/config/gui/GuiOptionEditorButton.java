@@ -28,9 +28,7 @@ public class GuiOptionEditorButton extends GuiOptionEditor {
         this.config = config;
 
         this.buttonText = buttonText;
-        if (
-            this.buttonText != null && this.buttonText.isEmpty()
-        ) this.buttonText = null;
+        if (this.buttonText != null && this.buttonText.isEmpty()) this.buttonText = null;
     }
 
     @Override
@@ -41,12 +39,7 @@ public class GuiOptionEditorButton extends GuiOptionEditor {
 
         GlStateManager.color(1, 1, 1, 1);
         Minecraft.getMinecraft().getTextureManager().bindTexture(button_tex);
-        RenderUtils.drawTexturedRect(
-            x + width / 6 - 24,
-            y + height - 7 - 14,
-            48,
-            16
-        );
+        RenderUtils.drawTexturedRect(x + width / 6 - 24, y + height - 7 - 14, 48, 16);
 
         if (buttonText != null) {
             TextRenderUtils.drawStringCenteredScaledMaxWidth(

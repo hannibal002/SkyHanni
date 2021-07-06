@@ -24,23 +24,15 @@ public class DungeonHandler {
     private static int deaths = 0;
     private static int crypts = 0;
 
-    private static final Pattern DungeonPlayerRegex = Pattern.compile(
-        "^\\[([HMBAT])] ([\\w]+) ([0-9]+|DEAD)$"
-    );
+    private static final Pattern DungeonPlayerRegex = Pattern.compile("^\\[([HMBAT])] ([\\w]+) ([0-9]+|DEAD)$");
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
         if (LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)) {
             DungeonHandler.checkForDungeonTime(event.formattedLine);
             DungeonHandler.checkForDungeonCleared(event.formattedLine);
-            DungeonHandler.checkForDungeonKeys(
-                event.formattedLine,
-                event.rawLine
-            );
-            DungeonHandler.checkForDungeonPlayers(
-                event.formattedLine,
-                Minecraft.getMinecraft()
-            );
+            DungeonHandler.checkForDungeonKeys(event.formattedLine, event.rawLine);
+            DungeonHandler.checkForDungeonPlayers(event.formattedLine, Minecraft.getMinecraft());
         }
     }
 
@@ -57,12 +49,7 @@ public class DungeonHandler {
             Classes playerClass = Classes.valueOf(dungeonMatcher.group(1));
             String displayName = dungeonMatcher.group(2);
             String health = dungeonMatcher.group(3);
-            if (
-                !mc.thePlayer
-                    .getName()
-                    .toLowerCase()
-                    .startsWith(displayName.toLowerCase().trim())
-            ) {
+            if (!mc.thePlayer.getName().toLowerCase().startsWith(displayName.toLowerCase().trim())) {
                 int healthNum = 0;
                 if (!health.equalsIgnoreCase("dead")) {
                     try {
@@ -82,22 +69,12 @@ public class DungeonHandler {
 
     public static void checkForDungeonTime(String scoreLine) {
         if (scoreLine.toLowerCase().trim().contains("time elapsed:")) {
-            String timeLine = scoreLine
-                .toLowerCase()
-                .trim()
-                .replace("time elapsed:", "");
+            String timeLine = scoreLine.toLowerCase().trim().replace("time elapsed:", "");
             String[] times = timeLine.split("m ");
             int time = 0;
             try {
-                time +=
-                    Integer.parseInt(
-                        times[0].replace(" ", "").replace("m", "")
-                    ) *
-                    60;
-                time +=
-                    Integer.parseInt(
-                        times[1].replace(" ", "").replace("s", "")
-                    );
+                time += Integer.parseInt(times[0].replace(" ", "").replace("m", "")) * 60;
+                time += Integer.parseInt(times[1].replace(" ", "").replace("s", ""));
             } catch (NumberFormatException ignored) {}
             dungeonTime = time;
         }
@@ -136,15 +113,10 @@ public class DungeonHandler {
         boolean hasSecrets = false;
         String[] parts = statusBar.split(" {4,}");
         for (String part : parts) {
-            if (
-                part.toLowerCase().contains("secrets") &&
-                !statusBar.toLowerCase().contains("no secrets")
-            ) {
+            if (part.toLowerCase().contains("secrets") && !statusBar.toLowerCase().contains("no secrets")) {
                 hasSecrets = true;
                 try {
-                    String secret = Utils
-                        .removeColor(part.replace("Secrets", ""))
-                        .replace(" ", "");
+                    String secret = Utils.removeColor(part.replace("Secrets", "")).replace(" ", "");
                     maxSecrets = Integer.parseInt(secret.split("/")[1]);
                     secrets = Integer.parseInt(secret.split("/")[0]);
                 } catch (NumberFormatException ignored) {}
@@ -159,9 +131,7 @@ public class DungeonHandler {
     public static void parseTotalSecrets(String playerName) {
         if (playerName.toLowerCase().contains("secrets found:")) {
             String totalSecret = Utils
-                .removeColor(
-                    playerName.toLowerCase().replace("secrets found:", "")
-                )
+                .removeColor(playerName.toLowerCase().replace("secrets found:", ""))
                 .replace(" ", "");
             try {
                 totalSecrets = Integer.parseInt(totalSecret);
@@ -184,9 +154,7 @@ public class DungeonHandler {
 
     public static void parseCrypts(String playerName) {
         if (playerName.toLowerCase().contains("crypts:")) {
-            String crypt = Utils
-                .removeColor(playerName.toLowerCase().replace("crypts:", ""))
-                .replace(" ", "");
+            String crypt = Utils.removeColor(playerName.toLowerCase().replace("crypts:", "")).replace(" ", "");
             try {
                 crypts = Integer.parseInt(crypt);
             } catch (NumberFormatException ignored) {}

@@ -40,15 +40,10 @@ public class RPGHud extends Gui {
     }
 
     public static void manaPredictionUpdate(boolean isIncrease, int decrease) {
-        mana =
-            isIncrease
-                ? Math.min(mana + (maxMana / 50), maxMana)
-                : mana - decrease;
+        mana = isIncrease ? Math.min(mana + (maxMana / 50), maxMana) : mana - decrease;
     }
 
-    private static final DecimalFormat decimalFormat = new DecimalFormat(
-        "#.##"
-    );
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     static {
         decimalFormat.setGroupingUsed(true);
@@ -65,10 +60,7 @@ public class RPGHud extends Gui {
             )
         ) MinecraftForge.EVENT_BUS.post(
             new RenderGameOverlayEvent.Post(
-                new RenderGameOverlayEvent(
-                    event.partialTicks,
-                    event.resolution
-                ),
+                new RenderGameOverlayEvent(event.partialTicks, event.resolution),
                 RenderGameOverlayEvent.ElementType.EXPERIENCE
             )
         );
@@ -84,17 +76,7 @@ public class RPGHud extends Gui {
             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
             FontRenderer font = mc.fontRendererObj;
             if (mc.thePlayer.getHealth() < mc.thePlayer.getMaxHealth()) {
-                health =
-                    Math.max(
-                        (int) (
-                            maxHealth *
-                            (
-                                mc.thePlayer.getHealth() /
-                                mc.thePlayer.getMaxHealth()
-                            )
-                        ),
-                        health
-                    );
+                health = Math.max((int) (maxHealth * (mc.thePlayer.getHealth() / mc.thePlayer.getMaxHealth())), health);
             }
 
             mc.renderEngine.bindTexture(GuiTextures.playerStat);
@@ -107,10 +89,7 @@ public class RPGHud extends Gui {
 
             drawTexturedModalRect(x, y, rightAligned ? 131 : 5, 6, 120, 47);
 
-            float manaWidth = Math.min(
-                57 * ((float) mana / (float) maxMana),
-                57
-            );
+            float manaWidth = Math.min(57 * ((float) mana / (float) maxMana), 57);
             drawTexturedModalRect(
                 rightAligned ? x + 16 : 47 + x,
                 17 + y,
@@ -120,10 +99,7 @@ public class RPGHud extends Gui {
                 4
             );
 
-            float healthWidth = Math.min(
-                70 * ((float) health / (float) maxHealth),
-                70
-            );
+            float healthWidth = Math.min(70 * ((float) health / (float) maxHealth), 70);
             drawTexturedModalRect(
                 rightAligned ? x + 3 : 47 + x,
                 22 + y,
@@ -134,10 +110,7 @@ public class RPGHud extends Gui {
             );
 
             if (health > maxHealth) {
-                float absorptionWidth = Math.min(
-                    70 * ((float) (health - maxHealth) / (float) maxHealth),
-                    70
-                );
+                float absorptionWidth = Math.min(70 * ((float) (health - maxHealth) / (float) maxHealth), 70);
                 drawTexturedModalRect(
                     rightAligned ? x + 3 : 47 + x,
                     22 + y,
@@ -149,27 +122,13 @@ public class RPGHud extends Gui {
             }
 
             float xpWidth = 67 * mc.thePlayer.experience;
-            drawTexturedModalRect(
-                rightAligned ? x + 7 : 45 + x,
-                28 + y,
-                rightAligned ? 189 : 0,
-                73,
-                (int) xpWidth,
-                4
-            );
+            drawTexturedModalRect(rightAligned ? x + 7 : 45 + x, 28 + y, rightAligned ? 189 : 0, 73, (int) xpWidth, 4);
             //Air in water
             NumberFormat myFormat = NumberFormat.getInstance();
             myFormat.setGroupingUsed(true);
             if (mc.thePlayer.getAir() < 300) {
                 float airWidth = 60 * ((float) mc.thePlayer.getAir() / 300);
-                drawTexturedModalRect(
-                    rightAligned ? x + 17 : 39 + x,
-                    33 + y,
-                    rightAligned ? 192 : 0,
-                    82,
-                    64,
-                    6
-                );
+                drawTexturedModalRect(rightAligned ? x + 17 : 39 + x, 33 + y, rightAligned ? 192 : 0, 82, 64, 6);
                 drawTexturedModalRect(
                     rightAligned ? x + 19 : 41 + x,
                     33 + y,

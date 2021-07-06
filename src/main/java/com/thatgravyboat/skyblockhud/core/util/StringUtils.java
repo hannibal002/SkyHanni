@@ -7,10 +7,7 @@ import net.minecraft.client.gui.FontRenderer;
 
 public class StringUtils {
 
-    public static final Set<String> PROTOCOLS = Sets.newHashSet(
-        "http",
-        "https"
-    );
+    public static final Set<String> PROTOCOLS = Sets.newHashSet("http", "https");
 
     public static String cleanColour(String in) {
         return in.replaceAll("(?i)\\u00A7.", "");

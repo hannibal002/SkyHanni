@@ -55,15 +55,8 @@ public class MixinNetHandlerPlayClient {
         ),
         cancellable = true
     )
-    public void handleTeams(
-        S3EPacketTeams packetIn,
-        CallbackInfo ci,
-        Scoreboard scoreboard
-    ) {
+    public void handleTeams(S3EPacketTeams packetIn, CallbackInfo ci, Scoreboard scoreboard) {
         //This stops Hypixel from being stupid and spamming our logs because they dont have different ids for things.
-        if (
-            scoreboard.getTeam(packetIn.getName()) != null &&
-            packetIn.getAction() == 0
-        ) ci.cancel();
+        if (scoreboard.getTeam(packetIn.getName()) != null && packetIn.getAction() == 0) ci.cancel();
     }
 }

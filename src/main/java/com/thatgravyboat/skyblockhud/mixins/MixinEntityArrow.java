@@ -23,12 +23,9 @@ public class MixinEntityArrow {
             position != null &&
             position.entityHit != null &&
             this.shootingEntity != null &&
-            this.shootingEntity.getUniqueID()
-                .equals(Minecraft.getMinecraft().thePlayer.getUniqueID())
+            this.shootingEntity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())
         ) {
-            KillTrackerHandler.attackedEntities.add(
-                position.entityHit.getUniqueID()
-            );
+            KillTrackerHandler.attackedEntities.add(position.entityHit.getUniqueID());
         }
         return position;
     }

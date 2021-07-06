@@ -14,10 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderEnderman.class)
 public class MixinEndermanRenderer {
 
-    @Inject(
-        method = "doRender(Lnet/minecraft/entity/monster/EntityEnderman;DDDFF)V",
-        at = @At("HEAD")
-    )
+    @Inject(method = "doRender(Lnet/minecraft/entity/monster/EntityEnderman;DDDFF)V", at = @At("HEAD"))
     public void onRender(
         EntityEnderman entity,
         double x,
@@ -28,15 +25,8 @@ public class MixinEndermanRenderer {
         CallbackInfo ci
     ) {
         if (EntityTypeHelper.isZealot(entity)) {
-            Color color = new Color(
-                SpecialColour.specialToChromaRGB("255:255:0:48:255")
-            );
-            GlStateManager.color(
-                color.getRed() / 255f,
-                color.getGreen() / 255f,
-                color.getBlue() / 255f,
-                255f
-            );
+            Color color = new Color(SpecialColour.specialToChromaRGB("255:255:0:48:255"));
+            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 255f);
         }
     }
 }

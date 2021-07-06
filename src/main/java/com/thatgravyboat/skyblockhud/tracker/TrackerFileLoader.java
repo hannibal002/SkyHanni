@@ -23,24 +23,15 @@ public class TrackerFileLoader {
     public static ItemStack getDisplayItem(JsonObject jsonObject) {
         int meta = jsonObject.get("meta").getAsInt();
         String displayItemId = jsonObject.get("item").getAsString();
-        Item item = Item.itemRegistry.getObject(
-            new ResourceLocation(displayItemId)
-        );
+        Item item = Item.itemRegistry.getObject(new ResourceLocation(displayItemId));
         ItemStack stack = new ItemStack(item, 0, meta);
-        if (
-            jsonObject.has("skullData") &&
-            displayItemId.equals("minecraft:skull") &&
-            meta == 3
-        ) {
-            stack.setTagInfo(
-                "SkullOwner",
-                getSkullTag(jsonObject.getAsJsonObject("skullData"))
-            );
+        if (jsonObject.has("skullData") && displayItemId.equals("minecraft:skull") && meta == 3) {
+            stack.setTagInfo("SkullOwner", getSkullTag(jsonObject.getAsJsonObject("skullData")));
         }
-        if (
-            jsonObject.has("enchanted") &&
-            jsonObject.get("enchanted").getAsBoolean()
-        ) stack.setTagInfo("ench", new NBTTagList());
+        if (jsonObject.has("enchanted") && jsonObject.get("enchanted").getAsBoolean()) stack.setTagInfo(
+            "ench",
+            new NBTTagList()
+        );
         return stack;
     }
 
@@ -65,10 +56,7 @@ public class TrackerFileLoader {
         for (JsonElement element : object.get("trackers").getAsJsonArray()) {
             JsonObject tracker = element.getAsJsonObject();
             StringBuilder builder = new StringBuilder();
-            tracker
-                .get("location")
-                .getAsJsonArray()
-                .forEach(loc -> builder.append(loc.getAsString()));
+            tracker.get("location").getAsJsonArray().forEach(loc -> builder.append(loc.getAsString()));
             String location = builder.toString();
 
             Map<String, ItemStack> stacks = new HashMap<>();
@@ -76,42 +64,27 @@ public class TrackerFileLoader {
                 JsonObject dropObject = drop.getAsJsonObject();
 
                 //Display Item Creation
-                ItemStack stack = getDisplayItem(
-                    dropObject.getAsJsonObject("displayItem")
-                );
+                ItemStack stack = getDisplayItem(dropObject.getAsJsonObject("displayItem"));
                 String itemId = dropObject.get("id").getAsString();
 
                 stacks.put(itemId, stack);
             }
 
-            String event = tracker.has("event")
-                ? tracker.get("event").getAsString()
-                : null;
+            String event = tracker.has("event") ? tracker.get("event").getAsString() : null;
 
             Map<String, Map<String, ItemStack>> events = new HashMap<>();
             events.put(event, stacks);
 
             if (TrackerHandler.trackers.containsKey(location)) {
-                TrackerHandler.trackers
-                    .get(location)
-                    .dropTrackers.put(event, stacks);
+                TrackerHandler.trackers.get(location).dropTrackers.put(event, stacks);
             } else {
-                TrackerHandler.trackers.putIfAbsent(
-                    location,
-                    new TrackerHandler.TrackerData(events)
-                );
+                TrackerHandler.trackers.putIfAbsent(location, new TrackerHandler.TrackerData(events));
             }
 
             tracker
                 .get("location")
                 .getAsJsonArray()
-                .forEach(
-                    loc ->
-                        TrackerHandler.trackerIds.put(
-                            Locations.get(loc.getAsString()),
-                            location
-                        )
-                );
+                .forEach(loc -> TrackerHandler.trackerIds.put(Locations.get(loc.getAsString()), location));
         }
     }
 
@@ -124,16 +97,13 @@ public class TrackerFileLoader {
                         JsonObject jsonObject = new JsonObject();
                         jsonObject.addProperty("location", locations);
 
-                        if (event == null) jsonObject.add(
+                        if (event == null) jsonObject.add("event", new JsonNull()); else jsonObject.addProperty(
                             "event",
-                            new JsonNull()
-                        ); else jsonObject.addProperty("event", event);
+                            event
+                        );
 
                         JsonObject dropsData = new JsonObject();
-                        drops.forEach(
-                            (s, stack) ->
-                                dropsData.addProperty(s, stack.stackSize)
-                        );
+                        drops.forEach((s, stack) -> dropsData.addProperty(s, stack.stackSize));
                         jsonObject.add("drops", dropsData);
                         trackerStats.add(jsonObject);
                     }
@@ -146,20 +116,10 @@ public class TrackerFileLoader {
 
     public static void loadTrackersFile() {
         try {
-            ResourceLocation trackers = new ResourceLocation(
-                "skyblockhud:data/trackers.json"
-            );
-            InputStream is = Minecraft
-                .getMinecraft()
-                .getResourceManager()
-                .getResource(trackers)
-                .getInputStream();
+            ResourceLocation trackers = new ResourceLocation("skyblockhud:data/trackers.json");
+            InputStream is = Minecraft.getMinecraft().getResourceManager().getResource(trackers).getInputStream();
 
-            try (
-                BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(is, StandardCharsets.UTF_8)
-                )
-            ) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
                 loadTrackers(gson.fromJson(reader, JsonObject.class));
             }
         } catch (Exception ignored) {}
@@ -175,10 +135,7 @@ public class TrackerFileLoader {
 
             try (
                 BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(
-                        new FileInputStream(configFile),
-                        StandardCharsets.UTF_8
-                    )
+                    new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)
                 )
             ) {
                 JsonObject json = gson.fromJson(reader, JsonObject.class);
@@ -189,37 +146,25 @@ public class TrackerFileLoader {
                             element -> {
                                 if (element.isJsonObject()) {
                                     JsonObject object = element.getAsJsonObject();
-                                    String location = object
-                                        .get("location")
-                                        .getAsString();
-                                    Map<String, Map<String, ItemStack>> trackers = TrackerHandler.trackers.get(
-                                        location
-                                    )
+                                    String location = object.get("location").getAsString();
+                                    Map<String, Map<String, ItemStack>> trackers = TrackerHandler.trackers.get(location)
                                         .dropTrackers;
 
                                     JsonElement event = object.get("event");
-                                    String eventString = event == null ||
-                                        event.isJsonNull()
+                                    String eventString = event == null || event.isJsonNull()
                                         ? null
                                         : event.getAsString();
-                                    Map<String, ItemStack> drops = trackers.get(
-                                        eventString
-                                    );
+                                    Map<String, ItemStack> drops = trackers.get(eventString);
 
                                     if (drops != null) {
                                         for (Map.Entry<String, JsonElement> drop : object
                                             .getAsJsonObject("drops")
                                             .entrySet()) {
-                                            if (
-                                                drops.containsKey(drop.getKey())
-                                            ) {
-                                                drops.get(drop.getKey())
-                                                    .stackSize =
-                                                    drop.getValue().getAsInt();
+                                            if (drops.containsKey(drop.getKey())) {
+                                                drops.get(drop.getKey()).stackSize = drop.getValue().getAsInt();
                                             }
                                         }
-                                        drops =
-                                            TrackerHandler.sortTrackers(drops);
+                                        drops = TrackerHandler.sortTrackers(drops);
                                         trackers.put(eventString, drops);
                                     }
                                 }
@@ -239,10 +184,7 @@ public class TrackerFileLoader {
 
             try (
                 BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(
-                        new FileOutputStream(configFile),
-                        StandardCharsets.UTF_8
-                    )
+                    new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8)
                 )
             ) {
                 JsonObject json = new JsonObject();

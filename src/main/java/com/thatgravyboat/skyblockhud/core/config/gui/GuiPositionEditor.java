@@ -67,28 +67,13 @@ public class GuiPositionEditor extends GuiScreen {
         this.width = scaledResolution.getScaledWidth();
         this.height = scaledResolution.getScaledHeight();
         mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
-        mouseY =
-            height -
-            Mouse.getY() *
-            height /
-            Minecraft.getMinecraft().displayHeight -
-            1;
+        mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1;
 
         drawDefaultBackground();
 
         if (clicked) {
-            grabbedX +=
-                position.moveX(
-                    mouseX - grabbedX,
-                    elementWidth,
-                    scaledResolution
-                );
-            grabbedY +=
-                position.moveY(
-                    mouseY - grabbedY,
-                    elementHeight,
-                    scaledResolution
-                );
+            grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution);
+            grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution);
         }
 
         renderCallback.run();
@@ -124,8 +109,7 @@ public class GuiPositionEditor extends GuiScreen {
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
-        throws IOException {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
         if (mouseButton == 0) {
@@ -133,29 +117,17 @@ public class GuiPositionEditor extends GuiScreen {
             if (guiScaleOverride >= 0) {
                 scaledResolution = Utils.pushGuiScale(guiScaleOverride);
             } else {
-                scaledResolution =
-                    new ScaledResolution(Minecraft.getMinecraft());
+                scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
             }
-            mouseX =
-                Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
-            mouseY =
-                height -
-                Mouse.getY() *
-                height /
-                Minecraft.getMinecraft().displayHeight -
-                1;
+            mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
+            mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1;
 
             int x = position.getAbsX(scaledResolution, elementWidth);
             int y = position.getAbsY(scaledResolution, elementHeight);
             if (position.isCenterX()) x -= elementWidth / 2;
             if (position.isCenterY()) y -= elementHeight / 2;
 
-            if (
-                mouseX >= x &&
-                mouseY >= y &&
-                mouseX <= x + elementWidth &&
-                mouseY <= y + elementHeight
-            ) {
+            if (mouseX >= x && mouseY >= y && mouseX <= x + elementWidth && mouseY <= y + elementHeight) {
                 clicked = true;
                 grabbedX = mouseX;
                 grabbedY = mouseY;
@@ -174,34 +146,16 @@ public class GuiPositionEditor extends GuiScreen {
         if (keyCode == Keyboard.KEY_R) {
             position.set(originalPosition);
         } else if (!clicked) {
-            boolean shiftHeld =
-                Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) ||
-                Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+            boolean shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
             int dist = shiftHeld ? 10 : 1;
             if (keyCode == Keyboard.KEY_DOWN) {
-                position.moveY(
-                    dist,
-                    elementHeight,
-                    new ScaledResolution(Minecraft.getMinecraft())
-                );
+                position.moveY(dist, elementHeight, new ScaledResolution(Minecraft.getMinecraft()));
             } else if (keyCode == Keyboard.KEY_UP) {
-                position.moveY(
-                    -dist,
-                    elementHeight,
-                    new ScaledResolution(Minecraft.getMinecraft())
-                );
+                position.moveY(-dist, elementHeight, new ScaledResolution(Minecraft.getMinecraft()));
             } else if (keyCode == Keyboard.KEY_LEFT) {
-                position.moveX(
-                    -dist,
-                    elementWidth,
-                    new ScaledResolution(Minecraft.getMinecraft())
-                );
+                position.moveX(-dist, elementWidth, new ScaledResolution(Minecraft.getMinecraft()));
             } else if (keyCode == Keyboard.KEY_RIGHT) {
-                position.moveX(
-                    dist,
-                    elementWidth,
-                    new ScaledResolution(Minecraft.getMinecraft())
-                );
+                position.moveX(dist, elementWidth, new ScaledResolution(Minecraft.getMinecraft()));
             }
         }
         super.keyTyped(typedChar, keyCode);
@@ -214,48 +168,21 @@ public class GuiPositionEditor extends GuiScreen {
     }
 
     @Override
-    protected void mouseClickMove(
-        int mouseX,
-        int mouseY,
-        int clickedMouseButton,
-        long timeSinceLastClick
-    ) {
-        super.mouseClickMove(
-            mouseX,
-            mouseY,
-            clickedMouseButton,
-            timeSinceLastClick
-        );
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 
         if (clicked) {
             ScaledResolution scaledResolution;
             if (guiScaleOverride >= 0) {
                 scaledResolution = Utils.pushGuiScale(guiScaleOverride);
             } else {
-                scaledResolution =
-                    new ScaledResolution(Minecraft.getMinecraft());
+                scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
             }
-            mouseX =
-                Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
-            mouseY =
-                height -
-                Mouse.getY() *
-                height /
-                Minecraft.getMinecraft().displayHeight -
-                1;
+            mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
+            mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1;
 
-            grabbedX +=
-                position.moveX(
-                    mouseX - grabbedX,
-                    elementWidth,
-                    scaledResolution
-                );
-            grabbedY +=
-                position.moveY(
-                    mouseY - grabbedY,
-                    elementHeight,
-                    scaledResolution
-                );
+            grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution);
+            grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution);
             positionChangedCallback.run();
 
             if (guiScaleOverride >= 0) {

@@ -9,14 +9,7 @@ public class GuiOptionEditorBoolean extends GuiOptionEditor {
 
     public GuiOptionEditorBoolean(ConfigProcessor.ProcessedOption option) {
         super(option);
-        bool =
-            new GuiElementBoolean(
-                0,
-                0,
-                (boolean) option.get(),
-                10,
-                option::set
-            );
+        bool = new GuiElementBoolean(0, 0, (boolean) option.get(), 10, option::set);
     }
 
     @Override

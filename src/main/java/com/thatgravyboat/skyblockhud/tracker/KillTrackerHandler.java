@@ -34,9 +34,7 @@ public class KillTrackerHandler {
             NBTTagCompound tag = new NBTTagCompound();
             event.entity.writeToNBT(tag);
             System.out.println("Tag : " + tag);
-            System.out.println(
-                "Damage : " + getDamageSourceString(event.source)
-            );
+            System.out.println("Damage : " + getDamageSourceString(event.source));
             System.out.println(
                 "----------------------------------------------------------------------------------------------------------------"
             );
@@ -74,11 +72,7 @@ public class KillTrackerHandler {
     @SubscribeEvent
     public void onWorldChange(EntityJoinWorldEvent event) {
         if (event.entity != null) {
-            if (
-                event.entity
-                    .getUniqueID()
-                    .equals(Minecraft.getMinecraft().thePlayer.getUniqueID())
-            ) {
+            if (event.entity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())) {
                 attackedEntities.clear();
             }
         }

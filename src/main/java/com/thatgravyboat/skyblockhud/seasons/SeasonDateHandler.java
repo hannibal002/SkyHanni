@@ -14,25 +14,10 @@ public class SeasonDateHandler {
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
-        if (
-            Season.get(
-                SeasonDateHandler
-                    .removeDate(event.formattedLine.toLowerCase())
-                    .toUpperCase()
-            ) !=
-            Season.ERROR
-        ) {
+        if (Season.get(SeasonDateHandler.removeDate(event.formattedLine.toLowerCase()).toUpperCase()) != Season.ERROR) {
             SeasonDateHandler.setCurrentDateAndSeason(
-                SeasonDateHandler.removeSeason(
-                    Utils.removeColor(event.formattedLine.toLowerCase().trim())
-                ),
-                SeasonDateHandler
-                    .removeDate(
-                        Utils.removeColor(
-                            event.formattedLine.toLowerCase().trim()
-                        )
-                    )
-                    .toUpperCase()
+                SeasonDateHandler.removeSeason(Utils.removeColor(event.formattedLine.toLowerCase().trim())),
+                SeasonDateHandler.removeDate(Utils.removeColor(event.formattedLine.toLowerCase().trim())).toUpperCase()
             );
         }
     }
@@ -70,12 +55,7 @@ public class SeasonDateHandler {
     }
 
     public static String getFancySeasonAndDate() {
-        return (
-            currentSeason.getDisplayName() +
-            " " +
-            currentDate +
-            getDataSuffix(currentDate)
-        );
+        return (currentSeason.getDisplayName() + " " + currentDate + getDataSuffix(currentDate));
     }
 
     public static String getCurrentEvent() {
@@ -96,12 +76,6 @@ public class SeasonDateHandler {
     }
 
     public static int removeSeason(String seasonDate) {
-        return Integer.parseInt(
-            Pattern
-                .compile("[^0-9]")
-                .matcher(seasonDate.toLowerCase())
-                .replaceAll("")
-                .trim()
-        );
+        return Integer.parseInt(Pattern.compile("[^0-9]").matcher(seasonDate.toLowerCase()).replaceAll("").trim());
     }
 }

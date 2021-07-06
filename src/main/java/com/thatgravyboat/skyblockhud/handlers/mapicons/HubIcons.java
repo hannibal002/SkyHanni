@@ -78,9 +78,7 @@ public class HubIcons {
                     .nl(" Bartender")
                     .nl(" Maddox the slayer")
                     .nl("Description", 'l')
-                    .nl(
-                        "The Tavern is where maddox the slayer is located you can"
-                    )
+                    .nl("The Tavern is where maddox the slayer is located you can")
                     .nl("start slayer quests with them to unlock")
                     .apd("new items the more slayer bosses you kill.")
                     .build(),
@@ -110,10 +108,7 @@ public class HubIcons {
         hubIcons.add(
             new MapHandler.MapIcon(
                 new Vector2f(58, -73),
-                new ResourceLocation(
-                    "skyblockhud",
-                    "maps/icons/fishing_merchant.png"
-                ),
+                new ResourceLocation("skyblockhud", "maps/icons/fishing_merchant.png"),
                 new ComponentBuilder()
                     .nl("Fishing Merchant", new char[] { 'a', 'l' })
                     .nl("Description", 'l')
@@ -141,10 +136,7 @@ public class HubIcons {
         hubIcons.add(
             new MapHandler.MapIcon(
                 new Vector2f(-4, -128),
-                new ResourceLocation(
-                    "skyblockhud",
-                    "maps/icons/metal_merchants.png"
-                ),
+                new ResourceLocation("skyblockhud", "maps/icons/metal_merchants.png"),
                 new ComponentBuilder()
                     .nl("Blacksmith Merchants", new char[] { 'a', 'l' })
                     .nl("Merchants", new char[] { 'c', 'l' })
@@ -158,10 +150,7 @@ public class HubIcons {
         hubIcons.add(
             new MapHandler.MapIcon(
                 new Vector2f(-30, -120),
-                new ResourceLocation(
-                    "skyblockhud",
-                    "maps/icons/blacksmith.png"
-                ),
+                new ResourceLocation("skyblockhud", "maps/icons/blacksmith.png"),
                 new ComponentBuilder()
                     .nl("Blacksmith", new char[] { 'a', 'l' })
                     .nl("NPCS", new char[] { 'c', 'l' })
@@ -170,9 +159,7 @@ public class HubIcons {
                     .nl(" Smithmonger")
                     .nl("Description", 'l')
                     .nl("The Blacksmith lets you reforge your items")
-                    .nl(
-                        "while the Smithmonger allows you to buy reforge stones"
-                    )
+                    .nl("while the Smithmonger allows you to buy reforge stones")
                     .apd("and Dusk allows you to combine and apply runes.")
                     .build(),
                 MapHandler.MapIconTypes.SHOPS
@@ -253,9 +240,7 @@ public class HubIcons {
                 new ComponentBuilder()
                     .nl("Bank", new char[] { 'a', 'l' })
                     .nl("Description", 'l')
-                    .nl(
-                        "The Bank is where you can store your money on skyblock"
-                    )
+                    .nl("The Bank is where you can store your money on skyblock")
                     .apd("you can also store some items in the vault.")
                     .build(),
                 MapHandler.MapIconTypes.MISC

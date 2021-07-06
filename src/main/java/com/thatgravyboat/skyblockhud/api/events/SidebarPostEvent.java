@@ -12,11 +12,7 @@ public class SidebarPostEvent extends Event {
     public List<String> scores;
     public String[] arrayScores;
 
-    public SidebarPostEvent(
-        Scoreboard scoreboard,
-        ScoreObjective objective,
-        List<String> scores
-    ) {
+    public SidebarPostEvent(Scoreboard scoreboard, ScoreObjective objective, List<String> scores) {
         this.scoreboard = scoreboard;
         this.objective = objective;
         this.scores = scores;

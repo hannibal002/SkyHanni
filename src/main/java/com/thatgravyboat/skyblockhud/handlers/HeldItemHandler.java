@@ -13,21 +13,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class HeldItemHandler extends Gui {
 
     public void drawFuelBar(Minecraft mc, int current, int max) {
-        GenericOverlays.drawSmallBar(
-            mc,
-            100,
-            100,
-            (double) current / (double) max,
-            1.0d,
-            0xff00ff,
-            0xffff00,
-            0
-        );
+        GenericOverlays.drawSmallBar(mc, 100, 100, (double) current / (double) max, 1.0d, 0xff00ff, 0xffff00, 0);
         drawString(
             mc.fontRendererObj,
-            "Fuel - " +
-            Math.round(((double) current / (double) max) * 100) +
-            "%",
+            "Fuel - " + Math.round(((double) current / (double) max) * 100) + "%",
             100,
             100,
             0xffffff
@@ -37,16 +26,11 @@ public class HeldItemHandler extends Gui {
     public boolean isDrill(ItemStack stack) {
         if (stack == null) return false;
         if (!stack.getTagCompound().hasKey("ExtraAttributes")) return false;
-        return stack
-            .getTagCompound()
-            .getCompoundTag("ExtraAttributes")
-            .hasKey("drill_fuel");
+        return stack.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("drill_fuel");
     }
 
     public String getDrillFuel(ItemStack stack) {
-        NBTTagCompound display = stack
-            .getTagCompound()
-            .getCompoundTag("display");
+        NBTTagCompound display = stack.getTagCompound().getCompoundTag("display");
         NBTTagList lore = display.getTagList("Lore", 8);
         for (int i = lore.tagCount() - 1; i >= 0; i--) {
             String line = Utils.removeColor(lore.getStringTagAt(i));
