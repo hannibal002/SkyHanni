@@ -66,7 +66,7 @@ shadowJar {
     exclude 'dummyThing'
     exclude 'LICENSE.txt'
 
-    classifier = mixinClassifier
+    archiveClassifier.set(mixinClassifier)
 }
 
 reobf {
