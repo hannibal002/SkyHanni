@@ -1,0 +1,10 @@
+{
+  "package": "com.thatgravyboat.skyblockhud.mixins",
+  "refmap": "mixins.skyblockhud.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinEndermanRenderer",
+    "MixinGuiIngameForge",
+    "MixinNetHandlerPlayClient"
+  ]
+}

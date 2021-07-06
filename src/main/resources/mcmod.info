@@ -1,0 +1,16 @@
+[
+{
+  "modid": "skyblockhud",
+  "name": "Skyblock Hud",
+  "description": "Hypixel Skyblock RPG HUD",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["ThatGravyBoat"],
+  "credits": "Map Icons by ModCruel",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
