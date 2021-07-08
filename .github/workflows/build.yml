@@ -12,8 +12,7 @@ on:
     paths-ignore:
       - '.gitignore'
   workflow_dispatch:
-permissions:
-  actions: write
+permissions: write-all
 jobs:
   build:
     runs-on: ubuntu-latest
