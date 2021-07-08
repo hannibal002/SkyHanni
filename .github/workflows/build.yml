@@ -41,7 +41,7 @@ jobs:
         run: ./gradlew --stop
         
   Check-Formating:
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     name: Check Formatting
     
     steps:
