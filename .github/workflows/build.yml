@@ -14,7 +14,6 @@ on:
   workflow_dispatch:
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -40,3 +39,22 @@ jobs:
           path: build/libs/*.jar
       - name: Stop gradle daemons
         run: ./gradlew --stop
+        
+  Check-Formating:
+    runs-on: ubuntu-lates
+    name: Check Formatting
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Prettify the Java Code
+        uses: lwerner-lshigh/prettier_action_java@v1.1.1
+        with:
+          prettier_options: '--no-semi --write *.java'
+          branch: ${{ github.head_ref }}
+          dry: ${{ github.event_name != 'push' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
