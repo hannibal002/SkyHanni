@@ -8,8 +8,8 @@
           "displayItem": "minecraft:skull",
           "meta": 3,
           "skullData": {
-              "id": "ca156a9a-0286-3005-a839-a6c4dd4c671e",
-              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFkNzYyMGIyZTQ5MzQ5NjNiYjEyNTA4MzEwZDA1NDk0YzA2N2RjMzNlMDA4Y2VjZjJjZDdiNDU0OTY1NGZhYjMifX19"
+            "id": "ca156a9a-0286-3005-a839-a6c4dd4c671e",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFkNzYyMGIyZTQ5MzQ5NjNiYjEyNTA4MzEwZDA1NDk0YzA2N2RjMzNlMDA4Y2VjZjJjZDdiNDU0OTY1NGZhYjMifX19"
           }
         },
         {
@@ -245,9 +245,7 @@
       ]
     },
     {
-      "location": [
-        "YOURISLAND"
-      ],
+      "location": ["YOURISLAND"],
       "event": "traveling zoo",
       "drops": [
         {
