@@ -111,13 +111,16 @@ public enum Locations {
     MINERSGUILD("minersguild", "Miner's Guild", LocationCategory.DWARVENMINES),
     //CRYSTALHOLLOWS
     JUNGLE("jungle", "Jungle", LocationCategory.CRYSTALHOLLOWS),
+    JUNGLETEMPLE("jungletemple", "Jungle Temple", LocationCategory.CRYSTALHOLLOWS),
+    MITHRILDEPOSITS("mithrildeposits", "Mithril Deposits", LocationCategory.CRYSTALHOLLOWS),
     MINESOFDIVAN("minesofdivan", "Mines of Divan", LocationCategory.CRYSTALHOLLOWS),
     MAMGAFIELDS("magmafields", "Magma Fields", LocationCategory.CRYSTALHOLLOWS),
+    KHAZADDM("khzaddm", "Khazad-dûm", LocationCategory.CRYSTALHOLLOWS),
     GOBLINHOLDOUT("goblinholdout", "Goblin Holdout", LocationCategory.CRYSTALHOLLOWS),
-    CRYSTALNUCLEUS("crystalnucleus", "Crystal Nucleus", LocationCategory.CRYSTALHOLLOWS),
+    GOBLINQUEENSDEN("goblinqueensden", "Goblin Queens Den", LocationCategory.CRYSTALHOLLOWS),
     PERCURSORREMNANTS("precursorremnants", "Precursor Remnants", LocationCategory.CRYSTALHOLLOWS),
-    MITHRILDEPOSITS("mithrildeposits", "Mithril Deposits", LocationCategory.CRYSTALHOLLOWS),
     LOSTPRECURSORCITY("lostprecursorcity", "Lost Precursor City", LocationCategory.CRYSTALHOLLOWS),
+    CRYSTALNUCLEUS("crystalnucleus", "Crystal Nucleus", LocationCategory.CRYSTALHOLLOWS),
     CRYSTALHOLLOWS("crystalhollows", "Crystal Hollows", LocationCategory.CRYSTALHOLLOWS);
 
     private final String name;
