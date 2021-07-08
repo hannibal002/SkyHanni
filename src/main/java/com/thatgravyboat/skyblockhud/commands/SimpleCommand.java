@@ -1,10 +1,9 @@
 package com.thatgravyboat.skyblockhud.commands;
 
+import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
-
-import java.util.List;
 
 /**
  @author Moulberry

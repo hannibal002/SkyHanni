@@ -3,15 +3,14 @@ package com.thatgravyboat.skyblockhud.playerstats;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ActionBarParsing {
 
@@ -66,7 +65,7 @@ public class ActionBarParsing {
                 message = DefenseReplaceRegex.matcher(message).replaceAll("");
                 message = ManaReplaceRegex.matcher(message).replaceAll("");
                 Matcher overflowMatcher = ManaOverflowReplaceRegex.matcher(message);
-                if (overflowMatcher.find()){
+                if (overflowMatcher.find()) {
                     message = overflowMatcher.replaceAll("\u00A73\u02AC " + overflowMatcher.group(3));
                 }
 

@@ -1,12 +1,11 @@
 package com.thatgravyboat.skyblockhud.commands;
 
+import java.util.List;
+import java.util.Set;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
 import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.List;
-import java.util.Set;
 
 public abstract class SimpleSubCommand extends CommandBase {
 
@@ -25,7 +24,7 @@ public abstract class SimpleSubCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/"+commandName;
+        return "/" + commandName;
     }
 
     @Override
@@ -34,7 +33,7 @@ public abstract class SimpleSubCommand extends CommandBase {
             processNoSubCommand(sender);
             return;
         }
-        if (subCommands.contains(args[0])){
+        if (subCommands.contains(args[0])) {
             processSubCommand(sender, args[0], ArrayUtils.remove(args, 0));
             return;
         }
@@ -48,8 +47,8 @@ public abstract class SimpleSubCommand extends CommandBase {
 
     @Override
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        if (args.length == 1){
-            return getListOfStringsMatchingLastWord(args,subCommands);
+        if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args, subCommands);
         }
         return null;
     }
@@ -58,5 +57,5 @@ public abstract class SimpleSubCommand extends CommandBase {
 
     abstract void processNoSubCommand(ICommandSender sender);
 
-    public void processBadSubCommand(ICommandSender sender, String subCommand){}
+    public void processBadSubCommand(ICommandSender sender, String subCommand) {}
 }
