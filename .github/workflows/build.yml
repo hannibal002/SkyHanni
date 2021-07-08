@@ -3,14 +3,14 @@ name: Build
 on:
   push:
     branches:
-      - '*'
+      - "*"
     paths-ignore:
-      - '.gitignore'
+      - ".gitignore"
   pull_request:
     branches:
-      - '*'
+      - "*"
     paths-ignore:
-      - '.gitignore'
+      - ".gitignore"
   workflow_dispatch:
 permissions: write-all
 jobs:
@@ -40,11 +40,11 @@ jobs:
           path: build/libs/*.jar
       - name: Stop gradle daemons
         run: ./gradlew --stop
-        
+
   Check-Formating:
     runs-on: ubuntu-latest
     name: Check Formatting
-    
+
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
@@ -54,7 +54,7 @@ jobs:
       - name: Prettify the Java Code
         uses: lwerner-lshigh/prettier_action_java@v1.1.1
         with:
-          prettier_options: '--write .'
+          prettier_options: "--write ."
           branch: ${{ github.head_ref }}
           dry: ${{ github.event_name != 'push' }}
         env:
