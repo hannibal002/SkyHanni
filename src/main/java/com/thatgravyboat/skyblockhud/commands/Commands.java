@@ -8,15 +8,14 @@ import com.thatgravyboat.skyblockhud.core.GuiScreenElementWrapper;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.playerstats.ActionBarParsing;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import org.apache.commons.lang3.StringUtils;
-
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 
 public class Commands {
 
@@ -33,7 +32,6 @@ public class Commands {
     };
 
     private static final SimpleSubCommand devCommand = new SimpleSubCommand("sbhdev", ImmutableSet.of("copyBossBar", "copyScoreboard", "copyActionBar")) {
-
         @Override
         void processSubCommand(ICommandSender sender, String subCommand, String[] args) {
             StringSelection clipboard = null;
@@ -52,16 +50,7 @@ public class Commands {
             }
             if (clipboard != null) {
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboard, clipboard);
-                sender.addChatMessage(new ChatComponentText(
-                        "[" +
-                        EnumChatFormatting.RED +
-                        EnumChatFormatting.BOLD +
-                        "SkyBlockHud" +
-                        EnumChatFormatting.RESET +
-                        "] : " +
-                        EnumChatFormatting.GRAY +
-                        "Info copied to clipboard!"
-                ));
+                sender.addChatMessage(new ChatComponentText("[" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "SkyBlockHud" + EnumChatFormatting.RESET + "] : " + EnumChatFormatting.GRAY + "Info copied to clipboard!"));
             }
         }
 
@@ -80,8 +69,7 @@ public class Commands {
         "sbhmap",
         new SimpleCommand.ProcessCommandRunnable() {
             public void processCommand(ICommandSender sender, String[] args) {
-                if (LocationHandler.getCurrentLocation().getCategory().getMap() != null && SkyblockHud.hasSkyblockScoreboard())
-                    SkyblockHud.screenToOpen = new MapHandler.MapScreen();
+                if (LocationHandler.getCurrentLocation().getCategory().getMap() != null && SkyblockHud.hasSkyblockScoreboard()) SkyblockHud.screenToOpen = new MapHandler.MapScreen();
             }
         }
     );
