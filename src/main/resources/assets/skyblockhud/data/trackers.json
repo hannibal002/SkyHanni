@@ -5,7 +5,7 @@
       "drops": [
         {
           "id": "WISE_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -16,7 +16,7 @@
         },
         {
           "id": "UNSTABLE_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -27,7 +27,7 @@
         },
         {
           "id": "PROTECTOR_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -38,7 +38,7 @@
         },
         {
           "id": "OLD_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -49,7 +49,7 @@
         },
         {
           "id": "YOUNG_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -60,7 +60,7 @@
         },
         {
           "id": "STRONG_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -71,7 +71,7 @@
         },
         {
           "id": "SUPERIOR_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -82,7 +82,7 @@
         },
         {
           "id": "CRYSTAL_FRAGMENT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:quartz",
             "meta": 0,
             "enchanted": true
@@ -90,7 +90,7 @@
         },
         {
           "id": "SUMMONING_EYE",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -106,7 +106,7 @@
       "drops": [
         {
           "id": "WOLF_TOOTH",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:ghast_tear",
             "meta": 0,
             "enchanted": true
@@ -114,7 +114,7 @@
         },
         {
           "id": "HAMSTER_WHEEL",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:trapdoor",
             "meta": 0,
             "enchanted": true
@@ -122,7 +122,7 @@
         },
         {
           "id": "CRITICAL;6",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:enchanted_book",
             "meta": 0,
             "enchanted": true
@@ -130,21 +130,21 @@
         },
         {
           "id": "RED_CLAW_EGG",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:spawn_egg",
             "meta": 96
           }
         },
         {
           "id": "GRIZZLY_BAIT",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:fish",
             "meta": 1
           }
         },
         {
           "id": "OVERFLUX_CAPACITOR",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:quartz",
             "meta": 0,
             "enchanted": true
@@ -157,21 +157,21 @@
       "drops": [
         {
           "id": "TARANTULA_WEB",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:string",
             "meta": 0
           }
         },
         {
           "id": "TOXIC_ARROW_POISON",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:dye",
             "meta": 10
           }
         },
         {
           "id": "SPIDER_CATALYST",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -182,7 +182,7 @@
         },
         {
           "id": "BANE_OF_ARTHROPODS;6",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:enchanted_book",
             "meta": 0,
             "enchanted": true
@@ -190,7 +190,7 @@
         },
         {
           "id": "FLY_SWATTER",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:golden_shovel",
             "meta": 0,
             "enchanted": true
@@ -198,7 +198,7 @@
         },
         {
           "id": "TARANTULA_TALISMAN",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -209,7 +209,7 @@
         },
         {
           "id": "DIGESTED_MOSQUITO",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:rotten_flesh",
             "meta": 0
           }
@@ -221,21 +221,21 @@
       "drops": [
         {
           "id": "REVENANT_FLESH",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:rotten_flesh",
             "meta": 0
           }
         },
         {
           "id": "FOUL_FLESH",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:coal",
             "meta": 1
           }
         },
         {
           "id": "UNDEAD_CATALYST",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -246,7 +246,7 @@
         },
         {
           "id": "SMITE;6",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:enchanted_book",
             "meta": 0,
             "enchanted": true
@@ -254,7 +254,7 @@
         },
         {
           "id": "BEHEADED_HORROR",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -265,7 +265,7 @@
         },
         {
           "id": "REVENANT_CATALYST",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -276,7 +276,7 @@
         },
         {
           "id": "REVENANT_VISCERA",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:cooked_porkchop",
             "meta": 0,
             "enchanted": true
@@ -284,7 +284,7 @@
         },
         {
           "id": "SHARD_OF_THE_SHREDDED",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -295,7 +295,7 @@
         },
         {
           "id": "SMITE;7",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:enchanted_book",
             "meta": 0,
             "enchanted": true
@@ -303,7 +303,7 @@
         },
         {
           "id": "WARDEN_HEART",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -319,14 +319,14 @@
       "drops": [
         {
           "id": "SORROW",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:ghast_tear",
             "meta": 0
           }
         },
         {
           "id": "VOLTA",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
@@ -337,7 +337,7 @@
         },
         {
           "id": "PLASMA",
-          "displayItem" : {
+          "displayItem": {
             "item": "minecraft:skull",
             "meta": 3,
             "skullData": {
