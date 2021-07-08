@@ -53,7 +53,7 @@ jobs:
       - name: Prettify the Java Code
         uses: lwerner-lshigh/prettier_action_java@v1.1.1
         with:
-          prettier_options: '--no-semi --write *.java'
+          prettier_options: '--write .'
           branch: ${{ github.head_ref }}
           dry: ${{ github.event_name != 'push' }}
         env:
