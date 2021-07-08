@@ -1,9 +1,5 @@
 package com.thatgravyboat.skyblockhud;
 
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -19,6 +15,11 @@ import net.minecraftforge.fml.common.Loader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 public class Utils {
 
@@ -45,6 +46,18 @@ public class Utils {
 
     public static boolean inRangeInclusive(int value, int min, int max) {
         return value <= max && value >= min;
+    }
+
+    public static float lerp(float f, float g, float h) {
+        return g + f * (h - g);
+    }
+
+    public static double lerp(double d, double e, double f) {
+        return e + d * (f - e);
+    }
+
+    public static int lerp(float f, int g, int h) {
+        return (int) (g + f * (h - g));
     }
 
     public static int whatRomanNumeral(String roman) {

@@ -5,8 +5,6 @@ import com.thatgravyboat.skyblockhud.GuiTextures;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -14,6 +12,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 public class RPGHud extends Gui {
 
@@ -83,22 +84,19 @@ public class RPGHud extends Gui {
                 drawTexturedModalRect(rightAligned ? x + 3 : 47 + x, 22 + y, rightAligned ? 186 : 0, 77, (int) absorptionWidth, 5);
             }
 
-            float xpWidth = 67 * mc.thePlayer.experience;
-            drawTexturedModalRect(rightAligned ? x + 7 : 45 + x, 28 + y, rightAligned ? 189 : 0, 73, (int) xpWidth, 4);
+            drawTexturedModalRect(rightAligned ? x + 7 : 45 + x, 28 + y, rightAligned ? 189 : 0, 73, Utils.lerp(mc.thePlayer.experience, 0, 67), 4);
             //Air in water
             NumberFormat myFormat = NumberFormat.getInstance();
             myFormat.setGroupingUsed(true);
             if (mc.thePlayer.getAir() < 300) {
-                float airWidth = 60 * ((float) mc.thePlayer.getAir() / 300);
                 drawTexturedModalRect(rightAligned ? x + 17 : 39 + x, 33 + y, rightAligned ? 192 : 0, 82, 64, 6);
-                drawTexturedModalRect(rightAligned ? x + 19 : 41 + x, 33 + y, rightAligned ? 196 : 0, 88, (int) airWidth, 4);
+                drawTexturedModalRect(rightAligned ? x + 19 : 41 + x, 33 + y, rightAligned ? 196 : 0, 88, Utils.lerp(mc.thePlayer.getAir() / 300f, 0, 60), 4);
             }
-            GlStateManager.scale(0.75f, 0.75f, 1);
-            drawCenteredString(mc.fontRendererObj, "" + mc.thePlayer.experienceLevel, (rightAligned ? 130 : 0) + (int) (15 + x / 0.75f), (int) (45 + y / 0.75f), 8453920);
-            GlStateManager.scale(1 / 0.75f, 1 / 0.75f, 1);
-            GlStateManager.scale(0.75f, 0.75f, 1);
-            font.drawString(ChatFormatting.RED + " \u2764 " + health + "/" + maxHealth, (rightAligned ? -40 : 0) + (int) (64 + x / 0.75f), (int) (8 + y / 0.75f), 0xffffff, true);
-            GlStateManager.scale(1 / 0.75f, 1 / 0.75f, 1);
+
+            Utils.drawStringScaled("" + mc.thePlayer.experienceLevel, mc.fontRendererObj, (rightAligned ? 130 : 14) + x - (mc.fontRendererObj.getStringWidth("" + mc.thePlayer.experienceLevel) / 2f), 34 + y, false, 8453920, 0.75f);
+
+            Utils.drawStringScaled(ChatFormatting.RED + " \u2764 " + health + "/" + maxHealth, mc.fontRendererObj, (rightAligned ? 10 : 42) + x, 8 + y, true, 0xffffff, 0.75f);
+
             GlStateManager.color(255, 255, 255);
             GlStateManager.disableBlend();
         }

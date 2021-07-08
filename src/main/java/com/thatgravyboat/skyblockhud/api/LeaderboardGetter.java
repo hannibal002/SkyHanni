@@ -1,13 +1,9 @@
 package com.thatgravyboat.skyblockhud.api;
 
-import static com.thatgravyboat.skyblockhud.ComponentHandler.SCOREBOARD_CHARACTERS;
-
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPreGetEvent;
-import java.util.*;
-import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -17,12 +13,21 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.thatgravyboat.skyblockhud.ComponentHandler.SCOREBOARD_CHARACTERS;
+
 public class LeaderboardGetter {
 
     private static Map<Integer, String> cachedScores = new HashMap<>();
     private static List<String> cachedScoresList = new ArrayList<>();
 
     private static int ticks = 0;
+
+    public static List<String> getCachedScores() {
+        return cachedScoresList;
+    }
 
     @SubscribeEvent
     public void onClientUpdate(TickEvent.ClientTickEvent event) {

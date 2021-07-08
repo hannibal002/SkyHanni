@@ -86,6 +86,7 @@ public enum Locations {
     THELIFT("thelift", "The Lift", LocationCategory.DWARVENMINES),
     DWARVENVILLAGE("dwarvenvillage", "Dwarven Village", LocationCategory.DWARVENMINES),
     DWARVENMINES("dwarvenmines", "Dwarven Mines", LocationCategory.DWARVENMINES),
+    DWARVENTAVERN("dwarvemtavern", "Dwarven Tavern", LocationCategory.DWARVENMINES),
     LAVASPRINGS("lavasprings", "Lava Springs", LocationCategory.DWARVENMINES),
     PALACEBRIDGE("palacebridge", "Palace Bridge", LocationCategory.DWARVENMINES),
     ROYALPALACE("royalpalace", "Royal Palace", LocationCategory.DWARVENMINES),
@@ -110,11 +111,14 @@ public enum Locations {
     MINERSGUILD("minersguild", "Miner's Guild", LocationCategory.DWARVENMINES),
     //CRYSTALHOLLOWS
     JUNGLE("jungle", "Jungle", LocationCategory.CRYSTALHOLLOWS),
+    MINESOFDIVAN("minesofdivan", "Mines of Divan", LocationCategory.CRYSTALHOLLOWS),
     MAMGAFIELDS("magmafields", "Magma Fields", LocationCategory.CRYSTALHOLLOWS),
     GOBLINHOLDOUT("goblinholdout", "Goblin Holdout", LocationCategory.CRYSTALHOLLOWS),
     CRYSTALNUCLEUS("crystalnucleus", "Crystal Nucleus", LocationCategory.CRYSTALHOLLOWS),
     PERCURSORREMNANTS("precursorremnants", "Precursor Remnants", LocationCategory.CRYSTALHOLLOWS),
-    MITHRILDEPOSITS("mithrildeposits", "Mithril Deposits", LocationCategory.CRYSTALHOLLOWS);
+    MITHRILDEPOSITS("mithrildeposits", "Mithril Deposits", LocationCategory.CRYSTALHOLLOWS),
+    LOSTPRECURSORCITY("lostprecursorcity", "Lost Precursor City", LocationCategory.CRYSTALHOLLOWS),
+    CRYSTALHOLLOWS("crystalhollows", "Crystal Hollows", LocationCategory.CRYSTALHOLLOWS);
 
     private final String name;
     private final String displayName;
