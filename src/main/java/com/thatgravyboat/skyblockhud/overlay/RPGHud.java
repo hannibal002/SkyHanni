@@ -5,15 +5,16 @@ import com.thatgravyboat.skyblockhud.GuiTextures;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import com.thatgravyboat.skyblockhud.handlers.HeldItemHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 public class RPGHud extends Gui {
 
@@ -52,7 +53,6 @@ public class RPGHud extends Gui {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.renderer.hideXpBar)) MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Post(new RenderGameOverlayEvent(event.partialTicks, event.resolution), RenderGameOverlayEvent.ElementType.EXPERIENCE));
         if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.rpg.showRpgHud)) {
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.enableBlend();
@@ -73,14 +73,24 @@ public class RPGHud extends Gui {
             drawTexturedModalRect(x, y, rightAligned ? 131 : 5, 6, 120, 47);
 
             float manaWidth = Math.min(57 * ((float) mana / (float) maxMana), 57);
-            drawTexturedModalRect(rightAligned ? x + 16 : 47 + x, 17 + y, rightAligned ? 199 : 0, 64, (int) manaWidth, 4);
+            int manaX = rightAligned ? x + 16 : 47 + x;
+            if (HeldItemHandler.hasManaCost(mc.thePlayer.getHeldItem())){
+                int manaCost = HeldItemHandler.getManaCost(mc.thePlayer.getHeldItem());
+                drawTexturedModalRect(manaX, 17 + y, rightAligned ? 199 : 0, manaCost > mana ? 96 : 64, (int) manaWidth, 4);
+                if (manaCost <= mana) {
+                    drawTexturedModalRect(manaX, 17 + y, rightAligned ? 199 : 0, 92, Utils.lerp((float) manaCost / (float) maxMana,0, 57), 4);
+                }
+            }else {
+                drawTexturedModalRect(manaX, 17 + y, rightAligned ? 199 : 0, 64, (int) manaWidth, 4);
+            }
 
             float healthWidth = Math.min(70 * ((float) health / (float) maxHealth), 70);
-            drawTexturedModalRect(rightAligned ? x + 3 : 47 + x, 22 + y, rightAligned ? 186 : 0, 68, (int) healthWidth, 5);
+            int healthX = rightAligned ? x + 3 : 47 + x;
+            drawTexturedModalRect(healthX, 22 + y, rightAligned ? 186 : 0, 68, (int) healthWidth, 5);
 
             if (health > maxHealth) {
                 float absorptionWidth = Math.min(70 * ((float) (health - maxHealth) / (float) maxHealth), 70);
-                drawTexturedModalRect(rightAligned ? x + 3 : 47 + x, 22 + y, rightAligned ? 186 : 0, 77, (int) absorptionWidth, 5);
+                drawTexturedModalRect(healthX, 22 + y, rightAligned ? 186 : 0, 77, (int) absorptionWidth, 5);
             }
 
             drawTexturedModalRect(rightAligned ? x + 7 : 45 + x, 28 + y, rightAligned ? 189 : 0, 73, Utils.lerp(mc.thePlayer.experience, 0, 67), 4);
@@ -92,9 +102,9 @@ public class RPGHud extends Gui {
                 drawTexturedModalRect(rightAligned ? x + 19 : 41 + x, 33 + y, rightAligned ? 196 : 0, 88, Utils.lerp(mc.thePlayer.getAir() / 300f, 0, 60), 4);
             }
 
-            Utils.drawStringScaled("" + mc.thePlayer.experienceLevel, mc.fontRendererObj, (rightAligned ? 130 : 14) + x - (mc.fontRendererObj.getStringWidth("" + mc.thePlayer.experienceLevel) / 2f), 34 + y, false, 8453920, 0.75f);
+            Utils.drawStringScaled("" + mc.thePlayer.experienceLevel, font, (rightAligned ? 112 : 14) + x - (font.getStringWidth("" + mc.thePlayer.experienceLevel) / 2f), 34 + y, false, 8453920, 0.75f);
 
-            Utils.drawStringScaled(ChatFormatting.RED + " \u2764 " + health + "/" + maxHealth, mc.fontRendererObj, (rightAligned ? 10 : 42) + x, 8 + y, true, 0xffffff, 0.75f);
+            Utils.drawStringScaled(ChatFormatting.RED + " \u2764 " + health + "/" + maxHealth, font, (rightAligned ? 10 : 42) + x, 8 + y, true, 0xffffff, 0.75f);
 
             GlStateManager.color(255, 255, 255);
             GlStateManager.disableBlend();

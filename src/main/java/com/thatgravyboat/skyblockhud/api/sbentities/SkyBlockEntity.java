@@ -1,7 +1,8 @@
-package com.thatgravyboat.skyblockhud.handlers.sbentities;
+package com.thatgravyboat.skyblockhud.api.sbentities;
+
+import net.minecraft.entity.Entity;
 
 import java.util.function.Predicate;
-import net.minecraft.entity.Entity;
 
 public class SkyBlockEntity {
 

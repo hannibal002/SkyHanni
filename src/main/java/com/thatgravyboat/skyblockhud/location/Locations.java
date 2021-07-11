@@ -114,14 +114,15 @@ public enum Locations {
     JUNGLETEMPLE("jungletemple", "Jungle Temple", LocationCategory.CRYSTALHOLLOWS),
     MITHRILDEPOSITS("mithrildeposits", "Mithril Deposits", LocationCategory.CRYSTALHOLLOWS),
     MINESOFDIVAN("minesofdivan", "Mines of Divan", LocationCategory.CRYSTALHOLLOWS),
-    MAMGAFIELDS("magmafields", "Magma Fields", LocationCategory.CRYSTALHOLLOWS),
-    KHAZADDM("khzaddm", "Khazad-dûm", LocationCategory.CRYSTALHOLLOWS),
+    MAGMAFIELDS("magmafields", "Magma Fields", LocationCategory.CRYSTALHOLLOWS),
+    KHAZADDM("khzaddm", "Khazad-d\u00FBm", LocationCategory.CRYSTALHOLLOWS),
     GOBLINHOLDOUT("goblinholdout", "Goblin Holdout", LocationCategory.CRYSTALHOLLOWS),
     GOBLINQUEENSDEN("goblinqueensden", "Goblin Queens Den", LocationCategory.CRYSTALHOLLOWS),
-    PERCURSORREMNANTS("precursorremnants", "Precursor Remnants", LocationCategory.CRYSTALHOLLOWS),
+    PRECURSORREMNANTS("precursorremnants", "Precursor Remnants", LocationCategory.CRYSTALHOLLOWS),
     LOSTPRECURSORCITY("lostprecursorcity", "Lost Precursor City", LocationCategory.CRYSTALHOLLOWS),
     CRYSTALNUCLEUS("crystalnucleus", "Crystal Nucleus", LocationCategory.CRYSTALHOLLOWS),
-    CRYSTALHOLLOWS("crystalhollows", "Crystal Hollows", LocationCategory.CRYSTALHOLLOWS);
+    CRYSTALHOLLOWS("crystalhollows", "Crystal Hollows", LocationCategory.CRYSTALHOLLOWS),
+    FAIRYGROTTO("fairygrotto", "Fairy Grotto", LocationCategory.CRYSTALHOLLOWS);
 
     private final String name;
     private final String displayName;
@@ -149,7 +150,6 @@ public enum Locations {
         try {
             return Locations.valueOf(id.replace(" ", "").toUpperCase());
         } catch (IllegalArgumentException ex) {
-            LocationHandler.reportUndocumentedLocation(id);
             return DEFAULT;
         }
     }

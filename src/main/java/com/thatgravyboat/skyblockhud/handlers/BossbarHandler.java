@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.handlers;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
-import com.thatgravyboat.skyblockhud.location.DwarvenMineHandler;
+import com.thatgravyboat.skyblockhud.location.MinesHandler;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import net.minecraft.entity.boss.BossStatus;
@@ -22,7 +22,7 @@ public class BossbarHandler {
                 bossBarRendered = false;
             }
             String bossName = Utils.removeColor(BossStatus.bossName);
-            if (SkyblockHud.config.renderer.hideBossBar && DwarvenMineHandler.currentEvent == DwarvenMineHandler.Event.NONE && !LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)) {
+            if (SkyblockHud.config.renderer.hideBossBar && MinesHandler.currentEvent == MinesHandler.Event.NONE && !LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)) {
                 if (bossName.equalsIgnoreCase("wither")) {
                     event.setCanceled(true);
                     bossBarRendered = false;

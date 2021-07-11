@@ -2,15 +2,17 @@ package com.thatgravyboat.skyblockhud.playerstats;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.overlay.MiningHud;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ActionBarParsing {
 
@@ -24,6 +26,7 @@ public class ActionBarParsing {
     private static final Pattern ManaRegex = Pattern.compile("([0-9]+)/([0-9]+)\u270E Mana");
     private static final Pattern ManaOverflowRegex = Pattern.compile("([0-9]+)/([0-9]+)\u270E ([0-9]+)\u02AC");
     private static final Pattern ManaDecreaseRegex = Pattern.compile("-([0-9]+) Mana \\(");
+    private static final Pattern DrillFuelRegex = Pattern.compile("([0-9,]+)/([0-9,]+k) Drill Fuel");
     private static final Pattern XpGainRegex = Pattern.compile("\\+(\\d*\\.?\\d*) (Farming|Mining|Combat|Foraging|Fishing|Enchanting|Alchemy|Carpentry|Runecrafting) \\((\\d*\\.?\\d*)%\\)");
 
     private static final Pattern HealthReplaceRegex = Pattern.compile("\u00A7c([0-9]+)/([0-9]+)\u2764");
@@ -32,6 +35,7 @@ public class ActionBarParsing {
     private static final Pattern DefenseReplaceRegex = Pattern.compile("\u00A7a([0-9]+)\u00A7a\u2748 Defense");
     private static final Pattern ManaReplaceRegex = Pattern.compile("\u00A7b([0-9]+)/([0-9]+)\u270E Mana");
     private static final Pattern ManaOverflowReplaceRegex = Pattern.compile("\u00A7b([0-9]+)/([0-9]+)\u270E \u00A73([0-9]+)\u02AC");
+    private static final Pattern DrillFuelReplaceRegex = Pattern.compile("\u00A72([0-9,]+)/([0-9,]+k) Drill Fuel");
 
     private static int ticksSinceLastPrediction = 0;
     private static boolean predict = false;
@@ -49,29 +53,47 @@ public class ActionBarParsing {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onStatusBarHigh(ClientChatReceivedEvent event) {
-        if (event.type == 2 && SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
-            parseActionBar(event.message.getUnformattedText());
+        if (event.type == 2) {
+            if (SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
+                parseActionBar(event.message.getUnformattedText());
+            }
+            if (SkyblockHud.config.miningHud.showDrillBar) {
+                String bar = Utils.removeColor(event.message.getUnformattedText());
+                Matcher DrillFuelMatcher = DrillFuelRegex.matcher(bar);
+                if (DrillFuelMatcher.find()) {
+                    try {
+                        MiningHud.setFuel(Integer.parseInt(DrillFuelMatcher.group(1).replace(",", "")), Integer.parseInt(DrillFuelMatcher.group(2).replace("k", "")) * 1000);
+                    } catch (Exception ignored) {
+                        MiningHud.setFuel(0, 0);
+                    }
+                }
+            }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onStatusBarLow(ClientChatReceivedEvent event) {
-        if (event.type == 2 && SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
-            String message = event.message.getUnformattedText();
-            if (lastLowEditedActionBar == null || !lastLowActionBar.equals(message)) {
-                lastLowActionBar = message;
-                message = HealthReplaceRegex.matcher(message).replaceAll("");
-                message = HealthAbsorptionReplaceRegex.matcher(message).replaceAll("");
-                message = DefenseReplaceRegex.matcher(message).replaceAll("");
-                message = ManaReplaceRegex.matcher(message).replaceAll("");
-                Matcher overflowMatcher = ManaOverflowReplaceRegex.matcher(message);
-                if (overflowMatcher.find()) {
-                    message = overflowMatcher.replaceAll("\u00A73\u02AC " + overflowMatcher.group(3));
-                }
+        if (event.type == 2) {
+            if (SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
+                String message = event.message.getUnformattedText();
+                if (lastLowEditedActionBar == null || !lastLowActionBar.equals(message)) {
+                    lastLowActionBar = message;
+                    message = HealthReplaceRegex.matcher(message).replaceAll("");
+                    message = HealthAbsorptionReplaceRegex.matcher(message).replaceAll("");
+                    message = DefenseReplaceRegex.matcher(message).replaceAll("");
+                    message = ManaReplaceRegex.matcher(message).replaceAll("");
+                    Matcher overflowMatcher = ManaOverflowReplaceRegex.matcher(message);
+                    if (overflowMatcher.find()) {
+                        message = overflowMatcher.replaceAll("\u00A73\u02AC " + overflowMatcher.group(3));
+                    }
 
-                lastLowEditedActionBar = new ChatComponentText(message.trim());
+                    lastLowEditedActionBar = new ChatComponentText(message.trim());
+                }
+                event.message = lastLowEditedActionBar;
             }
-            event.message = lastLowEditedActionBar;
+            if (SkyblockHud.config.miningHud.showDrillBar) {
+                event.message = new ChatComponentText(DrillFuelReplaceRegex.matcher(event.message.getUnformattedText()).replaceAll("").trim());
+            }
         }
     }
 

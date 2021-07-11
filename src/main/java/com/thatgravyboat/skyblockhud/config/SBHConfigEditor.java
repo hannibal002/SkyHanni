@@ -1,7 +1,5 @@
 package com.thatgravyboat.skyblockhud.config;
 
-import static com.thatgravyboat.skyblockhud.GuiTextures.*;
-
 import com.google.common.collect.Lists;
 import com.thatgravyboat.skyblockhud.core.GlScissorStack;
 import com.thatgravyboat.skyblockhud.core.GuiElement;
@@ -13,10 +11,6 @@ import com.thatgravyboat.skyblockhud.core.util.lerp.LerpUtils;
 import com.thatgravyboat.skyblockhud.core.util.lerp.LerpingInteger;
 import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
 import com.thatgravyboat.skyblockhud.core.util.render.TextRenderUtils;
-import java.awt.*;
-import java.net.URI;
-import java.util.*;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -27,10 +21,18 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
+import java.net.URI;
+import java.util.List;
+import java.util.*;
+
+import static com.thatgravyboat.skyblockhud.GuiTextures.DISCORD;
+import static com.thatgravyboat.skyblockhud.GuiTextures.TWITTER;
+
 public class SBHConfigEditor extends GuiElement {
 
     private static final ResourceLocation[] socialsIco = new ResourceLocation[] { DISCORD, TWITTER };
-    private static final String[] socialsLink = new String[] { "https://discord.gg/moulberry", "https://twitter.com/thatgravytboat/" };
+    private static final String[] socialsLink = new String[] { "https://discord.gg/moulberry", "https://twitter.com/thatgravyboat/" };
 
     private final long openedMillis;
 

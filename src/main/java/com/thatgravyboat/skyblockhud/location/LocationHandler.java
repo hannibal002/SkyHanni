@@ -1,15 +1,13 @@
 package com.thatgravyboat.skyblockhud.location;
 
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.Locale;
 
 public class LocationHandler {
 
     private static Locations currentLocation = Locations.NONE;
-    private static final List<String> UndocumentedLocations = new ArrayList<>();
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
@@ -40,12 +38,5 @@ public class LocationHandler {
         if (location.startsWith("THECATACOMBS")) {
             currentLocation = Locations.CATACOMBS;
         } else setCurrentLocation(location.replaceAll("[^A-Za-z0-9]", ""));
-    }
-
-    public static void reportUndocumentedLocation(String locationId) {
-        if (!UndocumentedLocations.contains(locationId)) {
-            UndocumentedLocations.add(locationId);
-            System.out.println("Missing Location value for: " + locationId);
-        }
     }
 }

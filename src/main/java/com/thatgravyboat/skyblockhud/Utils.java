@@ -1,9 +1,5 @@
 package com.thatgravyboat.skyblockhud;
 
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,11 +10,18 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Loader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 public class Utils {
 
@@ -57,6 +60,18 @@ public class Utils {
 
     public static int lerp(float f, int g, int h) {
         return (int) (g + f * (h - g));
+    }
+
+    public static NBTTagCompound getSkyBlockTag(ItemStack stack){
+        if (stack == null) return null;
+        if (!stack.hasTagCompound()) return null;
+        if (!stack.getTagCompound().hasKey("ExtraAttributes")) return null;
+        return stack.getTagCompound().getCompoundTag("ExtraAttributes");
+    }
+
+    public static boolean isDrill(ItemStack stack){
+        NBTTagCompound tag = getSkyBlockTag(stack);
+        return tag != null && tag.hasKey("drill_fuel");
     }
 
     public static int whatRomanNumeral(String roman) {
@@ -119,17 +134,13 @@ public class Utils {
 
     public static boolean overlayShouldRender(boolean hideOnf3, RenderGameOverlayEvent.ElementType type, RenderGameOverlayEvent.ElementType checkType, boolean... booleans) {
         Minecraft mc = Minecraft.getMinecraft();
-        boolean shouldRender;
-        if (booleans.length > 1) {
-            for (boolean aBoolean : booleans) if (!aBoolean) return false;
-            shouldRender = true;
-        } else shouldRender = booleans.length != 1 || booleans[0];
+        for (boolean aBoolean : booleans) if (!aBoolean) return false;
         if (hideOnf3) {
             if (mc.gameSettings.showDebugInfo || (mc.gameSettings.keyBindPlayerList.isKeyDown() && (!mc.isIntegratedServerRunning() || mc.thePlayer.sendQueue.getPlayerInfoMap().size() > 1))) {
                 return false;
             }
         }
-        return (shouldRender && ((type == null && Loader.isModLoaded("labymod")) || type == checkType));
+        return ((type == null && Loader.isModLoaded("labymod")) || type == checkType);
     }
 
     public static void drawStringScaledMaxWidth(String str, FontRenderer fr, float x, float y, boolean shadow, int len, int colour) {

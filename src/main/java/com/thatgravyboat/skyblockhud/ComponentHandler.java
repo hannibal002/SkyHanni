@@ -5,9 +5,6 @@ import com.google.common.collect.Ordering;
 import com.thatgravyboat.skyblockhud.dungeons.DungeonHandler;
 import com.thatgravyboat.skyblockhud.location.*;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -19,6 +16,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class ComponentHandler {
 
@@ -45,7 +46,10 @@ public class ComponentHandler {
                                 if (formattedTabListPlayer.toLowerCase().contains("crypts:")) DungeonHandler.parseCrypts(formattedTabListPlayer);
                             } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
                                 if (formattedTabListPlayer.toLowerCase().contains("mithril powder:")) {
-                                    DwarvenMineHandler.parseMithril(formattedTabListPlayer);
+                                    MinesHandler.parseMithril(formattedTabListPlayer);
+                                }
+                                if (formattedTabListPlayer.toLowerCase().contains("gemstone powder:")) {
+                                    MinesHandler.parseGemstone(formattedTabListPlayer);
                                 }
                             } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.MUSHROOMDESERT)) {
                                 if (formattedTabListPlayer.toLowerCase().contains("pelts:")) {
@@ -64,8 +68,10 @@ public class ComponentHandler {
                                     if (i < 80) {
                                         if (players.get(i + 1).getDisplayName() != null) {
                                             String secondLine = SCOREBOARD_CHARACTERS.matcher(Utils.removeColor(players.get(i + 1).getDisplayName().getFormattedText())).replaceAll("");
-                                            SeasonDateHandler.setCurrentEvent(formattedTabListPlayer.replace("Event:", ""), secondLine);
-                                            eventPass = true;
+                                            if (!formattedTabListPlayer.contains("N/A")) {
+                                                SeasonDateHandler.setCurrentEvent(formattedTabListPlayer.replace("Event:", ""), secondLine);
+                                                eventPass = true;
+                                            }
                                         }
                                     }
                                 }

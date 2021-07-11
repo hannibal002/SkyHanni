@@ -10,9 +10,6 @@ import com.thatgravyboat.skyblockhud.handlers.TimeHandler;
 import com.thatgravyboat.skyblockhud.location.*;
 import com.thatgravyboat.skyblockhud.seasons.Season;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -22,6 +19,10 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public class OverlayHud extends Gui {
 
@@ -65,11 +66,11 @@ public class OverlayHud extends Gui {
             if (IslandHandler.flightTime > 0) drawFlightDuration(width, offset, mc);
         } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.MUSHROOMDESERT)) {
             drawTrapperOrPelts(width, offset, mc);
-        } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
-            if (DwarvenMineHandler.currentEvent != DwarvenMineHandler.Event.NONE) {
+        } else if (LocationHandler.getCurrentLocation().getCategory().isMiningCategory()) {
+            if (MinesHandler.currentEvent.display && LocationHandler.getCurrentLocation().getCategory() == LocationCategory.DWARVENMINES) {
                 drawDwarvenEvent(width, offset, mc);
             } else {
-                drawMithril(width, offset, mc);
+                drawMiningPowders(width, offset, mc);
             }
         } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.PARK) && ParkIslandHandler.isRaining()) {
             if (LocationHandler.getCurrentLocation().equals(Locations.HOWLINGCAVE)) {
@@ -206,15 +207,38 @@ public class OverlayHud extends Gui {
         }
     }
 
-    public void drawMithril(int width, int offset, Minecraft mc) {
-        if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
+    public void drawMiningPowders(int width, int offset, Minecraft mc) {
+        if (MinesHandler.gemstone == 0) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
-            String mithril = DwarvenMineHandler.getMithrilFormatted();
+            String mithril = MinesHandler.getMithrilFormatted();
             drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(mithril)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(mithril))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(mithril) + 14, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(mithril))) + 4, offset + (bossBarVisible ? 38 : 21), 91, 0, 8, 8);
             drawString(font, mithril, (width / 2) - 19 - (font.getStringWidth(mithril)), offset + (bossBarVisible ? 38 : 21), 0x00C896);
+        }else {
+            LocationCategory locationCategory = LocationHandler.getCurrentLocation().getCategory();
+            String mithril = locationCategory == LocationCategory.DWARVENMINES ? MinesHandler.getMithrilFormatted() : MinesHandler.getMithrilShortFormatted();
+            String gemstone = locationCategory == LocationCategory.CRYSTALHOLLOWS ? MinesHandler.getGemstoneFormatted() : MinesHandler.getGemstoneShortFormatted();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            mc.renderEngine.bindTexture(GuiTextures.overlay);
+
+            int edge = (width / 2) - 33;
+
+            int barWidth = font.getStringWidth(mithril) + 12 + font.getStringWidth(gemstone);
+
+            int firstText = locationCategory == LocationCategory.DWARVENMINES ? font.getStringWidth(mithril) : font.getStringWidth(gemstone);
+
+            //Bar
+            drawTexturedModalRect(edge - barWidth, offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
+            drawTexturedModalRect(edge - barWidth + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, barWidth + 14, 14);
+
+            //Icons
+            drawTexturedModalRect(edge - barWidth + 4, offset + (bossBarVisible ? 38 : 21), locationCategory == LocationCategory.DWARVENMINES ? 91 : 131, 0, 8, 8);
+            drawTexturedModalRect(edge - barWidth + 16 + firstText, offset + (bossBarVisible ? 38 : 21), locationCategory == LocationCategory.DWARVENMINES ? 131 : 91, 0, 8, 8);
+
+            drawString(font, locationCategory == LocationCategory.DWARVENMINES ? mithril : gemstone, edge - barWidth + 14, offset + (bossBarVisible ? 38 : 21), locationCategory == LocationCategory.DWARVENMINES ? 0x00C896 : 0xFF55FF);
+            drawString(font, locationCategory == LocationCategory.DWARVENMINES ? gemstone : mithril, edge - barWidth + 26 + firstText, offset + (bossBarVisible ? 38 : 21), locationCategory == LocationCategory.DWARVENMINES ? 0xFF55FF : 0x00C896);
         }
     }
 
@@ -234,17 +258,17 @@ public class OverlayHud extends Gui {
         if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.renderEngine.bindTexture(GuiTextures.overlay);
-            if (DwarvenMineHandler.eventMax > 0) {
-                String duration = DwarvenMineHandler.eventProgress + "/" + DwarvenMineHandler.eventMax;
+            if (MinesHandler.eventMax > 0 || !MinesHandler.currentEvent.needsMax) {
+                String duration = MinesHandler.currentEvent.needsMax ? MinesHandler.eventProgress + "/" + MinesHandler.eventMax : String.valueOf(MinesHandler.eventProgress);
                 drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
                 drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(duration) + 14, 14);
-                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 4, offset + (bossBarVisible ? 38 : 21), DwarvenMineHandler.currentEvent.x, 0, 8, 8);
+                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 4, offset + (bossBarVisible ? 38 : 21), MinesHandler.currentEvent.x, 0, 8, 8);
                 drawString(font, duration, (width / 2) - 19 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
             } else {
-                String text = DwarvenMineHandler.currentEvent.displayName;
+                String text = MinesHandler.currentEvent.displayName;
                 drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(text)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
                 drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(text))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(text) + 14, 14);
-                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(text))) + 4, offset + (bossBarVisible ? 38 : 21), DwarvenMineHandler.currentEvent.x, 0, 8, 8);
+                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(text))) + 4, offset + (bossBarVisible ? 38 : 21), MinesHandler.currentEvent.x, 0, 8, 8);
                 drawString(font, text, (width / 2) - 19 - (font.getStringWidth(text)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
             }
         }

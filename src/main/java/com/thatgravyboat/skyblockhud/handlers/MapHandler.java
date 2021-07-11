@@ -1,7 +1,5 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
-
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.config.KeyBindings;
@@ -10,10 +8,6 @@ import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.handlers.mapicons.DwarvenIcons;
 import com.thatgravyboat.skyblockhud.handlers.mapicons.HubIcons;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import javax.vecmath.Vector2f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -25,6 +19,13 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
+
+import javax.vecmath.Vector2f;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
 
 public class MapHandler {
 
@@ -69,7 +70,7 @@ public class MapHandler {
         NETHER(0.5f, 257, 371, 436, 732, 433, 736, new ResourceLocation("skyblockhud", "maps/fort.png"), Collections.emptyList()),
         BARN(1.5f, 135, 130, -82, 320, -81, 318, new ResourceLocation("skyblockhud", "maps/barn.png"), Collections.emptyList()),
         DWARVEN(0.5f, 409, 461, 206, 160, 202, 166, new ResourceLocation("skyblockhud", "maps/dwarven.png"), DwarvenIcons.dwarvenIcons),
-        PARK(1.0f, 211, 230, 480, 133, 478, 134, new ResourceLocation("skyblockhud", "maps/park.png"), Collections.emptyList());
+        PARK(1f, 211, 230, 480, 133, 478, 134, new ResourceLocation("skyblockhud", "maps/park.png"), Collections.emptyList());
 
         public float scaleFactor;
         public int width;

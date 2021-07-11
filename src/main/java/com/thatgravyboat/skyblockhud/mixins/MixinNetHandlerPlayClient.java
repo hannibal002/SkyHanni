@@ -2,6 +2,7 @@ package com.thatgravyboat.skyblockhud.mixins;
 
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.server.S3EPacketTeams;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,4 +50,10 @@ public class MixinNetHandlerPlayClient {
         //This stops Hypixel from being stupid and spamming our logs because they dont have different ids for things.
         if (scoreboard.getTeam(packetIn.getName()) != null && packetIn.getAction() == 0) ci.cancel();
     }
+
+    @Inject(method = "handleTeams", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/network/play/server/S3EPacketTeams;getAction()I", ordinal = 6, shift = At.Shift.BEFORE), cancellable = true)
+    public void handleTeamRemove(S3EPacketTeams packetIn, CallbackInfo ci, Scoreboard scoreboard, ScorePlayerTeam scoreplayerteam){
+        if (scoreplayerteam == null) ci.cancel();
+    }
+
 }

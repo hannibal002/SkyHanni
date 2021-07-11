@@ -3,11 +3,12 @@ package com.thatgravyboat.skyblockhud.handlers;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class SlayerHandler {
 
@@ -19,7 +20,7 @@ public class SlayerHandler {
         ZOMBIE(34, "Revenant Horror"),
         WOLF(42, "Sven Packmaster"),
         SPIDER(50, "Tarantula Broodfather"),
-        VOIDGLOOMSERAPH(50, "Voidgloom Seraph"),
+        VOIDGLOOMSERAPH(58, "Voidgloom Seraph"),
         NONE(0, "");
 
         private final String displayName;
