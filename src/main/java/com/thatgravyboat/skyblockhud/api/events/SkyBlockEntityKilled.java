@@ -12,5 +12,4 @@ public class SkyBlockEntityKilled extends Event {
         this.id = id;
         this.entity = entity;
     }
-
 }

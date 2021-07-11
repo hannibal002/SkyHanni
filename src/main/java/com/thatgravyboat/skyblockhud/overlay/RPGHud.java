@@ -6,15 +6,14 @@ import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.handlers.HeldItemHandler;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 public class RPGHud extends Gui {
 
@@ -74,13 +73,13 @@ public class RPGHud extends Gui {
 
             float manaWidth = Math.min(57 * ((float) mana / (float) maxMana), 57);
             int manaX = rightAligned ? x + 16 : 47 + x;
-            if (HeldItemHandler.hasManaCost(mc.thePlayer.getHeldItem())){
+            if (HeldItemHandler.hasManaCost(mc.thePlayer.getHeldItem())) {
                 int manaCost = HeldItemHandler.getManaCost(mc.thePlayer.getHeldItem());
                 drawTexturedModalRect(manaX, 17 + y, rightAligned ? 199 : 0, manaCost > mana ? 96 : 64, (int) manaWidth, 4);
                 if (manaCost <= mana) {
-                    drawTexturedModalRect(manaX, 17 + y, rightAligned ? 199 : 0, 92, Utils.lerp((float) manaCost / (float) maxMana,0, 57), 4);
+                    drawTexturedModalRect(manaX, 17 + y, rightAligned ? 199 : 0, 92, Utils.lerp((float) manaCost / (float) maxMana, 0, 57), 4);
                 }
-            }else {
+            } else {
                 drawTexturedModalRect(manaX, 17 + y, rightAligned ? 199 : 0, 64, (int) manaWidth, 4);
             }
 

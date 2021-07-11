@@ -52,8 +52,7 @@ public class MixinNetHandlerPlayClient {
     }
 
     @Inject(method = "handleTeams", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/network/play/server/S3EPacketTeams;getAction()I", ordinal = 6, shift = At.Shift.BEFORE), cancellable = true)
-    public void handleTeamRemove(S3EPacketTeams packetIn, CallbackInfo ci, Scoreboard scoreboard, ScorePlayerTeam scoreplayerteam){
+    public void handleTeamRemove(S3EPacketTeams packetIn, CallbackInfo ci, Scoreboard scoreboard, ScorePlayerTeam scoreplayerteam) {
         if (scoreplayerteam == null) ci.cancel();
     }
-
 }

@@ -3,6 +3,9 @@ package com.thatgravyboat.skyblockhud.api;
 import com.thatgravyboat.skyblockhud.DevModeConstants;
 import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;
 import com.thatgravyboat.skyblockhud.api.sbentities.EntityTypeRegistry;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
@@ -10,10 +13,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public class KillTracking {
 

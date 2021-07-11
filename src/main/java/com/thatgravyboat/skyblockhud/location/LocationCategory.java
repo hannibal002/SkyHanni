@@ -1,8 +1,8 @@
 package com.thatgravyboat.skyblockhud.location;
 
-import com.thatgravyboat.skyblockhud.handlers.MapHandler;
-
 import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
+
+import com.thatgravyboat.skyblockhud.handlers.MapHandler;
 
 public enum LocationCategory {
     ERROR("error", 34),
@@ -50,5 +50,4 @@ public enum LocationCategory {
     public boolean isMiningCategory() {
         return this == LocationCategory.DWARVENMINES || this == LocationCategory.CRYSTALHOLLOWS;
     }
-
 }

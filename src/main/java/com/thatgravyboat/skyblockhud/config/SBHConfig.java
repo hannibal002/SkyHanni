@@ -50,9 +50,9 @@ public class SBHConfig extends Config {
             case "map":
                 editOverlay(activeConfigCategory, 72, 72, map.miniMapPosition);
                 return;
-//            case "tracker":
-//                editOverlay(activeConfigCategory, 120, 70, trackers.trackerPosition);
-//                return;
+            //            case "tracker":
+            //                editOverlay(activeConfigCategory, 120, 70, trackers.trackerPosition);
+            //                return;
         }
     }
 
@@ -84,10 +84,10 @@ public class SBHConfig extends Config {
     @Category(name = "Mining Hud", desc = "All Options for the Mining Hud.")
     public MiningHud miningHud = new MiningHud();
 
-//TODO ENABLED WHEN TRACKER GETS ADDED BACK
-//    @Expose
-//    @Category(name = "Tracker", desc = "All Options for the Trackers.")
-//    public Trackers trackers = new Trackers();
+    //TODO ENABLED WHEN TRACKER GETS ADDED BACK
+    //    @Expose
+    //    @Category(name = "Tracker", desc = "All Options for the Trackers.")
+    //    public Trackers trackers = new Trackers();
 
     public static class Misc {
 
@@ -320,7 +320,6 @@ public class SBHConfig extends Config {
         @ConfigOption(name = "Show Heat Bar", desc = "Allows you to show or hide the Heat Bar.")
         @ConfigEditorBoolean
         public boolean showHeatBar = true;
-
     }
 
     public static class Trackers {

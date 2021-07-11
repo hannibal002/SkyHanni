@@ -2,9 +2,9 @@ package com.thatgravyboat.skyblockhud.handlers;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
-import com.thatgravyboat.skyblockhud.location.MinesHandler;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
+import com.thatgravyboat.skyblockhud.location.MinesHandler;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;

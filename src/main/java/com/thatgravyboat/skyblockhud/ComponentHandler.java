@@ -5,6 +5,9 @@ import com.google.common.collect.Ordering;
 import com.thatgravyboat.skyblockhud.dungeons.DungeonHandler;
 import com.thatgravyboat.skyblockhud.location.*;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -16,10 +19,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class ComponentHandler {
 

@@ -20,6 +20,11 @@ import com.thatgravyboat.skyblockhud.overlay.OverlayHud;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
 import com.thatgravyboat.skyblockhud.playerstats.ActionBarParsing;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -36,12 +41,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
-
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 @Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
 public class SkyblockHud {

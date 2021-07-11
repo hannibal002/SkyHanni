@@ -2,11 +2,10 @@ package com.thatgravyboat.skyblockhud.api.sbentities;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityEnderman;
-
 import java.util.List;
 import java.util.Map;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityEnderman;
 
 public class EntityTypeRegistry {
 

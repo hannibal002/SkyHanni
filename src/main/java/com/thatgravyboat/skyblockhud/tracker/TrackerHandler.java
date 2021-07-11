@@ -6,6 +6,7 @@ import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -14,8 +15,6 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.util.*;
 
 public class TrackerHandler {
 
@@ -90,7 +89,7 @@ public class TrackerHandler {
 
             Map<String, ItemStack> tracker = tracked.dropTrackers.get(tracked.getDropId(SeasonDateHandler.getCurrentEvent()));
             if (tracker != null) {
-                Position pos = null;// SkyblockHud.config.trackers.trackerPosition;
+                Position pos = null; // SkyblockHud.config.trackers.trackerPosition;
                 int startPos = pos.getAbsX(event.resolution, (tracker.size() >= 6 ? 120 : tracker.size() * 20));
                 int y = pos.getAbsY(event.resolution, (int) (10 + Math.ceil(tracker.size() / 5d) * 20));
 

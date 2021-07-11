@@ -10,6 +10,9 @@ import com.thatgravyboat.skyblockhud.handlers.TimeHandler;
 import com.thatgravyboat.skyblockhud.location.*;
 import com.thatgravyboat.skyblockhud.seasons.Season;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -19,10 +22,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
 public class OverlayHud extends Gui {
 
@@ -216,7 +215,7 @@ public class OverlayHud extends Gui {
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(mithril))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(mithril) + 14, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(mithril))) + 4, offset + (bossBarVisible ? 38 : 21), 91, 0, 8, 8);
             drawString(font, mithril, (width / 2) - 19 - (font.getStringWidth(mithril)), offset + (bossBarVisible ? 38 : 21), 0x00C896);
-        }else {
+        } else {
             LocationCategory locationCategory = LocationHandler.getCurrentLocation().getCategory();
             String mithril = locationCategory == LocationCategory.DWARVENMINES ? MinesHandler.getMithrilFormatted() : MinesHandler.getMithrilShortFormatted();
             String gemstone = locationCategory == LocationCategory.CRYSTALHOLLOWS ? MinesHandler.getGemstoneFormatted() : MinesHandler.getGemstoneShortFormatted();

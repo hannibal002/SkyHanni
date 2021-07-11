@@ -1,5 +1,9 @@
 package com.thatgravyboat.skyblockhud;
 
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -17,11 +21,6 @@ import net.minecraftforge.fml.common.Loader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
-
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 
 public class Utils {
 
@@ -62,14 +61,14 @@ public class Utils {
         return (int) (g + f * (h - g));
     }
 
-    public static NBTTagCompound getSkyBlockTag(ItemStack stack){
+    public static NBTTagCompound getSkyBlockTag(ItemStack stack) {
         if (stack == null) return null;
         if (!stack.hasTagCompound()) return null;
         if (!stack.getTagCompound().hasKey("ExtraAttributes")) return null;
         return stack.getTagCompound().getCompoundTag("ExtraAttributes");
     }
 
-    public static boolean isDrill(ItemStack stack){
+    public static boolean isDrill(ItemStack stack) {
         NBTTagCompound tag = getSkyBlockTag(stack);
         return tag != null && tag.hasKey("drill_fuel");
     }

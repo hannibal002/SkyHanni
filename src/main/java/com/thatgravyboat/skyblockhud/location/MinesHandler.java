@@ -3,13 +3,12 @@ package com.thatgravyboat.skyblockhud.location;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Locale;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class MinesHandler {
 
@@ -81,7 +80,7 @@ public class MinesHandler {
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
-        if (event.formattedLine.toLowerCase().contains("heat")){
+        if (event.formattedLine.toLowerCase().contains("heat")) {
             try {
                 MiningHud.setHeat(Integer.parseInt(event.formattedLine.toLowerCase().replace("heat:", "").trim()));
             } catch (Exception ignored) {}
@@ -106,7 +105,7 @@ public class MinesHandler {
         if (event.formattedLine.equalsIgnoreCase("wind compass")) {
             MinesHandler.currentEvent = Event.WIND;
         }
-        if (event.formattedLine.equalsIgnoreCase("nearby players")){
+        if (event.formattedLine.equalsIgnoreCase("nearby players")) {
             MinesHandler.currentEvent = Event.TOGETHER;
             try {
                 MinesHandler.eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("nearby players", ""));
@@ -150,7 +149,7 @@ public class MinesHandler {
             MinesHandler.eventProgress = 0;
             MinesHandler.eventMax = 0;
         }
-        if (!arrayString.toLowerCase().contains("heat:")){
+        if (!arrayString.toLowerCase().contains("heat:")) {
             MiningHud.setHeat(0);
         }
     }
