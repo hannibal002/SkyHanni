@@ -2,10 +2,11 @@ package com.thatgravyboat.skyblockhud.handlers.mapicons;
 
 import com.thatgravyboat.skyblockhud.ComponentBuilder;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
+import net.minecraft.util.ResourceLocation;
+
+import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.List;
-import javax.vecmath.Vector2f;
-import net.minecraft.util.ResourceLocation;
 
 public class DwarvenIcons {
 
@@ -20,7 +21,7 @@ public class DwarvenIcons {
     }
 
     private static void setupNpcIcons() {
-        dwarvenIcons.add(new MapHandler.MapIcon(new Vector2f(129, 187), new ResourceLocation("skyblockhud", "maps/icons/puzzle.png"), new ComponentBuilder().nl("Puzzler", new char[] { 'a', 'l' }).nl("Description", 'l').nl("The Puzzler gives you a small puzzle each day to solve and").nl("gives you 1000 mithril powder.").build(), MapHandler.MapIconTypes.NPC));
+        dwarvenIcons.add(new MapHandler.MapIcon(new Vector2f(181, 135), new ResourceLocation("skyblockhud", "maps/icons/puzzle.png"), new ComponentBuilder().nl("Puzzler", new char[] { 'a', 'l' }).nl("Description", 'l').nl("The Puzzler gives you a small puzzle each day to solve and").nl("gives you 1000 mithril powder.").build(), MapHandler.MapIconTypes.NPC));
     }
 
     private static void setupMiscIcons() {}
