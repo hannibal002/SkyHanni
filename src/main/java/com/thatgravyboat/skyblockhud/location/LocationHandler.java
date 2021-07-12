@@ -1,8 +1,11 @@
 package com.thatgravyboat.skyblockhud.location;
 
+import com.thatgravyboat.skyblockhud.api.events.LocationChangeEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
-import java.util.Locale;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.Locale;
 
 public class LocationHandler {
 
@@ -20,10 +23,6 @@ public class LocationHandler {
         }
     }
 
-    public static void setCurrentLocation(String location) {
-        currentLocation = Locations.get(location);
-    }
-
     public static void setCurrentLocation(Locations location) {
         currentLocation = location;
     }
@@ -35,7 +34,12 @@ public class LocationHandler {
     public static void handleLocation(String locationLine) {
         String location = locationLine.replace(" ", "").toUpperCase(Locale.ENGLISH).trim();
         if (location.startsWith("THECATACOMBS")) {
+            MinecraftForge.EVENT_BUS.post(new LocationChangeEvent(currentLocation, Locations.CATACOMBS));
             currentLocation = Locations.CATACOMBS;
-        } else setCurrentLocation(location.replaceAll("[^A-Za-z0-9]", ""));
+        } else {
+            Locations locations = Locations.get(location.replaceAll("[^A-Za-z0-9]", ""));
+            MinecraftForge.EVENT_BUS.post(new LocationChangeEvent(currentLocation, locations));
+            currentLocation = locations;
+        }
     }
 }

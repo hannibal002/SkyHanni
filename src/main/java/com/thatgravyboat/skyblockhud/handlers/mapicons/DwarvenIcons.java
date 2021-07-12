@@ -2,10 +2,11 @@ package com.thatgravyboat.skyblockhud.handlers.mapicons;
 
 import com.thatgravyboat.skyblockhud.ComponentBuilder;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
+import net.minecraft.util.ResourceLocation;
+
+import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.List;
-import javax.vecmath.Vector2f;
-import net.minecraft.util.ResourceLocation;
 
 public class DwarvenIcons {
 

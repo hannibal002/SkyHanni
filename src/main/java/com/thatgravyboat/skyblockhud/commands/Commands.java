@@ -6,17 +6,19 @@ import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.api.LeaderboardGetter;
 import com.thatgravyboat.skyblockhud.config.SBHConfigEditor;
 import com.thatgravyboat.skyblockhud.core.GuiScreenElementWrapper;
+import com.thatgravyboat.skyblockhud.handlers.CrystalWaypoints;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.playerstats.ActionBarParsing;
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import org.apache.commons.lang3.StringUtils;
+
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 
 public class Commands {
 
@@ -84,6 +86,7 @@ public class Commands {
         ClientCommandHandler.instance.registerCommand(settingsCommand3);
         ClientCommandHandler.instance.registerCommand(mapCommand);
         ClientCommandHandler.instance.registerCommand(devCommand);
+        ClientCommandHandler.instance.registerCommand(new CrystalWaypoints.WaypointCommand());
     }
 
     private static void sendSBHMessage(ICommandSender sender, String message) {
