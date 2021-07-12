@@ -1,5 +1,9 @@
 package com.thatgravyboat.skyblockhud;
 
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -20,11 +24,6 @@ import net.minecraftforge.fml.common.Loader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
-
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 
 public class Utils {
 
@@ -292,12 +291,12 @@ public class Utils {
         double y = loc.getY() - viewerY - viewer.getEyeHeight();
         double z = loc.getZ() - viewerZ;
 
-        double distSq = x*x + y*y + z*z;
+        double distSq = x * x + y * y + z * z;
         double dist = Math.sqrt(distSq);
-        if(distSq > 144) {
-            x *= 12/dist;
-            y *= 12/dist;
-            z *= 12/dist;
+        if (distSq > 144) {
+            x *= 12 / dist;
+            y *= 12 / dist;
+            z *= 12 / dist;
         }
         GlStateManager.translate(x, y, z);
         GlStateManager.translate(0, viewer.getEyeHeight(), 0);
@@ -310,7 +309,7 @@ public class Utils {
         GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 
-        drawNametag(EnumChatFormatting.YELLOW.toString()+Math.round(dist)+"m");
+        drawNametag(EnumChatFormatting.YELLOW.toString() + Math.round(dist) + "m");
 
         GlStateManager.popMatrix();
 

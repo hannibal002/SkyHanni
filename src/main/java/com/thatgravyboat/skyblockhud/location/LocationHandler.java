@@ -2,10 +2,9 @@ package com.thatgravyboat.skyblockhud.location;
 
 import com.thatgravyboat.skyblockhud.api.events.LocationChangeEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
+import java.util.Locale;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.util.Locale;
 
 public class LocationHandler {
 

@@ -8,9 +8,8 @@ public class LocationChangeEvent extends Event {
     public Locations oldLocation;
     public Locations newLocation;
 
-    public LocationChangeEvent(Locations oldLocation, Locations newLocation){
+    public LocationChangeEvent(Locations oldLocation, Locations newLocation) {
         this.oldLocation = oldLocation;
         this.newLocation = newLocation;
     }
 }
-
