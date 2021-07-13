@@ -1,8 +1,9 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
-import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
-
 import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.overlay.MiningHud;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -11,6 +12,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
 
 @Mixin(GuiIngameForge.class)
 public class MixinGuiIngameForge {
@@ -60,6 +63,12 @@ public class MixinGuiIngameForge {
             ci.cancel();
             if (pre(EXPERIENCE)) return;
             post(EXPERIENCE);
+        } else if (!SkyblockHud.config.renderer.hideXpBar && (SkyblockHud.config.mining.showDrillBar || SkyblockHud.config.mining.showHeatBar) && SkyblockHud.hasSkyblockScoreboard()){
+            if (MiningHud.getHeat() > 0 || Utils.isDrill(Minecraft.getMinecraft().thePlayer.getHeldItem())){
+                ci.cancel();
+                if (pre(EXPERIENCE)) return;
+                post(EXPERIENCE);
+            }
         }
     }
 

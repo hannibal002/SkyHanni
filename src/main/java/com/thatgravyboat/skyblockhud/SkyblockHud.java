@@ -10,10 +10,7 @@ import com.thatgravyboat.skyblockhud.config.KeyBindings;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import com.thatgravyboat.skyblockhud.dungeons.DungeonHandler;
 import com.thatgravyboat.skyblockhud.handlers.*;
-import com.thatgravyboat.skyblockhud.location.FarmingIslandHandler;
-import com.thatgravyboat.skyblockhud.location.IslandHandler;
-import com.thatgravyboat.skyblockhud.location.LocationHandler;
-import com.thatgravyboat.skyblockhud.location.MinesHandler;
+import com.thatgravyboat.skyblockhud.location.*;
 import com.thatgravyboat.skyblockhud.overlay.DungeonOverlay;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
 import com.thatgravyboat.skyblockhud.overlay.OverlayHud;
@@ -83,6 +80,7 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new ComponentHandler());
         MinecraftForge.EVENT_BUS.register(new ActionBarParsing());
         MinecraftForge.EVENT_BUS.register(new CrystalWaypoints());
+        MinecraftForge.EVENT_BUS.register(new FarmHouseHandler());
         Commands.init();
 
         configFile = new File(event.getModConfigurationDirectory(), "sbh-config.json");

@@ -81,8 +81,8 @@ public class SBHConfig extends Config {
     public Map map = new Map();
 
     @Expose
-    @Category(name = "Mining Hud", desc = "All Options for the Mining Hud.")
-    public MiningHud miningHud = new MiningHud();
+    @Category(name = "Mining", desc = "All Options for the Mining Stuff.")
+    public Mining mining = new Mining();
 
     //TODO ENABLED WHEN TRACKER GETS ADDED BACK
     //    @Expose
@@ -126,6 +126,11 @@ public class SBHConfig extends Config {
         @ConfigOption(name = "Show RPG Hud", desc = "Allows you to show or hide the RPG Hud.")
         @ConfigEditorBoolean
         public boolean showRpgHud = true;
+
+        @Expose
+        @ConfigOption(name = "Flip Hud", desc = "Flips the hud when half way across the screen.")
+        @ConfigEditorBoolean
+        public boolean flipHud = true;
 
         @Expose
         @ConfigOption(name = "RPG Hud Position", desc = "Allows you to change the position of the RPG Hud.")
@@ -309,7 +314,7 @@ public class SBHConfig extends Config {
         public boolean showQuestIcons = false;
     }
 
-    public static class MiningHud {
+    public static class Mining {
 
         @Expose
         @ConfigOption(name = "Show Drill Bar", desc = "Allows you to show or hide the Drill Bar.")
@@ -320,6 +325,11 @@ public class SBHConfig extends Config {
         @ConfigOption(name = "Show Heat Bar", desc = "Allows you to show or hide the Heat Bar.")
         @ConfigEditorBoolean
         public boolean showHeatBar = true;
+
+        @Expose
+        @ConfigOption(name = "Auto Waypoint", desc = "Turns on auto waypoints for the main areas of crystal hollows.")
+        @ConfigEditorBoolean
+        public boolean autoWaypoint = true;
     }
 
     public static class Trackers {

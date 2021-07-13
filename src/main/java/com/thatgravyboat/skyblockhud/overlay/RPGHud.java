@@ -67,7 +67,7 @@ public class RPGHud extends Gui {
             int x = position.getAbsX(event.resolution, 120);
             int y = position.getAbsY(event.resolution, 47);
 
-            boolean rightAligned = position.rightAligned(event.resolution, 120);
+            boolean rightAligned = position.rightAligned(event.resolution, 120) && SkyblockHud.config.rpg.flipHud;
 
             drawTexturedModalRect(x, y, rightAligned ? 131 : 5, 6, 120, 47);
 

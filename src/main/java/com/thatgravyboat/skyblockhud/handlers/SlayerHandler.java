@@ -11,8 +11,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class SlayerHandler {
 
-    //Optional Characters are required because Hypixel dumb and cuts off text
-    private static final Pattern COMBAT_XP_REGEX = Pattern.compile("\\(([\\d,]+)/([\\dkm]+)\\) comb?a?t? x?p?");
     private static final Pattern KILLS_REGEX = Pattern.compile("(\\d+)/(\\d+) kills?");
 
     public enum slayerTypes {
@@ -91,7 +89,6 @@ public class SlayerHandler {
         if (isDoingSlayer) {
             String line = event.formattedLine.toLowerCase();
             Matcher killMatcher = KILLS_REGEX.matcher(line);
-            Matcher xpMatcher = COMBAT_XP_REGEX.matcher(line);
 
             if (killMatcher.find()) {
                 SlayerHandler.bossSlain = false;
@@ -101,15 +98,6 @@ public class SlayerHandler {
                 } catch (Exception ignored) {}
                 try {
                     maxKills = Integer.parseInt(killMatcher.group(2));
-                } catch (Exception ignored) {}
-            } else if (xpMatcher.find()) {
-                SlayerHandler.bossSlain = false;
-                SlayerHandler.isKillingBoss = false;
-                try {
-                    progress = Integer.parseInt(xpMatcher.group(1));
-                } catch (Exception ignored) {}
-                try {
-                    maxKills = Integer.parseInt(xpMatcher.group(2).replace("k", "")) * (xpMatcher.group(2).contains("k") ? 1000 : xpMatcher.group(2).contains("m") ? 1000000 : 1);
                 } catch (Exception ignored) {}
             } else if (line.contains("slay the boss")) {
                 SlayerHandler.bossSlain = false;
@@ -121,10 +109,6 @@ public class SlayerHandler {
                 SlayerHandler.maxKills = 0;
                 SlayerHandler.progress = 0;
                 SlayerHandler.bossSlain = true;
-            }
-            if (maxKills == 0 && progress == 0) {
-                SlayerHandler.maxKills = 0;
-                SlayerHandler.progress = 0;
             }
         }
     }

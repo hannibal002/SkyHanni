@@ -1,7 +1,5 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
-
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.config.KeyBindings;
@@ -25,6 +23,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
+
+import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
 
 public class MapHandler {
 
@@ -126,10 +126,10 @@ public class MapHandler {
                 mc.renderEngine.bindTexture(mapOverlay);
                 Gui.drawModalRectWithCustomSizedTexture(pos.getAbsX(event.resolution, 72), pos.getAbsY(event.resolution, 72), 0, 0, 72, 72, 256, 256);
                 String keyCode = GameSettings.getKeyDisplayString(KeyBindings.map.getKeyCode());
-                Utils.drawStringCenteredScaled(keyCode, mc.fontRendererObj, pos.getAbsX(event.resolution, 64) + 58, pos.getAbsY(event.resolution, 72) + 66, false, 6, 0xFFFFFF);
+                Utils.drawStringCenteredScaled(keyCode, mc.fontRendererObj, pos.getAbsX(event.resolution, 64) + (pos.rightAligned(event.resolution, 72) ? 50 : 58), pos.getAbsY(event.resolution, 72) + 66, false, 6, 0xFFFFFF);
                 BlockPos playerPos = mc.thePlayer.getPosition();
                 String position = String.format("%d/%d/%d", playerPos.getX(), playerPos.getY(), playerPos.getZ());
-                Utils.drawStringCenteredScaled(position, mc.fontRendererObj, pos.getAbsX(event.resolution, 64) + 29, pos.getAbsY(event.resolution, 72) + 66, false, 36, 0xFFFFFF);
+                Utils.drawStringCenteredScaled(position, mc.fontRendererObj, pos.getAbsX(event.resolution, 64) + (pos.rightAligned(event.resolution, 72) ? 21 : 29), pos.getAbsY(event.resolution, 72) + 66, false, 36, 0xFFFFFF);
                 GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
             }
         }

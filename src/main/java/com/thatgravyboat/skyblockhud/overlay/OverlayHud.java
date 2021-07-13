@@ -60,6 +60,9 @@ public class OverlayHud extends Gui {
         // LOCATION
         drawLocation(width, offset, mc);
 
+        //FARMHOUSE
+        drawFarmHouseMedals(width, offset, mc);
+
         //EXTRA SLOT
         if (LocationHandler.getCurrentLocation().equals(Locations.YOURISLAND)) {
             if (IslandHandler.flightTime > 0) drawFlightDuration(width, offset, mc);
@@ -273,6 +276,24 @@ public class OverlayHud extends Gui {
         }
     }
 
+    public void drawFarmHouseMedals(int width, int offset, Minecraft mc) {
+        if (LocationHandler.getCurrentLocation().equals(Locations.FARMHOUSE)) {
+            int bronze = font.getStringWidth(FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.BRONZE));
+            int silver = font.getStringWidth(FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.SILVER));
+            int gold = font.getStringWidth(FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.GOLD));
+
+            int end = drawLeftBottomBar(width, offset, 40 + bronze + silver + gold, mc);
+            drawTexturedModalRect(end + 2, offset + (bossBarVisible ? 38 : 21), 139, 0, 8, 8);
+            drawTexturedModalRect(end + 14 + gold, offset + (bossBarVisible ? 38 : 21), 147, 0, 8, 8);
+            drawTexturedModalRect(end + 26 + gold + silver, offset + (bossBarVisible ? 38 : 21), 155, 0, 8, 8);
+
+            drawString(font, FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.GOLD), end + 12, offset + (bossBarVisible ? 38 : 21), 0xffffff);
+            drawString(font, FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.SILVER), end + gold + 24, offset + (bossBarVisible ? 38 : 21), 0xffffff);
+            drawString(font, FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.BRONZE), end + gold + silver + 36, offset + (bossBarVisible ? 38 : 21), 0xffffff);
+
+        }
+    }
+
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
         if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard())) {
@@ -290,5 +311,16 @@ public class OverlayHud extends Gui {
         GlStateManager.scale(factor, factor, 1);
         drawCenteredString(font, text, (int) (x / factor), (int) (y / factor), color);
         GlStateManager.scale(1 / factor, 1 / factor, 1);
+    }
+
+
+    public int drawLeftBottomBar(int width, int offset, int barWidth, Minecraft mc) {
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        int edge = (width / 2) - 17;
+
+        drawTexturedModalRect(edge - barWidth, offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
+        drawTexturedModalRect(edge - barWidth + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, barWidth - 2, 14);
+        return edge - barWidth + 2;
     }
 }
