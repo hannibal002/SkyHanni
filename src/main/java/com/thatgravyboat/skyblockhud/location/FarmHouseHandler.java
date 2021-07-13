@@ -17,12 +17,12 @@ public class FarmHouseHandler {
 
     @SubscribeEvent
     public void onSidebarLineUpdate(SidebarLineUpdateEvent event) {
-        if (event.formattedLine.contains("medals:")){
+        if (event.formattedLine.contains("medals:")) {
             for (Medal value : Medal.values()) {
-                if (event.formattedLine.contains(value.name())){
+                if (event.formattedLine.contains(value.name())) {
                     try {
                         medals[value.ordinal()] = Integer.parseInt(event.formattedLine.replace("medals:", "").replace(value.name(), "").trim());
-                    }catch (Exception ignored){}
+                    } catch (Exception ignored) {}
                     break;
                 }
             }
@@ -30,13 +30,12 @@ public class FarmHouseHandler {
     }
 
     @SubscribeEvent
-    public void onProfileSwitch(ProfileSwitchedEvent event){
+    public void onProfileSwitch(ProfileSwitchedEvent event) {
         Arrays.fill(medals, 0);
     }
 
-    public static String getFormattedMedals(Medal medal){
+    public static String getFormattedMedals(Medal medal) {
         if (medal == null) return "0";
         return String.valueOf(medals[medal.ordinal()]);
     }
-
 }

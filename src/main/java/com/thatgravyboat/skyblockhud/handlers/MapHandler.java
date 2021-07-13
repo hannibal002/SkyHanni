@@ -1,5 +1,7 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
+import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
+
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.config.KeyBindings;
@@ -23,8 +25,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
-
-import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
 
 public class MapHandler {
 

@@ -290,7 +290,6 @@ public class OverlayHud extends Gui {
             drawString(font, FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.GOLD), end + 12, offset + (bossBarVisible ? 38 : 21), 0xffffff);
             drawString(font, FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.SILVER), end + gold + 24, offset + (bossBarVisible ? 38 : 21), 0xffffff);
             drawString(font, FarmHouseHandler.getFormattedMedals(FarmHouseHandler.Medal.BRONZE), end + gold + silver + 36, offset + (bossBarVisible ? 38 : 21), 0xffffff);
-
         }
     }
 
@@ -312,7 +311,6 @@ public class OverlayHud extends Gui {
         drawCenteredString(font, text, (int) (x / factor), (int) (y / factor), color);
         GlStateManager.scale(1 / factor, 1 / factor, 1);
     }
-
 
     public int drawLeftBottomBar(int width, int offset, int barWidth, Minecraft mc) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

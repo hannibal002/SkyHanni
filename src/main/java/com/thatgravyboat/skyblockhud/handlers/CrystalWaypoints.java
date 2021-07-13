@@ -43,12 +43,11 @@ public class CrystalWaypoints {
     public void onLocationChange(LocationChangeEvent event) {
         if (!event.newLocation.getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
             waypoints.clear();
+        } else if (!waypoints.containsKey("Crystal Nucleus") && SkyblockHud.config.mining.autoWaypoint) {
+            waypoints.put("Crystal Nucleus", new BlockPos(512.5, 106.5, 512.5));
         }
-        else if (!waypoints.containsKey("Crystal Nucleus") && SkyblockHud.config.mining.autoWaypoint){
-            waypoints.put("Crystal Nucleus", new BlockPos(512.5,106.5,512.5));
-        }
-        if (IMPORTANT_WAYPOINTS.contains(event.newLocation) && SkyblockHud.config.mining.autoWaypoint){
-            if (!waypoints.containsKey(event.newLocation.getDisplayName())){
+        if (IMPORTANT_WAYPOINTS.contains(event.newLocation) && SkyblockHud.config.mining.autoWaypoint) {
+            if (!waypoints.containsKey(event.newLocation.getDisplayName())) {
                 waypoints.put(event.newLocation.getDisplayName(), Minecraft.getMinecraft().thePlayer.getPosition());
             }
         }
@@ -100,7 +99,7 @@ public class CrystalWaypoints {
                                         } else {
                                             sbhMessage(sender, "Waypoint already exists!");
                                         }
-                                    }catch (Exception e){
+                                    } catch (Exception e) {
                                         sbhMessage(sender, "Error!");
                                     }
                                 }
@@ -111,7 +110,7 @@ public class CrystalWaypoints {
                                     sbhMessage(sender, "No waypoint with that name!");
                                     break;
                                 }
-                                StringSelection clipboard = new StringSelection(name + " : ("+pos.getX()+"/"+pos.getY()+"/"+pos.getZ()+")");
+                                StringSelection clipboard = new StringSelection(name + " : (" + pos.getX() + "/" + pos.getY() + "/" + pos.getZ() + ")");
                                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboard, clipboard);
                                 break;
                         }
@@ -126,7 +125,7 @@ public class CrystalWaypoints {
                         if (args.length == 1) {
                             return getListOfStringsMatchingLastWord(args, Lists.newArrayList("add", "clear", "remove", "copy", "addat"));
                         }
-                        if (args.length > 1 && args[0].equalsIgnoreCase("addat")){
+                        if (args.length > 1 && args[0].equalsIgnoreCase("addat")) {
                             return func_175771_a(args, 1, pos);
                         }
                         return null;
@@ -135,7 +134,7 @@ public class CrystalWaypoints {
             );
         }
 
-        private static void sbhMessage(ICommandSender sender, String message){
+        private static void sbhMessage(ICommandSender sender, String message) {
             sender.addChatMessage(new ChatComponentText("[" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "SkyBlockHud" + EnumChatFormatting.RESET + "] : " + EnumChatFormatting.GRAY + message));
         }
     }
