@@ -1,7 +1,9 @@
 {
   "trackers": [
     {
-      "location": ["DRAGONSNEST"],
+      "location": [
+        "DRAGONSNEST"
+      ],
       "drops": [
         {
           "id": "WISE_FRAGMENT",
@@ -88,7 +90,10 @@
       ]
     },
     {
-      "location": ["RUINS", "HOWLINGCAVE"],
+      "location": [
+        "RUINS",
+        "HOWLINGCAVE"
+      ],
       "drops": [
         {
           "id": "WOLF_TOOTH",
@@ -127,7 +132,9 @@
       ]
     },
     {
-      "location": ["SPIDERSDEN"],
+      "location": [
+        "SPIDERSDEN"
+      ],
       "drops": [
         {
           "id": "TOXIC_ARROW_POISON",
@@ -172,7 +179,10 @@
       ]
     },
     {
-      "location": ["GRAVEYARD", "COALMINE"],
+      "location": [
+        "GRAVEYARD",
+        "COALMINE"
+      ],
       "drops": [
         {
           "id": "FOUL_FLESH",
@@ -245,7 +255,9 @@
       ]
     },
     {
-      "location": ["YOURISLAND"],
+      "location": [
+        "YOURISLAND"
+      ],
       "event": "traveling zoo",
       "drops": [
         {

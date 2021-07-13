@@ -1,7 +1,9 @@
 {
   "trackers": [
     {
-      "location": ["DRAGONSNEST"],
+      "location": [
+        "DRAGONSNEST"
+      ],
       "drops": [
         {
           "id": "WISE_FRAGMENT",
@@ -102,7 +104,10 @@
       ]
     },
     {
-      "location": ["RUINS", "HOWLINGCAVE"],
+      "location": [
+        "RUINS",
+        "HOWLINGCAVE"
+      ],
       "drops": [
         {
           "id": "WOLF_TOOTH",
@@ -153,7 +158,9 @@
       ]
     },
     {
-      "location": ["SPIDERSDEN"],
+      "location": [
+        "SPIDERSDEN"
+      ],
       "drops": [
         {
           "id": "TARANTULA_WEB",
@@ -217,7 +224,10 @@
       ]
     },
     {
-      "location": ["GRAVEYARD", "COALMINE"],
+      "location": [
+        "GRAVEYARD",
+        "COALMINE"
+      ],
       "drops": [
         {
           "id": "REVENANT_FLESH",
@@ -315,7 +325,9 @@
       ]
     },
     {
-      "location": ["THEMIST"],
+      "location": [
+        "THEMIST"
+      ],
       "drops": [
         {
           "id": "SORROW",
