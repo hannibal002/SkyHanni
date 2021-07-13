@@ -75,7 +75,7 @@ public class OverlayHud extends Gui {
             if (LocationHandler.getCurrentLocation().equals(Locations.HOWLINGCAVE)) {
                 drawSlayer(width, offset, mc);
             } else drawRainDuration(width, offset, mc);
-        } else if (LocationHandler.getCurrentLocation().equals(Locations.FARMHOUSE)){
+        } else if (LocationHandler.getCurrentLocation().equals(Locations.FARMHOUSE)) {
             drawFarmHouseMedals(width, offset, mc);
         } else if (SlayerHandler.isDoingSlayer) {
             drawSlayer(width, offset, mc);
