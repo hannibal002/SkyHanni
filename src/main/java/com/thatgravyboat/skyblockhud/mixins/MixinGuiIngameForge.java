@@ -1,7 +1,5 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
-import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
-
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
@@ -11,9 +9,12 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
 
 @Mixin(GuiIngameForge.class)
 public class MixinGuiIngameForge {
@@ -25,8 +26,8 @@ public class MixinGuiIngameForge {
     public void onRenderArmor(int width, int height, CallbackInfo ci) {
         if (SkyblockHud.config.renderer.hideArmor && SkyblockHud.hasSkyblockScoreboard()) {
             ci.cancel();
-            if (pre(ARMOR)) return;
-            post(ARMOR);
+            if (prePost(ARMOR, eventParent)) return;
+            postPost(ARMOR, eventParent);
         }
     }
 
@@ -34,8 +35,8 @@ public class MixinGuiIngameForge {
     public void onRenderHealth(int width, int height, CallbackInfo ci) {
         if (SkyblockHud.config.renderer.hideHearts && SkyblockHud.hasSkyblockScoreboard()) {
             ci.cancel();
-            if (pre(HEALTH)) return;
-            post(HEALTH);
+            if (prePost(HEALTH, eventParent)) return;
+            postPost(HEALTH, eventParent);
         }
     }
 
@@ -43,8 +44,8 @@ public class MixinGuiIngameForge {
     public void onRenderAir(int width, int height, CallbackInfo ci) {
         if (SkyblockHud.config.renderer.hideAir && SkyblockHud.hasSkyblockScoreboard()) {
             ci.cancel();
-            if (pre(AIR)) return;
-            post(AIR);
+            if (prePost(AIR, eventParent)) return;
+            postPost(AIR, eventParent);
         }
     }
 
@@ -52,8 +53,8 @@ public class MixinGuiIngameForge {
     public void onRenderHealthMount(int width, int height, CallbackInfo ci) {
         if (SkyblockHud.config.renderer.hideAnimalHearts && SkyblockHud.hasSkyblockScoreboard()) {
             ci.cancel();
-            if (pre(HEALTHMOUNT)) return;
-            post(HEALTHMOUNT);
+            if (prePost(HEALTHMOUNT, eventParent)) return;
+            postPost(HEALTHMOUNT, eventParent);
         }
     }
 
@@ -61,13 +62,13 @@ public class MixinGuiIngameForge {
     public void onRenderExperience(int width, int height, CallbackInfo ci) {
         if (SkyblockHud.config.renderer.hideXpBar && SkyblockHud.hasSkyblockScoreboard()) {
             ci.cancel();
-            if (pre(EXPERIENCE)) return;
-            post(EXPERIENCE);
+            if (prePost(EXPERIENCE, eventParent)) return;
+            postPost(EXPERIENCE, eventParent);
         } else if (!SkyblockHud.config.renderer.hideXpBar && (SkyblockHud.config.mining.showDrillBar || SkyblockHud.config.mining.showHeatBar) && SkyblockHud.hasSkyblockScoreboard()) {
             if (MiningHud.getHeat() > 0 || Utils.isDrill(Minecraft.getMinecraft().thePlayer.getHeldItem())) {
                 ci.cancel();
-                if (pre(EXPERIENCE)) return;
-                post(EXPERIENCE);
+                if (prePost(EXPERIENCE, eventParent)) return;
+                postPost(EXPERIENCE, eventParent);
             }
         }
     }
@@ -76,8 +77,8 @@ public class MixinGuiIngameForge {
     public void onRenderJumpBar(int width, int height, CallbackInfo ci) {
         if (SkyblockHud.config.renderer.hideXpBar && SkyblockHud.hasSkyblockScoreboard()) {
             ci.cancel();
-            if (pre(JUMPBAR)) return;
-            post(JUMPBAR);
+            if (prePost(JUMPBAR, eventParent)) return;
+            postPost(JUMPBAR, eventParent);
         }
     }
 
@@ -85,16 +86,18 @@ public class MixinGuiIngameForge {
     public void onRenderFood(int width, int height, CallbackInfo ci) {
         if (SkyblockHud.config.renderer.hideFood && SkyblockHud.hasSkyblockScoreboard()) {
             ci.cancel();
-            if (pre(FOOD)) return;
-            post(FOOD);
+            if (prePost(FOOD, eventParent)) return;
+            postPost(FOOD, eventParent);
         }
     }
 
-    private boolean pre(RenderGameOverlayEvent.ElementType type) {
+    @Unique
+    private static boolean prePost(RenderGameOverlayEvent.ElementType type, RenderGameOverlayEvent eventParent) {
         return MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Pre(eventParent, type));
     }
 
-    private void post(RenderGameOverlayEvent.ElementType type) {
+    @Unique
+    private static void postPost(RenderGameOverlayEvent.ElementType type, RenderGameOverlayEvent eventParent) {
         MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.Post(eventParent, type));
     }
 }
