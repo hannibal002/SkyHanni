@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 public class SkyBlockEntityKilled extends Event {
 
     public String id;
+
     @Nullable
     public Entity entity;
 

@@ -21,7 +21,7 @@ public class TrackerHandler extends Gui {
     public static Set<TrackerObject> trackerObjects = new HashSet<>();
     public static Map<Locations, Map<String, TrackerObject>> trackers = new HashMap<>();
 
-    public static <K,V> Map<K, V> sortTrackers(Map<K, V> map, Comparator<? super Map.Entry<K, V>> comparator) {
+    public static <K, V> Map<K, V> sortTrackers(Map<K, V> map, Comparator<? super Map.Entry<K, V>> comparator) {
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
         list.sort(comparator);
 
@@ -46,7 +46,6 @@ public class TrackerHandler extends Gui {
                 object.increaseCount(amount);
                 trackers.put(LocationHandler.getCurrentLocation(), sortTrackers(trackerMap, (entry1, entry2) -> Integer.compare(entry2.getValue().getCount(), entry1.getValue().getCount())));
             }
-
         }
     }
 
@@ -61,12 +60,12 @@ public class TrackerHandler extends Gui {
     }
 
     @SubscribeEvent
-    public void onSbEntityDeath(SkyBlockEntityKilled event){
+    public void onSbEntityDeath(SkyBlockEntityKilled event) {
         System.out.println(event.id);
         if (SkyblockHud.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
             Map<String, TrackerObject> trackerMap = trackers.get(LocationHandler.getCurrentLocation());
-            if (trackerMap.containsKey("ENTITY:"+event.id)){
-                TrackerObject object = trackerMap.get("ENTITY:"+event.id);
+            if (trackerMap.containsKey("ENTITY:" + event.id)) {
+                TrackerObject object = trackerMap.get("ENTITY:" + event.id);
                 object.increaseCount();
                 trackers.put(LocationHandler.getCurrentLocation(), sortTrackers(trackerMap, (entry1, entry2) -> Integer.compare(entry2.getValue().getCount(), entry1.getValue().getCount())));
             }
@@ -75,7 +74,7 @@ public class TrackerHandler extends Gui {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), trackers.containsKey(LocationHandler.getCurrentLocation()),!SkyblockHud.config.trackers.hideTracker)) {
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), trackers.containsKey(LocationHandler.getCurrentLocation()), !SkyblockHud.config.trackers.hideTracker)) {
             Map<String, TrackerObject> tracker = trackers.get(LocationHandler.getCurrentLocation());
             Minecraft mc = Minecraft.getMinecraft();
 
@@ -87,7 +86,7 @@ public class TrackerHandler extends Gui {
                 Gui.drawRect(startPos, y, startPos + 130, y + 10, -1072689136);
                 mc.fontRendererObj.drawString("Tracker", startPos + 4, y + 1, 0xffffff, false);
                 y += 10;
-                Gui.drawRect(startPos, y, startPos + (tracker.size() >= 6 ? 130 : (tracker.size() * 20)+10), (int) (y + (Math.ceil(tracker.size() / 5d) * 20)), 1610612736);
+                Gui.drawRect(startPos, y, startPos + (tracker.size() >= 6 ? 130 : (tracker.size() * 20) + 10), (int) (y + (Math.ceil(tracker.size() / 5d) * 20)), 1610612736);
                 int x = startPos + 5;
                 for (TrackerObject object : tracker.values()) {
                     String s = Utils.formattedNumber(object.getCount(), 1000);

@@ -361,6 +361,6 @@ public class Utils {
     public static String formattedNumber(int number, int numberToFormatAt) {
         DecimalFormat formatter = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.CANADA));
         formatter.setRoundingMode(RoundingMode.FLOOR);
-        return number > numberToFormatAt-1 ? formatter.format((double) number / 1000) + "k" : String.valueOf(number);
+        return number > numberToFormatAt - 1 ? formatter.format((double) number / 1000) + "k" : String.valueOf(number);
     }
 }

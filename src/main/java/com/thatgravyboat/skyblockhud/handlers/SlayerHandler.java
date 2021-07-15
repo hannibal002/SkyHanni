@@ -122,8 +122,8 @@ public class SlayerHandler {
     public void onChatMessage(ClientChatReceivedEvent event) {
         if (event.type != 2) {
             Matcher slayerMatcher = SLAYER_PATTERN.matcher(Utils.removeColor(event.message.getUnformattedText()));
-            if (slayerMatcher.find()){
-                MinecraftForge.EVENT_BUS.post(new SkyBlockEntityKilled(slayerMatcher.group(1).toUpperCase(Locale.ENGLISH)+"_SLAYER", null));
+            if (slayerMatcher.find()) {
+                MinecraftForge.EVENT_BUS.post(new SkyBlockEntityKilled(slayerMatcher.group(1).toUpperCase(Locale.ENGLISH) + "_SLAYER", null));
             }
         }
     }

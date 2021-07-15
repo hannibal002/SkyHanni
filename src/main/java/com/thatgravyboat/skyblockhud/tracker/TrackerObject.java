@@ -19,14 +19,14 @@ public class TrackerObject {
     private final boolean isEntity;
     private int count;
 
-    public TrackerObject(JsonObject jsonObject, EnumSet<Locations> locations){
+    public TrackerObject(JsonObject jsonObject, EnumSet<Locations> locations) {
         this.stack = decodeToItemStack(jsonObject);
         this.internalId = jsonObject.get("id").getAsString();
         this.isEntity = jsonObject.get("id").getAsString().contains("entity:");
         this.locations = locations;
     }
 
-    public static ItemStack decodeToItemStack(JsonObject jsonObject){
+    public static ItemStack decodeToItemStack(JsonObject jsonObject) {
         jsonObject = jsonObject.getAsJsonObject("displayItem");
         int meta = jsonObject.get("meta").getAsInt();
         ResourceLocation itemid = new ResourceLocation(jsonObject.get("item").getAsString());
@@ -59,7 +59,7 @@ public class TrackerObject {
     }
 
     public void increaseCount(int amount) {
-        count+=amount;
+        count += amount;
     }
 
     public void increaseCount() {
@@ -89,6 +89,4 @@ public class TrackerObject {
     public boolean isEntity() {
         return isEntity;
     }
-
-
 }

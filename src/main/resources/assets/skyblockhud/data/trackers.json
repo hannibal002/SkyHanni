@@ -156,7 +156,7 @@
           }
         }
       ],
-      "mobs" : [
+      "mobs": [
         {
           "id": "entity:WOLF_SLAYER",
           "displayItem": {
@@ -235,7 +235,7 @@
           }
         }
       ],
-      "mobs" : [
+      "mobs": [
         {
           "id": "entity:SPIDER_SLAYER",
           "displayItem": {
@@ -350,7 +350,7 @@
           }
         }
       ],
-      "mobs" : [
+      "mobs": [
         {
           "id": "entity:ZOMBIE_SLAYER",
           "displayItem": {

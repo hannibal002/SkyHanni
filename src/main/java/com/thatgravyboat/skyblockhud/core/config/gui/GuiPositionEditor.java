@@ -1,6 +1,5 @@
 package com.thatgravyboat.skyblockhud.core.config.gui;
 
-
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import java.io.IOException;
@@ -26,10 +25,7 @@ public class GuiPositionEditor extends GuiScreen {
 
     private int guiScaleOverride = -1;
 
-    public GuiPositionEditor(Position position, int elementWidth, int elementHeight,
-                                    Runnable renderCallback,
-                                    Runnable positionChangedCallback,
-                                    Runnable closedCallback) {
+    public GuiPositionEditor(Position position, int elementWidth, int elementHeight, Runnable renderCallback, Runnable positionChangedCallback, Runnable closedCallback) {
         this.position = position;
         this.originalPosition = position.clone();
         this.elementWidth = elementWidth;
@@ -54,7 +50,7 @@ public class GuiPositionEditor extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
         ScaledResolution scaledResolution;
-        if(guiScaleOverride >= 0) {
+        if (guiScaleOverride >= 0) {
             scaledResolution = Utils.pushGuiScale(guiScaleOverride);
         } else {
             scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
@@ -67,7 +63,7 @@ public class GuiPositionEditor extends GuiScreen {
 
         drawDefaultBackground();
 
-        if(clicked) {
+        if (clicked) {
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution);
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution);
         }
@@ -77,28 +73,26 @@ public class GuiPositionEditor extends GuiScreen {
         int x = position.getAbsX(scaledResolution, elementWidth);
         int y = position.getAbsY(scaledResolution, elementHeight);
 
-        if(position.isCenterX()) x -= elementWidth/2;
-        if(position.isCenterY()) y -= elementHeight/2;
-        Gui.drawRect(x, y, x+elementWidth, y+elementHeight, 0x80404040);
+        if (position.isCenterX()) x -= elementWidth / 2;
+        if (position.isCenterY()) y -= elementHeight / 2;
+        Gui.drawRect(x, y, x + elementWidth, y + elementHeight, 0x80404040);
 
-        if(guiScaleOverride >= 0) {
+        if (guiScaleOverride >= 0) {
             Utils.pushGuiScale(-1);
         }
 
         scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        Utils.drawStringCentered("Position Editor", Minecraft.getMinecraft().fontRendererObj,
-                scaledResolution.getScaledWidth()/2, 8, true, 0xffffff);
-        Utils.drawStringCentered("R to Reset - Arrow keys/mouse to move", Minecraft.getMinecraft().fontRendererObj,
-                scaledResolution.getScaledWidth()/2, 18, true, 0xffffff);
+        Utils.drawStringCentered("Position Editor", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2, 8, true, 0xffffff);
+        Utils.drawStringCentered("R to Reset - Arrow keys/mouse to move", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2, 18, true, 0xffffff);
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
-        if(mouseButton == 0) {
+        if (mouseButton == 0) {
             ScaledResolution scaledResolution;
-            if(guiScaleOverride >= 0) {
+            if (guiScaleOverride >= 0) {
                 scaledResolution = Utils.pushGuiScale(guiScaleOverride);
             } else {
                 scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
@@ -108,17 +102,16 @@ public class GuiPositionEditor extends GuiScreen {
 
             int x = position.getAbsX(scaledResolution, elementWidth);
             int y = position.getAbsY(scaledResolution, elementHeight);
-            if(position.isCenterX()) x -= elementWidth/2;
-            if(position.isCenterY()) y -= elementHeight/2;
+            if (position.isCenterX()) x -= elementWidth / 2;
+            if (position.isCenterY()) y -= elementHeight / 2;
 
-            if(mouseX >= x && mouseY >= y &&
-                    mouseX <= x+elementWidth && mouseY <= y+elementHeight) {
+            if (mouseX >= x && mouseY >= y && mouseX <= x + elementWidth && mouseY <= y + elementHeight) {
                 clicked = true;
                 grabbedX = mouseX;
                 grabbedY = mouseY;
             }
 
-            if(guiScaleOverride >= 0) {
+            if (guiScaleOverride >= 0) {
                 Utils.pushGuiScale(-1);
             }
         }
@@ -128,18 +121,18 @@ public class GuiPositionEditor extends GuiScreen {
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         Keyboard.enableRepeatEvents(true);
 
-        if(keyCode == Keyboard.KEY_R) {
+        if (keyCode == Keyboard.KEY_R) {
             position.set(originalPosition);
-        } else if(!clicked) {
+        } else if (!clicked) {
             boolean shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
             int dist = shiftHeld ? 10 : 1;
-            if(keyCode == Keyboard.KEY_DOWN) {
+            if (keyCode == Keyboard.KEY_DOWN) {
                 position.moveY(dist, elementHeight, new ScaledResolution(Minecraft.getMinecraft()));
-            } else if(keyCode == Keyboard.KEY_UP) {
+            } else if (keyCode == Keyboard.KEY_UP) {
                 position.moveY(-dist, elementHeight, new ScaledResolution(Minecraft.getMinecraft()));
-            } else if(keyCode == Keyboard.KEY_LEFT) {
+            } else if (keyCode == Keyboard.KEY_LEFT) {
                 position.moveX(-dist, elementWidth, new ScaledResolution(Minecraft.getMinecraft()));
-            } else if(keyCode == Keyboard.KEY_RIGHT) {
+            } else if (keyCode == Keyboard.KEY_RIGHT) {
                 position.moveX(dist, elementWidth, new ScaledResolution(Minecraft.getMinecraft()));
             }
         }
@@ -156,9 +149,9 @@ public class GuiPositionEditor extends GuiScreen {
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 
-        if(clicked) {
+        if (clicked) {
             ScaledResolution scaledResolution;
-            if(guiScaleOverride >= 0) {
+            if (guiScaleOverride >= 0) {
                 scaledResolution = Utils.pushGuiScale(guiScaleOverride);
             } else {
                 scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
@@ -170,7 +163,7 @@ public class GuiPositionEditor extends GuiScreen {
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution);
             positionChangedCallback.run();
 
-            if(guiScaleOverride >= 0) {
+            if (guiScaleOverride >= 0) {
                 Utils.pushGuiScale(-1);
             }
         }

@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class MixinNetHandlerPlayClient {
 
     @Inject(method = "handleSetSlot", at = @At("HEAD"))
-    public void onHandleSetSlot(S2FPacketSetSlot packetIn, CallbackInfo ci){
+    public void onHandleSetSlot(S2FPacketSetSlot packetIn, CallbackInfo ci) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             Minecraft mc = Minecraft.getMinecraft();
             PacketThreadUtil.checkThreadAndEnqueue(packetIn, mc.getNetHandler(), mc);
@@ -39,7 +39,10 @@ public class MixinNetHandlerPlayClient {
                         if (extraAttributes.hasKey("enchantments")) {
                             NBTTagCompound enchantments = extraAttributes.getCompoundTag("enchantments");
                             if (enchantments.getKeySet().size() == 1) {
-                                for (String e : enchantments.getKeySet()) { specialId = e; break; }
+                                for (String e : enchantments.getKeySet()) {
+                                    specialId = e;
+                                    break;
+                                }
                                 if (specialId != null) number = enchantments.getInteger(specialId);
                             }
                         }

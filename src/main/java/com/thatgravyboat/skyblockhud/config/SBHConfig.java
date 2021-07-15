@@ -96,13 +96,8 @@ public class SBHConfig extends Config {
         public boolean hideScoreboard = false;
 
         @Expose
-        @ConfigOption(
-                name = "Bar Textures",
-                desc = "Change the style of bars. Dont change this unless the pack ur using tells you can."
-        )
-        @ConfigEditorDropdown(
-                values = {"Style 1", "Style 2"}
-        )
+        @ConfigOption(name = "Bar Textures", desc = "Change the style of bars. Dont change this unless the pack ur using tells you can.")
+        @ConfigEditorDropdown(values = { "Style 1", "Style 2" })
         public int barTexture = 0;
     }
 

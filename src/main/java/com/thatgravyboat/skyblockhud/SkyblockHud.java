@@ -129,20 +129,18 @@ public class SkyblockHud {
     // DISABLE UNTIL NEW SYSTEM
 
     @EventHandler
-    public void loadComplete(FMLLoadCompleteEvent event){
+    public void loadComplete(FMLLoadCompleteEvent event) {
         TrackerFileLoader.loadTrackersFile();
 
-        if (TrackerFileLoader.loadTrackerStatsFile(configDirectory)){
+        if (TrackerFileLoader.loadTrackerStatsFile(configDirectory)) {
             TrackerFileLoader.saveTrackerStatsFile(configDirectory);
         }
     }
 
     @SubscribeEvent
-    public void onLeaveServer(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
+    public void onLeaveServer(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
         TrackerFileLoader.saveTrackerStatsFile(configDirectory);
     }
-
-
 
     public static boolean hasSkyblockScoreboard() {
         Minecraft mc = Minecraft.getMinecraft();

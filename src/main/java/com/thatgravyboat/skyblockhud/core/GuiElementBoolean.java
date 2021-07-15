@@ -37,7 +37,7 @@ public class GuiElementBoolean extends GuiElement {
         this.toggleCallback = toggleCallback;
         this.lastMillis = System.currentTimeMillis();
 
-        if(value) animation = 36;
+        if (value) animation = 36;
     }
 
     @Override
@@ -51,58 +51,56 @@ public class GuiElementBoolean extends GuiElement {
         long deltaMillis = currentMillis - lastMillis;
         lastMillis = currentMillis;
         boolean passedLimit = false;
-        if(previewValue != value) {
-            if((previewValue && animation > 12) ||
-                    (!previewValue && animation < 24)) {
+        if (previewValue != value) {
+            if ((previewValue && animation > 12) || (!previewValue && animation < 24)) {
                 passedLimit = true;
             }
         }
-        if(previewValue != passedLimit) {
-            animation += deltaMillis/10;
+        if (previewValue != passedLimit) {
+            animation += deltaMillis / 10;
         } else {
-            animation -= deltaMillis/10;
+            animation -= deltaMillis / 10;
         }
-        lastMillis -= deltaMillis%10;
+        lastMillis -= deltaMillis % 10;
 
-        if(previewValue == value) {
+        if (previewValue == value) {
             animation = Math.max(0, Math.min(36, animation));
-        } else if(!passedLimit) {
-            if(previewValue) {
+        } else if (!passedLimit) {
+            if (previewValue) {
                 animation = Math.max(0, Math.min(12, animation));
             } else {
                 animation = Math.max(24, Math.min(36, animation));
             }
         } else {
-            if(previewValue) {
+            if (previewValue) {
                 animation = Math.max(12, animation);
             } else {
                 animation = Math.min(24, animation);
             }
         }
 
-        int animation = (int)(LerpUtils.sigmoidZeroOne(this.animation/36f)*36);
-        if(animation < 3) {
+        int animation = (int) (LerpUtils.sigmoidZeroOne(this.animation / 36f) * 36);
+        if (animation < 3) {
             buttonLoc = GuiTextures.OFF;
-        } else if(animation < 13) {
+        } else if (animation < 13) {
             buttonLoc = GuiTextures.ONE;
-        } else if(animation < 23) {
+        } else if (animation < 23) {
             buttonLoc = GuiTextures.TWO;
-        } else if(animation < 33) {
+        } else if (animation < 33) {
             buttonLoc = GuiTextures.THREE;
         }
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(buttonLoc);
-        RenderUtils.drawTexturedRect(x+animation, y, 12, 14);
+        RenderUtils.drawTexturedRect(x + animation, y, 12, 14);
     }
 
     @Override
     public boolean mouseInput(int mouseX, int mouseY) {
-        if(mouseX > x-clickRadius && mouseX < x+xSize+clickRadius &&
-            mouseY > y-clickRadius && mouseY < y+ySize+clickRadius) {
-            if(Mouse.getEventButton() == 0) {
-                if(Mouse.getEventButtonState()) {
+        if (mouseX > x - clickRadius && mouseX < x + xSize + clickRadius && mouseY > y - clickRadius && mouseY < y + ySize + clickRadius) {
+            if (Mouse.getEventButton() == 0) {
+                if (Mouse.getEventButtonState()) {
                     previewValue = !value;
-                } else if(previewValue == !value) {
+                } else if (previewValue == !value) {
                     value = !value;
                     toggleCallback.accept(value);
                 }

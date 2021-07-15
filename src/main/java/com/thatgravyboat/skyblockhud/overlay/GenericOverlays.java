@@ -32,7 +32,7 @@ public class GenericOverlays extends Gui {
     public static void drawSmallBar(Minecraft mc, int x, int y, double percentage, double max, int fullColor, int loadingColor, int barStyle) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
             updateBar();
-            mc.renderEngine.bindTexture(bars);;
+            mc.renderEngine.bindTexture(bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);
             GlStateManager.enableBlend();
             RenderUtils.drawTexturedModalRect(x, y, 0, 35, 62, 5);
@@ -48,9 +48,7 @@ public class GenericOverlays extends Gui {
     public static void updateBar() {
         if (lastBar != SkyblockHud.config.misc.barTexture) {
             lastBar = SkyblockHud.config.misc.barTexture;
-            if (lastBar == 0) bars = new ResourceLocation("skyblockhud", "bars.png");
-            else bars = new ResourceLocation("skyblockhud", "bars_"+lastBar+".png");
+            if (lastBar == 0) bars = new ResourceLocation("skyblockhud", "bars.png"); else bars = new ResourceLocation("skyblockhud", "bars_" + lastBar + ".png");
         }
-
     }
 }

@@ -1,5 +1,8 @@
 package com.thatgravyboat.skyblockhud.config;
 
+import static com.thatgravyboat.skyblockhud.GuiTextures.DISCORD;
+import static com.thatgravyboat.skyblockhud.GuiTextures.TWITTER;
+
 import com.google.common.collect.Lists;
 import com.thatgravyboat.skyblockhud.core.GlScissorStack;
 import com.thatgravyboat.skyblockhud.core.GuiElement;
@@ -13,8 +16,8 @@ import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
 import com.thatgravyboat.skyblockhud.core.util.render.TextRenderUtils;
 import java.awt.*;
 import java.net.URI;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -24,9 +27,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-
-import static com.thatgravyboat.skyblockhud.GuiTextures.DISCORD;
-import static com.thatgravyboat.skyblockhud.GuiTextures.TWITTER;
 
 public class SBHConfigEditor extends GuiElement {
 
@@ -237,11 +237,11 @@ public class SBHConfigEditor extends GuiElement {
             for (ConfigProcessor.ProcessedOption option : getOptionsInCategory(cat).values()) {
                 int optionWidth = optionWidthDefault;
                 if (option.accordionId >= 0) {
-                    if(!activeAccordions.containsKey(option.accordionId)) {
+                    if (!activeAccordions.containsKey(option.accordionId)) {
                         continue;
                     }
                     int accordionDepth = activeAccordions.get(option.accordionId);
-                    optionWidth = optionWidthDefault - (2 * innerPadding)*(accordionDepth + 1);
+                    optionWidth = optionWidthDefault - (2 * innerPadding) * (accordionDepth + 1);
                 }
 
                 GuiOptionEditor editor = option.editor;
@@ -253,7 +253,7 @@ public class SBHConfigEditor extends GuiElement {
                     if (accordion.getToggled()) {
                         int accordionDepth = 0;
                         if (option.accordionId >= 0) {
-                            accordionDepth = activeAccordions.get(option.accordionId)+1;
+                            accordionDepth = activeAccordions.get(option.accordionId) + 1;
                         }
                         activeAccordions.put(accordion.getAccordionId(), accordionDepth);
                     }
@@ -300,7 +300,7 @@ public class SBHConfigEditor extends GuiElement {
                     if (accordion.getToggled()) {
                         int accordionDepth = 0;
                         if (option.accordionId >= 0) {
-                            accordionDepth = activeAccordions.get(option.accordionId)+1;
+                            accordionDepth = activeAccordions.get(option.accordionId) + 1;
                         }
                         activeAccordions.put(accordion.getAccordionId(), accordionDepth);
                     }
@@ -431,7 +431,7 @@ public class SBHConfigEditor extends GuiElement {
                             if (accordion.getToggled()) {
                                 int accordionDepth = 0;
                                 if (option.accordionId >= 0) {
-                                    accordionDepth = activeAccordions.get(option.accordionId)+1;
+                                    accordionDepth = activeAccordions.get(option.accordionId) + 1;
                                 }
                                 activeAccordions.put(accordion.getAccordionId(), accordionDepth);
                             }
@@ -491,7 +491,7 @@ public class SBHConfigEditor extends GuiElement {
                         continue;
                     }
                     int accordionDepth = activeAccordions.get(option.accordionId);
-                    optionWidth = optionWidthDefault - (2*innerPadding)*(accordionDepth+1);
+                    optionWidth = optionWidthDefault - (2 * innerPadding) * (accordionDepth + 1);
                 }
 
                 GuiOptionEditor editor = option.editor;
@@ -503,7 +503,7 @@ public class SBHConfigEditor extends GuiElement {
                     if (accordion.getToggled()) {
                         int accordionDepth = 0;
                         if (option.accordionId >= 0) {
-                            accordionDepth = activeAccordions.get(option.accordionId)+1;
+                            accordionDepth = activeAccordions.get(option.accordionId) + 1;
                         }
                         activeAccordions.put(accordion.getAccordionId(), accordionDepth);
                     }
@@ -528,7 +528,7 @@ public class SBHConfigEditor extends GuiElement {
                             continue;
                         }
                         int accordionDepth = activeAccordions.get(option.accordionId);
-                        optionWidth = optionWidthDefault - (2*innerPadding)*(accordionDepth+1);
+                        optionWidth = optionWidthDefault - (2 * innerPadding) * (accordionDepth + 1);
                     }
 
                     GuiOptionEditor editor = option.editor;
@@ -540,7 +540,7 @@ public class SBHConfigEditor extends GuiElement {
                         if (accordion.getToggled()) {
                             int accordionDepth = 0;
                             if (option.accordionId >= 0) {
-                                accordionDepth = activeAccordions.get(option.accordionId)+1;
+                                accordionDepth = activeAccordions.get(option.accordionId) + 1;
                             }
                             activeAccordions.put(accordion.getAccordionId(), accordionDepth);
                         }
@@ -586,7 +586,7 @@ public class SBHConfigEditor extends GuiElement {
                     if (accordion.getToggled()) {
                         int accordionDepth = 0;
                         if (option.accordionId >= 0) {
-                            accordionDepth = activeAccordions.get(option.accordionId)+1;
+                            accordionDepth = activeAccordions.get(option.accordionId) + 1;
                         }
                         activeAccordions.put(accordion.getAccordionId(), accordionDepth);
                     }
