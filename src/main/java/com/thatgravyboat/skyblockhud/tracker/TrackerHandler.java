@@ -61,7 +61,6 @@ public class TrackerHandler extends Gui {
 
     @SubscribeEvent
     public void onSbEntityDeath(SkyBlockEntityKilled event) {
-        System.out.println(event.id);
         if (SkyblockHud.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
             Map<String, TrackerObject> trackerMap = trackers.get(LocationHandler.getCurrentLocation());
             if (trackerMap.containsKey("ENTITY:" + event.id)) {

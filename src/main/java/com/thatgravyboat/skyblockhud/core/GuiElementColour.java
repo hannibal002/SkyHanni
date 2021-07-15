@@ -313,7 +313,6 @@ public class GuiElementColour extends GuiElement {
 
             float y = mouseYF - this.y - 5;
             y = Math.max(0, Math.min(64, y));
-            System.out.println(y);
 
             if (clickedComponent == 1) {
                 int rgb = Color.getHSBColor(wheelAngle / 360, wheelRadius, 1 - y / 64f).getRGB();

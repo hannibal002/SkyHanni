@@ -22,6 +22,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class CrystalWaypoints {
@@ -37,6 +38,15 @@ public class CrystalWaypoints {
         waypoints.forEach((text, pos) -> Utils.renderWaypointText(text, pos, event.partialTicks));
         GlStateManager.enableCull();
         GlStateManager.enableDepth();
+    }
+
+    @SubscribeEvent
+    public void onWorldChange(EntityJoinWorldEvent event) {
+        if (event.entity != null) {
+            if (event.entity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())) {
+                waypoints.clear();
+            }
+        }
     }
 
     @SubscribeEvent
