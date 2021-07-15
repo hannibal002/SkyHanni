@@ -9,7 +9,8 @@ public class GuiOptionEditorBoolean extends GuiOptionEditor {
 
     public GuiOptionEditorBoolean(ConfigProcessor.ProcessedOption option) {
         super(option);
-        bool = new GuiElementBoolean(0, 0, (boolean) option.get(), 10, option::set);
+
+        bool = new GuiElementBoolean(0, 0, (boolean)option.get(), 10, option::set);
     }
 
     @Override
@@ -17,16 +18,16 @@ public class GuiOptionEditorBoolean extends GuiOptionEditor {
         super.render(x, y, width);
         int height = getHeight();
 
-        bool.x = x + width / 6 - 24;
-        bool.y = y + height - 7 - 14;
+        bool.x = x+width/6-24;
+        bool.y = y+height-7-14;
         bool.render();
     }
 
     @Override
     public boolean mouseInput(int x, int y, int width, int mouseX, int mouseY) {
         int height = getHeight();
-        bool.x = x + width / 6 - 24;
-        bool.y = y + height - 7 - 14;
+        bool.x = x+width/6-24;
+        bool.y = y+height-7-14;
         return bool.mouseInput(mouseX, mouseY);
     }
 

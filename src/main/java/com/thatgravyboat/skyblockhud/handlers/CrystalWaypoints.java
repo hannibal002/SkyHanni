@@ -28,7 +28,7 @@ public class CrystalWaypoints {
 
     public static final HashMap<String, BlockPos> waypoints = new HashMap<>();
 
-    private static final Set<Locations> IMPORTANT_WAYPOINTS = Sets.newHashSet(Locations.GOBLINQUEENSDEN, Locations.LOSTPRECURSORCITY, Locations.JUNGLETEMPLE, Locations.MINESOFDIVAN);
+    private static final Set<Locations> IMPORTANT_WAYPOINTS = Sets.newHashSet(Locations.GOBLINQUEENSDEN, Locations.LOSTPRECURSORCITY, Locations.JUNGLETEMPLE, Locations.MINESOFDIVAN, Locations.KHAZADDM, Locations.FAIRYGROTTO);
 
     @SubscribeEvent
     public void onRenderLast(RenderWorldLastEvent event) {

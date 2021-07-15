@@ -47,25 +47,27 @@ public class GuiOptionEditorAccordion extends GuiOptionEditor {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.color(1, 1, 1, 1);
         worldrenderer.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION);
-        if (accordionToggled) {
-            worldrenderer.pos((double) x + 6, (double) y + 6, 0.0D).endVertex();
-            worldrenderer.pos((double) x + 9.75f, (double) y + 13.5f, 0.0D).endVertex();
-            worldrenderer.pos((double) x + 13.5f, (double) y + 6, 0.0D).endVertex();
+        if(accordionToggled) {
+            worldrenderer.pos((double)x+6, (double)y+6, 0.0D).endVertex();
+            worldrenderer.pos((double)x+9.75f, (double)y+13.5f, 0.0D).endVertex();
+            worldrenderer.pos((double)x+13.5f, (double)y+6, 0.0D).endVertex();
         } else {
-            worldrenderer.pos((double) x + 6, (double) y + 13.5f, 0.0D).endVertex();
-            worldrenderer.pos((double) x + 13.5f, (double) y + 9.75f, 0.0D).endVertex();
-            worldrenderer.pos((double) x + 6, (double) y + 6, 0.0D).endVertex();
+            worldrenderer.pos((double)x+6, (double)y+13.5f, 0.0D).endVertex();
+            worldrenderer.pos((double)x+13.5f, (double)y+9.75f, 0.0D).endVertex();
+            worldrenderer.pos((double)x+6, (double)y+6, 0.0D).endVertex();
         }
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
 
-        TextRenderUtils.drawStringScaledMaxWidth(option.name, Minecraft.getMinecraft().fontRendererObj, x + 18, y + 6, false, width - 10, 0xc0c0c0);
+        TextRenderUtils.drawStringScaledMaxWidth(option.name, Minecraft.getMinecraft().fontRendererObj,
+                x+18, y+6, false, width-10, 0xc0c0c0);
     }
 
     @Override
     public boolean mouseInput(int x, int y, int width, int mouseX, int mouseY) {
-        if (Mouse.getEventButtonState() && mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + getHeight()) {
+        if(Mouse.getEventButtonState() && mouseX > x && mouseX < x+ width &&
+                mouseY > y && mouseY < y+getHeight()) {
             accordionToggled = !accordionToggled;
             return true;
         }

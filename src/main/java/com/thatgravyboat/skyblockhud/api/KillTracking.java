@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -32,7 +33,9 @@ public class KillTracking {
             System.out.println("----------------------------------------------------------------------------------------------------------------");
             System.out.println("Name : " + event.entity.getName());
             System.out.println("UUID : " + event.entity.getUniqueID());
-            System.out.println("Tag : " + event.entity.serializeNBT());
+            NBTTagCompound compound = new NBTTagCompound();
+            event.entity.writeToNBT(compound);
+            System.out.println("Tag : " + compound);
             System.out.println("Damage : " + getDamageSourceString(event.source));
             System.out.println("SBH Entity ID: " + EntityTypeRegistry.getEntityId(event.entity));
             System.out.println("----------------------------------------------------------------------------------------------------------------");

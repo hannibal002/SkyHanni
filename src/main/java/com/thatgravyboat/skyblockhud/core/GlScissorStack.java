@@ -1,14 +1,14 @@
 package com.thatgravyboat.skyblockhud.core;
 
-import java.util.LinkedList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.opengl.GL11;
 
+import java.util.LinkedList;
+
 public class GlScissorStack {
 
     private static class Bounds {
-
         int left;
         int top;
         int right;
@@ -27,10 +27,10 @@ public class GlScissorStack {
             right = Math.min(right, this.right);
             bottom = Math.min(bottom, this.bottom);
 
-            if (top > bottom) {
+            if(top > bottom) {
                 top = bottom;
             }
-            if (left > right) {
+            if(left > right) {
                 left = right;
             }
 
@@ -40,39 +40,39 @@ public class GlScissorStack {
         public void set(ScaledResolution scaledResolution) {
             int height = Minecraft.getMinecraft().displayHeight;
             int scale = scaledResolution.getScaleFactor();
-            GL11.glScissor(left * scale, height - bottom * scale, (right - left) * scale, (bottom - top) * scale);
+            GL11.glScissor(left*scale, height-bottom*scale, (right-left)*scale, (bottom-top)*scale);
         }
     }
 
     private static final LinkedList<Bounds> boundsStack = new LinkedList<>();
 
     public static void push(int left, int top, int right, int bottom, ScaledResolution scaledResolution) {
-        if (right < left) {
+        if(right < left) {
             int temp = right;
             right = left;
             left = temp;
         }
-        if (bottom < top) {
+        if(bottom < top) {
             int temp = bottom;
             bottom = top;
             top = temp;
         }
-        if (boundsStack.isEmpty()) {
+        if(boundsStack.isEmpty()) {
             boundsStack.push(new Bounds(left, top, right, bottom));
         } else {
             boundsStack.push(boundsStack.peek().createSubBound(left, top, right, bottom));
         }
-        if (!boundsStack.isEmpty()) {
+        if(!boundsStack.isEmpty()) {
             boundsStack.peek().set(scaledResolution);
         }
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
     }
 
     public static void pop(ScaledResolution scaledResolution) {
-        if (!boundsStack.isEmpty()) {
+        if(!boundsStack.isEmpty()) {
             boundsStack.pop();
         }
-        if (boundsStack.isEmpty()) {
+        if(boundsStack.isEmpty()) {
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
         } else {
             boundsStack.peek().set(scaledResolution);
@@ -83,4 +83,5 @@ public class GlScissorStack {
         boundsStack.clear();
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
+
 }

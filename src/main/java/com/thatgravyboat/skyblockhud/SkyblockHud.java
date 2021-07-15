@@ -3,6 +3,7 @@ package com.thatgravyboat.skyblockhud;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.thatgravyboat.skyblockhud.api.KillTracking;
 import com.thatgravyboat.skyblockhud.api.LeaderboardGetter;
 import com.thatgravyboat.skyblockhud.api.events.ProfileSwitchedEvent;
 import com.thatgravyboat.skyblockhud.commands.Commands;
@@ -17,6 +18,8 @@ import com.thatgravyboat.skyblockhud.overlay.OverlayHud;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
 import com.thatgravyboat.skyblockhud.playerstats.ActionBarParsing;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import com.thatgravyboat.skyblockhud.tracker.TrackerFileLoader;
+import com.thatgravyboat.skyblockhud.tracker.TrackerHandler;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
@@ -32,11 +35,13 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.lwjgl.input.Keyboard;
 
 @Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
@@ -69,10 +74,9 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new MinesHandler());
         MinecraftForge.EVENT_BUS.register(new FarmingIslandHandler());
 
-        /* DISABLE UNTIL NEW SYSTEM
         MinecraftForge.EVENT_BUS.register(new TrackerHandler());
-        MinecraftForge.EVENT_BUS.register(new KillTrackerHandler());
-         */
+        MinecraftForge.EVENT_BUS.register(new KillTracking());
+
         MinecraftForge.EVENT_BUS.register(new HeldItemHandler());
 
         ClientRegistry.registerKeyBinding(KeyBindings.map);
@@ -99,7 +103,7 @@ public class SkyblockHud {
         configDirectory = event.getModConfigurationDirectory();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
-        //Runtime.getRuntime().addShutdownHook(new Thread(() -> TrackerFileLoader.saveTrackerStatsFile(event.getModConfigurationDirectory())));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> TrackerFileLoader.saveTrackerStatsFile(event.getModConfigurationDirectory())));
     }
 
     public void saveConfig() {
@@ -122,7 +126,7 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new MiningHud());
     }
 
-    /* DISABLE UNTIL NEW SYSTEM
+    // DISABLE UNTIL NEW SYSTEM
 
     @EventHandler
     public void loadComplete(FMLLoadCompleteEvent event){
@@ -138,7 +142,7 @@ public class SkyblockHud {
         TrackerFileLoader.saveTrackerStatsFile(configDirectory);
     }
 
-     */
+
 
     public static boolean hasSkyblockScoreboard() {
         Minecraft mc = Minecraft.getMinecraft();

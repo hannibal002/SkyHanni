@@ -4,108 +4,55 @@ import com.google.gson.*;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 
 public class TrackerFileLoader {
 
     private static final Gson gson = new GsonBuilder().create();
 
-    public static ItemStack getDisplayItem(JsonObject jsonObject) {
-        int meta = jsonObject.get("meta").getAsInt();
-        String displayItemId = jsonObject.get("item").getAsString();
-        Item item = Item.itemRegistry.getObject(new ResourceLocation(displayItemId));
-        ItemStack stack = new ItemStack(item, 0, meta);
-        if (jsonObject.has("skullData") && displayItemId.equals("minecraft:skull") && meta == 3) {
-            stack.setTagInfo("SkullOwner", getSkullTag(jsonObject.getAsJsonObject("skullData")));
-        }
-        if (jsonObject.has("enchanted") && jsonObject.get("enchanted").getAsBoolean()) stack.setTagInfo("ench", new NBTTagList());
-        return stack;
-    }
-
-    public static NBTBase getSkullTag(JsonObject skullObject) {
-        NBTTagCompound skullOwner = new NBTTagCompound();
-        NBTTagCompound properties = new NBTTagCompound();
-        NBTTagList textures = new NBTTagList();
-        NBTTagCompound value = new NBTTagCompound();
-
-        skullOwner.setString("Id", skullObject.get("id").getAsString());
-
-        value.setString("Value", skullObject.get("texture").getAsString());
-        textures.appendTag(value);
-
-        properties.setTag("textures", textures);
-
-        skullOwner.setTag("Properties", properties);
-        return skullOwner;
-    }
-
     private static void loadTrackers(JsonObject object) {
         for (JsonElement element : object.get("trackers").getAsJsonArray()) {
             JsonObject tracker = element.getAsJsonObject();
-            StringBuilder builder = new StringBuilder();
-            tracker.get("location").getAsJsonArray().forEach(loc -> builder.append(loc.getAsString()));
-            String location = builder.toString();
-
-            Map<String, ItemStack> stacks = new HashMap<>();
-            for (JsonElement drop : tracker.get("drops").getAsJsonArray()) {
-                JsonObject dropObject = drop.getAsJsonObject();
-
-                //Display Item Creation
-                ItemStack stack = getDisplayItem(dropObject.getAsJsonObject("displayItem"));
-                String itemId = dropObject.get("id").getAsString();
-
-                stacks.put(itemId, stack);
+            EnumSet<Locations> locations = EnumSet.noneOf(Locations.class);
+            tracker.get("location").getAsJsonArray().forEach(l -> {
+                Locations location = Locations.get(l.getAsString().toUpperCase(Locale.ENGLISH));
+                if (location != Locations.DEFAULT){
+                    locations.add(location);
+                }
+            });
+            if (tracker.has("drops")) {
+                for (JsonElement drop : tracker.get("drops").getAsJsonArray()) {
+                    TrackerHandler.trackerObjects.add(new TrackerObject(drop.getAsJsonObject(), locations));
+                }
             }
-
-            String event = tracker.has("event") ? tracker.get("event").getAsString() : null;
-
-            Map<String, Map<String, ItemStack>> events = new HashMap<>();
-            events.put(event, stacks);
-
-            if (TrackerHandler.trackers.containsKey(location)) {
-                TrackerHandler.trackers.get(location).dropTrackers.put(event, stacks);
-            } else {
-                TrackerHandler.trackers.putIfAbsent(location, new TrackerHandler.TrackerData(events));
+            if (tracker.has("mobs")) {
+                for (JsonElement mob : tracker.get("mobs").getAsJsonArray()) {
+                    TrackerHandler.trackerObjects.add(new TrackerObject(mob.getAsJsonObject(), locations));
+                }
             }
-
-            tracker.get("location").getAsJsonArray().forEach(loc -> TrackerHandler.trackerIds.put(Locations.get(loc.getAsString()), location));
         }
-    }
 
-    private static JsonElement getTrackerFile() {
-        List<JsonObject> trackerStats = new ArrayList<>();
-        TrackerHandler.trackers.forEach(
-            (locations, trackerData) ->
-                trackerData.dropTrackers.forEach(
-                    (event, drops) -> {
-                        JsonObject jsonObject = new JsonObject();
-                        jsonObject.addProperty("location", locations);
+        for (TrackerObject trackerObject : TrackerHandler.trackerObjects) {
+            for (Locations location : trackerObject.getLocations()) {
+                if (TrackerHandler.trackers.containsKey(location)){
+                    TrackerHandler.trackers.get(location).put(trackerObject.getInternalId(), trackerObject);
+                }else {
+                    HashMap<String, TrackerObject> value = new HashMap<>();
+                    value.put(trackerObject.getInternalId(), trackerObject);
+                    TrackerHandler.trackers.put(location, value);
+                }
+            }
+        }
 
-                        if (event == null) jsonObject.add("event", new JsonNull()); else jsonObject.addProperty("event", event);
-
-                        JsonObject dropsData = new JsonObject();
-                        drops.forEach((s, stack) -> dropsData.addProperty(s, stack.stackSize));
-                        jsonObject.add("drops", dropsData);
-                        trackerStats.add(jsonObject);
-                    }
-                )
-        );
-        JsonArray stats = new JsonArray();
-        trackerStats.forEach(stats::add);
-        return stats;
     }
 
     public static void loadTrackersFile() {
+        TrackerHandler.trackers.clear();
+        TrackerHandler.trackerObjects.clear();
         try {
             ResourceLocation trackers = new ResourceLocation("skyblockhud:data/trackers.json");
             InputStream is = Minecraft.getMinecraft().getResourceManager().getResource(trackers).getInputStream();
@@ -114,6 +61,22 @@ public class TrackerFileLoader {
                 loadTrackers(gson.fromJson(reader, JsonObject.class));
             }
         } catch (Exception ignored) {}
+    }
+
+    private static JsonElement getTrackerFile() {
+        JsonArray stats = new JsonArray();
+        TrackerHandler.trackerObjects.forEach((trackerObject) ->{
+            if (trackerObject.getCount() > 0) {
+                JsonObject jsonObject = new JsonObject();
+                JsonArray locations = new JsonArray();
+                trackerObject.getLocations().forEach(l -> locations.add(new JsonPrimitive(l.toString().toUpperCase(Locale.ENGLISH))));
+                jsonObject.add("id", new JsonPrimitive(trackerObject.getInternalId()));
+                jsonObject.add("locations", locations);
+                jsonObject.add("count", new JsonPrimitive(trackerObject.getCount()));
+                stats.add(jsonObject);
+            }
+        });
+        return stats;
     }
 
     public static boolean loadTrackerStatsFile(File configDirectory) {
@@ -127,31 +90,29 @@ public class TrackerFileLoader {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 JsonObject json = gson.fromJson(reader, JsonObject.class);
                 if (json.has("trackerStats")) {
-                    json
-                        .getAsJsonArray("trackerStats")
-                        .forEach(
-                            element -> {
+                    json.getAsJsonArray("trackerStats").forEach(element -> {
                                 if (element.isJsonObject()) {
                                     JsonObject object = element.getAsJsonObject();
-                                    String location = object.get("location").getAsString();
-                                    Map<String, Map<String, ItemStack>> trackers = TrackerHandler.trackers.get(location).dropTrackers;
+                                    JsonArray locations = object.get("locations").getAsJsonArray();
+                                    Locations firstLocation = null;
+                                    for (JsonElement location : locations) {
+                                        firstLocation = Locations.get(location.getAsString());
+                                        if (!firstLocation.equals(Locations.DEFAULT)) break;
+                                    }
 
-                                    JsonElement event = object.get("event");
-                                    String eventString = event == null || event.isJsonNull() ? null : event.getAsString();
-                                    Map<String, ItemStack> drops = trackers.get(eventString);
-
-                                    if (drops != null) {
-                                        for (Map.Entry<String, JsonElement> drop : object.getAsJsonObject("drops").entrySet()) {
-                                            if (drops.containsKey(drop.getKey())) {
-                                                drops.get(drop.getKey()).stackSize = drop.getValue().getAsInt();
-                                            }
-                                        }
-                                        drops = TrackerHandler.sortTrackers(drops);
-                                        trackers.put(eventString, drops);
+                                    if (firstLocation != null && !firstLocation.equals(Locations.DEFAULT)){
+                                        TrackerHandler.trackers.get(firstLocation).get(object.get("id").getAsString()).setCount(object.get("count").getAsInt());
                                     }
                                 }
-                            }
+                    });
+
+                    TrackerHandler.trackers.forEach((location, map) -> {
+                        TrackerHandler.trackers.put(location,
+                                TrackerHandler.sortTrackers(map,
+                                        (entry1, entry2) -> Integer.compare(entry2.getValue().getCount(), entry1.getValue().getCount())
+                                )
                         );
+                    });
                 }
             }
         } catch (Exception ignored) {}

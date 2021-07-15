@@ -155,6 +155,19 @@
             "enchanted": true
           }
         }
+      ],
+      "mobs" : [
+        {
+          "id": "entity:WOLF_SLAYER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "42482f09-bf1b-452e-aa91-0b9f9dc6868f",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQxYWE3ZTNiOTU2NGIzODQ2ZjFkZWExNGYxYjFjY2JmMzk5YmJiMjNiOTUyZGJkN2VlYzQxODAyYTI4OWM5NiJ9fX0="
+            }
+          }
+        }
       ]
     },
     {
@@ -221,6 +234,19 @@
             "meta": 0
           }
         }
+      ],
+      "mobs" : [
+        {
+          "id": "entity:SPIDER_SLAYER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "9bedf23e-8a90-410d-bd1f-333d3929821e",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTdjNzkxY2IwNzk3ZGRkMTAzOTUyYjU0OGQzZDU2MGE3NzJiNGU5NDZjYzA5NjQzODU3Y2ViZGFhOWQxYmNjNCJ9fX0="
+            }
+          }
+        }
       ]
     },
     {
@@ -233,7 +259,8 @@
           "id": "REVENANT_FLESH",
           "displayItem": {
             "item": "minecraft:rotten_flesh",
-            "meta": 0
+            "meta": 0,
+            "enchanted": true
           }
         },
         {
@@ -285,14 +312,6 @@
           }
         },
         {
-          "id": "REVENANT_VISCERA",
-          "displayItem": {
-            "item": "minecraft:cooked_porkchop",
-            "meta": 0,
-            "enchanted": true
-          }
-        },
-        {
           "id": "SHARD_OF_THE_SHREDDED",
           "displayItem": {
             "item": "minecraft:skull",
@@ -319,6 +338,27 @@
             "skullData": {
               "id": "7adc7613-256a-3593-899b-d4d9bbf50387",
               "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDQ1ZjRkMTM5YzllODkyNjJlYzA2YjI3YWFhZDczZmE0ODhhYjQ5MjkwZDJjY2Q2ODVhMjU1NDcyNTM3M2M5YiJ9fX0="
+            }
+          }
+        },
+        {
+          "id": "SCYTHE_BLADE",
+          "displayItem": {
+            "item": "minecraft:diamond",
+            "meta": 0,
+            "enchanted": true
+          }
+        }
+      ],
+      "mobs" : [
+        {
+          "id": "entity:ZOMBIE_SLAYER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "a593ac46-8eb5-46f0-ab18-5a5c496a94fc",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjY3YjI3ZmI3ZTI5ZWM5OGUxY2Q0YThmODQ2Njg1NmQ5ZWYzZjJlOWZiZDlhZWQ2MzExZjhhYmU1NGI2YWIyIn19fQ=="
             }
           }
         }

@@ -3,15 +3,20 @@ package com.thatgravyboat.skyblockhud.handlers;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
+import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class SlayerHandler {
 
     private static final Pattern KILLS_REGEX = Pattern.compile("(\\d+)/(\\d+) kills?");
+    private static final Pattern SLAYER_PATTERN = Pattern.compile("Talk to Maddox to claim your ([A-Za-z]+) Slayer XP!");
 
     public enum slayerTypes {
         ZOMBIE(34, "Revenant Horror"),
@@ -109,6 +114,16 @@ public class SlayerHandler {
                 SlayerHandler.maxKills = 0;
                 SlayerHandler.progress = 0;
                 SlayerHandler.bossSlain = true;
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onChatMessage(ClientChatReceivedEvent event) {
+        if (event.type != 2) {
+            Matcher slayerMatcher = SLAYER_PATTERN.matcher(Utils.removeColor(event.message.getUnformattedText()));
+            if (slayerMatcher.find()){
+                MinecraftForge.EVENT_BUS.post(new SkyBlockEntityKilled(slayerMatcher.group(1).toUpperCase(Locale.ENGLISH)+"_SLAYER", null));
             }
         }
     }

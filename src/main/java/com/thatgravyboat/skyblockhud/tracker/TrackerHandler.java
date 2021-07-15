@@ -2,10 +2,10 @@ package com.thatgravyboat.skyblockhud.tracker;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
-import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
 import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -16,57 +16,37 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class TrackerHandler {
+public class TrackerHandler extends Gui {
 
-    public static class TrackerData {
+    public static Set<TrackerObject> trackerObjects = new HashSet<>();
+    public static Map<Locations, Map<String, TrackerObject>> trackers = new HashMap<>();
 
-        public Map<String, Map<String, ItemStack>> dropTrackers;
+    public static <K,V> Map<K, V> sortTrackers(Map<K, V> map, Comparator<? super Map.Entry<K, V>> comparator) {
+        List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
+        list.sort(comparator);
 
-        public TrackerData(Map<String, Map<String, ItemStack>> trackers) {
-            this.dropTrackers = trackers;
-        }
-
-        public String getDropId(String event) {
-            if (event == null || event.isEmpty() || !eventGoing() || !dropTrackers.containsKey(event.toLowerCase().trim())) return null;
-            return event.toLowerCase().trim();
-        }
-
-        private boolean eventGoing() {
-            return SeasonDateHandler.getCurrentEventTime().trim().toLowerCase().contains("ends in");
-        }
-    }
-
-    public static Map<String, TrackerData> trackers = new HashMap<>();
-    public static Map<Locations, String> trackerIds = new HashMap<>();
-
-    public static Map<String, ItemStack> sortTrackers(Map<String, ItemStack> map) {
-        List<Map.Entry<String, ItemStack>> list = new ArrayList<>(map.entrySet());
-        list.sort((entry1, entry2) -> Integer.compare(entry2.getValue().stackSize, entry1.getValue().stackSize));
-
-        Map<String, ItemStack> result = new LinkedHashMap<>();
-        for (Map.Entry<String, ItemStack> entry : list) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
         }
 
         return result;
     }
 
-    public static void onItemAdded(String id, int amount, String enchant, int level) {
-        if (SkyblockHud.hasSkyblockScoreboard() && trackerIds.containsKey(LocationHandler.getCurrentLocation())) {
-            String trackerId = trackerIds.get(LocationHandler.getCurrentLocation());
-            TrackerData tracked = trackers.get(trackerId);
-            String dropTrackerId = tracked.getDropId(SeasonDateHandler.getCurrentEvent());
-            Map<String, ItemStack> tracker = tracked.dropTrackers.get(dropTrackerId);
+    public static void onItemAdded(String id, int amount, String specialId, int number) {
+        if (SkyblockHud.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
+            Map<String, TrackerObject> trackerMap = trackers.get(LocationHandler.getCurrentLocation());
             String dropId = id;
-            if (enchant != null) {
-                dropId = enchant.toUpperCase() + ";" + level;
+            if (specialId != null) {
+                dropId = specialId.toUpperCase() + ";" + number;
             }
 
-            if (tracker != null && tracker.containsKey(dropId)) {
-                ItemStack stack = tracker.get(dropId);
-                stack.stackSize += amount;
-                tracked.dropTrackers.put(dropTrackerId, sortTrackers(tracker));
+            if (trackerMap != null && trackerMap.containsKey(dropId)) {
+                TrackerObject object = trackerMap.get(dropId);
+                object.increaseCount(amount);
+                trackers.put(LocationHandler.getCurrentLocation(), sortTrackers(trackerMap, (entry1, entry2) -> Integer.compare(entry2.getValue().getCount(), entry1.getValue().getCount())));
             }
+
         }
     }
 
@@ -81,36 +61,47 @@ public class TrackerHandler {
     }
 
     @SubscribeEvent
-    public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), trackerIds.containsKey(LocationHandler.getCurrentLocation())/*,!SkyblockHud.config.trackers.hideTracker*/)) {
-            String trackerId = trackerIds.get(LocationHandler.getCurrentLocation());
-            Minecraft mc = Minecraft.getMinecraft();
-            TrackerData tracked = trackers.get(trackerId);
+    public void onSbEntityDeath(SkyBlockEntityKilled event){
+        System.out.println(event.id);
+        if (SkyblockHud.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
+            Map<String, TrackerObject> trackerMap = trackers.get(LocationHandler.getCurrentLocation());
+            if (trackerMap.containsKey("ENTITY:"+event.id)){
+                TrackerObject object = trackerMap.get("ENTITY:"+event.id);
+                object.increaseCount();
+                trackers.put(LocationHandler.getCurrentLocation(), sortTrackers(trackerMap, (entry1, entry2) -> Integer.compare(entry2.getValue().getCount(), entry1.getValue().getCount())));
+            }
+        }
+    }
 
-            Map<String, ItemStack> tracker = tracked.dropTrackers.get(tracked.getDropId(SeasonDateHandler.getCurrentEvent()));
+    @SubscribeEvent
+    public void renderOverlay(RenderGameOverlayEvent.Post event) {
+        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), trackers.containsKey(LocationHandler.getCurrentLocation()),!SkyblockHud.config.trackers.hideTracker)) {
+            Map<String, TrackerObject> tracker = trackers.get(LocationHandler.getCurrentLocation());
+            Minecraft mc = Minecraft.getMinecraft();
+
             if (tracker != null) {
-                Position pos = null; // SkyblockHud.config.trackers.trackerPosition;
-                int startPos = pos.getAbsX(event.resolution, (tracker.size() >= 6 ? 120 : tracker.size() * 20));
+                Position pos = SkyblockHud.config.trackers.trackerPosition;
+                int startPos = pos.getAbsX(event.resolution, (tracker.size() >= 6 ? 130 : tracker.size() * 20));
                 int y = pos.getAbsY(event.resolution, (int) (10 + Math.ceil(tracker.size() / 5d) * 20));
 
-                Gui.drawRect(startPos, y, startPos + 120, y + 10, -1072689136);
+                Gui.drawRect(startPos, y, startPos + 130, y + 10, -1072689136);
                 mc.fontRendererObj.drawString("Tracker", startPos + 4, y + 1, 0xffffff, false);
                 y += 10;
-                Gui.drawRect(startPos, y, startPos + (tracker.size() >= 6 ? 120 : tracker.size() * 20), (int) (y + (Math.ceil(tracker.size() / 5d) * 20)), 1610612736);
-                int x = startPos;
-                for (ItemStack stack : tracker.values()) {
-                    String s = String.valueOf(stack.stackSize);
+                Gui.drawRect(startPos, y, startPos + (tracker.size() >= 6 ? 130 : (tracker.size() * 20)+10), (int) (y + (Math.ceil(tracker.size() / 5d) * 20)), 1610612736);
+                int x = startPos + 5;
+                for (TrackerObject object : tracker.values()) {
+                    String s = Utils.formattedNumber(object.getCount(), 1000);
                     GlStateManager.disableLighting();
                     GlStateManager.enableDepth();
-                    drawItemStack(stack, x, y);
+                    drawItemStack(object.getDisplayStack(), x, y);
                     GlStateManager.disableDepth();
                     GlStateManager.disableBlend();
-                    mc.fontRendererObj.drawStringWithShadow(s, (float) (x + 19 - 2 - mc.fontRendererObj.getStringWidth(s)), (float) (y + 9), stack.stackSize < 1 ? 16733525 : 16777215);
+                    mc.fontRendererObj.drawStringWithShadow(s, (float) (x + 19 - 2 - mc.fontRendererObj.getStringWidth(s)), (float) (y + 9), object.getCount() < 1 ? 16733525 : 16777215);
                     GlStateManager.enableBlend();
                     GlStateManager.enableDepth();
 
-                    if ((x - startPos) / 20 == 5) {
-                        x = startPos;
+                    if ((x - startPos + 5) / 20 == 5) {
+                        x = startPos + 5;
                         y += 20;
                     } else {
                         x += 20;

@@ -1,6 +1,13 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
+import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.tracker.TrackerHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketThreadUtil;
+import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.network.play.server.S3EPacketTeams;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
@@ -13,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(NetHandlerPlayClient.class)
 public class MixinNetHandlerPlayClient {
 
-    /* DISABLE UNTIL NEW SYSTEM
     @Inject(method = "handleSetSlot", at = @At("HEAD"))
     public void onHandleSetSlot(S2FPacketSetSlot packetIn, CallbackInfo ci){
         if (SkyblockHud.hasSkyblockScoreboard()) {
@@ -28,22 +34,21 @@ public class MixinNetHandlerPlayClient {
                         String id = extraAttributes.getString("id");
                         ItemStack slotStack = Minecraft.getMinecraft().thePlayer.inventoryContainer.getSlot(packetIn.func_149173_d()).getStack();
                         int changeAmount = stack.stackSize - (slotStack == null ? 0 : slotStack.stackSize);
-                        String eId = null;
-                        int eLvl = -1;
+                        String specialId = null;
+                        int number = -1;
                         if (extraAttributes.hasKey("enchantments")) {
                             NBTTagCompound enchantments = extraAttributes.getCompoundTag("enchantments");
                             if (enchantments.getKeySet().size() == 1) {
-                                for (String e : enchantments.getKeySet()) { eId = e; break; }
-                                if (eId != null) eLvl = enchantments.getInteger(eId);
+                                for (String e : enchantments.getKeySet()) { specialId = e; break; }
+                                if (specialId != null) number = enchantments.getInteger(specialId);
                             }
                         }
-                        TrackerHandler.onItemAdded(id, changeAmount, eId, eLvl);
+                        TrackerHandler.onItemAdded(id, changeAmount, specialId, number);
                     }
                 }
             }
         }
     }
-     */
 
     @Inject(method = "handleTeams", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/network/play/server/S3EPacketTeams;getAction()I", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true)
     public void handleTeams(S3EPacketTeams packetIn, CallbackInfo ci, Scoreboard scoreboard) {
@@ -53,6 +58,7 @@ public class MixinNetHandlerPlayClient {
 
     @Inject(method = "handleTeams", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/network/play/server/S3EPacketTeams;getAction()I", ordinal = 6, shift = At.Shift.BEFORE), cancellable = true)
     public void handleTeamRemove(S3EPacketTeams packetIn, CallbackInfo ci, Scoreboard scoreboard, ScorePlayerTeam scoreplayerteam) {
+        //This stops Hypixel from being stupid and spamming our logs because they dont have different ids for things.
         if (scoreplayerteam == null) ci.cancel();
     }
 }

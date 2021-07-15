@@ -25,8 +25,9 @@ public class ChromaColour {
 
         int[] arr = new int[split.length];
 
-        for (int i = 0; i < split.length; i++) {
-            arr[i] = Integer.parseInt(split[split.length - 1 - i], RADIX);
+
+        for(int i=0; i<split.length; i++) {
+            arr[i] = Integer.parseInt(split[split.length-1-i], RADIX);
         }
         return arr;
     }
@@ -39,7 +40,7 @@ public class ChromaColour {
         int a = d[3];
         int chr = d[4];
 
-        return ((a & 0xFF) << 24 | (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF));
+        return (a & 0xFF) << 24 | (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF);
     }
 
     public static int getSpeed(String special) {
@@ -47,16 +48,15 @@ public class ChromaColour {
     }
 
     public static float getSecondsForSpeed(int speed) {
-        return ((255 - speed) / 254f * (MAX_CHROMA_SECS - MIN_CHROMA_SECS) + MIN_CHROMA_SECS);
+        return (255-speed)/254f*(MAX_CHROMA_SECS-MIN_CHROMA_SECS)+MIN_CHROMA_SECS;
     }
 
     private static final int MIN_CHROMA_SECS = 1;
     private static final int MAX_CHROMA_SECS = 60;
 
     public static long startTime = -1;
-
     public static int specialToChromaRGB(String special) {
-        if (startTime < 0) startTime = System.currentTimeMillis();
+        if(startTime < 0) startTime = System.currentTimeMillis();
 
         int[] d = decompose(special);
         int chr = d[4];
@@ -67,14 +67,14 @@ public class ChromaColour {
 
         float[] hsv = Color.RGBtoHSB(r, g, b, null);
 
-        if (chr > 0) {
+        if(chr > 0) {
             float seconds = getSecondsForSpeed(chr);
-            hsv[0] += (System.currentTimeMillis() - startTime) / 1000f / seconds;
+            hsv[0] += (System.currentTimeMillis()-startTime)/1000f/seconds;
             hsv[0] %= 1;
-            if (hsv[0] < 0) hsv[0] += 1;
+            if(hsv[0] < 0) hsv[0] += 1;
         }
 
-        return ((a & 0xFF) << 24 | (Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]) & 0x00FFFFFF));
+        return (a & 0xFF) << 24 | (Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]) & 0x00FFFFFF);
     }
 
     public static int rotateHue(int argb, int degrees) {
@@ -85,9 +85,11 @@ public class ChromaColour {
 
         float[] hsv = Color.RGBtoHSB(r, g, b, null);
 
-        hsv[0] += degrees / 360f;
+        hsv[0] += degrees/360f;
         hsv[0] %= 1;
 
-        return ((a & 0xFF) << 24 | (Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]) & 0x00FFFFFF));
+        return (a & 0xFF) << 24 | (Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]) & 0x00FFFFFF);
     }
+
+
 }

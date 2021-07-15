@@ -22,23 +22,23 @@ public class LerpingInteger {
         int lastTimeSpent = timeSpent;
         this.timeSpent += System.currentTimeMillis() - lastMillis;
 
-        float lastDistPercentToTarget = lastTimeSpent / (float) timeToReachTarget;
-        float distPercentToTarget = timeSpent / (float) timeToReachTarget;
-        float fac = (1 - lastDistPercentToTarget) / lastDistPercentToTarget;
+        float lastDistPercentToTarget = lastTimeSpent/(float)timeToReachTarget;
+        float distPercentToTarget = timeSpent/(float)timeToReachTarget;
+        float fac = (1-lastDistPercentToTarget)/lastDistPercentToTarget;
 
-        int startValue = lerpValue - (int) ((targetValue - lerpValue) / fac);
+        int startValue = lerpValue - (int)((targetValue - lerpValue)/fac);
 
         int dist = targetValue - startValue;
-        if (dist == 0) return;
+        if(dist == 0) return;
 
         int oldLerpValue = lerpValue;
-        if (distPercentToTarget >= 1) {
+        if(distPercentToTarget >= 1) {
             lerpValue = targetValue;
         } else {
-            lerpValue = startValue + (int) (dist * distPercentToTarget);
+            lerpValue = startValue + (int)(dist*distPercentToTarget);
         }
 
-        if (lerpValue == oldLerpValue) {
+        if(lerpValue == oldLerpValue) {
             timeSpent = lastTimeSpent;
         } else {
             this.lastMillis = System.currentTimeMillis();

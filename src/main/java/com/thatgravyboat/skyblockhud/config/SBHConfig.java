@@ -50,9 +50,9 @@ public class SBHConfig extends Config {
             case "map":
                 editOverlay(activeConfigCategory, 72, 72, map.miniMapPosition);
                 return;
-            //            case "tracker":
-            //                editOverlay(activeConfigCategory, 120, 70, trackers.trackerPosition);
-            //                return;
+            case "tracker":
+                editOverlay(activeConfigCategory, 130, 70, trackers.trackerPosition);
+                return;
         }
     }
 
@@ -84,17 +84,26 @@ public class SBHConfig extends Config {
     @Category(name = "Mining", desc = "All Options for the Mining Stuff.")
     public Mining mining = new Mining();
 
-    //TODO ENABLED WHEN TRACKER GETS ADDED BACK
-    //    @Expose
-    //    @Category(name = "Tracker", desc = "All Options for the Trackers.")
-    //    public Trackers trackers = new Trackers();
+    @Expose
+    @Category(name = "Tracker", desc = "All Options for the Trackers.")
+    public Trackers trackers = new Trackers();
 
     public static class Misc {
 
         @Expose
-        @ConfigOption(name = "Hide Scoreboard", desc = "Hides the scoreboard when in skyblock.")
+        @ConfigOption(name = "Hide Scoreboard", desc = "Hides the scoreboard when in Skyblock.")
         @ConfigEditorBoolean
         public boolean hideScoreboard = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Bar Textures",
+                desc = "Change the style of bars. Dont change this unless the pack ur using tells you can."
+        )
+        @ConfigEditorDropdown(
+                values = {"Style 1", "Style 2"}
+        )
+        public int barTexture = 0;
     }
 
     public static class MainHud {
@@ -342,6 +351,6 @@ public class SBHConfig extends Config {
         @Expose
         @ConfigOption(name = "Hide Tracker", desc = "It will still track the data just in case.")
         @ConfigEditorBoolean
-        public boolean hideTracker = false;
+        public boolean hideTracker = true;
     }
 }

@@ -1,9 +1,13 @@
 package com.thatgravyboat.skyblockhud;
 
+import java.math.RoundingMode;
 import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Locale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -352,5 +356,11 @@ public class Utils {
         GlStateManager.enableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
+    }
+
+    public static String formattedNumber(int number, int numberToFormatAt) {
+        DecimalFormat formatter = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.CANADA));
+        formatter.setRoundingMode(RoundingMode.FLOOR);
+        return number > numberToFormatAt-1 ? formatter.format((double) number / 1000) + "k" : String.valueOf(number);
     }
 }

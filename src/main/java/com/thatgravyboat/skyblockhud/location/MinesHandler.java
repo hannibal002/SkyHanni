@@ -105,7 +105,7 @@ public class MinesHandler {
         if (event.formattedLine.equalsIgnoreCase("wind compass")) {
             MinesHandler.currentEvent = Event.WIND;
         }
-        if (event.formattedLine.equalsIgnoreCase("nearby players")) {
+        if (event.formattedLine.toLowerCase(Locale.ENGLISH).contains("nearby players")) {
             MinesHandler.currentEvent = Event.TOGETHER;
             try {
                 MinesHandler.eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("nearby players", ""));
