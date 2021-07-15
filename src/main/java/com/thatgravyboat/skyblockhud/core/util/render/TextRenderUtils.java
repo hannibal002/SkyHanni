@@ -63,9 +63,7 @@ public class TextRenderUtils {
             int tooltipX = mouseX + 12;
             if (tooltipX + tooltipTextWidth + 4 > screenWidth) {
                 tooltipX = mouseX - 16 - tooltipTextWidth;
-                if (
-                    tooltipX < 4
-                ) { // if the tooltip doesn't fit on the screen
+                if (tooltipX < 4) { // if the tooltip doesn't fit on the screen
                     if (mouseX > screenWidth / 2) {
                         tooltipTextWidth = mouseX - 12 - 8;
                     } else {
