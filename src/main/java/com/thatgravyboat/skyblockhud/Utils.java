@@ -363,4 +363,9 @@ public class Utils {
         formatter.setRoundingMode(RoundingMode.FLOOR);
         return number > numberToFormatAt - 1 ? formatter.format((double) number / 1000) + "k" : String.valueOf(number);
     }
+
+    public static boolean equalsIgnoreCaseAnyOf(String string, String... strings){
+        for (String o : strings) if (string.equalsIgnoreCase(o)) return true;
+        return false;
+    }
 }

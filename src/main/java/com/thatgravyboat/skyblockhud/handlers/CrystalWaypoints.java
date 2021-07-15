@@ -42,10 +42,8 @@ public class CrystalWaypoints {
 
     @SubscribeEvent
     public void onWorldChange(EntityJoinWorldEvent event) {
-        if (event.entity != null) {
-            if (event.entity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())) {
-                waypoints.clear();
-            }
+        if (event.entity == Minecraft.getMinecraft().thePlayer) {
+            waypoints.clear();
         }
     }
 
@@ -95,6 +93,15 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
+                            case "move":
+                                if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
+                                    if (CrystalWaypoints.waypoints.containsKey(name)) {
+                                        CrystalWaypoints.waypoints.put(name, sender.getPosition().add(0.5, 0.5, 0.5));
+                                    } else {
+                                        sbhMessage(sender, "Waypoint doesnt exist!");
+                                    }
+                                }
+                                break;
                             case "clear":
                                 CrystalWaypoints.waypoints.clear();
                                 break;
@@ -129,11 +136,11 @@ public class CrystalWaypoints {
                 new TabCompleteRunnable() {
                     @Override
                     public List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos) {
-                        if (args.length == 2 && (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("copy"))) {
+                        if (args.length == 2 && Utils.equalsIgnoreCaseAnyOf (args[0], "remove","copy", "move")) {
                             return getListOfStringsMatchingLastWord(args, waypoints.keySet());
                         }
                         if (args.length == 1) {
-                            return getListOfStringsMatchingLastWord(args, Lists.newArrayList("add", "clear", "remove", "copy", "addat"));
+                            return getListOfStringsMatchingLastWord(args, Lists.newArrayList("add", "clear", "remove", "copy", "addat", "move"));
                         }
                         if (args.length > 1 && args[0].equalsIgnoreCase("addat")) {
                             return func_175771_a(args, 1, pos);

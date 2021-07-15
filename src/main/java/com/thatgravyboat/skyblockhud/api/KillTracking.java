@@ -54,10 +54,8 @@ public class KillTracking {
 
     @SubscribeEvent
     public void onWorldChange(EntityJoinWorldEvent event) {
-        if (event.entity != null) {
-            if (event.entity.getUniqueID().equals(Minecraft.getMinecraft().thePlayer.getUniqueID())) {
-                attackedEntities.clear();
-            }
+        if (event.entity == Minecraft.getMinecraft().thePlayer) {
+            attackedEntities.clear();
         }
     }
 }

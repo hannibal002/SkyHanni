@@ -179,7 +179,8 @@
           "id": "TARANTULA_WEB",
           "displayItem": {
             "item": "minecraft:string",
-            "meta": 0
+            "meta": 0,
+            "enchanted": true
           }
         },
         {
@@ -395,6 +396,282 @@
             "skullData": {
               "id": "3498885a-3841-3748-8183-893f766ad136",
               "texture": "ewogICJ0aW1lc3RhbXAiIDogMTYxMDY0MjExNzM0NywKICAicHJvZmlsZUlkIiA6ICJkZTU3MWExMDJjYjg0ODgwOGZlN2M5ZjQ0OTZlY2RhZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJNSEZfTWluZXNraW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzVhYTgzMzJiYmVjNGE5NThmZWEyYmU2NGI4ZjE2ODJmNWQ4MjQ3NDUxYWEyYjc1NjllZGQwNDk4NDM3ZDcwNiIKICAgIH0KICB9Cn0="
+            }
+          }
+        }
+      ]
+    },
+    {
+      "location": [
+        "THEEND",
+        "DRAGONSNEST",
+        "VOIDSEPULTURE"
+      ],
+      "drops": [
+        {
+          "id": "NULL_SPHERE",
+          "displayItem": {
+            "item": "minecraft:firework_charge",
+            "meta": 0,
+            "enchanted": true
+          }
+        },
+        {
+          "id": "TWILIGHT_ARROW_POISON",
+          "displayItem": {
+            "item": "minecraft:dye",
+            "meta": 5,
+            "enchanted": true
+          }
+        },
+        {
+          "id": "SUMMONING_EYE",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "00a702b9-7bad-3205-a04b-52478d8c0e7f",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGFhOGZjOGRlNjQxN2I0OGQ0OGM4MGI0NDNjZjUzMjZlM2Q5ZGE0ZGJlOWIyNWZjZDQ5NTQ5ZDk2MTY4ZmMwIn19fQ=="
+            }
+          }
+        },
+        {
+          "id": "TRANSMISSION_TUNER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "df5671b6-329a-3fd7-9f56-71b6329a9fd7",
+              "texture": "e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGFlNTRkMDNjZTA1MTA2ZjZmNzQ1YjhmODUxMzQ0ZWMzOGU2OGRkMzMwN2EzMWM4NDNiMDgyMTJkZjU0NmRkOSJ9fX0="
+            }
+          }
+        },
+        {
+          "id": "MANA_STEAL;1",
+          "displayItem": {
+            "item": "minecraft:enchanted_book",
+            "meta": 0,
+            "enchanted": true
+          }
+        },
+        {
+          "id": "NULL_ATOM",
+          "displayItem": {
+            "item": "minecraft:wooden_button",
+            "meta": 0,
+            "enchanted": true
+          }
+        },
+        {
+          "id": "POCKET_ESPRESSO_MACHINE",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "9bf867c8-d5b6-33e3-8fa3-f4a573979ebe",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjY2MDcwY2UwM2E1NDVlZTRkMjYzYmNmMjdmMzYzMzhkMjQ5ZDdjYjdhMjM3NmY5MmMxNjczYWUxMzRlMDRiNiJ9fX0="
+            }
+          }
+        },
+        {
+          "id": "PET_SKIN_ENDERMAN_SLAYER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "301afb75-07dd-37ce-94a1-7c5c40ab2512",
+              "texture": "ewogICJ0aW1lc3RhbXAiIDogMTYyMTk4NDE5NTUwNCwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGZmZjQxZTFhZmM1OTdiMTRmNzdiOGU0NGUyYTEzNGRhYmUxNjFhMTUyNmFkZTgwZTYyOTBmMmRmMzMxZGMxMSIKICAgIH0KICB9Cn0"
+            }
+          }
+        },
+        {
+          "id": "ETHERWARP_MERGER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "209e7834-3376-36e1-84eb-da13ef083836",
+              "texture": "ewogICJ0aW1lc3RhbXAiIDogMTYyMTYxNzYxOTExMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2U1MzE0ZjQ5MTk2OTFjY2JmODA3NzQzZGFlNDdhZTQ1YWMyZTNmZjA4Zjc5ZWVjZGQ0NTJmZTYwMmVmZjdmNiIKICAgIH0KICB9Cn0"
+            }
+          }
+        },
+        {
+          "id": "JUDGEMENT_CORE",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "ed896594-8655-3212-933e-c67bca300084",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmYzZGRkN2Y4MTA4OWM4NWIyNmVkNTk3Njc1NTE5ZjAzYTFkY2Q2ZDE3MTNlMGNmYzY2YWZiODc0M2NiZTAifX19"
+            }
+          }
+        },
+        {
+          "id": "EXCEEDINGLY_RARE_ENDER_ARTIFACT_UPGRADER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "eac161df-59c5-3647-92eb-950d53331e0e",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTI1OTIzMWE5NDY5ODdlYTUzMTQxNzg5YTA5NDk2ZjA5OGQ2ZWNhYzQxMmEwMWUwYTI0YzkwNmE5OWZkYmQ5YSJ9fX0"
+            }
+          }
+        },
+        {
+          "id": "ENDER_SLAYER;7",
+          "displayItem": {
+            "item": "minecraft:enchanted_book",
+            "meta": 0,
+            "enchanted": true
+          }
+        },
+        {
+          "id": "HANDY_BLOOD_CHALICE",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "d17ab030-ec6c-3a88-9805-50b5812690fb",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDMxY2Q3ZWQ0ZTRiZjA3YzNkZmQ5YmE0OTg3MDhlNzMwZTY5ZDgwNzMzNWFmZmFiYzEyZDg3ZmY1NDJmNmE4OCJ9fX0"
+            }
+          }
+        },
+        {
+          "id": "SINFUL_DICE",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "05ab8a23-a718-3dbb-8307-d999ebed1e24",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmUyMmMyOThlN2M2MzM2YWYxNzkwOWFjMWYxZWU2ODM0YjU4YjFhM2NjOTlhYmEyNTVjYTdlYWViNDc2MTczIn19fQ"
+            }
+          }
+        },
+        {
+          "id": "SMARTY_PANTS;1",
+          "displayItem": {
+            "item": "minecraft:enchanted_book",
+            "meta": 0,
+            "enchanted": true
+          }
+        }
+      ],
+      "mobs": [
+        {
+          "id": "entity:ENDERMAN_SLAYER",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "fcee8e82-d1d5-44da-9d98-157a52abce20",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjk2YTAwMmZkNmRhMGNiNDI3YWUzNWNiZGZhMjg2Y2NmNTIwMTFiYWE3Y2FlZGRhOTRkNjRjZGExOThiNWFhYyJ9fX0="
+            }
+          }
+        }
+      ]
+    },
+    {
+      "location": [
+        "JERRYSWORKSHOP",
+        "JERRYPOND"
+      ],
+      "drops": [
+        {
+          "id": "HILT_OF_TRUE_ICE",
+          "displayItem": {
+            "item": "minecraft:ice",
+            "meta": 0,
+            "enchanted": true
+          }
+        },
+        {
+          "id": "BABY_YETI;3",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "7895e21a-8f3b-3e30-bea6-06108f64d5dc",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWIxMjY4MTRmYzNmYTg0NmRhZDkzNGMzNDk2MjhhN2ExZGU1YjQxNTAyMWEwM2VmNDIxMWQ2MjUxNGQ1In19fQ"
+            }
+          }
+        },
+        {
+          "id": "BABY_YETI;4",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "7895e21a-8f3b-3e30-bea6-06108f64d5dc",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWIxMjY4MTRmYzNmYTg0NmRhZDkzNGMzNDk2MjhhN2ExZGU1YjQxNTAyMWEwM2VmNDIxMWQ2MjUxNGQ1In19fQ"
+            }
+          }
+        },
+        {
+          "id": "YETI_ROD",
+          "displayItem": {
+            "item": "minecraft:fishing_rod",
+            "meta": 0
+          }
+        },
+        {
+          "id": "RED_GIFT",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "bc74cb05-2758-3395-93ec-70452a983604",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjczYTIxMTQxMzZiOGVlNDkyNmNhYTUxNzg1NDE0MDM2YTJiNzZlNGYxNjY4Y2I4OWQ5OTcxNmM0MjEifX19"
+            }
+          }
+        },
+        {
+          "id": "GREEN_GIFT",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "d5eb6a2a-3f10-3d6b-ba6a-4d46bb58a5cb",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ5N2Y0ZjQ0ZTc5NmY3OWNhNDMwOTdmYWE3YjRmZTkxYzQ0NWM3NmU1YzI2YTVhZDc5NGY1ZTQ3OTgzNyJ9fX0"
+            }
+          }
+        },
+        {
+          "id": "WHITE_GIFT",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "7732c5e4-1800-3b90-a70f-727d2969254b",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTBmNTM5ODUxMGIxYTA1YWZjNWIyMDFlYWQ4YmZjNTgzZTU3ZDcyMDJmNTE5M2IwYjc2MWZjYmQwYWUyIn19fQ=="
+            }
+          }
+        },
+        {
+          "id": "ICE_ROD",
+          "displayItem": {
+            "item": "minecraft:fishing_rod",
+            "meta": 0
+          }
+        },
+        {
+          "id": "ICE_HUNK",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "8151ccb0-c40c-3665-8f5d-80b6a74d6c81",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGRiYTY0MmVmZmZhMTNlYzM3MzBlYWZjNTkxNGFiNjgxMTVjMWY5OTg4MDNmNzQ0NTJlMmUwY2QyNmFmMGI4In19fQ"
+            }
+          }
+        },
+        {
+          "id": "BLUE_ICE_HUNK",
+          "displayItem": {
+            "item": "minecraft:skull",
+            "meta": 3,
+            "skullData": {
+              "id": "070f6268-39a5-3c12-b129-355c8f66fc8a",
+              "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWFiMDllZTE0ZTNhNWRmNTk5Y2ZhNGQxNmM1Y2U4ZDA1NGJlZjg0Njk1MTMyMGY3MjFhYTRhNzE4MWY4ZGI1ZSJ9fX0"
             }
           }
         }
