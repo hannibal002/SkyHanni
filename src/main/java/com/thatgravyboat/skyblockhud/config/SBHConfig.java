@@ -339,7 +339,6 @@ public class SBHConfig extends Config {
         @ConfigOption(name = "Chat Waypoint Mode", desc = "Change the mode of the chat waypoint In Chat Bar will allow you to edit it before adding it to your waypoints.")
         @ConfigEditorDropdown(values = { "Instant Add", "In chat bar" })
         public int chatWaypointMode = 1;
-
     }
 
     public static class Trackers {

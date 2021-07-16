@@ -70,26 +70,20 @@ public class CrystalWaypoints {
     }
 
     @SubscribeEvent
-    public void onChatMessage(ClientChatReceivedEvent event){
+    public void onChatMessage(ClientChatReceivedEvent event) {
         if (event.type != 2 && LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
             Matcher matcher = LOCATION_MESSAGE_REGEX.matcher(event.message.getUnformattedText());
             if (!matcher.find()) return;
             ChatStyle style = new ChatStyle();
             style.setParentStyle(event.message.getChatStyle());
             ClickEvent.Action action = SkyblockHud.config.mining.chatWaypointMode == 0 ? ClickEvent.Action.RUN_COMMAND : ClickEvent.Action.SUGGEST_COMMAND;
-            style.setChatClickEvent(new ClickEvent(
-                    action,
-                    "/sbhpoints addat " + matcher.group(2) + " " + matcher.group(3) + " " + matcher.group(4) + " " + matcher.group(1)
-            ));
-            style.setChatHoverEvent(new HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT,
-                    new ChatComponentText("Click to add waypoint!").setChatStyle(new ChatStyle().setBold(true))
-            ));
+            style.setChatClickEvent(new ClickEvent(action, "/sbhpoints addat " + matcher.group(2) + " " + matcher.group(3) + " " + matcher.group(4) + " " + matcher.group(1)));
+            style.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to add waypoint!").setChatStyle(new ChatStyle().setBold(true))));
             event.message.setChatStyle(style);
         }
     }
 
-    private static String copyWayPoint(String name){
+    private static String copyWayPoint(String name) {
         BlockPos pos = waypoints.get(name);
         if (pos == null) {
             return null;
@@ -120,7 +114,6 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
-
                             case "remove":
                                 if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
                                     if (CrystalWaypoints.waypoints.containsKey(name)) {
@@ -130,7 +123,6 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
-
                             case "move":
                                 if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
                                     if (CrystalWaypoints.waypoints.containsKey(name)) {
@@ -140,11 +132,9 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
-
                             case "clear":
                                 CrystalWaypoints.waypoints.clear();
                                 break;
-
                             case "addat":
                                 if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
                                     name = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
@@ -161,7 +151,6 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
-
                             case "copy":
                                 String copyText = copyWayPoint(name);
                                 if (copyText == null) {
@@ -171,7 +160,6 @@ public class CrystalWaypoints {
                                 StringSelection clipboard = new StringSelection(copyText);
                                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboard, clipboard);
                                 break;
-
                             case "send":
                                 String sendText = copyWayPoint(name);
                                 if (sendText == null) {
