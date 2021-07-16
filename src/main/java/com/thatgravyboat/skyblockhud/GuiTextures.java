@@ -33,4 +33,6 @@ public class GuiTextures {
     public static final ResourceLocation playerStat = new ResourceLocation("skyblockhud", "playerstats.png");
     public static final ResourceLocation mapOverlay = new ResourceLocation("skyblockhud", "maps/map_overlay.png");
     public static final ResourceLocation mining = new ResourceLocation("skyblockhud", "mines.png");
+
+    public static final ResourceLocation dialogue = new ResourceLocation("skyblockhud", "dialogue.png");
 }

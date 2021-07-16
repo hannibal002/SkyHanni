@@ -124,6 +124,7 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new BossbarHandler());
         MinecraftForge.EVENT_BUS.register(new MapHandler());
         MinecraftForge.EVENT_BUS.register(new MiningHud());
+        MinecraftForge.EVENT_BUS.register(new NpcDialogue());
     }
 
     // DISABLE UNTIL NEW SYSTEM

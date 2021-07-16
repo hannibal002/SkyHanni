@@ -59,6 +59,9 @@ public class SBHConfig extends Config {
             case "heat":
                 editOverlay(activeConfigCategory, 45, 7, mining.heatBar);
                 return;
+            case "dialogue":
+                editOverlay(activeConfigCategory, 182, 68, misc.dialoguePos);
+                return;
         }
     }
 
@@ -105,6 +108,16 @@ public class SBHConfig extends Config {
         @ConfigOption(name = "Bar Textures", desc = "Change the style of bars. Dont change this unless the pack ur using tells you can.")
         @ConfigEditorDropdown(values = { "Style 1", "Style 2" })
         public int barTexture = 0;
+
+        @Expose
+        @ConfigOption(name = "Hide Dialogue Box", desc = "Hides the Dialogue Box.")
+        @ConfigEditorBoolean
+        public boolean hideDialogueBox = true;
+
+        @Expose
+        @ConfigOption(name = "Dialogue Box", desc = "")
+        @ConfigEditorButton(runnableId = "dialogue", buttonText = "Edit")
+        public Position dialoguePos = new Position(0, -50, true, false);
     }
 
     public static class MainHud {
