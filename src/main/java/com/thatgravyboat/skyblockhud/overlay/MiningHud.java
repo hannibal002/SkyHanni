@@ -42,12 +42,12 @@ public class MiningHud extends Gui {
                 } else if (heat > 0 && SkyblockHud.config.mining.showHeatBar) {
                     renderHeatBar(mc, (event.resolution.getScaledWidth() / 2) - 22, event.resolution.getScaledHeight() - 31);
                 }
-            }else if (SkyblockHud.config.mining.barMode == 0) {
-                if (heat > 0 && SkyblockHud.config.mining.showHeatBar){
+            } else if (SkyblockHud.config.mining.barMode == 0) {
+                if (heat > 0 && SkyblockHud.config.mining.showHeatBar) {
                     Position position = SkyblockHud.config.mining.heatBar;
                     renderHeatBar(mc, position.getAbsX(event.resolution, 45), position.getAbsY(event.resolution, 7));
                 }
-                if (Utils.isDrill(mc.thePlayer.getHeldItem()) && SkyblockHud.config.mining.showDrillBar){
+                if (Utils.isDrill(mc.thePlayer.getHeldItem()) && SkyblockHud.config.mining.showDrillBar) {
                     Position position = SkyblockHud.config.mining.drillBar;
                     renderFuelBar(mc, position.getAbsX(event.resolution, 136), position.getAbsY(event.resolution, 7));
                 }

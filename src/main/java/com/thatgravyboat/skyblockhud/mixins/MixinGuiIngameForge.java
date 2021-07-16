@@ -1,5 +1,7 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
+import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
+
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
@@ -13,8 +15,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
 
 @Mixin(GuiIngameForge.class)
 public class MixinGuiIngameForge {
@@ -64,7 +64,7 @@ public class MixinGuiIngameForge {
             ci.cancel();
             if (prePost(EXPERIENCE, eventParent)) return;
             postPost(EXPERIENCE, eventParent);
-        }else if (SkyblockHud.config.mining.barMode == 1) {
+        } else if (SkyblockHud.config.mining.barMode == 1) {
             if (!SkyblockHud.config.renderer.hideXpBar && (SkyblockHud.config.mining.showDrillBar || SkyblockHud.config.mining.showHeatBar) && SkyblockHud.hasSkyblockScoreboard()) {
                 if (MiningHud.getHeat() > 0 || Utils.isDrill(Minecraft.getMinecraft().thePlayer.getHeldItem())) {
                     ci.cancel();
@@ -81,7 +81,7 @@ public class MixinGuiIngameForge {
             ci.cancel();
             if (prePost(JUMPBAR, eventParent)) return;
             postPost(JUMPBAR, eventParent);
-        }else if (SkyblockHud.config.mining.barMode == 1) {
+        } else if (SkyblockHud.config.mining.barMode == 1) {
             if (!SkyblockHud.config.renderer.hideXpBar && (SkyblockHud.config.mining.showDrillBar || SkyblockHud.config.mining.showHeatBar) && SkyblockHud.hasSkyblockScoreboard()) {
                 if (MiningHud.getHeat() > 0 || Utils.isDrill(Minecraft.getMinecraft().thePlayer.getHeldItem())) {
                     ci.cancel();
