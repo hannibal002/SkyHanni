@@ -136,7 +136,7 @@ public class CrystalWaypoints {
                 new TabCompleteRunnable() {
                     @Override
                     public List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos) {
-                        if (args.length == 2 && Utils.equalsIgnoreCaseAnyOf (args[0], "remove","copy", "move")) {
+                        if (args.length == 2 && Utils.equalsIgnoreCaseAnyOf(args[0], "remove", "copy", "move")) {
                             return getListOfStringsMatchingLastWord(args, waypoints.keySet());
                         }
                         if (args.length == 1) {
