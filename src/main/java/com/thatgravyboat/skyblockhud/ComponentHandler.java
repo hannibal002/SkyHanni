@@ -43,7 +43,7 @@ public class ComponentHandler {
                                 if (formattedTabListPlayer.toLowerCase().contains("secrets found:")) DungeonHandler.parseTotalSecrets(formattedTabListPlayer);
                                 if (formattedTabListPlayer.toLowerCase().contains("deaths:")) DungeonHandler.parseDeaths(formattedTabListPlayer);
                                 if (formattedTabListPlayer.toLowerCase().contains("crypts:")) DungeonHandler.parseCrypts(formattedTabListPlayer);
-                            } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
+                            } else if (LocationHandler.getCurrentLocation().getCategory().isMiningCategory()) {
                                 if (formattedTabListPlayer.toLowerCase().contains("mithril powder:")) {
                                     MinesHandler.parseMithril(formattedTabListPlayer);
                                 }

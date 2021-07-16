@@ -15,17 +15,25 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class CrystalWaypoints {
+
+    public static final Pattern LOCATION_MESSAGE_REGEX = Pattern.compile("\\{(.*) : \\((-?\\d+)/(-?\\d+)/(-?\\d+)\\)}");
 
     public static final HashMap<String, BlockPos> waypoints = new HashMap<>();
 
@@ -61,6 +69,34 @@ public class CrystalWaypoints {
         }
     }
 
+    @SubscribeEvent
+    public void onChatMessage(ClientChatReceivedEvent event){
+        if (event.type != 2 && LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
+            Matcher matcher = LOCATION_MESSAGE_REGEX.matcher(event.message.getUnformattedText());
+            if (!matcher.find()) return;
+            ChatStyle style = new ChatStyle();
+            style.setParentStyle(event.message.getChatStyle());
+            ClickEvent.Action action = SkyblockHud.config.mining.chatWaypointMode == 0 ? ClickEvent.Action.RUN_COMMAND : ClickEvent.Action.SUGGEST_COMMAND;
+            style.setChatClickEvent(new ClickEvent(
+                    action,
+                    "/sbhpoints addat " + matcher.group(2) + " " + matcher.group(3) + " " + matcher.group(4) + " " + matcher.group(1)
+            ));
+            style.setChatHoverEvent(new HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    new ChatComponentText("Click to add waypoint!").setChatStyle(new ChatStyle().setBold(true))
+            ));
+            event.message.setChatStyle(style);
+        }
+    }
+
+    private static String copyWayPoint(String name){
+        BlockPos pos = waypoints.get(name);
+        if (pos == null) {
+            return null;
+        }
+        return "{" + name + " : (" + pos.getX() + "/" + pos.getY() + "/" + pos.getZ() + ")}";
+    }
+
     public static class WaypointCommand extends SimpleCommand {
 
         public WaypointCommand() {
@@ -84,6 +120,7 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
+
                             case "remove":
                                 if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
                                     if (CrystalWaypoints.waypoints.containsKey(name)) {
@@ -93,6 +130,7 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
+
                             case "move":
                                 if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
                                     if (CrystalWaypoints.waypoints.containsKey(name)) {
@@ -102,9 +140,11 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
+
                             case "clear":
                                 CrystalWaypoints.waypoints.clear();
                                 break;
+
                             case "addat":
                                 if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
                                     name = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
@@ -121,14 +161,24 @@ public class CrystalWaypoints {
                                     }
                                 }
                                 break;
+
                             case "copy":
-                                BlockPos pos = waypoints.get(name);
-                                if (pos == null) {
+                                String copyText = copyWayPoint(name);
+                                if (copyText == null) {
                                     sbhMessage(sender, "No waypoint with that name!");
                                     break;
                                 }
-                                StringSelection clipboard = new StringSelection(name + " : (" + pos.getX() + "/" + pos.getY() + "/" + pos.getZ() + ")");
+                                StringSelection clipboard = new StringSelection(copyText);
                                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboard, clipboard);
+                                break;
+
+                            case "send":
+                                String sendText = copyWayPoint(name);
+                                if (sendText == null) {
+                                    sbhMessage(sender, "No waypoint with that name!");
+                                    break;
+                                }
+                                Minecraft.getMinecraft().thePlayer.sendChatMessage(sendText);
                                 break;
                         }
                     }
@@ -136,11 +186,11 @@ public class CrystalWaypoints {
                 new TabCompleteRunnable() {
                     @Override
                     public List<String> tabComplete(ICommandSender sender, String[] args, BlockPos pos) {
-                        if (args.length == 2 && Utils.equalsIgnoreCaseAnyOf(args[0], "remove", "copy", "move")) {
+                        if (args.length == 2 && Utils.equalsIgnoreCaseAnyOf(args[0], "remove", "copy", "move", "send")) {
                             return getListOfStringsMatchingLastWord(args, waypoints.keySet());
                         }
                         if (args.length == 1) {
-                            return getListOfStringsMatchingLastWord(args, Lists.newArrayList("add", "clear", "remove", "copy", "addat", "move"));
+                            return getListOfStringsMatchingLastWord(args, Lists.newArrayList("add", "clear", "remove", "copy", "addat", "move", "send"));
                         }
                         if (args.length > 1 && args[0].equalsIgnoreCase("addat")) {
                             return func_175771_a(args, 1, pos);

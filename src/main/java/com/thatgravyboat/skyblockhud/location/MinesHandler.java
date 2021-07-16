@@ -16,8 +16,8 @@ public class MinesHandler {
         NONE(0, "Unknown", false, false),
         TICKET(107, "Raffle", true, true),
         GOBLIN(99, "Goblin Raid", true, true),
-        WIND(107, "Gone With The Wind", false, false),
-        TOGETHER(107, "Better Together", false, true);
+        WIND(0, "Gone With The Wind", false, false),
+        TOGETHER(171, "Better Together", false, true);
 
         public int x;
         public String displayName;
@@ -108,7 +108,7 @@ public class MinesHandler {
         if (event.formattedLine.toLowerCase(Locale.ENGLISH).contains("nearby players")) {
             MinesHandler.currentEvent = Event.TOGETHER;
             try {
-                MinesHandler.eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("nearby players", ""));
+                MinesHandler.eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("nearby players:", ""));
             } catch (Exception ignored) {}
         }
 
