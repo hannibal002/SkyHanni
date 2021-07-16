@@ -108,7 +108,7 @@ public class MinesHandler {
         if (event.formattedLine.toLowerCase(Locale.ENGLISH).contains("nearby players")) {
             MinesHandler.currentEvent = Event.TOGETHER;
             try {
-                MinesHandler.eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("nearby players:", ""));
+                MinesHandler.eventProgress = Integer.parseInt(event.formattedLine.toLowerCase().replace("nearby players:", "").trim());
             } catch (Exception ignored) {}
         }
 
