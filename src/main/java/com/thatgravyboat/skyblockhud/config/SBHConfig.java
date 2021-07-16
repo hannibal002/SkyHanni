@@ -53,6 +53,12 @@ public class SBHConfig extends Config {
             case "tracker":
                 editOverlay(activeConfigCategory, 130, 70, trackers.trackerPosition);
                 return;
+            case "drill":
+                editOverlay(activeConfigCategory, 136, 7, mining.drillBar);
+                return;
+            case "heat":
+                editOverlay(activeConfigCategory, 45, 7, mining.heatBar);
+                return;
         }
     }
 
@@ -321,23 +327,61 @@ public class SBHConfig extends Config {
     public static class Mining {
 
         @Expose
+        @ConfigOption(name = "Mining Bars", desc = "")
+        @ConfigEditorAccordion(id = 4)
+        public boolean miningBars = false;
+
+        @Expose
+        @ConfigOption(name = "Bar Mode", desc = "Change the mode of bar. Static mode will allow it to auto replace the xp when drill is held or you are heating up.")
+        @ConfigEditorDropdown(values = { "Moveable", "Static" })
+        @ConfigAccordionId(id = 4)
+        public int barMode = 1;
+
+        @Expose
         @ConfigOption(name = "Show Drill Bar", desc = "Allows you to show or hide the Drill Bar.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 4)
         public boolean showDrillBar = true;
 
         @Expose
         @ConfigOption(name = "Show Heat Bar", desc = "Allows you to show or hide the Heat Bar.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 4)
         public boolean showHeatBar = true;
+
+        @Expose
+        @ConfigOption(name = "Bar Positions (Requires mode to be Moveable)", desc = "")
+        @ConfigAccordionId(id = 4)
+        @ConfigEditorAccordion(id = 5)
+        public boolean barPositions = false;
+
+        @Expose
+        @ConfigOption(name = "Drill Bar Position", desc = "Allows you to change the position of the Drill Bar.")
+        @ConfigEditorButton(runnableId = "drill", buttonText = "Edit")
+        @ConfigAccordionId(id = 5)
+        public Position drillBar = new Position(-1, -1);
+
+        @Expose
+        @ConfigOption(name = "Heat Bar Position", desc = "Allows you to change the position of the Heat Bar.")
+        @ConfigEditorButton(runnableId = "heat", buttonText = "Edit")
+        @ConfigAccordionId(id = 5)
+        public Position heatBar = new Position(-1, -9);
+
+        @Expose
+        @ConfigOption(name = "Crystal Hollow Waypoints", desc = "")
+        @ConfigEditorAccordion(id = 6)
+        public boolean waypoints = false;
 
         @Expose
         @ConfigOption(name = "Auto Waypoint", desc = "Turns on auto waypoints for the main areas of crystal hollows.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 6)
         public boolean autoWaypoint = true;
 
         @Expose
         @ConfigOption(name = "Chat Waypoint Mode", desc = "Change the mode of the chat waypoint In Chat Bar will allow you to edit it before adding it to your waypoints.")
         @ConfigEditorDropdown(values = { "Instant Add", "In chat bar" })
+        @ConfigAccordionId(id = 6)
         public int chatWaypointMode = 1;
     }
 
