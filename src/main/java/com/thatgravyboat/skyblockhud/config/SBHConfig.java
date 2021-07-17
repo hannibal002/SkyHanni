@@ -301,21 +301,7 @@ public class SBHConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Map Locations", desc = "Remove a location from this list if you would like the map to not show up in that location. This is so you can use other mods maps.")
-        @ConfigEditorDraggableList(exampleText = {
-                "HUB",
-                "BARN",
-                "MUSHROOMDESERT",
-                "GOLDMINE (No Map Yet)",
-                "DEEPCAVERNS (No Map Yet)",
-                "SPIDERSDEN",
-                "PARK",
-                "FORTRESS",
-                "DUNGEONHUB (No Map Yet)",
-                "JERRY (No Map Yet)",
-                "THEEND (No Map Yet)",
-                "DWARVENMINES",
-                "CRYSTALHOLLOWS (No Map Yet)"
-        })
+        @ConfigEditorDraggableList(exampleText = { "HUB", "BARN", "MUSHROOMDESERT", "GOLDMINE (No Map Yet)", "DEEPCAVERNS (No Map Yet)", "SPIDERSDEN", "PARK", "FORTRESS", "DUNGEONHUB (No Map Yet)", "JERRY (No Map Yet)", "THEEND (No Map Yet)", "DWARVENMINES", "CRYSTALHOLLOWS (No Map Yet)" })
         public List<Integer> mapLocations = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 11));
 
         @Expose

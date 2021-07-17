@@ -1,5 +1,7 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
+import static com.thatgravyboat.skyblockhud.GuiTextures.dialogue;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -24,8 +26,6 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
-import static com.thatgravyboat.skyblockhud.GuiTextures.dialogue;
 
 public class NpcDialogue implements IResourceManagerReloadListener {
 
@@ -90,7 +90,7 @@ public class NpcDialogue implements IResourceManagerReloadListener {
 
             String npcID = currentNpc.toLowerCase(Locale.ENGLISH).replace(" ", "_");
 
-            if (NPCS.containsKey(npcID)){
+            if (NPCS.containsKey(npcID)) {
                 mc.renderEngine.bindTexture(NPCS.get(npcID));
                 Gui.drawModalRectWithCustomSizedTexture(x + 4, y + 4, 0, 0, 32, 60, 128, 128);
             }

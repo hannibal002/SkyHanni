@@ -1,9 +1,9 @@
 package com.thatgravyboat.skyblockhud.location;
 
+import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
+
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
-
-import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
 
 public enum LocationCategory {
     ERROR("error", 34),
@@ -45,8 +45,7 @@ public enum LocationCategory {
     }
 
     public MapHandler.Maps getMap() {
-        if (this.map != null && SkyblockHud.config.map.mapLocations.contains(this.ordinal() - 2)) return this.map;
-        else return null;
+        if (this.map != null && SkyblockHud.config.map.mapLocations.contains(this.ordinal() - 2)) return this.map; else return null;
     }
 
     public boolean isMiningCategory() {
