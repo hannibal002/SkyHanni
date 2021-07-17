@@ -55,7 +55,7 @@ public enum Locations {
     DEEPCAVERNS("deepcaverns", "Deep Caverns", LocationCategory.DEEPCAVERNS),
     GUNPOWDERMINES("gunpowdermines", "Gunpowder Mines", LocationCategory.DEEPCAVERNS),
     LAPISQUARRY("lapisquarry", "Lapis Quarry", LocationCategory.DEEPCAVERNS),
-    PIGMANSDEN("pigmansden", "Pigman's Den", LocationCategory.DEEPCAVERNS),
+    PIGMENSDEN("pigmensden", "Pigmen's Den", LocationCategory.DEEPCAVERNS),
     SLIMEHILL("slimehill", "Slimehill", LocationCategory.DEEPCAVERNS),
     DIAMONDRESERVE("diamondreserve", "Diamond Reserve", LocationCategory.DEEPCAVERNS),
     OBSIDIANSANCTUARY("obsidiansanctuary", "Obsidian Sanctuary", LocationCategory.DEEPCAVERNS),
