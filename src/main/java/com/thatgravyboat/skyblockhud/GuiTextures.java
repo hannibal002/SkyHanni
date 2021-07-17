@@ -19,6 +19,7 @@ public class GuiTextures {
     public static final ResourceLocation TWO = new ResourceLocation("skyblockhud:core/toggle_2.png");
     public static final ResourceLocation THREE = new ResourceLocation("skyblockhud:core/toggle_3.png");
     public static final ResourceLocation ON = new ResourceLocation("skyblockhud:core/toggle_on.png");
+    public static final ResourceLocation DELETE = new ResourceLocation("skyblockhud:core/delete.png");
 
     public static final ResourceLocation slider_off_cap = new ResourceLocation("skyblockhud:core/slider/slider_off_cap.png");
     public static final ResourceLocation slider_off_notch = new ResourceLocation("skyblockhud:core/slider/slider_off_notch.png");

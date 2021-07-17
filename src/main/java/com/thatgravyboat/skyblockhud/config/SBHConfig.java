@@ -7,6 +7,9 @@ import com.thatgravyboat.skyblockhud.core.config.Config;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.core.config.annotations.*;
 import com.thatgravyboat.skyblockhud.core.config.gui.GuiPositionEditor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 
 public class SBHConfig extends Config {
@@ -295,6 +298,25 @@ public class SBHConfig extends Config {
         @ConfigOption(name = "Show Mini-Map", desc = "Shows the Mini-Map on your overlay if turned off you can still use /sbhmap to see the map in fullscreen.")
         @ConfigEditorBoolean
         public boolean showMiniMap = false;
+
+        @Expose
+        @ConfigOption(name = "Map Locations", desc = "Remove a location from this list if you would like the map to not show up in that location. This is so you can use other mods maps.")
+        @ConfigEditorDraggableList(exampleText = {
+                "HUB",
+                "BARN",
+                "MUSHROOMDESERT",
+                "GOLDMINE (No Map Yet)",
+                "DEEPCAVERNS (No Map Yet)",
+                "SPIDERSDEN",
+                "PARK",
+                "FORTRESS",
+                "DUNGEONHUB (No Map Yet)",
+                "JERRY (No Map Yet)",
+                "THEEND (No Map Yet)",
+                "DWARVENMINES",
+                "CRYSTALHOLLOWS (No Map Yet)"
+        })
+        public List<Integer> mapLocations = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 11));
 
         @Expose
         @ConfigOption(name = "Mini-Map Position", desc = "Allows you to change the position of the Mini-Map.")

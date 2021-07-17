@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -86,6 +87,8 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new CrystalWaypoints());
         MinecraftForge.EVENT_BUS.register(new FarmHouseHandler());
         Commands.init();
+
+        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new NpcDialogue());
 
         configFile = new File(event.getModConfigurationDirectory(), "sbh-config.json");
 
