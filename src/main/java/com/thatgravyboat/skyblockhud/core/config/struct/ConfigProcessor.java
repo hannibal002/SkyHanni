@@ -117,6 +117,8 @@ public class ConfigProcessor {
                             if (optionField.isAnnotationPresent(ConfigEditorDropdown.class)) {
                                 ConfigEditorDropdown configEditorAnnotation = optionField.getAnnotation(ConfigEditorDropdown.class);
                                 editor = new GuiOptionEditorDropdown(option, configEditorAnnotation.values(), (int) option.get(), true);
+                            } else if (optionField.isAnnotationPresent(ConfigEditorStyle.class)) {
+                                editor = new GuiOptionEditorStyle(option, (int) option.get());
                             }
                         }
                         if (optionType.isAssignableFrom(List.class)) {

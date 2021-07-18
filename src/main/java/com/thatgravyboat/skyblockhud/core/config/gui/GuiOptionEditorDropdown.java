@@ -10,10 +10,10 @@ import org.lwjgl.input.Mouse;
 
 public class GuiOptionEditorDropdown extends GuiOptionEditor {
 
-    private final String[] values;
+    protected final String[] values;
     private final boolean useOrdinal;
-    private int selected;
-    private boolean open = false;
+    protected int selected;
+    protected boolean open = false;
 
     public GuiOptionEditorDropdown(ConfigProcessor.ProcessedOption option, String[] values, int selected, boolean useOrdinal) {
         super(option);

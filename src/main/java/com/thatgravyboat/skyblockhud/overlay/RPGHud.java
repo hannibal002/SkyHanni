@@ -1,11 +1,11 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-import com.thatgravyboat.skyblockhud.GuiTextures;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.handlers.HeldItemHandler;
+import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import net.minecraft.client.Minecraft;
@@ -61,7 +61,7 @@ public class RPGHud extends Gui {
                 health = Math.max((int) (maxHealth * (mc.thePlayer.getHealth() / mc.thePlayer.getMaxHealth())), health);
             }
 
-            mc.renderEngine.bindTexture(GuiTextures.playerStat);
+            mc.renderEngine.bindTexture(Textures.texture.playerStats);
             Position position = SkyblockHud.config.rpg.rpgHudPosition;
 
             int x = position.getAbsX(event.resolution, 120);

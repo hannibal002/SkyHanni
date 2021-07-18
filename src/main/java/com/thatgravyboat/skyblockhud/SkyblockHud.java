@@ -18,6 +18,7 @@ import com.thatgravyboat.skyblockhud.overlay.OverlayHud;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
 import com.thatgravyboat.skyblockhud.playerstats.ActionBarParsing;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import com.thatgravyboat.skyblockhud.textures.Textures;
 import com.thatgravyboat.skyblockhud.tracker.TrackerFileLoader;
 import com.thatgravyboat.skyblockhud.tracker.TrackerHandler;
 import java.awt.*;
@@ -89,6 +90,7 @@ public class SkyblockHud {
         Commands.init();
 
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new NpcDialogue());
+        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
 
         configFile = new File(event.getModConfigurationDirectory(), "sbh-config.json");
 
@@ -102,6 +104,8 @@ public class SkyblockHud {
             config = new SBHConfig();
             saveConfig();
         }
+
+        Textures.setTexture(config.misc.style);
 
         configDirectory = event.getModConfigurationDirectory();
 
@@ -129,8 +133,6 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new MiningHud());
         MinecraftForge.EVENT_BUS.register(new NpcDialogue());
     }
-
-    // DISABLE UNTIL NEW SYSTEM
 
     @EventHandler
     public void loadComplete(FMLLoadCompleteEvent event) {

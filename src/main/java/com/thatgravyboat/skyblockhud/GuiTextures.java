@@ -29,11 +29,6 @@ public class GuiTextures {
     public static final ResourceLocation slider_on_segment = new ResourceLocation("skyblockhud:core/slider/slider_on_segment.png");
     public static final ResourceLocation slider_button_new = new ResourceLocation("skyblockhud:core/slider/slider_button.png");
 
-    public static final ResourceLocation overlay = new ResourceLocation("skyblockhud", "stats.png");
-    public static final ResourceLocation dungeon = new ResourceLocation("skyblockhud", "dungeon.png");
-    public static final ResourceLocation playerStat = new ResourceLocation("skyblockhud", "playerstats.png");
     public static final ResourceLocation mapOverlay = new ResourceLocation("skyblockhud", "maps/map_overlay.png");
-    public static final ResourceLocation mining = new ResourceLocation("skyblockhud", "mines.png");
 
-    public static final ResourceLocation dialogue = new ResourceLocation("skyblockhud", "dialogue.png");
 }

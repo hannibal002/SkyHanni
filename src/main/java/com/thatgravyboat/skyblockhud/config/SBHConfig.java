@@ -108,9 +108,9 @@ public class SBHConfig extends Config {
         public boolean hideScoreboard = false;
 
         @Expose
-        @ConfigOption(name = "Bar Textures", desc = "Change the style of bars. Dont change this unless the pack ur using tells you can.")
-        @ConfigEditorDropdown(values = { "Style 1", "Style 2" })
-        public int barTexture = 0;
+        @ConfigOption(name = "Texture Styles", desc = "If this list only contains 1 thing that means your texture pack doesnt support styles")
+        @ConfigEditorStyle()
+        public int style = 0;
 
         @Expose
         @ConfigOption(name = "Hide Dialogue Box", desc = "Hides the Dialogue Box.")

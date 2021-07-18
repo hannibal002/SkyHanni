@@ -1,13 +1,12 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import static com.thatgravyboat.skyblockhud.GuiTextures.dialogue;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -80,7 +79,7 @@ public class NpcDialogue implements IResourceManagerReloadListener {
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
         if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), showDialogue, !SkyblockHud.config.misc.hideDialogueBox)) {
             Minecraft mc = Minecraft.getMinecraft();
-            mc.renderEngine.bindTexture(dialogue);
+            mc.renderEngine.bindTexture(Textures.texture.dialogue);
             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
             int x = SkyblockHud.config.misc.dialoguePos.getAbsX(event.resolution, 182) - 91;
@@ -111,8 +110,8 @@ public class NpcDialogue implements IResourceManagerReloadListener {
     public void onResourceManagerReload(IResourceManager resourceManager) {
         NPCS.clear();
         try {
-            ResourceLocation trackers = new ResourceLocation("skyblockhud:data/npc_textures.json");
-            InputStream is = resourceManager.getResource(trackers).getInputStream();
+            ResourceLocation npcs = new ResourceLocation("skyblockhud:data/npc_textures.json");
+            InputStream is = resourceManager.getResource(npcs).getInputStream();
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
                 for (JsonElement npc : gson.fromJson(reader, JsonObject.class).getAsJsonArray("npcs")) {

@@ -1,6 +1,5 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.GuiTextures;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.handlers.BossbarHandler;
@@ -10,6 +9,7 @@ import com.thatgravyboat.skyblockhud.handlers.TimeHandler;
 import com.thatgravyboat.skyblockhud.location.*;
 import com.thatgravyboat.skyblockhud.seasons.Season;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
+import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -35,7 +35,7 @@ public class OverlayHud extends Gui {
     public void drawClock(int width, int offset, Minecraft mc) {
         GlStateManager.enableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         //CLOCK
         int timeMin = (int) (TimeHandler.time / 60);
         int timeHour = timeMin / 60;
@@ -87,7 +87,7 @@ public class OverlayHud extends Gui {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             if (mc.thePlayer.ticksExisted % 100 == 0 && eventToggle) eventToggle = false;
             if (mc.thePlayer.ticksExisted % 600 == 0) eventToggle = true;
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
             String dateText = SeasonDateHandler.getFancySeasonAndDate();
             if (eventToggle && !SeasonDateHandler.getCurrentEvent().isEmpty() && !SeasonDateHandler.getCurrentEventTime().isEmpty()) dateText = SeasonDateHandler.getCurrentEvent().trim() + " " + SeasonDateHandler.getCurrentEventTime().trim();
             drawTexturedModalRect((width / 2) + 17, offset + (bossBarVisible ? 20 : 3), 2, 34, font.getStringWidth(dateText) + 9, 14);
@@ -99,7 +99,7 @@ public class OverlayHud extends Gui {
 
     public void drawLocation(int width, int offset, Minecraft mc) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName())), offset + (bossBarVisible ? 20 : 3), 0, 34, 2, 14);
         drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName()))) + 2, offset + (bossBarVisible ? 20 : 3), 2, 34, font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName()) + 14, 14);
         drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(LocationHandler.getCurrentLocation().getDisplayName()))) + 4, offset + (bossBarVisible ? 23 : 6), LocationHandler.getCurrentLocation().getCategory().getTexturePos(), 8, 8, 8);
@@ -108,7 +108,7 @@ public class OverlayHud extends Gui {
 
     public void drawRedstone(int width, int offset, Minecraft mc) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int redstoneColor = IslandHandler.redstone > 90 ? 0xFF0000 : IslandHandler.redstone > 75 ? 0xC45B00 : IslandHandler.redstone > 50 ? 0xFFFF55 : 0x55FF55;
         if (IslandHandler.redstone > 0 && Utils.isPlayerHoldingRedstone(mc.thePlayer)) {
             drawTexturedModalRect((width / 2) - 15, offset + (bossBarVisible ? 51 : 34), 0, 48, 30, 18);
@@ -119,7 +119,7 @@ public class OverlayHud extends Gui {
 
     public void drawPurseAndBits(int width, int offset, Minecraft mc) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int xPos = (width / 2) + 17;
 
         //COINS
@@ -127,7 +127,7 @@ public class OverlayHud extends Gui {
         drawTexturedModalRect(xPos + 1, offset + (bossBarVisible ? 37 : 20), 34, 0, 8, 8);
         drawString(font, CurrencyHandler.getCoinsFormatted(), xPos + 10, offset + (bossBarVisible ? 38 : 21), 0xFFAA00);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         xPos += font.getStringWidth(CurrencyHandler.getCoinsFormatted()) + 11;
 
         //BITS
@@ -136,7 +136,7 @@ public class OverlayHud extends Gui {
             drawTexturedModalRect(xPos + 1, offset + (bossBarVisible ? 37 : 20), 75, 0, 8, 8);
             drawString(font, CurrencyHandler.getBitsFormatted(), xPos + 10, offset + (bossBarVisible ? 38 : 21), 0x55FFFF);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
             xPos += font.getStringWidth(CurrencyHandler.getBitsFormatted()) + 11;
         }
 
@@ -149,7 +149,7 @@ public class OverlayHud extends Gui {
             DecimalFormat flightFormat = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.CANADA));
             String duration;
             if (IslandHandler.flightTime < 60) duration = IslandHandler.flightTime + "s"; else if (IslandHandler.flightTime < 3600) duration = flightFormat.format((double) IslandHandler.flightTime / 60) + "m"; else if (IslandHandler.flightTime < 86400) duration = flightFormat.format((double) IslandHandler.flightTime / 3600) + "hr"; else if (IslandHandler.flightTime < 86460) duration = flightFormat.format((double) IslandHandler.flightTime / 86400) + "day"; else duration = flightFormat.format((double) IslandHandler.flightTime / 86400) + "days";
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
             drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(duration) + 14, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 4, offset + (bossBarVisible ? 38 : 21), 67, 0, 8, 8);
@@ -160,7 +160,7 @@ public class OverlayHud extends Gui {
     public void drawRainDuration(int width, int offset, Minecraft mc) {
         if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.PARK)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
             String duration = "Rain: " + ParkIslandHandler.getRainTime();
             drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(duration) + 14, 14);
@@ -177,7 +177,7 @@ public class OverlayHud extends Gui {
             SlayerHandler.slayerTypes slayerType = SlayerHandler.currentSlayer;
             if (slayerType != SlayerHandler.slayerTypes.NONE) {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                mc.renderEngine.bindTexture(GuiTextures.overlay);
+                mc.renderEngine.bindTexture(Textures.texture.stats);
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(EnumChatFormatting.GREEN);
                 stringBuilder.append(Utils.intToRomanNumeral(tier));
@@ -211,7 +211,7 @@ public class OverlayHud extends Gui {
     public void drawMiningPowders(int width, int offset, Minecraft mc) {
         if (MinesHandler.gemstone == 0) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
             String mithril = MinesHandler.getMithrilFormatted();
             drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(mithril)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(mithril))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(mithril) + 14, 14);
@@ -222,7 +222,7 @@ public class OverlayHud extends Gui {
             String mithril = locationCategory == LocationCategory.DWARVENMINES ? MinesHandler.getMithrilFormatted() : MinesHandler.getMithrilShortFormatted();
             String gemstone = locationCategory == LocationCategory.CRYSTALHOLLOWS ? MinesHandler.getGemstoneFormatted() : MinesHandler.getGemstoneShortFormatted();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
 
             int edge = (width / 2) - 33;
 
@@ -246,7 +246,7 @@ public class OverlayHud extends Gui {
     public void drawTrapperOrPelts(int width, int offset, Minecraft mc) {
         if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.MUSHROOMDESERT)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
             String duration = FarmingIslandHandler.location != Locations.NONE ? FarmingIslandHandler.location.getDisplayName() : "" + FarmingIslandHandler.pelts;
             drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
             drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(duration) + 14, 14);
@@ -258,7 +258,7 @@ public class OverlayHud extends Gui {
     public void drawDwarvenEvent(int width, int offset, Minecraft mc) {
         if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(GuiTextures.overlay);
+            mc.renderEngine.bindTexture(Textures.texture.stats);
             if (MinesHandler.eventMax > 0 || !MinesHandler.currentEvent.needsMax) {
                 String duration = MinesHandler.currentEvent.needsMax ? MinesHandler.eventProgress + "/" + MinesHandler.eventMax : String.valueOf(MinesHandler.eventProgress);
                 drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
@@ -313,7 +313,7 @@ public class OverlayHud extends Gui {
 
     public int drawLeftBottomBar(int width, int offset, int barWidth, Minecraft mc) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int edge = (width / 2) - 17;
 
         drawTexturedModalRect(edge - barWidth, offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);

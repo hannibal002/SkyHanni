@@ -1,6 +1,5 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.GuiTextures;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.SpecialColour;
 import com.thatgravyboat.skyblockhud.Utils;
@@ -12,6 +11,7 @@ import com.thatgravyboat.skyblockhud.dungeons.DungeonPlayer;
 import com.thatgravyboat.skyblockhud.handlers.BossbarHandler;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
+import com.thatgravyboat.skyblockhud.textures.Textures;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -31,7 +31,7 @@ public class DungeonOverlay extends Gui {
         if (!SkyblockHud.config.dungeon.hideDeadDungeonPlayers || !isDead) {
             GlStateManager.enableBlend();
             Minecraft mc = Minecraft.getMinecraft();
-            mc.renderEngine.bindTexture(GuiTextures.dungeon);
+            mc.renderEngine.bindTexture(Textures.texture.dungeon);
 
             String healthString = isDead ? "DEAD" : Integer.toString(health);
             GlStateManager.color(1.0F, 1.0F, 1.0F, (float) SkyblockHud.config.dungeon.dungeonPlayerOpacity / 100);
@@ -46,12 +46,12 @@ public class DungeonOverlay extends Gui {
     public void drawDungeonClock(int width, int offset, Minecraft mc) {
         GlStateManager.enableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int dungeonTime = DungeonHandler.getDungeonTime();
         int dungeonTimeMin = dungeonTime / 60;
         int dungeonTimeSec = dungeonTime - dungeonTimeMin * 60;
         drawTexturedModalRect((width / 2) - 17, offset + (bossBarVisible ? 17 : 0), 0, 0, 34, 34);
-        mc.renderEngine.bindTexture(GuiTextures.dungeon);
+        mc.renderEngine.bindTexture(Textures.texture.dungeon);
         drawTexturedModalRect((width / 2) - 7, offset + (bossBarVisible ? 20 : 3), 16, 50, 3, 8);
         drawTexturedModalRect((width / 2) - 7, offset + (bossBarVisible ? 30 : 13), 19, 50, 3, 8);
         String dungeonTimeElapsed = (dungeonTimeMin > 9 ? String.valueOf(dungeonTimeMin) : "0" + dungeonTimeMin) + ":" + (dungeonTimeSec > 9 ? String.valueOf(dungeonTimeSec) : "0" + dungeonTimeSec);
@@ -61,7 +61,7 @@ public class DungeonOverlay extends Gui {
         drawString(font, DungeonHandler.getWitherKeys() + "x", (width / 2), offset + (bossBarVisible ? 30 : 13), 0x555555);
         //CLEARED PERCENTAGE
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int clearPercent = DungeonHandler.getDungeonCleared();
         String clearPercentage = "Dungeon Cleared: \u00A7" + (clearPercent <= 20 ? "4" : clearPercent <= 50 ? "6" : clearPercent <= 80 ? "e" : "a") + clearPercent + "%";
         drawTexturedModalRect((width / 2) + 17, offset + (bossBarVisible ? 20 : 3), 2, 34, font.getStringWidth(clearPercentage) + 3, 14);
@@ -70,7 +70,7 @@ public class DungeonOverlay extends Gui {
 
         //DEATHS
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int deaths = DungeonHandler.getDeaths();
         String deathText = "Deaths: " + deaths;
         drawTexturedModalRect((width / 2) + 17, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(deathText) + 3, 14);
@@ -79,7 +79,7 @@ public class DungeonOverlay extends Gui {
 
         //SECRETS
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int maxSecrets = DungeonHandler.getMaxSecrets();
         int secrets = DungeonHandler.getSecrets();
         int totalSecrets = DungeonHandler.getTotalSecrets();
@@ -90,7 +90,7 @@ public class DungeonOverlay extends Gui {
 
         //CRYPTS
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(GuiTextures.overlay);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
         int crypts = DungeonHandler.getCrypts();
         String cryptText = "Crypts: " + crypts;
         drawTexturedModalRect((width / 2) - 17 - (font.getStringWidth(cryptText)) - 4, offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);

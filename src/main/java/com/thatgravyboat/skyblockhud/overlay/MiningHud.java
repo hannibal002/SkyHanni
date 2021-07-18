@@ -1,9 +1,9 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.GuiTextures;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
+import com.thatgravyboat.skyblockhud.textures.Textures;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -59,7 +59,7 @@ public class MiningHud extends Gui {
         if (maxFuel == 0) return;
         GlStateManager.enableBlend();
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-        mc.renderEngine.bindTexture(GuiTextures.mining);
+        mc.renderEngine.bindTexture(Textures.texture.mines);
         drawTexturedModalRect(x, y, 0, 0, 136, 7);
         drawTexturedModalRect(x, y, 0, 7, Utils.lerp((float) fuel / (float) maxFuel, 0, 136), 7);
         String percentageText = Math.round(((float) fuel / (float) maxFuel) * 100) + "%";
@@ -69,7 +69,7 @@ public class MiningHud extends Gui {
     private void renderHeatBar(Minecraft mc, int x, int y) {
         GlStateManager.enableBlend();
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-        mc.renderEngine.bindTexture(GuiTextures.mining);
+        mc.renderEngine.bindTexture(Textures.texture.mines);
         drawTexturedModalRect(x, y, 137, 0, 45, 7);
         drawTexturedModalRect(x, y, 137, 7, Utils.lerp(heat / 100f, 0, 45), 7);
     }

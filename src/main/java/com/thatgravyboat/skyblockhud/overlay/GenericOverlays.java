@@ -2,21 +2,17 @@ package com.thatgravyboat.skyblockhud.overlay;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
+import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.awt.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.ResourceLocation;
 
 public class GenericOverlays extends Gui {
 
-    public static int lastBar = 0;
-    public static ResourceLocation bars = new ResourceLocation("skyblockhud", "bars.png");
-
     public static void drawLargeBar(Minecraft mc, int x, int y, float percentage, float max, int fullColor, int loadingColor, int barStyle) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
-            updateBar();
-            mc.renderEngine.bindTexture(bars);
+            mc.renderEngine.bindTexture(Textures.texture.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);
 
             RenderUtils.drawTexturedModalRect(x, y, 0, 0, 182, 5);
@@ -31,8 +27,7 @@ public class GenericOverlays extends Gui {
 
     public static void drawSmallBar(Minecraft mc, int x, int y, double percentage, double max, int fullColor, int loadingColor, int barStyle) {
         if (SkyblockHud.hasSkyblockScoreboard()) {
-            updateBar();
-            mc.renderEngine.bindTexture(bars);
+            mc.renderEngine.bindTexture(Textures.texture.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);
             GlStateManager.enableBlend();
             RenderUtils.drawTexturedModalRect(x, y, 0, 35, 62, 5);
@@ -42,13 +37,6 @@ public class GenericOverlays extends Gui {
             if (barStyle != 0) {
                 RenderUtils.drawTexturedModalRect(x, y, 0, 45 + (barStyle * 5), 62, 5);
             }
-        }
-    }
-
-    public static void updateBar() {
-        if (lastBar != SkyblockHud.config.misc.barTexture) {
-            lastBar = SkyblockHud.config.misc.barTexture;
-            if (lastBar == 0) bars = new ResourceLocation("skyblockhud", "bars.png"); else bars = new ResourceLocation("skyblockhud", "bars_" + lastBar + ".png");
         }
     }
 }
