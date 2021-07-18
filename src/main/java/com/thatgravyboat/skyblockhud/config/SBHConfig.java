@@ -109,7 +109,7 @@ public class SBHConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Texture Styles", desc = "If this list only contains 1 thing that means your texture pack doesnt support styles")
-        @ConfigEditorStyle()
+        @ConfigEditorStyle
         public int style = 0;
 
         @Expose

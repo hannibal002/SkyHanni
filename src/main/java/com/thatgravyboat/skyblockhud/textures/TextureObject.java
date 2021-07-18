@@ -14,24 +14,26 @@ public class TextureObject {
     public ResourceLocation dungeon = resource("dungeon.png");
     public ResourceLocation dialogue = resource("dialogue.png");
 
-    public TextureObject(String displayName){
+    public TextureObject(String displayName) {
         this.displayName = displayName;
     }
 
     public static TextureObject decode(JsonObject json) {
         TextureObject textureObject = new TextureObject(json.get("displayName").getAsString());
-        Arrays.stream(textureObject.getClass().getDeclaredFields())
-                .filter(field -> field.getType().equals(ResourceLocation.class)).forEach(field -> {
+        Arrays
+            .stream(textureObject.getClass().getDeclaredFields())
+            .filter(field -> field.getType().equals(ResourceLocation.class))
+            .forEach(
+                field -> {
                     try {
                         field.set(textureObject, new ResourceLocation(json.get(field.getName()).getAsString()));
                     } catch (Exception ignored) {}
                 }
-        );
+            );
         return textureObject;
     }
 
-
-    private static ResourceLocation resource(String path){
+    private static ResourceLocation resource(String path) {
         return new ResourceLocation("skyblockhud", path);
     }
 }

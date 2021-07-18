@@ -8,7 +8,7 @@ import org.lwjgl.input.Mouse;
 public class GuiOptionEditorStyle extends GuiOptionEditorDropdown {
 
     public GuiOptionEditorStyle(ConfigProcessor.ProcessedOption option, int selected) {
-        super(option, Textures.styles.stream().map(t ->t.displayName).collect(Collectors.toList()).toArray(new String[]{}), selected, true);
+        super(option, Textures.styles.stream().map(t -> t.displayName).collect(Collectors.toList()).toArray(new String[] {}), selected, true);
     }
 
     @Override
@@ -39,5 +39,4 @@ public class GuiOptionEditorStyle extends GuiOptionEditorDropdown {
 
         return false;
     }
-
 }

@@ -16,13 +16,14 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.util.ResourceLocation;
 
 public class Textures implements IResourceManagerReloadListener {
+
     private static final TextureObject DEFAULT_TEXTURE = new TextureObject("Default");
 
     private static final Gson gson = new GsonBuilder().create();
     public static final List<TextureObject> styles = Lists.newArrayList(DEFAULT_TEXTURE);
     public static TextureObject texture = DEFAULT_TEXTURE;
 
-    public static void setTexture(int selected){
+    public static void setTexture(int selected) {
         if (selected >= styles.size() || selected < 0) {
             texture = DEFAULT_TEXTURE;
             SkyblockHud.config.misc.style = 0;
@@ -45,5 +46,4 @@ public class Textures implements IResourceManagerReloadListener {
             }
         } catch (Exception ignored) {}
     }
-
 }

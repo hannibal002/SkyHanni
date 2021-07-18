@@ -30,5 +30,4 @@ public class GuiTextures {
     public static final ResourceLocation slider_button_new = new ResourceLocation("skyblockhud:core/slider/slider_button.png");
 
     public static final ResourceLocation mapOverlay = new ResourceLocation("skyblockhud", "maps/map_overlay.png");
-
 }
