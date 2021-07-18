@@ -36,14 +36,21 @@ public class Textures implements IResourceManagerReloadListener {
     public void onResourceManagerReload(IResourceManager resourceManager) {
         styles.clear();
         styles.add(DEFAULT_TEXTURE);
+        DEFAULT_TEXTURE.displayName = "Default";
         try {
             ResourceLocation stylesData = new ResourceLocation("skyblockhud:data/styles.json");
             InputStream is = resourceManager.getResource(stylesData).getInputStream();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                for (JsonElement json : gson.fromJson(reader, JsonObject.class).getAsJsonArray("styles")) {
+                JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
+                for (JsonElement json : jsonObject.getAsJsonArray("styles")) {
                     styles.add(TextureObject.decode((JsonObject) json));
+                }
+                if (jsonObject.has("defaultDisplayName") && jsonObject.get("defaultDisplayName").isJsonPrimitive()){
+                    DEFAULT_TEXTURE.displayName = jsonObject.get("defaultDisplayName").getAsString();
                 }
             }
         } catch (Exception ignored) {}
+
+        if (SkyblockHud.config != null) setTexture(SkyblockHud.config.misc.style);
     }
 }
