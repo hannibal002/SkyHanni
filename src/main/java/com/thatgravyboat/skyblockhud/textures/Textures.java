@@ -45,7 +45,7 @@ public class Textures implements IResourceManagerReloadListener {
                 for (JsonElement json : jsonObject.getAsJsonArray("styles")) {
                     styles.add(TextureObject.decode((JsonObject) json));
                 }
-                if (jsonObject.has("defaultDisplayName") && jsonObject.get("defaultDisplayName").isJsonPrimitive()){
+                if (jsonObject.has("defaultDisplayName") && jsonObject.get("defaultDisplayName").isJsonPrimitive()) {
                     DEFAULT_TEXTURE.displayName = jsonObject.get("defaultDisplayName").getAsString();
                 }
             }
