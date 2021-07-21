@@ -1,8 +1,8 @@
 package com.thatgravyboat.skyblockhud.location;
 
-import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.api.events.ProfileSwitchedEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class IslandHandler {

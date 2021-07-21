@@ -1,9 +1,9 @@
 package com.thatgravyboat.skyblockhud.location;
 
+import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
+
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
-
-import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
 
 public enum LocationCategory {
     ERROR("error", 34),

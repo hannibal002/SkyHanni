@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.core.config.gui;
 
-import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

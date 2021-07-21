@@ -1,9 +1,9 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;

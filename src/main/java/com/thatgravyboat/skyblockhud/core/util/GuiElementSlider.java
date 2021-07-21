@@ -1,16 +1,15 @@
 package com.thatgravyboat.skyblockhud.core.util;
 
+import static com.thatgravyboat.skyblockhud.GuiTextures.*;
+
 import com.thatgravyboat.skyblockhud.core.GuiElement;
 import com.thatgravyboat.skyblockhud.utils.Utils;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-
-import java.util.function.Consumer;
-
-import static com.thatgravyboat.skyblockhud.GuiTextures.*;
 
 public class GuiElementSlider extends GuiElement {
 

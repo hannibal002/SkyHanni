@@ -1,7 +1,6 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.handlers.BossbarHandler;
 import com.thatgravyboat.skyblockhud.handlers.CurrencyHandler;
 import com.thatgravyboat.skyblockhud.handlers.SlayerHandler;
@@ -10,6 +9,7 @@ import com.thatgravyboat.skyblockhud.location.*;
 import com.thatgravyboat.skyblockhud.seasons.Season;
 import com.thatgravyboat.skyblockhud.seasons.SeasonDateHandler;
 import com.thatgravyboat.skyblockhud.textures.Textures;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;

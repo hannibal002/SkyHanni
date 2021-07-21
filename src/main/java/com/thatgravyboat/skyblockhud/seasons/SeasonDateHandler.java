@@ -2,9 +2,8 @@ package com.thatgravyboat.skyblockhud.seasons;
 
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.utils.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
 import java.util.regex.Pattern;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class SeasonDateHandler {
 

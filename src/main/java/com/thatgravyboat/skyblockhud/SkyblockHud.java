@@ -22,6 +22,11 @@ import com.thatgravyboat.skyblockhud.textures.Textures;
 import com.thatgravyboat.skyblockhud.tracker.TrackerFileLoader;
 import com.thatgravyboat.skyblockhud.tracker.TrackerHandler;
 import com.thatgravyboat.skyblockhud.utils.Utils;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -41,12 +46,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.lwjgl.input.Keyboard;
-
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 @Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
 public class SkyblockHud {

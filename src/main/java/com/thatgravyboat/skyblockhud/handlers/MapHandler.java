@@ -1,5 +1,7 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
+import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
+
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.config.KeyBindings;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
@@ -8,6 +10,10 @@ import com.thatgravyboat.skyblockhud.handlers.mapicons.DwarvenIcons;
 import com.thatgravyboat.skyblockhud.handlers.mapicons.HubIcons;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.utils.Utils;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import javax.vecmath.Vector2f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -19,13 +25,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
-
-import javax.vecmath.Vector2f;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
 
 public class MapHandler {
 
@@ -59,11 +58,7 @@ public class MapHandler {
 
         public boolean cantRender() {
             SBHConfig.Map mapConfig = SkyblockHud.config.map;
-            if (mapConfig.showInfoIcons && type.equals(MapIconTypes.INFO)) return false;
-            else if (mapConfig.showMiscIcons && type.equals(MapIconTypes.MISC)) return false;
-            else if (mapConfig.showNpcIcons && type.equals(MapIconTypes.NPC)) return false;
-            else if (mapConfig.showQuestIcons && type.equals(MapIconTypes.QUEST)) return false;
-            else return (!mapConfig.showShopIcons || !type.equals(MapIconTypes.SHOPS));
+            if (mapConfig.showInfoIcons && type.equals(MapIconTypes.INFO)) return false; else if (mapConfig.showMiscIcons && type.equals(MapIconTypes.MISC)) return false; else if (mapConfig.showNpcIcons && type.equals(MapIconTypes.NPC)) return false; else if (mapConfig.showQuestIcons && type.equals(MapIconTypes.QUEST)) return false; else return (!mapConfig.showShopIcons || !type.equals(MapIconTypes.SHOPS));
         }
     }
 

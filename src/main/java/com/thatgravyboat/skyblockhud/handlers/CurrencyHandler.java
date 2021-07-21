@@ -1,8 +1,8 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;

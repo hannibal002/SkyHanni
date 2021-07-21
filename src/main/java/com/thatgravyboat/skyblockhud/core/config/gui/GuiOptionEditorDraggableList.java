@@ -1,10 +1,15 @@
 package com.thatgravyboat.skyblockhud.core.config.gui;
 
+import static com.thatgravyboat.skyblockhud.GuiTextures.DELETE;
+import static com.thatgravyboat.skyblockhud.GuiTextures.button_tex;
+
 import com.thatgravyboat.skyblockhud.core.config.struct.ConfigProcessor;
 import com.thatgravyboat.skyblockhud.core.util.lerp.LerpUtils;
 import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
 import com.thatgravyboat.skyblockhud.core.util.render.TextRenderUtils;
 import com.thatgravyboat.skyblockhud.utils.Utils;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -13,12 +18,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.thatgravyboat.skyblockhud.GuiTextures.DELETE;
-import static com.thatgravyboat.skyblockhud.GuiTextures.button_tex;
 
 public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
