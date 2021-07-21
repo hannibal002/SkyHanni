@@ -1,9 +1,9 @@
 package com.thatgravyboat.skyblockhud.location;
 
-import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
-
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
+
+import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
 
 public enum LocationCategory {
     ERROR("error", 34),
@@ -20,7 +20,7 @@ public enum LocationCategory {
     JERRY("jerry", 59),
     THEEND("the_end", 123),
     DWARVENMINES("dwarven_mines", 131, Maps.DWARVEN),
-    CRYSTALHOLLOWS("crystal_hollows", 139);
+    CRYSTALHOLLOWS("crystal_hollows", 139, Maps.CRYSTAL);
 
     private final String name;
     private final int texturePos;

@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.handlers.BossbarHandler;
 import com.thatgravyboat.skyblockhud.handlers.CurrencyHandler;
 import com.thatgravyboat.skyblockhud.handlers.SlayerHandler;

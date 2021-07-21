@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;

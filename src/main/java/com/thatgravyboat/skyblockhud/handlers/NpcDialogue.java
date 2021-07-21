@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.io.BufferedReader;
 import java.io.InputStream;

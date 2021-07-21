@@ -1,4 +1,4 @@
-package com.thatgravyboat.skyblockhud;
+package com.thatgravyboat.skyblockhud.utils;
 
 public class ComponentBuilder {
 
@@ -12,7 +12,7 @@ public class ComponentBuilder {
         return apd(text, '7');
     }
 
-    public ComponentBuilder apd(String text, char[] colors) {
+    public ComponentBuilder apd(String text, char... colors) {
         for (char color : colors) {
             builder.append("\u00A7").append(color);
         }
@@ -36,7 +36,7 @@ public class ComponentBuilder {
         return this;
     }
 
-    public ComponentBuilder nl(String text, char[] colors) {
+    public ComponentBuilder nl(String text, char... colors) {
         apd(text, colors);
         builder.append("\n");
         return this;

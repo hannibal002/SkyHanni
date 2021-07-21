@@ -1,13 +1,6 @@
-package com.thatgravyboat.skyblockhud;
+package com.thatgravyboat.skyblockhud.utils;
 
-import java.math.RoundingMode;
-import java.nio.FloatBuffer;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Locale;
+import com.thatgravyboat.skyblockhud.SkyblockHud;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -28,6 +21,15 @@ import net.minecraftforge.fml.common.Loader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+
+import java.math.RoundingMode;
+import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Locale;
 
 public class Utils {
 

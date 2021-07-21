@@ -3,7 +3,7 @@ package com.thatgravyboat.skyblockhud.handlers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.api.events.LocationChangeEvent;
 import com.thatgravyboat.skyblockhud.commands.SimpleCommand;
 import com.thatgravyboat.skyblockhud.location.LocationCategory;

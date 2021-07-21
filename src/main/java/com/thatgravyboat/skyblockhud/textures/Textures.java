@@ -6,14 +6,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.util.ResourceLocation;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class Textures implements IResourceManagerReloadListener {
 
@@ -39,14 +40,16 @@ public class Textures implements IResourceManagerReloadListener {
         DEFAULT_TEXTURE.displayName = "Default";
         try {
             ResourceLocation stylesData = new ResourceLocation("skyblockhud:data/styles.json");
-            InputStream is = resourceManager.getResource(stylesData).getInputStream();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
-                for (JsonElement json : jsonObject.getAsJsonArray("styles")) {
-                    styles.add(TextureObject.decode((JsonObject) json));
-                }
-                if (jsonObject.has("defaultDisplayName") && jsonObject.get("defaultDisplayName").isJsonPrimitive()) {
-                    DEFAULT_TEXTURE.displayName = jsonObject.get("defaultDisplayName").getAsString();
+
+            for (IResource resource : resourceManager.getAllResources(stylesData)) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+                    JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
+                    for (JsonElement json : jsonObject.getAsJsonArray("styles")) {
+                        styles.add(TextureObject.decode((JsonObject) json));
+                    }
+                    if (DEFAULT_TEXTURE.displayName.equals("Default") && jsonObject.has("defaultDisplayName") && jsonObject.get("defaultDisplayName").isJsonPrimitive()) {
+                        DEFAULT_TEXTURE.displayName = jsonObject.get("defaultDisplayName").getAsString();
+                    }
                 }
             }
         } catch (Exception ignored) {}

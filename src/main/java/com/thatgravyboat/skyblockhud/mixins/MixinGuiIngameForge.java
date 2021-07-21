@@ -1,10 +1,8 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
-import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
-
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -15,6 +13,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
 
 @Mixin(GuiIngameForge.class)
 public class MixinGuiIngameForge {

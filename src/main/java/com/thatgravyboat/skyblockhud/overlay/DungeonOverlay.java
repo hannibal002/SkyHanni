@@ -1,8 +1,8 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.SpecialColour;
-import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.utils.SpecialColour;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.dungeons.Classes;

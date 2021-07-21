@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.overlay;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.Utils;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.handlers.HeldItemHandler;
 import com.thatgravyboat.skyblockhud.textures.Textures;

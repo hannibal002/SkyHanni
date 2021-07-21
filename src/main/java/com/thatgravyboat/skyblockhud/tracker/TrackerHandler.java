@@ -1,12 +1,11 @@
 package com.thatgravyboat.skyblockhud.tracker;
 
 import com.thatgravyboat.skyblockhud.SkyblockHud;
-import com.thatgravyboat.skyblockhud.Utils;
 import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
-import java.util.*;
+import com.thatgravyboat.skyblockhud.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,6 +14,8 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.*;
 
 public class TrackerHandler extends Gui {
 

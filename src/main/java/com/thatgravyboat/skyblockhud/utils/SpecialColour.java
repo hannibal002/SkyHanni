@@ -1,4 +1,4 @@
-package com.thatgravyboat.skyblockhud;
+package com.thatgravyboat.skyblockhud.utils;
 
 import java.awt.*;
 
