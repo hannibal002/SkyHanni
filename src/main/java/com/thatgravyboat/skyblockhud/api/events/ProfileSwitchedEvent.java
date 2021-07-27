@@ -6,8 +6,7 @@ public class ProfileSwitchedEvent extends Event {
 
     public String profile;
 
-    public ProfileSwitchedEvent(String profile){
+    public ProfileSwitchedEvent(String profile) {
         this.profile = profile;
     }
-
 }

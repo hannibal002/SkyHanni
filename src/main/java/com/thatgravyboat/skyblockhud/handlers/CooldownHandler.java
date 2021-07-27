@@ -22,9 +22,9 @@ public class CooldownHandler {
     private static final Map<String, Cooldown> COOLDOWNS = new HashMap<>();
 
     public static Matcher getAbility(NBTTagCompound nbt) {
-        if (nbt != null && nbt.hasKey("ExtraAttributes") && nbt.getCompoundTag("ExtraAttributes").hasKey("uuid") && nbt.hasKey("display")){
+        if (nbt != null && nbt.hasKey("ExtraAttributes") && nbt.getCompoundTag("ExtraAttributes").hasKey("uuid") && nbt.hasKey("display")) {
             NBTTagCompound display = nbt.getCompoundTag("display");
-            if (display != null && display.hasKey("Lore")){
+            if (display != null && display.hasKey("Lore")) {
                 NBTTagList lore = display.getTagList("Lore", 8);
                 List<String> loreList = new ArrayList<>();
                 for (int i = 0; i < lore.tagCount(); i++) {
@@ -32,7 +32,7 @@ public class CooldownHandler {
                     if (!loreLine.isEmpty()) loreList.add(loreLine);
                 }
                 Matcher abilityMatcher = ABILITY_REGEX.matcher(String.join(" ", loreList));
-                if (abilityMatcher.find()){
+                if (abilityMatcher.find()) {
                     return abilityMatcher;
                 }
             }
@@ -41,11 +41,11 @@ public class CooldownHandler {
     }
 
     private static void addCooldown(IAbility ability) {
-        COOLDOWNS.putIfAbsent(ability.getAbility(), new Cooldown(ability.getAbilityTime()*20));
+        COOLDOWNS.putIfAbsent(ability.getAbility(), new Cooldown(ability.getAbilityTime() * 20));
     }
 
     @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event){
+    public void tick(TickEvent.ClientTickEvent event) {
         if (SkyblockHud.config.misc.hideItemCooldowns) return;
         if (event.phase.equals(TickEvent.Phase.END)) {
             COOLDOWNS.values().forEach(Cooldown::tick);
@@ -56,9 +56,9 @@ public class CooldownHandler {
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (SkyblockHud.config.misc.hideItemCooldowns) return;
-        if (event.action.equals(PlayerInteractEvent.Action.RIGHT_CLICK_AIR) || event.action.equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)){
+        if (event.action.equals(PlayerInteractEvent.Action.RIGHT_CLICK_AIR) || event.action.equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)) {
             if (event.entityPlayer.getHeldItem() != null) {
-                IAbility ability = (IAbility)((Object) event.entityPlayer.getHeldItem());
+                IAbility ability = (IAbility) ((Object) event.entityPlayer.getHeldItem());
                 if (ability.getAbility() != null) {
                     addCooldown(ability);
                 }
@@ -66,8 +66,8 @@ public class CooldownHandler {
         }
     }
 
-    public static float getAbilityTime(ItemStack stack){
-        IAbility ability = (IAbility)((Object) stack);
+    public static float getAbilityTime(ItemStack stack) {
+        IAbility ability = (IAbility) ((Object) stack);
         if (ability.getAbility() != null) {
             return COOLDOWNS.containsKey(ability.getAbility()) ? COOLDOWNS.get(ability.getAbility()).getTime() : -1f;
         }
@@ -75,10 +75,11 @@ public class CooldownHandler {
     }
 
     private static class Cooldown {
+
         public int current;
         public final int end;
 
-        Cooldown(int end){
+        Cooldown(int end) {
             this.end = end;
         }
 
@@ -91,8 +92,7 @@ public class CooldownHandler {
         }
 
         public float getTime() {
-            return current/(float)end;
+            return current / (float) end;
         }
     }
-
 }
