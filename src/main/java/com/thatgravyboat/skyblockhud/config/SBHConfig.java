@@ -121,6 +121,11 @@ public class SBHConfig extends Config {
         @ConfigOption(name = "Dialogue Box", desc = "")
         @ConfigEditorButton(runnableId = "dialogue", buttonText = "Edit")
         public Position dialoguePos = new Position(0, -50, true, false);
+
+        @Expose
+        @ConfigOption(name = "Hide Item Cooldowns", desc = "Hides item cooldowns")
+        @ConfigEditorBoolean
+        public boolean hideItemCooldowns = false;
     }
 
     public static class MainHud {
@@ -252,6 +257,11 @@ public class SBHConfig extends Config {
     public static class Renderer {
 
         @Expose
+        @ConfigOption(name = "Add Overflow Mana Back", desc = "Adds overflow mana back to the actionbar")
+        @ConfigEditorBoolean
+        public boolean addOverflowMana = false;
+
+        @Expose
         @ConfigOption(name = "Hide Boss Bar", desc = "Hides Boss Bar when certain conditions are met such as the name is just wither or it starts with objective:")
         @ConfigEditorBoolean
         public boolean hideBossBar = true;
@@ -301,7 +311,7 @@ public class SBHConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Map Locations", desc = "Remove a location from this list if you would like the map to not show up in that location. This is so you can use other mods maps.")
-        @ConfigEditorDraggableList(exampleText = { "HUB", "BARN", "MUSHROOMDESERT", "GOLDMINE (No Map Yet)", "DEEPCAVERNS (No Map Yet)", "SPIDERSDEN", "PARK", "FORTRESS", "DUNGEONHUB (No Map Yet)", "JERRY (No Map Yet)", "THEEND (No Map Yet)", "DWARVENMINES", "CRYSTALHOLLOWS (No Map Yet)" })
+        @ConfigEditorDraggableList(exampleText = { "HUB", "BARN", "MUSHROOMDESERT", "GOLDMINE (No Map Yet)", "DEEPCAVERNS (No Map Yet)", "SPIDERSDEN", "PARK", "FORTRESS", "DUNGEONHUB (No Map Yet)", "JERRY (No Map Yet)", "THEEND (No Map Yet)", "DWARVENMINES", "CRYSTALHOLLOWS" })
         public List<Integer> mapLocations = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 11));
 
         @Expose

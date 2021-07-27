@@ -82,7 +82,7 @@ public class ActionBarParsing {
                     message = DefenseReplaceRegex.matcher(message).replaceAll("");
                     message = ManaReplaceRegex.matcher(message).replaceAll("");
                     Matcher overflowMatcher = ManaOverflowReplaceRegex.matcher(message);
-                    if (overflowMatcher.find()) {
+                    if (overflowMatcher.find() && SkyblockHud.config.renderer.addOverflowMana) {
                         message = overflowMatcher.replaceAll("\u00A73\u02AC " + overflowMatcher.group(3));
                     }
 

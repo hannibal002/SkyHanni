@@ -1,6 +1,7 @@
 package com.thatgravyboat.skyblockhud.tracker;
 
 import com.google.gson.*;
+import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -85,8 +86,8 @@ public class TrackerFileLoader {
         return stats;
     }
 
-    public static boolean loadTrackerStatsFile(File configDirectory) {
-        File configFile = new File(configDirectory, "sbh-trackers-stats.json");
+    public static boolean loadTrackerStatsFile() {
+        File configFile = new File(SkyblockHud.configDirectory, "sbh-trackers-stats.json");
 
         try {
             if (configFile.createNewFile()) {
@@ -127,8 +128,8 @@ public class TrackerFileLoader {
         return false;
     }
 
-    public static void saveTrackerStatsFile(File configDirectory) {
-        File configFile = new File(configDirectory, "sbh-trackers-stats.json");
+    public static void saveTrackerStatsFile() {
+        File configFile = new File(SkyblockHud.configDirectory, "sbh-trackers-stats.json");
 
         try {
             configFile.createNewFile();

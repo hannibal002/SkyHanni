@@ -113,7 +113,7 @@ public class MinesHandler {
         }
 
         if (MinesHandler.currentEvent != Event.NONE) {
-            if (MinesHandler.currentEvent == Event.TICKET && event.formattedLine.toLowerCase().contains("tickets:")) {
+            if (MinesHandler.currentEvent == Event.TICKET) {
                 if (event.formattedLine.toLowerCase().contains("pool:")) {
                     try {
                         eventMax = Integer.parseInt(event.formattedLine.toLowerCase().replace("pool:", "").trim().split("/")[0].trim());

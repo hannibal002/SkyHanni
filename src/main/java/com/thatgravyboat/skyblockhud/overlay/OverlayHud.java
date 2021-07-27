@@ -45,8 +45,8 @@ public class OverlayHud extends Gui {
         String normalTime = (time12Hour == 0 ? "12" : String.valueOf(time12Hour)) + ":" + (timeMin == 0 ? "00" : timeMin) + (timeHour >= 12 ? "pm" : "am");
 
         drawTexturedModalRect((width / 2) - 17, offset + (bossBarVisible ? 17 : 0), 0, 0, 34, 34);
-        drawTexturedModalRect((width / 2) - 4, offset + (bossBarVisible ? 24 : 7), (timeHour > 19 || timeHour < 4) ? 43 : 43 + 8, 0, 8, 8);
-        if (SkyblockHud.config.main.twelveHourClock) drawScaledString(0.8f, width / 2, offset + (bossBarVisible ? 38 : 21), normalTime, (timeHour > 19 || timeHour < 4) ? 0xAFB8CC : 0xFFFF55); else drawCenteredString(font, militaryTime, (width / 2), offset + (bossBarVisible ? 38 : 21), (timeHour > 19 || timeHour < 4) ? 0xAFB8CC : 0xFFFF55);
+        drawTexturedModalRect((width / 2) - 4, offset + (bossBarVisible ? 24 : 7), (timeHour > 19 || timeHour < 6) ? 43 : 43 + 8, 0, 8, 8);
+        if (SkyblockHud.config.main.twelveHourClock) drawScaledString(0.8f, width / 2, offset + (bossBarVisible ? 38 : 21), normalTime, (timeHour > 19 || timeHour < 6) ? 0xAFB8CC : 0xFFFF55); else drawCenteredString(font, militaryTime, (width / 2), offset + (bossBarVisible ? 38 : 21), (timeHour > 19 || timeHour < 4) ? 0xAFB8CC : 0xFFFF55);
 
         //PURSE
         drawPurseAndBits(width, offset, mc);

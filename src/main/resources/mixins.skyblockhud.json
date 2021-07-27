@@ -3,8 +3,11 @@
   "refmap": "mixins.skyblockhud.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "GuiChestAccessor",
     "MixinEntityArrow",
     "MixinGuiIngameForge",
-    "MixinNetHandlerPlayClient"
+    "MixinItemStack",
+    "MixinNetHandlerPlayClient",
+    "MixinRenderItem"
   ]
 }

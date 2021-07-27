@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thatgravyboat.skyblockhud.api.KillTracking;
 import com.thatgravyboat.skyblockhud.api.LeaderboardGetter;
+import com.thatgravyboat.skyblockhud.api.events.ProfileJoinedEvent;
 import com.thatgravyboat.skyblockhud.api.events.ProfileSwitchedEvent;
 import com.thatgravyboat.skyblockhud.commands.Commands;
 import com.thatgravyboat.skyblockhud.config.KeyBindings;
@@ -51,7 +52,7 @@ import org.lwjgl.input.Keyboard;
 public class SkyblockHud {
 
     public static final String MODID = "skyblockhud";
-    public static final String VERSION = "1.12";
+    public static final String VERSION = "1.13";
 
     public static SBHConfig config;
 
@@ -61,7 +62,7 @@ public class SkyblockHud {
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
-    private static File configDirectory;
+    public static File configDirectory;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -88,12 +89,17 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new ActionBarParsing());
         MinecraftForge.EVENT_BUS.register(new CrystalWaypoints());
         MinecraftForge.EVENT_BUS.register(new FarmHouseHandler());
+        MinecraftForge.EVENT_BUS.register(new WarpHandler());
+        MinecraftForge.EVENT_BUS.register(new CooldownHandler());
         Commands.init();
 
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new NpcDialogue());
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
 
-        configFile = new File(event.getModConfigurationDirectory(), "sbh-config.json");
+        configDirectory = new File(event.getModConfigurationDirectory(), "skyblockhud");
+        try { configDirectory.mkdir(); } catch (Exception ignored){}
+
+        configFile = new File(configDirectory, "sbh-config.json");
 
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
@@ -108,10 +114,12 @@ public class SkyblockHud {
 
         Textures.setTexture(config.misc.style);
 
-        configDirectory = event.getModConfigurationDirectory();
+        if (WarpHandler.load()) {
+            WarpHandler.save();
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> TrackerFileLoader.saveTrackerStatsFile(event.getModConfigurationDirectory())));
+        Runtime.getRuntime().addShutdownHook(new Thread(TrackerFileLoader::saveTrackerStatsFile));
     }
 
     public void saveConfig() {
@@ -139,14 +147,14 @@ public class SkyblockHud {
     public void loadComplete(FMLLoadCompleteEvent event) {
         TrackerFileLoader.loadTrackersFile();
 
-        if (TrackerFileLoader.loadTrackerStatsFile(configDirectory)) {
-            TrackerFileLoader.saveTrackerStatsFile(configDirectory);
+        if (TrackerFileLoader.loadTrackerStatsFile()) {
+            TrackerFileLoader.saveTrackerStatsFile();
         }
     }
 
     @SubscribeEvent
     public void onLeaveServer(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-        TrackerFileLoader.saveTrackerStatsFile(configDirectory);
+        TrackerFileLoader.saveTrackerStatsFile();
     }
 
     public static boolean hasSkyblockScoreboard() {
@@ -180,8 +188,15 @@ public class SkyblockHud {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onStatusBar(ClientChatReceivedEvent event) {
-        if (Utils.removeColor(event.message.getUnformattedText()).toLowerCase().trim().startsWith("your profile was changed to:")) {
-            MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent());
+        String message = Utils.removeColor(event.message.getUnformattedText()).toLowerCase().trim();
+
+        if (message.startsWith("your profile was changed to:")) {
+            String stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim();
+            MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent(stripped));
+        }
+        if (message.startsWith("you are playing on profile:")){
+            String stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim();
+            MinecraftForge.EVENT_BUS.post(new ProfileJoinedEvent(stripped));
         }
     }
 

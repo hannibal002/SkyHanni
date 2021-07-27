@@ -12,7 +12,10 @@ import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.playerstats.ActionBarParsing;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -33,7 +36,7 @@ public class Commands {
         }
     };
 
-    private static final SimpleSubCommand devCommand = new SimpleSubCommand("sbhdev", ImmutableSet.of("copyBossBar", "copyScoreboard", "copyActionBar", "mobDeathLogging")) {
+    private static final SimpleSubCommand devCommand = new SimpleSubCommand("sbhdev", ImmutableSet.of("copyNpcSkin", "copyBossBar", "copyScoreboard", "copyActionBar", "mobDeathLogging")) {
         @Override
         void processSubCommand(ICommandSender sender, String subCommand, String[] args) {
             StringSelection clipboard = null;
@@ -48,6 +51,14 @@ public class Commands {
                     break;
                 case "copyActionBar":
                     clipboard = new StringSelection(ActionBarParsing.lastLowActionBar);
+                    break;
+                case "copySkin":
+                    Entity entity = Minecraft.getMinecraft().objectMouseOver.entityHit;
+                    if (entity instanceof AbstractClientPlayer){
+                        clipboard = new StringSelection("http://textures.minecraft.net/texture/"+((AbstractClientPlayer) entity).getLocationSkin().getResourcePath().replace("skins/", ""));
+                    }else {
+                        sendSBHMessage(sender, "Not a player!");
+                    }
                     break;
                 case "mobDeathLogging":
                     DevModeConstants.mobDeathLogging = !DevModeConstants.mobDeathLogging;
