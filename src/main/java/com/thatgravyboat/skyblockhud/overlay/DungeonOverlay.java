@@ -140,7 +140,10 @@ public class DungeonOverlay extends Gui {
                     drawDungeonPlayer(player.getName(), player.getHealth(), player.isDead(), player.getDungeonClass(), posX, posY);
                 }
             }
-            drawDungeonClock(event.resolution.getScaledWidth(), SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
+
+            if (!SkyblockHud.config.main.disaleMainHud) {
+                drawDungeonClock(event.resolution.getScaledWidth(), SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
+            }
         }
     }
 }

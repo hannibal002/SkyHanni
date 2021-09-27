@@ -23,6 +23,7 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -36,9 +37,8 @@ public class NpcDialogue implements IResourceManagerReloadListener {
     private static boolean showDialogue = false;
     private static int ticks = 0;
 
-    private static final Queue<String> DIALOGUE = new ArrayDeque<>();
-    private static String currentNpc = "Unknown";
-    private static String currentDialogue = null;
+    private static final Queue<Dialogue> DIALOGUE = new ArrayDeque<>();
+    private static Dialogue currentDialogue = null;
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -50,12 +50,11 @@ public class NpcDialogue implements IResourceManagerReloadListener {
 
             if (currentDialogue == null) {
                 showDialogue = false;
-                currentNpc = "Unknown";
             }
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onChat(ClientChatReceivedEvent event) {
         if (event.type != 2 && !SkyblockHud.config.misc.hideDialogueBox) {
             String message = Utils.removeColor(event.message.getUnformattedText());
@@ -64,12 +63,10 @@ public class NpcDialogue implements IResourceManagerReloadListener {
                 if (matcher.find()) {
                     showDialogue = true;
                     event.setCanceled(true);
-                    currentNpc = matcher.group(1);
-                    if (currentDialogue != null) {
-                        DIALOGUE.add(matcher.group(2));
-                    } else {
-                        currentDialogue = matcher.group(2);
-                    }
+
+                    Dialogue dialogue = new Dialogue(matcher.group(1), matcher.group(2));
+                    if (currentDialogue == null) currentDialogue = dialogue;
+                    else DIALOGUE.add(dialogue);
                 }
             }
         }
@@ -87,7 +84,7 @@ public class NpcDialogue implements IResourceManagerReloadListener {
 
             Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, 182, 68, 256, 256);
 
-            String npcID = currentNpc.toLowerCase(Locale.ENGLISH).replace(" ", "_");
+            String npcID = currentDialogue.name.toLowerCase(Locale.ENGLISH).replace(" ", "_");
 
             if (NPCS.containsKey(npcID)) {
                 mc.renderEngine.bindTexture(NPCS.get(npcID));
@@ -96,12 +93,10 @@ public class NpcDialogue implements IResourceManagerReloadListener {
 
             FontRenderer font = mc.fontRendererObj;
 
-            font.drawString(currentNpc, x + 40, y + 10, 0xffffff);
+            font.drawString(currentDialogue.name, x + 40, y + 10, 0xffffff);
 
-            List<String> text = font.listFormattedStringToWidth(currentDialogue, 160);
-
-            for (int i = 0; i < text.size(); i++) {
-                Utils.drawStringScaled(text.get(i), font, x + 40, y + 10 + font.FONT_HEIGHT + 6 + (i * font.FONT_HEIGHT + 3), false, 0xffffff, 0.75f);
+            for (int i = 0; i < currentDialogue.dialogue.size(); i++) {
+                Utils.drawStringScaled(currentDialogue.dialogue.get(i), font, x + 40, y + 10 + font.FONT_HEIGHT + 6 + (i * font.FONT_HEIGHT + 3), false, 0xffffff, 0.75f);
             }
         }
     }
@@ -122,5 +117,18 @@ public class NpcDialogue implements IResourceManagerReloadListener {
                 }
             }
         } catch (Exception ignored) {}
+    }
+
+
+    static class Dialogue {
+
+        public List<String> dialogue;
+        public String name;
+
+        public Dialogue(String name, String dialogue) {
+            this.dialogue = Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(dialogue, 160);
+            this.name = name;
+        }
+
     }
 }

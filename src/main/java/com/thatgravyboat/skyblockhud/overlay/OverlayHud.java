@@ -66,7 +66,7 @@ public class OverlayHud extends Gui {
         } else if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.MUSHROOMDESERT)) {
             drawTrapperOrPelts(width, offset, mc);
         } else if (LocationHandler.getCurrentLocation().getCategory().isMiningCategory()) {
-            if (MinesHandler.currentEvent.display && LocationHandler.getCurrentLocation().getCategory() == LocationCategory.DWARVENMINES) {
+            if (MinesHandler.currentEvent.display) {
                 drawDwarvenEvent(width, offset, mc);
             } else {
                 drawMiningPowders(width, offset, mc);
@@ -256,23 +256,31 @@ public class OverlayHud extends Gui {
     }
 
     public void drawDwarvenEvent(int width, int offset, Minecraft mc) {
-        if (LocationHandler.getCurrentLocation().getCategory().equals(LocationCategory.DWARVENMINES)) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(Textures.texture.stats);
-            if (MinesHandler.eventMax > 0 || !MinesHandler.currentEvent.needsMax) {
-                String duration = MinesHandler.currentEvent.needsMax ? MinesHandler.eventProgress + "/" + MinesHandler.eventMax : String.valueOf(MinesHandler.eventProgress);
-                drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
-                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(duration) + 14, 14);
-                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 4, offset + (bossBarVisible ? 38 : 21), MinesHandler.currentEvent.x, 0, 8, 8);
-                drawString(font, duration, (width / 2) - 19 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
-            } else {
-                String text = MinesHandler.currentEvent.displayName;
-                drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(text)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
-                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(text))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(text) + 14, 14);
-                drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(text))) + 4, offset + (bossBarVisible ? 38 : 21), MinesHandler.currentEvent.x, 0, 8, 8);
-                drawString(font, text, (width / 2) - 19 - (font.getStringWidth(text)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
-            }
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
+        if (MinesHandler.eventMax > 0) {
+            String duration = MinesHandler.currentEvent.needsMax ? MinesHandler.eventProgress + "/" + MinesHandler.eventMax : String.valueOf(MinesHandler.eventProgress);
+            drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
+            drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(duration) + 14, 14);
+            drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(duration))) + 4, offset + (bossBarVisible ? 38 : 21), MinesHandler.currentEvent.x, 0, 8, 8);
+            drawString(font, duration, (width / 2) - 19 - (font.getStringWidth(duration)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
+        } else if (!MinesHandler.currentEvent.needsMax) {
+            drawSingleEvent(width, offset, mc);
+        } else {
+            String text = MinesHandler.currentEvent.displayName;
+            drawTexturedModalRect((width / 2) - 33 - (font.getStringWidth(text)), offset + (bossBarVisible ? 35 : 18), 0, 34, 2, 14);
+            drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(text))) + 2, offset + (bossBarVisible ? 35 : 18), 2, 34, font.getStringWidth(text) + 14, 14);
+            drawTexturedModalRect(((width / 2) - 33 - (font.getStringWidth(text))) + 4, offset + (bossBarVisible ? 38 : 21), MinesHandler.currentEvent.x, 0, 8, 8);
+            drawString(font, text, (width / 2) - 19 - (font.getStringWidth(text)), offset + (bossBarVisible ? 38 : 21), 0xFFFFFF);
         }
+    }
+
+    public void drawSingleEvent(int width, int offset, Minecraft mc) {
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.renderEngine.bindTexture(Textures.texture.stats);
+        drawTexturedModalRect((width / 2) - 15, offset + (bossBarVisible ? 51 : 34), 0, 52, 30, 14);
+        drawTexturedModalRect((width / 2) - 10, offset + (bossBarVisible ? 53 : 36), MinesHandler.currentEvent.x, 0, 8, 8);
+        drawString(mc.fontRendererObj, MinesHandler.eventProgress +"", (width / 2), offset + (bossBarVisible ? 53 : 36), 0xffffff);
     }
 
     public void drawFarmHouseMedals(int width, int offset, Minecraft mc) {
@@ -298,7 +306,7 @@ public class OverlayHud extends Gui {
             bossBarVisible = BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            if (LocationHandler.getCurrentLocation() != Locations.CATACOMBS) {
+            if (LocationHandler.getCurrentLocation() != Locations.CATACOMBS && !SkyblockHud.config.main.disaleMainHud) {
                 drawClock(event.resolution.getScaledWidth(), SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
             }
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

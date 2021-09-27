@@ -38,6 +38,11 @@ public class TrackerObject {
         if (jsonObject.has("enchanted") && jsonObject.get("enchanted").getAsBoolean()) {
             stack.setTagInfo("ench", new NBTTagList());
         }
+        if (!jsonObject.get("id").getAsString().contains("entity:")) {
+            NBTTagCompound extraAttributes = new NBTTagCompound();
+            extraAttributes.setString("id", jsonObject.get("id").getAsString());
+            stack.setTagInfo("ExtraAttributes", extraAttributes);
+        }
         return stack;
     }
 

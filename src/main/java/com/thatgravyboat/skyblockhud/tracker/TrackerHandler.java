@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class TrackerHandler extends Gui {
 
     public static Set<TrackerObject> trackerObjects = new HashSet<>();
-    public static Map<Locations, Map<String, TrackerObject>> trackers = new HashMap<>();
+    public static LinkedHashMap<Locations, Map<String, TrackerObject>> trackers = new LinkedHashMap<>();
 
     public static <K, V> Map<K, V> sortTrackers(Map<K, V> map, Comparator<? super Map.Entry<K, V>> comparator) {
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());

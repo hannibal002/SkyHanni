@@ -131,6 +131,11 @@ public class SBHConfig extends Config {
     public static class MainHud {
 
         @Expose
+        @ConfigOption(name = "Disable Main Hud", desc = "IDK Why you would do this as its like half the mod but ok.")
+        @ConfigEditorBoolean
+        public boolean disaleMainHud = false;
+
+        @Expose
         @ConfigOption(name = "Main Hud Position", desc = "")
         @ConfigEditorButton(runnableId = "main", buttonText = "Edit")
         public Position mainHudPos = new Position(0, 1, true, false);

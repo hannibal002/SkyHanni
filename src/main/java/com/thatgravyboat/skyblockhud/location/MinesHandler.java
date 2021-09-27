@@ -3,11 +3,15 @@ package com.thatgravyboat.skyblockhud.location;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
+import com.thatgravyboat.skyblockhud.utils.Utils;
+import java.lang.ref.WeakReference;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Locale;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class MinesHandler {
@@ -152,5 +156,36 @@ public class MinesHandler {
         if (!arrayString.toLowerCase().contains("heat:")) {
             MiningHud.setHeat(0);
         }
+    }
+
+    public static WeakReference<PrehistoricEggProgress> getEggColorAndProgress(ItemStack stack) {
+        String id = Utils.getItemCustomId(stack);
+        if (id == null || !id.equals("PREHISTORIC_EGG")) return null;
+        NBTTagCompound extraAttributes = stack.getTagCompound().getCompoundTag("ExtraAttributes");
+        if (!extraAttributes.hasKey("blocks_walked")) return null;
+        PrehistoricEggProgress progress = new PrehistoricEggProgress();
+        int walked = extraAttributes.getInteger("blocks_walked");
+        if (walked < 4000) {
+            progress.currentColor = 0xffffff;
+            progress.progress = walked / 4000f;
+        }else if (walked < 10000) {
+            progress.currentColor = 0x55FF55;
+            progress.progress = (walked - 4000f) / 6000f;
+        }else if (walked < 20000) {
+            progress.currentColor = 0x5555FF;
+            progress.progress = (walked - 10000f) / 10000f;
+        }else if (walked < 40000) {
+            progress.currentColor = 0xAA00AA;
+            progress.progress = (walked - 20000f) / 20000f;
+        }else if (walked < 100000) {
+            progress.currentColor = 0xFFAA00;
+            progress.progress = (walked - 40000f) / 60000f;
+        }
+        return new WeakReference<>(progress);
+    }
+
+    public static class PrehistoricEggProgress {
+        public float progress;
+        public int currentColor;
     }
 }

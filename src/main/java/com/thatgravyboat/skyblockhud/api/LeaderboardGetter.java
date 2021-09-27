@@ -2,6 +2,7 @@ package com.thatgravyboat.skyblockhud.api;
 
 import static com.thatgravyboat.skyblockhud.ComponentHandler.SCOREBOARD_CHARACTERS;
 
+import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPreGetEvent;
@@ -35,13 +36,13 @@ public class LeaderboardGetter {
         if (ticks % 5 != 0) return;
 
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc.theWorld != null) {
+        if (mc.theWorld != null && SkyblockHud.hasSkyblockScoreboard()) {
             Scoreboard scoreboard = mc.theWorld.getScoreboard();
             ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1);
 
             if (sidebarObjective != null && !MinecraftForge.EVENT_BUS.post(new SidebarPreGetEvent(scoreboard, sidebarObjective))) {
                 Collection<Score> scoreList = sidebarObjective.getScoreboard().getSortedScores(sidebarObjective);
-                Map<Integer, String> scores = scoreList.stream().collect(Collectors.toMap(Score::getScorePoints, this::getLine));
+                Map<Integer, String> scores = scoreList.stream().collect(Collectors.toMap(Score::getScorePoints, this::getLine, (s1, s2) -> s1));
 
                 if (!cachedScores.equals(scores)) {
                     scores.forEach(

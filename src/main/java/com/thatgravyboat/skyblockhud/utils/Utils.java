@@ -369,4 +369,12 @@ public class Utils {
         for (String o : strings) if (string.equalsIgnoreCase(o)) return true;
         return false;
     }
+
+    public static String getItemCustomId(ItemStack stack){
+        if (stack == null) return null;
+        if (!stack.hasTagCompound()) return null;
+        if (!stack.getTagCompound().hasKey("ExtraAttributes")) return null;
+        if (!stack.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id")) return null;
+        return stack.getTagCompound().getCompoundTag("ExtraAttributes").getString("id");
+    }
 }

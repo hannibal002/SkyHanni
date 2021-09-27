@@ -1,6 +1,8 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
 import com.thatgravyboat.skyblockhud.handlers.CooldownHandler;
+import com.thatgravyboat.skyblockhud.location.MinesHandler;
+import java.lang.ref.WeakReference;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -22,6 +24,25 @@ public abstract class MixinRenderItem {
     public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
         if(stack == null) return;
         float cooldown = CooldownHandler.getAbilityTime(stack);
+
+        WeakReference<MinesHandler.PrehistoricEggProgress> weakProgress = MinesHandler.getEggColorAndProgress(stack);
+
+        if (weakProgress != null) {
+            MinesHandler.PrehistoricEggProgress progress = weakProgress.get();
+            if (progress == null) return;
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            GlStateManager.disableTexture2D();
+            GlStateManager.disableAlpha();
+            GlStateManager.disableBlend();
+            WorldRenderer worldrenderer = Tessellator.getInstance().getWorldRenderer();
+            this.draw(worldrenderer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
+            this.draw(worldrenderer, xPosition + 2, yPosition + 13,  Math.round(progress.progress * 13f), 1, (progress.currentColor >> 16) & 0xFF, (progress.currentColor >> 8) & 0xFF, progress.currentColor & 0xFF, 255);
+            GlStateManager.enableAlpha();
+            GlStateManager.enableTexture2D();
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
+        }
 
         if (cooldown > -1){
             GlStateManager.disableLighting();

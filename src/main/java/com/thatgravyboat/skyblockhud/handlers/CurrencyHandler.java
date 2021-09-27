@@ -51,7 +51,7 @@ public class CurrencyHandler {
 
     public static String getCoinsFormatted() {
         DecimalFormat formatter = new DecimalFormat("#,###.0", DecimalFormatSymbols.getInstance(Locale.CANADA));
-        String output = formatter.format(coins);
+        String output = formatter.format(getCoins());
         if (output.equals(".0")) output = "0.0"; else if (output.equals(",0")) output = "0,0";
         return output;
     }
@@ -59,7 +59,7 @@ public class CurrencyHandler {
     public static String getBitsFormatted() {
         DecimalFormat formatter = new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.CANADA));
         formatter.setRoundingMode(RoundingMode.FLOOR);
-        return bits > 999 ? formatter.format((double) bits / 1000) + "k" : String.valueOf(bits);
+        return getBits() > 999 ? formatter.format((double) getBits() / 1000) + "k" : String.valueOf(getBits());
     }
 
     public static void checkCoins(String formatedScoreboardLine) {
