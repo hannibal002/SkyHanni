@@ -168,16 +168,16 @@ public class MinesHandler {
         if (walked < 4000) {
             progress.currentColor = 0xffffff;
             progress.progress = walked / 4000f;
-        }else if (walked < 10000) {
+        } else if (walked < 10000) {
             progress.currentColor = 0x55FF55;
             progress.progress = (walked - 4000f) / 6000f;
-        }else if (walked < 20000) {
+        } else if (walked < 20000) {
             progress.currentColor = 0x5555FF;
             progress.progress = (walked - 10000f) / 10000f;
-        }else if (walked < 40000) {
+        } else if (walked < 40000) {
             progress.currentColor = 0xAA00AA;
             progress.progress = (walked - 20000f) / 20000f;
-        }else if (walked < 100000) {
+        } else if (walked < 100000) {
             progress.currentColor = 0xFFAA00;
             progress.progress = (walked - 40000f) / 60000f;
         }
@@ -185,6 +185,7 @@ public class MinesHandler {
     }
 
     public static class PrehistoricEggProgress {
+
         public float progress;
         public int currentColor;
     }

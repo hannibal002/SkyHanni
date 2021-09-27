@@ -280,7 +280,7 @@ public class OverlayHud extends Gui {
         mc.renderEngine.bindTexture(Textures.texture.stats);
         drawTexturedModalRect((width / 2) - 15, offset + (bossBarVisible ? 51 : 34), 0, 52, 30, 14);
         drawTexturedModalRect((width / 2) - 10, offset + (bossBarVisible ? 53 : 36), MinesHandler.currentEvent.x, 0, 8, 8);
-        drawString(mc.fontRendererObj, MinesHandler.eventProgress +"", (width / 2), offset + (bossBarVisible ? 53 : 36), 0xffffff);
+        drawString(mc.fontRendererObj, MinesHandler.eventProgress + "", (width / 2), offset + (bossBarVisible ? 53 : 36), 0xffffff);
     }
 
     public void drawFarmHouseMedals(int width, int offset, Minecraft mc) {

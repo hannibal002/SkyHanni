@@ -370,7 +370,7 @@ public class Utils {
         return false;
     }
 
-    public static String getItemCustomId(ItemStack stack){
+    public static String getItemCustomId(ItemStack stack) {
         if (stack == null) return null;
         if (!stack.hasTagCompound()) return null;
         if (!stack.getTagCompound().hasKey("ExtraAttributes")) return null;

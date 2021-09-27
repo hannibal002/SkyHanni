@@ -22,14 +22,12 @@ public class TrackerFileLoader {
             tracker
                 .get("location")
                 .getAsJsonArray()
-                .forEach(
-                    l -> {
-                        Locations location = Locations.get(l.getAsString().toUpperCase(Locale.ENGLISH));
-                        if (location != Locations.DEFAULT) {
-                            locations.add(location);
-                        }
+                .forEach(l -> {
+                    Locations location = Locations.get(l.getAsString().toUpperCase(Locale.ENGLISH));
+                    if (location != Locations.DEFAULT) {
+                        locations.add(location);
                     }
-                );
+                });
             if (tracker.has("drops")) {
                 for (JsonElement drop : tracker.get("drops").getAsJsonArray()) {
                     TrackerHandler.trackerObjects.add(new TrackerObject(drop.getAsJsonObject(), locations));
@@ -70,19 +68,17 @@ public class TrackerFileLoader {
 
     private static JsonElement getTrackerFile() {
         JsonArray stats = new JsonArray();
-        TrackerHandler.trackerObjects.forEach(
-            trackerObject -> {
-                if (trackerObject.getCount() > 0) {
-                    JsonObject jsonObject = new JsonObject();
-                    JsonArray locations = new JsonArray();
-                    trackerObject.getLocations().forEach(l -> locations.add(new JsonPrimitive(l.toString().toUpperCase(Locale.ENGLISH))));
-                    jsonObject.add("id", new JsonPrimitive(trackerObject.getInternalId()));
-                    jsonObject.add("locations", locations);
-                    jsonObject.add("count", new JsonPrimitive(trackerObject.getCount()));
-                    stats.add(jsonObject);
-                }
+        TrackerHandler.trackerObjects.forEach(trackerObject -> {
+            if (trackerObject.getCount() > 0) {
+                JsonObject jsonObject = new JsonObject();
+                JsonArray locations = new JsonArray();
+                trackerObject.getLocations().forEach(l -> locations.add(new JsonPrimitive(l.toString().toUpperCase(Locale.ENGLISH))));
+                jsonObject.add("id", new JsonPrimitive(trackerObject.getInternalId()));
+                jsonObject.add("locations", locations);
+                jsonObject.add("count", new JsonPrimitive(trackerObject.getCount()));
+                stats.add(jsonObject);
             }
-        );
+        });
         return stats;
     }
 
@@ -99,29 +95,25 @@ public class TrackerFileLoader {
                 if (json.has("trackerStats")) {
                     json
                         .getAsJsonArray("trackerStats")
-                        .forEach(
-                            element -> {
-                                if (element.isJsonObject()) {
-                                    JsonObject object = element.getAsJsonObject();
-                                    JsonArray locations = object.get("locations").getAsJsonArray();
-                                    Locations firstLocation = null;
-                                    for (JsonElement location : locations) {
-                                        firstLocation = Locations.get(location.getAsString());
-                                        if (!firstLocation.equals(Locations.DEFAULT)) break;
-                                    }
+                        .forEach(element -> {
+                            if (element.isJsonObject()) {
+                                JsonObject object = element.getAsJsonObject();
+                                JsonArray locations = object.get("locations").getAsJsonArray();
+                                Locations firstLocation = null;
+                                for (JsonElement location : locations) {
+                                    firstLocation = Locations.get(location.getAsString());
+                                    if (!firstLocation.equals(Locations.DEFAULT)) break;
+                                }
 
-                                    if (firstLocation != null && !firstLocation.equals(Locations.DEFAULT)) {
-                                        TrackerHandler.trackers.get(firstLocation).get(object.get("id").getAsString()).setCount(object.get("count").getAsInt());
-                                    }
+                                if (firstLocation != null && !firstLocation.equals(Locations.DEFAULT)) {
+                                    TrackerHandler.trackers.get(firstLocation).get(object.get("id").getAsString()).setCount(object.get("count").getAsInt());
                                 }
                             }
-                        );
+                        });
 
-                    TrackerHandler.trackers.forEach(
-                        (location, map) -> {
-                            TrackerHandler.trackers.put(location, TrackerHandler.sortTrackers(map, (entry1, entry2) -> Integer.compare(entry2.getValue().getCount(), entry1.getValue().getCount())));
-                        }
-                    );
+                    TrackerHandler.trackers.forEach((location, map) -> {
+                        TrackerHandler.trackers.put(location, TrackerHandler.sortTrackers(map, (entry1, entry2) -> Integer.compare(entry2.getValue().getCount(), entry1.getValue().getCount())));
+                    });
                 }
             }
         } catch (Exception ignored) {}

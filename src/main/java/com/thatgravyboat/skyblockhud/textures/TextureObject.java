@@ -23,13 +23,11 @@ public class TextureObject {
         Arrays
             .stream(textureObject.getClass().getDeclaredFields())
             .filter(field -> field.getType().equals(ResourceLocation.class))
-            .forEach(
-                field -> {
-                    try {
-                        field.set(textureObject, new ResourceLocation(json.get(field.getName()).getAsString()));
-                    } catch (Exception ignored) {}
-                }
-            );
+            .forEach(field -> {
+                try {
+                    field.set(textureObject, new ResourceLocation(json.get(field.getName()).getAsString()));
+                } catch (Exception ignored) {}
+            });
         return textureObject;
     }
 

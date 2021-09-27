@@ -45,13 +45,11 @@ public class LeaderboardGetter {
                 Map<Integer, String> scores = scoreList.stream().collect(Collectors.toMap(Score::getScorePoints, this::getLine, (s1, s2) -> s1));
 
                 if (!cachedScores.equals(scores)) {
-                    scores.forEach(
-                        (score, name) -> {
-                            if (cachedScores.get(score) == null || !cachedScores.get(score).equals(name)) {
-                                MinecraftForge.EVENT_BUS.post(new SidebarLineUpdateEvent(name, SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim(), score, scores.size(), scoreboard, sidebarObjective));
-                            }
+                    scores.forEach((score, name) -> {
+                        if (cachedScores.get(score) == null || !cachedScores.get(score).equals(name)) {
+                            MinecraftForge.EVENT_BUS.post(new SidebarLineUpdateEvent(name, SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim(), score, scores.size(), scoreboard, sidebarObjective));
                         }
-                    );
+                    });
                     cachedScores = scores;
                     cachedScoresList = scores.values().stream().map(name -> SCOREBOARD_CHARACTERS.matcher(name).replaceAll("").trim()).collect(Collectors.toList());
                 }

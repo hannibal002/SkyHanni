@@ -86,16 +86,14 @@ public class WarpHandler {
         JsonArray array = new JsonArray();
         PLAYER_WARPS
             .asMap()
-            .forEach(
-                (profile, warps) -> {
-                    JsonObject profileObject = new JsonObject();
-                    profileObject.addProperty("profile", profile);
-                    JsonArray warpArray = new JsonArray();
-                    warps.forEach(warp -> warpArray.add(new JsonPrimitive(warp.name())));
-                    profileObject.add("warps", warpArray);
-                    array.add(profileObject);
-                }
-            );
+            .forEach((profile, warps) -> {
+                JsonObject profileObject = new JsonObject();
+                profileObject.addProperty("profile", profile);
+                JsonArray warpArray = new JsonArray();
+                warps.forEach(warp -> warpArray.add(new JsonPrimitive(warp.name())));
+                profileObject.add("warps", warpArray);
+                array.add(profileObject);
+            });
         json.add("profileWarps", array);
 
         warpConfig = new File(SkyblockHud.configDirectory, "sbh-warps.json");
@@ -118,22 +116,18 @@ public class WarpHandler {
                 json
                     .get("profileWarps")
                     .getAsJsonArray()
-                    .forEach(
-                        jsonElement -> {
-                            JsonObject profileObject = jsonElement.getAsJsonObject();
-                            List<Warp> warps = new ArrayList<>();
-                            profileObject
-                                .get("warps")
-                                .getAsJsonArray()
-                                .forEach(
-                                    warpId -> {
-                                        Warp warp = Warp.safeValueOf(warpId.getAsString());
-                                        if (warp != null) warps.add(warp);
-                                    }
-                                );
-                            PLAYER_WARPS.putAll(profileObject.get("profile").getAsString(), warps);
-                        }
-                    );
+                    .forEach(jsonElement -> {
+                        JsonObject profileObject = jsonElement.getAsJsonObject();
+                        List<Warp> warps = new ArrayList<>();
+                        profileObject
+                            .get("warps")
+                            .getAsJsonArray()
+                            .forEach(warpId -> {
+                                Warp warp = Warp.safeValueOf(warpId.getAsString());
+                                if (warp != null) warps.add(warp);
+                            });
+                        PLAYER_WARPS.putAll(profileObject.get("profile").getAsString(), warps);
+                    });
             }
         } catch (Exception ignored) {}
         return false;

@@ -18,11 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderItem.class)
 public abstract class MixinRenderItem {
 
-    @Shadow protected abstract void draw(WorldRenderer renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha);
+    @Shadow
+    protected abstract void draw(WorldRenderer renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha);
 
-    @Inject(method="renderItemOverlayIntoGUI", at=@At("RETURN"))
+    @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
     public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
-        if(stack == null) return;
+        if (stack == null) return;
         float cooldown = CooldownHandler.getAbilityTime(stack);
 
         WeakReference<MinesHandler.PrehistoricEggProgress> weakProgress = MinesHandler.getEggColorAndProgress(stack);
@@ -37,14 +38,14 @@ public abstract class MixinRenderItem {
             GlStateManager.disableBlend();
             WorldRenderer worldrenderer = Tessellator.getInstance().getWorldRenderer();
             this.draw(worldrenderer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-            this.draw(worldrenderer, xPosition + 2, yPosition + 13,  Math.round(progress.progress * 13f), 1, (progress.currentColor >> 16) & 0xFF, (progress.currentColor >> 8) & 0xFF, progress.currentColor & 0xFF, 255);
+            this.draw(worldrenderer, xPosition + 2, yPosition + 13, Math.round(progress.progress * 13f), 1, (progress.currentColor >> 16) & 0xFF, (progress.currentColor >> 8) & 0xFF, progress.currentColor & 0xFF, 255);
             GlStateManager.enableAlpha();
             GlStateManager.enableTexture2D();
             GlStateManager.enableLighting();
             GlStateManager.enableDepth();
         }
 
-        if (cooldown > -1){
+        if (cooldown > -1) {
             GlStateManager.disableLighting();
             GlStateManager.disableDepth();
             GlStateManager.disableTexture2D();
@@ -52,7 +53,7 @@ public abstract class MixinRenderItem {
             GlStateManager.disableBlend();
             WorldRenderer worldrenderer = Tessellator.getInstance().getWorldRenderer();
             this.draw(worldrenderer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-            this.draw(worldrenderer, xPosition + 2, yPosition + 13,  Math.round(cooldown * 13f), 1, 102, 102, 255, 255);
+            this.draw(worldrenderer, xPosition + 2, yPosition + 13, Math.round(cooldown * 13f), 1, 102, 102, 255, 255);
             GlStateManager.enableAlpha();
             GlStateManager.enableTexture2D();
             GlStateManager.enableLighting();

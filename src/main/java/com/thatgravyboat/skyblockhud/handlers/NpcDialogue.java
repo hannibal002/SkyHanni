@@ -65,8 +65,7 @@ public class NpcDialogue implements IResourceManagerReloadListener {
                     event.setCanceled(true);
 
                     Dialogue dialogue = new Dialogue(matcher.group(1), matcher.group(2));
-                    if (currentDialogue == null) currentDialogue = dialogue;
-                    else DIALOGUE.add(dialogue);
+                    if (currentDialogue == null) currentDialogue = dialogue; else DIALOGUE.add(dialogue);
                 }
             }
         }
@@ -119,7 +118,6 @@ public class NpcDialogue implements IResourceManagerReloadListener {
         } catch (Exception ignored) {}
     }
 
-
     static class Dialogue {
 
         public List<String> dialogue;
@@ -129,6 +127,5 @@ public class NpcDialogue implements IResourceManagerReloadListener {
             this.dialogue = Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(dialogue, 160);
             this.name = name;
         }
-
     }
 }
