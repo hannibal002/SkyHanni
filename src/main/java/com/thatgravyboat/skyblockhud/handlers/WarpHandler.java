@@ -34,16 +34,16 @@ public class WarpHandler {
     }
 
     @SubscribeEvent
-    public void profileChange(ProfileSwitchedEvent event){
-        if (profile != null && !profile.equals(event.profile)){
+    public void profileChange(ProfileSwitchedEvent event) {
+        if (profile != null && !profile.equals(event.profile)) {
             load();
         }
         profile = event.profile;
     }
 
     @SubscribeEvent
-    public void profileJoined(ProfileJoinedEvent event){
-        if (profile != null && !profile.equals(event.profile)){
+    public void profileJoined(ProfileJoinedEvent event) {
+        if (profile != null && !profile.equals(event.profile)) {
             load();
         }
         profile = event.profile;
@@ -53,24 +53,24 @@ public class WarpHandler {
     public void onGuiClosed(GuiOpenEvent event) {
         boolean changed = false;
         GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
-        if (currentScreen instanceof GuiChest){
+        if (currentScreen instanceof GuiChest) {
             GuiChestAccessor accessor = (GuiChestAccessor) currentScreen;
-            if (accessor.getLowerChestInventory().getDisplayName().getUnformattedText().contains("Fast Travel")){
+            if (accessor.getLowerChestInventory().getDisplayName().getUnformattedText().contains("Fast Travel")) {
                 for (int i = 9; i < Math.min(36, accessor.getLowerChestInventory().getSizeInventory()); i++) {
                     ItemStack stack = accessor.getLowerChestInventory().getStackInSlot(i);
-                    if (stack != null && stack.getItem().equals(Items.skull) && stack.getTagCompound().hasKey("display")){
+                    if (stack != null && stack.getItem().equals(Items.skull) && stack.getTagCompound().hasKey("display")) {
                         NBTTagList lore = stack.getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
 
                         String warpLine = Utils.removeColor(lore.getStringTagAt(0)).trim();
 
                         if (warpLine.equals("Unknown island!")) continue;
 
-                        String disabledLine = Utils.removeColor(lore.getStringTagAt(lore.tagCount()-1)).trim();
+                        String disabledLine = Utils.removeColor(lore.getStringTagAt(lore.tagCount() - 1)).trim();
 
                         Warp warp = Warp.fromId(warpLine.replace("/warp", "").trim());
 
                         if (warp != null && !disabledLine.equals("Warp not unlocked!")) {
-                            if (PLAYER_WARPS.put(profile, warp)){
+                            if (PLAYER_WARPS.put(profile, warp)) {
                                 changed = true;
                             }
                         }
@@ -84,14 +84,18 @@ public class WarpHandler {
     public static void save() {
         JsonObject json = new JsonObject();
         JsonArray array = new JsonArray();
-        PLAYER_WARPS.asMap().forEach((profile, warps) -> {
-            JsonObject profileObject = new JsonObject();
-            profileObject.addProperty("profile", profile);
-            JsonArray warpArray = new JsonArray();
-            warps.forEach(warp -> warpArray.add(new JsonPrimitive(warp.name())));
-            profileObject.add("warps", warpArray);
-            array.add(profileObject);
-        });
+        PLAYER_WARPS
+            .asMap()
+            .forEach(
+                (profile, warps) -> {
+                    JsonObject profileObject = new JsonObject();
+                    profileObject.addProperty("profile", profile);
+                    JsonArray warpArray = new JsonArray();
+                    warps.forEach(warp -> warpArray.add(new JsonPrimitive(warp.name())));
+                    profileObject.add("warps", warpArray);
+                    array.add(profileObject);
+                }
+            );
         json.add("profileWarps", array);
 
         warpConfig = new File(SkyblockHud.configDirectory, "sbh-warps.json");
@@ -111,15 +115,25 @@ public class WarpHandler {
             if (warpConfig.createNewFile()) return true;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(warpConfig), StandardCharsets.UTF_8))) {
                 JsonObject json = GSON.fromJson(reader, JsonObject.class);
-                json.get("profileWarps").getAsJsonArray().forEach(jsonElement -> {
-                    JsonObject profileObject = jsonElement.getAsJsonObject();
-                    List<Warp> warps = new ArrayList<>();
-                    profileObject.get("warps").getAsJsonArray().forEach(warpId -> {
-                        Warp warp = Warp.safeValueOf(warpId.getAsString());
-                        if (warp != null) warps.add(warp);
-                    });
-                    PLAYER_WARPS.putAll(profileObject.get("profile").getAsString(), warps);
-                });
+                json
+                    .get("profileWarps")
+                    .getAsJsonArray()
+                    .forEach(
+                        jsonElement -> {
+                            JsonObject profileObject = jsonElement.getAsJsonObject();
+                            List<Warp> warps = new ArrayList<>();
+                            profileObject
+                                .get("warps")
+                                .getAsJsonArray()
+                                .forEach(
+                                    warpId -> {
+                                        Warp warp = Warp.safeValueOf(warpId.getAsString());
+                                        if (warp != null) warps.add(warp);
+                                    }
+                                );
+                            PLAYER_WARPS.putAll(profileObject.get("profile").getAsString(), warps);
+                        }
+                    );
             }
         } catch (Exception ignored) {}
         return false;
@@ -149,24 +163,23 @@ public class WarpHandler {
 
         public String warpId;
 
-        Warp(String warpId){
+        Warp(String warpId) {
             this.warpId = warpId;
         }
 
-        public static Warp fromId(String id){
+        public static Warp fromId(String id) {
             for (Warp value : Warp.values()) {
                 if (value.warpId.equals(id)) return value;
             }
             return null;
         }
 
-        public static Warp safeValueOf(String value){
+        public static Warp safeValueOf(String value) {
             try {
                 return Warp.valueOf(value);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 return null;
             }
         }
     }
-
 }

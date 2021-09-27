@@ -54,9 +54,9 @@ public class Commands {
                     break;
                 case "copySkin":
                     Entity entity = Minecraft.getMinecraft().objectMouseOver.entityHit;
-                    if (entity instanceof AbstractClientPlayer){
-                        clipboard = new StringSelection("http://textures.minecraft.net/texture/"+((AbstractClientPlayer) entity).getLocationSkin().getResourcePath().replace("skins/", ""));
-                    }else {
+                    if (entity instanceof AbstractClientPlayer) {
+                        clipboard = new StringSelection("http://textures.minecraft.net/texture/" + ((AbstractClientPlayer) entity).getLocationSkin().getResourcePath().replace("skins/", ""));
+                    } else {
                         sendSBHMessage(sender, "Not a player!");
                     }
                     break;

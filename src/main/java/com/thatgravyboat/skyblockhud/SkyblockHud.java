@@ -97,7 +97,9 @@ public class SkyblockHud {
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
 
         configDirectory = new File(event.getModConfigurationDirectory(), "skyblockhud");
-        try { configDirectory.mkdir(); } catch (Exception ignored){}
+        try {
+            configDirectory.mkdir();
+        } catch (Exception ignored) {}
 
         configFile = new File(configDirectory, "sbh-config.json");
 
@@ -194,7 +196,7 @@ public class SkyblockHud {
             String stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim();
             MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent(stripped));
         }
-        if (message.startsWith("you are playing on profile:")){
+        if (message.startsWith("you are playing on profile:")) {
             String stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim();
             MinecraftForge.EVENT_BUS.post(new ProfileJoinedEvent(stripped));
         }

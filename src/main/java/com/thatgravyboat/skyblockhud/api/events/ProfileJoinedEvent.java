@@ -6,7 +6,7 @@ public class ProfileJoinedEvent extends Event {
 
     public String profile;
 
-    public ProfileJoinedEvent(String profile){
+    public ProfileJoinedEvent(String profile) {
         this.profile = profile;
     }
 }
