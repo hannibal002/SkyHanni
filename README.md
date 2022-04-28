@@ -14,3 +14,5 @@
 </div>
 
 SBHud is a beta mod developed by ThatGravyBoat to add a better HUD to hypixel skyblock. It is in beta so expect bugs.
+
+This project has been discontinued and is now open source for anyone to fork and work on it but as of right now it wont be worked on by the original developer ThatGravyBoat
