@@ -1,0 +1,13 @@
+overrides:
+  - files:
+      - "*.java"
+    options:
+      useTabs: false
+      trailingComma: none
+      tabWidth: 4
+      endOfLine: lf
+      printWidth: 999999999 # >:c fine gravy
+  - files:
+      - "*.json"
+    options:
+      printWidth: 10
