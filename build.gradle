@@ -1,4 +1,5 @@
 buildscript {
+    ext.kotlin_version = '1.7.0'
     repositories {
         maven {
             name = 'jitpack'
@@ -6,15 +7,18 @@ buildscript {
         }
         maven { url = 'https://maven.minecraftforge.net/' }
         maven { url = 'https://repo.spongepowered.org/maven' }
+        mavenCentral()
     }
     dependencies {
         classpath 'com.github.asbyth:ForgeGradle:8708bf3e01'
         classpath 'com.github.xcfrg:MixinGradle:0.6-SNAPSHOT'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 apply plugin: 'java'
+apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -22,15 +26,20 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '1.13'
+version = '0.1'
 group= 'com.thatgravyboat.skyblockhud'
-archivesBaseName = 'SkyBlockHud'
+archivesBaseName = 'LorenzMod'
 String mixinClassifier = 'dep'
 
 minecraft {
     version = '1.8.9-11.15.1.2318-1.8.9'
     runDir = 'run'
     mappings = 'stable_22'
+//    clientRunArgs.addAll(
+//            arrayOf(
+//                    "--mixin mixins.skytils.json"
+//            )
+//    )
 }
 
 repositories {
@@ -38,11 +47,17 @@ repositories {
     flatDir {
         dirs 'deps'
     }
+    mavenCentral()
 }
 
 dependencies {
     compile('org.spongepowered:mixin:0.7.11-SNAPSHOT')
     annotationProcessor('org.spongepowered:mixin:0.7.11-SNAPSHOT')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}
+
+compileJava {
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 }
 
 mixin {
@@ -102,3 +117,13 @@ task moveResources {
 }
 moveResources.dependsOn processResources
 classes.dependsOn moveResources
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}

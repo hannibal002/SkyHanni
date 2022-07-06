@@ -1,13 +1,8 @@
 {
-  "package": "com.thatgravyboat.skyblockhud.mixins",
+  "package": "at.lorenz.mod.mixins",
   "refmap": "mixins.skyblockhud.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "GuiChestAccessor",
-    "MixinEntityArrow",
-    "MixinGuiIngameForge",
-    "MixinItemStack",
-    "MixinNetHandlerPlayClient",
-    "MixinRenderItem"
+    "MixinGuiContainer"
   ]
 }
