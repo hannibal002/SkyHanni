@@ -266,6 +266,7 @@ class HideNotClickableItems {
                 "Enchanted Wool" -> return false
                 "Training Weights" -> return false
                 "Journal Entry" -> return false
+                "Twilight Arrow Poison" -> return false
 
                 "Fairy's Galoshes" -> return false
             }
