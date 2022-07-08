@@ -1,5 +1,6 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
+import at.lorenz.mod.Features;
 import com.google.common.collect.Sets;
 import com.thatgravyboat.skyblockhud.SkyblockHud;
 import com.thatgravyboat.skyblockhud.api.item.IAbility;

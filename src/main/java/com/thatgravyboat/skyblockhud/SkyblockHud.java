@@ -1,5 +1,6 @@
 package com.thatgravyboat.skyblockhud;
 
+import at.lorenz.mod.Features;
 import at.lorenz.mod.HideNotClickableItems;
 import at.lorenz.mod.ItemDisplayOverlayFeatures;
 import at.lorenz.mod.bazaar.BazaarApi;
@@ -32,7 +33,8 @@ public class SkyblockHud {
     public static final String MODID = "lorenzmod";
     public static final String VERSION = "0.1";
 
-    public static SBHConfig config;
+    public static SBHConfig config;//TODO delete
+    public static Features feature;
     private File configFile;
 
     //    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet("SKYBLOCK", "\u7A7A\u5C9B\u751F\u5B58");
@@ -43,6 +45,7 @@ public class SkyblockHud {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+
         new BazaarApi();
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -53,7 +56,9 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
         MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
         MinecraftForge.EVENT_BUS.register(new ItemDisplayOverlayFeatures());
+
         Commands.init();
+
         //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
         //        MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
         //        MinecraftForge.EVENT_BUS.register(new LocationHandler());
@@ -94,13 +99,13 @@ public class SkyblockHud {
 
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
-                config = gson.fromJson(reader, SBHConfig.class);
+                feature = gson.fromJson(reader, Features.class);
             } catch (Exception ignored) {
             }
         }
 
-        if (config == null) {
-            config = new SBHConfig();
+        if (feature == null) {
+            feature = new Features();
             saveConfig();
         }
         //
@@ -120,7 +125,7 @@ public class SkyblockHud {
             configFile.createNewFile();
 
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
-                writer.write(gson.toJson(config));
+                writer.write(gson.toJson(feature));
             }
         } catch (IOException ignored) {
         }

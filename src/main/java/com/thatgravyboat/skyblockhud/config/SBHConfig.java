@@ -112,12 +112,12 @@ public class SBHConfig extends Config {
         public boolean test = false;
 
         @Expose
-        @ConfigOption(name = "Lorenz Small  Test B", desc = "def")
+        @ConfigOption(name = "Lorenz Small  Test B", desc = "abc")
         @ConfigEditorBoolean
         public boolean test2 = false;
 
         @Expose
-        @ConfigOption(name = "Lorenz Small  Test C", desc = "ghi")
+        @ConfigOption(name = "Lorenz Small  Test C", desc = "abc")
         @ConfigEditorBoolean
         public boolean test3 = false;
     }
