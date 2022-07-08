@@ -2,6 +2,7 @@ package com.thatgravyboat.skyblockhud_2.config;
 
 import static com.thatgravyboat.skyblockhud_2.GuiTextures.DISCORD;
 
+import at.lorenz.mod.LorenzMod;
 import at.lorenz.mod.config.Features;
 import com.google.common.collect.Lists;
 import com.thatgravyboat.skyblockhud_2.core.GlScissorStack;
@@ -147,7 +148,7 @@ public class SBHConfigEditor extends GuiElement {
         RenderUtils.drawFloatingRectDark(x + 5, y + 5, xSize - 10, 20, false);
 
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
-        TextRenderUtils.drawStringCenteredScaledMaxWidth("LorenzMod by " + EnumChatFormatting.RED + "hannibal2" + EnumChatFormatting.RESET + ", config by " + EnumChatFormatting.DARK_PURPLE + "Moulberry", fr, x + xSize / 2f, y + 15, false, 200, 0xa0a0a0);
+        TextRenderUtils.drawStringCenteredScaledMaxWidth("LorenzMod " + LorenzMod.VERSION +" by " + EnumChatFormatting.RED + "hannibal2" + EnumChatFormatting.RESET + ", config by " + EnumChatFormatting.DARK_PURPLE + "Moulberry", fr, x + xSize / 2f, y + 15, false, 200, 0xa0a0a0);
 
         RenderUtils.drawFloatingRectDark(x + 4, y + 49 - 20, 140, ySize - 54 + 20, false);
 

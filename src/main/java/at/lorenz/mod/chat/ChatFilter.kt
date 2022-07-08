@@ -10,7 +10,7 @@ class ChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzMod.feature.chat.mainFilter) return
+//        if (!LorenzMod.feature.chat.chatFilterAll) return
 
         val blockReason = block(event.message)
         if (blockReason != "") {
@@ -20,23 +20,23 @@ class ChatFilter {
 
     private fun block(message: String): String = when {
         message.startsWith("§aYou are playing on profile: §e") -> "profile"//TODO move into own class
-        lobby(message) -> "lobby"
-        empty(message) -> "empty"
-        warping(message) -> "warping"
-        welcome(message) -> "welcome"
-        guild(message) -> "guild"
-        killCombo(message) -> "kill_combo"
-        bazaarAndAHMiniMessages(message) -> "bz_ah_minis"
-        watchdogAnnouncement(message) -> "watchdog"
-        slayer(message) -> "slayer"
-        slayerDrop(message) -> "slayer_drop"
-        uselessDrop(message) -> "useless_drop"
-        uselessNotification(message) -> "useless_notification"
-        party(message) -> "party"
-        money(message) -> "money"
-        winterIsland(message) -> "winter_island"
-        uselessWarning(message) -> "useless_warning"
-        friendJoin(message) -> "friend_join"
+        lobby(message) && LorenzMod.feature.chat.hypixelHub -> "lobby"
+        empty(message) && LorenzMod.feature.chat.empty -> "empty"
+        warping(message) && LorenzMod.feature.chat.warping -> "warping"
+        welcome(message) && LorenzMod.feature.chat.welcome -> "welcome"
+        guild(message) && LorenzMod.feature.chat.others -> "guild"
+        killCombo(message) && LorenzMod.feature.chat.others -> "kill_combo"
+        bazaarAndAHMiniMessages(message) && LorenzMod.feature.chat.others -> "bz_ah_minis"
+        watchdogAnnouncement(message) && LorenzMod.feature.chat.others -> "watchdog"
+        slayer(message) && LorenzMod.feature.chat.others -> "slayer"
+        slayerDrop(message) && LorenzMod.feature.chat.others -> "slayer_drop"
+        uselessDrop(message) && LorenzMod.feature.chat.others -> "useless_drop"
+        uselessNotification(message) && LorenzMod.feature.chat.others -> "useless_notification"
+        party(message) && LorenzMod.feature.chat.others -> "party"
+        money(message) && LorenzMod.feature.chat.others -> "money"
+        winterIsland(message) && LorenzMod.feature.chat.others -> "winter_island"
+        uselessWarning(message) && LorenzMod.feature.chat.others -> "useless_warning"
+        friendJoin(message) && LorenzMod.feature.chat.others -> "friend_join"
 
 
         else -> ""

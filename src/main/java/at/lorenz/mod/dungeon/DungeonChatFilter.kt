@@ -10,7 +10,7 @@ class DungeonChatFilter {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
 
-        if (!LorenzMod.feature.dungeon.hideAnnoyingMessages) return
+        if (!LorenzMod.feature.chat.dungeonMessages) return
 
         val blockReason = block(event.message)
         if (blockReason != "") {
