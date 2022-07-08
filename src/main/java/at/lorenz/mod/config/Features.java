@@ -1,69 +1,45 @@
 package at.lorenz.mod.config;
 
-import com.google.gson.annotations.Expose;
 import at.lorenz.mod.LorenzMod;
+import com.google.gson.annotations.Expose;
 import com.thatgravyboat.skyblockhud_2.config.SBHConfigEditor;
+import com.thatgravyboat.skyblockhud_2.core.GuiElement;
 import com.thatgravyboat.skyblockhud_2.core.GuiScreenElementWrapper;
 import com.thatgravyboat.skyblockhud_2.core.config.Position;
 import com.thatgravyboat.skyblockhud_2.core.config.annotations.Category;
 import com.thatgravyboat.skyblockhud_2.core.config.annotations.ConfigEditorBoolean;
+import com.thatgravyboat.skyblockhud_2.core.config.annotations.ConfigEditorButton;
 import com.thatgravyboat.skyblockhud_2.core.config.annotations.ConfigOption;
 import com.thatgravyboat.skyblockhud_2.core.config.gui.GuiPositionEditor;
 import net.minecraft.client.Minecraft;
 
-public class Features  {
+public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
+        }, () -> {
+        }, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
     }
 
     public void executeRunnable(String runnableId) {
-        //        String activeConfigCategory = null;
-        //        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenElementWrapper) {
-        //            GuiScreenElementWrapper wrapper = (GuiScreenElementWrapper) Minecraft.getMinecraft().currentScreen;
-        //            if (wrapper.element instanceof SBHConfigEditor) {
-        //                activeConfigCategory = ((SBHConfigEditor) wrapper.element).getSelectedCategoryName();
-        //            }
-        //        }
-        //
-        //        switch (runnableId) {
-        //            case "rpg":
-        //                editOverlay(activeConfigCategory, 120, 47, rpg.rpgHudPosition);
-        //                return;
-        //            case "d1":
-        //                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer1);
-        //                return;
-        //            case "d2":
-        //                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer2);
-        //                return;
-        //            case "d3":
-        //                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer3);
-        //                return;
-        //            case "d4":
-        //                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer4);
-        //                return;
-        //            case "main":
-        //                editOverlay(activeConfigCategory, 1000, 34, main.mainHudPos);
-        //                return;
-        //            case "ultimate":
-        //                editOverlay(activeConfigCategory, 182, 5, dungeon.barPosition);
-        //                return;
-        //            case "map":
-        //                editOverlay(activeConfigCategory, 72, 72, map.miniMapPosition);
-        //                return;
-        //            case "tracker":
-        //                editOverlay(activeConfigCategory, 130, 70, trackers.trackerPosition);
-        //                return;
-        //            case "drill":
-        //                editOverlay(activeConfigCategory, 136, 7, mining.drillBar);
-        //                return;
-        //            case "heat":
-        //                editOverlay(activeConfigCategory, 45, 7, mining.heatBar);
-        //                return;
-        //            case "dialogue":
-        //                editOverlay(activeConfigCategory, 182, 68, misc.dialoguePos);
-        //                return;
-        //        }
+        String activeConfigCategory = null;
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenElementWrapper) {
+            GuiScreenElementWrapper wrapper = (GuiScreenElementWrapper) Minecraft.getMinecraft().currentScreen;
+            GuiElement element = wrapper.element;
+            if (element instanceof SBHConfigEditor) {
+                activeConfigCategory = ((SBHConfigEditor) element).getSelectedCategoryName();
+            }
+        }
+
+        if (runnableId.equals("petDisplay")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.petDisplayPos);
+            return;
+        }
+
+        if (runnableId.equals("testPos")) {
+            editOverlay(activeConfigCategory, 200, 16, test.testPos);
+            return;
+        }
     }
 
     @Expose
@@ -81,6 +57,14 @@ public class Features  {
     @Expose
     @Category(name = "Bazaar", desc = "Bazaar settings.")
     public Bazaar bazaar = new Bazaar();
+
+    @Expose
+    @Category(name = "Misc", desc = "Settings without a big category")
+    public Misc misc = new Misc();
+
+    @Expose
+    @Category(name = "Test", desc = "Test stuff")
+    public Test test = new Test();
 
     public static class Chat {
 
@@ -157,5 +141,31 @@ public class Features  {
         @ConfigOption(name = "Order Helper", desc = "Show visual hints when items are ready to pickup or outbid.")
         @ConfigEditorBoolean
         public boolean orderHelper = false;
+    }
+
+    public static class Misc {
+
+        @Expose
+        @ConfigOption(name = "Pet Display", desc = "Shows the current active pet.")
+        @ConfigEditorBoolean
+        public boolean petDisplay = false;
+
+        @Expose
+        @ConfigOption(name = "Pet Display Position", desc = "")
+        @ConfigEditorButton(runnableId = "petDisplay", buttonText = "Edit")
+        public Position petDisplayPos = new Position(10, 10, false, true);
+    }
+
+    public static class Test {
+
+        @Expose
+        @ConfigOption(name = "Enable Test", desc = "Enable Test logic")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Test Location", desc = "testPos")
+        @ConfigEditorButton(runnableId = "testPos", buttonText = "Edit")
+        public Position testPos = new Position(10, 10, false, true);
     }
 }

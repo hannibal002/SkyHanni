@@ -8,6 +8,7 @@ import at.lorenz.mod.chat.PlayerChatFilter;
 import at.lorenz.mod.config.Features;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
+import at.lorenz.mod.misc.CurrentPetDisplay;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thatgravyboat.skyblockhud_2.commands.Commands;
@@ -53,6 +54,7 @@ public class LorenzMod {
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
         MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
         MinecraftForge.EVENT_BUS.register(new ItemDisplayOverlayFeatures());
+        MinecraftForge.EVENT_BUS.register(new CurrentPetDisplay());
 
         Commands.init();
 
@@ -105,15 +107,7 @@ public class LorenzMod {
             feature = new Features();
             saveConfig();
         }
-        //
-        //        Textures.setTexture(config.misc.style);
-        //
-        //        if (WarpHandler.load()) {
-        //            WarpHandler.save();
-        //        }
-        //
         Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
-        //        Runtime.getRuntime().addShutdownHook(new Thread(TrackerFileLoader::saveTrackerStatsFile));
     }
 
     public void saveConfig() {
