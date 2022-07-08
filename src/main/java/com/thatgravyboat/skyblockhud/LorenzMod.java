@@ -1,12 +1,12 @@
 package com.thatgravyboat.skyblockhud;
 
-import at.lorenz.mod.config.Features;
 import at.lorenz.mod.HideNotClickableItems;
 import at.lorenz.mod.ItemDisplayOverlayFeatures;
 import at.lorenz.mod.bazaar.BazaarApi;
 import at.lorenz.mod.bazaar.BazaarOrderHelper;
 import at.lorenz.mod.chat.ChatFilter;
 import at.lorenz.mod.chat.ChatManager;
+import at.lorenz.mod.config.Features;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
 import com.google.gson.Gson;
