@@ -1,9 +1,8 @@
 package at.lorenz.mod.dungeon
 
-import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
-import com.thatgravyboat.skyblockhud.SkyblockHud
+import com.thatgravyboat.skyblockhud.LorenzMod
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonChatFilter {
@@ -11,7 +10,7 @@ class DungeonChatFilter {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
 
-        if (!SkyblockHud.feature.dungeon.hideAnnoyingMessages) return
+        if (!LorenzMod.feature.dungeon.hideAnnoyingMessages) return
 
         val blockReason = block(event.message)
         if (blockReason != "") {

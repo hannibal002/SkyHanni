@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.api;
 
 import static com.thatgravyboat.skyblockhud.ComponentHandler.SCOREBOARD_CHARACTERS;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPreGetEvent;
@@ -36,7 +36,7 @@ public class LeaderboardGetter {
         if (ticks % 5 != 0) return;
 
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc.theWorld != null && SkyblockHud.hasSkyblockScoreboard()) {
+        if (mc.theWorld != null && LorenzMod.hasSkyblockScoreboard()) {
             Scoreboard scoreboard = mc.theWorld.getScoreboard();
             ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1);
 

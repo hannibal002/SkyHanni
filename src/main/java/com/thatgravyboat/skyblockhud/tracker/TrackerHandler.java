@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.tracker;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
@@ -31,7 +31,7 @@ public class TrackerHandler extends Gui {
     }
 
     public static void onItemAdded(String id, int amount, String specialId, int number) {
-        if (SkyblockHud.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
+        if (LorenzMod.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
             Map<String, TrackerObject> trackerMap = trackers.get(LocationHandler.getCurrentLocation());
             String dropId = id;
             if (specialId != null) {
@@ -58,7 +58,7 @@ public class TrackerHandler extends Gui {
 
     @SubscribeEvent
     public void onSbEntityDeath(SkyBlockEntityKilled event) {
-        if (SkyblockHud.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
+        if (LorenzMod.hasSkyblockScoreboard() && trackers.containsKey(LocationHandler.getCurrentLocation())) {
             Map<String, TrackerObject> trackerMap = trackers.get(LocationHandler.getCurrentLocation());
             if (trackerMap.containsKey("ENTITY:" + event.id)) {
                 TrackerObject object = trackerMap.get("ENTITY:" + event.id);

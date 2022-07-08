@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.dungeons.Classes;
@@ -28,13 +28,13 @@ public class DungeonOverlay extends Gui {
     private static boolean bossBarVisible = false;
 
     public void drawDungeonPlayer(String name, int health, boolean isDead, Classes dungeonClass, int x, int y) {
-        if (!SkyblockHud.config.dungeon.hideDeadDungeonPlayers || !isDead) {
+        if (!LorenzMod.config.dungeon.hideDeadDungeonPlayers || !isDead) {
             GlStateManager.enableBlend();
             Minecraft mc = Minecraft.getMinecraft();
             mc.renderEngine.bindTexture(Textures.texture.dungeon);
 
             String healthString = isDead ? "DEAD" : Integer.toString(health);
-            GlStateManager.color(1.0F, 1.0F, 1.0F, (float) SkyblockHud.config.dungeon.dungeonPlayerOpacity / 100);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, (float) LorenzMod.config.dungeon.dungeonPlayerOpacity / 100);
             drawTexturedModalRect(x, y, 0, dungeonClass.getTextureY(), 120, 32);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             drawString(font, name, x + 50, y + 6, 0xFFFFFF);
@@ -99,9 +99,9 @@ public class DungeonOverlay extends Gui {
     }
 
     public void drawUltimateBar(Minecraft mc, ScaledResolution resolution) {
-        if (!SkyblockHud.config.dungeon.hideUltimateBar) {
+        if (!LorenzMod.config.dungeon.hideUltimateBar) {
             float percentage = mc.thePlayer.experience;
-            SBHConfig.DungeonHud dungeonHud = SkyblockHud.config.dungeon;
+            SBHConfig.DungeonHud dungeonHud = LorenzMod.config.dungeon;
             Position position = dungeonHud.barPosition;
 
             int x = position.getAbsX(resolution, 182);
@@ -114,15 +114,15 @@ public class DungeonOverlay extends Gui {
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS))) {
+        if (Utils.overlayShouldRender(event.type, LorenzMod.hasSkyblockScoreboard(), LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS))) {
             bossBarVisible = BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
             GlStateManager.enableBlend();
             drawUltimateBar(mc, event.resolution);
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            if (!SkyblockHud.config.dungeon.hideDungeonPlayers) {
+            if (!LorenzMod.config.dungeon.hideDungeonPlayers) {
                 int[] hardCodedPos = new int[] { 5, 42, 79, 116 };
-                Position[] positions = new Position[] { SkyblockHud.config.dungeon.dungeonPlayer1, SkyblockHud.config.dungeon.dungeonPlayer2, SkyblockHud.config.dungeon.dungeonPlayer3, SkyblockHud.config.dungeon.dungeonPlayer4 };
+                Position[] positions = new Position[] { LorenzMod.config.dungeon.dungeonPlayer1, LorenzMod.config.dungeon.dungeonPlayer2, LorenzMod.config.dungeon.dungeonPlayer3, LorenzMod.config.dungeon.dungeonPlayer4 };
                 for (int i = 0; i < Math.min(DungeonHandler.getDungeonPlayers().values().size(), 4); i++) {
                     DungeonPlayer player = (DungeonPlayer) DungeonHandler.getDungeonPlayers().values().toArray()[i];
                     int posX;
@@ -141,8 +141,8 @@ public class DungeonOverlay extends Gui {
                 }
             }
 
-            if (!SkyblockHud.config.main.disaleMainHud) {
-                drawDungeonClock(event.resolution.getScaledWidth(), SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
+            if (!LorenzMod.config.main.disaleMainHud) {
+                drawDungeonClock(event.resolution.getScaledWidth(), LorenzMod.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
             }
         }
     }

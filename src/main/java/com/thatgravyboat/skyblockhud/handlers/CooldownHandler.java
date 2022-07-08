@@ -1,8 +1,7 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import at.lorenz.mod.Features;
 import com.google.common.collect.Sets;
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.item.IAbility;
 import com.thatgravyboat.skyblockhud.utils.Utils;
 import java.util.*;
@@ -70,7 +69,7 @@ public class CooldownHandler {
 
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent event) {
-        if (SkyblockHud.config.misc.hideItemCooldowns) return;
+        if (LorenzMod.config.misc.hideItemCooldowns) return;
         if (event.phase.equals(TickEvent.Phase.END)) {
             COOLDOWNS.values().forEach(Cooldown::tick);
             COOLDOWNS.entrySet().removeIf(entry -> entry.getValue().isOver());
@@ -79,7 +78,7 @@ public class CooldownHandler {
 
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (SkyblockHud.config.misc.hideItemCooldowns) return;
+        if (LorenzMod.config.misc.hideItemCooldowns) return;
         if (event.action.equals(PlayerInteractEvent.Action.RIGHT_CLICK_AIR) || event.action.equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)) {
             if (event.entityPlayer.getHeldItem() != null) {
                 IAbility ability = (IAbility) ((Object) event.entityPlayer.getHeldItem());

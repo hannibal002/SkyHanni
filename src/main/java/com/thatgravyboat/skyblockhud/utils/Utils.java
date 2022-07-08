@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.utils;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import java.math.RoundingMode;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -32,11 +32,11 @@ import org.lwjgl.opengl.GL14;
 
 public class Utils {
 
-    private static LinkedList<Integer> guiScales = new LinkedList<>();
+    private static final LinkedList<Integer> guiScales = new LinkedList<>();
     private static ScaledResolution lastScale = new ScaledResolution(Minecraft.getMinecraft());
     //Labymod compatibility
-    private static FloatBuffer projectionMatrixOld = BufferUtils.createFloatBuffer(16);
-    private static FloatBuffer modelviewMatrixOld = BufferUtils.createFloatBuffer(16);
+    private static final FloatBuffer projectionMatrixOld = BufferUtils.createFloatBuffer(16);
+    private static final FloatBuffer modelviewMatrixOld = BufferUtils.createFloatBuffer(16);
 
     public static String removeColor(String input) {
         return input.replaceAll("(?i)\\u00A7.", "");
@@ -47,7 +47,7 @@ public class Utils {
     }
 
     public static boolean isPlayerHoldingRedstone(EntityPlayerSP player) {
-        if (!SkyblockHud.config.main.requireRedstone) return true;
+        if (!LorenzMod.config.main.requireRedstone) return true;
         ArrayList<Item> redstoneItems = new ArrayList<>(Arrays.asList(Items.redstone, Items.repeater, Items.comparator, Item.getByNameOrId("minecraft:redstone_torch")));
         if (player.getHeldItem() != null) return redstoneItems.contains(player.getHeldItem().getItem());
         return false;

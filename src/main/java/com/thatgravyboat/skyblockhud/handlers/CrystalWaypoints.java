@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.handlers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.events.LocationChangeEvent;
 import com.thatgravyboat.skyblockhud.commands.SimpleCommand;
 import com.thatgravyboat.skyblockhud.location.LocationCategory;
@@ -59,10 +59,10 @@ public class CrystalWaypoints {
     public void onLocationChange(LocationChangeEvent event) {
         if (!event.newLocation.getCategory().equals(LocationCategory.CRYSTALHOLLOWS)) {
             waypoints.clear();
-        } else if (!waypoints.containsKey("Crystal Nucleus") && SkyblockHud.config.mining.autoWaypoint) {
+        } else if (!waypoints.containsKey("Crystal Nucleus") && LorenzMod.config.mining.autoWaypoint) {
             waypoints.put("Crystal Nucleus", new BlockPos(512.5, 106.5, 512.5));
         }
-        if (IMPORTANT_WAYPOINTS.contains(event.newLocation) && SkyblockHud.config.mining.autoWaypoint) {
+        if (IMPORTANT_WAYPOINTS.contains(event.newLocation) && LorenzMod.config.mining.autoWaypoint) {
             if (!waypoints.containsKey(event.newLocation.getDisplayName())) {
                 waypoints.put(event.newLocation.getDisplayName(), Minecraft.getMinecraft().thePlayer.getPosition());
             }
@@ -76,7 +76,7 @@ public class CrystalWaypoints {
             if (!matcher.find()) return;
             ChatStyle style = new ChatStyle();
             style.setParentStyle(event.message.getChatStyle());
-            ClickEvent.Action action = SkyblockHud.config.mining.chatWaypointMode == 0 ? ClickEvent.Action.RUN_COMMAND : ClickEvent.Action.SUGGEST_COMMAND;
+            ClickEvent.Action action = LorenzMod.config.mining.chatWaypointMode == 0 ? ClickEvent.Action.RUN_COMMAND : ClickEvent.Action.SUGGEST_COMMAND;
             style.setChatClickEvent(new ClickEvent(action, "/sbhpoints addat " + matcher.group(2) + " " + matcher.group(3) + " " + matcher.group(4) + " " + matcher.group(1)));
             style.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to add waypoint!").setChatStyle(new ChatStyle().setBold(true))));
             event.message.setChatStyle(style);

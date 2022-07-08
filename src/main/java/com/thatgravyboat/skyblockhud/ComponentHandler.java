@@ -34,8 +34,8 @@ public class ComponentHandler {
         boolean eventPass = false;
         if (mc.theWorld != null) {
             List<NetworkPlayerInfo> players = sortingList.sortedCopy(mc.thePlayer.sendQueue.getPlayerInfoMap());
-            GuiIngameForge.renderObjective = !SkyblockHud.hasSkyblockScoreboard() || !SkyblockHud.config.misc.hideScoreboard;
-            if (players != null && SkyblockHud.hasSkyblockScoreboard()) {
+            GuiIngameForge.renderObjective = !LorenzMod.hasSkyblockScoreboard() || !LorenzMod.config.misc.hideScoreboard;
+            if (players != null && LorenzMod.hasSkyblockScoreboard()) {
                 if (ticksExisted % 60 == 0) {
                     for (NetworkPlayerInfo player : players) {
                         if (player.getDisplayName() != null) {

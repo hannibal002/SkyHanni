@@ -1,7 +1,6 @@
 package at.lorenz.mod
 
 import at.lorenz.mod.bazaar.BazaarApi
-import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.GuiContainerEvent
 import at.lorenz.mod.utils.ItemUtils
 import at.lorenz.mod.utils.ItemUtils.cleanName
@@ -10,8 +9,7 @@ import at.lorenz.mod.utils.LorenzColor
 import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.removeColorCodes
 import at.lorenz.mod.utils.RenderUtils.highlight
-import com.thatgravyboat.skyblockhud.SkyblockHud
-import com.thatgravyboat.skyblockhud.config.SBHConfig
+import com.thatgravyboat.skyblockhud.LorenzMod
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -137,7 +135,7 @@ class HideNotClickableItems {
     private fun isDisabled(): Boolean {
         if (bypassUntil > System.currentTimeMillis()) return true
 
-        return !SkyblockHud.feature.inventory.hideNotClickableItems
+        return !LorenzMod.feature.inventory.hideNotClickableItems
     }
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {

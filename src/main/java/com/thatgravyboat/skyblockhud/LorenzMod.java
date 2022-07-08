@@ -26,15 +26,13 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
-@Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
-public class SkyblockHud {
+@Mod(modid = LorenzMod.MODID, version = LorenzMod.VERSION)
+public class LorenzMod {
 
     public static final String MODID = "lorenzmod";
     public static final String VERSION = "0.1";
 
+    @Deprecated
     public static SBHConfig config;//TODO delete
     public static Features feature;
     private File configFile;

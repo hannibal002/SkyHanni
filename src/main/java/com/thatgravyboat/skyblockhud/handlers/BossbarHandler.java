@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import com.thatgravyboat.skyblockhud.utils.Utils;
@@ -17,11 +17,11 @@ public class BossbarHandler {
     public void onBossbarRender(RenderGameOverlayEvent.Pre event) {
         if (event.type == RenderGameOverlayEvent.ElementType.BOSSHEALTH && BossStatus.bossName != null) {
             bossBarRendered = !event.isCanceled();
-            if (!SkyblockHud.config.main.bossShiftHud) {
+            if (!LorenzMod.config.main.bossShiftHud) {
                 bossBarRendered = false;
             }
             String bossName = Utils.removeColor(BossStatus.bossName);
-            if (SkyblockHud.config.renderer.hideBossBar && !LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)) {
+            if (LorenzMod.config.renderer.hideBossBar && !LocationHandler.getCurrentLocation().equals(Locations.CATACOMBS)) {
                 if (bossName.equalsIgnoreCase("wither")) {
                     event.setCanceled(true);
                     bossBarRendered = false;

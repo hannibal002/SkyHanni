@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.textures.Textures;
 import com.thatgravyboat.skyblockhud.utils.Utils;
@@ -30,25 +30,25 @@ public class MiningHud extends Gui {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.mining.showDrillBar || SkyblockHud.config.mining.showHeatBar)) {
+        if (Utils.overlayShouldRender(event.type, LorenzMod.hasSkyblockScoreboard(), LorenzMod.config.mining.showDrillBar || LorenzMod.config.mining.showHeatBar)) {
             Minecraft mc = Minecraft.getMinecraft();
 
-            if (SkyblockHud.config.mining.barMode == 1) {
-                if (heat > 0 && Utils.isDrill(mc.thePlayer.getHeldItem()) && SkyblockHud.config.mining.showDrillBar && SkyblockHud.config.mining.showHeatBar) {
+            if (LorenzMod.config.mining.barMode == 1) {
+                if (heat > 0 && Utils.isDrill(mc.thePlayer.getHeldItem()) && LorenzMod.config.mining.showDrillBar && LorenzMod.config.mining.showHeatBar) {
                     renderFuelBar(mc, (event.resolution.getScaledWidth() / 2) - 91, event.resolution.getScaledHeight() - 31);
                     renderHeatBar(mc, (event.resolution.getScaledWidth() / 2) + 46, event.resolution.getScaledHeight() - 31);
-                } else if (Utils.isDrill(mc.thePlayer.getHeldItem()) && SkyblockHud.config.mining.showDrillBar) {
+                } else if (Utils.isDrill(mc.thePlayer.getHeldItem()) && LorenzMod.config.mining.showDrillBar) {
                     renderFuelBar(mc, (event.resolution.getScaledWidth() / 2) - 68, event.resolution.getScaledHeight() - 31);
-                } else if (heat > 0 && SkyblockHud.config.mining.showHeatBar) {
+                } else if (heat > 0 && LorenzMod.config.mining.showHeatBar) {
                     renderHeatBar(mc, (event.resolution.getScaledWidth() / 2) - 22, event.resolution.getScaledHeight() - 31);
                 }
-            } else if (SkyblockHud.config.mining.barMode == 0) {
-                if (heat > 0 && SkyblockHud.config.mining.showHeatBar) {
-                    Position position = SkyblockHud.config.mining.heatBar;
+            } else if (LorenzMod.config.mining.barMode == 0) {
+                if (heat > 0 && LorenzMod.config.mining.showHeatBar) {
+                    Position position = LorenzMod.config.mining.heatBar;
                     renderHeatBar(mc, position.getAbsX(event.resolution, 45), position.getAbsY(event.resolution, 7));
                 }
-                if (Utils.isDrill(mc.thePlayer.getHeldItem()) && SkyblockHud.config.mining.showDrillBar) {
-                    Position position = SkyblockHud.config.mining.drillBar;
+                if (Utils.isDrill(mc.thePlayer.getHeldItem()) && LorenzMod.config.mining.showDrillBar) {
+                    Position position = LorenzMod.config.mining.drillBar;
                     renderFuelBar(mc, position.getAbsX(event.resolution, 136), position.getAbsY(event.resolution, 7));
                 }
             }

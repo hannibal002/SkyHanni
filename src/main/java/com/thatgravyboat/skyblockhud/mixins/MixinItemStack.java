@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.item.IAbility;
 import com.thatgravyboat.skyblockhud.handlers.CooldownHandler;
 import java.util.regex.Matcher;
@@ -19,7 +19,7 @@ public class MixinItemStack implements IAbility {
 
     @Inject(method = "setTagCompound", at = @At("HEAD"))
     public void onNbt(NBTTagCompound nbt, CallbackInfo ci) {
-        if (SkyblockHud.config != null && !SkyblockHud.config.misc.hideItemCooldowns) {
+        if (LorenzMod.config != null && !LorenzMod.config.misc.hideItemCooldowns) {
             Matcher abilityMatcher = CooldownHandler.getAbility(nbt);
             if (abilityMatcher != null) {
                 ability = abilityMatcher.group(1);
