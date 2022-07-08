@@ -1,5 +1,6 @@
 package at.lorenz.mod.utils
 
+import at.lorenz.mod.utils.LorenzUtils.Companion.matchRegex
 import at.lorenz.mod.utils.LorenzUtils.Companion.removeColorCodes
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -34,6 +35,17 @@ class ItemUtils {
         fun isCoOpSoulBound(stack: ItemStack): Boolean = stack.getLore().any { it.contains("Co-op Soulbound") }
 
         fun isRecombobulated(stack: ItemStack): Boolean = stack.getLore().any { it.contains("§k") }
+
+        fun isPet(name: String): Boolean = name.matchRegex("\\[Lvl (.*)] (.*)") && !listOf(
+            "Archer",
+            "Berserk",
+            "Mage",
+            "Tank",
+            "Healer",
+            "➡",
+        ).any { name.contains(it) }
+
+        fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
     }
 }
