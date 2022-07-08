@@ -2,14 +2,14 @@ package at.lorenz.mod
 
 import at.lorenz.mod.bazaar.BazaarApi
 import at.lorenz.mod.config.LorenzConfig
-import at.lorenz.mod.utils.LorenzUtils.Companion.removeColorCodes
 import at.lorenz.mod.events.GuiContainerEvent
 import at.lorenz.mod.utils.ItemUtils
 import at.lorenz.mod.utils.ItemUtils.Companion.cleanName
 import at.lorenz.mod.utils.ItemUtils.Companion.getLore
 import at.lorenz.mod.utils.LorenzColor
 import at.lorenz.mod.utils.LorenzUtils
-import at.lorenz.mod.utils.RenderUtil.Companion.highlight
+import at.lorenz.mod.utils.LorenzUtils.Companion.removeColorCodes
+import at.lorenz.mod.utils.RenderUtils.highlight
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager

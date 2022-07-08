@@ -4,7 +4,7 @@ import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.GuiContainerEvent
 import at.lorenz.mod.utils.ItemUtils.Companion.getLore
 import at.lorenz.mod.utils.LorenzColor
-import at.lorenz.mod.utils.RenderUtil.Companion.highlight
+import at.lorenz.mod.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest

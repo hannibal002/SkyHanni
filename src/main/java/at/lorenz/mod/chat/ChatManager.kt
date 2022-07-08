@@ -2,8 +2,9 @@ package at.lorenz.mod.chat
 
 import at.lorenz.mod.utils.LorenzLogger
 import at.lorenz.mod.events.LorenzChatEvent
+import at.lorenz.mod.events.PacketEvent
 import at.lorenz.mod.utils.LorenzUtils
-import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -15,11 +16,13 @@ class ChatManager {
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: ClientChatReceivedEvent) {
-        val messageComponent = event.message
+    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+        val packet = event.packet
+        if (packet !is S02PacketChat) return
+        val messageComponent = packet.chatComponent
 
         val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
-        if (event.type.toInt() == 2) {
+        if (packet.type.toInt() == 2) {
 //            val actionBarEvent = LorenzActionBarEvent(message)
 //            actionBarEvent.postAndCatch()
         } else {
