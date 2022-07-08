@@ -75,7 +75,7 @@ jar {
 
 shadowJar {
     dependencies {
-        include(dependency('org.spongepowered:mixin:0.7.11-SNAPSHOT'))
+        include('org.spongepowered:mixin:0.7.11-SNAPSHOT')
     }
     exclude 'module-info.class'
     exclude 'dummyThing'
