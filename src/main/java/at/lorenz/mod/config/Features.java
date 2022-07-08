@@ -154,6 +154,11 @@ public class Features {
         @ConfigOption(name = "Pet Display Position", desc = "")
         @ConfigEditorButton(runnableId = "petDisplay", buttonText = "Edit")
         public Position petDisplayPos = new Position(10, 10, false, true);
+
+        @Expose
+        @ConfigOption(name = "Exp Bottles", desc = "Hides all the Exp bottles on the ground.")
+        @ConfigEditorBoolean
+        public boolean hideExpBottles = false;
     }
 
     public static class Test {
@@ -164,7 +169,7 @@ public class Features {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Test Location", desc = "testPos")
+        @ConfigOption(name = "Test Location", desc = "")
         @ConfigEditorButton(runnableId = "testPos", buttonText = "Edit")
         public Position testPos = new Position(10, 10, false, true);
     }

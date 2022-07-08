@@ -9,6 +9,7 @@ import at.lorenz.mod.config.Features;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
 import at.lorenz.mod.misc.CurrentPetDisplay;
+import at.lorenz.mod.misc.ExpBottleOnGroundHider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thatgravyboat.skyblockhud_2.commands.Commands;
@@ -54,6 +55,7 @@ public class LorenzMod {
         MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
         MinecraftForge.EVENT_BUS.register(new ItemDisplayOverlayFeatures());
         MinecraftForge.EVENT_BUS.register(new CurrentPetDisplay());
+        MinecraftForge.EVENT_BUS.register(new ExpBottleOnGroundHider());
 
         Commands.init();
 
