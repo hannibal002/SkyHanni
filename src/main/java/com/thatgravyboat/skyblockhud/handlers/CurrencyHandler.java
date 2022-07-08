@@ -69,7 +69,7 @@ public class CurrencyHandler {
                 double coins = Double.parseDouble(Pattern.compile("[^0-9.]").matcher(purse).replaceAll(""));
                 CurrencyHandler.setCoins(coins);
             } catch (IllegalArgumentException ex) {
-                System.out.println("Failed to parse purse, please report to ThatGravyBoat. Purse Text: " + purse);
+                System.out.println("Failed to parse purse, please report to hannibal2. Purse Text: " + purse);
             }
         }
     }
@@ -80,7 +80,7 @@ public class CurrencyHandler {
             int bit = Integer.parseInt(Pattern.compile("[^0-9]").matcher(bits).replaceAll(""));
             CurrencyHandler.setBits(bit);
         } catch (IllegalArgumentException ex) {
-            System.out.println("Failed to parse bits, please report to ThatGravyBoat. Bits Text: " + bits);
+            System.out.println("Failed to parse bits, please report to hannibal2. Bits Text: " + bits);
         }
     }
 }
