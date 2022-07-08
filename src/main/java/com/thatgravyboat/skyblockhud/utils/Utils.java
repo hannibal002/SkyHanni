@@ -46,12 +46,12 @@ public class Utils {
         return input.toLowerCase().replace(" ", "").replace(replace, "");
     }
 
-//    public static boolean isPlayerHoldingRedstone(EntityPlayerSP player) {
-//        if (!LorenzMod.config.main.requireRedstone) return true;
-//        ArrayList<Item> redstoneItems = new ArrayList<>(Arrays.asList(Items.redstone, Items.repeater, Items.comparator, Item.getByNameOrId("minecraft:redstone_torch")));
-//        if (player.getHeldItem() != null) return redstoneItems.contains(player.getHeldItem().getItem());
-//        return false;
-//    }
+    //    public static boolean isPlayerHoldingRedstone(EntityPlayerSP player) {
+    //        if (!LorenzMod.config.main.requireRedstone) return true;
+    //        ArrayList<Item> redstoneItems = new ArrayList<>(Arrays.asList(Items.redstone, Items.repeater, Items.comparator, Item.getByNameOrId("minecraft:redstone_torch")));
+    //        if (player.getHeldItem() != null) return redstoneItems.contains(player.getHeldItem().getItem());
+    //        return false;
+    //    }
 
     public static boolean inRangeInclusive(int value, int min, int max) {
         return value <= max && value >= min;
