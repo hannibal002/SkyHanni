@@ -33,7 +33,8 @@ public class LorenzMod {
     public static final String VERSION = "0.1";
 
     @Deprecated
-    public static SBHConfig config;//TODO delete
+    public static SBHConfig config; //TODO delete
+
     public static Features feature;
     private File configFile;
 
@@ -45,7 +46,6 @@ public class LorenzMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-
         new BazaarApi();
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -99,8 +99,7 @@ public class LorenzMod {
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 feature = gson.fromJson(reader, Features.class);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
         if (feature == null) {
@@ -114,7 +113,7 @@ public class LorenzMod {
         //            WarpHandler.save();
         //        }
         //
-                Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
         //        Runtime.getRuntime().addShutdownHook(new Thread(TrackerFileLoader::saveTrackerStatsFile));
     }
 
@@ -126,8 +125,7 @@ public class LorenzMod {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(feature));
             }
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
     }
 
     //    @EventHandler
