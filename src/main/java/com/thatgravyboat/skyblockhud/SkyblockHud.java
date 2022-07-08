@@ -43,7 +43,6 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
         MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
         MinecraftForge.EVENT_BUS.register(new ItemDisplayOverlayFeatures());
-
         //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
         //        MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
         //        MinecraftForge.EVENT_BUS.register(new LocationHandler());
