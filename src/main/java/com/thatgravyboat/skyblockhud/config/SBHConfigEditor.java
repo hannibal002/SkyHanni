@@ -40,9 +40,9 @@ public class SBHConfigEditor extends GuiElement {
     private final LerpingInteger optionsScroll = new LerpingInteger(0, 150);
     private final LerpingInteger categoryScroll = new LerpingInteger(0, 150);
 
-    private LinkedHashMap<String, ConfigProcessor.ProcessedCategory> processedConfig;
-    private TreeMap<String, Set<ConfigProcessor.ProcessedOption>> searchOptionMap = new TreeMap<>();
-    private HashMap<ConfigProcessor.ProcessedOption, ConfigProcessor.ProcessedCategory> categoryForOption = new HashMap<>();
+    private final LinkedHashMap<String, ConfigProcessor.ProcessedCategory> processedConfig;
+    private final TreeMap<String, Set<ConfigProcessor.ProcessedOption>> searchOptionMap = new TreeMap<>();
+    private final HashMap<ConfigProcessor.ProcessedOption, ConfigProcessor.ProcessedCategory> categoryForOption = new HashMap<>();
 
     public SBHConfigEditor(Config config) {
         this(config, null);
@@ -146,7 +146,7 @@ public class SBHConfigEditor extends GuiElement {
         RenderUtils.drawFloatingRectDark(x + 5, y + 5, xSize - 10, 20, false);
 
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
-        TextRenderUtils.drawStringCenteredScaledMaxWidth("SkyBlockHud by " + EnumChatFormatting.RED + "ThatGravyBoat" + EnumChatFormatting.RESET + ", config by " + EnumChatFormatting.DARK_PURPLE + "Moulberry", fr, x + xSize / 2f, y + 15, false, 200, 0xa0a0a0);
+        TextRenderUtils.drawStringCenteredScaledMaxWidth("LorenzMod by " + EnumChatFormatting.RED + "hannibal2" + EnumChatFormatting.RESET + ", config by " + EnumChatFormatting.DARK_PURPLE + "Moulberry", fr, x + xSize / 2f, y + 15, false, 200, 0xa0a0a0);
 
         RenderUtils.drawFloatingRectDark(x + 4, y + 49 - 20, 140, ySize - 54 + 20, false);
 
