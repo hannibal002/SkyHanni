@@ -68,7 +68,6 @@ public class Features {
         @ConfigEditorAccordion(id = 1)
         public boolean filterTypes = false;
 
-
         @Expose
         @ConfigOption(name = "HyPixel Hub", desc = "Block messages outside SkyBlock in the HyPixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and HyPixel tournaments.")
         @ConfigEditorBoolean
