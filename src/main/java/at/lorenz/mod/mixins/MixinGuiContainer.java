@@ -41,8 +41,10 @@ public abstract class MixinGuiContainer extends GuiScreen {
         hook.onDrawSlotPost(slot, ci);
     }
 
+
     @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
         hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
     }
+
 }
