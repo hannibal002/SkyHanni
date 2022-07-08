@@ -67,7 +67,7 @@ mixin {
 jar {
     manifest.attributes(
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-            'MixinConfigs': 'mixins.skyblockhud.json',
+            'MixinConfigs': 'mixins.lorenzmod.json',
             'FMLCorePluginContainsFMLMod': true,
             'ForceLoadAsMod': true
     )
