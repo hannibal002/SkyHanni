@@ -3,6 +3,7 @@ package at.lorenz.mod
 import at.lorenz.mod.events.GuiRenderItemEvent
 import at.lorenz.mod.utils.ItemUtils
 import at.lorenz.mod.utils.ItemUtils.cleanName
+import at.lorenz.mod.utils.LorenzDebug
 import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.between
 import at.lorenz.mod.utils.LorenzUtils.matchRegex

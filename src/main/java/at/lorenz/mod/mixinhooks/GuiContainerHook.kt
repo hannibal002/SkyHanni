@@ -1,4 +1,4 @@
-package at.lorenz.mod
+package at.lorenz.mod.mixinhooks
 
 import at.lorenz.mod.events.GuiContainerEvent
 import at.lorenz.mod.events.GuiContainerEvent.CloseWindowEvent
