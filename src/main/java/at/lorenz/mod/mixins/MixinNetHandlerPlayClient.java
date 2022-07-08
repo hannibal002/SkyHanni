@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = NetHandlerPlayClient.class, priority = 1001)
 public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient {
+
     @Shadow
     private WorldClient clientWorldController;
 
@@ -22,13 +23,12 @@ public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient
     private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
         NetHandlerPlayClientHookKt.onSendPacket(packet, ci);
     }
-
-//    @Inject(method = "handleSpawnMob", at = @At("TAIL"))
-//    private void onHandleSpawnMobTail(S0FPacketSpawnMob packetIn, CallbackInfo ci) {
-//        Entity entity = this.clientWorldController.getEntityByID(packetIn.getEntityID());
-//        MasterMode7Features.INSTANCE.onMobSpawned(entity);
-//        ((ExtensionEntityLivingBase) entity).getSkytilsHook().onNewDisplayName(
-//                entity.getDataWatcher().getWatchableObjectString(2)
-//        );
-//    }
+    //    @Inject(method = "handleSpawnMob", at = @At("TAIL"))
+    //    private void onHandleSpawnMobTail(S0FPacketSpawnMob packetIn, CallbackInfo ci) {
+    //        Entity entity = this.clientWorldController.getEntityByID(packetIn.getEntityID());
+    //        MasterMode7Features.INSTANCE.onMobSpawned(entity);
+    //        ((ExtensionEntityLivingBase) entity).getSkytilsHook().onNewDisplayName(
+    //                entity.getDataWatcher().getWatchableObjectString(2)
+    //        );
+    //    }
 }
