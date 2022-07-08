@@ -1,14 +1,14 @@
 [
   {
-    "modid": "skyblockhud",
-    "name": "Skyblock Hud",
-    "description": "Hypixel Skyblock RPG HUD",
+    "modid": "lorenzmod",
+    "name": "Lorenz Mod",
+    "description": "Hypixel Skyblock Mod",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "",
     "updateUrl": "",
-    "authorList": ["ThatGravyBoat"],
-    "credits": "Map Icons by ModCruel",
+    "authorList": ["hannibal2"],
+    "credits": "",
     "logoFile": "",
     "screenshots": [],
     "dependencies": []

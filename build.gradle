@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.7.0'
+    ext.kotlin_version = '1.7.10'
     repositories {
         maven {
             name = 'jitpack'
@@ -26,7 +26,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '0.1'
+version = '0.2.1'
 group= 'com.thatgravyboat.skyblockhud'
 archivesBaseName = 'LorenzMod'
 String mixinClassifier = 'dep'
