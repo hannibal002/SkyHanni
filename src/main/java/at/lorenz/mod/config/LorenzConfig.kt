@@ -8,5 +8,6 @@ class LorenzConfig {
         val hideNotClickableItems = true
 
         val lorenzBazaarOrderHelper = true
+        val lorenzDungeonHighlightClickedBlocks = true
     }
 }

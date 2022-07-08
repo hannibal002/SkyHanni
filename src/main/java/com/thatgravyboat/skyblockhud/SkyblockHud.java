@@ -6,6 +6,7 @@ import at.lorenz.mod.bazaar.BazaarOrderHelper;
 import at.lorenz.mod.chat.ChatFilter;
 import at.lorenz.mod.chat.ChatManager;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
+import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,6 +42,7 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new ChatFilter());
         MinecraftForge.EVENT_BUS.register(new DungeonChatFilter());
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
+        MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
 
 
 //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());

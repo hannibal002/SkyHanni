@@ -3,6 +3,8 @@
   "refmap": "mixins.skyblockhud.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinGuiContainer"
+    "MixinGuiContainer",
+    "MixinNetworkManager",
+    "MixinNetHandlerPlayClient"
   ]
 }
