@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.tracker;
 
 import com.google.gson.*;
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -83,7 +83,7 @@ public class TrackerFileLoader {
     }
 
     public static boolean loadTrackerStatsFile() {
-        File configFile = new File(SkyblockHud.configDirectory, "sbh-trackers-stats.json");
+        File configFile = new File(LorenzMod.configDirectory, "sbh-trackers-stats.json");
 
         try {
             if (configFile.createNewFile()) {
@@ -121,7 +121,7 @@ public class TrackerFileLoader {
     }
 
     public static void saveTrackerStatsFile() {
-        File configFile = new File(SkyblockHud.configDirectory, "sbh-trackers-stats.json");
+        File configFile = new File(LorenzMod.configDirectory, "sbh-trackers-stats.json");
 
         try {
             configFile.createNewFile();

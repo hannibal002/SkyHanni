@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
 import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.awt.*;
@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.GlStateManager;
 public class GenericOverlays extends Gui {
 
     public static void drawLargeBar(Minecraft mc, int x, int y, float percentage, float max, int fullColor, int loadingColor, int barStyle) {
-        if (SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(Textures.texture.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);
 
@@ -26,7 +26,7 @@ public class GenericOverlays extends Gui {
     }
 
     public static void drawSmallBar(Minecraft mc, int x, int y, double percentage, double max, int fullColor, int loadingColor, int barStyle) {
-        if (SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.hasSkyblockScoreboard()) {
             mc.renderEngine.bindTexture(Textures.texture.bars);
             Color color = new Color(percentage == max ? fullColor : loadingColor);
             GlStateManager.enableBlend();

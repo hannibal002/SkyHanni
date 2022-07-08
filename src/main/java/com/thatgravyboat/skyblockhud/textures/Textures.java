@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +26,7 @@ public class Textures implements IResourceManagerReloadListener {
     public static void setTexture(int selected) {
         if (selected >= styles.size() || selected < 0) {
             texture = DEFAULT_TEXTURE;
-            SkyblockHud.config.misc.style = 0;
+            LorenzMod.config.misc.style = 0;
         } else {
             texture = styles.get(selected);
         }
@@ -53,6 +53,6 @@ public class Textures implements IResourceManagerReloadListener {
             }
         } catch (Exception ignored) {}
 
-        if (SkyblockHud.config != null) setTexture(SkyblockHud.config.misc.style);
+        if (LorenzMod.config != null) setTexture(LorenzMod.config.misc.style);
     }
 }

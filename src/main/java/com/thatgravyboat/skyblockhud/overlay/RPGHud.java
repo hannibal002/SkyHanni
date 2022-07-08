@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.handlers.HeldItemHandler;
 import com.thatgravyboat.skyblockhud.textures.Textures;
@@ -52,7 +52,7 @@ public class RPGHud extends Gui {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.rpg.showRpgHud)) {
+        if (Utils.overlayShouldRender(event.type, LorenzMod.hasSkyblockScoreboard(), LorenzMod.config.rpg.showRpgHud)) {
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.enableBlend();
             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -62,12 +62,12 @@ public class RPGHud extends Gui {
             }
 
             mc.renderEngine.bindTexture(Textures.texture.playerStats);
-            Position position = SkyblockHud.config.rpg.rpgHudPosition;
+            Position position = LorenzMod.config.rpg.rpgHudPosition;
 
             int x = position.getAbsX(event.resolution, 120);
             int y = position.getAbsY(event.resolution, 47);
 
-            boolean rightAligned = position.rightAligned(event.resolution, 120) && SkyblockHud.config.rpg.flipHud;
+            boolean rightAligned = position.rightAligned(event.resolution, 120) && LorenzMod.config.rpg.flipHud;
 
             drawTexturedModalRect(x, y, rightAligned ? 131 : 5, 6, 120, 47);
 

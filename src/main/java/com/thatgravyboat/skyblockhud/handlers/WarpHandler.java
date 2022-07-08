@@ -3,7 +3,7 @@ package com.thatgravyboat.skyblockhud.handlers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.*;
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.events.ProfileJoinedEvent;
 import com.thatgravyboat.skyblockhud.api.events.ProfileSwitchedEvent;
 import com.thatgravyboat.skyblockhud.mixins.GuiChestAccessor;
@@ -96,7 +96,7 @@ public class WarpHandler {
             });
         json.add("profileWarps", array);
 
-        warpConfig = new File(SkyblockHud.configDirectory, "sbh-warps.json");
+        warpConfig = new File(LorenzMod.configDirectory, "sbh-warps.json");
 
         try {
             warpConfig.createNewFile();
@@ -107,7 +107,7 @@ public class WarpHandler {
     }
 
     public static boolean load() {
-        warpConfig = new File(SkyblockHud.configDirectory, "sbh-warps.json");
+        warpConfig = new File(LorenzMod.configDirectory, "sbh-warps.json");
 
         try {
             if (warpConfig.createNewFile()) return true;

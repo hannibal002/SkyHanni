@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.handlers;
 
 import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.config.KeyBindings;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import com.thatgravyboat.skyblockhud.core.config.Position;
@@ -57,7 +57,7 @@ public class MapHandler {
         }
 
         public boolean cantRender() {
-            SBHConfig.Map mapConfig = SkyblockHud.config.map;
+            SBHConfig.Map mapConfig = LorenzMod.config.map;
             if (mapConfig.showInfoIcons && type.equals(MapIconTypes.INFO)) return false; else if (mapConfig.showMiscIcons && type.equals(MapIconTypes.MISC)) return false; else if (mapConfig.showNpcIcons && type.equals(MapIconTypes.NPC)) return false; else if (mapConfig.showQuestIcons && type.equals(MapIconTypes.QUEST)) return false; else return (!mapConfig.showShopIcons || !type.equals(MapIconTypes.SHOPS));
         }
     }
@@ -97,7 +97,7 @@ public class MapHandler {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), SkyblockHud.config.map.showMiniMap)) {
+        if (Utils.overlayShouldRender(event.type, LorenzMod.hasSkyblockScoreboard(), LorenzMod.config.map.showMiniMap)) {
             Minecraft mc = Minecraft.getMinecraft();
             if (mc.currentScreen instanceof MapScreen) return;
             if (LocationHandler.getCurrentLocation().getCategory().getMap() == null) return;
@@ -105,7 +105,7 @@ public class MapHandler {
                 MapHandler.Maps map = LocationHandler.getCurrentLocation().getCategory().getMap();
                 mc.renderEngine.bindTexture(mapOverlay);
                 GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-                Position pos = SkyblockHud.config.map.miniMapPosition;
+                Position pos = LorenzMod.config.map.miniMapPosition;
                 Gui.drawModalRectWithCustomSizedTexture(pos.getAbsX(event.resolution, 72), pos.getAbsY(event.resolution, 72), 72, 0, 72, 72, 256, 256);
                 mc.renderEngine.bindTexture(map.mapTexture);
 
@@ -119,7 +119,7 @@ public class MapHandler {
 
                 Gui.drawModalRectWithCustomSizedTexture(pos.getAbsX(event.resolution, 72) + 4, pos.getAbsY(event.resolution, 72) + 2, u, v, 64, 64, 256, 256);
 
-                if (SkyblockHud.config.map.showPlayerLocation) {
+                if (LorenzMod.config.map.showPlayerLocation) {
                     mc.fontRendererObj.drawString("\u2022", pos.getAbsX(event.resolution, 72) + 36, pos.getAbsY(event.resolution, 72) + 34, 0xff0000, false);
                 }
 
@@ -138,7 +138,7 @@ public class MapHandler {
 
     @SubscribeEvent
     public void clientTick(TickEvent.ClientTickEvent event) {
-        if (KeyBindings.map.isPressed() && LocationHandler.getCurrentLocation().getCategory().getMap() != null && SkyblockHud.hasSkyblockScoreboard()) SkyblockHud.screenToOpen = new MapScreen();
+        if (KeyBindings.map.isPressed() && LocationHandler.getCurrentLocation().getCategory().getMap() != null && LorenzMod.hasSkyblockScoreboard()) LorenzMod.screenToOpen = new MapScreen();
     }
 
     public static class MapScreen extends GuiScreen {
@@ -154,7 +154,7 @@ public class MapHandler {
             float mapY = (height / 2f) - ((map.height / 2f) * map.scaleFactor);
             Gui.drawModalRectWithCustomSizedTexture((int) mapX, (int) mapY, 0, 0, (int) (map.width * map.scaleFactor), (int) (map.height * map.scaleFactor), (int) (map.width * map.scaleFactor), (int) (map.height * map.scaleFactor));
             drawIcons((int) mapX, (int) mapY);
-            if (this.mc.thePlayer != null && SkyblockHud.config.map.showPlayerLocation) {
+            if (this.mc.thePlayer != null && LorenzMod.config.map.showPlayerLocation) {
                 double x = this.mc.thePlayer.getPosition().getX() + map.xOffset;
                 double z = this.mc.thePlayer.getPosition().getZ() + map.yOffset;
                 fontRendererObj.drawString("\u2022", (int) (x * map.scaleFactor + mapX), (int) (z * map.scaleFactor + mapY), 0xff0000);

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.textures.Textures;
 import com.thatgravyboat.skyblockhud.utils.Utils;
 import java.io.BufferedReader;
@@ -42,7 +42,7 @@ public class NpcDialogue implements IResourceManagerReloadListener {
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase.equals(TickEvent.Phase.START) || SkyblockHud.config.misc.hideDialogueBox) return;
+        if (event.phase.equals(TickEvent.Phase.START) || LorenzMod.config.misc.hideDialogueBox) return;
         if (showDialogue) ticks++; else ticks = 0;
 
         if (showDialogue && ticks % 60 == 0) {
@@ -56,7 +56,7 @@ public class NpcDialogue implements IResourceManagerReloadListener {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onChat(ClientChatReceivedEvent event) {
-        if (event.type != 2 && !SkyblockHud.config.misc.hideDialogueBox) {
+        if (event.type != 2 && !LorenzMod.config.misc.hideDialogueBox) {
             String message = Utils.removeColor(event.message.getUnformattedText());
             if (message.toLowerCase(Locale.ENGLISH).startsWith("[npc]")) {
                 Matcher matcher = NPC_DIALOGUE_REGEX.matcher(message);
@@ -73,13 +73,13 @@ public class NpcDialogue implements IResourceManagerReloadListener {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard(), showDialogue, !SkyblockHud.config.misc.hideDialogueBox)) {
+        if (Utils.overlayShouldRender(event.type, LorenzMod.hasSkyblockScoreboard(), showDialogue, !LorenzMod.config.misc.hideDialogueBox)) {
             Minecraft mc = Minecraft.getMinecraft();
             mc.renderEngine.bindTexture(Textures.texture.dialogue);
             GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
-            int x = SkyblockHud.config.misc.dialoguePos.getAbsX(event.resolution, 182) - 91;
-            int y = SkyblockHud.config.misc.dialoguePos.getAbsY(event.resolution, 68);
+            int x = LorenzMod.config.misc.dialoguePos.getAbsX(event.resolution, 182) - 91;
+            int y = LorenzMod.config.misc.dialoguePos.getAbsY(event.resolution, 68);
 
             Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, 182, 68, 256, 256);
 

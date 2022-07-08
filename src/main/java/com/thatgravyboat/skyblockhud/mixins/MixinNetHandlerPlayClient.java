@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.tracker.TrackerHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
@@ -22,7 +22,7 @@ public class MixinNetHandlerPlayClient {
 
     @Inject(method = "handleSetSlot", at = @At("HEAD"))
     public void onHandleSetSlot(S2FPacketSetSlot packetIn, CallbackInfo ci) {
-        if (SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.hasSkyblockScoreboard()) {
             Minecraft mc = Minecraft.getMinecraft();
             PacketThreadUtil.checkThreadAndEnqueue(packetIn, mc.getNetHandler(), mc);
             if (packetIn.func_149175_c() == 0) {

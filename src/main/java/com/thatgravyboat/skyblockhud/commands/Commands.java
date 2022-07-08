@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.commands;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.config.SBHConfigEditor;
 import com.thatgravyboat.skyblockhud.core.GuiScreenElementWrapper;
 import com.thatgravyboat.skyblockhud.handlers.CrystalWaypoints;
@@ -15,9 +15,9 @@ public class Commands {
     private static final SimpleCommand.ProcessCommandRunnable settingsRunnable = new SimpleCommand.ProcessCommandRunnable() {
         public void processCommand(ICommandSender sender, String[] args) {
             if (args.length > 0) {
-                SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.feature, StringUtils.join(args, " ")));
+                LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, StringUtils.join(args, " ")));
             } else {
-                SkyblockHud.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(SkyblockHud.feature));
+                LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature));
             }
         }
     };

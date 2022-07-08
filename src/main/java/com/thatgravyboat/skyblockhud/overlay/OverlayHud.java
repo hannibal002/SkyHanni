@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.handlers.BossbarHandler;
 import com.thatgravyboat.skyblockhud.handlers.CurrencyHandler;
 import com.thatgravyboat.skyblockhud.handlers.SlayerHandler;
@@ -46,7 +46,7 @@ public class OverlayHud extends Gui {
 
         drawTexturedModalRect((width / 2) - 17, offset + (bossBarVisible ? 17 : 0), 0, 0, 34, 34);
         drawTexturedModalRect((width / 2) - 4, offset + (bossBarVisible ? 24 : 7), (timeHour > 19 || timeHour < 6) ? 43 : 43 + 8, 0, 8, 8);
-        if (SkyblockHud.config.main.twelveHourClock) drawScaledString(0.8f, width / 2, offset + (bossBarVisible ? 38 : 21), normalTime, (timeHour > 19 || timeHour < 6) ? 0xAFB8CC : 0xFFFF55); else drawCenteredString(font, militaryTime, (width / 2), offset + (bossBarVisible ? 38 : 21), (timeHour > 19 || timeHour < 4) ? 0xAFB8CC : 0xFFFF55);
+        if (LorenzMod.config.main.twelveHourClock) drawScaledString(0.8f, width / 2, offset + (bossBarVisible ? 38 : 21), normalTime, (timeHour > 19 || timeHour < 6) ? 0xAFB8CC : 0xFFFF55); else drawCenteredString(font, militaryTime, (width / 2), offset + (bossBarVisible ? 38 : 21), (timeHour > 19 || timeHour < 4) ? 0xAFB8CC : 0xFFFF55);
 
         //PURSE
         drawPurseAndBits(width, offset, mc);
@@ -302,12 +302,12 @@ public class OverlayHud extends Gui {
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (Utils.overlayShouldRender(event.type, SkyblockHud.hasSkyblockScoreboard())) {
+        if (Utils.overlayShouldRender(event.type, LorenzMod.hasSkyblockScoreboard())) {
             bossBarVisible = BossStatus.statusBarTime > 0 && GuiIngameForge.renderBossHealth && BossbarHandler.bossBarRendered;
             Minecraft mc = Minecraft.getMinecraft();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            if (LocationHandler.getCurrentLocation() != Locations.CATACOMBS && !SkyblockHud.config.main.disaleMainHud) {
-                drawClock(event.resolution.getScaledWidth(), SkyblockHud.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
+            if (LocationHandler.getCurrentLocation() != Locations.CATACOMBS && !LorenzMod.config.main.disaleMainHud) {
+                drawClock(event.resolution.getScaledWidth(), LorenzMod.config.main.mainHudPos.getAbsY(event.resolution, 34), mc);
             }
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }

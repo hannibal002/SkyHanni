@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.playerstats;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
 import com.thatgravyboat.skyblockhud.utils.Utils;
@@ -43,7 +43,7 @@ public class ActionBarParsing {
     public void tick(TickEvent.ClientTickEvent event) {
         if (predict) {
             ticksSinceLastPrediction++;
-            if (ticksSinceLastPrediction == 20 && SkyblockHud.config.rpg.showRpgHud) {
+            if (ticksSinceLastPrediction == 20 && LorenzMod.config.rpg.showRpgHud) {
                 ticksSinceLastPrediction = 0;
                 RPGHud.manaPredictionUpdate(true, 0);
             }
@@ -53,10 +53,10 @@ public class ActionBarParsing {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onStatusBarHigh(ClientChatReceivedEvent event) {
         if (event.type == 2) {
-            if (SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
+            if (LorenzMod.hasSkyblockScoreboard() && LorenzMod.config.rpg.showRpgHud) {
                 parseActionBar(event.message.getUnformattedText());
             }
-            if (SkyblockHud.config.mining.showDrillBar) {
+            if (LorenzMod.config.mining.showDrillBar) {
                 String bar = Utils.removeColor(event.message.getUnformattedText());
                 Matcher DrillFuelMatcher = DrillFuelRegex.matcher(bar);
                 if (DrillFuelMatcher.find()) {
@@ -73,7 +73,7 @@ public class ActionBarParsing {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onStatusBarLow(ClientChatReceivedEvent event) {
         if (event.type == 2) {
-            if (SkyblockHud.hasSkyblockScoreboard() && SkyblockHud.config.rpg.showRpgHud) {
+            if (LorenzMod.hasSkyblockScoreboard() && LorenzMod.config.rpg.showRpgHud) {
                 String message = event.message.getUnformattedText();
                 if (lastLowEditedActionBar == null || !lastLowActionBar.equals(message)) {
                     lastLowActionBar = message;
@@ -82,7 +82,7 @@ public class ActionBarParsing {
                     message = DefenseReplaceRegex.matcher(message).replaceAll("");
                     message = ManaReplaceRegex.matcher(message).replaceAll("");
                     Matcher overflowMatcher = ManaOverflowReplaceRegex.matcher(message);
-                    if (overflowMatcher.find() && SkyblockHud.config.renderer.addOverflowMana) {
+                    if (overflowMatcher.find() && LorenzMod.config.renderer.addOverflowMana) {
                         message = overflowMatcher.replaceAll("\u00A73\u02AC " + overflowMatcher.group(3));
                     }
 
@@ -90,7 +90,7 @@ public class ActionBarParsing {
                 }
                 event.message = lastLowEditedActionBar;
             }
-            if (SkyblockHud.config.mining.showDrillBar) {
+            if (LorenzMod.config.mining.showDrillBar) {
                 event.message = new ChatComponentText(DrillFuelReplaceRegex.matcher(event.message.getUnformattedText()).replaceAll("").trim());
             }
         }

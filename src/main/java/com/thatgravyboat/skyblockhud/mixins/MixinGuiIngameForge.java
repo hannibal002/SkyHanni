@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.mixins;
 
 import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
 
-import com.thatgravyboat.skyblockhud.SkyblockHud;
+import com.thatgravyboat.skyblockhud.LorenzMod;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
 import com.thatgravyboat.skyblockhud.utils.Utils;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,7 @@ public class MixinGuiIngameForge {
 
     @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true, remap = false)
     public void onRenderArmor(int width, int height, CallbackInfo ci) {
-        if (SkyblockHud.config.renderer.hideArmor && SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.config.renderer.hideArmor && LorenzMod.hasSkyblockScoreboard()) {
             ci.cancel();
             if (prePost(ARMOR, eventParent)) return;
             postPost(ARMOR, eventParent);
@@ -33,7 +33,7 @@ public class MixinGuiIngameForge {
 
     @Inject(method = "renderHealth", at = @At("HEAD"), cancellable = true, remap = false)
     public void onRenderHealth(int width, int height, CallbackInfo ci) {
-        if (SkyblockHud.config.renderer.hideHearts && SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.config.renderer.hideHearts && LorenzMod.hasSkyblockScoreboard()) {
             ci.cancel();
             if (prePost(HEALTH, eventParent)) return;
             postPost(HEALTH, eventParent);
@@ -42,7 +42,7 @@ public class MixinGuiIngameForge {
 
     @Inject(method = "renderAir", at = @At("HEAD"), cancellable = true, remap = false)
     public void onRenderAir(int width, int height, CallbackInfo ci) {
-        if (SkyblockHud.config.renderer.hideAir && SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.config.renderer.hideAir && LorenzMod.hasSkyblockScoreboard()) {
             ci.cancel();
             if (prePost(AIR, eventParent)) return;
             postPost(AIR, eventParent);
@@ -51,7 +51,7 @@ public class MixinGuiIngameForge {
 
     @Inject(method = "renderHealthMount", at = @At("HEAD"), cancellable = true, remap = false)
     public void onRenderHealthMount(int width, int height, CallbackInfo ci) {
-        if (SkyblockHud.config.renderer.hideAnimalHearts && SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.config.renderer.hideAnimalHearts && LorenzMod.hasSkyblockScoreboard()) {
             ci.cancel();
             if (prePost(HEALTHMOUNT, eventParent)) return;
             postPost(HEALTHMOUNT, eventParent);
@@ -60,12 +60,12 @@ public class MixinGuiIngameForge {
 
     @Inject(method = "renderExperience", at = @At("HEAD"), cancellable = true, remap = false)
     public void onRenderExperience(int width, int height, CallbackInfo ci) {
-        if (SkyblockHud.config.renderer.hideXpBar && SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.config.renderer.hideXpBar && LorenzMod.hasSkyblockScoreboard()) {
             ci.cancel();
             if (prePost(EXPERIENCE, eventParent)) return;
             postPost(EXPERIENCE, eventParent);
-        } else if (SkyblockHud.config.mining.barMode == 1) {
-            if (!SkyblockHud.config.renderer.hideXpBar && (SkyblockHud.config.mining.showDrillBar || SkyblockHud.config.mining.showHeatBar) && SkyblockHud.hasSkyblockScoreboard()) {
+        } else if (LorenzMod.config.mining.barMode == 1) {
+            if (!LorenzMod.config.renderer.hideXpBar && (LorenzMod.config.mining.showDrillBar || LorenzMod.config.mining.showHeatBar) && LorenzMod.hasSkyblockScoreboard()) {
                 if (MiningHud.getHeat() > 0 || Utils.isDrill(Minecraft.getMinecraft().thePlayer.getHeldItem())) {
                     ci.cancel();
                     if (prePost(EXPERIENCE, eventParent)) return;
@@ -77,12 +77,12 @@ public class MixinGuiIngameForge {
 
     @Inject(method = "renderJumpBar", at = @At("HEAD"), cancellable = true, remap = false)
     public void onRenderJumpBar(int width, int height, CallbackInfo ci) {
-        if (SkyblockHud.config.renderer.hideXpBar && SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.config.renderer.hideXpBar && LorenzMod.hasSkyblockScoreboard()) {
             ci.cancel();
             if (prePost(JUMPBAR, eventParent)) return;
             postPost(JUMPBAR, eventParent);
-        } else if (SkyblockHud.config.mining.barMode == 1) {
-            if (!SkyblockHud.config.renderer.hideXpBar && (SkyblockHud.config.mining.showDrillBar || SkyblockHud.config.mining.showHeatBar) && SkyblockHud.hasSkyblockScoreboard()) {
+        } else if (LorenzMod.config.mining.barMode == 1) {
+            if (!LorenzMod.config.renderer.hideXpBar && (LorenzMod.config.mining.showDrillBar || LorenzMod.config.mining.showHeatBar) && LorenzMod.hasSkyblockScoreboard()) {
                 if (MiningHud.getHeat() > 0 || Utils.isDrill(Minecraft.getMinecraft().thePlayer.getHeldItem())) {
                     ci.cancel();
                     if (prePost(JUMPBAR, eventParent)) return;
@@ -94,7 +94,7 @@ public class MixinGuiIngameForge {
 
     @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true, remap = false)
     public void onRenderFood(int width, int height, CallbackInfo ci) {
-        if (SkyblockHud.config.renderer.hideFood && SkyblockHud.hasSkyblockScoreboard()) {
+        if (LorenzMod.config.renderer.hideFood && LorenzMod.hasSkyblockScoreboard()) {
             ci.cancel();
             if (prePost(FOOD, eventParent)) return;
             postPost(FOOD, eventParent);
