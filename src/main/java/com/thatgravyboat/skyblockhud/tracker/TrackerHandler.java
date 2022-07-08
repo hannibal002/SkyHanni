@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.tracker;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.events.SkyBlockEntityKilled;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;

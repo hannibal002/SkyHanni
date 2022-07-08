@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.commands;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.config.SBHConfigEditor;
 import com.thatgravyboat.skyblockhud.core.GuiScreenElementWrapper;
 import com.thatgravyboat.skyblockhud.handlers.CrystalWaypoints;

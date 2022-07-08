@@ -8,7 +8,6 @@ import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.between
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
 import at.lorenz.mod.utils.NumberUtil.romanToDecimal
-import com.thatgravyboat.skyblockhud.LorenzMod
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

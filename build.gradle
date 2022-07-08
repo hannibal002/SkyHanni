@@ -27,7 +27,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 version = '0.2.1'
-group= 'com.thatgravyboat.skyblockhud'
+group= 'at.lorenz.mod'
 archivesBaseName = 'LorenzMod'
 String mixinClassifier = 'dep'
 

@@ -1,5 +1,6 @@
 package com.thatgravyboat.skyblockhud;
 
+import at.lorenz.mod.LorenzMod;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import com.thatgravyboat.skyblockhud.dungeons.DungeonHandler;

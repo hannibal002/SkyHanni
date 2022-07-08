@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
 import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.awt.*;

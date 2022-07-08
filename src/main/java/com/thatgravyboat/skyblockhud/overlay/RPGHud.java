@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.handlers.HeldItemHandler;
 import com.thatgravyboat.skyblockhud.textures.Textures;

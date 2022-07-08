@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.handlers;
 
 import static com.thatgravyboat.skyblockhud.GuiTextures.mapOverlay;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.config.KeyBindings;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import com.thatgravyboat.skyblockhud.core.config.Position;

@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.utils;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import java.math.RoundingMode;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;

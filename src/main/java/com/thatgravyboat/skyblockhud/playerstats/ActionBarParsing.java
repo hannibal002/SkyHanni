@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.playerstats;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
 import com.thatgravyboat.skyblockhud.overlay.RPGHud;
 import com.thatgravyboat.skyblockhud.utils.Utils;

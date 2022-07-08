@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.config;
 
 import com.google.gson.annotations.Expose;
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.core.GuiScreenElementWrapper;
 import com.thatgravyboat.skyblockhud.core.config.Config;
 import com.thatgravyboat.skyblockhud.core.config.Position;

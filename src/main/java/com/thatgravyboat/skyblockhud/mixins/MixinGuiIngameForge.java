@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.mixins;
 
 import static net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.*;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.overlay.MiningHud;
 import com.thatgravyboat.skyblockhud.utils.Utils;
 import net.minecraft.client.Minecraft;
