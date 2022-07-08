@@ -15,6 +15,8 @@ import com.thatgravyboat.skyblockhud.commands.Commands;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import com.thatgravyboat.skyblockhud.textures.Textures;
 import java.io.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.StandardCharsets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -26,16 +28,13 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
 @Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
 public class SkyblockHud {
 
     public static final String MODID = "lorenzmod";
     public static final String VERSION = "0.1";
 
-    public static SBHConfig config;//TODO delete
+    public static SBHConfig config; //TODO delete
     public static Features feature;
     private File configFile;
 
@@ -47,7 +46,6 @@ public class SkyblockHud {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-
         new BazaarApi();
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -101,8 +99,7 @@ public class SkyblockHud {
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 feature = gson.fromJson(reader, Features.class);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
         if (feature == null) {
@@ -116,7 +113,7 @@ public class SkyblockHud {
         //            WarpHandler.save();
         //        }
         //
-                Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
         //        Runtime.getRuntime().addShutdownHook(new Thread(TrackerFileLoader::saveTrackerStatsFile));
     }
 
@@ -128,8 +125,7 @@ public class SkyblockHud {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(feature));
             }
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
     }
 
     //    @EventHandler
