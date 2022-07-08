@@ -1,6 +1,6 @@
 package at.lorenz.mod.mixins;
 
-import at.lorenz.mod.GuiContainerHook;
+import at.lorenz.mod.mixinhooks.GuiContainerHook;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;

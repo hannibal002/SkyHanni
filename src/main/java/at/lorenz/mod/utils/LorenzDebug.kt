@@ -1,7 +1,4 @@
-package at.lorenz.mod
-
-import at.lorenz.mod.utils.LorenzLogger
-import at.lorenz.mod.utils.LorenzUtils
+package at.lorenz.mod.utils
 
 object LorenzDebug {
 
