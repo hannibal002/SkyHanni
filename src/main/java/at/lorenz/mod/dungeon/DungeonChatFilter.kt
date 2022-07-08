@@ -2,7 +2,7 @@ package at.lorenz.mod.dungeon
 
 import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.LorenzChatEvent
-import at.lorenz.mod.utils.LorenzUtils.Companion.matchRegex
+import at.lorenz.mod.utils.LorenzUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonChatFilter {

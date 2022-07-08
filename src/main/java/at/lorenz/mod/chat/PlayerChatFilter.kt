@@ -2,7 +2,7 @@ package at.lorenz.mod.chat
 
 import at.lorenz.mod.utils.LorenzLogger
 import at.lorenz.mod.utils.LorenzUtils
-import at.lorenz.mod.utils.LorenzUtils.Companion.removeColorCodes
+import at.lorenz.mod.utils.LorenzUtils.removeColorCodes
 import at.lorenz.mod.events.PlayerSendChatEvent
 
 class PlayerChatFilter {

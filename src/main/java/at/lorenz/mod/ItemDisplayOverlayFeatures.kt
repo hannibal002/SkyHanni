@@ -3,10 +3,10 @@ package at.lorenz.mod
 import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.GuiRenderItemEvent
 import at.lorenz.mod.utils.ItemUtils
-import at.lorenz.mod.utils.ItemUtils.Companion.cleanName
+import at.lorenz.mod.utils.ItemUtils.cleanName
 import at.lorenz.mod.utils.LorenzUtils
-import at.lorenz.mod.utils.LorenzUtils.Companion.between
-import at.lorenz.mod.utils.LorenzUtils.Companion.matchRegex
+import at.lorenz.mod.utils.LorenzUtils.between
+import at.lorenz.mod.utils.LorenzUtils.matchRegex
 import at.lorenz.mod.utils.NumberUtil.romanToDecimal
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack

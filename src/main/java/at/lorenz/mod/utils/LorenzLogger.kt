@@ -1,6 +1,6 @@
 package at.lorenz.mod.utils
 
-import at.lorenz.mod.utils.LorenzUtils.Companion.formatCurrentTime
+import at.lorenz.mod.utils.LorenzUtils.formatCurrentTime
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat

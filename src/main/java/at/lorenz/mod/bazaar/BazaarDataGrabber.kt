@@ -2,7 +2,7 @@ package at.lorenz.mod.bazaar
 
 import at.lorenz.mod.utils.APIUtil
 import at.lorenz.mod.utils.LorenzUtils
-import at.lorenz.mod.utils.LorenzUtils.Companion.round
+import at.lorenz.mod.utils.LorenzUtils.round
 import kotlin.concurrent.fixedRateTimer
 
 internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, BazaarData>) {
