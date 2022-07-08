@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RenderManager.class)
 public class MixinRenderManager {
+
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void shouldRender(Entity entityIn, ICamera camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
         RenderManagerHookKt.shouldRender(entityIn, camera, camX, camY, camZ, cir);
