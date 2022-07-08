@@ -18,7 +18,7 @@ class LorenzLogger(filePath: String) {
 
         init {
             val format = SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
-            PREFIX_PATH = "mods/LorenzAddons/logs/$format/"
+            PREFIX_PATH = "mods/LorenzMod/logs/$format/"
         }
     }
 
