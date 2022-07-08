@@ -62,7 +62,6 @@ public class LorenzMod {
 
         MinecraftForge.EVENT_BUS.register(new ButtonOnPause());
 
-
         //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
         //        MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
         //        MinecraftForge.EVENT_BUS.register(new LocationHandler());
