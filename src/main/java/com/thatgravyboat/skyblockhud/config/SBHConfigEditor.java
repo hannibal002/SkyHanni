@@ -3,10 +3,10 @@ package com.thatgravyboat.skyblockhud.config;
 import static com.thatgravyboat.skyblockhud.GuiTextures.DISCORD;
 import static com.thatgravyboat.skyblockhud.GuiTextures.TWITTER;
 
+import at.lorenz.mod.config.Features;
 import com.google.common.collect.Lists;
 import com.thatgravyboat.skyblockhud.core.GlScissorStack;
 import com.thatgravyboat.skyblockhud.core.GuiElement;
-import com.thatgravyboat.skyblockhud.core.config.Config;
 import com.thatgravyboat.skyblockhud.core.config.gui.GuiOptionEditor;
 import com.thatgravyboat.skyblockhud.core.config.gui.GuiOptionEditorAccordion;
 import com.thatgravyboat.skyblockhud.core.config.struct.ConfigProcessor;
@@ -44,11 +44,11 @@ public class SBHConfigEditor extends GuiElement {
     private final TreeMap<String, Set<ConfigProcessor.ProcessedOption>> searchOptionMap = new TreeMap<>();
     private final HashMap<ConfigProcessor.ProcessedOption, ConfigProcessor.ProcessedCategory> categoryForOption = new HashMap<>();
 
-    public SBHConfigEditor(Config config) {
+    public SBHConfigEditor(Features config) {
         this(config, null);
     }
 
-    public SBHConfigEditor(Config config, String categoryOpen) {
+    public SBHConfigEditor(Features config, String categoryOpen) {
         this.openedMillis = System.currentTimeMillis();
         this.processedConfig = ConfigProcessor.create(config);
 

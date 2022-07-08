@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.core.config.struct;
 
+import at.lorenz.mod.config.Features;
 import com.google.gson.annotations.Expose;
-import com.thatgravyboat.skyblockhud.core.config.Config;
 import com.thatgravyboat.skyblockhud.core.config.annotations.*;
 import com.thatgravyboat.skyblockhud.core.config.gui.*;
 import java.lang.reflect.Field;
@@ -66,7 +66,7 @@ public class ConfigProcessor {
         }
     }
 
-    public static LinkedHashMap<String, ProcessedCategory> create(Config config) {
+    public static LinkedHashMap<String, ProcessedCategory> create(Features config) {
         LinkedHashMap<String, ProcessedCategory> processedConfig = new LinkedHashMap<>();
         for (Field categoryField : config.getClass().getDeclaredFields()) {
             boolean exposePresent = categoryField.isAnnotationPresent(Expose.class);

@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.config.SBHConfigEditor;
 import com.thatgravyboat.skyblockhud.core.GuiScreenElementWrapper;
-import com.thatgravyboat.skyblockhud.core.config.Config;
 import com.thatgravyboat.skyblockhud.core.config.Position;
 import com.thatgravyboat.skyblockhud.core.config.annotations.Category;
 import com.thatgravyboat.skyblockhud.core.config.annotations.ConfigEditorBoolean;
@@ -12,13 +11,12 @@ import com.thatgravyboat.skyblockhud.core.config.annotations.ConfigOption;
 import com.thatgravyboat.skyblockhud.core.config.gui.GuiPositionEditor;
 import net.minecraft.client.Minecraft;
 
-public class Features extends Config {
+public class Features  {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.config, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
     }
 
-    @Override
     public void executeRunnable(String runnableId) {
         //        String activeConfigCategory = null;
         //        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenElementWrapper) {

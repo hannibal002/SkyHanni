@@ -3,7 +3,7 @@ package com.thatgravyboat.skyblockhud.commands;
 import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.config.SBHConfigEditor;
 import com.thatgravyboat.skyblockhud.core.GuiScreenElementWrapper;
-import com.thatgravyboat.skyblockhud.handlers.CrystalWaypoints;
+//import com.thatgravyboat.skyblockhud.handlers.CrystalWaypoints;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -80,7 +80,7 @@ public class Commands {
         ClientCommandHandler.instance.registerCommand(settingsCommand2);
         //        ClientCommandHandler.instance.registerCommand(mapCommand);
         //        ClientCommandHandler.instance.registerCommand(devCommand);
-        ClientCommandHandler.instance.registerCommand(new CrystalWaypoints.WaypointCommand());
+//        ClientCommandHandler.instance.registerCommand(new CrystalWaypoints.WaypointCommand());
     }
     //    private static void sendSBHMessage(ICommandSender sender, String message) {
     //        sender.addChatMessage(new ChatComponentText("[" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "SkyBlockHud" + EnumChatFormatting.RESET + "] : " + EnumChatFormatting.GRAY + message));
