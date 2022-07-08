@@ -6,6 +6,7 @@ import at.lorenz.mod.bazaar.BazaarApi;
 import at.lorenz.mod.bazaar.BazaarOrderHelper;
 import at.lorenz.mod.chat.ChatFilter;
 import at.lorenz.mod.chat.ChatManager;
+import at.lorenz.mod.chat.PlayerChatFilter;
 import at.lorenz.mod.config.Features;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
@@ -47,11 +48,12 @@ public class LorenzMod {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         new BazaarApi();
-
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatManager());
+
+        MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatFilter());
+        MinecraftForge.EVENT_BUS.register(new PlayerChatFilter());
         MinecraftForge.EVENT_BUS.register(new DungeonChatFilter());
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
         MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());

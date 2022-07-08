@@ -25,7 +25,6 @@ class ChatFilter {
         warping(message) -> "warping"
         welcome(message) -> "welcome"
         guild(message) -> "guild"
-        PlayerChatFilter.shouldBlock(message) -> "player_chat"
         killCombo(message) -> "kill_combo"
         bazaarAndAHMiniMessages(message) -> "bz_ah_minis"
         watchdogAnnouncement(message) -> "watchdog"

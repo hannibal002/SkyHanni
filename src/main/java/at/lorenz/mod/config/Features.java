@@ -90,6 +90,11 @@ public class Features extends Config {
         @ConfigOption(name = "Main Chat Filter", desc = "Hides all the annoying chat messages.")
         @ConfigEditorBoolean
         public boolean mainFilter = true;
+
+        @Expose
+        @ConfigOption(name = "Player Messages", desc = "Add a fancy new chat format for player messages.")
+        @ConfigEditorBoolean
+        public boolean playerMessages = false;
     }
 
     public static class Dungeon {
