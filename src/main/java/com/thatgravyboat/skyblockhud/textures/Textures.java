@@ -26,7 +26,7 @@ public class Textures implements IResourceManagerReloadListener {
     public static void setTexture(int selected) {
         if (selected >= styles.size() || selected < 0) {
             texture = DEFAULT_TEXTURE;
-            LorenzMod.config.misc.style = 0;
+//            LorenzMod.config.misc.style = 0;
         } else {
             texture = styles.get(selected);
         }
@@ -53,6 +53,6 @@ public class Textures implements IResourceManagerReloadListener {
             }
         } catch (Exception ignored) {}
 
-        if (LorenzMod.config != null) setTexture(LorenzMod.config.misc.style);
+//        if (LorenzMod.config != null) setTexture(LorenzMod.config.misc.style);
     }
 }

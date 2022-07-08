@@ -11,10 +11,6 @@ import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thatgravyboat.skyblockhud.commands.Commands;
-import com.thatgravyboat.skyblockhud.config.SBHConfig;
-import com.thatgravyboat.skyblockhud.textures.Textures;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -25,14 +21,16 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 @Mod(modid = LorenzMod.MODID, version = LorenzMod.VERSION)
 public class LorenzMod {
 
     public static final String MODID = "lorenzmod";
     public static final String VERSION = "0.2.1";
 
-    @Deprecated
-    public static SBHConfig config; //TODO delete
+//    public static SBHConfig config; //TODO delete
 
     public static Features feature;
     private File configFile;
@@ -86,20 +84,22 @@ public class LorenzMod {
 
         //
         //        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new NpcDialogue());
-        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
+//        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
         //
         configDirectory = new File("mods/LorenzMod/config");
         try {
             //noinspection ResultOfMethodCallIgnored
             configDirectory.mkdir();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         configFile = new File(configDirectory, "config.json");
 
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 feature = gson.fromJson(reader, Features.class);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         if (feature == null) {
@@ -125,7 +125,8 @@ public class LorenzMod {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(feature));
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     //    @EventHandler

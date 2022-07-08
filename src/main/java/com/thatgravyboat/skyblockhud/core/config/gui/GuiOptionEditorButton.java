@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.core.config.gui;
 
 import static com.thatgravyboat.skyblockhud.GuiTextures.button_tex;
 
-import com.thatgravyboat.skyblockhud.core.config.Config;
+import at.lorenz.mod.config.Features;
 import com.thatgravyboat.skyblockhud.core.config.struct.ConfigProcessor;
 import com.thatgravyboat.skyblockhud.core.util.render.RenderUtils;
 import com.thatgravyboat.skyblockhud.core.util.render.TextRenderUtils;
@@ -12,11 +12,11 @@ import org.lwjgl.input.Mouse;
 
 public class GuiOptionEditorButton extends GuiOptionEditor {
 
-    private String runnableId;
+    private final String runnableId;
     private String buttonText;
-    private Config config;
+    private final Features config;
 
-    public GuiOptionEditorButton(ConfigProcessor.ProcessedOption option, String runnableId, String buttonText, Config config) {
+    public GuiOptionEditorButton(ConfigProcessor.ProcessedOption option, String runnableId, String buttonText, Features config) {
         super(option);
         this.runnableId = runnableId;
         this.config = config;
