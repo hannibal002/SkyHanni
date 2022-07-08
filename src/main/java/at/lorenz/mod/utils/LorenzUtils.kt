@@ -5,63 +5,62 @@ import net.minecraft.util.ChatComponentText
 import org.intellij.lang.annotations.Language
 import java.text.SimpleDateFormat
 
-class LorenzUtils {
+object LorenzUtils {
 
-    companion object {
-        const val DEBUG_PREFIX = "[Debug] §7"
+    const val DEBUG_PREFIX = "[Debug] §7"
 
-        fun debug(message: String) {
-            internaChat(DEBUG_PREFIX + message)
-        }
+    fun debug(message: String) {
+        internaChat(DEBUG_PREFIX + message)
+    }
 
-        fun warning(message: String) {
-            internaChat("§cWarning! $message")
-        }
+    fun warning(message: String) {
+        internaChat("§cWarning! $message")
+    }
 
-        fun error(message: String) {
-            internaChat("§4$message")
-        }
+    fun error(message: String) {
+        internaChat("§4$message")
+    }
 
-        fun chat(message: String) {
-            internaChat(message)
-        }
+    fun chat(message: String) {
+        internaChat(message)
+    }
 
-        private fun internaChat(message: String) {
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            thePlayer.addChatMessage(ChatComponentText(message))
-        }
+    private fun internaChat(message: String) {
+        val thePlayer = Minecraft.getMinecraft().thePlayer
+        thePlayer.addChatMessage(ChatComponentText(message))
+    }
 
-        fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
+    fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
-        fun String.removeColorCodes(): String {
-            val builder = StringBuilder()
-            var skipNext = false
-            for (c in this.toCharArray()) {
-                if (c == '§') {
-                    skipNext = true
-                    continue
-                }
-                if (skipNext) {
-                    skipNext = false
-                    continue
-                }
-                builder.append(c)
+    fun String.removeColorCodes(): String {
+        val builder = StringBuilder()
+        var skipNext = false
+        for (c in this.toCharArray()) {
+            if (c == '§') {
+                skipNext = true
+                continue
             }
-
-            return builder.toString()
+            if (skipNext) {
+                skipNext = false
+                continue
+            }
+            builder.append(c)
         }
 
-        fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
+        return builder.toString()
+    }
 
-        fun stripVanillaMessage(originalMessage: String): String {
-            var message = originalMessage
+    fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
-            while (message.startsWith("§r")) {
-                message = message.substring(2)
-            }
-            while (message.endsWith("§r")) {
-                message = message.substring(0, message.length - 2)
-            }
+    fun stripVanillaMessage(originalMessage: String): String {
+        var message = originalMessage
+
+        while (message.startsWith("§r")) {
+            message = message.substring(2)
+        }
+        while (message.endsWith("§r")) {
+            message = message.substring(0, message.length - 2)
+        }
 
 //        if (!message.startsWith(LorenzUtils.DEBUG_PREFIX + "chat api got (123)")) {
 //            if (message.matchRegex("(.*)§r§7 \\((.{1,3})\\)")) {
@@ -79,15 +78,14 @@ class LorenzUtils {
 //            }
 //        }
 
-            return message
-        }
-
-        fun Double.round(decimals: Int): Double {
-            var multiplier = 1.0
-            repeat(decimals) { multiplier *= 10 }
-            return kotlin.math.round(this * multiplier) / multiplier
-        }
-
-        fun String.between(start: String, end: String): String = this.split(start, end)[1]
+        return message
     }
+
+    fun Double.round(decimals: Int): Double {
+        var multiplier = 1.0
+        repeat(decimals) { multiplier *= 10 }
+        return kotlin.math.round(this * multiplier) / multiplier
+    }
+
+    fun String.between(start: String, end: String): String = this.split(start, end)[1]
 }

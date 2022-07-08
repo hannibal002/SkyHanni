@@ -2,7 +2,7 @@ package at.lorenz.mod.bazaar
 
 import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.GuiContainerEvent
-import at.lorenz.mod.utils.ItemUtils.Companion.getLore
+import at.lorenz.mod.utils.ItemUtils.getLore
 import at.lorenz.mod.utils.LorenzColor
 import at.lorenz.mod.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
