@@ -1,7 +1,7 @@
 package at.lorenz.mod.config;
 
-import com.google.gson.annotations.Expose;
 import at.lorenz.mod.LorenzMod;
+import com.google.gson.annotations.Expose;
 import com.thatgravyboat.skyblockhud_2.config.SBHConfigEditor;
 import com.thatgravyboat.skyblockhud_2.core.GuiScreenElementWrapper;
 import com.thatgravyboat.skyblockhud_2.core.config.Position;
@@ -11,7 +11,7 @@ import com.thatgravyboat.skyblockhud_2.core.config.annotations.ConfigOption;
 import com.thatgravyboat.skyblockhud_2.core.config.gui.GuiPositionEditor;
 import net.minecraft.client.Minecraft;
 
-public class Features  {
+public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
         Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));

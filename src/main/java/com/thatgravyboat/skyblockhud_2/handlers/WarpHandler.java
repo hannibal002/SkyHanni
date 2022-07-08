@@ -1,9 +1,9 @@
 package com.thatgravyboat.skyblockhud_2.handlers;
 
+import at.lorenz.mod.LorenzMod;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.*;
-import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud_2.api.events.ProfileJoinedEvent;
 import com.thatgravyboat.skyblockhud_2.api.events.ProfileSwitchedEvent;
 import com.thatgravyboat.skyblockhud_2.mixins.GuiChestAccessor;
