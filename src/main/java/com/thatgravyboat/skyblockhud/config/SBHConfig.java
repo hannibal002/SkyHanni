@@ -20,53 +20,57 @@ public class SBHConfig extends Config {
 
     @Override
     public void executeRunnable(String runnableId) {
-        String activeConfigCategory = null;
-        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenElementWrapper) {
-            GuiScreenElementWrapper wrapper = (GuiScreenElementWrapper) Minecraft.getMinecraft().currentScreen;
-            if (wrapper.element instanceof SBHConfigEditor) {
-                activeConfigCategory = ((SBHConfigEditor) wrapper.element).getSelectedCategoryName();
-            }
-        }
-
-        switch (runnableId) {
-            case "rpg":
-                editOverlay(activeConfigCategory, 120, 47, rpg.rpgHudPosition);
-                return;
-            case "d1":
-                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer1);
-                return;
-            case "d2":
-                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer2);
-                return;
-            case "d3":
-                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer3);
-                return;
-            case "d4":
-                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer4);
-                return;
-            case "main":
-                editOverlay(activeConfigCategory, 1000, 34, main.mainHudPos);
-                return;
-            case "ultimate":
-                editOverlay(activeConfigCategory, 182, 5, dungeon.barPosition);
-                return;
-            case "map":
-                editOverlay(activeConfigCategory, 72, 72, map.miniMapPosition);
-                return;
-            case "tracker":
-                editOverlay(activeConfigCategory, 130, 70, trackers.trackerPosition);
-                return;
-            case "drill":
-                editOverlay(activeConfigCategory, 136, 7, mining.drillBar);
-                return;
-            case "heat":
-                editOverlay(activeConfigCategory, 45, 7, mining.heatBar);
-                return;
-            case "dialogue":
-                editOverlay(activeConfigCategory, 182, 68, misc.dialoguePos);
-                return;
-        }
+//        String activeConfigCategory = null;
+//        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenElementWrapper) {
+//            GuiScreenElementWrapper wrapper = (GuiScreenElementWrapper) Minecraft.getMinecraft().currentScreen;
+//            if (wrapper.element instanceof SBHConfigEditor) {
+//                activeConfigCategory = ((SBHConfigEditor) wrapper.element).getSelectedCategoryName();
+//            }
+//        }
+//
+//        switch (runnableId) {
+//            case "rpg":
+//                editOverlay(activeConfigCategory, 120, 47, rpg.rpgHudPosition);
+//                return;
+//            case "d1":
+//                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer1);
+//                return;
+//            case "d2":
+//                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer2);
+//                return;
+//            case "d3":
+//                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer3);
+//                return;
+//            case "d4":
+//                editOverlay(activeConfigCategory, 120, 32, dungeon.dungeonPlayer4);
+//                return;
+//            case "main":
+//                editOverlay(activeConfigCategory, 1000, 34, main.mainHudPos);
+//                return;
+//            case "ultimate":
+//                editOverlay(activeConfigCategory, 182, 5, dungeon.barPosition);
+//                return;
+//            case "map":
+//                editOverlay(activeConfigCategory, 72, 72, map.miniMapPosition);
+//                return;
+//            case "tracker":
+//                editOverlay(activeConfigCategory, 130, 70, trackers.trackerPosition);
+//                return;
+//            case "drill":
+//                editOverlay(activeConfigCategory, 136, 7, mining.drillBar);
+//                return;
+//            case "heat":
+//                editOverlay(activeConfigCategory, 45, 7, mining.heatBar);
+//                return;
+//            case "dialogue":
+//                editOverlay(activeConfigCategory, 182, 68, misc.dialoguePos);
+//                return;
+//        }
     }
+
+    @Expose
+    @Category(name = "Lorenz Options", desc = "Just a test by lorenz.")
+    public Lorenz lorenz = new Lorenz();
 
     @Expose
     @Category(name = "Misc Options", desc = "Just a bunch of random options.")
@@ -96,9 +100,27 @@ public class SBHConfig extends Config {
     @Category(name = "Mining", desc = "All Options for the Mining Stuff.")
     public Mining mining = new Mining();
 
-    @Expose
-    @Category(name = "Tracker", desc = "All Options for the Trackers.")
-    public Trackers trackers = new Trackers();
+//    @Expose
+//    @Category(name = "Tracker", desc = "All Options for the Trackers.")
+//    public Trackers trackers = new Trackers();
+
+    public static class Lorenz {
+
+        @Expose
+        @ConfigOption(name = "Lorenz Small  Test A", desc = "abc")
+        @ConfigEditorBoolean
+        public boolean test = false;
+
+        @Expose
+        @ConfigOption(name = "Lorenz Small  Test B", desc = "def")
+        @ConfigEditorBoolean
+        public boolean test2 = false;
+
+        @Expose
+        @ConfigOption(name = "Lorenz Small  Test C", desc = "ghi")
+        @ConfigEditorBoolean
+        public boolean test3 = false;
+    }
 
     public static class Misc {
 
@@ -421,16 +443,16 @@ public class SBHConfig extends Config {
         public int chatWaypointMode = 1;
     }
 
-    public static class Trackers {
-
-        @Expose
-        @ConfigOption(name = "Tracker Position", desc = "Allows you to change the position of the Trackers.")
-        @ConfigEditorButton(runnableId = "tracker", buttonText = "Edit")
-        public Position trackerPosition = new Position(-1, 200);
-
-        @Expose
-        @ConfigOption(name = "Hide Tracker", desc = "It will still track the data just in case.")
-        @ConfigEditorBoolean
-        public boolean hideTracker = true;
-    }
+//    public static class Trackers {
+//
+//        @Expose
+//        @ConfigOption(name = "Tracker Position", desc = "Allows you to change the position of the Trackers.")
+//        @ConfigEditorButton(runnableId = "tracker", buttonText = "Edit")
+//        public Position trackerPosition = new Position(-1, 200);
+//
+//        @Expose
+//        @ConfigOption(name = "Hide Tracker", desc = "It will still track the data just in case.")
+//        @ConfigEditorBoolean
+//        public boolean hideTracker = true;
+//    }
 }

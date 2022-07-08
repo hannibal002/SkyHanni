@@ -8,13 +8,23 @@ import at.lorenz.mod.chat.ChatFilter;
 import at.lorenz.mod.chat.ChatManager;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.thatgravyboat.skyblockhud.commands.Commands;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
-import java.io.File;
+import com.thatgravyboat.skyblockhud.textures.Textures;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 @Mod(modid = SkyblockHud.MODID, version = SkyblockHud.VERSION)
 public class SkyblockHud {
@@ -23,12 +33,11 @@ public class SkyblockHud {
     public static final String VERSION = "0.1";
 
     public static SBHConfig config;
-
-    //    private File configFile;
+    private File configFile;
 
     //    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet("SKYBLOCK", "\u7A7A\u5C9B\u751F\u5B58");
 
-    //    private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
     public static File configDirectory;
 
@@ -36,6 +45,7 @@ public class SkyblockHud {
     public void preInit(FMLPreInitializationEvent event) {
         new BazaarApi();
 
+        MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatManager());
         MinecraftForge.EVENT_BUS.register(new ChatFilter());
@@ -43,6 +53,7 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
         MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
         MinecraftForge.EVENT_BUS.register(new ItemDisplayOverlayFeatures());
+        Commands.init();
         //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
         //        MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
         //        MinecraftForge.EVENT_BUS.register(new LocationHandler());
@@ -67,28 +78,31 @@ public class SkyblockHud {
         //        MinecraftForge.EVENT_BUS.register(new FarmHouseHandler());
         //        MinecraftForge.EVENT_BUS.register(new WarpHandler());
         //        MinecraftForge.EVENT_BUS.register(new CooldownHandler());
-        //        Commands.init();
+
         //
         //        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new NpcDialogue());
-        //        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
+        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
         //
-        //        configDirectory = new File(event.getModConfigurationDirectory(), "skyblockhud");
-        //        try {
-        //            configDirectory.mkdir();
-        //        } catch (Exception ignored) {}
-        //
-        //        configFile = new File(configDirectory, "sbh-config.json");
-        //
-        //        if (configFile.exists()) {
-        //            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
-        //                config = gson.fromJson(reader, SBHConfig.class);
-        //            } catch (Exception ignored) {}
-        //        }
-        //
-        //        if (config == null) {
-        //            config = new SBHConfig();
-        //            saveConfig();
-        //        }
+        configDirectory = new File("mods/LorenzMod/config");
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            configDirectory.mkdir();
+        } catch (Exception ignored) {
+        }
+
+        configFile = new File(configDirectory, "config.json");
+
+        if (configFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
+                config = gson.fromJson(reader, SBHConfig.class);
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (config == null) {
+            config = new SBHConfig();
+            saveConfig();
+        }
         //
         //        Textures.setTexture(config.misc.style);
         //
@@ -96,19 +110,21 @@ public class SkyblockHud {
         //            WarpHandler.save();
         //        }
         //
-        //        Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
+                Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
         //        Runtime.getRuntime().addShutdownHook(new Thread(TrackerFileLoader::saveTrackerStatsFile));
     }
 
-    //    public void saveConfig() {
-    //        try {
-    //            configFile.createNewFile();
-    //
-    //            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
-    //                writer.write(gson.toJson(config));
-    //            }
-    //        } catch (IOException ignored) {}
-    //    }
+    public void saveConfig() {
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            configFile.createNewFile();
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
+                writer.write(gson.toJson(config));
+            }
+        } catch (IOException ignored) {
+        }
+    }
 
     //    @EventHandler
     //    public void postInit(FMLPostInitializationEvent event) {
@@ -179,17 +195,17 @@ public class SkyblockHud {
     //    }
 
     public static GuiScreen screenToOpen = null;
-    //    private static int screenTicks = 0;
+    private static int screenTicks = 0;
 
-    //    @SubscribeEvent
-    //    public void onClientTick(TickEvent.ClientTickEvent event) {
-    //        if (screenToOpen != null) {
-    //            screenTicks++;
-    //            if (screenTicks == 5) {
-    //                Minecraft.getMinecraft().displayGuiScreen(screenToOpen);
-    //                screenTicks = 0;
-    //                screenToOpen = null;
-    //            }
-    //        }
-    //    }
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (screenToOpen != null) {
+            screenTicks++;
+            if (screenTicks == 5) {
+                Minecraft.getMinecraft().displayGuiScreen(screenToOpen);
+                screenTicks = 0;
+                screenToOpen = null;
+            }
+        }
+    }
 }
