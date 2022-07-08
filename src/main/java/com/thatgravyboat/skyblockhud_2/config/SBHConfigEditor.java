@@ -1,8 +1,5 @@
 package com.thatgravyboat.skyblockhud_2.config;
 
-import static com.thatgravyboat.skyblockhud_2.GuiTextures.DISCORD;
-import static com.thatgravyboat.skyblockhud_2.GuiTextures.TWITTER;
-
 import at.lorenz.mod.config.Features;
 import com.google.common.collect.Lists;
 import com.thatgravyboat.skyblockhud_2.core.GlScissorStack;
@@ -14,10 +11,6 @@ import com.thatgravyboat.skyblockhud_2.core.util.lerp.LerpUtils;
 import com.thatgravyboat.skyblockhud_2.core.util.lerp.LerpingInteger;
 import com.thatgravyboat.skyblockhud_2.core.util.render.RenderUtils;
 import com.thatgravyboat.skyblockhud_2.core.util.render.TextRenderUtils;
-import java.awt.*;
-import java.net.URI;
-import java.util.*;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -28,10 +21,19 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
+import java.net.URI;
+import java.util.List;
+import java.util.*;
+
+import static com.thatgravyboat.skyblockhud_2.GuiTextures.DISCORD;
+
 public class SBHConfigEditor extends GuiElement {
 
-    private static final ResourceLocation[] socialsIco = new ResourceLocation[] { DISCORD, TWITTER };
-    private static final String[] socialsLink = new String[] { "https://discord.gg/moulberry", "https://twitter.com/thatgravyboat/" };
+    //    private static final ResourceLocation[] socialsIco = new ResourceLocation[] { DISCORD, TWITTER };
+    private static final ResourceLocation[] socialsIco = new ResourceLocation[]{DISCORD};
+    //    private static final String[] socialsLink = new String[] { "https://discord.gg/NcvkPDBA6Y", "https://twitter.com/thatgravyboat/" };
+    private static final String[] socialsLink = new String[]{"https://discord.gg/NcvkPDBA6Y"};
 
     private final long openedMillis;
 
@@ -473,7 +475,8 @@ public class SBHConfigEditor extends GuiElement {
                 if (mouseX >= socialLeft && mouseX <= socialLeft + 16 && mouseY >= y + 6 && mouseY <= y + 23) {
                     try {
                         Desktop.getDesktop().browse(new URI(socialsLink[socialIndex]));
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                     return true;
                 }
             }
