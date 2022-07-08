@@ -68,7 +68,6 @@ public class Features {
         @ConfigEditorAccordion(id = 1)
         public boolean filterTypes = false;
 
-
         @Expose
         @ConfigOption(name = "HyPixel Hub", desc = "Block messages outside SkyBlock in the HyPixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and HyPixel tournaments.")
         @ConfigEditorBoolean
@@ -186,6 +185,11 @@ public class Features {
         @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
         @ConfigEditorBoolean
         public boolean hideExpBottles = false;
+
+        @Expose
+        @ConfigOption(name = "Config Button", desc = "Adds a button to the pause menu to configure the Lorenz mod.")
+        @ConfigEditorBoolean
+        public boolean configButtonOnPause = true;
     }
 
     public static class Test {

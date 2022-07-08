@@ -8,6 +8,7 @@ import at.lorenz.mod.chat.PlayerChatFilter;
 import at.lorenz.mod.config.Features;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
+import at.lorenz.mod.misc.ButtonOnPause;
 import at.lorenz.mod.misc.CurrentPetDisplay;
 import at.lorenz.mod.misc.ExpBottleOnGroundHider;
 import com.google.gson.Gson;
@@ -58,6 +59,9 @@ public class LorenzMod {
         MinecraftForge.EVENT_BUS.register(new ExpBottleOnGroundHider());
 
         Commands.init();
+
+        MinecraftForge.EVENT_BUS.register(new ButtonOnPause());
+
 
         //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
         //        MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());

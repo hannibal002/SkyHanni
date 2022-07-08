@@ -3,7 +3,6 @@ package com.thatgravyboat.skyblockhud_2.commands;
 import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud_2.config.SBHConfigEditor;
 import com.thatgravyboat.skyblockhud_2.core.GuiScreenElementWrapper;
-//import com.thatgravyboat.skyblockhud.handlers.CrystalWaypoints;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
 import org.apache.commons.lang3.StringUtils;
