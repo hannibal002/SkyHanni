@@ -1,16 +1,16 @@
 package at.lorenz.mod.chat
 
-import at.lorenz.mod.config.LorenzConfig
+import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
-import at.lorenz.mod.events.LorenzChatEvent
+import com.thatgravyboat.skyblockhud.SkyblockHud
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzConfig.chatFilter) return
+        if (!SkyblockHud.feature.chat.filter) return
 
         val blockReason = block(event.message)
         if (blockReason != "") {
