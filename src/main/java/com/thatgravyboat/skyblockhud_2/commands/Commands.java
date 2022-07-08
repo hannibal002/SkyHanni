@@ -80,7 +80,7 @@ public class Commands {
         ClientCommandHandler.instance.registerCommand(settingsCommand2);
         //        ClientCommandHandler.instance.registerCommand(mapCommand);
         //        ClientCommandHandler.instance.registerCommand(devCommand);
-//        ClientCommandHandler.instance.registerCommand(new CrystalWaypoints.WaypointCommand());
+        //        ClientCommandHandler.instance.registerCommand(new CrystalWaypoints.WaypointCommand());
     }
     //    private static void sendSBHMessage(ICommandSender sender, String message) {
     //        sender.addChatMessage(new ChatComponentText("[" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "SkyBlockHud" + EnumChatFormatting.RESET + "] : " + EnumChatFormatting.GRAY + message));
