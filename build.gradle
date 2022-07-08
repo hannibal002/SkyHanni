@@ -61,7 +61,7 @@ compileJava {
 }
 
 mixin {
-    add sourceSets.main, 'mixins.skyblockhud.refmap.json'
+    add sourceSets.main, 'mixins.lorenzmod.refmap.json'
 }
 
 jar {
