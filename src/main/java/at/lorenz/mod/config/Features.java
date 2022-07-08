@@ -80,12 +80,12 @@ public class Features {
     public static class Dungeon {
 
         @Expose
-        @ConfigOption(name = "Hide Dungeon Messages", desc = "Hides annoyung dungeon messages.")
+        @ConfigOption(name = "Hide Messages", desc = "Hide annoying dungeon messages.")
         @ConfigEditorBoolean
         public boolean hideAnnoyingMessages = false;
 
         @Expose
-        @ConfigOption(name = "Highlight Clicked Blocks", desc = "Highlight blocks in dungeon when clicked: Lever, Chest, Wither Essence")
+        @ConfigOption(name = "Clicked Blocks", desc = "Highlight the following blocks when clicked in dungeon: Lever, Chest, Wither Essence")
         @ConfigEditorBoolean
         public boolean highlightClickedBlocks = false;
     }
@@ -113,7 +113,7 @@ public class Features {
         public boolean displayDungeonHeadFloor = false;
 
         @Expose
-        @ConfigOption(name = "New Year Cake Number", desc = "Shows the Number of the Year of New Year Cakes.")
+        @ConfigOption(name = "New Year Cake", desc = "Shows the Number of the Year of New Year Cakes.")
         @ConfigEditorBoolean
         public boolean displayNewYearCakeNumber = false;
 
@@ -154,7 +154,7 @@ public class Features {
         public Position petDisplayPos = new Position(10, 10, false, true);
 
         @Expose
-        @ConfigOption(name = "Exp Bottles", desc = "Hides all the Exp bottles on the ground.")
+        @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles laying on the ground.")
         @ConfigEditorBoolean
         public boolean hideExpBottles = false;
     }
