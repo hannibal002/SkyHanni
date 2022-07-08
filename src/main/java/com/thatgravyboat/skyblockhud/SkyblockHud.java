@@ -14,6 +14,8 @@ import com.google.gson.GsonBuilder;
 import com.thatgravyboat.skyblockhud.commands.Commands;
 import com.thatgravyboat.skyblockhud.config.SBHConfig;
 import com.thatgravyboat.skyblockhud.textures.Textures;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -92,8 +94,7 @@ public class SkyblockHud {
         try {
             //noinspection ResultOfMethodCallIgnored
             configDirectory.mkdir();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         configFile = new File(configDirectory, "config.json");
 
