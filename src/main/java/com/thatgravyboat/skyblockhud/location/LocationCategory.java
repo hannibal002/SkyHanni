@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.location;
 
 import static com.thatgravyboat.skyblockhud.handlers.MapHandler.Maps;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.handlers.MapHandler;
 
 public enum LocationCategory {

@@ -6,7 +6,7 @@ import at.lorenz.mod.utils.*
 import at.lorenz.mod.utils.BlockUtils.getBlockAt
 import at.lorenz.mod.utils.RenderUtils.drawSkytilsColor
 import at.lorenz.mod.utils.RenderUtils.drawString
-import com.thatgravyboat.skyblockhud.LorenzMod
+import at.lorenz.mod.LorenzMod
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.client.event.RenderWorldLastEvent

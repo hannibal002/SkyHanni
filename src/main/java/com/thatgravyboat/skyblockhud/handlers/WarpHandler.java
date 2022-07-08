@@ -3,7 +3,7 @@ package com.thatgravyboat.skyblockhud.handlers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.*;
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.events.ProfileJoinedEvent;
 import com.thatgravyboat.skyblockhud.api.events.ProfileSwitchedEvent;
 import com.thatgravyboat.skyblockhud.mixins.GuiChestAccessor;

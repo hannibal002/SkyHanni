@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.overlay;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.handlers.BossbarHandler;
 import com.thatgravyboat.skyblockhud.handlers.CurrencyHandler;
 import com.thatgravyboat.skyblockhud.handlers.SlayerHandler;

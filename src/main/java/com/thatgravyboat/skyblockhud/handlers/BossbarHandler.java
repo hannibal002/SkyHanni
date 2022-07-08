@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.location.LocationHandler;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import com.thatgravyboat.skyblockhud.utils.Utils;

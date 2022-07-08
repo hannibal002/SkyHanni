@@ -2,7 +2,7 @@ package com.thatgravyboat.skyblockhud.api;
 
 import static com.thatgravyboat.skyblockhud.ComponentHandler.SCOREBOARD_CHARACTERS;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.events.SidebarLineUpdateEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPostEvent;
 import com.thatgravyboat.skyblockhud.api.events.SidebarPreGetEvent;

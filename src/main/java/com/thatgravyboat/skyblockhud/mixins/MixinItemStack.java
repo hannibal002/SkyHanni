@@ -1,6 +1,6 @@
 package com.thatgravyboat.skyblockhud.mixins;
 
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.item.IAbility;
 import com.thatgravyboat.skyblockhud.handlers.CooldownHandler;
 import java.util.regex.Matcher;

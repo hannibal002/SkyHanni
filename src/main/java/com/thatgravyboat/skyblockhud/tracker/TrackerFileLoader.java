@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.tracker;
 
 import com.google.gson.*;
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.location.Locations;
 import java.io.*;
 import java.nio.charset.StandardCharsets;

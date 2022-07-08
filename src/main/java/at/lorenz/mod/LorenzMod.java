@@ -1,7 +1,5 @@
-package com.thatgravyboat.skyblockhud;
+package at.lorenz.mod;
 
-import at.lorenz.mod.HideNotClickableItems;
-import at.lorenz.mod.ItemDisplayOverlayFeatures;
 import at.lorenz.mod.bazaar.BazaarApi;
 import at.lorenz.mod.bazaar.BazaarOrderHelper;
 import at.lorenz.mod.chat.ChatFilter;

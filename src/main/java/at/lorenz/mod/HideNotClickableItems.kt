@@ -9,7 +9,6 @@ import at.lorenz.mod.utils.LorenzColor
 import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.removeColorCodes
 import at.lorenz.mod.utils.RenderUtils.highlight
-import com.thatgravyboat.skyblockhud.LorenzMod
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager

@@ -1,7 +1,7 @@
 package com.thatgravyboat.skyblockhud.handlers;
 
 import com.google.common.collect.Sets;
-import com.thatgravyboat.skyblockhud.LorenzMod;
+import at.lorenz.mod.LorenzMod;
 import com.thatgravyboat.skyblockhud.api.item.IAbility;
 import com.thatgravyboat.skyblockhud.utils.Utils;
 import java.util.*;
