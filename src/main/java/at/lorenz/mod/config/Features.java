@@ -85,6 +85,7 @@ public class Features extends Config {
     public Bazaar bazaar = new Bazaar();
 
     public static class Chat {
+
         @Expose
         @ConfigOption(name = "Main Chat Filter", desc = "Hides all the annoying chat messages.")
         @ConfigEditorBoolean
@@ -92,6 +93,7 @@ public class Features extends Config {
     }
 
     public static class Dungeon {
+
         @Expose
         @ConfigOption(name = "Hide Dungeon Messages", desc = "Hides annoyung dungeon messages.")
         @ConfigEditorBoolean
@@ -104,9 +106,9 @@ public class Features extends Config {
     }
 
     public static class Inventory {
+
         @Expose
-        @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " +
-                "the current inventory: ah, bz, accessory bag, etc")
+        @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc")
         @ConfigEditorBoolean
         public boolean hideNotClickableItems = false;
 
@@ -147,6 +149,7 @@ public class Features extends Config {
     }
 
     public static class Bazaar {
+
         @Expose
         @ConfigOption(name = "Order Helper", desc = "Show visual hints when items are ready to pickup or outbid.")
         @ConfigEditorBoolean
