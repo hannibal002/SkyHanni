@@ -1,12 +1,12 @@
 package at.lorenz.mod.dungeon
 
-import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.events.PacketEvent
 import at.lorenz.mod.utils.*
 import at.lorenz.mod.utils.BlockUtils.getBlockAt
 import at.lorenz.mod.utils.RenderUtils.drawSkytilsColor
 import at.lorenz.mod.utils.RenderUtils.drawString
+import com.thatgravyboat.skyblockhud.LorenzMod
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -27,7 +27,7 @@ class DungeonHighlightClickedBlocks {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzConfig.lorenzDungeonHighlightClickedBlocks) return
+        if (!LorenzMod.feature.dungeon.highlightClickedBlocks) return
         //TODO add
 //        if (!LorenzUtils.inDungeon) return
 
@@ -38,7 +38,7 @@ class DungeonHighlightClickedBlocks {
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
-        if (!LorenzConfig.lorenzDungeonHighlightClickedBlocks) return
+        if (!LorenzMod.feature.dungeon.highlightClickedBlocks) return
         //TODO add
 //        if (!LorenzUtils.inDungeon) return
 //      TODO add
@@ -75,7 +75,7 @@ class DungeonHighlightClickedBlocks {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!LorenzConfig.lorenzDungeonHighlightClickedBlocks) return
+        if (!LorenzMod.feature.dungeon.highlightClickedBlocks) return
         //TODO add
 //        if (!LorenzUtils.inDungeon) return
 

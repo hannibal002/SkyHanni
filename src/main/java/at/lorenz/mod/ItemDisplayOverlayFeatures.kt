@@ -1,6 +1,5 @@
 package at.lorenz.mod
 
-import at.lorenz.mod.config.LorenzConfig
 import at.lorenz.mod.events.GuiRenderItemEvent
 import at.lorenz.mod.utils.ItemUtils
 import at.lorenz.mod.utils.ItemUtils.cleanName
@@ -8,6 +7,7 @@ import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.between
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
 import at.lorenz.mod.utils.NumberUtil.romanToDecimal
+import com.thatgravyboat.skyblockhud.LorenzMod
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -43,7 +43,7 @@ class ItemDisplayOverlayFeatures {
     private fun getStackTip(item: ItemStack): String {
         val name = item.cleanName()
 
-        if (LorenzConfig.lorenzItemDisplayMasterStarSkullNumber) {
+        if (LorenzMod.feature.item.displayMasterStarNumber) {
             when (name) {
                 "First Master Star" -> return "1"
                 "Second Master Star" -> return "2"
@@ -51,14 +51,15 @@ class ItemDisplayOverlayFeatures {
                 "Fourth Master Star" -> return "4"
                 "Fifth Master Star" -> return "5"
             }
+        }
 
+        if (LorenzMod.feature.item.displayMasterSkullNumber) {
             if (name.matchRegex("(.*)Master Skull - Tier .")) {
                 return name.substring(name.length - 1)
             }
-
         }
 
-        if (LorenzConfig.lorenzItemDisplayDungeonHeadNumber) {
+        if (LorenzMod.feature.item.displayDungeonHeadFloor) {
             if (name.contains("Golden ") || name.contains("Diamond ")) {
                 when {
                     name.contains("Bonzo") -> return "1"
@@ -72,13 +73,13 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzConfig.lorenzItemDisplayNewYearCakeNumber) {
+        if (LorenzMod.feature.item.displayNewYearCakeNumber) {
             if (name.startsWith("New Year Cake")) {
                 return "§b" + name.split("(Year ", ")")[1]
             }
         }
 
-        if (LorenzConfig.lorenzItemDisplayPetLevel) {
+        if (LorenzMod.feature.item.displayPetLevel) {
             if (ItemUtils.isPet(name)) {
                 try {
                     val level = name.between("Lvl ", "] ").toInt()
@@ -93,7 +94,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzConfig.lorenzItemSackNameDisplay) {
+        if (LorenzMod.feature.item.displaySackName) {
             if (ItemUtils.isSack(name)) {
                 val split = name.split(" ")
                 val sackName = split[split.size - 2]
@@ -101,7 +102,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzConfig.lorenzItemDisplayMinionTier) {
+        if (LorenzMod.feature.item.displayMinionTier) {
             if (name.contains(" Minion ")) {
                 val array = name.split(" ")
                 val last = array[array.size - 1]

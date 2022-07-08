@@ -135,7 +135,7 @@ class HideNotClickableItems {
     private fun isDisabled(): Boolean {
         if (bypassUntil > System.currentTimeMillis()) return true
 
-        return !LorenzMod.feature.inventory.hideNotClickableItems
+        return !LorenzMod.feature.item.hideNotClickableItems
     }
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
