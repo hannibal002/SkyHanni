@@ -5,6 +5,7 @@
   "mixins": [
     "MixinGuiContainer",
     "MixinNetworkManager",
-    "MixinNetHandlerPlayClient"
+    "MixinNetHandlerPlayClient",
+    "MixinRenderItem"
   ]
 }

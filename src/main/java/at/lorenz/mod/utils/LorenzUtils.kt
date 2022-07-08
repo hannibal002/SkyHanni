@@ -87,5 +87,7 @@ class LorenzUtils {
             repeat(decimals) { multiplier *= 10 }
             return kotlin.math.round(this * multiplier) / multiplier
         }
+
+        fun String.between(start: String, end: String): String = this.split(start, end)[1]
     }
 }

@@ -1,5 +1,6 @@
 package com.thatgravyboat.skyblockhud;
 
+import at.lorenz.mod.ItemDisplayOverlayFeatures;
 import at.lorenz.mod.bazaar.BazaarApi;
 import at.lorenz.mod.HideNotClickableItems;
 import at.lorenz.mod.bazaar.BazaarOrderHelper;
@@ -43,6 +44,7 @@ public class SkyblockHud {
         MinecraftForge.EVENT_BUS.register(new DungeonChatFilter());
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
         MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
+        MinecraftForge.EVENT_BUS.register(new ItemDisplayOverlayFeatures());
 
 
 //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
