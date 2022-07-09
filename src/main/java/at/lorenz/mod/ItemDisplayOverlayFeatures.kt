@@ -74,7 +74,13 @@ class ItemDisplayOverlayFeatures {
 
         if (LorenzMod.feature.item.displayNewYearCakeNumber) {
             if (name.startsWith("New Year Cake")) {
-                return "§b" + name.between("(Year ", ")")
+                try {
+                    return "§b" + name.between("(Year ", ")")
+                } catch (e: IndexOutOfBoundsException) {
+                    val message = "New Year Cake error in string: '$name': ${e.message}"
+                    LorenzDebug.log(message)
+                    LorenzUtils.error(message)
+                }
             }
         }
 
