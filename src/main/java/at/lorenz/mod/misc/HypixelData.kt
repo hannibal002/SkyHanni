@@ -1,8 +1,6 @@
 package at.lorenz.mod.misc
 
-import at.lorenz.mod.events.DungeonEnterEvent
 import at.lorenz.mod.events.PacketEvent
-import at.lorenz.mod.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
