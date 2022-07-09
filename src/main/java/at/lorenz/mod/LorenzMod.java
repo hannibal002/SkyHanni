@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class LorenzMod {
 
     public static final String MODID = "lorenzmod";
-    public static final String VERSION = "0.4";
+    public static final String VERSION = "0.4.1";
 
     //    public static SBHConfig config; //TODO delete
 
