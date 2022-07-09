@@ -9,7 +9,19 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class DungeonData {
 
-    var dungeonFloor: String? = null
+    companion object {
+        var dungeonFloor: String? = null
+
+        fun isOneOf(vararg floors: String): Boolean {
+            for (floor in floors) {
+                if (dungeonFloor == floor) {
+                    return true
+                }
+            }
+
+            return false
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

@@ -116,6 +116,11 @@ public class Features {
         @ConfigOption(name = "Clicked Blocks", desc = "Highlight the following blocks when clicked in dungeon: Lever, Chest, Wither Essence")
         @ConfigEditorBoolean
         public boolean highlightClickedBlocks = false;
+
+        @Expose
+        @ConfigOption(name = "Boss Damage Indicator", desc = "Shows the missing health of a boss in the dungeon and the cooldown time until the boss becomes attackable.")
+        @ConfigEditorBoolean
+        public boolean bossDamageIndicator = false;
     }
 
     public static class Inventory {

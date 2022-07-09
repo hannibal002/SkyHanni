@@ -9,6 +9,7 @@ import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
@@ -308,5 +309,47 @@ object RenderUtils {
         GlStateManager.enableBlend()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
+    }
+
+    /**
+     * @author Mojang
+     */
+    fun drawLabel(
+        pos: Vec3,
+        text: String,
+        color: Color,
+        partialTicks: Float,
+        shadow: Boolean = false,
+        scale: Float = 1f
+    ) {
+        var mc = Minecraft.getMinecraft()
+        val player = mc.thePlayer
+        val x =
+            pos.xCoord - player.lastTickPosX + (pos.xCoord - player.posX - (pos.xCoord - player.lastTickPosX)) * partialTicks
+        val y =
+            pos.yCoord - player.lastTickPosY + (pos.yCoord - player.posY - (pos.yCoord - player.lastTickPosY)) * partialTicks
+        val z =
+            pos.zCoord - player.lastTickPosZ + (pos.zCoord - player.posZ - (pos.zCoord - player.lastTickPosZ)) * partialTicks
+        val renderManager = mc.renderManager
+        val f1 = 0.0266666688
+        val width = mc.fontRendererObj.getStringWidth(text) / 2
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(x, y, z)
+        GL11.glNormal3f(0f, 1f, 0f)
+        GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
+        GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
+        GlStateManager.scale(-f1, -f1, -f1)
+        GlStateManager.scale(scale, scale, scale)
+        GlStateManager.enableBlend()
+        GlStateManager.disableLighting()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.enableTexture2D()
+        mc.fontRendererObj.drawString(text, (-width).toFloat(), 0f, color.rgb, shadow)
+        GlStateManager.disableBlend()
+        GlStateManager.popMatrix()
+    }
+
+    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Float): Double {
+        return lastValue + (currentValue - lastValue) * multiplier
     }
 }

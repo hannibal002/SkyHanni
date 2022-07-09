@@ -2,6 +2,8 @@ package at.lorenz.mod.utils
 
 import at.lorenz.mod.misc.HypixelData
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.util.ChatComponentText
 import org.intellij.lang.annotations.Language
 import java.text.SimpleDateFormat
@@ -109,4 +111,7 @@ object LorenzUtils {
     }
 
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
+
+    val EntityLivingBase.baseMaxHealth: Double
+        get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue
 }
