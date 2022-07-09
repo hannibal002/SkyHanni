@@ -99,9 +99,6 @@ class DungeonChatFilter {
         message.matchRegex("§c(.*) §r§epicked up your (.*) Orb!") -> true
         message.matchRegex("§cThis ability is on cooldown for (.*)s.") -> true
         message.matchRegex("§a§l(.*) healed you for (.*) health!") -> true
-        message == "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!" -> true
-        message == "§cYour Mining Speed Boost has expired!" -> true
-        message == "§a§r§6Mining Speed Boost §r§ais now available!" -> true
         message.matchRegex("§eYour bone plating reduced the damage you took by §r§c(.*)§r§e!") -> true
         message.matchRegex("(.*) §r§eformed a tether with you!") -> true
         message.matchRegex("§eYour tether with (.*) §r§ehealed you for §r§a(.*) §r§ehealth.") -> true

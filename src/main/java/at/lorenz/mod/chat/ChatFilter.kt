@@ -39,6 +39,8 @@ class ChatFilter {
         friendJoin(message) && LorenzMod.feature.chat.others -> "friend_join"
 
 
+
+
         else -> ""
     }
 
@@ -55,6 +57,10 @@ class ChatFilter {
     private fun uselessNotification(message: String): Boolean {
         return when {
             message == "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!" -> true
+
+            message == "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!" -> true
+            message == "§cYour Mining Speed Boost has expired!" -> true
+            message == "§a§r§6Mining Speed Boost §r§ais now available!" -> true
 
             else -> false
         }
