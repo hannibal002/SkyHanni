@@ -267,9 +267,11 @@ class HideNotClickableItems {
                 "Training Weights" -> return false
                 "Journal Entry" -> return false
                 "Twilight Arrow Poison" -> return false
+                "Lever" -> return false
 
                 "Fairy's Galoshes" -> return false
             }
+            if (name.endsWith("Gem Rune I")) return false
 
             if (name.startsWith("Music Disc")) return false
         }
@@ -340,6 +342,7 @@ class HideNotClickableItems {
         items.add("Machine Gun Bow")
         items.add("Earth Shard")
         items.add("Zombie Commander Whip")
+        items.add("Sniper Bow")
 
         for (item in items) {
             if (name.endsWith(" $item")) {
