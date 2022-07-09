@@ -23,10 +23,6 @@ class HypixelData {
             !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
-        LorenzUtils.debug("connected to hypixel!")
-        if (hypixel) {
-            LorenzUtils.debug("connected to hypixel!")
-        }
     }
 
     @SubscribeEvent
@@ -34,9 +30,6 @@ class HypixelData {
         if (!hypixel || skyblock || event.packet !is S3DPacketDisplayScoreboard) return
         if (event.packet.func_149371_c() != 1) return
         skyblock = event.packet.func_149370_d() == "SBScoreboard"
-        if (skyblock) {
-            LorenzUtils.debug("joined on skyblock!")
-        }
     }
 
     val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
@@ -51,9 +44,6 @@ class HypixelData {
             val name = playerData?.displayName?.formattedText ?: playerData?.profile?.name ?: return@forEach
             areaRegex.matchEntire(name)?.let { result ->
                 dungeon = skyblock && result.groups["area"]?.value == "Dungeon"
-                if (dungeon) {
-                    LorenzUtils.debug("entered a dungeon!")
-                }
                 return@forEach
             }
         }
@@ -63,7 +53,6 @@ class HypixelData {
     fun onWorldChange(event: WorldEvent.Load) {
         skyblock = false
         dungeon = false
-        LorenzUtils.debug("onWorldChange")
     }
 
     @SubscribeEvent
@@ -71,6 +60,5 @@ class HypixelData {
         hypixel = false
         skyblock = false
         dungeon = false
-        LorenzUtils.debug("ClientDisconnection")
     }
 }
