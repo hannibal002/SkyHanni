@@ -12,6 +12,7 @@ class PlayerChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!LorenzUtils.isOnHypixel) return
         if (!LorenzMod.feature.chat.playerMessages) return
 
         if (shouldBlock(event.message)) {

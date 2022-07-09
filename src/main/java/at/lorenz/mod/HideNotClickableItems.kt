@@ -27,6 +27,7 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!LorenzUtils.inSkyblock) return
         if (isDisabled()) return
         if (event.gui !is GuiChest) return
         val guiChest = event.gui

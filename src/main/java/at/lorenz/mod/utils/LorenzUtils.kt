@@ -1,5 +1,6 @@
 package at.lorenz.mod.utils
 
+import at.lorenz.mod.misc.HypixelData
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import org.intellij.lang.annotations.Language
@@ -7,26 +8,46 @@ import java.text.SimpleDateFormat
 
 object LorenzUtils {
 
+    val isOnHypixel: Boolean
+        get() = HypixelData.hypixel
+
+    val inSkyblock: Boolean
+        get() = HypixelData.hypixel && HypixelData.skyblock
+
+    val inDungeons: Boolean
+        get() = HypixelData.hypixel && HypixelData.skyblock && HypixelData.dungeon
+
     const val DEBUG_PREFIX = "[Debug] §7"
 
     fun debug(message: String) {
-        internaChat(DEBUG_PREFIX + message)
+        internalChat(DEBUG_PREFIX + message)
     }
 
     fun warning(message: String) {
-        internaChat("§cWarning! $message")
+        internalChat("§cWarning! $message")
     }
 
     fun error(message: String) {
-        internaChat("§4$message")
+        internalChat("§4$message")
     }
 
     fun chat(message: String) {
-        internaChat(message)
+        internalChat(message)
     }
 
-    private fun internaChat(message: String) {
-        val thePlayer = Minecraft.getMinecraft().thePlayer
+    private fun internalChat(message: String) {
+        val minecraft = Minecraft.getMinecraft()
+        if (minecraft == null) {
+            println(message)
+            return
+        }
+
+        val thePlayer = minecraft.thePlayer
+        if (thePlayer == null) {
+            println(message)
+            return
+        }
+
         thePlayer.addChatMessage(ChatComponentText(message))
     }
 

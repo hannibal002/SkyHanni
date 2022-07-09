@@ -1,6 +1,7 @@
 package at.lorenz.mod.misc
 
 import at.lorenz.mod.LorenzMod
+import at.lorenz.mod.utils.LorenzUtils
 import com.thatgravyboat.skyblockhud_2.config.SBHConfigEditor
 import com.thatgravyboat.skyblockhud_2.core.GuiScreenElementWrapper
 import net.minecraft.client.gui.GuiButton
@@ -13,6 +14,8 @@ class ButtonOnPause {
 
     @SubscribeEvent
     fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
+        if (!LorenzUtils.isOnHypixel) return
+
         if (LorenzMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
             LorenzMod.screenToOpen = GuiScreenElementWrapper(SBHConfigEditor(LorenzMod.feature))
         }
@@ -20,6 +23,8 @@ class ButtonOnPause {
 
     @SubscribeEvent
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
+        if (!LorenzUtils.isOnHypixel) return
+
         if (LorenzMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu) {
             val x = event.gui.width - 105
             val x2 = x + 100

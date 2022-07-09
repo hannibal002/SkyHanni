@@ -28,8 +28,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzMod.feature.dungeon.highlightClickedBlocks) return
-        //TODO add
-//        if (!LorenzUtils.inDungeon) return
+        if (!LorenzUtils.inDungeons) return
 
         if (event.message == "§cYou hear the sound of something opening...") {
             event.blockedReason = "dungeon_highlight_clicked_block"
@@ -39,8 +38,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
         if (!LorenzMod.feature.dungeon.highlightClickedBlocks) return
-        //TODO add
-//        if (!LorenzUtils.inDungeon) return
+        if (!LorenzUtils.inDungeons) return
 //      TODO add
 //        if (DungeonAPI.inBossRoom) return
         if (event.packet !is C08PacketPlayerBlockPlacement || event.packet.stack == null) return
@@ -76,8 +74,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!LorenzMod.feature.dungeon.highlightClickedBlocks) return
-        //TODO add
-//        if (!LorenzUtils.inDungeon) return
+        if (!LorenzUtils.inDungeons) return
 
         blocks.removeAll { System.currentTimeMillis() > it.time + 3000 }
         blocks.forEach {

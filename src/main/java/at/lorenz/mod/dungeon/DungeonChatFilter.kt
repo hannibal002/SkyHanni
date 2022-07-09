@@ -3,12 +3,14 @@ package at.lorenz.mod.dungeon
 import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
 import at.lorenz.mod.LorenzMod
+import at.lorenz.mod.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyblock) return
 
         if (!LorenzMod.feature.chat.dungeonMessages) return
 
@@ -24,8 +26,7 @@ class DungeonChatFilter {
             isStart(message) -> return "start"
         }
 
-        //TODO add
-//        if (!LorenzUtils.inDungeon) return ""
+        if (!LorenzUtils.inDungeons) return ""
 
         return when {
             isKey(message) -> "key"
