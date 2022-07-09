@@ -3,6 +3,7 @@ package at.lorenz.mod.misc
 import at.lorenz.mod.LorenzMod
 import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.utils.GuiRender.renderString
+import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.between
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -16,6 +17,8 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyblock) return
+
         var blocked = false
 
         val message = event.message
@@ -40,6 +43,8 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+        if (!LorenzUtils.inSkyblock) return
+
         if (!LorenzMod.feature.misc.petDisplay) return
         if (currentPet == "") return
 

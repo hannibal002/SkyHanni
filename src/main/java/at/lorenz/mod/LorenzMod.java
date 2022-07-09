@@ -11,6 +11,7 @@ import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
 import at.lorenz.mod.misc.ButtonOnPause;
 import at.lorenz.mod.misc.CurrentPetDisplay;
 import at.lorenz.mod.misc.ExpBottleOnGroundHider;
+import at.lorenz.mod.misc.HypixelData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thatgravyboat.skyblockhud_2.commands.Commands;
@@ -47,6 +48,7 @@ public class LorenzMod {
         new BazaarApi();
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new ChatManager());
+        MinecraftForge.EVENT_BUS.register(new HypixelData());
 
         MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatFilter());

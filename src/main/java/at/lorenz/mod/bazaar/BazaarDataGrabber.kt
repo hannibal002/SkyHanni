@@ -38,10 +38,9 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
 
     fun start() {
         fixedRateTimer(name = "lorenz-bazaar-update", period = 1000L) {
-            //TODO add
-//            if (!LorenzUtils.inSkyBlock) {
-//                return@fixedRateTimer
-//            }
+            if (!LorenzUtils.inSkyblock) {
+                return@fixedRateTimer
+            }
 
             if (currentlyUpdating) {
                 LorenzUtils.error("Bazaar update took too long! Error?")
