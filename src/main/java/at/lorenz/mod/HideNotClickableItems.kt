@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
@@ -71,7 +72,7 @@ class HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (isDisabled()) return
         if (event.toolTip == null) return
