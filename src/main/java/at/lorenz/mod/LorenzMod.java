@@ -9,6 +9,7 @@ import at.lorenz.mod.config.Features;
 import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonData;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
+import at.lorenz.mod.dungeon.DungeonMilestoneDisplay;
 import at.lorenz.mod.dungeon.damageindicator.DungeonBossDamageIndicator;
 import at.lorenz.mod.items.HideNotClickableItems;
 import at.lorenz.mod.items.abilitycooldown.ItemAbilityCooldown;
@@ -66,6 +67,7 @@ public class LorenzMod {
         MinecraftForge.EVENT_BUS.register(new ExpBottleOnGroundHider());
         MinecraftForge.EVENT_BUS.register(new DungeonBossDamageIndicator());
         MinecraftForge.EVENT_BUS.register(new ItemAbilityCooldown());
+        MinecraftForge.EVENT_BUS.register(new DungeonMilestoneDisplay());
 
         Commands.init();
 

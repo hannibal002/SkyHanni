@@ -35,6 +35,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, debug.testPos);
             return;
         }
+
+        if (runnableId.equals("dungeonMilestoneDisplay")) {
+            editOverlay(activeConfigCategory, 200, 16, dungeon.milestoneDisplayPos);
+            return;
+        }
     }
 
     @Expose
@@ -121,20 +126,29 @@ public class Features {
         @ConfigOption(name = "Boss Damage Indicator", desc = "Shows the missing health of a boss in the dungeon and the cooldown time until the boss becomes attackable.")
         @ConfigEditorBoolean
         public boolean bossDamageIndicator = false;
+
+        @Expose
+        @ConfigOption(name = "Milestone Display", desc = "Shows the current milestone inside Dungeons.")
+        @ConfigEditorBoolean
+        public boolean showMilestoneDisplay = false;
+
+        @Expose
+        @ConfigOption(name = "Milestone Display Position", desc = "")
+        @ConfigEditorButton(runnableId = "dungeonMilestoneDisplay", buttonText = "Edit")
+        public Position milestoneDisplayPos = new Position(10, 10, false, true);
     }
 
     public static class Items {
 
         @Expose
+        @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc")
+        @ConfigEditorBoolean
+        public boolean hideNotClickableItems = false;
+
+        @Expose
         @ConfigOption(name = "Item Number as Stack", desc = "")
         @ConfigEditorAccordion(id = 2)
         public boolean filterTypes = false;
-
-        @Expose
-        @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
-        public boolean hideNotClickableItems = false;
 
         @Expose
         @ConfigOption(name = "Master Star Number", desc = "Shows the Tier of the Master Star.")

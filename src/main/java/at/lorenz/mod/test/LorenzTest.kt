@@ -2,10 +2,7 @@ package at.lorenz.mod.test
 
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import at.lorenz.mod.LorenzMod
-import at.lorenz.mod.utils.GuiRender.renderString
-import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class LorenzTest {
     @SubscribeEvent
