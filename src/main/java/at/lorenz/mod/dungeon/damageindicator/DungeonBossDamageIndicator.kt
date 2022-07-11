@@ -140,7 +140,6 @@ class DungeonBossDamageIndicator {
         }
     }
 
-    //TODO test why this does not work
     private val maxHealth = mutableMapOf<UUID, Double>()
 
     private fun setMaxHealth(entity: EntityLivingBase, currentMaxHealth: Double) {
