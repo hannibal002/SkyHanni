@@ -73,7 +73,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (LorenzMod.feature.item.displayNewYearCakeNumber) {
-            if (name.startsWith("New Year Cake")) {
+            if (name.startsWith("New Year Cake (")) {
                 try {
                     return "§b" + name.between("(Year ", ")")
                 } catch (e: IndexOutOfBoundsException) {

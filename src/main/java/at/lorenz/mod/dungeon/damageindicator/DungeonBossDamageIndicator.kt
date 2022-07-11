@@ -108,12 +108,16 @@ class DungeonBossDamageIndicator {
             val currentMaxHealth = event.entity.baseMaxHealth
 
             val debugMaxHealth = getMaxHealthFor(event.entity)
-            val biggestHealth = max(currentMaxHealth, debugMaxHealth)
-            if (biggestHealth > debugMaxHealth) {
+            val biggestHealth: Double
+            val health = event.entity.health + 0.0
+            if (debugMaxHealth == 0.0) {
+                biggestHealth = max(currentMaxHealth, health)
                 setMaxHealth(event.entity, biggestHealth)
+            } else {
+                biggestHealth = debugMaxHealth
             }
 
-            val percentage = event.entity.health / max(debugMaxHealth, currentMaxHealth)
+            val percentage = health / biggestHealth
             val color = when {
                 percentage > 0.9 -> LorenzColor.DARK_GREEN
                 percentage > 0.75 -> LorenzColor.GREEN
@@ -124,7 +128,7 @@ class DungeonBossDamageIndicator {
 
             data[entity] = EntityData(
                 entity,
-                NumberUtil.format(event.entity.health),
+                NumberUtil.format(health),
                 color,
                 System.currentTimeMillis(),
                 ignoreBlocks,
