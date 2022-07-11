@@ -45,7 +45,7 @@ class DungeonBossFinder {
 
     //F6
     private var floor6Giants = false
-    private var floor6GiantsSpawnTime = 0L //TODO different giants cooldown delayed from each other
+    private var floor6GiantsSpawnTime = 0L
     private var floor6GiantsSeparateDelay = mutableMapOf<UUID, Long>()
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = 0L

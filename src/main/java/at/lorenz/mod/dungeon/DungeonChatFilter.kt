@@ -136,7 +136,6 @@ class DungeonChatFilter {
         message.matchRegex("(.*)§r§a struck you for §r§c(.*)§r§a damage!") -> true
         message.matchRegex("(.*)§r§c struck you for (.*)!") -> true
 
-        //TODO abstract if more "burnt" messages are found
         message.matchRegex("§7The Mage's Magma burnt you for §r§c(.*)§r§7 true damage.") -> true
 
         message.matchRegex("§7Your (.*) hit §r§c(.*) §r§7(enemy|enemies) for §r§c(.*) §r§7damage.") -> true
