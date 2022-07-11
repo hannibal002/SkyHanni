@@ -208,4 +208,6 @@ object ItemUtil {
         })
         return this
     }
+
+    fun NBTTagList.asStringSet() = (0..tagCount()).mapTo(hashSetOf()) { getStringTagAt(it) }
 }
