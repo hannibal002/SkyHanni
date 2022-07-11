@@ -1,4 +1,4 @@
-package at.lorenz.mod.items
+package at.lorenz.mod.items.abilitycooldown
 
 import at.lorenz.mod.LorenzMod
 import at.lorenz.mod.events.GuiRenderItemEvent
@@ -53,7 +53,7 @@ class ItemAbilityCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && LorenzMod.feature.abilities.itemAbilityCooldown
+        return LorenzUtils.inSkyblock && LorenzMod.feature.items.itemAbilityCooldown
     }
 
     private fun click(ability: Ability) {

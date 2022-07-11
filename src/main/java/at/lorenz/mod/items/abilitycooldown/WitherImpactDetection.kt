@@ -1,4 +1,4 @@
-package at.lorenz.mod.items
+package at.lorenz.mod.items.abilitycooldown
 
 import at.lorenz.mod.events.PacketEvent
 import at.lorenz.mod.utils.ItemUtil.asStringSet

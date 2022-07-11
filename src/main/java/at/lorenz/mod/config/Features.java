@@ -63,10 +63,6 @@ public class Features {
     @Category(name = "Debug", desc = "Debug and test stuff.")
     public Debug debug = new Debug();
 
-    @Expose
-    @Category(name = "Abilities", desc = "Stuff about abilities.")
-    public Abilities abilities = new Abilities();
-
     public static class Chat {
 
         @Expose
@@ -132,44 +128,62 @@ public class Features {
     public static class Items {
 
         @Expose
+        @ConfigOption(name = "Item Number as Stack", desc = "")
+        @ConfigEditorAccordion(id = 2)
+        public boolean filterTypes = false;
+
+        @Expose
         @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean hideNotClickableItems = false;
 
         @Expose
         @ConfigOption(name = "Master Star Number", desc = "Shows the Tier of the Master Star.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean displayMasterStarNumber = false;
 
         @Expose
         @ConfigOption(name = "Master Skull Number", desc = "Shows the tier of the Master Skull accessory.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean displayMasterSkullNumber = false;
 
         @Expose
         @ConfigOption(name = "Dungeon Head Floor", desc = "Shows the correct floor for golden and diamond heads.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean displayDungeonHeadFloor = false;
 
         @Expose
         @ConfigOption(name = "New Year Cake", desc = "Shows the Number of the Year of New Year Cakes.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean displayNewYearCakeNumber = false;
 
         @Expose
         @ConfigOption(name = "Pet Level", desc = "Shows the level of the pet when not maxed.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean displayPetLevel = false;
 
         @Expose
         @ConfigOption(name = "Sack Name", desc = "Shows an abbreviation of the Sack name.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean displaySackName = false;
 
         @Expose
         @ConfigOption(name = "Minion Tier", desc = "Shows the Minion Tier over Items.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
         public boolean displayMinionTier = false;
+
+        @Expose
+        @ConfigOption(name = "Ability Cooldown", desc = "Shows the cooldown of item abilities.")
+        @ConfigEditorBoolean
+        public boolean itemAbilityCooldown = false;
     }
 
     public static class Bazaar {
@@ -214,13 +228,5 @@ public class Features {
         @ConfigOption(name = "Test Location", desc = "")
         @ConfigEditorButton(runnableId = "testPos", buttonText = "Edit")
         public Position testPos = new Position(10, 10, false, true);
-    }
-
-    public static class Abilities {
-
-        @Expose
-        @ConfigOption(name = "Item Cooldown", desc = "Shows the cooldown of item abilities.")
-        @ConfigEditorBoolean
-        public boolean itemAbilityCooldown = false;
     }
 }

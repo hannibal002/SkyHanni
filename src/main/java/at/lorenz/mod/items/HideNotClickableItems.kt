@@ -1,5 +1,6 @@
-package at.lorenz.mod
+package at.lorenz.mod.items
 
+import at.lorenz.mod.LorenzMod
 import at.lorenz.mod.bazaar.BazaarApi
 import at.lorenz.mod.events.GuiContainerEvent
 import at.lorenz.mod.utils.ItemUtils
