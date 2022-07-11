@@ -13,9 +13,7 @@ import net.minecraft.client.Minecraft;
 public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
-        }, () -> {
-        }, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
     }
 
     public void executeRunnable(String runnableId) {
