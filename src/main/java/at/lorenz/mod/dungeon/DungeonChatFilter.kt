@@ -40,8 +40,6 @@ class DungeonChatFilter {
             isPuzzle(message) -> "puzzle"
             isBoss(message) -> "boss"
             isEnd(message) -> "end"
-            //TODO add
-//            DungeonMilestoneDisplay.isMilestoneMessage(message) -> "milestone"
 
             else -> ""
         }
