@@ -13,7 +13,9 @@ import net.minecraft.client.Minecraft;
 public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
+        }, () -> {
+        }, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
     }
 
     public void executeRunnable(String runnableId) {
@@ -32,7 +34,7 @@ public class Features {
         }
 
         if (runnableId.equals("testPos")) {
-            editOverlay(activeConfigCategory, 200, 16, test.testPos);
+            editOverlay(activeConfigCategory, 200, 16, debug.testPos);
             return;
         }
     }
@@ -46,20 +48,24 @@ public class Features {
     public Dungeon dungeon = new Dungeon();
 
     @Expose
-    @Category(name = "Item", desc = "Changing the behavior around items and the inventory.")
-    public Inventory item = new Inventory();
+    @Category(name = "Items", desc = "Changing the behavior around items and the inventory.")
+    public Items items = new Items();
 
     @Expose
     @Category(name = "Bazaar", desc = "Bazaar settings.")
     public Bazaar bazaar = new Bazaar();
 
     @Expose
-    @Category(name = "Misc", desc = "Settings without a big category")
+    @Category(name = "Misc", desc = "Settings without a category.")
     public Misc misc = new Misc();
 
     @Expose
-    @Category(name = "Test", desc = "Test stuff")
-    public Test test = new Test();
+    @Category(name = "Debug", desc = "Debug and test stuff.")
+    public Debug debug = new Debug();
+
+    @Expose
+    @Category(name = "Abilities", desc = "Stuff about abilities.")
+    public Abilities abilities = new Abilities();
 
     public static class Chat {
 
@@ -123,7 +129,7 @@ public class Features {
         public boolean bossDamageIndicator = false;
     }
 
-    public static class Inventory {
+    public static class Items {
 
         @Expose
         @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc")
@@ -197,7 +203,7 @@ public class Features {
         public boolean configButtonOnPause = true;
     }
 
-    public static class Test {
+    public static class Debug {
 
         @Expose
         @ConfigOption(name = "Enable Test", desc = "Enable Test logic")
@@ -208,5 +214,13 @@ public class Features {
         @ConfigOption(name = "Test Location", desc = "")
         @ConfigEditorButton(runnableId = "testPos", buttonText = "Edit")
         public Position testPos = new Position(10, 10, false, true);
+    }
+
+    public static class Abilities {
+
+        @Expose
+        @ConfigOption(name = "Item Cooldown", desc = "Shows the cooldown of item abilities.")
+        @ConfigEditorBoolean
+        public boolean itemAbilityCooldown = false;
     }
 }

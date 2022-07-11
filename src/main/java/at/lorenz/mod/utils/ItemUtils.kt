@@ -46,4 +46,27 @@ object ItemUtils {
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
 
+    fun getItemsInInventoryWithSlots(withCursorItem: Boolean = false): Map<ItemStack, Int> {
+        val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
+        val player = Minecraft.getMinecraft().thePlayer
+        if (player == null) {
+            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            return map
+        }
+        for (slot in player.openContainer.inventorySlots) {
+            if (slot.hasStack) {
+                map[slot.stack] = slot.slotNumber
+            }
+        }
+
+        if (withCursorItem) {
+            if (player.inventory != null) {
+                if (player.inventory.itemStack != null) {
+                    map[player.inventory.itemStack] = -1
+                }
+            }
+        }
+
+        return map
+    }
 }

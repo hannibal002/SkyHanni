@@ -42,7 +42,7 @@ class ItemDisplayOverlayFeatures {
     private fun getStackTip(item: ItemStack): String {
         val name = item.cleanName()
 
-        if (LorenzMod.feature.item.displayMasterStarNumber) {
+        if (LorenzMod.feature.items.displayMasterStarNumber) {
             when (name) {
                 "First Master Star" -> return "1"
                 "Second Master Star" -> return "2"
@@ -52,13 +52,13 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzMod.feature.item.displayMasterSkullNumber) {
+        if (LorenzMod.feature.items.displayMasterSkullNumber) {
             if (name.matchRegex("(.*)Master Skull - Tier .")) {
                 return name.substring(name.length - 1)
             }
         }
 
-        if (LorenzMod.feature.item.displayDungeonHeadFloor) {
+        if (LorenzMod.feature.items.displayDungeonHeadFloor) {
             if (name.contains("Golden ") || name.contains("Diamond ")) {
                 when {
                     name.contains("Bonzo") -> return "1"
@@ -72,7 +72,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzMod.feature.item.displayNewYearCakeNumber) {
+        if (LorenzMod.feature.items.displayNewYearCakeNumber) {
             if (name.startsWith("New Year Cake (")) {
                 try {
                     return "§b" + name.between("(Year ", ")")
@@ -84,7 +84,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzMod.feature.item.displayPetLevel) {
+        if (LorenzMod.feature.items.displayPetLevel) {
             if (ItemUtils.isPet(name)) {
                 try {
                     val level = name.between("Lvl ", "] ").toInt()
@@ -99,7 +99,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzMod.feature.item.displaySackName) {
+        if (LorenzMod.feature.items.displaySackName) {
             if (ItemUtils.isSack(name)) {
                 val split = name.split(" ")
                 val sackName = split[split.size - 2]
@@ -107,7 +107,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LorenzMod.feature.item.displayMinionTier) {
+        if (LorenzMod.feature.items.displayMinionTier) {
             if (name.contains(" Minion ")) {
                 val array = name.split(" ")
                 val last = array[array.size - 1]

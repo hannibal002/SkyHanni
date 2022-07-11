@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.util.ChatComponentText
 import org.intellij.lang.annotations.Language
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 object LorenzUtils {
@@ -114,4 +115,16 @@ object LorenzUtils {
 
     val EntityLivingBase.baseMaxHealth: Double
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue
+
+    fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
+
+    fun formatPercentage(percentage: Double, format: String?): String =
+        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
+
+    fun formatInteger(i: Int): String = DecimalFormat("#,##0").format(i.toLong()).replace(',', '.')
+
+    fun formatDouble(d: Double, format: String?): String =
+        DecimalFormat(format).format(d).replace(',', 'x').replace('.', ',').replace('x', '.')
+
+    fun formatDouble(d: Double): String = formatDouble(d, "#,##0.0")
 }

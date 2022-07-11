@@ -10,6 +10,7 @@ import at.lorenz.mod.dungeon.DungeonChatFilter;
 import at.lorenz.mod.dungeon.DungeonData;
 import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
 import at.lorenz.mod.dungeon.damageindicator.DungeonBossDamageIndicator;
+import at.lorenz.mod.items.ItemAbilityCooldown;
 import at.lorenz.mod.misc.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -61,6 +62,7 @@ public class LorenzMod {
         MinecraftForge.EVENT_BUS.register(new CurrentPetDisplay());
         MinecraftForge.EVENT_BUS.register(new ExpBottleOnGroundHider());
         MinecraftForge.EVENT_BUS.register(new DungeonBossDamageIndicator());
+        MinecraftForge.EVENT_BUS.register(new ItemAbilityCooldown());
 
         Commands.init();
 

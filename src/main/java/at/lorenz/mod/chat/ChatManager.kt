@@ -1,5 +1,6 @@
 package at.lorenz.mod.chat
 
+import at.lorenz.mod.events.LorenzActionBarEvent
 import at.lorenz.mod.utils.LorenzLogger
 import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.events.PacketEvent
@@ -23,8 +24,8 @@ class ChatManager {
 
         val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
         if (packet.type.toInt() == 2) {
-//            val actionBarEvent = LorenzActionBarEvent(message)
-//            actionBarEvent.postAndCatch()
+            val actionBarEvent = LorenzActionBarEvent(message)
+            actionBarEvent.postAndCatch()
         } else {
 
             val chatEvent = LorenzChatEvent(message, messageComponent)
