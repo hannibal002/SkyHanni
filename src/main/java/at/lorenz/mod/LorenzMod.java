@@ -12,6 +12,7 @@ import at.lorenz.mod.dungeon.DungeonHighlightClickedBlocks;
 import at.lorenz.mod.dungeon.damageindicator.DungeonBossDamageIndicator;
 import at.lorenz.mod.items.ItemAbilityCooldown;
 import at.lorenz.mod.misc.*;
+import at.lorenz.mod.test.LorenzTest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thatgravyboat.skyblockhud_2.commands.Commands;
@@ -66,6 +67,7 @@ public class LorenzMod {
 
         Commands.init();
 
+        MinecraftForge.EVENT_BUS.register(new LorenzTest());
         MinecraftForge.EVENT_BUS.register(new ButtonOnPause());
 
         //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
