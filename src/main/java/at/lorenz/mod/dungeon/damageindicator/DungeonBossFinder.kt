@@ -4,6 +4,7 @@ import at.lorenz.mod.dungeon.DungeonData
 import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.baseMaxHealth
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
+import at.lorenz.mod.utils.LorenzVec
 import at.lorenz.mod.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -11,6 +12,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
+import java.util.*
 
 class DungeonBossFinder {
 
@@ -44,6 +46,7 @@ class DungeonBossFinder {
     //F6
     private var floor6Giants = false
     private var floor6GiantsSpawnTime = 0L //TODO different giants cooldown delayed from each other
+    private var floor6GiantsSeparateDelay = mutableMapOf<UUID, Long>()
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = 0L
 
@@ -168,8 +171,10 @@ class DungeonBossFinder {
             if (DungeonData.isOneOf("F6", "M6")) {
                 if (entity is EntityGiantZombie && !entity.isInvisible) {
                     if (floor6Giants && entity.posY > 68) {
-                        ignoreBlocks(floor6GiantsSpawnTime + 1_000 > System.currentTimeMillis())
-                        delayedStart(floor6GiantsSpawnTime)
+                        val extraDelay = checkExtraF6GiantsDelay(entity)
+                        ignoreBlocks(floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis())
+
+                        delayedStart(floor6GiantsSpawnTime + extraDelay)
                         return true
                     }
 
@@ -182,6 +187,45 @@ class DungeonBossFinder {
         }
 
         return false
+    }
+
+    private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Long {
+        val uuid = entity.uniqueID
+
+        if (floor6GiantsSeparateDelay.contains(uuid)) {
+            return floor6GiantsSeparateDelay[uuid]!!
+        }
+
+        val middle = LorenzVec(-8, 0, 56)
+
+        val loc = entity.getLorenzVec()
+
+        var pos = 0
+
+        //first
+        if (loc.x > middle.x && loc.z > middle.z) {
+            pos = 2
+        }
+
+        //second
+        if (loc.x > middle.x && loc.z < middle.z) {
+            pos = 3
+        }
+
+        //third
+        if (loc.x < middle.x && loc.z < middle.z) {
+            pos = 0
+        }
+
+        //fourth
+        if (loc.x < middle.x && loc.z > middle.z) {
+            pos = 1
+        }
+
+        val extraDelay = 900L * pos
+        floor6GiantsSeparateDelay[uuid] = extraDelay
+
+        return extraDelay
     }
 
     fun handleChat(message: String) {
