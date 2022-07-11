@@ -310,6 +310,17 @@ class HideNotClickableItems {
     private fun hideSalvage(chestName: String, stack: ItemStack): Boolean {
         if (chestName != "Salvage Item") return false
 
+        if (ItemUtils.isRecombobulated(stack)) {
+            hideReason = "This item should not be salvaged! (Recombobulated)"
+            return true
+        }
+        for (line in stack.getLore()) {
+            if (line.contains("LEGENDARY DUNGEON")) {
+                hideReason = "This item should not be salvaged! (Legendary)"
+                return true
+            }
+        }
+
         val name = stack.cleanName()
 
         val armorSets = listOf(
@@ -346,17 +357,6 @@ class HideNotClickableItems {
 
         for (item in items) {
             if (name.endsWith(" $item")) {
-
-                if (ItemUtils.isRecombobulated(stack)) {
-                    hideReason = "This item should not be salvaged! (Recombobulated)"
-                    return true
-                }
-//                val rarity = stack.getSkyBlockRarity()
-//                if (rarity == ItemRarity.LEGENDARY || rarity == ItemRarity.MYTHIC) {
-//                    hideReason = "This item should not be salvaged! (Rarity)"
-//                    return true
-//                }
-
                 return false
             }
         }
