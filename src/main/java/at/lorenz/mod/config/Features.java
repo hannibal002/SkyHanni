@@ -161,54 +161,54 @@ public class Features {
         public boolean hideNotClickableItems = false;
 
         @Expose
-        @ConfigOption(name = "Item Number as Stack", desc = "")
+        @ConfigOption(name = "Item number as stack size", desc = "")
         @ConfigEditorAccordion(id = 2)
         public boolean filterTypes = false;
 
         @Expose
-        @ConfigOption(name = "Master Star Number", desc = "Shows the Tier of the Master Star.")
+        @ConfigOption(name = "Master Star Number", desc = "Show the Tier of the Master Star.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displayMasterStarNumber = false;
 
         @Expose
-        @ConfigOption(name = "Master Skull Number", desc = "Shows the tier of the Master Skull accessory.")
+        @ConfigOption(name = "Master Skull Number", desc = "Show the tier of the Master Skull accessory.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displayMasterSkullNumber = false;
 
         @Expose
-        @ConfigOption(name = "Dungeon Head Floor", desc = "Shows the correct floor for golden and diamond heads.")
+        @ConfigOption(name = "Dungeon Head Floor", desc = "Show the correct floor for golden and diamond heads.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displayDungeonHeadFloor = false;
 
         @Expose
-        @ConfigOption(name = "New Year Cake", desc = "Shows the Number of the Year of New Year Cakes.")
+        @ConfigOption(name = "New Year Cake", desc = "Show the Number of the Year of New Year Cakes.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displayNewYearCakeNumber = false;
 
         @Expose
-        @ConfigOption(name = "Pet Level", desc = "Shows the level of the pet when not maxed.")
+        @ConfigOption(name = "Pet Level", desc = "Show the level of the pet when not maxed.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displayPetLevel = false;
 
         @Expose
-        @ConfigOption(name = "Sack Name", desc = "Shows an abbreviation of the Sack name.")
+        @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displaySackName = false;
 
         @Expose
-        @ConfigOption(name = "Minion Tier", desc = "Shows the Minion Tier over Items.")
+        @ConfigOption(name = "Minion Tier", desc = "Show the Minion Tier over Items.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displayMinionTier = false;
 
         @Expose
-        @ConfigOption(name = "Ability Cooldown", desc = "Shows the cooldown of item abilities.")
+        @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")
         @ConfigEditorBoolean
         public boolean itemAbilityCooldown = false;
     }
@@ -224,7 +224,7 @@ public class Features {
     public static class Misc {
 
         @Expose
-        @ConfigOption(name = "Pet Display", desc = "Shows the current active pet.")
+        @ConfigOption(name = "Pet Display", desc = "Show the current active pet.")
         @ConfigEditorBoolean
         public boolean petDisplay = false;
 
@@ -239,7 +239,7 @@ public class Features {
         public boolean hideExpBottles = false;
 
         @Expose
-        @ConfigOption(name = "Config Button", desc = "Adds a button to the pause menu to configure the Lorenz mod.")
+        @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure the Lorenz mod.")
         @ConfigEditorBoolean
         public boolean configButtonOnPause = true;
     }
