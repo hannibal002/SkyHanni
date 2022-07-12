@@ -224,7 +224,7 @@ public class Features {
     public static class Misc {
 
         @Expose
-        @ConfigOption(name = "Pet Display", desc = "Show the current active pet.")
+        @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
         @ConfigEditorBoolean
         public boolean petDisplay = false;
 
