@@ -40,6 +40,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, dungeon.milestoneDisplayPos);
             return;
         }
+
+        if (runnableId.equals("dungeonDeathCounter")) {
+            editOverlay(activeConfigCategory, 200, 16, dungeon.deathCounterDisplay);
+            return;
+        }
     }
 
     @Expose
@@ -123,12 +128,12 @@ public class Features {
         public boolean highlightClickedBlocks = false;
 
         @Expose
-        @ConfigOption(name = "Boss Damage Indicator", desc = "Shows the missing health of a boss in the dungeon and the cooldown time until the boss becomes attackable.")
+        @ConfigOption(name = "Boss Damage Indicator", desc = "Show the missing health of a boss in the dungeon and the cooldown time until the boss becomes attackable.")
         @ConfigEditorBoolean
         public boolean bossDamageIndicator = false;
 
         @Expose
-        @ConfigOption(name = "Milestone Display", desc = "Shows the current milestone inside Dungeons.")
+        @ConfigOption(name = "Milestone Display", desc = "Show the current milestone inside Dungeons.")
         @ConfigEditorBoolean
         public boolean showMilestoneDisplay = false;
 
@@ -136,6 +141,16 @@ public class Features {
         @ConfigOption(name = "Milestone Display Position", desc = "")
         @ConfigEditorButton(runnableId = "dungeonMilestoneDisplay", buttonText = "Edit")
         public Position milestoneDisplayPos = new Position(10, 10, false, true);
+
+        @Expose
+        @ConfigOption(name = "Death Counter", desc = "Display the total amount of deaths in the current dungeon.")
+        @ConfigEditorBoolean
+        public boolean deathCounter = false;
+
+        @Expose
+        @ConfigOption(name = "Death Counter Position", desc = "")
+        @ConfigEditorButton(runnableId = "dungeonDeathCounter", buttonText = "Edit")
+        public Position deathCounterDisplay = new Position(10, 10, false, true);
     }
 
     public static class Items {
