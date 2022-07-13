@@ -118,6 +118,11 @@ public class Features {
         @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages inside dungeon.")
         @ConfigEditorBoolean
         public boolean dungeonMessages = false;
+
+        @Expose
+        @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from watcher and bosses inside dungeon.")
+        @ConfigEditorBoolean
+        public boolean dungeonBossMessages = false;
     }
 
     public static class Dungeon {

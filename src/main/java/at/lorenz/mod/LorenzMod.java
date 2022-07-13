@@ -67,6 +67,7 @@ public class LorenzMod {
         MinecraftForge.EVENT_BUS.register(new DungeonMilestoneDisplay());
         MinecraftForge.EVENT_BUS.register(new DungeonDeathCounter());
         MinecraftForge.EVENT_BUS.register(new DungeonCleanEnd());
+        MinecraftForge.EVENT_BUS.register(new DungeonBossMessages());
 
         Commands.init();
 

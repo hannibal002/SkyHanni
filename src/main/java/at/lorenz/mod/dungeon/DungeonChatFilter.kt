@@ -38,7 +38,6 @@ class DungeonChatFilter {
             isDamage(message) -> "damage"
             isAbility(message) -> "ability"
             isPuzzle(message) -> "puzzle"
-            isBoss(message) -> "boss"
             isEnd(message) -> "end"
 
             else -> ""
@@ -46,36 +45,6 @@ class DungeonChatFilter {
     }
 
     private fun isDoor(message: String): Boolean = message == "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
-
-    private fun isBoss(message: String): Boolean {
-        when {
-            message.matchRegex("§([cd4])\\[BOSS] (.*)") -> {
-                when {
-                    message.contains(" The Watcher§r§f: ") -> return true
-                    message.contains(" Bonzo§r§f: ") -> return true
-                    message.contains(" Scarf§r§f:") -> return true
-                    message.contains("Professor§r§f") -> return true
-                    message.contains(" Livid§r§f: ") || message.contains(" Enderman§r§f: ") -> return true
-                    message.contains(" Thorn§r§f: ") -> return true
-                    message.contains(" Sadan§r§f: ") -> return true
-                    message.contains(" Maxor§r§c: ") -> return true
-                    message.contains(" Storm§r§c: ") -> return true
-                    message.contains(" Goldor§r§c: ") -> return true
-                    message.contains(" Necron§r§c: ") -> return true
-                    message.contains(" §r§4§kWither King§r§c:") -> return true
-
-                    message.endsWith(" Necron§r§c: That is enough, fool!") -> return true
-                    message.endsWith(" Necron§r§c: Adventurers! Be careful of who you are messing with..") -> return true
-                    message.endsWith(" Necron§r§c: Before I have to deal with you myself.") -> return true
-                }
-            }
-
-            //M7 - Dragons
-            message == "§cThe Crystal withers your soul as you hold it in your hands!" -> return true
-            message == "§cIt doesn't seem like that is supposed to go there." -> return true
-        }
-        return false
-    }
 
     private fun isEnd(message: String): Boolean = when {
         message.matchRegex("(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!") -> true
