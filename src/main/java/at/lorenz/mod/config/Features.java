@@ -151,6 +151,11 @@ public class Features {
         @ConfigOption(name = "Death Counter Position", desc = "")
         @ConfigEditorButton(runnableId = "dungeonDeathCounter", buttonText = "Edit")
         public Position deathCounterDisplay = new Position(10, 10, false, true);
+
+        @Expose
+        @ConfigOption(name = "Clean End", desc = "Hide entities and particles after the boss in Floor 1 - 6 has died.")
+        @ConfigEditorBoolean
+        public boolean cleanEnd = false;
     }
 
     public static class Items {

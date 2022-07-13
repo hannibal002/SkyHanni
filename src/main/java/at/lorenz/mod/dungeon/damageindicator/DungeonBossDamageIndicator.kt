@@ -1,6 +1,7 @@
 package at.lorenz.mod.dungeon.damageindicator
 
 import at.lorenz.mod.LorenzMod
+import at.lorenz.mod.events.DamageIndicatorFinalBossEvent
 import at.lorenz.mod.events.DungeonEnterEvent
 import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.utils.LorenzColor
@@ -25,6 +26,7 @@ class DungeonBossDamageIndicator {
     var data = mutableMapOf<EntityLivingBase, EntityData>()
     private var bossFinder: DungeonBossFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
+    private val maxHealth = mutableMapOf<UUID, Double>()
 
     @SubscribeEvent
     fun onDungeonStart(event: DungeonEnterEvent) {
@@ -101,6 +103,7 @@ class DungeonBossDamageIndicator {
         try {
             val entity = event.entity
             val result = bossFinder?.shouldShow(entity) ?: return
+            checkLastBossDead(result.finalBoss, entity.entityId)
             val ignoreBlocks = result.ignoreBlocks
             val delayedStart = result.delayedStart
 
@@ -139,7 +142,11 @@ class DungeonBossDamageIndicator {
         }
     }
 
-    private val maxHealth = mutableMapOf<UUID, Double>()
+    private fun checkLastBossDead(finalBoss: Boolean, id: Int) {
+        if (finalBoss) {
+            DamageIndicatorFinalBossEvent(id).postAndCatch()
+        }
+    }
 
     private fun setMaxHealth(entity: EntityLivingBase, currentMaxHealth: Double) {
         maxHealth[entity.uniqueID!!] = currentMaxHealth
