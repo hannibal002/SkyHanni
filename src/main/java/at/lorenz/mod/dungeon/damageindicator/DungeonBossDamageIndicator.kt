@@ -34,13 +34,15 @@ class DungeonBossDamageIndicator {
     @SubscribeEvent(receiveCanceled = true)
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!LorenzMod.feature.dungeon.bossDamageIndicator) return
 
         bossFinder?.handleChat(event.message)
     }
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
+        if (!LorenzUtils.inDungeons) return
+        if (!LorenzMod.feature.dungeon.bossDamageIndicator) return
+
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
@@ -95,15 +97,12 @@ class DungeonBossDamageIndicator {
     @SubscribeEvent
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
         if (!LorenzUtils.inDungeons) return
-        if (!LorenzMod.feature.dungeon.bossDamageIndicator) return
 
         try {
             val entity = event.entity
-
-            var ignoreBlocks = false
-            var delayedStart = -1L
-            val show = bossFinder?.shouldShow(entity, { ignoreBlocks = it }, { delayedStart = it }) ?: false
-            if (!show) return
+            val result = bossFinder?.shouldShow(entity) ?: return
+            val ignoreBlocks = result.ignoreBlocks
+            val delayedStart = result.delayedStart
 
             val currentMaxHealth = event.entity.baseMaxHealth
 

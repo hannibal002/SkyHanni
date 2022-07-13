@@ -42,6 +42,7 @@ class DungeonBossFinder {
 
     //F5
     private var floor5lividEntity: EntityOtherPlayerMP? = null
+    private var floor5lividEntitySpawnTime = 0L
 
     //F6
     private var floor6Giants = false
@@ -50,26 +51,20 @@ class DungeonBossFinder {
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = 0L
 
-    internal fun shouldShow(
-        entity: EntityLivingBase,
-        ignoreBlocks: (Boolean) -> Unit,
-        delayedStart: (Long) -> Unit
-    ): Boolean {
+    internal fun shouldShow(entity: EntityLivingBase): EntityResult? {
         if (LorenzUtils.inDungeons) {
             if (DungeonData.isOneOf("F1", "M1")) {
                 if (floor1bonzo1) {
                     if (entity is EntityOtherPlayerMP) {
                         if (entity.name == "Bonzo ") {
-                            delayedStart(floor1bonzo1SpawnTime)
-                            return true
+                            return EntityResult(floor1bonzo1SpawnTime)
                         }
                     }
                 }
                 if (floor1bonzo2) {
                     if (entity is EntityOtherPlayerMP) {
                         if (entity.name == "Bonzo ") {
-                            delayedStart(floor1bonzo2SpawnTime)
-                            return true
+                            return EntityResult(floor1bonzo2SpawnTime)
                         }
                     }
                 }
@@ -81,16 +76,14 @@ class DungeonBossFinder {
                         if (floor2summons1) {
                             if (!floor2summonsDiedOnce.contains(entity)) {
                                 if (entity.health.toInt() != 0) {
-                                    delayedStart(floor2summons1SpawnTime)
-                                    return true
+                                    return EntityResult(floor2summons1SpawnTime)
                                 } else {
                                     floor2summonsDiedOnce.add(entity)
                                 }
                             }
                         }
                         if (floor2secondPhase) {
-                            delayedStart(floor2secondPhaseSpawnTime)
-                            return true
+                            return EntityResult(floor2secondPhaseSpawnTime)
                         }
                     }
                 }
@@ -100,8 +93,7 @@ class DungeonBossFinder {
                         //TODO only show scarf after (all/at least x) summons are dead?
                         val result = entity.name == "Scarf "
                         if (result) {
-                            delayedStart(floor2secondPhaseSpawnTime)
-                            return true
+                            return EntityResult(floor2secondPhaseSpawnTime)
                         }
                     }
                 }
@@ -123,9 +115,7 @@ class DungeonBossFinder {
                             findGuardians()
                         }
                         if (guardians.contains(entity)) {
-                            ignoreBlocks(true)
-                            delayedStart(floor3GuardianShieldSpawnTime)
-                            return true
+                            return EntityResult(floor3GuardianShieldSpawnTime, true)
                         }
                     }
                 }
@@ -133,18 +123,14 @@ class DungeonBossFinder {
                 if (floor3Professor) {
                     if (entity is EntityOtherPlayerMP) {
                         if (entity.name == "The Professor") {
-                            delayedStart(floor3ProfessorSpawnTime)
-                            ignoreBlocks(floor3ProfessorSpawnTime + 1_000 > System.currentTimeMillis())
-                            return true
+                            return EntityResult(floor3ProfessorSpawnTime, floor3ProfessorSpawnTime + 1_000 > System.currentTimeMillis())
                         }
                     }
                 }
                 if (floor3ProfessorGuardianPrepare) {
                     if (entity is EntityOtherPlayerMP) {
                         if (entity.name == "The Professor") {
-                            delayedStart(floor3ProfessorGuardianPrepareSpawnTime)
-                            ignoreBlocks(true)
-                            return true
+                            return EntityResult(floor3ProfessorGuardianPrepareSpawnTime, true)
                         }
                     }
                 }
@@ -152,7 +138,7 @@ class DungeonBossFinder {
                 if (entity is EntityGuardian) {
                     if (floor3ProfessorGuardian) {
                         if (entity == floor3ProfessorGuardianEntity) {
-                            return true
+                            return EntityResult()
                         }
                     }
                 }
@@ -160,10 +146,9 @@ class DungeonBossFinder {
 
             if (DungeonData.isOneOf("F5", "M5")) {
                 if (entity is EntityOtherPlayerMP) {
-                    val floor5lividEntity1 = floor5lividEntity
-                    if (entity == floor5lividEntity1) {
-                        ignoreBlocks(entity.getLorenzVec().distance(5.5, 69.0, -2.5) < 5)
-                        return true
+                    if (entity == floor5lividEntity) {
+//                        ignoreBlocks(entity.getLorenzVec().distance(5.5, 69.0, -2.5) < 5)
+                        return EntityResult(floor5lividEntitySpawnTime, true)
                     }
                 }
             }
@@ -172,21 +157,17 @@ class DungeonBossFinder {
                 if (entity is EntityGiantZombie && !entity.isInvisible) {
                     if (floor6Giants && entity.posY > 68) {
                         val extraDelay = checkExtraF6GiantsDelay(entity)
-                        ignoreBlocks(floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis())
-
-                        delayedStart(floor6GiantsSpawnTime + extraDelay)
-                        return true
+                        return EntityResult(floor6GiantsSpawnTime + extraDelay, floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis())
                     }
 
                     if (floor6Sadan) {
-                        delayedStart(floor6SadanSpawnTime)
-                        return true
+                        return EntityResult(floor6SadanSpawnTime)
                     }
                 }
             }
         }
 
-        return false
+        return null
     }
 
     private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Long {
@@ -300,8 +281,9 @@ class DungeonBossFinder {
 
 
             //F5
-            "§c[BOSS] Livid§r§f: I respect you for making it to here, but I'll be your undoing." -> {
+            "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
                 floor5lividEntity = findLivid()
+                floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
             }
 
             //F6
