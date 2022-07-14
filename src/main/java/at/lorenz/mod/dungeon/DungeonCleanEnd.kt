@@ -39,9 +39,6 @@ class DungeonCleanEnd {
 
         if (!bossDone) return false
 
-        //TODO remove
-        if (Minecraft.getMinecraft().thePlayer.isSneaking) return false
-
         return true
     }
 

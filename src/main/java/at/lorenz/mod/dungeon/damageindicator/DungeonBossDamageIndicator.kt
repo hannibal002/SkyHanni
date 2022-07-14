@@ -1,6 +1,7 @@
 package at.lorenz.mod.dungeon.damageindicator
 
 import at.lorenz.mod.LorenzMod
+import at.lorenz.mod.dungeon.DungeonData
 import at.lorenz.mod.events.DamageIndicatorFinalBossEvent
 import at.lorenz.mod.events.DungeonEnterEvent
 import at.lorenz.mod.events.LorenzChatEvent
@@ -26,7 +27,7 @@ class DungeonBossDamageIndicator {
     var data = mutableMapOf<EntityLivingBase, EntityData>()
     private var bossFinder: DungeonBossFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
-    private val maxHealth = mutableMapOf<UUID, Double>()
+    private val maxHealth = mutableMapOf<UUID, Int>()
 
     @SubscribeEvent
     fun onDungeonStart(event: DungeonEnterEvent) {
@@ -107,19 +108,36 @@ class DungeonBossDamageIndicator {
             val ignoreBlocks = result.ignoreBlocks
             val delayedStart = result.delayedStart
 
-            val currentMaxHealth = event.entity.baseMaxHealth
 
-            val debugMaxHealth = getMaxHealthFor(event.entity)
-            val biggestHealth: Double
-            val health = event.entity.health + 0.0
-            if (debugMaxHealth == 0.0) {
-                biggestHealth = max(currentMaxHealth, health)
-                setMaxHealth(event.entity, biggestHealth)
+            var health = event.entity.health.toInt()
+            val maxHealth: Int
+            if (DungeonData.isOneOf("F4")) {
+                val hitPoints = when (health) {
+                    300_000 -> 4
+                    222_000 -> 3
+                    144_000 -> 2
+                    66_000 -> 1
+                    else -> {
+                        LorenzUtils.error("Unexpected health of thorn in F4! ($health)")
+                        return
+                    }
+                }
+
+                health = hitPoints
+                maxHealth = 4
             } else {
-                biggestHealth = debugMaxHealth
+                val biggestHealth = getMaxHealthFor(event.entity)
+
+                if (biggestHealth == 0) {
+                    val currentMaxHealth = event.entity.baseMaxHealth.toInt()
+                    maxHealth = max(currentMaxHealth, health)
+                    setMaxHealth(event.entity, maxHealth)
+                } else {
+                    maxHealth = biggestHealth
+                }
             }
 
-            val percentage = health / biggestHealth
+            val percentage = health.toDouble() / maxHealth.toDouble()
             val color = when {
                 percentage > 0.9 -> LorenzColor.DARK_GREEN
                 percentage > 0.75 -> LorenzColor.GREEN
@@ -148,12 +166,12 @@ class DungeonBossDamageIndicator {
         }
     }
 
-    private fun setMaxHealth(entity: EntityLivingBase, currentMaxHealth: Double) {
+    private fun setMaxHealth(entity: EntityLivingBase, currentMaxHealth: Int) {
         maxHealth[entity.uniqueID!!] = currentMaxHealth
     }
 
-    private fun getMaxHealthFor(entity: EntityLivingBase): Double {
-        return maxHealth.getOrDefault(entity.uniqueID!!, 0.0)
+    private fun getMaxHealthFor(entity: EntityLivingBase): Int {
+        return maxHealth.getOrDefault(entity.uniqueID!!, 0)
     }
 
     @SubscribeEvent
