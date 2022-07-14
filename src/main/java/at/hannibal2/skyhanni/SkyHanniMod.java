@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.dungeon.*;
 import at.hannibal2.skyhanni.dungeon.damageindicator.DungeonBossDamageIndicator;
+import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
 import at.hannibal2.skyhanni.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.items.ItemDisplayOverlayFeatures;
 import at.hannibal2.skyhanni.items.abilitycooldown.ItemAbilityCooldown;
@@ -65,6 +66,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new DungeonDeathCounter());
         MinecraftForge.EVENT_BUS.register(new DungeonCleanEnd());
         MinecraftForge.EVENT_BUS.register(new DungeonBossMessages());
+        MinecraftForge.EVENT_BUS.register(new TrophyFishMessages());
 
         Commands.init();
 

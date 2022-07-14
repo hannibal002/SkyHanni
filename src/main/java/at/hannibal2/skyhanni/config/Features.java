@@ -13,7 +13,9 @@ import net.minecraft.client.Minecraft;
 public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
+        }, () -> {
+        }, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
     }
 
     public void executeRunnable(String runnableId) {
@@ -65,6 +67,10 @@ public class Features {
     @Expose
     @Category(name = "Bazaar", desc = "Bazaar settings.")
     public Bazaar bazaar = new Bazaar();
+
+    @Expose
+    @Category(name = "Fishing", desc = "Fishing stuff.")
+    public Fishing fishing = new Fishing();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
@@ -237,6 +243,20 @@ public class Features {
         @ConfigOption(name = "Order Helper", desc = "Show visual hints inside the Bazaar Manage Order view when items are ready to pickup or outbid.")
         @ConfigEditorBoolean
         public boolean orderHelper = false;
+    }
+
+    public static class Fishing {
+
+        @Expose
+        @ConfigOption(name = "Trophy Counter", desc = "Counts every single Trohy message from chat and tells you how many you got already.")
+        @ConfigEditorBoolean
+        public boolean trophyCounter = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
+        @ConfigEditorBoolean
+        public boolean trophyFishBronzeHider = false;
+
     }
 
     public static class Misc {
