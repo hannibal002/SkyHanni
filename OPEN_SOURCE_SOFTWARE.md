@@ -3,7 +3,7 @@
 SkyHanni would not be possible without the following open source software:
 
 | Software                                                                       | License                                                                                                           |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+|--------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | [Apache Commons Lang](https://github.com/apache/commons-lang)                  | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)                                                     |
 | [GSON](https://github.com/google/gson)                                         | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)                                                     |
 | [Minecraft Forge](https://github.com/MinecraftForge/MinecraftForge/tree/1.8.9) | [Minecraft Forge License](https://github.com/MinecraftForge/MinecraftForge/blob/1.8.9/MinecraftForge-License.txt) |
