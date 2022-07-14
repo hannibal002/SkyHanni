@@ -1,7 +1,7 @@
 package at.lorenz.mod.utils
 
 import at.lorenz.mod.utils.LorenzUtils.removeColorCodes
-import com.thatgravyboat.skyblockhud_2.core.config.Position
+import com.thatgravyboat.amod.core.config.Position
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager

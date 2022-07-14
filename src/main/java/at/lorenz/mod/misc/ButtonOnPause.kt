@@ -2,8 +2,8 @@ package at.lorenz.mod.misc
 
 import at.lorenz.mod.LorenzMod
 import at.lorenz.mod.utils.LorenzUtils
-import com.thatgravyboat.skyblockhud_2.config.SBHConfigEditor
-import com.thatgravyboat.skyblockhud_2.core.GuiScreenElementWrapper
+import com.thatgravyboat.amod.config.ConfigEditor
+import com.thatgravyboat.amod.core.GuiScreenElementWrapper
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -17,7 +17,11 @@ class ButtonOnPause {
         if (!LorenzUtils.isOnHypixel) return
 
         if (LorenzMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
-            LorenzMod.screenToOpen = GuiScreenElementWrapper(SBHConfigEditor(LorenzMod.feature))
+            LorenzMod.screenToOpen = GuiScreenElementWrapper(
+                ConfigEditor(
+                    LorenzMod.feature
+                )
+            )
         }
     }
 

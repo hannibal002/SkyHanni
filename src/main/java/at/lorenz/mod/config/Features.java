@@ -2,18 +2,18 @@ package at.lorenz.mod.config;
 
 import at.lorenz.mod.LorenzMod;
 import com.google.gson.annotations.Expose;
-import com.thatgravyboat.skyblockhud_2.config.SBHConfigEditor;
-import com.thatgravyboat.skyblockhud_2.core.GuiElement;
-import com.thatgravyboat.skyblockhud_2.core.GuiScreenElementWrapper;
-import com.thatgravyboat.skyblockhud_2.core.config.Position;
-import com.thatgravyboat.skyblockhud_2.core.config.annotations.*;
-import com.thatgravyboat.skyblockhud_2.core.config.gui.GuiPositionEditor;
+import com.thatgravyboat.amod.config.ConfigEditor;
+import com.thatgravyboat.amod.core.GuiElement;
+import com.thatgravyboat.amod.core.GuiScreenElementWrapper;
+import com.thatgravyboat.amod.core.config.Position;
+import com.thatgravyboat.amod.core.config.annotations.*;
+import com.thatgravyboat.amod.core.config.gui.GuiPositionEditor;
 import net.minecraft.client.Minecraft;
 
 public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new SBHConfigEditor(LorenzMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> LorenzMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(LorenzMod.feature, activeConfig))));
     }
 
     public void executeRunnable(String runnableId) {
@@ -21,8 +21,8 @@ public class Features {
         if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenElementWrapper) {
             GuiScreenElementWrapper wrapper = (GuiScreenElementWrapper) Minecraft.getMinecraft().currentScreen;
             GuiElement element = wrapper.element;
-            if (element instanceof SBHConfigEditor) {
-                activeConfigCategory = ((SBHConfigEditor) element).getSelectedCategoryName();
+            if (element instanceof ConfigEditor) {
+                activeConfigCategory = ((ConfigEditor) element).getSelectedCategoryName();
             }
         }
 

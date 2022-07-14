@@ -15,7 +15,7 @@ import at.lorenz.mod.misc.*;
 import at.lorenz.mod.test.LorenzTest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.thatgravyboat.skyblockhud_2.commands.Commands;
+import com.thatgravyboat.amod.commands.Commands;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import net.minecraft.client.Minecraft;
@@ -33,12 +33,8 @@ public class LorenzMod {
     public static final String MODID = "lorenzmod";
     public static final String VERSION = "0.6";
 
-    //    public static SBHConfig config; //TODO delete
-
     public static Features feature;
     private File configFile;
-
-    //    private static final Set<String> SKYBLOCK_IN_ALL_LANGUAGES = Sets.newHashSet("SKYBLOCK", "\u7A7A\u5C9B\u751F\u5B58");
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
@@ -74,35 +70,6 @@ public class LorenzMod {
         MinecraftForge.EVENT_BUS.register(new LorenzTest());
         MinecraftForge.EVENT_BUS.register(new ButtonOnPause());
 
-        //        MinecraftForge.EVENT_BUS.register(new LeaderboardGetter());
-        //        MinecraftForge.EVENT_BUS.register(new SeasonDateHandler());
-        //        MinecraftForge.EVENT_BUS.register(new LocationHandler());
-        //        MinecraftForge.EVENT_BUS.register(new IslandHandler());
-        //        MinecraftForge.EVENT_BUS.register(new TimeHandler());
-        //        MinecraftForge.EVENT_BUS.register(new CurrencyHandler());
-        //        MinecraftForge.EVENT_BUS.register(new SlayerHandler());
-        //        MinecraftForge.EVENT_BUS.register(new DungeonHandler());
-        //        MinecraftForge.EVENT_BUS.register(new MinesHandler());
-        //        MinecraftForge.EVENT_BUS.register(new FarmingIslandHandler());
-        //
-        //        MinecraftForge.EVENT_BUS.register(new TrackerHandler());
-        //        MinecraftForge.EVENT_BUS.register(new KillTracking());
-        //
-        //        MinecraftForge.EVENT_BUS.register(new HeldItemHandler());
-        //
-        //        ClientRegistry.registerKeyBinding(KeyBindings.map);
-        //
-        //        MinecraftForge.EVENT_BUS.register(new ComponentHandler());
-        //        MinecraftForge.EVENT_BUS.register(new ActionBarParsing());
-        //        MinecraftForge.EVENT_BUS.register(new CrystalWaypoints());
-        //        MinecraftForge.EVENT_BUS.register(new FarmHouseHandler());
-        //        MinecraftForge.EVENT_BUS.register(new WarpHandler());
-        //        MinecraftForge.EVENT_BUS.register(new CooldownHandler());
-
-        //
-        //        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new NpcDialogue());
-        //        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Textures());
-        //
         configDirectory = new File("mods/LorenzMod/config");
         try {
             //noinspection ResultOfMethodCallIgnored
@@ -134,74 +101,6 @@ public class LorenzMod {
             }
         } catch (IOException ignored) {}
     }
-
-    //    @EventHandler
-    //    public void postInit(FMLPostInitializationEvent event) {
-    //        MinecraftForge.EVENT_BUS.register(new OverlayHud());
-    //        MinecraftForge.EVENT_BUS.register(new RPGHud());
-    //        MinecraftForge.EVENT_BUS.register(new DungeonOverlay());
-    //        MinecraftForge.EVENT_BUS.register(new BossbarHandler());
-    //        MinecraftForge.EVENT_BUS.register(new MapHandler());
-    //        MinecraftForge.EVENT_BUS.register(new MiningHud());
-    //        MinecraftForge.EVENT_BUS.register(new NpcDialogue());
-    //    }
-
-    //    @EventHandler
-    //    public void loadComplete(FMLLoadCompleteEvent event) {
-    //        TrackerFileLoader.loadTrackersFile();
-    //
-    //        if (TrackerFileLoader.loadTrackerStatsFile()) {
-    //            TrackerFileLoader.saveTrackerStatsFile();
-    //        }
-    //    }
-
-    //    @SubscribeEvent
-    //    public void onLeaveServer(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-    //        TrackerFileLoader.saveTrackerStatsFile();
-    //    }
-
-    public static boolean hasSkyblockScoreboard() {
-        //        Minecraft mc = Minecraft.getMinecraft();
-        //
-        //        if (mc != null && mc.theWorld != null) {
-        //            Scoreboard scoreboard = mc.theWorld.getScoreboard();
-        //            ScoreObjective sidebarObjective = scoreboard.getObjectiveInDisplaySlot(1);
-        //            if (sidebarObjective != null) {
-        //                String objectiveName = sidebarObjective.getDisplayName().replaceAll("(?i)\\u00A7.", "");
-        //                for (String skyblock : SKYBLOCK_IN_ALL_LANGUAGES) {
-        //                    if (objectiveName.startsWith(skyblock)) {
-        //                        return true;
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        return false;
-    }
-
-    //    @SubscribeEvent
-    //    public void onTooltip(ItemTooltipEvent event) {
-    //        if (event.itemStack != null && Keyboard.isKeyDown(Keyboard.KEY_BACKSLASH)) {
-    //            try {
-    //                StringSelection clipboard = new StringSelection(event.itemStack.serializeNBT().toString());
-    //                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboard, clipboard);
-    //            } catch (Exception ignored) {}
-    //        }
-    //    }
-
-    //    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    //    public void onStatusBar(ClientChatReceivedEvent event) {
-    //        String message = Utils.removeColor(event.message.getUnformattedText()).toLowerCase().trim();
-    //
-    //        if (message.startsWith("your profile was changed to:")) {
-    //            String stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim();
-    //            MinecraftForge.EVENT_BUS.post(new ProfileSwitchedEvent(stripped));
-    //        }
-    //        if (message.startsWith("you are playing on profile:")) {
-    //            String stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim();
-    //            MinecraftForge.EVENT_BUS.post(new ProfileJoinedEvent(stripped));
-    //        }
-    //    }
 
     public static GuiScreen screenToOpen = null;
     private static int screenTicks = 0;
