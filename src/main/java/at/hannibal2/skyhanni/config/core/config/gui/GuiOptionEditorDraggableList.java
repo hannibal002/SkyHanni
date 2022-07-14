@@ -4,11 +4,10 @@ import static at.hannibal2.skyhanni.config.GuiTextures.DELETE;
 import static at.hannibal2.skyhanni.config.GuiTextures.button_tex;
 
 import at.hannibal2.skyhanni.config.core.config.struct.ConfigProcessor;
-import at.hannibal2.skyhanni.config.utils.Utils;
 import at.hannibal2.skyhanni.config.core.util.lerp.LerpUtils;
 import at.hannibal2.skyhanni.config.core.util.render.RenderUtils;
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils;
-
+import at.hannibal2.skyhanni.config.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;

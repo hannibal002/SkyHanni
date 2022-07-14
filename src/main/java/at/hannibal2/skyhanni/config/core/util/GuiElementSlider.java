@@ -4,7 +4,6 @@ import static at.hannibal2.skyhanni.config.GuiTextures.*;
 
 import at.hannibal2.skyhanni.config.core.GuiElement;
 import at.hannibal2.skyhanni.config.utils.Utils;
-
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;

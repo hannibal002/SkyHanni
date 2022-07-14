@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.core.config.gui;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.utils.Utils;
-
 import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
