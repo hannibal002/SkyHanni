@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.misc
 
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
@@ -59,5 +62,22 @@ class HypixelData {
         hypixel = false
         skyblock = false
         dungeon = false
+    }
+
+    @SubscribeEvent
+    fun onStatusBar(event: LorenzChatEvent) {
+        if (!hypixel) return
+
+        val message = event.message.removeColorCodes().lowercase()
+
+        if (message.startsWith("your profile was changed to:")) {
+            val stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim();
+            ProfileJoinEvent(stripped).postAndCatch()
+        }
+        if (message.startsWith("you are playing on profile:")) {
+            val stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim();
+            ProfileJoinEvent(stripped).postAndCatch()
+
+        }
     }
 }

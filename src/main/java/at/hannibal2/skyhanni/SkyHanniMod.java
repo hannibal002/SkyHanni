@@ -48,6 +48,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new HypixelData());
         MinecraftForge.EVENT_BUS.register(new DungeonData());
         MinecraftForge.EVENT_BUS.register(new ScoreboardData());
+        MinecraftForge.EVENT_BUS.register(new ApiData());
 
         MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatFilter());
