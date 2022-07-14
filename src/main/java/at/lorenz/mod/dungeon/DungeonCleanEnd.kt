@@ -10,6 +10,7 @@ import at.lorenz.mod.utils.LorenzUtils.matchRegex
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityGuardian
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.event.world.WorldEvent
@@ -90,6 +91,18 @@ class DungeonCleanEnd {
         val entity = event.entity
 
         if (entity == Minecraft.getMinecraft().thePlayer) return
+
+        if (LorenzMod.feature.dungeon.cleanEndF3IgnoreGuardians) {
+            if (DungeonData.isOneOf("F3", "M3")) {
+                if (entity is EntityGuardian) {
+                    if (entity.entityId != lastBossId) {
+                        if (Minecraft.getMinecraft().thePlayer.isSneaking) {
+                            return
+                        }
+                    }
+                }
+            }
+        }
 
         if (chestsSpawned) {
             if (entity is EntityArmorStand) {
