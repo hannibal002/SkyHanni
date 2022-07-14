@@ -256,7 +256,6 @@ public class Features {
         @ConfigOption(name = "Hide Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
         @ConfigEditorBoolean
         public boolean trophyFishBronzeHider = false;
-
     }
 
     public static class Misc {

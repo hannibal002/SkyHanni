@@ -21,6 +21,7 @@ object LorenzUtils {
         get() = HypixelData.hypixel && HypixelData.skyblock && HypixelData.dungeon
 
     const val DEBUG_PREFIX = "[Debug] §7"
+    private val log = LorenzLogger("chat/mod_sent")
 
     fun debug(message: String) {
         internalChat(DEBUG_PREFIX + message)
@@ -39,6 +40,7 @@ object LorenzUtils {
     }
 
     private fun internalChat(message: String) {
+        log.log(message)
         val minecraft = Minecraft.getMinecraft()
         if (minecraft == null) {
             println(message)
