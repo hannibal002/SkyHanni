@@ -1,6 +1,7 @@
 package at.lorenz.mod.dungeon.damageindicator
 
 import at.lorenz.mod.dungeon.DungeonData
+import at.lorenz.mod.test.LorenzTest
 import at.lorenz.mod.utils.LorenzUtils
 import at.lorenz.mod.utils.LorenzUtils.baseMaxHealth
 import at.lorenz.mod.utils.LorenzUtils.matchRegex
@@ -10,6 +11,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntityGhast
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
 import java.util.*
@@ -145,6 +147,16 @@ class DungeonBossFinder {
                         }
                     }
                 }
+            }
+
+            if (DungeonData.isOneOf("F4", "M4")) {
+                if (entity is EntityGhast) {
+                    val health = LorenzUtils.formatDouble(entity.health.toDouble())
+                    LorenzTest.enabled = true
+                    LorenzTest.text = "thorn has $health hp!"
+                    return EntityResult(ignoreBlocks = true, finalBoss = true)
+                }
+
             }
 
             if (DungeonData.isOneOf("F5", "M5")) {
