@@ -31,7 +31,7 @@ object ItemUtils {
 
     fun ItemStack.getLore() = ItemUtil.getItemLore(this)
 
-    fun isCoOpSoulBound(stack: ItemStack): Boolean = stack.getLore().any { it.contains("Co-op Soulbound") }
+    fun isSoulBound(stack: ItemStack): Boolean = stack.getLore().any { it.contains(" Soulbound ") }
 
     fun isRecombobulated(stack: ItemStack): Boolean = stack.getLore().any { it.contains("§k") }
 

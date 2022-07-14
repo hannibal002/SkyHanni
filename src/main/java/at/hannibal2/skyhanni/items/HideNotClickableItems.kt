@@ -171,7 +171,10 @@ class HideNotClickableItems {
             return true
         }
 
-        if (stack.cleanName().endsWith(" Bait")) return false
+        if (stack.getLore().any { it.removeColorCodes() == "Fishing Bait" }) {
+            return false
+        }
+//        if (stack.cleanName().endsWith(" Bait")) return false
 
         hideReason = "This item is not a fishing bait!"
         return true
@@ -201,8 +204,8 @@ class HideNotClickableItems {
     private fun hideTrade(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
-        if (ItemUtils.isCoOpSoulBound(stack)) {
-            hideReason = "Coop-Soulbound items cannot be traded!"
+        if (ItemUtils.isSoulBound(stack)) {
+            hideReason = "Soulbound items cannot be traded!"
             return true
         }
 
@@ -262,6 +265,7 @@ class HideNotClickableItems {
                 "Lever" -> return false
 
                 "Fairy's Galoshes" -> return false
+                "Blaze Powder" -> return false
             }
             if (name.endsWith("Gem Rune I")) return false
 
@@ -347,8 +351,13 @@ class HideNotClickableItems {
         items.add("Zombie Commander Whip")
         items.add("Sniper Bow")
 
+        //Crimson essence
+        items.add("Blade of the Volcano")
+        items.add("Slug Boots")
+        items.add("Flaming Chestplate")
+
         for (item in items) {
-            if (name.endsWith(" $item")) {
+            if (name.endsWith(item)) {
                 return false
             }
         }
@@ -391,8 +400,8 @@ class HideNotClickableItems {
     }
 
     private fun isNotAuctionable(stack: ItemStack): Boolean {
-        if (ItemUtils.isCoOpSoulBound(stack)) {
-            hideReason = "Coop-Soulbound items cannot be auctioned!"
+        if (ItemUtils.isSoulBound(stack)) {
+            hideReason = "Soulbound items cannot be auctioned!"
             return true
         }
 
