@@ -161,6 +161,11 @@ public class Features {
         @ConfigOption(name = "Clean End", desc = "Hide entities and particles after the boss in Floor 1 - 6 has died.")
         @ConfigEditorBoolean
         public boolean cleanEnd = false;
+
+        @Expose
+        @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 guardians from the clean end feature when sneaking. Makes it easier to kill them after the boss died already. Thanks hypixel.")
+        @ConfigEditorBoolean
+        public boolean cleanEndF3IgnoreGuardians = false;
     }
 
     public static class Items {
