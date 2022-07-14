@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![discord badge](https://img.shields.io/discord/516977525906341928?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/moulberry)
+[![discord badge](https://img.shields.io/discord/516977525906341928?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/8DXVN4BJz3)
 [![made with java](https://img.shields.io/badge/Made%20With-Java-orange?style=for-the-badge&logo=java&logocolor=white)](https://www.java.com/)
 
 </div>
