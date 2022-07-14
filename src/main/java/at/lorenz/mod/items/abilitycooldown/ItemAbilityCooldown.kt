@@ -98,7 +98,6 @@ class ItemAbilityCooldown {
         if (!isEnabled()) return
 
         val item = event.stack ?: return
-//        if (item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
         if (item.stackSize != 1) return
 
         var stackTip = ""
@@ -124,96 +123,6 @@ class ItemAbilityCooldown {
             GlStateManager.enableDepth()
         }
     }
-
-//    @SubscribeEvent
-//    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Pre) {
-//        if (!isEnabled()) return
-//
-//        val item = event.stack ?: return
-////        if (item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
-//        if (item.stackSize != 1) return
-//
-//        var stackTip = ""
-//
-//        val isActive = Minecraft.getMinecraft().currentScreen == null
-//        val itemText = items.filter { it.key == item && it.value.active }
-//            .firstNotNullOfOrNull { it.value }
-//
-//        if (itemText != null) return
-////        if (!isActive && !itemText.active) return
-//
-//        stackTip = "T"
-//
-////        items.filter { it.key == item }
-////            .forEach { stackTip = it.value.color.getChatColor() + it.value.text }
-//
-//        if (stackTip.isNotEmpty()) {
-//            GlStateManager.disableLighting()
-//            GlStateManager.disableDepth()
-//            GlStateManager.disableBlend()
-//            event.fr.drawStringWithShadow(
-//                stackTip,
-//                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
-//                (event.y + 9).toFloat(),
-//                16777215
-//            )
-//            GlStateManager.enableLighting()
-//            GlStateManager.enableDepth()
-//        }
-//    }
-
-//    @SubscribeEvent
-//    fun onGuiDrawEvent(event: GuiContainerEvent.BackgroundDrawnEvent) {
-//        if (!isEnabled())
-//
-//        val guiContainer: GuiContainer? = event.gui
-//        if (guiContainer != null && guiContainer !is GuiInventory) return
-//        val chest = guiContainer.inventorySlots
-//
-////        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-////        if (chestName != "Spirit Leap") return
-//
-//        for (slot in chest.inventorySlots) {
-//            if (slot == null) continue
-////            if (slot.slotNumber == slot.slotIndex) continue
-//            if (slot.stack == null) continue
-//
-//            val stack = slot.stack
-//
-////            for ((item, text) in map) {
-////                if (item == stack) {
-////                    slot highlight text.color
-////                }
-////            }
-//            map.filter { it.key == stack }.forEach { slot highlight it.value.color }
-//
-////            slot highlight LorenzColor.WHITE
-//
-////            val displayName = stack.displayName
-////            if (displayName == " ") continue
-//
-////            val itemLore = stack.getLore()
-////            if (itemLore.size == 1 && itemLore[0] == "§eClick to teleport!") {
-////
-////                if (displayName.contains(witherDoorName)) {
-////                    if (lastWitherDoorOpened + 10_000 > System.currentTimeMillis()) {
-////                        slot highlight LorenzColor.YELLOW
-////                        return
-////                    }
-////                }
-////                if (displayName.contains(teleportName)) {
-////                    if (lastTeleport + 10_000 > System.currentTimeMillis()) {
-////                        slot highlight LorenzColor.AQUA
-////                        return
-////                    }
-////                }
-////            } else {
-////                //TODO hide the item totally?
-////                slot highlight LorenzColor.RED
-////            }
-//
-//        }
-//    }
 
     private fun hasAbility(itemName: String): Ability? {
         for (ability in Ability.values()) {

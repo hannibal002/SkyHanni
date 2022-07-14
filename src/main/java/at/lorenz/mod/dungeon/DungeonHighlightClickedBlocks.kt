@@ -4,7 +4,7 @@ import at.lorenz.mod.events.LorenzChatEvent
 import at.lorenz.mod.events.PacketEvent
 import at.lorenz.mod.utils.*
 import at.lorenz.mod.utils.BlockUtils.getBlockAt
-import at.lorenz.mod.utils.RenderUtils.drawSkytilsColor
+import at.lorenz.mod.utils.RenderUtils.drawColor
 import at.lorenz.mod.utils.RenderUtils.drawString
 import at.lorenz.mod.LorenzMod
 import net.minecraft.init.Blocks
@@ -78,7 +78,7 @@ class DungeonHighlightClickedBlocks {
 
         blocks.removeAll { System.currentTimeMillis() > it.time + 3000 }
         blocks.forEach {
-            event.drawSkytilsColor(it.position, it.color)
+            event.drawColor(it.position, it.color)
             event.drawString(it.position.add(0.5, 0.5, 0.5), it.displayText, true)
         }
     }
