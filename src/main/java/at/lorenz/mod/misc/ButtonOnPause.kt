@@ -2,8 +2,8 @@ package at.lorenz.mod.misc
 
 import at.lorenz.mod.LorenzMod
 import at.lorenz.mod.utils.LorenzUtils
-import com.thatgravyboat.amod.config.ConfigEditor
-import com.thatgravyboat.amod.core.GuiScreenElementWrapper
+import at.lorenz.mod.config.config.ConfigEditor
+import at.lorenz.mod.config.core.GuiScreenElementWrapper
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraftforge.client.event.GuiScreenEvent

@@ -15,7 +15,7 @@ import at.lorenz.mod.misc.*;
 import at.lorenz.mod.test.LorenzTest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.thatgravyboat.amod.commands.Commands;
+import at.lorenz.mod.config.commands.Commands;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import net.minecraft.client.Minecraft;
