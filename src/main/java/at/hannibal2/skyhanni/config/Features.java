@@ -48,6 +48,9 @@ public class Features {
     }
 
     @Expose
+    public String apiKey = "";
+
+    @Expose
     @Category(name = "Chat", desc = "Chat related features.")
     public Chat chat = new Chat();
 
