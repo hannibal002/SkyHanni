@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.commands;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
 import at.hannibal2.skyhanni.config.config.ConfigEditor;
+import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
 import org.apache.commons.lang3.StringUtils;

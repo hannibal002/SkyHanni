@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.config.core.config.struct;
 
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import at.hannibal2.skyhanni.config.Features;
+import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import at.hannibal2.skyhanni.config.core.config.gui.*;
-
 import com.google.gson.annotations.Expose;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
