@@ -353,8 +353,12 @@ class HideNotClickableItems {
 
         //Crimson essence
         items.add("Blade of the Volcano")
+        items.add("Staff of the Volcano")
         items.add("Slug Boots")
         items.add("Flaming Chestplate")
+        items.add("Moogma Leggings")
+        items.add("Rampart Leggings")
+        items.add("Rampart Boots")
 
         for (item in items) {
             if (name.endsWith(item)) {
