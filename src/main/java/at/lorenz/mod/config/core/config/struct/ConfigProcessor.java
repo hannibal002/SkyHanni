@@ -1,9 +1,9 @@
 package at.lorenz.mod.config.core.config.struct;
 
 import at.lorenz.mod.config.Features;
-import com.google.gson.annotations.Expose;
 import at.lorenz.mod.config.core.config.annotations.*;
 import at.lorenz.mod.config.core.config.gui.*;
+import com.google.gson.annotations.Expose;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.List;
