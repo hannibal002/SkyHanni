@@ -1,13 +1,13 @@
 package at.lorenz.mod.config;
 
 import at.lorenz.mod.LorenzMod;
-import com.google.gson.annotations.Expose;
 import at.lorenz.mod.config.config.ConfigEditor;
 import at.lorenz.mod.config.core.GuiElement;
 import at.lorenz.mod.config.core.GuiScreenElementWrapper;
 import at.lorenz.mod.config.core.config.Position;
 import at.lorenz.mod.config.core.config.annotations.*;
 import at.lorenz.mod.config.core.config.gui.GuiPositionEditor;
+import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 
 public class Features {

@@ -4,7 +4,6 @@ import static at.lorenz.mod.config.GuiTextures.DISCORD;
 
 import at.lorenz.mod.LorenzMod;
 import at.lorenz.mod.config.Features;
-import com.google.common.collect.Lists;
 import at.lorenz.mod.config.core.GlScissorStack;
 import at.lorenz.mod.config.core.GuiElement;
 import at.lorenz.mod.config.core.config.gui.GuiOptionEditor;
@@ -14,6 +13,7 @@ import at.lorenz.mod.config.core.util.lerp.LerpUtils;
 import at.lorenz.mod.config.core.util.lerp.LerpingInteger;
 import at.lorenz.mod.config.core.util.render.RenderUtils;
 import at.lorenz.mod.config.core.util.render.TextRenderUtils;
+import com.google.common.collect.Lists;
 import java.awt.*;
 import java.net.URI;
 import java.util.*;
