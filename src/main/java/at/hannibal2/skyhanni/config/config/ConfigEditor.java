@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.config.core.util.lerp.LerpUtils;
 import at.hannibal2.skyhanni.config.core.util.lerp.LerpingInteger;
 import at.hannibal2.skyhanni.config.core.util.render.RenderUtils;
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils;
-
 import com.google.common.collect.Lists;
 import java.awt.*;
 import java.net.URI;

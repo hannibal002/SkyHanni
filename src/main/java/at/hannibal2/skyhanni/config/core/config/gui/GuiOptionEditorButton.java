@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.core.config.gui;
 
 import static at.hannibal2.skyhanni.config.GuiTextures.button_tex;
 
-import at.hannibal2.skyhanni.config.core.config.struct.ConfigProcessor;
 import at.hannibal2.skyhanni.config.Features;
+import at.hannibal2.skyhanni.config.core.config.struct.ConfigProcessor;
 import at.hannibal2.skyhanni.config.core.util.render.RenderUtils;
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils;
 import net.minecraft.client.Minecraft;
