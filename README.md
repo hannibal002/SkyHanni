@@ -1,5 +1,5 @@
 <h1 align = "center">
-	Lorenz Mod: Mod for hypixel skyblock
+	SkyHanni: mod for hypixel skyblock
 </h1>
 
 <div align="center">
@@ -9,4 +9,4 @@
 
 </div>
 
-Lorenz Mod is a beta mod developed by hannibal2 to add new features to hypixel skyblock. It is in beta so expect bugs.
+SkyHanni is a beta mod developed by hannibal2 to add new features to hypixel skyblock. It is in beta so expect bugs.

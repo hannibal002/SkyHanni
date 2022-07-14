@@ -26,9 +26,9 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '0.6'
-group= 'at.lorenz.mod'
-archivesBaseName = 'LorenzMod'
+version = '0.1'
+group= 'at.hannibal2.skyhanni'
+archivesBaseName = 'SkyHanni'
 String mixinClassifier = 'dep'
 
 minecraft {
@@ -56,13 +56,13 @@ compileJava {
 }
 
 mixin {
-    add sourceSets.main, 'mixins.lorenzmod.refmap.json'
+    add sourceSets.main, 'mixins.skyhanni.refmap.json'
 }
 
 jar {
     manifest.attributes(
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-            'MixinConfigs': 'mixins.lorenzmod.json',
+            'MixinConfigs': 'mixins.skyhanni.json',
             'FMLCorePluginContainsFMLMod': true,
             'ForceLoadAsMod': true
     )
