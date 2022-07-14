@@ -13,9 +13,7 @@ import net.minecraft.client.Minecraft;
 public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
-        }, () -> {
-        }, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
     }
 
     public void executeRunnable(String runnableId) {
@@ -256,7 +254,6 @@ public class Features {
         @ConfigOption(name = "Hide Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
         @ConfigEditorBoolean
         public boolean trophyFishBronzeHider = false;
-
     }
 
     public static class Misc {
