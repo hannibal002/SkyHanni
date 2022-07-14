@@ -1,7 +1,7 @@
 [
   {
-    "modid": "lorenzmod",
-    "name": "Lorenz Mod",
+    "modid": "skyhanni",
+    "name": "SkyHanni",
     "description": "Hypixel Skyblock Mod",
     "version": "${version}",
     "mcversion": "${mcversion}",

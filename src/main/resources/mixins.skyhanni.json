@@ -1,0 +1,12 @@
+{
+  "package": "at.hannibal2.skyhanni.mixins",
+  "refmap": "mixins.skyhanni.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinGuiContainer",
+    "MixinNetworkManager",
+    "MixinNetHandlerPlayClient",
+    "MixinRenderItem",
+    "MixinRenderManager"
+  ]
+}
