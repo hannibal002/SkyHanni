@@ -17,10 +17,9 @@ class ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-
         val item = event.stack ?: return
 
-        if (!LorenzUtils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
+        if (!LorenzUtils.inSkyblock || item.stackSize != 1) return
 
         val stackTip = getStackTip(item)
 

@@ -31,7 +31,7 @@ object RenderUtils {
         )
     }
 
-    fun RenderWorldLastEvent.drawSkytilsColor(location: LorenzVec, color: LorenzColor, beacon: Boolean = false) {
+    fun RenderWorldLastEvent.drawColor(location: LorenzVec, color: LorenzColor, beacon: Boolean = false) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
         val y = location.y - viewerY
