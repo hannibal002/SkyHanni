@@ -9,7 +9,7 @@ object LorenzDebug {
         println("debug logger: $text")
     }
 
-    fun writeAndLog(text: String) {
+    fun chatAndLog(text: String) {
         LorenzUtils.debug(text)
         log(text)
     }
