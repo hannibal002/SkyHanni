@@ -178,9 +178,20 @@ class HideNotClickableItems {
             hideSackOfSacks(chestName, stack) -> true
             hideFishingBag(chestName, stack) -> true
             hidePotionBag(chestName, stack) -> true
+            hidePrivateIslandChest(chestName, stack) -> true
 
             else -> false
         }
+    }
+
+    private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {
+        if (chestName != "Chest" && chestName != "Large Chest") return false
+        //TODO make check if player is on private island
+
+        if (!ItemUtils.isSoulBound(stack)) return false
+
+        hideReason = "This item cannot be stored into a chest!"
+        return true
     }
 
     private fun hidePotionBag(chestName: String, stack: ItemStack): Boolean {
