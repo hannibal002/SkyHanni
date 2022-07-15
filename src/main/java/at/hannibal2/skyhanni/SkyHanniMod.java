@@ -81,16 +81,14 @@ public class SkyHanniMod {
         try {
             //noinspection ResultOfMethodCallIgnored
             configDirectory.mkdir();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         configFile = new File(configDirectory, "config.json");
 
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 feature = gson.fromJson(reader, Features.class);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
         if (feature == null) {
@@ -111,8 +109,7 @@ public class SkyHanniMod {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(feature));
             }
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
     }
 
     public static GuiScreen screenToOpen = null;
