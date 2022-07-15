@@ -13,7 +13,9 @@ import net.minecraft.client.Minecraft;
 public class Features {
 
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
+        }, () -> {
+        }, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
     }
 
     public void executeRunnable(String runnableId) {
@@ -53,9 +55,6 @@ public class Features {
     }
 
     @Expose
-    public String apiKey = "";
-
-    @Expose
     @Category(name = "Chat", desc = "Chat related features.")
     public Chat chat = new Chat();
 
@@ -78,6 +77,10 @@ public class Features {
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public Misc misc = new Misc();
+
+    @Expose
+    @Category(name = "Apis", desc = "Api Data")
+    public ApiData apiData = new ApiData();
 
     @Expose
     @Category(name = "Debug", desc = "Debug and test stuff.")
@@ -291,6 +294,18 @@ public class Features {
         @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
         @ConfigEditorBoolean
         public boolean configButtonOnPause = true;
+    }
+
+    public static class ApiData {
+
+        @Expose
+        public String apiKey = "";
+
+        @Expose
+        @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.")
+        @ConfigEditorBoolean
+        public boolean repoAutoUpdate = true;
+
     }
 
     public static class Debug {

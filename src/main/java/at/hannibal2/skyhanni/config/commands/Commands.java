@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Commands {
 
-    private static final SimpleCommand.ProcessCommandRunnable settingsRunnable = new SimpleCommand.ProcessCommandRunnable() {
+    private static final SimpleCommand.ProcessCommandRunnable mainMenu = new SimpleCommand.ProcessCommandRunnable() {
         public void processCommand(ICommandSender sender, String[] args) {
             if (args.length > 0) {
                 SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, StringUtils.join(args, " ")));
@@ -20,7 +20,19 @@ public class Commands {
     };
 
     public static void init() {
-        ClientCommandHandler.instance.registerCommand(new SimpleCommand("sh", settingsRunnable));
-        ClientCommandHandler.instance.registerCommand(new SimpleCommand("skyhanni", settingsRunnable));
+        ClientCommandHandler.instance.registerCommand(new SimpleCommand("sh", mainMenu));
+        ClientCommandHandler.instance.registerCommand(new SimpleCommand("skyhanni", mainMenu));
+
+        ClientCommandHandler.instance.registerCommand(new SimpleCommand("shreloadlocalrepo", new SimpleCommand.ProcessCommandRunnable() {
+            public void processCommand(ICommandSender sender, String[] args) {
+                SkyHanniMod.repo.reloadLocalRepo();
+            }
+        }));
+
+        ClientCommandHandler.instance.registerCommand(new SimpleCommand("shupdaterepo", new SimpleCommand.ProcessCommandRunnable() {
+            public void processCommand(ICommandSender sender, String[] args) {
+                SkyHanniMod.repo.updateRepo();
+            }
+        }));
     }
 }
