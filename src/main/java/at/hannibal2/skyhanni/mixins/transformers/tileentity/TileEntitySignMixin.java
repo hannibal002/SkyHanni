@@ -6,28 +6,25 @@ import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(TileEntitySign.class)
-public class TileEntitySignMixin implements IModifiedSign
-{
+public class TileEntitySignMixin implements IModifiedSign {
+
     private final TileEntitySign that = (TileEntitySign) (Object) this;
     private int selectionStart = -1;
     private int selectionEnd = -1;
     private boolean caretVisible;
 
     @Override
-    public IChatComponent getText(int line)
-    {
+    public IChatComponent getText(int line) {
         return this.that.signText[line];
     }
 
     @Override
-    public void setText(int line, IChatComponent component)
-    {
+    public void setText(int line, IChatComponent component) {
         this.that.signText[line] = component;
     }
 
     @Override
-    public void setSelectionState(int currentRow, int selectionStart, int selectionEnd, boolean caretVisible)
-    {
+    public void setSelectionState(int currentRow, int selectionStart, int selectionEnd, boolean caretVisible) {
         this.that.lineBeingEdited = currentRow;
         this.selectionStart = selectionStart;
         this.selectionEnd = selectionEnd;
@@ -35,8 +32,7 @@ public class TileEntitySignMixin implements IModifiedSign
     }
 
     @Override
-    public void resetSelectionState()
-    {
+    public void resetSelectionState() {
         this.that.lineBeingEdited = -1;
         this.selectionStart = -1;
         this.selectionEnd = -1;
@@ -44,20 +40,17 @@ public class TileEntitySignMixin implements IModifiedSign
     }
 
     @Override
-    public boolean getCaretVisible()
-    {
+    public boolean getCaretVisible() {
         return this.caretVisible;
     }
 
     @Override
-    public int getSelectionStart()
-    {
+    public int getSelectionStart() {
         return this.selectionStart;
     }
 
     @Override
-    public int getSelectionEnd()
-    {
+    public int getSelectionEnd() {
         return this.selectionEnd;
     }
 }
