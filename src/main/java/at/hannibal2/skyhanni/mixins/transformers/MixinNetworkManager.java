@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins;
+package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixinhooks.NetworkManagerHookKt;
 import io.netty.channel.ChannelHandlerContext;

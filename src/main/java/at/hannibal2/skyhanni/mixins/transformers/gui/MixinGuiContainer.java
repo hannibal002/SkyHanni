@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins;
+package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.mixinhooks.GuiContainerHook;
 import net.minecraft.client.gui.GuiScreen;

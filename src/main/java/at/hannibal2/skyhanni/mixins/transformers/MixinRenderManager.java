@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins;
+package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixinhooks.RenderManagerHookKt;
 import net.minecraft.client.renderer.culling.ICamera;
