@@ -389,38 +389,9 @@ class HideNotClickableItems {
 
         val result = notAuctionableFilter.match(name)
 
-//        val result = when {
-//            name.contains("Personal Deletor") -> true
-//            name.contains("Day Crystal") -> true
-//            name.contains("Night Crystal") -> true
-//
-//            name.contains("Cat Talisman") -> true
-//            name.contains("Lynx Talisman") -> true
-//            name.contains("Cheetah Talisman") -> true
-//
-//            name.contains("Hoe of Great Tilling") -> true
-//            name.contains("Hoe of Greater Tilling") -> true
-//            name.contains("InfiniDirt") -> true
-//            name.contains("Prismapump") -> true
-//            name.contains("Mathematical Hoe Blueprint") -> true
-//            name.contains("Basket of Seeds") -> true
-//            name.contains("Nether Wart Pouch") -> true
-//
-//            name.contains("Carrot Hoe") -> true
-//            name.contains("Sugar Cane Hoe") -> true
-//            name.contains("Nether Warts Hoe") -> true
-//            name.contains("Potato Hoe") -> true
-//            name.contains("Melon Dicer") -> true
-//            name.contains("Pumpkin Dicer") -> true
-//            name.contains("Coco Chopper") -> true
-//            name.contains("Wheat Hoe") -> true
-//
-//            else -> false
-//        }
-
         if (result) hideReason = "This item cannot be auctioned!"
         return result
     }
 
-    private fun isSkyBlockMenuItem(name: String): Boolean = name == "SkyBlock Menu (Right Click)"
+    private fun isSkyBlockMenuItem(name: String): Boolean = name == "SkyBlock Menu (Click)"
 }
