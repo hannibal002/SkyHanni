@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.sign;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ChatAllowedCharacters;
@@ -7,10 +9,8 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 public class TextInputUtil {
+
     private final FontRenderer fontRenderer;
     private final Supplier<String> stringSupplier;
     private final Consumer<String> stringConsumer;
