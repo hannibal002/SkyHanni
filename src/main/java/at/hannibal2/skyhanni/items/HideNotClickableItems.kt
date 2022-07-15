@@ -426,7 +426,6 @@ class HideNotClickableItems {
         }
 
         val result = notAuctionableFilter.match(name)
-
         if (result) hideReason = "This item cannot be auctioned!"
         return result
     }
