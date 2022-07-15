@@ -179,9 +179,18 @@ class HideNotClickableItems {
             hideFishingBag(chestName, stack) -> true
             hidePotionBag(chestName, stack) -> true
             hidePrivateIslandChest(chestName, stack) -> true
-
+            hideAttributeFusion(chestName, stack) -> true
             else -> false
         }
+    }
+
+    private fun hideAttributeFusion(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Attribute Fusion")) return false
+
+        if (ItemUtils.hasAttributes(stack)) return false
+
+        hideReason = "This item has no attributes!"
+        return true
     }
 
     private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {

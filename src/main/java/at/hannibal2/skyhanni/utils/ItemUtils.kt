@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
@@ -74,5 +76,23 @@ object ItemUtils {
         }
 
         return map
+    }
+
+    fun hasAttributes(stack: ItemStack): Boolean {
+        if (stack.hasTagCompound()) {
+            val tagCompound = stack.tagCompound
+            if (tagCompound.hasKey("ExtraAttributes")) {
+                val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
+                try {
+                    val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
+                    if (json.has("attributes")) {
+                        return true
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        return false
     }
 }
