@@ -97,9 +97,11 @@ class ItemDisplayOverlayFeatures {
 
         if (SkyHanniMod.feature.items.displayMinionTier) {
             if (name.contains(" Minion ")) {
-                val array = name.split(" ")
-                val last = array[array.size - 1]
-                return last.romanToDecimal().toString()
+                if (item.getLore().any { it.contains("Place this minion") }) {
+                    val array = name.split(" ")
+                    val last = array[array.size - 1]
+                    return last.romanToDecimal().toString()
+                }
             }
         }
 
