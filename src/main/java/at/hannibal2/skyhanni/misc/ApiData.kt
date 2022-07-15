@@ -17,7 +17,7 @@ class ApiData {
     fun onStatusBar(event: LorenzChatEvent) {
         val message = event.message
         if (message.startsWith("§aYour new API key is §r§b")) {
-            SkyHanniMod.feature.apiKey = message.substring(26)
+            SkyHanniMod.feature.apiData.apiKey = message.substring(26)
             LorenzUtils.chat("§b[SkyHanni] A new API Key has been detected and installed")
 
             if (currentProfileName != "") {
@@ -35,7 +35,7 @@ class ApiData {
     private fun updateApiData() {
         val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
 
-        val apiKey = SkyHanniMod.feature.apiKey
+        val apiKey = SkyHanniMod.feature.apiData.apiKey
 
         if (apiKey.isEmpty()) {
             LorenzUtils.error("SkyHanni has no API Key set. Type /api new to reload.")
@@ -72,7 +72,7 @@ class ApiData {
     }
 
     private fun loadProfile(playerUuid: String, profileId: String) {
-        val apiKey = SkyHanniMod.feature.apiKey
+        val apiKey = SkyHanniMod.feature.apiData.apiKey
         val url = "https://api.hypixel.net/skyblock/profile?key=$apiKey&profile=$profileId"
 
         val jsonObject = APIUtil.getJSONResponse(url)

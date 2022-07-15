@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.bazaar.BazaarApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -26,6 +28,22 @@ class HideNotClickableItems {
 
     private var lastClickTime = 0L
     private var bypassUntil = 0L
+
+    private val hideNpcSellList = MultiFilter()
+    private val hideBackpackList = MultiFilter()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val constant = event.getConstant("HideNotClickableItems")!!
+
+        try {
+            hideNpcSellList.load(constant["hide_npc_sell"].asJsonObject)
+            hideBackpackList.load(constant["hide_backpack"].asJsonObject)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            LorenzUtils.error("error in RepositoryReloadEvent")
+        }
+    }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -251,27 +269,7 @@ class HideNotClickableItems {
         }
 
         if (!ItemUtils.isRecombobulated(stack)) {
-            when (name) {
-                "Health Potion VIII Splash Potion" -> return false
-                "Stone Button" -> return false
-                "Revive Stone" -> return false
-                "Premium Flesh" -> return false
-                "Defuse Kit" -> return false
-                "White Wool" -> return false
-                "Enchanted Wool" -> return false
-                "Training Weights" -> return false
-                "Journal Entry" -> return false
-                "Twilight Arrow Poison" -> return false
-                "Lever" -> return false
-
-                "Fairy's Galoshes" -> return false
-                "Blaze Powder" -> return false
-                "Egg" -> return false
-                "Corrupted Fragment" -> return false
-            }
-            if (name.endsWith("Gem Rune I")) return false
-
-            if (name.startsWith("Music Disc")) return false
+            if (hideNpcSellList.match(name)) return false
         }
 
         hideReason = "This item should not be sold at the NPC!"
@@ -292,14 +290,15 @@ class HideNotClickableItems {
             return true
         }
 
-        val result = when {
-            name.endsWith(" New Year Cake Bag") -> true
-            name == "Nether Wart Pouch" -> true
-            name == "Basket of Seeds" -> true
-            name == "Builder's Wand" -> true
-
-            else -> false
-        }
+        val result = hideBackpackList.match(name)
+//        val result = when {
+//            name.endsWith("New Year Cake Bag") -> true
+//            name == "Nether Wart Pouch" -> true
+//            name == "Basket of Seeds" -> true
+//            name == "Builder's Wand" -> true
+//
+//            else -> false
+//        }
 
         if (result) hideReason = "Bags cannot be put into the storage!"
         return result
