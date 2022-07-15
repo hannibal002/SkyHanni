@@ -31,6 +31,7 @@ class HideNotClickableItems {
 
     private val hideNpcSellList = MultiFilter()
     private val hideInStorageList = MultiFilter()
+    private val tradeNpcList = MultiFilter()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -38,6 +39,9 @@ class HideNotClickableItems {
             val hideNotClickableItems = event.getConstant("HideNotClickableItems")!!
             hideNpcSellList.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
             hideInStorageList.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
+
+            val tradeNpcs = event.getConstant("TradeNpcs")!!
+            tradeNpcList.load(tradeNpcs)
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
@@ -251,7 +255,7 @@ class HideNotClickableItems {
     }
 
     private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
-        if (chestName != "Trades" && chestName != "Ophelia") return false
+        if (!tradeNpcList.match(chestName)) return false
 
         var name = stack.cleanName()
         val size = stack.stackSize
