@@ -45,6 +45,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, dungeon.deathCounterDisplay);
             return;
         }
+
+        if (runnableId.equals("bestSellMethod")) {
+            editOverlay(activeConfigCategory, 200, 16, bazaar.bestSellMethodPos);
+            return;
+        }
     }
 
     @Expose
@@ -241,6 +246,16 @@ public class Features {
         @ConfigOption(name = "Order Helper", desc = "Show visual hints inside the Bazaar Manage Order view when items are ready to pickup or outbid.")
         @ConfigEditorBoolean
         public boolean orderHelper = false;
+
+        @Expose
+        @ConfigOption(name = "Best Sell Method", desc = "Difference between sell instantly and sell offer.")
+        @ConfigEditorBoolean
+        public boolean bestSellMethod = false;
+
+        @Expose
+        @ConfigOption(name = "Best Sell Method Position", desc = "")
+        @ConfigEditorButton(runnableId = "bestSellMethod", buttonText = "Edit")
+        public Position bestSellMethodPos = new Position(10, 10, false, true);
     }
 
     public static class Fishing {
