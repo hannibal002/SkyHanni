@@ -88,8 +88,7 @@ object ItemUtils {
                     if (json.has("attributes")) {
                         return true
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } catch (_: Exception) {
                 }
             }
         }
