@@ -34,11 +34,10 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val constant = event.getConstant("HideNotClickableItems")!!
-
         try {
-            hideNpcSellList.load(constant["hide_npc_sell"].asJsonObject)
-            hideBackpackList.load(constant["hide_backpack"].asJsonObject)
+            val hideNotClickableItems = event.getConstant("HideNotClickableItems")!!
+            hideNpcSellList.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
+            hideBackpackList.load(hideNotClickableItems["hide_backpack"].asJsonObject)
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
@@ -275,7 +274,7 @@ class HideNotClickableItems {
     }
 
     private fun hideChestBackpack(chestName: String, stack: ItemStack): Boolean {
-        if (!chestName.contains("Ender Chest") && !chestName.contains("Backpack")) return false
+        if (!chestName.contains("Ender Chest") && !chestName.contains("Backpack") && chestName != "Storage") return false
 
         val name = stack.cleanName()
 
@@ -289,14 +288,6 @@ class HideNotClickableItems {
         }
 
         val result = hideBackpackList.match(name)
-//        val result = when {
-//            name.endsWith("New Year Cake Bag") -> true
-//            name == "Nether Wart Pouch" -> true
-//            name == "Basket of Seeds" -> true
-//            name == "Builder's Wand" -> true
-//
-//            else -> false
-//        }
 
         if (result) hideReason = "Bags cannot be put into the storage!"
         return result
