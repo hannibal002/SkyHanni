@@ -30,14 +30,14 @@ class HideNotClickableItems {
     private var bypassUntil = 0L
 
     private val hideNpcSellList = MultiFilter()
-    private val hideBackpackList = MultiFilter()
+    private val hideInStorageList = MultiFilter()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
             val hideNotClickableItems = event.getConstant("HideNotClickableItems")!!
             hideNpcSellList.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
-            hideBackpackList.load(hideNotClickableItems["hide_backpack"].asJsonObject)
+            hideInStorageList.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
@@ -151,7 +151,7 @@ class HideNotClickableItems {
         hideReason = ""
         return when {
             hideNpcSell(chestName, stack) -> true
-            hideChestBackpack(chestName, stack) -> true
+            hideInStorage(chestName, stack) -> true
             hideSalvage(chestName, stack) -> true
             hideTrade(chestName, stack) -> true
             hideBazaarOrAH(chestName, stack) -> true
@@ -273,7 +273,7 @@ class HideNotClickableItems {
         return true
     }
 
-    private fun hideChestBackpack(chestName: String, stack: ItemStack): Boolean {
+    private fun hideInStorage(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.contains("Ender Chest") && !chestName.contains("Backpack") && chestName != "Storage") return false
 
         val name = stack.cleanName()
@@ -287,7 +287,7 @@ class HideNotClickableItems {
             return true
         }
 
-        val result = hideBackpackList.match(name)
+        val result = hideInStorageList.match(name)
 
         if (result) hideReason = "Bags cannot be put into the storage!"
         return result
