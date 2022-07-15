@@ -77,7 +77,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new LorenzTest());
         MinecraftForge.EVENT_BUS.register(new ButtonOnPause());
 
-        configDirectory = new File("config/SkyHanni/config");
+        configDirectory = new File("config/skyhanni");
         try {
             //noinspection ResultOfMethodCallIgnored
             configDirectory.mkdir();
