@@ -20,9 +20,7 @@ class MultiFilter {
 
     private fun fill(jsonObject: JsonObject, key: String, list: MutableList<String>) {
         if (jsonObject.has(key)) {
-            for (element in jsonObject[key].asJsonArray) {
-                list.add(element.asString)
-            }
+            list.addAll(jsonObject[key].asJsonArray.map { it.asString })
         }
     }
 
