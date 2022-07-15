@@ -267,6 +267,7 @@ class HideNotClickableItems {
                 "Fairy's Galoshes" -> return false
                 "Blaze Powder" -> return false
                 "Egg" -> return false
+                "Corrupted Fragment" -> return false
             }
             if (name.endsWith("Gem Rune I")) return false
 
