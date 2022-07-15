@@ -42,7 +42,7 @@ public class Features {
         }
 
         if (runnableId.equals("dungeonDeathCounter")) {
-            editOverlay(activeConfigCategory, 200, 16, dungeon.deathCounterDisplay);
+            editOverlay(activeConfigCategory, 200, 16, dungeon.deathCounterPos);
             return;
         }
 
@@ -167,7 +167,7 @@ public class Features {
         @Expose
         @ConfigOption(name = "Death Counter Position", desc = "")
         @ConfigEditorButton(runnableId = "dungeonDeathCounter", buttonText = "Edit")
-        public Position deathCounterDisplay = new Position(10, 10, false, true);
+        public Position deathCounterPos = new Position(10, 10, false, true);
 
         @Expose
         @ConfigOption(name = "Clean End", desc = "Hide entities and particles after the boss in Floor 1 - 6 has died.")
@@ -223,16 +223,15 @@ public class Features {
         public boolean displayPetLevel = false;
 
         @Expose
-        @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
-        public boolean displaySackName = false;
-
-        @Expose
         @ConfigOption(name = "Minion Tier", desc = "Show the Minion Tier over Items.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean displayMinionTier = false;
+
+        @Expose
+        @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
+        @ConfigEditorBoolean
+        public boolean displaySackName = false;
 
         @Expose
         @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")
