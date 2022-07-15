@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -32,6 +33,7 @@ class HideNotClickableItems {
     private val hideNpcSellList = MultiFilter()
     private val hideInStorageList = MultiFilter()
     private val tradeNpcList = MultiFilter()
+    private val itemsToSalvage = mutableListOf<String>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -42,9 +44,24 @@ class HideNotClickableItems {
 
             val tradeNpcs = event.getConstant("TradeNpcs")!!
             tradeNpcList.load(tradeNpcs)
+
+            updateSalvageList(hideNotClickableItems)
+
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
+        }
+    }
+
+    private fun updateSalvageList(hideNotClickableItems: JsonObject) {
+        itemsToSalvage.clear()
+        val salvage = hideNotClickableItems["salvage"].asJsonObject
+        itemsToSalvage.addAll(salvage.asJsonObject["items"].asJsonArray.map { it.asString })
+        for (armor in salvage.asJsonObject["armor"].asJsonArray.map { it.asString }) {
+            itemsToSalvage.add("$armor Helmet")
+            itemsToSalvage.add("$armor Chestplate")
+            itemsToSalvage.add("$armor Leggings")
+            itemsToSalvage.add("$armor Boots")
         }
     }
 
@@ -312,49 +329,7 @@ class HideNotClickableItems {
         }
 
         val name = stack.cleanName()
-
-        val armorSets = listOf(
-            "Zombie Knight",
-            "Heavy",
-            "Zombie Soldier",
-            "Skeleton Grunt",
-            "Skeleton Soldier",
-            "Zombie Commander",
-            "Skeleton Master",
-            "Sniper",
-            "Skeletor",
-            "Rotten",
-        )
-
-        val items = mutableListOf<String>()
-        for (armor in armorSets) {
-            items.add("$armor Helmet")
-            items.add("$armor Chestplate")
-            items.add("$armor Leggings")
-            items.add("$armor Boots")
-        }
-
-        items.add("Zombie Soldier Cutlass")
-        items.add("Silent Death")
-        items.add("Zombie Knight Sword")
-        items.add("Conjuring")
-        items.add("Dreadlord Sword")
-        items.add("Soulstealer Bow")
-        items.add("Machine Gun Bow")
-        items.add("Earth Shard")
-        items.add("Zombie Commander Whip")
-        items.add("Sniper Bow")
-
-        //Crimson essence
-        items.add("Blade of the Volcano")
-        items.add("Staff of the Volcano")
-        items.add("Slug Boots")
-        items.add("Flaming Chestplate")
-        items.add("Moogma Leggings")
-        items.add("Rampart Leggings")
-        items.add("Rampart Boots")
-
-        for (item in items) {
+        for (item in itemsToSalvage) {
             if (name.endsWith(item)) {
                 return false
             }
