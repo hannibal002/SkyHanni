@@ -40,12 +40,8 @@ class HideNotClickableItems {
             val hideNotClickableItems = event.getConstant("HideNotClickableItems")!!
             hideNpcSellFilter.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
             hideInStorageFilter.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
-
-            val tradeNpcs = event.getConstant("TradeNpcs")!!
-            tradeNpcFilter.load(tradeNpcs)
-
+            tradeNpcFilter.load(event.getConstant("TradeNpcs")!!)
             updateSalvageList(hideNotClickableItems)
-
             hidePlayerTradeFilter.load(hideNotClickableItems["hide_player_trade"].asJsonObject)
             notAuctionableFilter.load(hideNotClickableItems["not_auctionable"].asJsonObject)
 
@@ -242,7 +238,7 @@ class HideNotClickableItems {
     private fun hidePlayerTrade(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
-        if (ItemUtils.isSoulBound(stack)) {
+        if (ItemUtils.isCoopSoulBound(stack)) {
             hideReason = "Soulbound items cannot be traded!"
             return true
         }
@@ -368,7 +364,7 @@ class HideNotClickableItems {
     }
 
     private fun isNotAuctionable(stack: ItemStack): Boolean {
-        if (ItemUtils.isSoulBound(stack)) {
+        if (ItemUtils.isCoopSoulBound(stack)) {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
         }
