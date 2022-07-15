@@ -180,8 +180,37 @@ class HideNotClickableItems {
             hidePotionBag(chestName, stack) -> true
             hidePrivateIslandChest(chestName, stack) -> true
             hideAttributeFusion(chestName, stack) -> true
+            hideYourEquipment(chestName, stack) -> true
             else -> false
         }
+    }
+
+    private fun hideYourEquipment(chestName: String, stack: ItemStack): Boolean {
+        if (!chestName.startsWith("Your Equipment")) return false
+
+        val list = listOf(
+            "HELMET",
+            "CHESTPLATE",
+            "LEGGINGS",
+            "BOOTS",
+            "NECKLACE",
+            "CLOAK",
+            "BELT",
+            "GLOVES"
+        )
+        for (type in list) {
+            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {
+                return false
+            }
+        }
+
+        if (isSkyBlockMenuItem(stack.cleanName())) {
+            hideReason = "The SkyBlock Menu cannot be put into the potion bag!"
+            return true
+        }
+
+        hideReason = "This item cannot be put into your equipment!"
+        return true
     }
 
     private fun hideAttributeFusion(chestName: String, stack: ItemStack): Boolean {
