@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.commands;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.config.ConfigEditor;
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
+import at.hannibal2.skyhanni.test.LorenzTest;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -24,25 +25,36 @@ public class Commands {
         ClientCommandHandler.instance.registerCommand(new SimpleCommand("skyhanni", mainMenu));
 
         ClientCommandHandler.instance.registerCommand(
-            new SimpleCommand(
-                "shreloadlocalrepo",
-                new SimpleCommand.ProcessCommandRunnable() {
-                    public void processCommand(ICommandSender sender, String[] args) {
-                        SkyHanniMod.repo.reloadLocalRepo();
-                    }
-                }
-            )
+                new SimpleCommand(
+                        "shreloadlocalrepo",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                SkyHanniMod.repo.reloadLocalRepo();
+                            }
+                        }
+                )
         );
 
         ClientCommandHandler.instance.registerCommand(
-            new SimpleCommand(
-                "shupdaterepo",
-                new SimpleCommand.ProcessCommandRunnable() {
-                    public void processCommand(ICommandSender sender, String[] args) {
-                        SkyHanniMod.repo.updateRepo();
-                    }
-                }
-            )
+                new SimpleCommand(
+                        "shupdaterepo",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                SkyHanniMod.repo.updateRepo();
+                            }
+                        }
+                )
+        );
+
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "ii",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                LorenzTest.Companion.printLore();
+                            }
+                        }
+                )
         );
     }
 }
