@@ -13,14 +13,16 @@ class MultiFilter {
         startsWith.clear()
         endsWith.clear()
 
-        for (element in hideNpcSell["equals"].asJsonArray) {
-            equals.add(element.asString)
-        }
-        for (element in hideNpcSell["startsWith"].asJsonArray) {
-            startsWith.add(element.asString)
-        }
-        for (element in hideNpcSell["endsWith"].asJsonArray) {
-            endsWith.add(element.asString)
+        fill(hideNpcSell, "equals", equals)
+        fill(hideNpcSell, "startsWith", startsWith)
+        fill(hideNpcSell, "endsWith", endsWith)
+    }
+
+    private fun fill(jsonObject: JsonObject, key: String, list: MutableList<String>) {
+        if (jsonObject.has(key)) {
+            for (element in jsonObject[key].asJsonArray) {
+                list.add(element.asString)
+            }
         }
     }
 
