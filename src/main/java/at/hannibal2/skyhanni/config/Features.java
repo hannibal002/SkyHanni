@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.config.ConfigEditor;
-import at.hannibal2.skyhanni.config.core.GuiElement;
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
-import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
+import at.hannibal2.skyhanni.config.gui.config.ConfigEditor;
+import at.hannibal2.skyhanni.config.gui.core.GuiElement;
+import at.hannibal2.skyhanni.config.gui.core.GuiScreenElementWrapper;
+import at.hannibal2.skyhanni.config.gui.core.config.Position;
+import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
+import at.hannibal2.skyhanni.config.gui.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;

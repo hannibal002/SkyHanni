@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.chat.ChatFilter;
 import at.hannibal2.skyhanni.chat.ChatManager;
 import at.hannibal2.skyhanni.chat.PlayerChatFilter;
 import at.hannibal2.skyhanni.config.Features;
-import at.hannibal2.skyhanni.config.commands.Commands;
+import at.hannibal2.skyhanni.config.gui.commands.Commands;
 import at.hannibal2.skyhanni.dungeon.*;
 import at.hannibal2.skyhanni.dungeon.damageindicator.DungeonBossDamageIndicator;
 import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
