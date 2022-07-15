@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui.inventory;
 
-
 import at.hannibal2.skyhanni.sign.*;
+import java.io.IOException;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -19,11 +20,9 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.IOException;
-import java.util.List;
-
 @Mixin(GuiEditSign.class)
 public class GuiEditSignMixin extends GuiScreen implements IEditSign {
+
     private final GuiEditSign that = (GuiEditSign) (Object) this;
     private TextInputUtil textInputUtil;
     private SignSelectionList globalSelector;
@@ -40,7 +39,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
 
     @Inject(method = "initGui()V", at = @At("RETURN"))
     private void initGui(CallbackInfo info) {
-//        this.textInputUtil = new TextInputUtil(this.fontRendererObj, () -> ((IModifiedSign) this.that.tileSign).getText(this.editLine).getUnformattedText(), text -> ((IModifiedSign) this.that.tileSign).setText(this.editLine, new ChatComponentText(text)), 90);
+        //        this.textInputUtil = new TextInputUtil(this.fontRendererObj, () -> ((IModifiedSign) this.that.tileSign).getText(this.editLine).getUnformattedText(), text -> ((IModifiedSign) this.that.tileSign).setText(this.editLine, new ChatComponentText(text)), 90);
         this.textInputUtil = new TextInputUtil(this.fontRendererObj, () -> ((IModifiedSign) getTileSign(this.that)).getText(this.editLine).getUnformattedText(), text -> ((IModifiedSign) getTileSign(this.that)).setText(this.editLine, new ChatComponentText(text)), 90);
 
         if (SkyBlockEventHandler.isSkyBlock && SkyBlockcatiaConfig.enableSignSelectionList) {
@@ -87,56 +86,55 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
             Keyboard.enableRepeatEvents(false);
 
             if (SkyBlockEventHandler.isSkyBlock) {
-//                String text = this.that.tileSign.signText[0].getUnformattedText();
+                //                String text = this.that.tileSign.signText[0].getUnformattedText();
                 String text = getTileSign(this.that).signText[0].getUnformattedText();
-
-//                if (!StringUtils.isNullOrEmpty(text))
-//                {
-//                    if (NumberUtils.isNumericWithKM(text) && (!SkyBlockcatiaSettings.INSTANCE.auctionBidConfirm && this.isAuctionPrice() || this.isAuctionStartBidSign() || this.isBazaarPrice() || this.isBankWithdraw() || this.isBankDeposit()))
-//                    {
-//                        this.globalSelector.add(text);
-//                    }
-//                    else if (NumberUtils.isNumeric(text) && this.isBazaarOrder())
-//                    {
-//                        this.globalSelector.add(text);
-//                    }
-//                    else if (this.isAuctionQuery())
-//                    {
-//                        this.globalSelector.add(text);
-//                    }
-//                }
+                //                if (!StringUtils.isNullOrEmpty(text))
+                //                {
+                //                    if (NumberUtils.isNumericWithKM(text) && (!SkyBlockcatiaSettings.INSTANCE.auctionBidConfirm && this.isAuctionPrice() || this.isAuctionStartBidSign() || this.isBazaarPrice() || this.isBankWithdraw() || this.isBankDeposit()))
+                //                    {
+                //                        this.globalSelector.add(text);
+                //                    }
+                //                    else if (NumberUtils.isNumeric(text) && this.isBazaarOrder())
+                //                    {
+                //                        this.globalSelector.add(text);
+                //                    }
+                //                    else if (this.isAuctionQuery())
+                //                    {
+                //                        this.globalSelector.add(text);
+                //                    }
+                //                }
             }
-//            if (!(SkyBlockcatiaSettings.INSTANCE.auctionBidConfirm && this.isAuctionPrice())) {
-////                SignSelectionList.processSignData(this.that.tileSign);
-//                SignSelectionList.processSignData(getTileSign(this.that));
-//            }
+            //            if (!(SkyBlockcatiaSettings.INSTANCE.auctionBidConfirm && this.isAuctionPrice())) {
+            ////                SignSelectionList.processSignData(this.that.tileSign);
+            //                SignSelectionList.processSignData(getTileSign(this.that));
+            //            }
             info.cancel();
         }
     }
 
     @Inject(method = "actionPerformed(Lnet/minecraft/client/gui/GuiButton;)V", cancellable = true, at = @At(value = "INVOKE", target = "net/minecraft/tileentity/TileEntitySign.markDirty()V", shift = Shift.AFTER))
     private void actionPerformed(GuiButton button, CallbackInfo info) throws IOException {
-//        if (SkyBlockcatiaSettings.INSTANCE.auctionBidConfirm)
-//        {
-//            String text = this.that.tileSign.signText[0].getUnformattedText();
-//
-//            if (!StringUtils.isNullOrEmpty(text) && NumberUtils.isNumeric(text) && this.isAuctionPrice())
-//            {
-//                int price = Integer.parseInt(text);
-//
-//                if (price >= SkyBlockcatiaSettings.INSTANCE.auctionBidConfirmValue)
-//                {
-//                    this.mc.displayGuiScreen(new GuiYesNo(this, LangUtils.translate("message.bid_confirm_title"), LangUtils.translate("message.bid_confirm"), 201));
-//                    info.cancel();
-//                }
-//                else
-//                {
-//                    this.that.tileSign.markDirty();
-//                    SignSelectionList.processSignData(this.that.tileSign);
-//                    this.globalSelector.add(text);
-//                }
-//            }
-//        }
+        //        if (SkyBlockcatiaSettings.INSTANCE.auctionBidConfirm)
+        //        {
+        //            String text = this.that.tileSign.signText[0].getUnformattedText();
+        //
+        //            if (!StringUtils.isNullOrEmpty(text) && NumberUtils.isNumeric(text) && this.isAuctionPrice())
+        //            {
+        //                int price = Integer.parseInt(text);
+        //
+        //                if (price >= SkyBlockcatiaSettings.INSTANCE.auctionBidConfirmValue)
+        //                {
+        //                    this.mc.displayGuiScreen(new GuiYesNo(this, LangUtils.translate("message.bid_confirm_title"), LangUtils.translate("message.bid_confirm"), 201));
+        //                    info.cancel();
+        //                }
+        //                else
+        //                {
+        //                    this.that.tileSign.markDirty();
+        //                    SignSelectionList.processSignData(this.that.tileSign);
+        //                    this.globalSelector.add(text);
+        //                }
+        //            }
+        //        }
     }
 
     @Inject(method = "keyTyped(CI)V", cancellable = true, at = @At("HEAD"))
@@ -152,7 +150,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
     private void drawScreenPre(int mouseX, int mouseY, float partialTicks, CallbackInfo info) {
         if (SkyBlockcatiaConfig.enableOverwriteSignEditing) {
             this.drawDefaultBackground();
-//            this.drawCenteredString(this.fontRendererObj, LangUtils.translate("sign.edit"), this.width / 2, 40, 16777215);
+            //            this.drawCenteredString(this.fontRendererObj, LangUtils.translate("sign.edit"), this.width / 2, 40, 16777215);
             this.drawCenteredString(this.fontRendererObj, "Sign Edit", this.width / 2, 40, 16777215);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.pushMatrix();
@@ -160,16 +158,16 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
             float f = 93.75F;
             GlStateManager.scale(-f, -f, -f);
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-//            Block block = this.that.tileSign.getBlockType();
+            //            Block block = this.that.tileSign.getBlockType();
             Block block = getTileSign(this.that).getBlockType();
 
             if (block == Blocks.standing_sign) {
-//                float f1 = this.that.tileSign.getBlockMetadata() * 360 / 16.0F;
+                //                float f1 = this.that.tileSign.getBlockMetadata() * 360 / 16.0F;
                 float f1 = getTileSign(this.that).getBlockMetadata() * 360 / 16.0F;
                 GlStateManager.rotate(f1, 0.0F, 1.0F, 0.0F);
                 GlStateManager.translate(0.0F, -1.0625F, 0.0F);
             } else {
-//                int i = this.that.tileSign.getBlockMetadata();
+                //                int i = this.that.tileSign.getBlockMetadata();
                 int i = getTileSign(this.that).getBlockMetadata();
                 float f2 = 0.0F;
 
@@ -187,11 +185,11 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
                 GlStateManager.rotate(f2, 0.0F, 1.0F, 0.0F);
                 GlStateManager.translate(0.0F, -1.0625F, 0.0F);
             }
-//            ((IModifiedSign) this.that.tileSign).setSelectionState(this.editLine, this.textInputUtil.getSelectionStart(), this.textInputUtil.getSelectionEnd(), this.updateCounter / 6 % 2 == 0);
+            //            ((IModifiedSign) this.that.tileSign).setSelectionState(this.editLine, this.textInputUtil.getSelectionStart(), this.textInputUtil.getSelectionEnd(), this.updateCounter / 6 % 2 == 0);
             ((IModifiedSign) getTileSign(this.that)).setSelectionState(this.editLine, this.textInputUtil.getSelectionStart(), this.textInputUtil.getSelectionEnd(), this.updateCounter / 6 % 2 == 0);
-//            TileEntityRendererDispatcher.instance.renderTileEntityAt(this.that.tileSign, -0.5D, -0.75D, -0.5D, 0.0F);
+            //            TileEntityRendererDispatcher.instance.renderTileEntityAt(this.that.tileSign, -0.5D, -0.75D, -0.5D, 0.0F);
             TileEntityRendererDispatcher.instance.renderTileEntityAt(getTileSign(this.that), -0.5D, -0.75D, -0.5D, 0.0F);
-//            ((IModifiedSign) this.that.tileSign).resetSelectionState();
+            //            ((IModifiedSign) this.that.tileSign).resetSelectionState();
             ((IModifiedSign) getTileSign(this.that)).resetSelectionState();
             GlStateManager.popMatrix();
             super.drawScreen(mouseX, mouseY, partialTicks);
@@ -235,7 +233,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
     }
 
     private boolean isAuctionStartBidSign() {
-//        return this.that.tileSign.signText[2].getUnformattedText().equals("Your auction") && this.that.tileSign.signText[3].getUnformattedText().equals("starting bid");
+        //        return this.that.tileSign.signText[2].getUnformattedText().equals("Your auction") && this.that.tileSign.signText[3].getUnformattedText().equals("starting bid");
         return getTileSign(this.that).signText[2].getUnformattedText().equals("Your auction") && getTileSign(this.that).signText[3].getUnformattedText().equals("starting bid");
     }
 
