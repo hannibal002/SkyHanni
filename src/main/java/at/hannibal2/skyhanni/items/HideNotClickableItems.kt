@@ -27,9 +27,9 @@ class HideNotClickableItems {
     private var lastClickTime = 0L
     private var bypassUntil = 0L
 
-    private val hideNpcSellList = MultiFilter()
-    private val hideInStorageList = MultiFilter()
-    private val tradeNpcList = MultiFilter()
+    private val hideNpcSellFilter = MultiFilter()
+    private val hideInStorageFilter = MultiFilter()
+    private val tradeNpcFilter = MultiFilter()
     private val itemsToSalvage = mutableListOf<String>()
     private val hidePlayerTradeFilter = MultiFilter()
 
@@ -37,11 +37,11 @@ class HideNotClickableItems {
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
             val hideNotClickableItems = event.getConstant("HideNotClickableItems")!!
-            hideNpcSellList.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
-            hideInStorageList.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
+            hideNpcSellFilter.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
+            hideInStorageFilter.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
 
             val tradeNpcs = event.getConstant("TradeNpcs")!!
-            tradeNpcList.load(tradeNpcs)
+            tradeNpcFilter.load(tradeNpcs)
 
             updateSalvageList(hideNotClickableItems)
 
@@ -265,7 +265,7 @@ class HideNotClickableItems {
     }
 
     private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
-        if (!tradeNpcList.match(chestName)) return false
+        if (!tradeNpcFilter.match(chestName)) return false
 
         var name = stack.cleanName()
         val size = stack.stackSize
@@ -280,7 +280,7 @@ class HideNotClickableItems {
         }
 
         if (!ItemUtils.isRecombobulated(stack)) {
-            if (hideNpcSellList.match(name)) return false
+            if (hideNpcSellFilter.match(name)) return false
         }
 
         hideReason = "This item should not be sold at the NPC!"
@@ -301,7 +301,7 @@ class HideNotClickableItems {
             return true
         }
 
-        val result = hideInStorageList.match(name)
+        val result = hideInStorageFilter.match(name)
 
         if (result) hideReason = "Bags cannot be put into the storage!"
         return result
