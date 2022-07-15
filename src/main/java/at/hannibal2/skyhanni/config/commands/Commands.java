@@ -23,16 +23,26 @@ public class Commands {
         ClientCommandHandler.instance.registerCommand(new SimpleCommand("sh", mainMenu));
         ClientCommandHandler.instance.registerCommand(new SimpleCommand("skyhanni", mainMenu));
 
-        ClientCommandHandler.instance.registerCommand(new SimpleCommand("shreloadlocalrepo", new SimpleCommand.ProcessCommandRunnable() {
-            public void processCommand(ICommandSender sender, String[] args) {
-                SkyHanniMod.repo.reloadLocalRepo();
-            }
-        }));
+        ClientCommandHandler.instance.registerCommand(
+            new SimpleCommand(
+                "shreloadlocalrepo",
+                new SimpleCommand.ProcessCommandRunnable() {
+                    public void processCommand(ICommandSender sender, String[] args) {
+                        SkyHanniMod.repo.reloadLocalRepo();
+                    }
+                }
+            )
+        );
 
-        ClientCommandHandler.instance.registerCommand(new SimpleCommand("shupdaterepo", new SimpleCommand.ProcessCommandRunnable() {
-            public void processCommand(ICommandSender sender, String[] args) {
-                SkyHanniMod.repo.updateRepo();
-            }
-        }));
+        ClientCommandHandler.instance.registerCommand(
+            new SimpleCommand(
+                "shupdaterepo",
+                new SimpleCommand.ProcessCommandRunnable() {
+                    public void processCommand(ICommandSender sender, String[] args) {
+                        SkyHanniMod.repo.updateRepo();
+                    }
+                }
+            )
+        );
     }
 }

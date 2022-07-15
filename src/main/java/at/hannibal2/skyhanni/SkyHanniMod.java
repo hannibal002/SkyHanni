@@ -19,6 +19,8 @@ import at.hannibal2.skyhanni.repo.RepoManager;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -27,9 +29,6 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 @Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION)
 public class SkyHanniMod {
