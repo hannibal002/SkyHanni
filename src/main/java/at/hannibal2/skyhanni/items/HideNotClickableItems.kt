@@ -192,8 +192,6 @@ class HideNotClickableItems {
         if (stack.getLore().any { it.removeColorCodes() == "Fishing Bait" }) {
             return false
         }
-//        if (stack.cleanName().endsWith(" Bait")) return false
-
         hideReason = "This item is not a fishing bait!"
         return true
     }
