@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni;
 
 import at.hannibal2.skyhanni.bazaar.BazaarApi;
+import at.hannibal2.skyhanni.bazaar.BazaarBestSellMethod;
 import at.hannibal2.skyhanni.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.chat.ChatFilter;
 import at.hannibal2.skyhanni.chat.ChatManager;
@@ -67,6 +68,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new DungeonCleanEnd());
         MinecraftForge.EVENT_BUS.register(new DungeonBossMessages());
         MinecraftForge.EVENT_BUS.register(new TrophyFishMessages());
+        MinecraftForge.EVENT_BUS.register(new BazaarBestSellMethod());
 
         Commands.init();
 
