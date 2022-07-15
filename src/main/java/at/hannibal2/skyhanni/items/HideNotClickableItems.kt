@@ -4,13 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.bazaar.BazaarApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
-import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -34,6 +31,7 @@ class HideNotClickableItems {
     private val hideInStorageList = MultiFilter()
     private val tradeNpcList = MultiFilter()
     private val itemsToSalvage = mutableListOf<String>()
+    private val hidePlayerTradeFilter = MultiFilter()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -46,6 +44,8 @@ class HideNotClickableItems {
             tradeNpcList.load(tradeNpcs)
 
             updateSalvageList(hideNotClickableItems)
+
+            hidePlayerTradeFilter.load(hideNotClickableItems["hide_player_trade"].asJsonObject)
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -174,7 +174,7 @@ class HideNotClickableItems {
             hideNpcSell(chestName, stack) -> true
             hideInStorage(chestName, stack) -> true
             hideSalvage(chestName, stack) -> true
-            hideTrade(chestName, stack) -> true
+            hidePlayerTrade(chestName, stack) -> true
             hideBazaarOrAH(chestName, stack) -> true
             hideAccessoryBag(chestName, stack) -> true
             hideSackOfSacks(chestName, stack) -> true
@@ -237,7 +237,7 @@ class HideNotClickableItems {
         return true
     }
 
-    private fun hideTrade(chestName: String, stack: ItemStack): Boolean {
+    private fun hidePlayerTrade(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
         if (ItemUtils.isSoulBound(stack)) {
@@ -257,15 +257,8 @@ class HideNotClickableItems {
             return true
         }
 
-        val result = when {
-            name.contains("Personal Deletor") -> true
-            name.contains("Day Crystal") -> true
-            name.contains("Night Crystal") -> true
-            name.contains("Cat Talisman") -> true
-            name.contains("Lynx Talisman") -> true
-            name.contains("Cheetah Talisman") -> true
-            else -> false
-        }
+        val result = hidePlayerTradeFilter.match(name)
+        LorenzDebug.log("hidePlayerTradeList filter result for '$name': $result")
 
         if (result) hideReason = "This item cannot be traded!"
         return result
