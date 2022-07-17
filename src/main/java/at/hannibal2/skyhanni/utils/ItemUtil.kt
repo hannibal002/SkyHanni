@@ -96,13 +96,15 @@ object ItemUtil {
     fun getItemLore(itemStack: ItemStack): List<String> {
         if (itemStack.hasTagCompound() && itemStack.tagCompound.hasKey("display", NBT_COMPOUND)) {
             val display = itemStack.tagCompound.getCompoundTag("display")
-            if (display.hasKey("Lore", NBT_LIST)) {
-                val lore = display.getTagList("Lore", NBT_STRING)
-                val loreAsList = ArrayList<String>(lore.tagCount())
-                for (lineNumber in 0 until lore.tagCount()) {
-                    loreAsList.add(lore.getStringTagAt(lineNumber))
+            if (display != null) {
+                if (display.hasKey("Lore", NBT_LIST)) {
+                    val lore = display.getTagList("Lore", NBT_STRING)
+                    val loreAsList = ArrayList<String>(lore.tagCount())
+                    for (lineNumber in 0 until lore.tagCount()) {
+                        loreAsList.add(lore.getStringTagAt(lineNumber))
+                    }
+                    return Collections.unmodifiableList(loreAsList)
                 }
-                return Collections.unmodifiableList(loreAsList)
             }
         }
         return emptyList()
