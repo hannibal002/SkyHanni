@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.GuiRender.renderString
-import at.hannibal2.skyhanni.utils.ItemUtil
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSBItemID
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -28,7 +28,7 @@ class LorenzTest {
                 print("===")
                 print("ITEM LORE")
                 print("display name: '" + itemStack.displayName.toString() + "'")
-                val itemID = ItemUtil.getSkyBlockItemID(itemStack)
+                val itemID = itemStack.getSBItemID()
                 print("itemID: '$itemID'")
 //            val rarity: ItemRarityOld = ItemUtils.getRarity(itemStack)
 //            print("rarity: '$rarity'")
@@ -101,4 +101,40 @@ class LorenzTest {
             SkyHanniMod.feature.debug.testPos.renderString(text)
         }
     }
+
+//    @SubscribeEvent
+//    fun onGetBlockModel(event: RenderBlockInWorldEvent) {
+//        if (!LorenzUtils.inSkyblock || !SkyHanniMod.feature.debug.enabled) return
+//        val state = event.state
+//
+//        if (event.state != null && event.pos != null) {
+////            if ((event.pos as BlockPos).y <= 76) {
+//            val block = (state as IBlockState).block
+//
+//
+//            if (block === Blocks.flowing_lava) {
+//                event.state = Blocks.flowing_water.blockState.block.defaultState
+//            }
+//
+//            if (block === Blocks.lava) {
+//                event.state = Blocks.water.blockState.block.defaultState
+//            }
+//
+//
+//
+////            if (block === Blocks.redstone_lamp) {
+////                val blockState = Blocks.redstone_lamp.blockState
+////                event.state = blockState.block.defaultState
+////            }
+////                if (block === Blocks.flowing_lava &&
+////                    (state as IBlockState).getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE
+////                ) {
+////                    event.state = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
+////                }
+////                if (block === Blocks.carpet && (state as IBlockState).getValue(BlockCarpet.COLOR) == EnumDyeColor.WHITE) {
+////                    event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
+////                }
+////            }
+//        }
+//    }
 }

@@ -9,6 +9,7 @@
     "MixinRenderManager",
     "gui.MixinGuiContainer",
     "gui.inventory.GuiEditSignMixin",
-    "tileentity.TileEntitySignMixin"
+    "tileentity.TileEntitySignMixin",
+    "renderer.MixinBlockRendererDispatcher"
   ]
 }

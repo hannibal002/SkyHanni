@@ -89,6 +89,8 @@ class ItemDisplayOverlayFeatures {
 
         if (SkyHanniMod.feature.items.displaySackName) {
             if (ItemUtils.isSack(name)) {
+                //TODO fix this and replace other
+//                val sackName = grabSackName(name)
                 val split = name.split(" ")
                 val sackName = split[split.size - 2]
                 return (if (name.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
@@ -107,4 +109,13 @@ class ItemDisplayOverlayFeatures {
 
         return ""
     }
+
+//    private fun grabSackName(name: String): String {
+//        val split = name.split(" ")
+//        val text = split[0]
+//        for (line in arrayOf("Large", "Medium", "Small", "Enchanted")) {
+//            if (text == line) return grabSackName(name.substring(text.length + 1))
+//        }
+//        return text
+//    }
 }
