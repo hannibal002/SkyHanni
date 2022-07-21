@@ -21,8 +21,8 @@ class TrophyFishMessages {
         val trophyFishes = profileData["trophy_fish"].asJsonObject
         for ((rawName, value) in trophyFishes.entrySet()) {
             val rarity = when {
-                rawName.endsWith("_silver") -> "silver"
                 rawName.endsWith("_bronze") -> "bronze"
+                rawName.endsWith("_silver") -> "silver"
                 rawName.endsWith("_gold") -> "gold"
                 rawName.endsWith("_diamond") -> "diamond"
                 else -> continue

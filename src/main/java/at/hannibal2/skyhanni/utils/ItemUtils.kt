@@ -29,7 +29,7 @@ object ItemUtils {
         return list
     }
 
-    fun isSack(name: String): Boolean = name.endsWith(" Sack")
+    fun isSack(name: String): Boolean = name.endsWith(" Sack")//TODO change
 
     fun ItemStack.getLore() = ItemUtil.getItemLore(this)
 
@@ -41,7 +41,7 @@ object ItemUtils {
     fun isSoulBound(stack: ItemStack): Boolean =
         stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
-    fun isRecombobulated(stack: ItemStack): Boolean = stack.getLore().any { it.contains("§k") }
+    fun isRecombobulated(stack: ItemStack): Boolean = stack.getLore().any { it.contains("§k") }//TODO use item api
 
     fun isPet(name: String): Boolean = name.matchRegex("\\[Lvl (.*)] (.*)") && !listOf(
         "Archer",
@@ -93,5 +93,9 @@ object ItemUtils {
             }
         }
         return false
+    }
+
+    fun ItemStack.getSBItemID(): String {
+        return ItemUtil.getSkyBlockItemID(this) ?: ""
     }
 }
