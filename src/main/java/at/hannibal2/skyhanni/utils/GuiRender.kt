@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.GlStateManager
 object GuiRender {
 
     fun Position.renderString(string: String) {
+        if (string == "") return
         val textToRender = "§f$string"
 
         GlStateManager.pushMatrix()

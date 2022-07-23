@@ -11,10 +11,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
 
-    companion object {
-        var currentPet: String = ""
-    }
-
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyblock) return
@@ -23,15 +19,15 @@ class CurrentPetDisplay {
 
         val message = event.message
         if (message.matchRegex("§aYou summoned your §r(.*)§r§a!")) {
-            currentPet = message.between("your §r", "§r§a")
+            SkyHanniMod.feature.hidden.currentPet = message.between("your §r", "§r§a")
             blocked = true
         }
         if (message.matchRegex("§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE")) {
-            currentPet = message.between("] ", "§e!")
+            SkyHanniMod.feature.hidden.currentPet = message.between("] ", "§e!")
             blocked = true
         }
         if (message.matchRegex("§aYou despawned your §r(.*)§r§a!")) {
-            currentPet = ""
+            SkyHanniMod.feature.hidden.currentPet = ""
             blocked = true
         }
 
@@ -46,8 +42,7 @@ class CurrentPetDisplay {
         if (!LorenzUtils.inSkyblock) return
 
         if (!SkyHanniMod.feature.misc.petDisplay) return
-        if (currentPet == "") return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(currentPet)
+        SkyHanniMod.feature.misc.petDisplayPos.renderString(SkyHanniMod.feature.hidden.currentPet)
     }
 }

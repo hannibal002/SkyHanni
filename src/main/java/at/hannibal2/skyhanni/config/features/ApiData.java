@@ -7,9 +7,6 @@ import com.google.gson.annotations.Expose;
 public class ApiData {
 
     @Expose
-    public String apiKey = "";
-
-    @Expose
     @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.")
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;

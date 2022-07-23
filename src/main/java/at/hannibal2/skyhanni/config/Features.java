@@ -78,10 +78,13 @@ public class Features {
     public Misc misc = new Misc();
 
     @Expose
-    @Category(name = "Apis", desc = "Api Data")
+    @Category(name = "Api", desc = "Api Data")
     public ApiData apiData = new ApiData();
 
     @Expose
     @Category(name = "Debug", desc = "Debug and test stuff.")
     public Debug debug = new Debug();
+
+    @Expose
+    public Hidden hidden = new Hidden();
 }
