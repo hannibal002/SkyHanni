@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
 import at.hannibal2.skyhanni.dungeon.*;
 import at.hannibal2.skyhanni.dungeon.damageindicator.DungeonBossDamageIndicator;
+import at.hannibal2.skyhanni.fishing.SeaCreatureManager;
+import at.hannibal2.skyhanni.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
 import at.hannibal2.skyhanni.inventory.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.items.HideNotClickableItems;
@@ -54,6 +56,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new DungeonData());
         MinecraftForge.EVENT_BUS.register(new ScoreboardData());
         MinecraftForge.EVENT_BUS.register(new ApiData());
+        MinecraftForge.EVENT_BUS.register(new SeaCreatureManager());
 
         MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatFilter());
@@ -73,6 +76,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new TrophyFishMessages());
         MinecraftForge.EVENT_BUS.register(new BazaarBestSellMethod());
         MinecraftForge.EVENT_BUS.register(new AnvilCombineHelper());
+        MinecraftForge.EVENT_BUS.register(new SeaCreatureMessageShortener());
 
         Commands.init();
 
