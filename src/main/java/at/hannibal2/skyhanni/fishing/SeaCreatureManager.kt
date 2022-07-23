@@ -16,13 +16,13 @@ class SeaCreatureManager {
 
             for (variant in data.entrySet().map { it.value.asJsonObject }) {
                 val chatColor = variant["chat_color"].asString
-                for ((displayName, v) in variant["sea_creatures"].asJsonObject.entrySet()) {
-                    val value = v.asJsonObject
-                    val chatMessage = value["chat_message"].asString
-                    val fishingExperience = value["fishing_experience"].asInt
+                for ((displayName, value) in variant["sea_creatures"].asJsonObject.entrySet()) {
+                    val seaCreature = value.asJsonObject
+                    val chatMessage = seaCreature["chat_message"].asString
+                    val fishingExperience = seaCreature["fishing_experience"].asInt
 
-                    val rare = if (value.has("rare")) {
-                         value["rare"].asBoolean
+                    val rare = if (seaCreature.has("rare")) {
+                         seaCreature["rare"].asBoolean
                     } else false
 
                     seaCreatureMap[chatMessage] = SeaCreature(displayName, fishingExperience, chatColor, rare)
