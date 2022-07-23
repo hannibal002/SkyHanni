@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
-import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
@@ -45,8 +44,12 @@ class TrophyFishMessages {
         if (!SkyHanniMod.feature.fishing.trophyCounter) return
 
         val message = event.message
-        if (message.startsWith("§6§lTROPHY FISH! §r§bYou caught a §r")) {
-            val displayName = message.between(" a §r", "§r §r")
+        if (message.startsWith("§6§lTROPHY FISH! §r§bYou caught a")) {
+            var displayName = if (message.contains(" a §r")) message.between(" a §r", "§r §r") else message.between(" an §r", "§r §r")
+            if (displayName.contains("§k")) {
+                displayName = displayName.replace("§k", "")
+                displayName = displayName.replace("Obfuscated", "Obfuscated Fish")
+            }
             val rarity = message.between("§r §r", "§b.").lowercase().replace("§l", "")
 
             val name = (rarity + "_" + displayName).removeColorCodes().lowercase().replace(" ", "")
