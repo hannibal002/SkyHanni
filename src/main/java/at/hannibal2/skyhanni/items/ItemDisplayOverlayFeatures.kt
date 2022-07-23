@@ -42,7 +42,7 @@ class ItemDisplayOverlayFeatures {
     private fun getStackTip(item: ItemStack): String {
         val name = item.cleanName()
 
-        if (SkyHanniMod.feature.items.displayMasterStarNumber) {
+        if (SkyHanniMod.feature.inventory.displayMasterStarNumber) {
             when (name) {
                 "First Master Star" -> return "1"
                 "Second Master Star" -> return "2"
@@ -52,13 +52,13 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.items.displayMasterSkullNumber) {
+        if (SkyHanniMod.feature.inventory.displayMasterSkullNumber) {
             if (name.matchRegex("(.*)Master Skull - Tier .")) {
                 return name.substring(name.length - 1)
             }
         }
 
-        if (SkyHanniMod.feature.items.displayDungeonHeadFloor) {
+        if (SkyHanniMod.feature.inventory.displayDungeonHeadFloor) {
             if (name.contains("Golden ") || name.contains("Diamond ")) {
                 when {
                     name.contains("Bonzo") -> return "1"
@@ -72,13 +72,13 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.items.displayNewYearCakeNumber) {
+        if (SkyHanniMod.feature.inventory.displayNewYearCakeNumber) {
             if (name.startsWith("New Year Cake (")) {
                 return "§b" + name.between("(Year ", ")")
             }
         }
 
-        if (SkyHanniMod.feature.items.displayPetLevel) {
+        if (SkyHanniMod.feature.inventory.displayPetLevel) {
             if (ItemUtils.isPet(name)) {
                 val level = name.between("Lvl ", "] ").toInt()
                 if (level != ItemUtils.maxPetLevel(name)) {
@@ -87,7 +87,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.items.displaySackName) {
+        if (SkyHanniMod.feature.inventory.displaySackName) {
             if (ItemUtils.isSack(name)) {
                 //TODO fix this and replace other
 //                val sackName = grabSackName(name)
@@ -97,7 +97,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.items.displayMinionTier) {
+        if (SkyHanniMod.feature.inventory.displayMinionTier) {
             if (name.contains(" Minion ")) {
                 if (item.getLore().any { it.contains("Place this minion") }) {
                     val array = name.split(" ")

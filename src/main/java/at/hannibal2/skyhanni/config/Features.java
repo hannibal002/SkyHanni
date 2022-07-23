@@ -62,8 +62,8 @@ public class Features {
     public Dungeon dungeon = new Dungeon();
 
     @Expose
-    @Category(name = "Items", desc = "Changing the behavior around items and the inventory.")
-    public Items items = new Items();
+    @Category(name = "Inventory", desc = "Changing the behavior around items and the inventory.")
+    public Inventory inventory = new Inventory();
 
     @Expose
     @Category(name = "Bazaar", desc = "Bazaar settings.")
@@ -84,10 +84,4 @@ public class Features {
     @Expose
     @Category(name = "Debug", desc = "Debug and test stuff.")
     public Debug debug = new Debug();
-
-
-
-
-
-
 }

@@ -164,7 +164,7 @@ class HideNotClickableItems {
     private fun isDisabled(): Boolean {
         if (bypassUntil > System.currentTimeMillis()) return true
 
-        return !SkyHanniMod.feature.items.hideNotClickableItems
+        return !SkyHanniMod.feature.inventory.hideNotClickableItems
     }
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
