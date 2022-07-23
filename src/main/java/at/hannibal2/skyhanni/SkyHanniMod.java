@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.gui.commands.Commands;
 import at.hannibal2.skyhanni.dungeon.*;
 import at.hannibal2.skyhanni.dungeon.damageindicator.DungeonBossDamageIndicator;
 import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
+import at.hannibal2.skyhanni.inventory.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.items.ItemDisplayOverlayFeatures;
 import at.hannibal2.skyhanni.items.abilitycooldown.ItemAbilityCooldown;
@@ -71,6 +72,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new DungeonBossMessages());
         MinecraftForge.EVENT_BUS.register(new TrophyFishMessages());
         MinecraftForge.EVENT_BUS.register(new BazaarBestSellMethod());
+        MinecraftForge.EVENT_BUS.register(new AnvilCombineHelper());
 
         Commands.init();
 

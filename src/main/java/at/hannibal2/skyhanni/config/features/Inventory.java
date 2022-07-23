@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorBool
 import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
 
-public class Items {
+public class Inventory {
 
     @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc")
@@ -63,4 +63,9 @@ public class Items {
     @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")
     @ConfigEditorBoolean
     public boolean itemAbilityCooldown = false;
+
+    @Expose
+    @ConfigOption(name = "Anvil Combine Helper", desc = "Suggests the same item in the inventory when trying to combine two items in the anvil.")
+    @ConfigEditorBoolean
+    public boolean anvilCombineHelper = false;
 }
