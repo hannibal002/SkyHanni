@@ -7,6 +7,7 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
+import java.util.LinkedList
 
 object ItemUtils {
 
@@ -53,6 +54,30 @@ object ItemUtils {
     ).any { name.contains(it) }
 
     fun maxPetLevel(name: String) = if (name.contains("Golden Dragon")) 200 else 100
+
+    fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
+        val list: LinkedList<ItemStack> = LinkedList()
+        val player = Minecraft.getMinecraft().thePlayer
+        if (player == null) {
+            LorenzUtils.warning("getItemsInInventoryWithSlots: player is null!")
+            return list
+        }
+        for (slot in player.openContainer.inventorySlots) {
+            if (slot.hasStack) {
+                list.add(slot.stack)
+            }
+        }
+
+        if (withCursorItem) {
+            if (player.inventory != null) {
+                if (player.inventory.itemStack != null) {
+                    list.add(player.inventory.itemStack)
+                }
+            }
+        }
+
+        return list
+    }
 
     fun getItemsInInventoryWithSlots(withCursorItem: Boolean = false): Map<ItemStack, Int> {
         val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()

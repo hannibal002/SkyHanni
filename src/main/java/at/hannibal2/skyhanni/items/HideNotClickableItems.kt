@@ -121,6 +121,7 @@ class HideNotClickableItems {
 
         val stack = event.itemStack
         if (ItemUtils.getItemsInOpenChest().contains(stack)) return
+        if (!ItemUtils.getItemsInInventory().contains(stack)) return
 
         if (hide(chestName, stack)) {
             val first = event.toolTip[0]
