@@ -4,11 +4,15 @@ data class SeaCreature(
     val displayName: String,
     val fishingExperience: Int,
     val chatColor: String,
-    val special: Boolean,
+    val rare: Boolean,
 ) {
 
     override fun toString(): String {
-        return chatColor + displayName
+        return  chatColor + rare() + displayName
+    }
+
+    private fun rare(): String {
+        return if (rare) "§l" else ""
     }
 }
 
