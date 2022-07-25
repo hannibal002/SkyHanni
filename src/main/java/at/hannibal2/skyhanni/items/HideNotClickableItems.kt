@@ -93,7 +93,6 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        //test who is this?
         if (isDisabled()) return
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
