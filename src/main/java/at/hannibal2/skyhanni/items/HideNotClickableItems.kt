@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSBItemID
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import com.google.gson.JsonObject
@@ -330,6 +330,11 @@ class HideNotClickableItems {
 
         if (!ItemUtils.isRecombobulated(stack)) {
             if (hideNpcSellFilter.match(name)) return false
+
+            val id = stack.getInternalName()
+            if (VanillaItemManager.isVanillaItem(id) && !stack.isItemEnchanted) {
+                return false
+            }
         }
 
         hideReason = "This item should not be sold at the NPC!"
@@ -433,5 +438,5 @@ class HideNotClickableItems {
         return result
     }
 
-    private fun isSkyBlockMenuItem(stack: ItemStack): Boolean = stack.getSBItemID() == "SKYBLOCK_MENU"
+    private fun isSkyBlockMenuItem(stack: ItemStack): Boolean = stack.getInternalName() == "SKYBLOCK_MENU"
 }
