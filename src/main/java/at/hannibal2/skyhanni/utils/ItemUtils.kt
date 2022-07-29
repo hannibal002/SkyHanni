@@ -7,9 +7,10 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
-import java.util.LinkedList
+import java.util.*
 
 object ItemUtils {
+    private val gson = GsonBuilder().setPrettyPrinting().create()
 
     fun ItemStack.cleanName() = this.displayName.removeColorCodes()
 
@@ -32,7 +33,18 @@ object ItemUtils {
 
     fun isSack(name: String): Boolean = name.endsWith(" Sack")//TODO change
 
-    fun ItemStack.getLore() = ItemUtil.getItemLore(this)
+    fun ItemStack.getLore() = getLoree(this)
+
+
+    fun getLoree(`is`: ItemStack): List<String> {
+        val tagCompound = `is`.tagCompound ?: return emptyList()
+        val tagList = tagCompound.getCompoundTag("display").getTagList("Lore", 8)
+        val list: MutableList<String> = ArrayList()
+        for (i in 0 until tagList.tagCount()) {
+            list.add(tagList.getStringTagAt(i))
+        }
+        return list
+    }
 
     fun isCoopSoulBound(stack: ItemStack): Boolean =
         stack.getLore().any {
@@ -120,7 +132,53 @@ object ItemUtils {
         return false
     }
 
-    fun ItemStack.getSBItemID(): String {
-        return ItemUtil.getSkyBlockItemID(this) ?: ""
+    fun ItemStack.getInternalName(): String {
+        val tag = tagCompound
+        if (tag == null || !tag.hasKey("ExtraAttributes", 10)) return ""
+
+        val extraAttributes = tag.getCompoundTag("ExtraAttributes")
+        var internalName = if (extraAttributes.hasKey("id", 8)) {
+            extraAttributes.getString("id").replace(":".toRegex(), "-")
+        } else {
+            return ""
+        }
+
+        if (internalName == "PET") {
+            val petInfo = extraAttributes.getString("petInfo")
+            if (petInfo.isNotEmpty()) {
+                val petInfoObject: JsonObject = gson.fromJson(petInfo, JsonObject::class.java)
+                internalName = petInfoObject["type"].asString
+                return when (petInfoObject["tier"].asString) {
+                    "COMMON" -> "$internalName;0"
+                    "UNCOMMON" -> "$internalName;1"
+                    "RARE" -> "$internalName;2"
+                    "EPIC" -> "$internalName;3"
+                    "LEGENDARY" -> "$internalName;4"
+                    "MYTHIC" -> "$internalName;5"
+                    else -> internalName
+                }
+            }
+        }
+
+        if (internalName == "ENCHANTED_BOOK" && extraAttributes.hasKey("enchantments", 10)) {
+            val enchants = extraAttributes.getCompoundTag("enchantments")
+            for (enchantment in enchants.keySet) {
+                return enchantment.uppercase(Locale.getDefault()) + ";" + enchants.getInteger(enchantment)
+            }
+        }
+
+        if (internalName == "RUNE" && extraAttributes.hasKey("runes", 10)) {
+            val rune = extraAttributes.getCompoundTag("runes")
+            for (enchantment in rune.keySet) {
+                return enchantment.uppercase(Locale.getDefault()) + "_RUNE" + ";" + rune.getInteger(enchantment)
+            }
+        }
+
+        if (internalName == "PARTY_HAT_CRAB" && extraAttributes.getString("party_hat_color") != null) {
+            val crabHat = extraAttributes.getString("party_hat_color")
+            return "PARTY_HAT_CRAB" + "_" + crabHat.uppercase(Locale.getDefault())
+        }
+
+        return internalName
     }
 }

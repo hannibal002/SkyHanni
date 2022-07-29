@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.GuiRender.renderString
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSBItemID
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -28,7 +28,7 @@ class LorenzTest {
                 print("===")
                 print("ITEM LORE")
                 print("display name: '" + itemStack.displayName.toString() + "'")
-                val itemID = itemStack.getSBItemID()
+                val itemID = itemStack.getInternalName()
                 print("itemID: '$itemID'")
 //            val rarity: ItemRarityOld = ItemUtils.getRarity(itemStack)
 //            print("rarity: '$rarity'")

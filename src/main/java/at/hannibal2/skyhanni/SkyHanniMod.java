@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
 import at.hannibal2.skyhanni.inventory.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.items.ItemDisplayOverlayFeatures;
+import at.hannibal2.skyhanni.items.VanillaItemManager;
 import at.hannibal2.skyhanni.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.misc.*;
 import at.hannibal2.skyhanni.repo.RepoManager;
@@ -57,6 +58,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new ScoreboardData());
         MinecraftForge.EVENT_BUS.register(new ApiData());
         MinecraftForge.EVENT_BUS.register(new SeaCreatureManager());
+        MinecraftForge.EVENT_BUS.register(new VanillaItemManager());
 
         MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatFilter());

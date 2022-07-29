@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.items.abilitycooldown
 
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.ItemUtil.asStringSet
-import at.hannibal2.skyhanni.utils.ItemUtil.getExtraAttributes
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S2APacketParticles
@@ -62,4 +63,12 @@ class WitherImpactDetection(private val itemAbilityCooldown: ItemAbilityCooldown
             if (diff < 0) lastShieldUse = -1
         }
     }
+
+    private fun getExtraAttributes(item: ItemStack?): NBTTagCompound? {
+        return if (item == null || !item.hasTagCompound()) {
+            null
+        } else item.getSubCompound("ExtraAttributes", false)
+    }
+
+    private fun NBTTagList.asStringSet() = (0..tagCount()).mapTo(hashSetOf()) { getStringTagAt(it) }
 }
