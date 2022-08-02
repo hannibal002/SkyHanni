@@ -37,13 +37,9 @@ class VanillaItemManager {
                     val internalName = name.split(".")[0]
                     vanillaItems.add(internalName)
                 }
-            } else {
-                LorenzDebug.log("cannot read file: '$file'")
             }
         }
 
-        LorenzDebug.log("all vanilla items: ${vanillaItems.size}")
-        vanillaItems.forEach { LorenzDebug.log(it) }
     }
 
     private fun getJsonFromFile(file: File): JsonObject? {
