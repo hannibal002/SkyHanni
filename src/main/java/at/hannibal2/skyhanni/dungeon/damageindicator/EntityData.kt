@@ -5,7 +5,7 @@ import net.minecraft.entity.EntityLivingBase
 
 class EntityData(
     val entity: EntityLivingBase,
-    val ignoreBlocks: Boolean,
+    var ignoreBlocks: Boolean,
     val delayedStart: Long,
     val finalDungeonBoss: Boolean,
     val bossType: BossType = BossType.DUNGEON,
