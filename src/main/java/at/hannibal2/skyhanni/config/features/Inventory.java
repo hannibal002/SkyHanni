@@ -9,7 +9,7 @@ import com.google.gson.annotations.Expose;
 public class Inventory {
 
     @Expose
-    @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc")
+    @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc.")
     @ConfigEditorBoolean
     public boolean hideNotClickableItems = false;
 
@@ -58,11 +58,6 @@ public class Inventory {
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
     @ConfigEditorBoolean
     public boolean displaySackName = false;
-
-    @Expose
-    @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")
-    @ConfigEditorBoolean
-    public boolean itemAbilityCooldown = false;
 
     @Expose
     @ConfigOption(name = "Anvil Combine Helper", desc = "Suggests the same item in the inventory when trying to combine two items in the anvil.")

@@ -9,7 +9,7 @@ import com.google.gson.annotations.Expose;
 public class Dungeon {
 
     @Expose
-    @ConfigOption(name = "Clicked Blocks", desc = "Highlight the following blocks when clicked in dungeon: Lever, Chest, Wither Essence")
+    @ConfigOption(name = "Clicked Blocks", desc = "Highlight the following blocks when clicked in dungeon: Lever, Chest, Wither Essence.")
     @ConfigEditorBoolean
     public boolean highlightClickedBlocks = false;
 
