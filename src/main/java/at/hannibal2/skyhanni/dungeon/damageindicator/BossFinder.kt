@@ -11,10 +11,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.monster.EntityBlaze
-import net.minecraft.entity.monster.EntityGhast
-import net.minecraft.entity.monster.EntityGiantZombie
-import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.*
+import net.minecraft.util.AxisAlignedBB
 import java.util.*
 
 class BossFinder {
@@ -54,7 +53,7 @@ class BossFinder {
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = 0L
 
-    internal fun shouldShow(entity: EntityLivingBase): EntityResult? {
+    internal fun tryAdd(entity: EntityLivingBase): EntityResult? {
         if (LorenzUtils.inDungeons) {
             if (DungeonData.isOneOf("F1", "M1")) {
                 if (floor1bonzo1) {
@@ -67,7 +66,7 @@ class BossFinder {
                 if (floor1bonzo2) {
                     if (entity is EntityOtherPlayerMP) {
                         if (entity.name == "Bonzo ") {
-                            return EntityResult(floor1bonzo2SpawnTime, finalBoss = true)
+                            return EntityResult(floor1bonzo2SpawnTime, finalDungeonBoss = true)
                         }
                     }
                 }
@@ -96,7 +95,7 @@ class BossFinder {
                         //TODO only show scarf after (all/at least x) summons are dead?
                         val result = entity.name == "Scarf "
                         if (result) {
-                            return EntityResult(floor2secondPhaseSpawnTime, finalBoss = true)
+                            return EntityResult(floor2secondPhaseSpawnTime, finalDungeonBoss = true)
                         }
                     }
                 }
@@ -144,7 +143,7 @@ class BossFinder {
                 if (entity is EntityGuardian) {
                     if (floor3ProfessorGuardian) {
                         if (entity == floor3ProfessorGuardianEntity) {
-                            return EntityResult(finalBoss = true)
+                            return EntityResult(finalDungeonBoss = true)
                         }
                     }
                 }
@@ -156,7 +155,7 @@ class BossFinder {
                     //TODO add m4 support
                     LorenzTest.enabled = true
                     LorenzTest.text = "thorn has $health hp!"
-                    return EntityResult(ignoreBlocks = true, finalBoss = true)
+                    return EntityResult(ignoreBlocks = true, finalDungeonBoss = true)
                 }
 
             }
@@ -164,7 +163,7 @@ class BossFinder {
             if (DungeonData.isOneOf("F5", "M5")) {
                 if (entity is EntityOtherPlayerMP) {
                     if (entity == floor5lividEntity) {
-                        return EntityResult(floor5lividEntitySpawnTime, true, finalBoss = true)
+                        return EntityResult(floor5lividEntitySpawnTime, true, finalDungeonBoss = true)
                     }
                 }
             }
@@ -180,10 +179,35 @@ class BossFinder {
                     }
 
                     if (floor6Sadan) {
-                        return EntityResult(floor6SadanSpawnTime, finalBoss = true)
+                        return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true)
                     }
                 }
             }
+        } else {
+
+            if (entity is EntityBlaze) {
+                if (entity.name != "Dinnerbone") {
+                    if (entity.hasNameTagWith(0, 2, 0, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ")) {
+                        if (entity.baseMaxHealth == 50_000_000.0) {
+                            return EntityResult(bossType = BossType.NETHER_ASHFANG)
+                        }
+                    }
+                }
+            }
+            if (entity is EntitySkeleton) {
+                if (entity.hasNameTagWith(0, 5, 0, "§e﴾ §8[§7Lv200§8] §l§8§lBladesoul§r ")) {
+                    return EntityResult(bossType = BossType.NETHER_BLADESOUL)
+                }
+            }
+            if (entity is EntityOtherPlayerMP) {
+                if (entity.name == "Mage Outlaw") {
+                    return EntityResult(bossType = BossType.NETHER_MAGE_OUTLAW)
+                }
+                if (entity.name == "DukeBarb ") {
+                    return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
+                }
+            }
+
         }
 
         return null
@@ -384,4 +408,13 @@ class BossFinder {
 
         return null
     }
+}
+
+private fun EntityMob.hasNameTagWith(x: Int, y: Int, z: Int, startName: String): Boolean {
+    val center = getLorenzVec().add(x, y, z)
+    val a = center.add(-1.6, -1.6, -1.6).toBlocPos()
+    val b = center.add(1.6, 1.6, 1.6).toBlocPos()
+    val alignedBB = AxisAlignedBB(a, b)
+    val clazz = EntityArmorStand::class.java
+    return worldObj.getEntitiesWithinAABB(clazz, alignedBB).any { it.name.startsWith(startName) }
 }
