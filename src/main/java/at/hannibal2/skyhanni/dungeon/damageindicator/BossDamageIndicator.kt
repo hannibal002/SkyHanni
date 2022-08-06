@@ -122,6 +122,20 @@ class BossDamageIndicator {
 
                 health = hitPoints
                 maxHealth = 4
+//            } else if (DungeonData.isOneOf("M4")) {
+//                val hitPoints = when (health) {
+//                    300_000 -> 4
+//                    222_000 -> 3
+//                    144_000 -> 2
+//                    66_000 -> 1
+//                    else -> {
+//                        LorenzUtils.error("Unexpected health of thorn in F4! ($health)")
+//                        return
+//                    }
+//                }
+
+//                health = hitPoints
+//                maxHealth = 4
             } else {
                 val biggestHealth = getMaxHealthFor(event.entity)
 
@@ -143,8 +157,18 @@ class BossDamageIndicator {
                 else -> LorenzColor.RED
             }
 
+            if (data.containsKey(entity)){
+                val lastHealth = data[entity]!!.lastHealth
+                val diff = lastHealth -  health
+                if (diff != 0) {
+                    LorenzUtils.chat("diff: $diff")
+                }
+
+            }
+
             data[entity] = EntityData(
                 entity,
+                health,
                 NumberUtil.format(health),
                 color,
                 System.currentTimeMillis(),
