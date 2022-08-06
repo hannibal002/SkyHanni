@@ -56,5 +56,15 @@ public class Commands {
                         }
                 )
         );
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "testhanni",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                LorenzTest.Companion.testCommand();
+                            }
+                        }
+                )
+        );
     }
 }

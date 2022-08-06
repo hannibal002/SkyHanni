@@ -1,20 +1,22 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.GuiRender.renderString
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzDebug
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getSBItemID
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LorenzTest {
 
-    var log = LorenzLogger("debug/packets")
+    var packetLog = LorenzLogger("debug/packets")
 
     companion object {
         var enabled = false
@@ -28,7 +30,7 @@ class LorenzTest {
                 print("===")
                 print("ITEM LORE")
                 print("display name: '" + itemStack.displayName.toString() + "'")
-                val itemID = itemStack.getInternalName()
+                val itemID = itemStack.getSBItemID()
                 print("itemID: '$itemID'")
 //            val rarity: ItemRarityOld = ItemUtils.getRarity(itemStack)
 //            print("rarity: '$rarity'")
@@ -91,6 +93,68 @@ class LorenzTest {
         private fun print(text: String) {
             LorenzDebug.log(text)
         }
+
+        fun testCommand() {
+            val minecraft = Minecraft.getMinecraft()
+            val start = minecraft.thePlayer.position.toLorenzVec()
+            val world = minecraft.theWorld
+            for (entity in world.loadedEntityList) {
+                val position = entity.position
+                val vec = position.toLorenzVec()
+                val distance = start.distance(vec)
+                if (distance < 10) {
+                    LorenzDebug.log("found entity: " + entity.name)
+                    val displayName = entity.displayName
+                    LorenzDebug.log("displayName: $displayName")
+                    val simpleName = entity.javaClass.simpleName
+                    LorenzDebug.log("simpleName: $simpleName")
+                    LorenzDebug.log("vec: $vec")
+                    LorenzDebug.log("distance: $distance")
+
+                    val rotationYaw = entity.rotationYaw
+                    val rotationPitch = entity.rotationPitch
+                    LorenzDebug.log("rotationYaw: $rotationYaw")
+                    LorenzDebug.log("rotationPitch: $rotationPitch")
+
+                    if (entity is EntityArmorStand) {
+                        LorenzDebug.log("armor stand data:")
+                        val headRotation = entity.headRotation.toLorenzVec()
+                        val bodyRotation = entity.bodyRotation.toLorenzVec()
+                        LorenzDebug.log("headRotation: $headRotation")
+                        LorenzDebug.log("bodyRotation: $bodyRotation")
+
+                        /**
+                         * xzLen = cos(pitch)
+                        x = xzLen * cos(yaw)
+                        y = sin(pitch)
+                        z = xzLen * sin(-yaw)
+                         */
+
+//                        val xzLen = cos(0.0)
+//                        val x = xzLen * cos(rotationYaw)
+//                        val y = sin(0.0)
+//                        val z = xzLen * sin(-rotationYaw)
+
+                        val dir = LorenzVec.getFromYawPitch(rotationYaw.toDouble(), 0.0)
+
+//                        val direction = Vec3(1.0, 1.0, 1.0).rotateYaw(rotationYaw).toLorenzVec()
+//                        val direction = LorenzVec(x, y, z)
+
+                        for ((id, stack) in entity.inventory.withIndex()) {
+                            LorenzDebug.log("id $id = $stack")
+                            if (stack != null) {
+                                val cleanName = stack.cleanName()
+                                val type = stack.javaClass.name
+                                LorenzDebug.log("cleanName: $cleanName")
+                                LorenzDebug.log("type: $type")
+
+                            }
+                        }
+                    }
+                    LorenzDebug.log("")
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -100,6 +164,11 @@ class LorenzTest {
         if (enabled) {
             SkyHanniMod.feature.debug.testPos.renderString(text)
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+        packetLog.log(event.packet.toString())
     }
 
 //    @SubscribeEvent

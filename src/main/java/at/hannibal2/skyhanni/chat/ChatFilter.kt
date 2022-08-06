@@ -37,11 +37,28 @@ class ChatFilter {
         winterIsland(message) && SkyHanniMod.feature.chat.others -> "winter_island"
         uselessWarning(message) && SkyHanniMod.feature.chat.others -> "useless_warning"
         friendJoin(message) && SkyHanniMod.feature.chat.others -> "friend_join"
-
-
+        annoyingSpam(message) && SkyHanniMod.feature.chat.others -> "annoying_spam"
 
 
         else -> ""
+    }
+
+    //TODO split into others
+    private fun annoyingSpam(message: String): Boolean {
+        if (message.matchRegex("§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.")) return true
+        if (message.matchRegex("§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.")) return true
+        if (message == "§cThere are blocks in the way!") return true
+        if (message == "§aYour Blessing enchant got you double drops!") return true
+        if (message == "§cYou can't use the wardrobe in combat!") return true
+        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fFish Bait§r§b.") return true
+        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§aGrand Experience Bottle§r§b.") return true
+        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§aBlessed Bait§r§b.") return true
+        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fDark Bait§r§b.") return true
+        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b.") return true
+        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b.") return true
+        if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.") return true
+
+        return false
     }
 
     private fun friendJoin(message: String): Boolean {
