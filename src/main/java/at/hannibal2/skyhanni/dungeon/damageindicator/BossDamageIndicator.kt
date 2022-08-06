@@ -24,7 +24,7 @@ import kotlin.math.max
 
 class BossDamageIndicator {
 
-    var data = mutableMapOf<EntityLivingBase, EntityData>()
+    var data = mutableMapOf<UUID, EntityData>()
     private var bossFinder: BossFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
     private val maxHealth = mutableMapOf<UUID, Int>()
@@ -32,6 +32,7 @@ class BossDamageIndicator {
     @SubscribeEvent
     fun onDungeonStart(event: WorldEvent.Load) {
         bossFinder = BossFinder()
+        data.clear()
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -49,7 +50,7 @@ class BossDamageIndicator {
         val player = Minecraft.getMinecraft().thePlayer
 
         for (data in data.values) {
-            if (System.currentTimeMillis() > data.time + 100) continue//TODO use removeIf
+            if (System.currentTimeMillis() > data.timeLastTick + 100) continue//TODO use removeIf
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
@@ -98,15 +99,12 @@ class BossDamageIndicator {
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
         try {
             val entity = event.entity
-            val result = bossFinder?.shouldShow(entity) ?: return
+            val entityData = grabData(entity) ?: return
             if (LorenzUtils.inDungeons) {
-                checkLastBossDead(result.finalBoss, entity.entityId)
+                checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
-            val ignoreBlocks = result.ignoreBlocks
-            val delayedStart = result.delayedStart
 
-
-            var health = event.entity.health.toInt()
+            var health = entity.health.toInt()
             val maxHealth: Int
             if (DungeonData.isOneOf("F4")) {
                 val hitPoints = when (health) {
@@ -158,31 +156,64 @@ class BossDamageIndicator {
                 else -> LorenzColor.RED
             }
 
-            if (data.containsKey(entity)){
-                val lastHealth = data[entity]!!.lastHealth
-                val diff = lastHealth -  health
+            if (data.containsKey(entity.uniqueID)) {
+                val lastHealth = data[entity.uniqueID]!!.lastHealth
+                val diff = lastHealth - health
                 if (diff != 0) {
-                    LorenzUtils.chat("diff: $diff")
+                    val bossType = entityData.bossType
+                    if (bossType == BossType.NETHER_ASHFANG) {
+                        if (diff < 0) {
+                            val oldHealth = lastHealth / 1_000_000
+                            val newHealth = health / 1_000_000
+                            LorenzUtils.chat("§e§lAshfang healing: ${oldHealth}M -> ${newHealth}M")
+                        }
+                    } else if (bossType == BossType.NETHER_BLADESOUL) {
+                        if (diff < 0) {
+                            val oldHealth = lastHealth / 1_000_000
+                            val newHealth = health / 1_000_000
+                            val oldFormat = NumberUtil.format(oldHealth)
+                            val newFormat = NumberUtil.format(newHealth)
+                            LorenzUtils.chat("§e§lBladesoul healing: §a+12.5m §e(${oldFormat}M -> ${newFormat}M)")
+                        }
+                    } else if (bossType == BossType.NETHER_BARBARIAN_DUKE) {
+                        if (diff < 0) {
+                            val oldHealth = lastHealth / 1_000_000
+                            val newHealth = health / 1_000_000
+                            val oldFormat = NumberUtil.format(oldHealth)
+                            val newFormat = NumberUtil.format(newHealth)
+                            LorenzUtils.chat("§e§lBarbarian Duke healing: §a+12.5m §e(${oldFormat}M -> ${newFormat}M)")
+                        }
+                    } else {
+                        LorenzUtils.chat("$bossType diff: $diff")
+                    }
                 }
-
             }
 
-            data[entity] = EntityData(
-                entity,
-                health,
-                NumberUtil.format(health),
-                color,
-                System.currentTimeMillis(),
-                ignoreBlocks,
-                delayedStart
-            )
+            entityData.lastHealth = health
+            entityData.text = NumberUtil.format(health)
+            entityData.color = color
+            entityData.timeLastTick = System.currentTimeMillis()
+            data[entity.uniqueID] = entityData
 
         } catch (e: Throwable) {
             e.printStackTrace()
         }
     }
 
-    private fun checkLastBossDead(finalBoss: Boolean, id: Int) {
+    private fun grabData(entity: EntityLivingBase): EntityData? {
+        if (data.contains(entity.uniqueID)) return data[entity.uniqueID]
+
+        val entityResult = bossFinder?.tryAdd(entity) ?: return null
+        return EntityData(
+            entity,
+            entityResult.ignoreBlocks,
+            entityResult.delayedStart,
+            entityResult.finalDungeonBoss,
+            entityResult.bossType
+        )
+    }
+
+    private fun checkFinalBoss(finalBoss: Boolean, id: Int) {
         if (finalBoss) {
             DamageIndicatorFinalBossEvent(id).postAndCatch()
         }
