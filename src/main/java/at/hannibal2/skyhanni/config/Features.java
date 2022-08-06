@@ -51,6 +51,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, bazaar.bestSellMethodPos);
             return;
         }
+
+        if (runnableId.equals("ashfangFreezeCooldown")) {
+            editOverlay(activeConfigCategory, 200, 16, abilities.ashfangFreezeCooldownPos);
+            return;
+        }
     }
 
     @Expose
@@ -64,6 +69,10 @@ public class Features {
     @Expose
     @Category(name = "Inventory", desc = "Changing the behavior around items and the inventory.")
     public Inventory inventory = new Inventory();
+
+    @Expose
+    @Category(name = "Abilitiies", desc = "Stuff about abilities")
+    public Abilities abilities = new Abilities();
 
     @Expose
     @Category(name = "Bazaar", desc = "Bazaar settings.")

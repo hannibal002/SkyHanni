@@ -53,7 +53,7 @@ class ItemAbilityCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.inventory.itemAbilityCooldown
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.abilities.itemAbilityCooldown
     }
 
     private fun click(ability: Ability) {

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.gui.commands.Commands;
 import at.hannibal2.skyhanni.diana.GriffinBurrowFinder;
 import at.hannibal2.skyhanni.dungeon.*;
 import at.hannibal2.skyhanni.dungeon.damageindicator.DungeonBossDamageIndicator;
+import at.hannibal2.skyhanni.features.abilities.AshfangFreezeCooldown;
 import at.hannibal2.skyhanni.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
@@ -81,6 +82,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new AnvilCombineHelper());
         MinecraftForge.EVENT_BUS.register(new SeaCreatureMessageShortener());
         MinecraftForge.EVENT_BUS.register(new GriffinBurrowFinder());
+        MinecraftForge.EVENT_BUS.register(new AshfangFreezeCooldown());
 
         Commands.init();
 

@@ -17,7 +17,7 @@ public class Fishing {
     public boolean trophyFishBronzeHider = false;
 
     @Expose
-    @ConfigOption(name = "Shorten Fishing Message", desc = "Shorten the message what type of sea creature you have fished")
+    @ConfigOption(name = "Shorten Fishing Message", desc = "Shorten the message what type of sea creature you have fished.")
     @ConfigEditorBoolean
     public boolean shortenFishingMessage = false;
 }
