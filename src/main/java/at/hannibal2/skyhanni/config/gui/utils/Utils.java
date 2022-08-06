@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.config.gui.utils;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.math.RoundingMode;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -363,5 +365,9 @@ public class Utils {
         if (!stack.getTagCompound().hasKey("ExtraAttributes")) return null;
         if (!stack.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id")) return null;
         return stack.getTagCompound().getCompoundTag("ExtraAttributes").getString("id");
+    }
+    public static void copyToClipboard(String str) {
+        Toolkit.getDefaultToolkit().getSystemClipboard()
+                .setContents(new StringSelection(str), null);
     }
 }

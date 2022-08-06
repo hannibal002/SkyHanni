@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.gui.utils.Utils
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.GuiRender.renderString
@@ -100,55 +101,42 @@ class LorenzTest {
             val minecraft = Minecraft.getMinecraft()
             val start = minecraft.thePlayer.position.toLorenzVec()
             val world = minecraft.theWorld
+            
+            val resultList = mutableListOf<String>()
+            var counter = 0
+
             for (entity in world.loadedEntityList) {
                 val position = entity.position
                 val vec = position.toLorenzVec()
                 val distance = start.distance(vec)
                 if (distance < 10) {
-                    LorenzDebug.log("found entity: " + entity.name)
+                    resultList.add("found entity: '" + entity.name + "'")
                     val displayName = entity.displayName
-                    LorenzDebug.log("displayName: $displayName")
+                    resultList.add("displayName: '${displayName.formattedText}'")
                     val simpleName = entity.javaClass.simpleName
-                    LorenzDebug.log("simpleName: $simpleName")
-                    LorenzDebug.log("vec: $vec")
-                    LorenzDebug.log("distance: $distance")
+                    resultList.add("simpleName: $simpleName")
+                    resultList.add("vec: $vec")
+                    resultList.add("distance: $distance")
 
                     val rotationYaw = entity.rotationYaw
                     val rotationPitch = entity.rotationPitch
-                    LorenzDebug.log("rotationYaw: $rotationYaw")
-                    LorenzDebug.log("rotationPitch: $rotationPitch")
+                    resultList.add("rotationYaw: $rotationYaw")
+                    resultList.add("rotationPitch: $rotationPitch")
 
                     if (entity is EntityArmorStand) {
-                        LorenzDebug.log("armor stand data:")
+                        resultList.add("armor stand data:")
                         val headRotation = entity.headRotation.toLorenzVec()
                         val bodyRotation = entity.bodyRotation.toLorenzVec()
-                        LorenzDebug.log("headRotation: $headRotation")
-                        LorenzDebug.log("bodyRotation: $bodyRotation")
-
-                        /**
-                         * xzLen = cos(pitch)
-                        x = xzLen * cos(yaw)
-                        y = sin(pitch)
-                        z = xzLen * sin(-yaw)
-                         */
-
-//                        val xzLen = cos(0.0)
-//                        val x = xzLen * cos(rotationYaw)
-//                        val y = sin(0.0)
-//                        val z = xzLen * sin(-rotationYaw)
-
-                        val dir = LorenzVec.getFromYawPitch(rotationYaw.toDouble(), 0.0)
-
-//                        val direction = Vec3(1.0, 1.0, 1.0).rotateYaw(rotationYaw).toLorenzVec()
-//                        val direction = LorenzVec(x, y, z)
+                        resultList.add("headRotation: $headRotation")
+                        resultList.add("bodyRotation: $bodyRotation")
 
                         for ((id, stack) in entity.inventory.withIndex()) {
-                            LorenzDebug.log("id $id = $stack")
+                            resultList.add("id $id = $stack")
                             if (stack != null) {
                                 val cleanName = stack.cleanName()
                                 val type = stack.javaClass.name
-                                LorenzDebug.log("cleanName: $cleanName")
-                                LorenzDebug.log("type: $type")
+                                resultList.add("cleanName: $cleanName")
+                                resultList.add("type: $type")
 
                             }
                         }
@@ -156,13 +144,22 @@ class LorenzTest {
                         if (entity is EntityLivingBase) {
                             val baseMaxHealth = entity.baseMaxHealth
                             val health = entity.health.toInt()
-                            LorenzDebug.log("baseMaxHealth: $baseMaxHealth")
-                            LorenzDebug.log("health: $health")
+                            resultList.add("baseMaxHealth: $baseMaxHealth")
+                            resultList.add("health: $health")
                         }
                     }
-                    LorenzDebug.log("")
-                    LorenzDebug.log("")
+                    resultList.add("")
+                    resultList.add("")
+                    counter++
                 }
+            }
+
+            if (counter != 0) {
+                val string = resultList.joinToString("\n")
+                Utils.copyToClipboard(string)
+                LorenzUtils.chat("§e$counter entities copied to clipboard!")
+            } else {
+                LorenzUtils.chat("§eNo entities in radius from 10 found!")
             }
         }
     }
@@ -178,7 +175,7 @@ class LorenzTest {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        packetLog.log(event.packet.toString())
+//        packetLog.log(event.packet.toString())
     }
 
 //    @SubscribeEvent
