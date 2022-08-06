@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.utils.GuiRender.renderString
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -150,7 +152,15 @@ class LorenzTest {
 
                             }
                         }
+                    } else {
+                        if (entity is EntityLivingBase) {
+                            val baseMaxHealth = entity.baseMaxHealth
+                            val health = entity.health.toInt()
+                            LorenzDebug.log("baseMaxHealth: $baseMaxHealth")
+                            LorenzDebug.log("health: $health")
+                        }
                     }
+                    LorenzDebug.log("")
                     LorenzDebug.log("")
                 }
             }
