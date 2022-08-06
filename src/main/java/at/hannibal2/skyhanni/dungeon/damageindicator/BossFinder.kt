@@ -11,6 +11,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.boss.EntityDragon
+import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.*
 import net.minecraft.util.AxisAlignedBB
@@ -208,6 +210,25 @@ class BossFinder {
                 }
             }
 
+            //TODO testing and make right and so
+            if (entity is EntityWither) {
+                if (entity.hasNameTagWith(0, 4, 0, "§8[§7Lv100§8] §c§5Vanquisher§r ")) {
+                    return EntityResult(bossType = BossType.NETHER_VANQUISHER)
+                }
+            }
+
+            if (entity is EntityEnderman) {
+                if (entity.hasNameTagWith(0, 3, 0, "§c☠ §bVoidgloom Seraph ")) {
+                    return EntityResult(bossType = BossType.END_ENDERMAN_SLAYER)
+                }
+            }
+
+            //TODO testing and make right and so
+            if (entity is EntityDragon) {
+//                if (entity.hasNameTagWith(0, 3, 0, "§c☠ §bVoidgloom Seraph ")) {
+                return EntityResult(bossType = BossType.END_ENDER_DRAGON)
+//                }
+            }
         }
 
         return null
@@ -410,11 +431,11 @@ class BossFinder {
     }
 }
 
-private fun EntityMob.hasNameTagWith(x: Int, y: Int, z: Int, startName: String): Boolean {
+fun EntityMob.hasNameTagWith(x: Int, y: Int, z: Int, contains: String): Boolean {
     val center = getLorenzVec().add(x, y, z)
     val a = center.add(-1.6, -1.6, -1.6).toBlocPos()
     val b = center.add(1.6, 1.6, 1.6).toBlocPos()
     val alignedBB = AxisAlignedBB(a, b)
     val clazz = EntityArmorStand::class.java
-    return worldObj.getEntitiesWithinAABB(clazz, alignedBB).any { it.name.startsWith(startName) }
+    return worldObj.getEntitiesWithinAABB(clazz, alignedBB).any { it.name.contains(contains) }
 }

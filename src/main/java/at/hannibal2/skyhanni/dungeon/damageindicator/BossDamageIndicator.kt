@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -54,6 +55,7 @@ class BossDamageIndicator {
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
+            if (data.hidden) continue
 
             val entity = data.entity
 
@@ -155,7 +157,29 @@ class BossDamageIndicator {
                 }
             }
 
-            val percentage = health.toDouble() / maxHealth.toDouble()
+            var calcHealth = health
+            var calcMaxHealth = maxHealth
+
+
+            if (entityData.bossType == BossType.END_ENDERMAN_SLAYER) {
+                if (maxHealth == 66_666_666) {
+                    calcMaxHealth = 22_222_222
+                    if (health > 44_444_444) {
+                        calcHealth -= 44_444_444
+                    } else if (health > 22_222_222) {
+                        calcHealth -= 22_222_222
+                    } else {
+                        calcHealth = health
+                    }
+                } else {
+                    println("maxHealth: $maxHealth")
+                }
+                if (entity is EntityEnderman) {
+                    entityData.hidden = entity.hasNameTagWith(0, 3, 0, " Hits")
+                }
+            }
+
+            val percentage = calcHealth.toDouble() / calcMaxHealth.toDouble()
             val color = when {
                 percentage > 0.9 -> LorenzColor.DARK_GREEN
                 percentage > 0.75 -> LorenzColor.GREEN
@@ -212,7 +236,7 @@ class BossDamageIndicator {
             }
 
             entityData.lastHealth = health
-            entityData.text = NumberUtil.format(health)
+            entityData.text = NumberUtil.format(calcHealth)
             entityData.color = color
             entityData.timeLastTick = System.currentTimeMillis()
             data[entity.uniqueID] = entityData
