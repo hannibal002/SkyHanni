@@ -122,6 +122,7 @@ class BossDamageIndicator {
 
                 health = hitPoints
                 maxHealth = 4
+                //TODO add m4 support
 //            } else if (DungeonData.isOneOf("M4")) {
 //                val hitPoints = when (health) {
 //                    300_000 -> 4
