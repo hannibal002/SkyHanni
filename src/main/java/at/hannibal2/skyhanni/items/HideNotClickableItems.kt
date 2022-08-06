@@ -1,25 +1,23 @@
 package at.hannibal2.skyhanni.items
 
+import at.hannibal2.skyhanni.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.bazaar.BazaarApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.opengl.GL11
 
 class HideNotClickableItems {
 
@@ -73,10 +71,6 @@ class HideNotClickableItems {
         val chest = guiChest.inventorySlots as ContainerChest
         val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
 
-        val lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)
-        GlStateManager.disableLighting()
-        GlStateManager.color(1f, 1f, 1f, 1f)
-
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
 
@@ -84,29 +78,9 @@ class HideNotClickableItems {
             if (slot.stack == null) continue
 
             if (hide(chestName, slot.stack)) {
-                slot highlight LorenzColor.GRAY
+                val color = LorenzColor.DARK_GRAY.addOpacity(160)
+                slot.stack.background = color.rgb
             }
-        }
-
-        if (lightingState) GlStateManager.enableLighting()
-    }
-
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        if (isDisabled()) return
-        if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-
-        val slot = event.slot
-        if (slot.slotNumber == slot.slotIndex) return
-        if (slot.stack == null) return
-
-        val stack = slot.stack
-
-        if (hide(chestName, stack)) {
-            event.isCanceled = true
         }
     }
 

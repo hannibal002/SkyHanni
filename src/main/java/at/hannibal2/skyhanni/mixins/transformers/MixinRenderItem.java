@@ -38,4 +38,9 @@ public abstract class MixinRenderItem {
             ci.cancel();
         }
     }
+
+    @Inject(method = "renderItemIntoGUI", at = @At("RETURN"))
+    public void renderItemReturn(ItemStack stack, int x, int y, CallbackInfo ci) {
+        RenderItemHookKt.renderItemReturn(stack, x, y, ci);
+    }
 }
