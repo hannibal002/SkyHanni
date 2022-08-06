@@ -4,20 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.dungeon.DungeonData
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.max
@@ -49,8 +46,11 @@ class BossDamageIndicator {
 
         val player = Minecraft.getMinecraft().thePlayer
 
+        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + 100 }.map { it.key }) {
+            data.remove(uuid)
+        }
+
         for (data in data.values) {
-            if (System.currentTimeMillis() > data.timeLastTick + 100) continue//TODO use removeIf
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
@@ -96,9 +96,17 @@ class BossDamageIndicator {
     }
 
     @SubscribeEvent
-    fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
+    fun onTickEvent(event: TickEvent.ClientTickEvent) {
+        if (!LorenzUtils.inSkyblock) return
+        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
+            if (entity is EntityLivingBase) {
+                checkEntity(entity)
+            }
+        }
+    }
+
+    private fun checkEntity(entity: EntityLivingBase) {
         try {
-            val entity = event.entity
             val entityData = grabData(entity) ?: return
             if (LorenzUtils.inDungeons) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
@@ -136,12 +144,12 @@ class BossDamageIndicator {
 //                health = hitPoints
 //                maxHealth = 4
             } else {
-                val biggestHealth = getMaxHealthFor(event.entity)
+                val biggestHealth = getMaxHealthFor(entity)
 
                 if (biggestHealth == 0) {
-                    val currentMaxHealth = event.entity.baseMaxHealth.toInt()
+                    val currentMaxHealth = entity.baseMaxHealth.toInt()
                     maxHealth = max(currentMaxHealth, health)
-                    setMaxHealth(event.entity, maxHealth)
+                    setMaxHealth(entity, maxHealth)
                 } else {
                     maxHealth = biggestHealth
                 }
@@ -183,10 +191,24 @@ class BossDamageIndicator {
                             val newFormat = NumberUtil.format(newHealth)
                             LorenzUtils.chat("§e§lBarbarian Duke healing: §a+12.5m §e(${oldFormat}M -> ${newFormat}M)")
                         }
-                    } else {
-                        LorenzUtils.chat("$bossType diff: $diff")
+                        //TODO check for revive buffs
+//                    } else {
+//                        LorenzUtils.chat("$bossType diff: $diff")
                     }
                 }
+            }
+
+            if (entityData.bossType == BossType.NETHER_BARBARIAN_DUKE) {
+                val location = entity.getLorenzVec()
+                val y = location.y
+                var ignoreBlocks = false
+                val distance = Minecraft.getMinecraft().thePlayer.getLorenzVec().distance(location)
+                if (distance < 10) {
+                    if (y == 117.0) {
+                        ignoreBlocks = true
+                    }
+                }
+                entityData.ignoreBlocks = ignoreBlocks
             }
 
             entityData.lastHealth = health
