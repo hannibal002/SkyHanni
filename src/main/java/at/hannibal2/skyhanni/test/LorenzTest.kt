@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.GuiRender.renderString
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSBItemID
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.nbt.NBTTagCompound
@@ -30,8 +30,8 @@ class LorenzTest {
                 print("===")
                 print("ITEM LORE")
                 print("display name: '" + itemStack.displayName.toString() + "'")
-                val itemID = itemStack.getSBItemID()
-                print("itemID: '$itemID'")
+                val itemID = itemStack.getInternalName()
+                print("internalName: '$itemID'")
 //            val rarity: ItemRarityOld = ItemUtils.getRarity(itemStack)
 //            print("rarity: '$rarity'")
                 print("")
