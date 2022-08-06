@@ -153,6 +153,7 @@ class BossFinder {
             if (DungeonData.isOneOf("F4", "M4")) {
                 if (entity is EntityGhast) {
                     val health = LorenzUtils.formatDouble(entity.health.toDouble())
+                    //TODO add m4 support
                     LorenzTest.enabled = true
                     LorenzTest.text = "thorn has $health hp!"
                     return EntityResult(ignoreBlocks = true, finalBoss = true)
