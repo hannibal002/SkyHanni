@@ -22,13 +22,20 @@ object RenderUtils {
     val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     infix fun Slot.highlight(color: LorenzColor) {
+        highlight(color.toColor())
+    }
+
+    infix fun Slot.highlight(color: Color) {
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
         Gui.drawRect(
             this.xDisplayPosition,
             this.yDisplayPosition,
             this.xDisplayPosition + 16,
             this.yDisplayPosition + 16,
-            color.toColor().rgb
+            color.rgb
         )
+        GlStateManager.popMatrix()
     }
 
     fun RenderWorldLastEvent.drawColor(location: LorenzVec, color: LorenzColor, beacon: Boolean = false) {

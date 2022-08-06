@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.items.abilitycooldown
 
+import at.hannibal2.skyhanni.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
@@ -107,7 +108,10 @@ class ItemAbilityCooldown {
             .firstNotNullOfOrNull { it.value } ?: return
         if (guiOpen && !itemText.onCooldown) return
 
-        stackTip = itemText.color.getChatColor() + itemText.text
+        val color = itemText.color
+        stackTip = color.getChatColor() + itemText.text
+
+        item.background = color.addOpacity(120).rgb
 
         if (stackTip.isNotEmpty()) {
             GlStateManager.disableLighting()

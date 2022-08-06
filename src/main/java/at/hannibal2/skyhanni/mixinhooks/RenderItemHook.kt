@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixinhooks
 
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.events.RenderRealOverlayEvent
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
@@ -25,4 +26,8 @@ fun renderItemOverlayPost(
         yPosition,
         text
     ).postAndCatch()
+}
+
+fun renderItemReturn(stack: ItemStack, x: Int, y: Int, ci: CallbackInfo) {
+    RenderRealOverlayEvent(stack, x, y).postAndCatch()
 }
