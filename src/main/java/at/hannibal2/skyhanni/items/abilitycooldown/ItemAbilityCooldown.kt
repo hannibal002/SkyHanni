@@ -167,7 +167,8 @@ class ItemAbilityCooldown {
         ENDSTONE_SWORD("Extreme Focus", 5, "End Stone Sword"),
         PIGMAN_SWORD("Burning Souls", 5, "Pigman Sword"),
 
-        SOULWARD("Soulward", 20, "Soul Esoward");
+        SOULWARD("Soulward", 20, "Soul Esoward"),
+        ECHO("Echo", 3, "Ancestral Spade");
 
         fun click() {
             lastClick = System.currentTimeMillis()

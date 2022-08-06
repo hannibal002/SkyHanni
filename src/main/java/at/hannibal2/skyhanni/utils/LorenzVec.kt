@@ -2,15 +2,21 @@ package at.hannibal2.skyhanni.utils
 
 import net.minecraft.entity.Entity
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
+import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.sin
 
 data class LorenzVec(
     val x: Double,
     val y: Double,
-    val z: Double
+    val z: Double,
 ) {
+
     constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
+
+    constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
     fun toBlocPos(): BlockPos = BlockPos(x, y, z)
 
@@ -47,6 +53,18 @@ data class LorenzVec(
         LorenzVec(x multiplyZeroSave d.toDouble(), y multiplyZeroSave d.toDouble(), z multiplyZeroSave d.toDouble())
 
     fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
+
+    companion object {
+        fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
+            val yaw: Double = (yaw + 90) * Math.PI / 180
+            val pitch: Double = (pitch + 90) * Math.PI / 180
+
+            val x = sin(pitch) * cos(yaw)
+            val y = sin(pitch) * sin(yaw)
+            val z = cos(pitch)
+            return LorenzVec(x, z, y)
+        }
+    }
 }
 
 private infix fun Double.multiplyZeroSave(other: Double): Double {
@@ -59,3 +77,5 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
+
+fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)

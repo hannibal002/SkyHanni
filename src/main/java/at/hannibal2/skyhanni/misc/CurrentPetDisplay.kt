@@ -36,7 +36,6 @@ class CurrentPetDisplay {
         }
     }
 
-
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (!LorenzUtils.inSkyblock) return

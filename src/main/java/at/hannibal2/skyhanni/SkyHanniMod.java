@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.bazaar.BazaarBestSellMethod;
 import at.hannibal2.skyhanni.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.chat.ChatFilter;
 import at.hannibal2.skyhanni.chat.ChatManager;
+import at.hannibal2.skyhanni.chat.NewChatFilter;
 import at.hannibal2.skyhanni.chat.PlayerChatFilter;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
+import at.hannibal2.skyhanni.diana.GriffinBurrowFinder;
 import at.hannibal2.skyhanni.dungeon.*;
 import at.hannibal2.skyhanni.dungeon.damageindicator.DungeonBossDamageIndicator;
 import at.hannibal2.skyhanni.fishing.SeaCreatureManager;
@@ -16,13 +18,14 @@ import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
 import at.hannibal2.skyhanni.inventory.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.items.ItemDisplayOverlayFeatures;
-import at.hannibal2.skyhanni.items.VanillaItemManager;
 import at.hannibal2.skyhanni.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.misc.*;
 import at.hannibal2.skyhanni.repo.RepoManager;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -31,9 +34,6 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 @Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION)
 public class SkyHanniMod {
@@ -51,11 +51,7 @@ public class SkyHanniMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        loading("BazaarApi");
         new BazaarApi();
-        doneLoading();
-
-        loading("MinecraftForge.EVENT_BUS");
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new ChatManager());
         MinecraftForge.EVENT_BUS.register(new HypixelData());
@@ -63,10 +59,10 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new ScoreboardData());
         MinecraftForge.EVENT_BUS.register(new ApiData());
         MinecraftForge.EVENT_BUS.register(new SeaCreatureManager());
-        MinecraftForge.EVENT_BUS.register(new VanillaItemManager());
 
         MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
         MinecraftForge.EVENT_BUS.register(new ChatFilter());
+        MinecraftForge.EVENT_BUS.register(new NewChatFilter());
         MinecraftForge.EVENT_BUS.register(new PlayerChatFilter());
         MinecraftForge.EVENT_BUS.register(new DungeonChatFilter());
         MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
@@ -84,67 +80,35 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new BazaarBestSellMethod());
         MinecraftForge.EVENT_BUS.register(new AnvilCombineHelper());
         MinecraftForge.EVENT_BUS.register(new SeaCreatureMessageShortener());
-        doneLoading();
+        MinecraftForge.EVENT_BUS.register(new GriffinBurrowFinder());
 
-        loading("Commands.init");
         Commands.init();
-        doneLoading();
 
-        loading("more MinecraftForge.EVENT_BUS");
         MinecraftForge.EVENT_BUS.register(new LorenzTest());
         MinecraftForge.EVENT_BUS.register(new ButtonOnPause());
-        doneLoading();
 
-        loading("config");
         configDirectory = new File("config/skyhanni");
         try {
             //noinspection ResultOfMethodCallIgnored
             configDirectory.mkdir();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         configFile = new File(configDirectory, "config.json");
 
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 feature = gson.fromJson(reader, Features.class);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
-        doneLoading();
 
-        loading("features");
         if (feature == null) {
             feature = new Features();
             saveConfig();
         }
-        doneLoading();
-
-        loading("addShutdownHook");
         Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
-        doneLoading();
 
-        loading("Repo");
         repo = new RepoManager(configDirectory);
         repo.loadRepoInformation();
-        doneLoading();
-    }
-
-    private long startLoadTime = 0;
-
-    private String lastLoad = "";
-
-    private void loading(String text) {
-        lastLoad = text;
-        System.out.println(" ");
-        System.out.println("SkyHanni starts loading '" + lastLoad + "'");
-        startLoadTime = System.currentTimeMillis();
-    }
-
-    private void doneLoading() {
-        long duration = System.currentTimeMillis() - startLoadTime;
-        System.out.println("Done (took " + duration + " ms)");
-        System.out.println(" ");
     }
 
     public void saveConfig() {
@@ -155,8 +119,7 @@ public class SkyHanniMod {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(feature));
             }
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
     }
 
     public static GuiScreen screenToOpen = null;
