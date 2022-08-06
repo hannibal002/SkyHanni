@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TrophyFishMessages {
@@ -52,7 +52,7 @@ class TrophyFishMessages {
             }
             val rarity = message.between("§r §r", "§b.").lowercase().replace("§l", "")
 
-            val name = (rarity + "_" + displayName).removeColorCodes().lowercase().replace(" ", "")
+            val name = (rarity + "_" + displayName).removeColor().lowercase().replace(" ", "")
             val amount = map.getOrDefault(name, 0) + 1
             map[name] = amount
             event.blockedReason = "trophy_fish"

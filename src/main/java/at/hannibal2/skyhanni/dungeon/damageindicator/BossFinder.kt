@@ -11,12 +11,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityGhast
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
 import java.util.*
 
-class DungeonBossFinder {
+class BossFinder {
 
     //F1
     private var floor1bonzo1 = false
@@ -225,110 +226,114 @@ class DungeonBossFinder {
     }
 
     fun handleChat(message: String) {
-        when (message) {
-            //F1
-            "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I’m basically unbeatable." -> {
-                floor1bonzo1 = true
-                floor1bonzo1SpawnTime = System.currentTimeMillis() + 11_250
+        if (LorenzUtils.inDungeons) {
+            when (message) {
+                //F1
+                "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I’m basically unbeatable." -> {
+                    floor1bonzo1 = true
+                    floor1bonzo1SpawnTime = System.currentTimeMillis() + 11_250
+                }
+
+                "§c[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!" -> {
+                    floor1bonzo1 = false
+                }
+
+                "§c[BOSS] Bonzo§r§f: Oh I'm dead!" -> {
+                    floor1bonzo2 = true
+                    floor1bonzo2SpawnTime = System.currentTimeMillis() + 4_200
+                }
+
+                "§c[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.." -> {
+                    floor1bonzo2 = false
+                }
+
+                //F2
+                "§c[BOSS] Scarf§r§f: ARISE, MY CREATIONS!" -> {
+                    floor2summons1 = true
+                    floor2summons1SpawnTime = System.currentTimeMillis() + 3_500
+                }
+
+                "§c[BOSS] Scarf§r§f: Those toys are not strong enough I see." -> {
+                    floor2summons1 = false
+                }
+
+                "§c[BOSS] Scarf§r§f: Don't get too excited though." -> {
+                    floor2secondPhase = true
+                    floor2secondPhaseSpawnTime = System.currentTimeMillis() + 6_300
+                }
+
+                "§c[BOSS] Scarf§r§f: Whatever..." -> {
+                    floor2secondPhase = false
+                }
+
+                //F3
+                "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
+                    floor3GuardianShield = true
+                    floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 16_400
+                }
+
+                "§c[BOSS] The Professor§r§f: Even if you took my barrier down, I can still fight." -> {
+                    floor3GuardianShield = false
+                }
+
+                "§c[BOSS] The Professor§r§f: Oh? You found my Guardians one weakness?" -> {
+                    floor3Professor = true
+                    floor3ProfessorSpawnTime = System.currentTimeMillis() + 10_300
+                }
+
+                "§c[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique." -> {
+                    floor3Professor = false
+
+                    floor3ProfessorGuardianPrepare = true
+                    floor3ProfessorGuardianPrepareSpawnTime = System.currentTimeMillis() + 10_500
+                }
+
+                "§c[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!" -> {
+                    floor3ProfessorGuardian = true
+                }
+
+                "§c[BOSS] The Professor§r§f: What?! My Guardian power is unbeatable!" -> {
+                    floor3ProfessorGuardian = false
+                }
+
+
+                //F5
+                "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
+                    floor5lividEntity = findLivid()
+                    floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
+                }
+
+                //F6
+                "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
+                    floor6Giants = true
+                    floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400
+                }
+
+                "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
+                    floor6Giants = false
+                    floor6Sadan = true
+                    floor6SadanSpawnTime = System.currentTimeMillis() + 32_500
+                }
+
+                "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
+                    floor6Sadan = false
+                }
             }
 
-            "§c[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!" -> {
-                floor1bonzo1 = false
+            if (message.matchRegex("§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!")) {
+                floor5lividEntity = null
             }
-
-            "§c[BOSS] Bonzo§r§f: Oh I'm dead!" -> {
-                floor1bonzo2 = true
-                floor1bonzo2SpawnTime = System.currentTimeMillis() + 4_200
-            }
-
-            "§c[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.." -> {
-                floor1bonzo2 = false
-            }
-
-            //F2
-            "§c[BOSS] Scarf§r§f: ARISE, MY CREATIONS!" -> {
-                floor2summons1 = true
-                floor2summons1SpawnTime = System.currentTimeMillis() + 3_500
-            }
-
-            "§c[BOSS] Scarf§r§f: Those toys are not strong enough I see." -> {
-                floor2summons1 = false
-            }
-
-            "§c[BOSS] Scarf§r§f: Don't get too excited though." -> {
-                floor2secondPhase = true
-                floor2secondPhaseSpawnTime = System.currentTimeMillis() + 6_300
-            }
-
-            "§c[BOSS] Scarf§r§f: Whatever..." -> {
-                floor2secondPhase = false
-            }
-
-            //F3
-            "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
-                floor3GuardianShield = true
-                floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 16_400
-            }
-
-            "§c[BOSS] The Professor§r§f: Even if you took my barrier down, I can still fight." -> {
-                floor3GuardianShield = false
-            }
-
-            "§c[BOSS] The Professor§r§f: Oh? You found my Guardians one weakness?" -> {
-                floor3Professor = true
-                floor3ProfessorSpawnTime = System.currentTimeMillis() + 10_300
-            }
-
-            "§c[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique." -> {
-                floor3Professor = false
-
-                floor3ProfessorGuardianPrepare = true
-                floor3ProfessorGuardianPrepareSpawnTime = System.currentTimeMillis() + 10_500
-            }
-
-            "§c[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!" -> {
-                floor3ProfessorGuardian = true
-            }
-
-            "§c[BOSS] The Professor§r§f: What?! My Guardian power is unbeatable!" -> {
-                floor3ProfessorGuardian = false
-            }
-
-
-            //F5
-            "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
-                floor5lividEntity = findLivid()
-                floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
-            }
-
-            //F6
-            "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
-                floor6Giants = true
-                floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400
-            }
-
-            "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
-                floor6Giants = false
-                floor6Sadan = true
-                floor6SadanSpawnTime = System.currentTimeMillis() + 32_500
-            }
-
-            "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
-                floor6Sadan = false
-            }
-        }
-
-        if (message.matchRegex("§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!")) {
-            floor5lividEntity = null
         }
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (floor3ProfessorGuardian) {
-            if (entity is EntityGuardian) {
-                if (floor3ProfessorGuardianEntity == null) {
-                    floor3ProfessorGuardianEntity = entity
-                    floor3ProfessorGuardianPrepare = false
+        if (LorenzUtils.inDungeons) {
+            if (floor3ProfessorGuardian) {
+                if (entity is EntityGuardian) {
+                    if (floor3ProfessorGuardianEntity == null) {
+                        floor3ProfessorGuardianEntity = entity
+                        floor3ProfessorGuardianPrepare = false
+                    }
                 }
             }
         }

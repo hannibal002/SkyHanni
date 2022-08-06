@@ -58,7 +58,7 @@ object LorenzUtils {
 
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
-    fun String.removeColorCodes(): String {
+    fun String.removeColor(): String {
         val builder = StringBuilder()
         var skipNext = false
         for (c in this.toCharArray()) {

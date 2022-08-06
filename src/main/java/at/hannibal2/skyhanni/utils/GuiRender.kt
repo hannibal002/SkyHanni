@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.gui.core.config.Position
-import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -17,7 +17,7 @@ object GuiRender {
 
         val renderer = Minecraft.getMinecraft().renderManager.fontRenderer
 
-        val offsetX = (200 - renderer.getStringWidth(textToRender.removeColorCodes())) / 2
+        val offsetX = (200 - renderer.getStringWidth(textToRender.removeColor())) / 2
 
         val x = getAbsX(resolution, 200) + offsetX
         val y = getAbsY(resolution, 16)

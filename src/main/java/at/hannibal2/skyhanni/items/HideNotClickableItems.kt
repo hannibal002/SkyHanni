@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -100,7 +100,7 @@ class HideNotClickableItems {
         if (hide(chestName, stack)) {
             val first = event.toolTip[0]
             event.toolTip.clear()
-            event.toolTip.add("§7" + first.removeColorCodes())
+            event.toolTip.add("§7" + first.removeColor())
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
@@ -232,7 +232,7 @@ class HideNotClickableItems {
             return true
         }
 
-        if (stack.getLore().any { it.removeColorCodes() == "Fishing Bait" }) {
+        if (stack.getLore().any { it.removeColor() == "Fishing Bait" }) {
             return false
         }
         hideReason = "This item is not a fishing bait!"
