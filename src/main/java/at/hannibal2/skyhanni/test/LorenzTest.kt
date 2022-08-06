@@ -124,6 +124,12 @@ class LorenzTest {
                     resultList.add("rotationYaw: $rotationYaw")
                     resultList.add("rotationPitch: $rotationPitch")
 
+                    val riddenByEntity = entity.riddenByEntity
+                    resultList.add("riddenByEntity: $riddenByEntity")
+                    val ridingEntity = entity.ridingEntity
+                    resultList.add("ridingEntity: $ridingEntity")
+
+
                     if (entity is EntityArmorStand) {
                         resultList.add("armor stand data:")
                         val headRotation = entity.headRotation.toLorenzVec()
