@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -146,6 +147,13 @@ class LorenzTest {
                             val health = entity.health.toInt()
                             resultList.add("baseMaxHealth: $baseMaxHealth")
                             resultList.add("health: $health")
+                        }
+                        if (entity is EntityMagmaCube) {
+                            val squishFactor = entity.squishFactor
+                            val slimeSize = entity.slimeSize
+                            resultList.add("factor: $squishFactor")
+                            resultList.add("slimeSize: $slimeSize")
+
                         }
                     }
                     resultList.add("")
