@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.dungeon.damageindicator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.dungeon.DungeonData
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,33 +16,31 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.max
 
-class DungeonBossDamageIndicator {
+class BossDamageIndicator {
 
     var data = mutableMapOf<EntityLivingBase, EntityData>()
-    private var bossFinder: DungeonBossFinder? = null
+    private var bossFinder: BossFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
     private val maxHealth = mutableMapOf<UUID, Int>()
 
     @SubscribeEvent
-    fun onDungeonStart(event: DungeonEnterEvent) {
-        bossFinder = DungeonBossFinder()
+    fun onDungeonStart(event: WorldEvent.Load) {
+        bossFinder = BossFinder()
     }
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inDungeons) return
-
         bossFinder?.handleChat(event.message)
     }
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.bossDamageIndicator) return
 
         GlStateManager.disableDepth()
@@ -99,12 +96,12 @@ class DungeonBossDamageIndicator {
 
     @SubscribeEvent
     fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
-        if (!LorenzUtils.inDungeons) return
-
         try {
             val entity = event.entity
             val result = bossFinder?.shouldShow(entity) ?: return
-            checkLastBossDead(result.finalBoss, entity.entityId)
+            if (LorenzUtils.inDungeons) {
+                checkLastBossDead(result.finalBoss, entity.entityId)
+            }
             val ignoreBlocks = result.ignoreBlocks
             val delayedStart = result.delayedStart
 

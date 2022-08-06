@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
-import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -12,7 +12,7 @@ import java.util.*
 object ItemUtils {
     private val gson = GsonBuilder().setPrettyPrinting().create()
 
-    fun ItemStack.cleanName() = this.displayName.removeColorCodes()
+    fun ItemStack.cleanName() = this.displayName.removeColor()
 
     fun getItemsInOpenChest(): List<ItemStack> {
         val list = mutableListOf<ItemStack>()

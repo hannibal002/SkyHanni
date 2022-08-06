@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlayerSendChatEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatFilter {
@@ -65,7 +65,7 @@ class PlayerChatFilter {
             }
         }
 
-        send(channel, name.removeColorCodes(), message.removeColorCodes())
+        send(channel, name.removeColor(), message.removeColor())
         return true
     }
 

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.misc
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.removeColorCodes
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
@@ -22,7 +22,7 @@ class ScoreboardData {
     }
 
     private fun cleanSB(scoreboard: String): String {
-        return scoreboard.removeColorCodes().toCharArray().filter { it.code in 21..126 }.joinToString(separator = "")
+        return scoreboard.removeColor().toCharArray().filter { it.code in 21..126 }.joinToString(separator = "")
     }
 
     fun fetchScoreboardLines(): List<String> {
