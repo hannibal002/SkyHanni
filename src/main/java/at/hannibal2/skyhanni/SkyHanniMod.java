@@ -81,7 +81,7 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(new BazaarBestSellMethod());
         MinecraftForge.EVENT_BUS.register(new AnvilCombineHelper());
         MinecraftForge.EVENT_BUS.register(new SeaCreatureMessageShortener());
-        MinecraftForge.EVENT_BUS.register(new GriffinBurrowFinder());
+//        MinecraftForge.EVENT_BUS.register(new GriffinBurrowFinder());
         MinecraftForge.EVENT_BUS.register(new AshfangFreezeCooldown());
 
         Commands.init();
