@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.chat.PlayerChatFilter;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
 import at.hannibal2.skyhanni.dungeon.*;
-import at.hannibal2.skyhanni.dungeon.damageindicator.BossDamageIndicator;
+import at.hannibal2.skyhanni.damageindicator.BossDamageIndicator;
 import at.hannibal2.skyhanni.features.abilities.AshfangFreezeCooldown;
 import at.hannibal2.skyhanni.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.fishing.SeaCreatureMessageShortener;

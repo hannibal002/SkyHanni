@@ -14,11 +14,6 @@ public class Dungeon {
     public boolean highlightClickedBlocks = false;
 
     @Expose
-    @ConfigOption(name = "Boss Damage Indicator", desc = "Show the missing health of a boss in the dungeon and the cooldown time until the boss becomes attackable.")
-    @ConfigEditorBoolean
-    public boolean bossDamageIndicator = false;
-
-    @Expose
     @ConfigOption(name = "Milestone Display", desc = "Show the current milestone inside Dungeons.")
     @ConfigEditorBoolean
     public boolean showMilestoneDisplay = false;
