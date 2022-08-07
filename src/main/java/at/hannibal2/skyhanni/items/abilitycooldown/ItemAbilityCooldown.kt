@@ -111,15 +111,22 @@ class ItemAbilityCooldown {
         val color = itemText.color
         stackTip = color.getChatColor() + itemText.text
 
-        item.background = color.addOpacity(120).rgb
+        if (SkyHanniMod.feature.abilities.itemAbilityCooldownBackground) {
+            var opacity = 130
+            if (color == LorenzColor.GREEN) {
+                opacity = 80
+            }
+            item.background = color.addOpacity(opacity).rgb
+        }
 
         if (stackTip.isNotEmpty()) {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
-            event.fr.drawStringWithShadow(
+            //TODO add option to change the size
+            event.fontRenderer.drawStringWithShadow(
                 stackTip,
-                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
+                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),
                 (event.y + 9).toFloat(),
                 16777215
             )
@@ -144,7 +151,7 @@ class ItemAbilityCooldown {
         val cooldownInSeconds: Long,
         vararg val itemNames: String,
         var lastClick: Long = 0L,
-        val actionBarDetection: Boolean = true
+        val actionBarDetection: Boolean = true,
     ) {
         ATOMSPLIT("Soulcry", 4, "Atomsplit Katana", "Vorpal Katana", "Voidedge Katana"),
         WITHER_IMPACT("Wither Impact", 5, "Hyperion", "Scylla", "Valkyrie", "Astrea", actionBarDetection = false),
