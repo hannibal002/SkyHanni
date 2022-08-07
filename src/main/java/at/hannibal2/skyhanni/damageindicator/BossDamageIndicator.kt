@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.dungeon.DungeonData
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.misc.ScoreboardData
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEnderman
+import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -160,105 +162,130 @@ class BossDamageIndicator {
 
 
             if (entityData.bossType == BossType.END_ENDERMAN_SLAYER) {
-                //custom prefix and health for the four different ender slayers
-                when (maxHealth) {
-                    300_000 -> {
-                        calcMaxHealth = 100_000
-                        if (health > 200_000) {
-                            calcHealth -= 200_000
-                            extraPrefix = "1/3"
-                        } else if (health > 100_000) {
-                            calcHealth -= 100_000
-                            extraPrefix = "2/3"
-                        } else {
-                            calcHealth = health
-                            extraPrefix = "3/3"
-                        }
-                    }
-                    15_000_000 -> {
-                        calcMaxHealth = 5_000_000
-                        if (health > 10_000_000) {
-                            extraPrefix = "1/3"
-                            calcHealth -= 10_000_000
-                        } else if (health > 5_000_000) {
-                            calcHealth -= 5_000_000
-                            extraPrefix = "2/3"
-                        } else {
-                            calcHealth = health
-                            extraPrefix = "3/3"
-                        }
-                    }
-                    66_666_666 -> {
-                        calcMaxHealth = 22_222_222
-                        if (health > 44_444_444) {
-                            calcHealth -= 44_444_444
-                            extraPrefix = "1/3"
-                        } else if (health > 22_222_222) {
-                            calcHealth -= 22_222_222
-                            extraPrefix = "2/3"
-                        } else {
-                            calcHealth = health
-                            extraPrefix = "3/3"
-                        }
-
-                    }
-                    300_000_000 -> {
-                        calcMaxHealth = 50_000_000
-                        if (health > 250_000_000) {
-                            calcHealth -= 250_000_000
-                            extraPrefix = "1/6"
-                        } else if (health > 200_000_000) {
-                            calcHealth -= 200_000_000
-                            extraPrefix = "2/6"
-                        } else if (health > 150_000_000) {
-                            calcHealth -= 150_000_000
-                            extraPrefix = "3/6"
-                        } else if (health > 100_000_000) {
-                            calcHealth -= 100_000_000
-                            extraPrefix = "4/6"
-                        } else if (health > 50_000_000) {
-                            calcHealth -= 50_000_000
-                            extraPrefix = "5/6"
-                        } else {
-                            calcHealth = health
-                            extraPrefix = "6/6"
-                        }
-                    }
-                    else -> {
-                        //TODO this is a workaround, find a sweet solution pls?
-                        if (!entityData.hidden) {
-                            LorenzUtils.warning("§c[SkyHanni] Unknown max enderman health: $maxHealth")
-                            entityData.hidden = true
-                        }
-
-                    }
-                }
-
                 //Hides the damage indicator when in hit phase or in laser phase
                 if (entity is EntityEnderman) {
                     var hidden = false
-                    if (entity.hasNameTagWith(0, 3, 0, " Hit")) {
-                        hidden = true
-                    }
-                    if (entity.ridingEntity != null) {
-                        hidden = true
-                    }
+                    if (entity.hasNameTagWith(3, " Hit")) hidden = true
+                    if (entity.ridingEntity != null) hidden = true
                     entityData.hidden = hidden
                 }
-            }
 
-            //See through blocks when the barbarian duke stands on the platform and the player is below
-            if (entityData.bossType == BossType.NETHER_BARBARIAN_DUKE) {
-                val location = entity.getLorenzVec()
-                val y = location.y
-                var ignoreBlocks = false
-                val distance = Minecraft.getMinecraft().thePlayer.getLorenzVec().distance(location)
-                if (distance < 10) {
-                    if (y == 117.0) {
-                        ignoreBlocks = true
+                if (!entityData.hidden) {
+                    //custom prefix and health for the four different ender slayers
+                    when (maxHealth) {
+                        300_000 -> {
+                            calcMaxHealth = 100_000
+                            if (health > 200_000) {
+                                calcHealth -= 200_000
+                                extraPrefix = "1/3"
+                            } else if (health > 100_000) {
+                                calcHealth -= 100_000
+                                extraPrefix = "2/3"
+                            } else {
+                                calcHealth = health
+                                extraPrefix = "3/3"
+                            }
+                        }
+                        15_000_000 -> {
+                            calcMaxHealth = 5_000_000
+                            if (health > 10_000_000) {
+                                extraPrefix = "1/3"
+                                calcHealth -= 10_000_000
+                            } else if (health > 5_000_000) {
+                                calcHealth -= 5_000_000
+                                extraPrefix = "2/3"
+                            } else {
+                                calcHealth = health
+                                extraPrefix = "3/3"
+                            }
+                        }
+                        66_666_666 -> {
+                            calcMaxHealth = 22_222_222
+                            if (health > 44_444_444) {
+                                calcHealth -= 44_444_444
+                                extraPrefix = "1/3"
+                            } else if (health > 22_222_222) {
+                                calcHealth -= 22_222_222
+                                extraPrefix = "2/3"
+                            } else {
+                                calcHealth = health
+                                extraPrefix = "3/3"
+                            }
+
+                        }
+                        300_000_000 -> {
+                            calcMaxHealth = 50_000_000
+                            if (health > 250_000_000) {
+                                calcHealth -= 250_000_000
+                                extraPrefix = "1/6"
+                            } else if (health > 200_000_000) {
+                                calcHealth -= 200_000_000
+                                extraPrefix = "2/6"
+                            } else if (health > 150_000_000) {
+                                calcHealth -= 150_000_000
+                                extraPrefix = "3/6"
+                            } else if (health > 100_000_000) {
+                                calcHealth -= 100_000_000
+                                extraPrefix = "4/6"
+                            } else if (health > 50_000_000) {
+                                calcHealth -= 50_000_000
+                                extraPrefix = "5/6"
+                            } else {
+                                calcHealth = health
+                                extraPrefix = "6/6"
+                            }
+                        }
+                        else -> {
+                            //TODO this is a workaround, find a sweet solution pls?
+                            LorenzUtils.warning("§c[SkyHanni] Unknown max enderman health: $maxHealth")
+                            entityData.hidden = true
+
+                        }
                     }
                 }
-                entityData.ignoreBlocks = ignoreBlocks
+            }
+            if (entityData.bossType == BossType.NETHER_MAGMA_BOSS) {
+                if (entity is EntityMagmaCube) {
+                    val slimeSize = entity.slimeSize
+                    extraPrefix = when (slimeSize) {
+                        24 -> "1/6"
+                        22 -> "2/6"
+                        20 -> "3/6"
+                        18 -> "4/6"
+                        16 -> "5/6"
+                        else -> {
+                            calcMaxHealth = 10_000_000
+                            "6/6"
+                        }
+                    }
+
+                    //hide while in the middle
+                    val position = entity.getLorenzVec()
+                    entityData.hidden = position.x == -368.0 && position.z == -804.0
+
+                    for (line in ScoreboardData.sidebarLinesRaw) {
+                        if (line.contains("▎")) {
+                            val color: String
+                            if (line.startsWith("§7")) {
+                                color = "§7"
+                            } else if (line.startsWith("§e")) {
+                                color = "§e"
+                            } else if (line.startsWith("§6") || line.startsWith("§a") || line.startsWith("§c")) {
+                                calcHealth = 0
+                                break
+                            } else {
+                                LorenzUtils.error("unknown magma boss health sidebar format!")
+                                break
+                            }
+
+                            val text = line.replace("\uD83C\uDF81" + color, "")
+                            val max = 25.0
+                            val length = text.split("§e", "§7")[1].length
+                            val missing = (health.toDouble() / max) * length
+                            calcHealth = (health - missing).toInt()
+                        }
+                    }
+                }
             }
 
             val percentage = calcHealth.toDouble() / calcMaxHealth.toDouble()
