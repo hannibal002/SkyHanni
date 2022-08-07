@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.gui.commands;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.gui.config.ConfigEditor;
 import at.hannibal2.skyhanni.config.gui.core.GuiScreenElementWrapper;
+import at.hannibal2.skyhanni.test.CopyNearbyEntitiesCommand;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -62,6 +63,16 @@ public class Commands {
                         new SimpleCommand.ProcessCommandRunnable() {
                             public void processCommand(ICommandSender sender, String[] args) {
                                 LorenzTest.Companion.testCommand();
+                            }
+                        }
+                )
+        );
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "copyentities",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                CopyNearbyEntitiesCommand.Companion.testCommand(args);
                             }
                         }
                 )
