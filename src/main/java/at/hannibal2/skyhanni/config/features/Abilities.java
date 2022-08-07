@@ -14,6 +14,11 @@ public class Abilities {
     public boolean itemAbilityCooldown = false;
 
     @Expose
+    @ConfigOption(name = "Ability Cooldown Background", desc = "Show the cooldown color of item abilities in the background.")
+    @ConfigEditorBoolean
+    public boolean itemAbilityCooldownBackground = false;
+
+    @Expose
     @ConfigOption(name = "Ashfang Freeze", desc = "Show the cooldown how long Ashfang blocks all your abilities.")
     @ConfigEditorBoolean
     public boolean ashfangFreezeCooldown = false;

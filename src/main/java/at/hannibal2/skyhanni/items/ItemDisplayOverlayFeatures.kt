@@ -27,9 +27,9 @@ class ItemDisplayOverlayFeatures {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
-            event.fr.drawStringWithShadow(
+            event.fontRenderer.drawStringWithShadow(
                 stackTip,
-                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
+                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),
                 (event.y + 9).toFloat(),
                 16777215
             )
