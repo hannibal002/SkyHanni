@@ -40,7 +40,7 @@ class BossDamageIndicator {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!SkyHanniMod.feature.misc.bossDamageIndicator) return
+        if (!SkyHanniMod.feature.misc.damageIndicator) return
 
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
