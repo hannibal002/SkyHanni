@@ -12,13 +12,16 @@ class ScoreboardData {
 
     companion object {
         var sidebarLines: List<String> = emptyList()
+        var sidebarLinesRaw: List<String> = emptyList()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
 
-        sidebarLines = fetchScoreboardLines().map { cleanSB(it) }
+        val list = fetchScoreboardLines()
+        sidebarLines = list.map { cleanSB(it) }.reversed()
+        sidebarLinesRaw = list.reversed()
     }
 
     private fun cleanSB(scoreboard: String): String {
