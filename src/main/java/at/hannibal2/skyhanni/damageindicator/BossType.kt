@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.dungeon.damageindicator
+package at.hannibal2.skyhanni.damageindicator
 
 enum class BossType {
     DUNGEON,

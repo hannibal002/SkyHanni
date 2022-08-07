@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.dungeon.damageindicator
+package at.hannibal2.skyhanni.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.dungeon.DungeonData
@@ -28,7 +28,7 @@ class BossDamageIndicator {
     private val maxHealth = mutableMapOf<UUID, Int>()
 
     @SubscribeEvent
-    fun onDungeonStart(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Load) {
         bossFinder = BossFinder()
         data.clear()
     }
@@ -40,7 +40,7 @@ class BossDamageIndicator {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!SkyHanniMod.feature.dungeon.bossDamageIndicator) return
+        if (!SkyHanniMod.feature.misc.bossDamageIndicator) return
 
         GlStateManager.disableDepth()
         GlStateManager.disableCull()

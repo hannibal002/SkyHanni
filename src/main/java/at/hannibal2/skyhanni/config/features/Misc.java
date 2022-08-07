@@ -9,6 +9,11 @@ import com.google.gson.annotations.Expose;
 public class Misc {
 
     @Expose
+    @ConfigOption(name = "Boss Damage Indicator", desc = "Show the missing health of a boss in the dungeon, of slayer bosses and other bosses and the cooldown time until the boss becomes attackable.")
+    @ConfigEditorBoolean
+    public boolean bossDamageIndicator = false;
+
+    @Expose
     @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
     @ConfigEditorBoolean
     public boolean petDisplay = false;

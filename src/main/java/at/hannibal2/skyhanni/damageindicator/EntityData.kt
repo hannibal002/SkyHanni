@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.dungeon.damageindicator
+package at.hannibal2.skyhanni.damageindicator
 
 import at.hannibal2.skyhanni.utils.LorenzColor
 import net.minecraft.entity.EntityLivingBase
