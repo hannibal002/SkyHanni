@@ -161,21 +161,90 @@ class BossDamageIndicator {
             var calcMaxHealth = maxHealth
 
 
+            var extraPrefix = ""
+
             if (entityData.bossType == BossType.END_ENDERMAN_SLAYER) {
-                if (maxHealth == 66_666_666) {
-                    calcMaxHealth = 22_222_222
-                    if (health > 44_444_444) {
-                        calcHealth -= 44_444_444
-                    } else if (health > 22_222_222) {
-                        calcHealth -= 22_222_222
-                    } else {
-                        calcHealth = health
+                when (maxHealth) {
+                    300_000 -> {
+                        calcMaxHealth = 100_000
+                        if (health > 200_000) {
+                            calcHealth -= 200_000
+                            extraPrefix = "1/3"
+                        } else if (health > 100_000) {
+                            calcHealth -= 100_000
+                            extraPrefix = "2/3"
+                        } else {
+                            calcHealth = health
+                            extraPrefix = "3/3"
+                        }
                     }
-                } else {
-                    println("maxHealth: $maxHealth")
+                    15_000_000 -> {
+                        calcMaxHealth = 5_000_000
+                        if (health > 10_000_000) {
+                            extraPrefix = "1/3"
+                            calcHealth -= 10_000_000
+                        } else if (health > 5_000_000) {
+                            calcHealth -= 5_000_000
+                            extraPrefix = "2/3"
+                        } else {
+                            calcHealth = health
+                            extraPrefix = "3/3"
+                        }
+                    }
+                    66_666_666 -> {
+                        calcMaxHealth = 22_222_222
+                        if (health > 44_444_444) {
+                            calcHealth -= 44_444_444
+                            extraPrefix = "1/3"
+                        } else if (health > 22_222_222) {
+                            calcHealth -= 22_222_222
+                            extraPrefix = "2/3"
+                        } else {
+                            calcHealth = health
+                            extraPrefix = "3/3"
+                        }
+
+                    }
+                    300_000_000 -> {
+                        calcMaxHealth = 50_000_000
+                        if (health > 250_000_000) {
+                            calcHealth -= 250_000_000
+                            extraPrefix = "1/6"
+                        } else if (health > 200_000_000) {
+                            calcHealth -= 200_000_000
+                            extraPrefix = "2/6"
+                        } else if (health > 150_000_000) {
+                            calcHealth -= 150_000_000
+                            extraPrefix = "3/6"
+                        } else if (health > 100_000_000) {
+                            calcHealth -= 100_000_000
+                            extraPrefix = "4/6"
+                        } else if (health > 50_000_000) {
+                            calcHealth -= 50_000_000
+                            extraPrefix = "5/6"
+                        } else {
+                            calcHealth = health
+                            extraPrefix = "6/6"
+                        }
+                    }
+                    else -> {
+                        //TODO this is a workaround, find a sweet solution pls?
+                        if (!entityData.hidden) {
+                            LorenzUtils.warning("§c[SkyHanni] Unknown max enderman health: $maxHealth")
+                            entityData.hidden = true
+                        }
+
+                    }
                 }
                 if (entity is EntityEnderman) {
-                    entityData.hidden = entity.hasNameTagWith(0, 3, 0, " Hits")
+                    var hidden = false
+                    if (entity.hasNameTagWith(0, 3, 0, " Hit")) {
+                        hidden = true
+                    }
+                    if (entity.ridingEntity != null) {
+                        hidden = true
+                    }
+                    entityData.hidden = hidden
                 }
             }
 
@@ -236,7 +305,7 @@ class BossDamageIndicator {
             }
 
             entityData.lastHealth = health
-            entityData.text = NumberUtil.format(calcHealth)
+            entityData.text = extraPrefix + " " + NumberUtil.format(calcHealth)
             entityData.color = color
             entityData.timeLastTick = System.currentTimeMillis()
             data[entity.uniqueID] = entityData
