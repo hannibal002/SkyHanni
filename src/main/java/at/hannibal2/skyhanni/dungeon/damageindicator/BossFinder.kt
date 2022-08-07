@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
@@ -223,11 +224,24 @@ class BossFinder {
                 }
             }
 
-            //TODO testing and make right and so
             if (entity is EntityDragon) {
-//                if (entity.hasNameTagWith(0, 3, 0, "§c☠ §bVoidgloom Seraph ")) {
+                //TODO testing and make right and so
                 return EntityResult(bossType = BossType.END_ENDER_DRAGON)
-//                }
+            }
+
+            if (entity is EntityIronGolem) {
+                //TODO testing
+                if (entity.hasNameTagWith(0, 3, 0, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ")) {
+                    return EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR, ignoreBlocks = true)
+                }
+            }
+
+            if (entity is EntityZombie) {
+                if (entity.hasNameTagWith(0, 2, 0, "§c☠ §fAtoned Horror ")) {
+                    if (entity.baseMaxHealth == 10_000_000.0) {
+                        return EntityResult(bossType = BossType.HUB_REVENANT_HORROR)
+                    }
+                }
             }
         }
 
@@ -431,7 +445,7 @@ class BossFinder {
     }
 }
 
-fun EntityMob.hasNameTagWith(x: Int, y: Int, z: Int, contains: String): Boolean {
+fun EntityLiving.hasNameTagWith(x: Int, y: Int, z: Int, contains: String): Boolean {
     val center = getLorenzVec().add(x, y, z)
     val a = center.add(-1.6, -1.6, -1.6).toBlocPos()
     val b = center.add(1.6, 1.6, 1.6).toBlocPos()
