@@ -153,6 +153,7 @@ class ItemAbilityCooldown {
         var lastClick: Long = 0L,
         val actionBarDetection: Boolean = true,
     ) {
+        //TODO add into repo
         ATOMSPLIT("Soulcry", 4, "Atomsplit Katana", "Vorpal Katana", "Voidedge Katana"),
         WITHER_IMPACT("Wither Impact", 5, "Hyperion", "Scylla", "Valkyrie", "Astrea", actionBarDetection = false),
 
@@ -180,6 +181,7 @@ class ItemAbilityCooldown {
 
         SOULWARD("Soulward", 20, "Soul Esoward"),
         ECHO("Echo", 3, "Ancestral Spade");
+        //TODO add new crimson isle weapons
 
         fun click() {
             lastClick = System.currentTimeMillis()
