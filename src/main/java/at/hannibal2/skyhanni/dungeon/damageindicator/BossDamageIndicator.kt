@@ -114,10 +114,25 @@ class BossDamageIndicator {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
 
-            var health = entity.health.toInt()
+            val biggestHealth = getMaxHealthFor(entity)
+
+            val health = entity.health.toInt()
             val maxHealth: Int
+
+            if (biggestHealth == 0) {
+                val currentMaxHealth = entity.baseMaxHealth.toInt()
+                maxHealth = max(currentMaxHealth, health)
+                setMaxHealth(entity, maxHealth)
+            } else {
+                maxHealth = biggestHealth
+            }
+
+            var calcHealth = health
+            var calcMaxHealth = maxHealth
+            var extraPrefix = ""
+
             if (DungeonData.isOneOf("F4")) {
-                val hitPoints = when (health) {
+                calcHealth = when (health) {
                     300_000 -> 4
                     222_000 -> 3
                     144_000 -> 2
@@ -127,12 +142,10 @@ class BossDamageIndicator {
                         return
                     }
                 }
-
-                health = hitPoints
-                maxHealth = 4
+                calcMaxHealth = 4
                 //TODO add m4 support
 //            } else if (DungeonData.isOneOf("M4")) {
-//                val hitPoints = when (health) {
+//                calcHealth = when (health) {
 //                    300_000 -> 4
 //                    222_000 -> 3
 //                    144_000 -> 2
@@ -142,28 +155,12 @@ class BossDamageIndicator {
 //                        return
 //                    }
 //                }
-
-//                health = hitPoints
-//                maxHealth = 4
-            } else {
-                val biggestHealth = getMaxHealthFor(entity)
-
-                if (biggestHealth == 0) {
-                    val currentMaxHealth = entity.baseMaxHealth.toInt()
-                    maxHealth = max(currentMaxHealth, health)
-                    setMaxHealth(entity, maxHealth)
-                } else {
-                    maxHealth = biggestHealth
-                }
+//                calcMaxHealth = 4
             }
 
-            var calcHealth = health
-            var calcMaxHealth = maxHealth
-
-
-            var extraPrefix = ""
 
             if (entityData.bossType == BossType.END_ENDERMAN_SLAYER) {
+                //custom prefix and health for the four different ender slayers
                 when (maxHealth) {
                     300_000 -> {
                         calcMaxHealth = 100_000
@@ -236,6 +233,8 @@ class BossDamageIndicator {
 
                     }
                 }
+
+                //Hides the damage indicator when in hit phase or in laser phase
                 if (entity is EntityEnderman) {
                     var hidden = false
                     if (entity.hasNameTagWith(0, 3, 0, " Hit")) {
@@ -246,6 +245,20 @@ class BossDamageIndicator {
                     }
                     entityData.hidden = hidden
                 }
+            }
+
+            //See through blocks when the barbarian duke stands on the platform and the player is below
+            if (entityData.bossType == BossType.NETHER_BARBARIAN_DUKE) {
+                val location = entity.getLorenzVec()
+                val y = location.y
+                var ignoreBlocks = false
+                val distance = Minecraft.getMinecraft().thePlayer.getLorenzVec().distance(location)
+                if (distance < 10) {
+                    if (y == 117.0) {
+                        ignoreBlocks = true
+                    }
+                }
+                entityData.ignoreBlocks = ignoreBlocks
             }
 
             val percentage = calcHealth.toDouble() / calcMaxHealth.toDouble()
@@ -289,19 +302,6 @@ class BossDamageIndicator {
 //                        LorenzUtils.chat("$bossType diff: $diff")
                     }
                 }
-            }
-
-            if (entityData.bossType == BossType.NETHER_BARBARIAN_DUKE) {
-                val location = entity.getLorenzVec()
-                val y = location.y
-                var ignoreBlocks = false
-                val distance = Minecraft.getMinecraft().thePlayer.getLorenzVec().distance(location)
-                if (distance < 10) {
-                    if (y == 117.0) {
-                        ignoreBlocks = true
-                    }
-                }
-                entityData.ignoreBlocks = ignoreBlocks
             }
 
             entityData.lastHealth = health
