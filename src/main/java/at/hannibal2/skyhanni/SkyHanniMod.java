@@ -24,8 +24,10 @@ import at.hannibal2.skyhanni.repo.RepoManager;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -52,55 +54,57 @@ public class SkyHanniMod {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         new BazaarApi();
-        MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new ChatManager());
-        MinecraftForge.EVENT_BUS.register(new HypixelData());
-        MinecraftForge.EVENT_BUS.register(new DungeonData());
-        MinecraftForge.EVENT_BUS.register(new ScoreboardData());
-        MinecraftForge.EVENT_BUS.register(new ApiData());
-        MinecraftForge.EVENT_BUS.register(new SeaCreatureManager());
-        MinecraftForge.EVENT_BUS.register(new ItemRenderBackground());
+        registerEvent(this);
+        registerEvent(new ChatManager());
+        registerEvent(new HypixelData());
+        registerEvent(new DungeonData());
+        registerEvent(new ScoreboardData());
+        registerEvent(new ApiData());
+        registerEvent(new SeaCreatureManager());
+        registerEvent(new ItemRenderBackground());
 
-        MinecraftForge.EVENT_BUS.register(new BazaarOrderHelper());
-        MinecraftForge.EVENT_BUS.register(new ChatFilter());
-        MinecraftForge.EVENT_BUS.register(new NewChatFilter());
-        MinecraftForge.EVENT_BUS.register(new PlayerChatFilter());
-        MinecraftForge.EVENT_BUS.register(new DungeonChatFilter());
-        MinecraftForge.EVENT_BUS.register(new HideNotClickableItems());
-        MinecraftForge.EVENT_BUS.register(new DungeonHighlightClickedBlocks());
-        MinecraftForge.EVENT_BUS.register(new ItemDisplayOverlayFeatures());
-        MinecraftForge.EVENT_BUS.register(new CurrentPetDisplay());
-        MinecraftForge.EVENT_BUS.register(new ExpBottleOnGroundHider());
-        MinecraftForge.EVENT_BUS.register(new BossDamageIndicator());
-        MinecraftForge.EVENT_BUS.register(new ItemAbilityCooldown());
-        MinecraftForge.EVENT_BUS.register(new DungeonMilestoneDisplay());
-        MinecraftForge.EVENT_BUS.register(new DungeonDeathCounter());
-        MinecraftForge.EVENT_BUS.register(new DungeonCleanEnd());
-        MinecraftForge.EVENT_BUS.register(new DungeonBossMessages());
-        MinecraftForge.EVENT_BUS.register(new TrophyFishMessages());
-        MinecraftForge.EVENT_BUS.register(new BazaarBestSellMethod());
-        MinecraftForge.EVENT_BUS.register(new AnvilCombineHelper());
-        MinecraftForge.EVENT_BUS.register(new SeaCreatureMessageShortener());
-//        MinecraftForge.EVENT_BUS.register(new GriffinBurrowFinder());
-        MinecraftForge.EVENT_BUS.register(new AshfangFreezeCooldown());
+        registerEvent(new BazaarOrderHelper());
+        registerEvent(new ChatFilter());
+        registerEvent(new NewChatFilter());
+        registerEvent(new PlayerChatFilter());
+        registerEvent(new DungeonChatFilter());
+        registerEvent(new HideNotClickableItems());
+        registerEvent(new DungeonHighlightClickedBlocks());
+        registerEvent(new ItemDisplayOverlayFeatures());
+        registerEvent(new CurrentPetDisplay());
+        registerEvent(new ExpBottleOnGroundHider());
+        registerEvent(new BossDamageIndicator());
+        registerEvent(new ItemAbilityCooldown());
+        registerEvent(new DungeonMilestoneDisplay());
+        registerEvent(new DungeonDeathCounter());
+        registerEvent(new DungeonCleanEnd());
+        registerEvent(new DungeonBossMessages());
+        registerEvent(new TrophyFishMessages());
+        registerEvent(new BazaarBestSellMethod());
+        registerEvent(new AnvilCombineHelper());
+        registerEvent(new SeaCreatureMessageShortener());
+//        registerEvent(new GriffinBurrowFinder());
+        registerEvent(new AshfangFreezeCooldown());
 
         Commands.init();
 
-        MinecraftForge.EVENT_BUS.register(new LorenzTest());
-        MinecraftForge.EVENT_BUS.register(new ButtonOnPause());
+        registerEvent(new LorenzTest());
+        registerEvent(new ButtonOnPause());
 
         configDirectory = new File("config/skyhanni");
         try {
             //noinspection ResultOfMethodCallIgnored
             configDirectory.mkdir();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         configFile = new File(configDirectory, "config.json");
 
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
                 feature = gson.fromJson(reader, Features.class);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         if (feature == null) {
@@ -113,6 +117,15 @@ public class SkyHanniMod {
         repo.loadRepoInformation();
     }
 
+    private void registerEvent(Object object) {
+        String simpleName = object.getClass().getSimpleName();
+        System.out.println("SkyHanni registering '" + simpleName + "'");
+        long start = System.currentTimeMillis();
+        MinecraftForge.EVENT_BUS.register(object);
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Done after " + duration + " ms!");
+    }
+
     public void saveConfig() {
         try {
             //noinspection ResultOfMethodCallIgnored
@@ -121,7 +134,8 @@ public class SkyHanniMod {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
                 writer.write(gson.toJson(feature));
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     public static GuiScreen screenToOpen = null;
