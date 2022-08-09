@@ -12,13 +12,13 @@ import java.text.SimpleDateFormat
 object LorenzUtils {
 
     val isOnHypixel: Boolean
-        get() = HypixelData.hypixel
+        get() = HypixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
 
     val inSkyblock: Boolean
-        get() = HypixelData.hypixel && HypixelData.skyblock
+        get() = isOnHypixel && HypixelData.skyblock
 
     val inDungeons: Boolean
-        get() = HypixelData.hypixel && HypixelData.skyblock && HypixelData.dungeon
+        get() = inSkyblock && HypixelData.dungeon
 
     const val DEBUG_PREFIX = "[Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
