@@ -16,6 +16,7 @@ import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.*
+import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.util.AxisAlignedBB
 import java.util.*
 
@@ -253,6 +254,14 @@ class BossFinder {
                 if (entity.baseMaxHealth == 200_000_000.0) {
                     if (entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")) {
                         return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
+                    }
+                }
+            }
+
+            if (entity is EntityHorse) {
+                if (entity.baseMaxHealth == 3_000_000.0) {
+                    if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
+                        return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
                     }
                 }
             }
