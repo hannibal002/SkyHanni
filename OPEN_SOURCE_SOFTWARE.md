@@ -10,3 +10,4 @@ SkyHanni would not be possible without the following open source software:
 | [Not Enough Updates](https://github.com/Moulberry/NotEnoughUpdates/)           | [Creative Commons Public License](https://creativecommons.org/licenses/by-nc/3.0/)                                |
 | [Wynntils](https://github.com/Wynntils/Wynntils)                               | [AGPL 3.0](https://github.com/Wynntils/Wynntils/blob/development/LICENSE)                                         |
 | [Skytils](https://github.com/Skytils/SkytilsMod)                               | [AGPL 3.0](https://github.com/Skytils/SkytilsMod/blob/1.x/LICENSE.md)                                             |
+| [Forge1.8.9Template](https://github.com/romangraef/Forge1.8.9Template)                               | [AGPL 3.0](https://github.com/Skytils/SkytilsMod/blob/1.x/LICENSE.md)                                             |
