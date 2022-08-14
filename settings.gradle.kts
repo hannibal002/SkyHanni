@@ -18,4 +18,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "skyhanni"
+rootProject.name = "SkyHanni"
