@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.config.gui.utils.Utils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -21,7 +23,7 @@ class CopyNearbyEntitiesCommand {
             }
 
             val minecraft = Minecraft.getMinecraft()
-            val start = minecraft.thePlayer.position.toLorenzVec()
+            val start = LocationUtils.playerLocation()
             val world = minecraft.theWorld
 
             val resultList = mutableListOf<String>()
@@ -61,6 +63,10 @@ class CopyNearbyEntitiesCommand {
                         for ((id, stack) in entity.inventory.withIndex()) {
                             resultList.add("id $id = $stack")
                             if (stack != null) {
+                                val skullTexture = stack.getSkullTexture()
+                                if (skullTexture != null) {
+                                    resultList.add("skullTexture: $skullTexture")
+                                }
                                 val cleanName = stack.cleanName()
                                 val type = stack.javaClass.name
                                 resultList.add("cleanName: $cleanName")
