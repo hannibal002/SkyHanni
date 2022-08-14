@@ -6,7 +6,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraftforge.common.util.Constants
 import java.util.*
 
 object ItemUtils {
@@ -87,7 +89,6 @@ object ItemUtils {
                 }
             }
         }
-
         return list
     }
 
@@ -180,5 +181,14 @@ object ItemUtils {
         }
 
         return internalName
+    }
+
+    fun ItemStack.getSkullTexture(): String? {
+        if (item != Items.skull) return null
+        if (tagCompound == null) return null
+        val nbt = tagCompound
+        if (!nbt.hasKey("SkullOwner")) return null
+        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
+            .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
 }

@@ -51,7 +51,7 @@ class GriffinBurrowFinder {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (lastArrowLine != null) {
             var start = lastArrowLine!!.start
-            val y = (Minecraft.getMinecraft().thePlayer.position.y - 1).toDouble()
+            val y = (LocationUtils.playerLocation().y - 1)
             start = LorenzVec(start.x, y, start.z)
             val direction = lastArrowLine!!.direction
 
@@ -74,7 +74,7 @@ class GriffinBurrowFinder {
             val x = packet.xCoordinate
             val y = packet.yCoordinate
             val z = packet.zCoordinate
-            val distance = LorenzVec(x, y, z).distance(Minecraft.getMinecraft().thePlayer.getLorenzVec())
+            val distance = LorenzVec(x, y, z).distance(LocationUtils.playerLocation())
             if (distance < 20) {
 //                LorenzDebug.log("")
 //                LorenzDebug.log("S2APacketParticles close")
@@ -93,7 +93,7 @@ class GriffinBurrowFinder {
             val x = packet.x
             val y = packet.y
             val z = packet.z
-            val distance = LorenzVec(x, y, z).distance(Minecraft.getMinecraft().thePlayer.getLorenzVec())
+            val distance = LorenzVec(x, y, z).distance(LocationUtils.playerLocation())
             if (distance < 20) {
                 val soundName = packet.soundName
                 val pitch = packet.pitch
@@ -135,7 +135,7 @@ class GriffinBurrowFinder {
     }
 
     private fun checkEntities() {
-        val playerLocation = Minecraft.getMinecraft().thePlayer.position.toLorenzVec()
+        val playerLocation = LocationUtils.playerLocation()
         for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
             if (list.contains(entity.uniqueID)) continue
             if (entity !is EntityArmorStand) continue

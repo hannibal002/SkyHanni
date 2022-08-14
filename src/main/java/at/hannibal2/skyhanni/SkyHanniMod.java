@@ -85,6 +85,7 @@ public class SkyHanniMod {
         registerEvent(new SeaCreatureMessageShortener());
 //        registerEvent(new GriffinBurrowFinder());
         registerEvent(new AshfangFreezeCooldown());
+        registerEvent(new SummoningSoulsName());
 
         Commands.init();
 
