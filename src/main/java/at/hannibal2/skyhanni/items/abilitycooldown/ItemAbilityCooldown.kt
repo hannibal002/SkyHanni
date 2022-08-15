@@ -180,8 +180,12 @@ class ItemAbilityCooldown {
         PIGMAN_SWORD("Burning Souls", 5, "Pigman Sword"),
 
         SOULWARD("Soulward", 20, "Soul Esoward"),
-        ECHO("Echo", 3, "Ancestral Spade");
+        ECHO("Echo", 3, "Ancestral Spade"),
+
+        FIRE_VEIL("Fire Veil", 5, "Fire Veil Wand"),
         //TODO add new crimson isle weapons
+
+        ;
 
         fun click() {
             lastClick = System.currentTimeMillis()
