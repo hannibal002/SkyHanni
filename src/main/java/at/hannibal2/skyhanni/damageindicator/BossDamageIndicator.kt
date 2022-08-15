@@ -365,7 +365,7 @@ class BossDamageIndicator {
         if (healed <= 0) return
 
         //Hide auto heal every 10 ticks (with rounding errors)
-        if ((healed == 15_000 || healed == 15_001) && bossType == BossType.HUB_REVENANT_HORROR) return
+        if ((healed == 15_000 || healed == 15_001) && bossType == BossType.SLAYER_ZOMBIE_5) return
 
         val formatLastHealth = NumberUtil.format(lastHealth)
         val formatHealth = NumberUtil.format(health)

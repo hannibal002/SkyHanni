@@ -15,8 +15,12 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     END_ENDSTONE_PROTECTOR("§cEndstone Protector", 3),
     END_ENDER_DRAGON("Ender Dragon", 4),//TODO fix totally
 
-    //TODO more seperated slayer variants
-    HUB_REVENANT_HORROR("§5Revenant Horror 5", 5, "§5Rev 5"),
+    SLAYER_ZOMBIE_1("§aRevenant Horror 1", 5, "§aRev 1"),
+    SLAYER_ZOMBIE_2("§eRevenant Horror 2", 5, "§eRev 2"),
+    SLAYER_ZOMBIE_3("§cRevenant Horror 3", 5, "§cRev 3"),
+    SLAYER_ZOMBIE_4("§4Revenant Horror 4", 5, "§4Rev 4"),
+    SLAYER_ZOMBIE_5("§5Revenant Horror 5", 5, "§5Rev 5"),
+
     SPIDER_SLAYER("Spider Slayer", 6, "Spider"),
     WOLF_SLAYER("Wolf Slayer", 7, "Wolf"),
 
@@ -28,4 +32,9 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     BLAZE_SLAYER("Blaze Slayer", 9, "Blaze"),
 
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman", 10),
+
+    //TODO arachne
+
+    //TODO corelone
+    //TODO bal
 }

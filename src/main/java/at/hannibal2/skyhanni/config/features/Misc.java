@@ -46,7 +46,7 @@ public class Misc {
                     "\u00a7bVanquisher",
                     "\u00a7bEndstone Protector (not tested)",
                     "\u00a7bEnder Dragon (not finished)",
-                    "\u00a7bRevenant Horror (not finished)",
+                    "\u00a7bRevenant Horror",
                     "\u00a7bSpider Slayer (not implemented)",
                     "\u00a7bWolf Slayer (not implemented)",
                     "\u00a7bVoidgloom Seraph",
