@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.damageindicator
 
 import at.hannibal2.skyhanni.dungeon.DungeonData
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
@@ -155,11 +154,9 @@ class BossFinder {
 
             if (DungeonData.isOneOf("F4", "M4")) {
                 if (entity is EntityGhast) {
-                    val health = LorenzUtils.formatDouble(entity.health.toDouble())
-                    //TODO add m4 support
-                    LorenzTest.enabled = true
-                    LorenzTest.text = "thorn has $health hp!"
-                    return EntityResult(ignoreBlocks = true, finalDungeonBoss = true)
+                    return EntityResult(bossType = BossType.DUNGEON_F4_THORN,
+                        ignoreBlocks = true,
+                        finalDungeonBoss = true)
                 }
 
             }

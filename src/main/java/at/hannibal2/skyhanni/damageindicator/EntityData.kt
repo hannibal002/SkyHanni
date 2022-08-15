@@ -7,7 +7,7 @@ class EntityData(
     var ignoreBlocks: Boolean,
     var delayedStart: Long,
     val finalDungeonBoss: Boolean,
-    val bossType: BossType = BossType.DUNGEON,
+    val bossType: BossType,
 
     var lastHealth: Int = 0,
     var healthText: String = "",

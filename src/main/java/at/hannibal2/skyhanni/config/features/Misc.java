@@ -51,7 +51,14 @@ public class Misc {
                     "\u00a7bWolf Slayer (not implemented)",
                     "\u00a7bVoidgloom Seraph",
                     "\u00a7bBlaze Slayer (not implemented)",
-                    "\u00a7bHeadless Horseman (bugged)"
+                    "\u00a7bHeadless Horseman (bugged)",
+                    "\u00a7bDungeon Floor 1",
+                    "\u00a7bDungeon Floor 2",
+                    "\u00a7bDungeon Floor 3",
+                    "\u00a7bDungeon Floor 4",
+                    "\u00a7bDungeon Floor 5",
+                    "\u00a7bDungeon Floor 6",
+                    "\u00a7bDungeon Floor 7"
             }
     )
     @ConfigAccordionId(id = 1)
