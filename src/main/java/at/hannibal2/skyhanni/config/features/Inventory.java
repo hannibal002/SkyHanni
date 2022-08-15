@@ -15,43 +15,43 @@ public class Inventory {
 
     @Expose
     @ConfigOption(name = "Item number as stack size", desc = "")
-    @ConfigEditorAccordion(id = 2)
+    @ConfigEditorAccordion(id = 1)
     public boolean filterTypes = false;
 
     @Expose
     @ConfigOption(name = "Master Star Number", desc = "Show the Tier of the Master Star.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 1)
     public boolean displayMasterStarNumber = false;
 
     @Expose
     @ConfigOption(name = "Master Skull Number", desc = "Show the tier of the Master Skull accessory.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 1)
     public boolean displayMasterSkullNumber = false;
 
     @Expose
     @ConfigOption(name = "Dungeon Head Floor", desc = "Show the correct floor for golden and diamond heads.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 1)
     public boolean displayDungeonHeadFloor = false;
 
     @Expose
     @ConfigOption(name = "New Year Cake", desc = "Show the Number of the Year of New Year Cakes.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 1)
     public boolean displayNewYearCakeNumber = false;
 
     @Expose
     @ConfigOption(name = "Pet Level", desc = "Show the level of the pet when not maxed.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 1)
     public boolean displayPetLevel = false;
 
     @Expose
     @ConfigOption(name = "Minion Tier", desc = "Show the Minion Tier over Items.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 1)
     public boolean displayMinionTier = false;
 
     @Expose

@@ -62,7 +62,7 @@ public class Commands {
                         "testhanni",
                         new SimpleCommand.ProcessCommandRunnable() {
                             public void processCommand(ICommandSender sender, String[] args) {
-                                LorenzTest.Companion.testCommand();
+                                LorenzTest.Companion.testCommand(args);
                             }
                         }
                 )

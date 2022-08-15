@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.dungeon.DungeonData
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.misc.ScoreboardData
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
@@ -89,7 +88,6 @@ class BossDamageIndicator {
                 6f
             )
 
-
             var bossName = data.bossType.bossName
             if (data.namePrefix.isNotEmpty()) {
                 bossName = data.namePrefix + bossName
@@ -98,15 +96,13 @@ class BossDamageIndicator {
                 bossName += data.nameSuffix
             }
 
-            val scale2 = LorenzTest.b.toFloat()
-            val above = LorenzTest.a.toFloat()
             RenderUtils.drawLabel(
                 pos,
                 bossName,
                 partialTicks,
                 true,
-                scale2,
-                above
+                3.9f,
+                -9.0f
             )
         }
         GlStateManager.enableDepth()
@@ -309,37 +305,11 @@ class BossDamageIndicator {
                 else -> LorenzColor.RED
             }
 
-            if (data.containsKey(entity.uniqueID)) {
-                val lastHealth = data[entity.uniqueID]!!.lastHealth
-                val diff = lastHealth - health
-                if (diff != 0) {
+            if (SkyHanniMod.feature.misc.damageIndicatorHealingMessage) {
+                if (data.containsKey(entity.uniqueID)) {
+                    val lastHealth = data[entity.uniqueID]!!.lastHealth
                     val bossType = entityData.bossType
-                    if (bossType == BossType.NETHER_ASHFANG) {
-                        if (diff < 0) {
-                            val oldHealth = lastHealth / 1_000_000
-                            val newHealth = health / 1_000_000
-                            LorenzUtils.chat("§e§lAshfang healing: ${oldHealth}M -> ${newHealth}M")
-                        }
-                    } else if (bossType == BossType.NETHER_BLADESOUL) {
-                        if (diff < 0) {
-                            val oldHealth = lastHealth / 1_000_000
-                            val newHealth = health / 1_000_000
-                            val oldFormat = NumberUtil.format(oldHealth)
-                            val newFormat = NumberUtil.format(newHealth)
-                            LorenzUtils.chat("§e§lBladesoul healing: §a+12.5m §e(${oldFormat}M -> ${newFormat}M)")
-                        }
-                    } else if (bossType == BossType.NETHER_BARBARIAN_DUKE) {
-                        if (diff < 0) {
-                            val oldHealth = lastHealth / 1_000_000
-                            val newHealth = health / 1_000_000
-                            val oldFormat = NumberUtil.format(oldHealth)
-                            val newFormat = NumberUtil.format(newHealth)
-                            LorenzUtils.chat("§e§lBarbarian Duke healing: §a+12.5m §e(${oldFormat}M -> ${newFormat}M)")
-                        }
-                        //TODO check for revive buffs
-//                    } else {
-//                        LorenzUtils.chat("$bossType diff: $diff")
-                    }
+                    checkHealed(health, lastHealth, bossType)
                 }
             }
 
@@ -352,6 +322,20 @@ class BossDamageIndicator {
         } catch (e: Throwable) {
             e.printStackTrace()
         }
+    }
+
+    private fun checkHealed(health: Int, lastHealth: Int, bossType: BossType) {
+        val healed = health - lastHealth
+        if (healed <= 0) return
+
+        //Hide auto heal every 10 ticks
+        if (healed == 15_000 && bossType == BossType.HUB_REVENANT_HORROR) return
+
+        val formatLastHealth = NumberUtil.format(lastHealth)
+        val formatHealth = NumberUtil.format(health)
+        val healedFormat = NumberUtil.format(healed)
+        println(bossType.bossName + " §fhealed for $healed❤ ($lastHealth -> $health)")
+        LorenzUtils.chat(bossType.bossName + " §ehealed for §a$healedFormat❤ §8(§e$formatLastHealth -> $formatHealth§8)")
     }
 
     private fun grabData(entity: EntityLivingBase): EntityData? {

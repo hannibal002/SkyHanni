@@ -22,9 +22,6 @@ class LorenzTest {
         var enabled = false
         var text = ""
 
-        var a = -9.0
-        var b = 3.9
-
         val debugLogger = LorenzLogger("debug/test")
 
         fun printLore() {
@@ -97,8 +94,7 @@ class LorenzTest {
             LorenzDebug.log(text)
         }
 
-        fun testCommand() {
-
+        fun testCommand(args: Array<String>) {
         }
     }
 

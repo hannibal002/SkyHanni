@@ -1,17 +1,27 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.gui.core.config.Position;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorButton;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
 public class Misc {
 
     @Expose
-    @ConfigOption(name = "Damage Indicator", desc = "Show the missing health of a boss in the dungeon, of slayer bosses and other bosses and the cooldown time until the boss becomes attackable.")
+    @ConfigOption(name = "Damage Indicator", desc = "")
+    @ConfigEditorAccordion(id = 1)
+    public boolean damageIndicatorInternal = false;
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Show the missing health of a boss.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
     public boolean damageIndicator = false;
+
+    @Expose
+    @ConfigOption(name = "Healing Chat Message", desc = "Sends a chat message when a boss heals himself.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean damageIndicatorHealingMessage = false;
 
     @Expose
     @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
