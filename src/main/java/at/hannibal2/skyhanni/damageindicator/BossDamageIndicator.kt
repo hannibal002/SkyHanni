@@ -60,7 +60,6 @@ class BossDamageIndicator {
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
-            if (data.healthLineHidden) continue
             if (data.bossType.bossTypeToggle !in SkyHanniMod.feature.misc.damageIndicatorBossesToShow) continue
 
             val entity = data.entity
@@ -70,10 +69,7 @@ class BossDamageIndicator {
             if (delayedStart != -1L) {
                 if (delayedStart > System.currentTimeMillis()) {
                     val delay = delayedStart - System.currentTimeMillis()
-                    val color = colorForTime(delay)
-                    var d = delay * 1.0
-                    d /= 1000
-                    healthText = color.getChatColor() + decimalFormat.format(d)
+                    healthText = formatDelay(delay)
                 }
             }
 
@@ -83,13 +79,16 @@ class BossDamageIndicator {
                 RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
                 RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
             )
-            RenderUtils.drawLabel(
-                pos,
-                healthText,
-                partialTicks,
-                true,
-                6f
-            )
+
+            if (!data.healthLineHidden) {
+                RenderUtils.drawLabel(
+                    pos,
+                    healthText,
+                    partialTicks,
+                    true,
+                    6f
+                )
+            }
 
             var bossName = when (SkyHanniMod.feature.misc.damageIndicatorBossName) {
                 0 -> ""
@@ -118,11 +117,15 @@ class BossDamageIndicator {
         GlStateManager.enableCull()
     }
 
-    private fun colorForTime(delayedStart: Long): LorenzColor = when {
-        delayedStart < 1_000 -> LorenzColor.DARK_PURPLE
-        delayedStart < 3_000 -> LorenzColor.LIGHT_PURPLE
+    private fun formatDelay(delay: Long): String {
+        val color = when {
+            delay < 1_000 -> LorenzColor.DARK_PURPLE
+            delay < 3_000 -> LorenzColor.LIGHT_PURPLE
 
-        else -> LorenzColor.WHITE
+            else -> LorenzColor.WHITE
+        }
+        val d = (delay * 1.0) / 1000
+        return color.getChatColor() + decimalFormat.format(d)
     }
 
     @SubscribeEvent
@@ -189,6 +192,9 @@ class BossDamageIndicator {
 
             var customHealthText = ""
 
+            //TODO implement
+//            if (!entityData.dead) {
+
             if (entityData.bossType == BossType.SLAYER_ENDERMAN_1 ||
                 entityData.bossType == BossType.SLAYER_ENDERMAN_2 ||
                 entityData.bossType == BossType.SLAYER_ENDERMAN_3 ||
@@ -207,20 +213,22 @@ class BossDamageIndicator {
                             BossType.SLAYER_ENDERMAN_4 -> 100
                             else -> 100
                         }
-                        val hits = name.between("Seraph ", " Hits").toInt()
+                        val hits = name.between("Seraph ", " Hit").toInt()
                         val color = percentageColor(hits, maxHits)
 
                         customHealthText = color.getChatColor() + "$hits Hits"
                     })
                     if (entity.ridingEntity != null) {
-                        entityData.healthLineHidden = true
+                        val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
+                        //TODO more tests, more exact values, better logic? idk make this working perfectly pls
+//                        val remainingTicks = 8 * 20 - ticksAlive
+                        val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+                        customHealthText = formatDelay(remainingTicks * 50)
                     }
                 }
 
                 when (entityData.bossType) {
                     BossType.SLAYER_ENDERMAN_4 -> {
-                        entityData.namePrefix = "§4"
-                        entityData.nameSuffix = " 4"
                         val step = maxHealth / 6
                         calcMaxHealth = step
                         if (health > step * 5) {
@@ -327,6 +335,7 @@ class BossDamageIndicator {
             if (customHealthText.isNotEmpty()) {
                 entityData.healthText = customHealthText
             } else {
+                val color = percentageColor(calcHealth, calcMaxHealth)
                 entityData.healthText = color.getChatColor() + NumberUtil.format(calcHealth)
             }
             entityData.timeLastTick = System.currentTimeMillis()
