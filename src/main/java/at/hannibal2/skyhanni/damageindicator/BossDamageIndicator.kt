@@ -16,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -343,6 +344,15 @@ class BossDamageIndicator {
 //                        entityData.nameSuffix = " §lBOOM - $format"
                             entityData.nameSuffix = " §lBOOM!"
                         })
+                    }
+                }
+                if (entityData.bossType == BossType.SLAYER_WOLF_3 ||
+                    entityData.bossType == BossType.SLAYER_WOLF_4
+                ) {
+                    if (entity is EntityWolf) {
+                        if (entity.hasNameTagWith(2, "§bCalling the pups!")) {
+                            customHealthText = "Pups!"
+                        }
                     }
                 }
             }

@@ -16,6 +16,7 @@ import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.*
 import net.minecraft.entity.passive.EntityHorse
+import net.minecraft.entity.passive.EntityWolf
 import net.minecraft.util.AxisAlignedBB
 import java.util.*
 
@@ -213,13 +214,11 @@ class BossFinder {
                     return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
                 }
             }
-
             if (entity is EntityWither) {
                 if (entity.hasNameTagWith(4, "§8[§7Lv100§8] §c§5Vanquisher§r ")) {
                     return EntityResult(bossType = BossType.NETHER_VANQUISHER)
                 }
             }
-
             if (entity is EntityEnderman) {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
                     when (maxHealth) {
@@ -238,19 +237,16 @@ class BossFinder {
                     }
                 }
             }
-
             if (entity is EntityDragon) {
                 //TODO testing and make right and so
                 return EntityResult(bossType = BossType.END_ENDER_DRAGON)
             }
-
             if (entity is EntityIronGolem) {
                 //TODO testing
                 if (entity.hasNameTagWith(3, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ")) {
                     return EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR, ignoreBlocks = true)
                 }
             }
-
             if (entity is EntityZombie) {
                 if (entity.hasNameTagWith(2, "§c☠ §bRevenant Horror")) {
                     when (maxHealth) {
@@ -285,7 +281,6 @@ class BossFinder {
                     }
                 }
             }
-
             if (entity is EntityHorse) {
                 if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
                     if (maxHealth == 3_000_000) {
@@ -306,7 +301,6 @@ class BossFinder {
                     }
                 }
             }
-
             if (entity is EntitySpider) {
                 if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
                     when (maxHealth) {
@@ -321,6 +315,24 @@ class BossFinder {
                         }
                         2_400_000, 4_800_000 -> {
                             return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+                        }
+                    }
+                }
+            }
+            if (entity is EntityWolf) {
+                if (entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
+                    when (maxHealth) {
+                        2_000, 4_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_WOLF_1)
+                        }
+                        40_000, 80_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_WOLF_2)
+                        }
+                        750_000, 1_500_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_WOLF_3)
+                        }
+                        2_000_000, 4_000_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_WOLF_4)
                         }
                     }
                 }
