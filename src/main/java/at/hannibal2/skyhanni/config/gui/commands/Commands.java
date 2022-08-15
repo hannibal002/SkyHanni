@@ -72,7 +72,7 @@ public class Commands {
                         "copyentities",
                         new SimpleCommand.ProcessCommandRunnable() {
                             public void processCommand(ICommandSender sender, String[] args) {
-                                CopyNearbyEntitiesCommand.Companion.testCommand(args);
+                                CopyNearbyEntitiesCommand.INSTANCE.command(args);
                             }
                         }
                 )
