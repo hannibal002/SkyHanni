@@ -306,6 +306,25 @@ class BossFinder {
                     }
                 }
             }
+
+            if (entity is EntitySpider) {
+                if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
+                    when (maxHealth) {
+                        740, 1_500 -> {
+                            return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+                        }
+                        30_000, 60_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+                        }
+                        900_000, 1_800_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+                        }
+                        2_400_000, 4_800_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+                        }
+                    }
+                }
+            }
         }
 
         return null
