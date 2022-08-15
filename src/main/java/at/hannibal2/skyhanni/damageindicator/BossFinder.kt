@@ -195,6 +195,10 @@ class BossFinder {
                         if (entity.baseMaxHealth == 50_000_000.0) {
                             return EntityResult(bossType = BossType.NETHER_ASHFANG)
                         }
+                        //Derpy
+                        if (entity.baseMaxHealth == 100_000_000.0) {
+                            return EntityResult(bossType = BossType.NETHER_ASHFANG)
+                        }
                     }
                 }
             }
@@ -228,6 +232,14 @@ class BossFinder {
                     ) {
                         return EntityResult(bossType = BossType.END_ENDERMAN_SLAYER)
                     }
+                    //Derpy
+                    if (entity.baseMaxHealth == 600_000.0 ||
+                        entity.baseMaxHealth == 30_000_000.0 ||
+                        entity.baseMaxHealth == 66_666_666.0 * 2.0 ||
+                        entity.baseMaxHealth == 600_000_000.0
+                    ) {
+                        return EntityResult(bossType = BossType.END_ENDERMAN_SLAYER)
+                    }
                 }
             }
 
@@ -248,19 +260,31 @@ class BossFinder {
                     if (entity.baseMaxHealth == 10_000_000.0) {
                         return EntityResult(bossType = BossType.HUB_REVENANT_HORROR)
                     }
+                    //Derpy
+                    if (entity.baseMaxHealth == 20_000_000.0) {
+                        return EntityResult(bossType = BossType.HUB_REVENANT_HORROR)
+                    }
                 }
             }
             if (entity is EntityMagmaCube) {
-                if (entity.baseMaxHealth == 200_000_000.0) {
-                    if (entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")) {
+                if (entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")) {
+                    if (entity.baseMaxHealth == 200_000_000.0) {
+                        return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
+                    }
+                    //Derpy
+                    if (entity.baseMaxHealth == 400_000_000.0) {
                         return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
                     }
                 }
             }
 
             if (entity is EntityHorse) {
-                if (entity.baseMaxHealth == 3_000_000.0) {
-                    if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
+                if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
+                    if (entity.baseMaxHealth == 3_000_000.0) {
+                        return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
+                    }
+                    //Derpy
+                    if (entity.baseMaxHealth == 6_000_000.0) {
                         return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
                     }
                 }
@@ -470,33 +494,28 @@ class BossFinder {
 fun EntityLiving.hasNameTagWith(
     y: Int,
     contains: String,
-    debug: Boolean = false,
+    debugRightEntity: Boolean = false,
     consumer: (EntityArmorStand) -> Unit = {},
+    inaccuracy: Double = 1.6,
+    debugWrongEntity: Boolean = false,
 ): Boolean {
     val center = getLorenzVec().add(0, y, 0)
-    val a = center.add(-1.6, -1.6 - y, -1.6).toBlocPos()
-    val b = center.add(1.6, 1.6, 1.6).toBlocPos()
+    val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlocPos()
+    val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlocPos()
     val alignedBB = AxisAlignedBB(a, b)
     val clazz = EntityArmorStand::class.java
-    return worldObj.getEntitiesWithinAABB(clazz, alignedBB).any {
+    val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
+    return found.any {
         val result = it.name.contains(contains)
-        if (!result) {
-            if (debug) {
-                println("wrong entity in aabb: '" + it.name + "'")
-            }
+        if (debugWrongEntity && !result) {
+            println("wrong entity in aabb: '" + it.name + "'")
         }
-        if (result && debug) {
-            println("hasNameTagWith debug!")
-            val locNametag = it.getLorenzVec()
-            val locMob = this.getLorenzVec()
-            println("mob: $locMob")
-            println("nametag: $locNametag")
-            val distance = locMob.distance(locNametag)
-            println("distance: $distance")
-
-
+        if (debugRightEntity && result) {
+            println("mob: " + center.printWithAccuracy(2))
+            println("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+            println("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
         }
         if (result) consumer(it)
-        return result
+        result
     }
 }

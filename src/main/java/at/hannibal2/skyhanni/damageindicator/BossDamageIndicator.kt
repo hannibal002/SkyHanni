@@ -165,7 +165,9 @@ class BossDamageIndicator {
                 //Hides the damage indicator when in hit phase or in laser phase
                 if (entity is EntityEnderman) {
                     var hidden = false
-                    if (entity.hasNameTagWith(3, " Hit")) hidden = true
+                    val hasNameTagWith = entity.hasNameTagWith(3, " Hit")
+//                    println("is in hit phase: $hasNameTagWith")
+                    if (hasNameTagWith) hidden = true
                     if (entity.ridingEntity != null) hidden = true
                     entityData.hidden = hidden
                 }
@@ -173,62 +175,23 @@ class BossDamageIndicator {
                 if (!entityData.hidden) {
                     //custom prefix and health for the four different ender slayers
                     when (maxHealth) {
-                        300_000 -> {
-                            calcMaxHealth = 100_000
-                            if (health > 200_000) {
-                                calcHealth -= 200_000
-                                extraPrefix = "1/3"
-                            } else if (health > 100_000) {
-                                calcHealth -= 100_000
-                                extraPrefix = "2/3"
-                            } else {
-                                calcHealth = health
-                                extraPrefix = "3/3"
-                            }
-                        }
-                        15_000_000 -> {
-                            calcMaxHealth = 5_000_000
-                            if (health > 10_000_000) {
-                                extraPrefix = "1/3"
-                                calcHealth -= 10_000_000
-                            } else if (health > 5_000_000) {
-                                calcHealth -= 5_000_000
-                                extraPrefix = "2/3"
-                            } else {
-                                calcHealth = health
-                                extraPrefix = "3/3"
-                            }
-                        }
-                        66_666_666 -> {
-                            calcMaxHealth = 22_222_222
-                            if (health > 44_444_444) {
-                                calcHealth -= 44_444_444
-                                extraPrefix = "1/3"
-                            } else if (health > 22_222_222) {
-                                calcHealth -= 22_222_222
-                                extraPrefix = "2/3"
-                            } else {
-                                calcHealth = health
-                                extraPrefix = "3/3"
-                            }
-
-                        }
-                        300_000_000 -> {
-                            calcMaxHealth = 50_000_000
-                            if (health > 250_000_000) {
-                                calcHealth -= 250_000_000
+                        300_000_000, 600_000_000 -> {
+                            val step = maxHealth / 6
+                            calcMaxHealth = step
+                            if (health > step * 5) {
+                                calcHealth -= step * 5
                                 extraPrefix = "1/6"
-                            } else if (health > 200_000_000) {
-                                calcHealth -= 200_000_000
+                            } else if (health > step * 4) {
+                                calcHealth -= step * 4
                                 extraPrefix = "2/6"
-                            } else if (health > 150_000_000) {
-                                calcHealth -= 150_000_000
+                            } else if (health > step * 3) {
+                                calcHealth -= step * 3
                                 extraPrefix = "3/6"
-                            } else if (health > 100_000_000) {
-                                calcHealth -= 100_000_000
+                            } else if (health > step * 2) {
+                                calcHealth -= step * 2
                                 extraPrefix = "4/6"
-                            } else if (health > 50_000_000) {
-                                calcHealth -= 50_000_000
+                            } else if (health > step) {
+                                calcHealth -= step
                                 extraPrefix = "5/6"
                             } else {
                                 calcHealth = health
@@ -236,10 +199,19 @@ class BossDamageIndicator {
                             }
                         }
                         else -> {
-                            //TODO this is a workaround, find a sweet solution pls?
-                            LorenzUtils.warning("§c[SkyHanni] Unknown max enderman health: $maxHealth")
-                            entityData.hidden = true
+                            val step = maxHealth / 3
 
+                            calcMaxHealth = step
+                            if (health > step * 2) {
+                                calcHealth -= step * 2
+                                extraPrefix = "1/3"
+                            } else if (health > step) {
+                                calcHealth -= step
+                                extraPrefix = "2/3"
+                            } else {
+                                calcHealth = health
+                                extraPrefix = "3/3"
+                            }
                         }
                     }
                 }

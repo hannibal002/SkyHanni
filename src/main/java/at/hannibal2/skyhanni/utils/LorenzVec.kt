@@ -6,6 +6,7 @@ import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
 import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.round
 import kotlin.math.sin
 
 data class LorenzVec(
@@ -53,6 +54,19 @@ data class LorenzVec(
         LorenzVec(x multiplyZeroSave d.toDouble(), y multiplyZeroSave d.toDouble(), z multiplyZeroSave d.toDouble())
 
     fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
+
+    fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
+
+    fun printWithAccuracy(accuracy: Int): String {
+        val x = (round(x * accuracy) / accuracy)
+        val y = (round(y * accuracy) / accuracy)
+        val z = (round(z * accuracy) / accuracy)
+        return LorenzVec(x, y, z).toCleanString()
+    }
+
+    private fun toCleanString(): String {
+        return "$x $y $z"
+    }
 
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
