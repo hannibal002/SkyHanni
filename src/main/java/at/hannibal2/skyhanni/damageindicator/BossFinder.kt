@@ -222,9 +222,7 @@ class BossFinder {
 
             if (entity is EntityEnderman) {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
-
-
-                    when (maxHealth.toInt()) {
+                    when (maxHealth) {
                         300_000, 600_000 -> {
                             return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
                         }
@@ -296,6 +294,15 @@ class BossFinder {
                     //Derpy
                     if (maxHealth == 6_000_000) {
                         return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
+                    }
+                }
+            }
+            if (entity is EntityBlaze) {
+                if (entity.hasNameTagWith(2, "§c☠ §bInferno Demonlord ")) {
+                    when (maxHealth) {
+                        2_500_000, 5_000_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_BLAZE_1)
+                        }
                     }
                 }
             }

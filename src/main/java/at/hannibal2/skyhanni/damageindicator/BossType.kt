@@ -29,7 +29,7 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     SLAYER_ENDERMAN_3("§cVoidgloom Seraph 3", 8),
     SLAYER_ENDERMAN_4("§4Voidgloom Seraph 4", 8),
 
-    BLAZE_SLAYER("Blaze Slayer", 9, "Blaze"),
+    SLAYER_BLAZE_1("§aInferno Demonlord 1", 9),
 
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman", 10),
 
@@ -58,4 +58,6 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
      * f7 blood room giants
      *
      */
+
+    //TODO diana mythological creatures
 }
