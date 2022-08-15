@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.misc.ScoreboardData
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
@@ -57,21 +59,20 @@ class BossDamageIndicator {
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
-            if (data.hidden) continue
+            if (data.healthLineHidden) continue
             if (data.bossType.bossTypeToggle !in SkyHanniMod.feature.misc.damageIndicatorBossesToShow) continue
 
             val entity = data.entity
 
-            var color = data.color
-            var text = data.text
+            var healthText = data.healthText
             val delayedStart = data.delayedStart
             if (delayedStart != -1L) {
                 if (delayedStart > System.currentTimeMillis()) {
                     val delay = delayedStart - System.currentTimeMillis()
-                    color = colorForTime(delay)
+                    val color = colorForTime(delay)
                     var d = delay * 1.0
                     d /= 1000
-                    text = decimalFormat.format(d)
+                    healthText = color.getChatColor() + decimalFormat.format(d)
                 }
             }
 
@@ -83,7 +84,7 @@ class BossDamageIndicator {
             )
             RenderUtils.drawLabel(
                 pos,
-                color.getChatColor() + text,
+                healthText,
                 partialTicks,
                 true,
                 6f
@@ -155,6 +156,8 @@ class BossDamageIndicator {
 
             var calcHealth = health
             var calcMaxHealth = maxHealth
+            entityData.namePrefix = ""
+            entityData.nameSuffix = ""
 
             if (DungeonData.isOneOf("F4")) {
                 calcHealth = when (health) {
@@ -183,79 +186,82 @@ class BossDamageIndicator {
 //                calcMaxHealth = 4
             }
 
+            var customHealthText = ""
 
-            if (entityData.bossType == BossType.END_ENDERMAN_SLAYER) {
+            if (entityData.bossType == BossType.SLAYER_ENDERMAN_1 ||
+                entityData.bossType == BossType.SLAYER_ENDERMAN_2 ||
+                entityData.bossType == BossType.SLAYER_ENDERMAN_3 ||
+                entityData.bossType == BossType.SLAYER_ENDERMAN_4
+            ) {
                 var statePrefix = ""
                 //Hides the damage indicator when in hit phase or in laser phase
                 if (entity is EntityEnderman) {
-                    var hidden = false
-                    val hasNameTagWith = entity.hasNameTagWith(3, " Hit")
-//                    println("is in hit phase: $hasNameTagWith")
-                    if (hasNameTagWith) hidden = true
-                    if (entity.ridingEntity != null) hidden = true
-                    entityData.hidden = hidden
+                    entity.hasNameTagWith(3, " Hit", consumer = {
+                        val name = it.name.removeColor()
+
+                        val maxHits = when (entityData.bossType) {
+                            BossType.SLAYER_ENDERMAN_1 -> 15
+                            BossType.SLAYER_ENDERMAN_2 -> 30
+                            BossType.SLAYER_ENDERMAN_3 -> 60
+                            BossType.SLAYER_ENDERMAN_4 -> 100
+                            else -> 100
+                        }
+                        val hits = name.between("Seraph ", " Hits").toInt()
+                        val color = percentageColor(hits, maxHits)
+
+                        customHealthText = color.getChatColor() + "$hits Hits"
+                    })
+                    if (entity.ridingEntity != null) {
+                        entityData.healthLineHidden = true
+                    }
                 }
 
-                if (!entityData.hidden) {
-                    //custom prefix and health for the four different ender slayers
-                    when (maxHealth) {
-                        300_000_000, 600_000_000 -> {
-                            entityData.namePrefix = "§4"
-                            entityData.nameSuffix = " 4"
-                            val step = maxHealth / 6
-                            calcMaxHealth = step
-                            if (health > step * 5) {
-                                calcHealth -= step * 5
-                                statePrefix = "§c1/6 "
-                            } else if (health > step * 4) {
-                                calcHealth -= step * 4
-                                statePrefix = "§e2/6 "
-                            } else if (health > step * 3) {
-                                calcHealth -= step * 3
-                                statePrefix = "§e3/6 "
-                            } else if (health > step * 2) {
-                                calcHealth -= step * 2
-                                statePrefix = "§e4/6 "
-                            } else if (health > step) {
-                                calcHealth -= step
-                                statePrefix = "§e5/6 "
-                            } else {
-                                calcHealth = health
-                                statePrefix = "§a6/6 "
-                            }
+                when (entityData.bossType) {
+                    BossType.SLAYER_ENDERMAN_4 -> {
+                        entityData.namePrefix = "§4"
+                        entityData.nameSuffix = " 4"
+                        val step = maxHealth / 6
+                        calcMaxHealth = step
+                        if (health > step * 5) {
+                            calcHealth -= step * 5
+                            statePrefix = "§c1/6 "
+                        } else if (health > step * 4) {
+                            calcHealth -= step * 4
+                            statePrefix = "§e2/6 "
+                        } else if (health > step * 3) {
+                            calcHealth -= step * 3
+                            statePrefix = "§e3/6 "
+                        } else if (health > step * 2) {
+                            calcHealth -= step * 2
+                            statePrefix = "§e4/6 "
+                        } else if (health > step) {
+                            calcHealth -= step
+                            statePrefix = "§e5/6 "
+                        } else {
+                            calcHealth = health
+                            statePrefix = "§a6/6 "
                         }
-                        else -> {
-                            when (maxHealth) {
-                                300_000, 600_000 -> {
-                                    entityData.namePrefix = "§a"
-                                    entityData.nameSuffix = " 1"
-                                }
-                                15_000_000, 30_000_000 -> {
-                                    entityData.namePrefix = "§e"
-                                    entityData.nameSuffix = " 2"
-                                }
-                                66_666_666, 66_666_666 * 2 -> {
-                                    entityData.namePrefix = "§c"
-                                    entityData.nameSuffix = " 3"
-                                }
-                            }
+                    }
+                    BossType.SLAYER_ENDERMAN_1,
+                    BossType.SLAYER_ENDERMAN_2,
+                    BossType.SLAYER_ENDERMAN_3,
+                    -> {
+                        val step = maxHealth / 3
 
-                            val step = maxHealth / 3
-
-                            calcMaxHealth = step
-                            if (health > step * 2) {
-                                calcHealth -= step * 2
-                                statePrefix = "§c1/3 "
-                            } else if (health > step) {
-                                calcHealth -= step
-                                statePrefix = "§e2/3 "
-                            } else {
-                                calcHealth = health
-                                statePrefix = "§a3/3 "
-                            }
+                        calcMaxHealth = step
+                        if (health > step * 2) {
+                            calcHealth -= step * 2
+                            statePrefix = "§c1/3 "
+                        } else if (health > step) {
+                            calcHealth -= step
+                            statePrefix = "§e2/3 "
+                        } else {
+                            calcHealth = health
+                            statePrefix = "§a3/3 "
                         }
 
                     }
+                    else -> {}
                 }
                 entityData.namePrefix = statePrefix + entityData.namePrefix
             }
@@ -276,7 +282,7 @@ class BossDamageIndicator {
 
                     //hide while in the middle
                     val position = entity.getLorenzVec()
-                    entityData.hidden = position.x == -368.0 && position.z == -804.0
+                    entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
 
                     for (line in ScoreboardData.sidebarLinesRaw) {
                         if (line.contains("▎")) {
@@ -302,15 +308,7 @@ class BossDamageIndicator {
                     }
                 }
             }
-
-            val percentage = calcHealth.toDouble() / calcMaxHealth.toDouble()
-            val color = when {
-                percentage > 0.9 -> LorenzColor.DARK_GREEN
-                percentage > 0.75 -> LorenzColor.GREEN
-                percentage > 0.5 -> LorenzColor.YELLOW
-                percentage > 0.25 -> LorenzColor.GOLD
-                else -> LorenzColor.RED
-            }
+            val color = percentageColor(calcHealth, calcMaxHealth)
 
             if (SkyHanniMod.feature.misc.damageIndicatorHealingMessage) {
                 if (data.containsKey(entity.uniqueID)) {
@@ -321,13 +319,30 @@ class BossDamageIndicator {
             }
 
             entityData.lastHealth = health
-            entityData.text = NumberUtil.format(calcHealth)
-            entityData.color = color
+            if (customHealthText.isNotEmpty()) {
+                entityData.healthText = customHealthText
+            } else {
+                entityData.healthText = color.getChatColor() + NumberUtil.format(calcHealth)
+            }
             entityData.timeLastTick = System.currentTimeMillis()
             data[entity.uniqueID] = entityData
 
         } catch (e: Throwable) {
             e.printStackTrace()
+        }
+    }
+
+    private fun percentageColor(
+        have: Int,
+        max: Int,
+    ): LorenzColor {
+        val percentage = have.toDouble() / max.toDouble()
+        return when {
+            percentage > 0.9 -> LorenzColor.DARK_GREEN
+            percentage > 0.75 -> LorenzColor.GREEN
+            percentage > 0.5 -> LorenzColor.YELLOW
+            percentage > 0.25 -> LorenzColor.GOLD
+            else -> LorenzColor.RED
         }
     }
 

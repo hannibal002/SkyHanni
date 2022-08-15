@@ -224,20 +224,21 @@ class BossFinder {
 
             if (entity is EntityEnderman) {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
-                    if (entity.baseMaxHealth == 300_000.0 ||
-                        entity.baseMaxHealth == 15_000_000.0 ||
-                        entity.baseMaxHealth == 66_666_666.0 ||
-                        entity.baseMaxHealth == 300_000_000.0
-                    ) {
-                        return EntityResult(bossType = BossType.END_ENDERMAN_SLAYER)
-                    }
-                    //Derpy
-                    if (entity.baseMaxHealth == 600_000.0 ||
-                        entity.baseMaxHealth == 30_000_000.0 ||
-                        entity.baseMaxHealth == 66_666_666.0 * 2.0 ||
-                        entity.baseMaxHealth == 600_000_000.0
-                    ) {
-                        return EntityResult(bossType = BossType.END_ENDERMAN_SLAYER)
+
+
+                    when (entity.baseMaxHealth.toInt()) {
+                        300_000, 600_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
+                        }
+                        15_000_000, 30_000_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
+                        }
+                        66_666_666, 66_666_666 * 2 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
+                        }
+                        300_000_000, 600_000_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
+                        }
                     }
                 }
             }
