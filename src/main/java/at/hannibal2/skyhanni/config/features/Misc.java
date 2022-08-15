@@ -48,7 +48,7 @@ public class Misc {
                     "\u00a7bEnder Dragon (not finished)",
                     "\u00a7bRevenant Horror",
                     "\u00a7bTarantula Broodfather",
-                    "\u00a7bWolf Slayer (not implemented)",
+                    "\u00a7bSven Packmaster",
                     "\u00a7bVoidgloom Seraph",
                     "\u00a7bInferno Demonlord (only tier 1 yet)",
                     "\u00a7bHeadless Horseman (bugged)",
@@ -63,7 +63,7 @@ public class Misc {
     )
     @ConfigAccordionId(id = 1)
     //TODO only show currently working and tested features
-    public List<Integer> damageIndicatorBossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 8, 9));
+    public List<Integer> damageIndicatorBossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9));
 
 
     @Expose
