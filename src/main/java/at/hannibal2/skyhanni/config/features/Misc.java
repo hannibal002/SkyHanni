@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.config.gui.core.config.Position;
 import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Misc {
 
     @Expose
@@ -29,7 +33,31 @@ public class Misc {
             desc = "Change how the boss name should be displayed")
     @ConfigEditorDropdown(values = {"Disabled", "Full Name", "Short Name"})
     @ConfigAccordionId(id = 1)
-    public int damageIndicatorBossName = 0;
+    public int damageIndicatorBossName = 1;
+    @Expose
+    @ConfigOption(
+            name = "Select Boss",
+            desc = "Change what type of boss you want the damage indicator be enabled for."
+    )
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "\u00a7bDungeon All",
+                    "\u00a7bNether Mini Bosses",
+                    "\u00a7bVanquisher",
+                    "\u00a7bEndstone Protector",
+                    "\u00a7bEnder Dragon",
+                    "\u00a7bRevenant Horror",
+                    "\u00a7bSpider Slayer",
+                    "\u00a7bWolf Slayer",
+                    "\u00a7bVoidgloom Seraph",
+                    "\u00a7bBlaze Slayer",
+                    "\u00a7bHeadless Horseman"
+            }
+    )
+    @ConfigAccordionId(id = 1)
+    //TODO only show currently working and tested features
+    public List<Integer> damageIndicatorBossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 8));
+
 
     @Expose
     @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")

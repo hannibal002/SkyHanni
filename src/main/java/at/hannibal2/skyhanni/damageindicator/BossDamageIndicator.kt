@@ -58,6 +58,7 @@ class BossDamageIndicator {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
             if (data.hidden) continue
+            if (data.bossType.bossTypeToggle !in SkyHanniMod.feature.misc.damageIndicatorBossesToShow) continue
 
             val entity = data.entity
 

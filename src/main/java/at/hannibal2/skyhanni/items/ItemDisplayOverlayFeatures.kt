@@ -42,7 +42,7 @@ class ItemDisplayOverlayFeatures {
     private fun getStackTip(item: ItemStack): String {
         val name = item.cleanName()
 
-        if (SkyHanniMod.feature.inventory.displayMasterStarNumber) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(0)) {
             when (name) {
                 "First Master Star" -> return "1"
                 "Second Master Star" -> return "2"
@@ -52,13 +52,13 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.displayMasterSkullNumber) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(1)) {
             if (name.matchRegex("(.*)Master Skull - Tier .")) {
                 return name.substring(name.length - 1)
             }
         }
 
-        if (SkyHanniMod.feature.inventory.displayDungeonHeadFloor) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(2)) {
             if (name.contains("Golden ") || name.contains("Diamond ")) {
                 when {
                     name.contains("Bonzo") -> return "1"
@@ -72,17 +72,27 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.displayNewYearCakeNumber) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(3)) {
             if (name.startsWith("New Year Cake (")) {
                 return "§b" + name.between("(Year ", ")")
             }
         }
 
-        if (SkyHanniMod.feature.inventory.displayPetLevel) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(4)) {
             if (ItemUtils.isPet(name)) {
                 val level = name.between("Lvl ", "] ").toInt()
                 if (level != ItemUtils.maxPetLevel(name)) {
                     return "$level"
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(5)) {
+            if (name.contains(" Minion ")) {
+                if (item.getLore().any { it.contains("Place this minion") }) {
+                    val array = name.split(" ")
+                    val last = array[array.size - 1]
+                    return last.romanToDecimal().toString()
                 }
             }
         }
@@ -94,16 +104,6 @@ class ItemDisplayOverlayFeatures {
                 val split = name.split(" ")
                 val sackName = split[split.size - 2]
                 return (if (name.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
-            }
-        }
-
-        if (SkyHanniMod.feature.inventory.displayMinionTier) {
-            if (name.contains(" Minion ")) {
-                if (item.getLore().any { it.contains("Place this minion") }) {
-                    val array = name.split(" ")
-                    val last = array[array.size - 1]
-                    return last.romanToDecimal().toString()
-                }
             }
         }
 
