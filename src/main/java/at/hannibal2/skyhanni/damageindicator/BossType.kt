@@ -1,22 +1,21 @@
 package at.hannibal2.skyhanni.damageindicator
 
-enum class BossType {
-    DUNGEON,
+enum class BossType(val bossName: String) {
+    DUNGEON("Generic Dungeon boss"),//TODO split in different bosses
 
-//    CRIMSON_AILE_BLADESOUL,
-    NETHER_BLADESOUL,
-    NETHER_MAGMA_BOSS,
-    NETHER_ASHFANG,
-    NETHER_BARBARIAN_DUKE,
-    NETHER_MAGE_OUTLAW,
+    NETHER_BLADESOUL("§8Bladesoul"),
+    NETHER_MAGMA_BOSS("§4Magma Boss"),
+    NETHER_ASHFANG("§cAshfang"),
+    NETHER_BARBARIAN_DUKE("§eBarbarian Duke"),
+    NETHER_MAGE_OUTLAW("§5Mage Outlaw"),
 
-    NETHER_VANQUISHER,
+    NETHER_VANQUISHER("§5Vanquisher"),
 
-    END_ENDSTONE_PROTECTOR,
-    END_ENDERMAN_SLAYER,
-    END_ENDER_DRAGON,
+    END_ENDSTONE_PROTECTOR("§cEndstone Protector"),//TODO add color
+    END_ENDERMAN_SLAYER("Voidgloom Seraph"),
+    END_ENDER_DRAGON("Ender Dragon"),//TODO fix totally
 
-    HUB_REVENANT_HORROR,
-    HUB_HEADLESS_HORSEMAN,
+    HUB_REVENANT_HORROR("§5Revenant Horror 5"),//TODO add other variants like voidgloom?
+    HUB_HEADLESS_HORSEMAN("§6Headless Horseman"),
 
 }
