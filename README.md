@@ -9,4 +9,4 @@
 
 </div>
 
-SkyHanni is a beta mod developed by hannibal2 to add new features to hypixel skyblock. It is in beta so expect bugs.
+SkyHanni is a Minecraft modification that adds new features to Hypixel Skyblock. It is in beta, so expect bugs.
