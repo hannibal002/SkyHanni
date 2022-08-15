@@ -17,7 +17,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -78,20 +77,21 @@ class BossDamageIndicator {
             }
 
             val partialTicks = event.partialTicks
-            val pos = Vec3(
-                RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
-                RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
-                RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
-            )
+
+            val location = if (data.dead && data.deathLocation != null) {
+                data.deathLocation!!
+            } else {
+                val loc = LorenzVec(
+                    RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
+                    RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
+                    RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
+                )
+                if (data.dead) data.deathLocation = loc
+                loc
+            }
 
             if (!data.healthLineHidden) {
-                RenderUtils.drawLabel(
-                    pos,
-                    healthText,
-                    partialTicks,
-                    true,
-                    6f
-                )
+                RenderUtils.drawLabel(location, healthText, partialTicks, true, 6f)
             }
 
             var bossName = when (SkyHanniMod.feature.misc.damageIndicatorBossName) {
@@ -108,14 +108,7 @@ class BossDamageIndicator {
                 bossName += data.nameSuffix
             }
 
-            RenderUtils.drawLabel(
-                pos,
-                bossName,
-                partialTicks,
-                true,
-                3.9f,
-                -9.0f
-            )
+            RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f)
         }
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
@@ -416,6 +409,7 @@ class BossDamageIndicator {
             else -> bossType.fullName
         }
 
+        //TODO fix rounding error (25+4=30)
         println(bossName + " §healed for $healed❤ ($lastHealth -> $health)")
         LorenzUtils.chat("$bossName §ehealed for §a$healedFormat❤ §8(§e$formatLastHealth -> $formatHealth§8)")
     }
