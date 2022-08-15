@@ -14,5 +14,7 @@ class EntityData(
     var text: String = "",
     var color: LorenzColor = LorenzColor.DARK_GREEN,
     var timeLastTick: Long = 0,
-    var hidden: Boolean = false
+    var hidden: Boolean = false,
+    var namePrefix: String = "",
+    var nameSuffix: String = ""
 )

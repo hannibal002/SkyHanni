@@ -327,7 +327,8 @@ object RenderUtils {
         color: Color,
         partialTicks: Float,
         shadow: Boolean = false,
-        scale: Float = 1f
+        scale: Float = 1f,
+        yOff: Float = 0f,
     ) {
         var mc = Minecraft.getMinecraft()
         val player = mc.thePlayer
@@ -351,7 +352,7 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.enableTexture2D()
-        mc.fontRendererObj.drawString(text, (-width).toFloat(), 0f, color.rgb, shadow)
+        mc.fontRendererObj.drawString(text, (-width).toFloat(), yOff, color.rgb, shadow)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
     }

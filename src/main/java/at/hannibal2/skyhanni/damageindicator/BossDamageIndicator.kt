@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.dungeon.DungeonData
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.misc.ScoreboardData
+import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
@@ -75,17 +76,39 @@ class BossDamageIndicator {
             }
 
             val partialTicks = event.partialTicks
+            val pos = Vec3(
+                RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
+                RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
+                RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
+            )
             RenderUtils.drawLabel(
-                Vec3(
-                    RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
-                    RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
-                    RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
-                ),
+                pos,
                 text,
                 color.toColor(),
                 partialTicks,
                 true,
                 6f
+            )
+
+
+            var bossName = data.bossType.bossName
+            if (data.namePrefix.isNotEmpty()) {
+                bossName = data.namePrefix + bossName
+            }
+            if (data.nameSuffix.isNotEmpty()) {
+                bossName += data.nameSuffix
+            }
+
+            val scale2 = LorenzTest.b.toFloat()
+            val above = LorenzTest.a.toFloat()
+            RenderUtils.drawLabel(
+                pos,
+                bossName,
+                LorenzColor.WHITE.toColor(),
+                partialTicks,
+                true,
+                scale2,
+                above
             )
         }
         GlStateManager.enableDepth()
@@ -131,7 +154,6 @@ class BossDamageIndicator {
 
             var calcHealth = health
             var calcMaxHealth = maxHealth
-            var extraPrefix = ""
 
             if (DungeonData.isOneOf("F4")) {
                 calcHealth = when (health) {
@@ -162,6 +184,7 @@ class BossDamageIndicator {
 
 
             if (entityData.bossType == BossType.END_ENDERMAN_SLAYER) {
+                var statePrefix = ""
                 //Hides the damage indicator when in hit phase or in laser phase
                 if (entity is EntityEnderman) {
                     var hidden = false
@@ -176,60 +199,79 @@ class BossDamageIndicator {
                     //custom prefix and health for the four different ender slayers
                     when (maxHealth) {
                         300_000_000, 600_000_000 -> {
+                            entityData.namePrefix = "§4"
+                            entityData.nameSuffix = " 4"
                             val step = maxHealth / 6
                             calcMaxHealth = step
                             if (health > step * 5) {
                                 calcHealth -= step * 5
-                                extraPrefix = "1/6"
+                                statePrefix = "§c1/6 "
                             } else if (health > step * 4) {
                                 calcHealth -= step * 4
-                                extraPrefix = "2/6"
+                                statePrefix = "§e2/6 "
                             } else if (health > step * 3) {
                                 calcHealth -= step * 3
-                                extraPrefix = "3/6"
+                                statePrefix = "§e3/6 "
                             } else if (health > step * 2) {
                                 calcHealth -= step * 2
-                                extraPrefix = "4/6"
+                                statePrefix = "§e4/6 "
                             } else if (health > step) {
                                 calcHealth -= step
-                                extraPrefix = "5/6"
+                                statePrefix = "§e5/6 "
                             } else {
                                 calcHealth = health
-                                extraPrefix = "6/6"
+                                statePrefix = "§a6/6 "
                             }
                         }
                         else -> {
+                            when (maxHealth) {
+                                300_000, 600_000 -> {
+                                    entityData.namePrefix = "§a"
+                                    entityData.nameSuffix = " 1"
+                                }
+                                15_000_000, 30_000_000 -> {
+                                    entityData.namePrefix = "§e"
+                                    entityData.nameSuffix = " 2"
+                                }
+                                66_666_666, 66_666_666 * 2 -> {
+                                    entityData.namePrefix = "§c"
+                                    entityData.nameSuffix = " 3"
+                                }
+                            }
+
                             val step = maxHealth / 3
 
                             calcMaxHealth = step
                             if (health > step * 2) {
                                 calcHealth -= step * 2
-                                extraPrefix = "1/3"
+                                statePrefix = "§c1/3 "
                             } else if (health > step) {
                                 calcHealth -= step
-                                extraPrefix = "2/3"
+                                statePrefix = "§e2/3 "
                             } else {
                                 calcHealth = health
-                                extraPrefix = "3/3"
+                                statePrefix = "§a3/3 "
                             }
                         }
+
                     }
                 }
+                entityData.namePrefix = statePrefix + entityData.namePrefix
             }
             if (entityData.bossType == BossType.NETHER_MAGMA_BOSS) {
                 if (entity is EntityMagmaCube) {
                     val slimeSize = entity.slimeSize
-                    extraPrefix = when (slimeSize) {
-                        24 -> "1/6"
-                        22 -> "2/6"
-                        20 -> "3/6"
-                        18 -> "4/6"
-                        16 -> "5/6"
+                    entityData.namePrefix = when (slimeSize) {
+                        24 -> "§c1/6"
+                        22 -> "§e2/6"
+                        20 -> "§e3/6"
+                        18 -> "§e4/6"
+                        16 -> "§e5/6"
                         else -> {
                             calcMaxHealth = 10_000_000
-                            "6/6"
+                            "§a6/6"
                         }
-                    }
+                    } + " §f"
 
                     //hide while in the middle
                     val position = entity.getLorenzVec()
@@ -304,7 +346,7 @@ class BossDamageIndicator {
             }
 
             entityData.lastHealth = health
-            entityData.text = extraPrefix + " " + NumberUtil.format(calcHealth)
+            entityData.text = NumberUtil.format(calcHealth)
             entityData.color = color
             entityData.timeLastTick = System.currentTimeMillis()
             data[entity.uniqueID] = entityData
