@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.damageindicator
 
+import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.entity.EntityLivingBase
 
 class EntityData(
@@ -15,5 +16,6 @@ class EntityData(
     var healthLineHidden: Boolean = false,
     var namePrefix: String = "",
     var nameSuffix: String = "",
-    var dead: Boolean = false
+    var dead: Boolean = false,
+    var deathLocation: LorenzVec? = null
 )

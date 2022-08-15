@@ -9,7 +9,6 @@ import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
-import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
@@ -322,7 +321,7 @@ object RenderUtils {
      * @author Mojang
      */
     fun drawLabel(
-        pos: Vec3,
+        pos: LorenzVec,
         text: String,
         partialTicks: Float,
         shadow: Boolean = false,
@@ -332,11 +331,11 @@ object RenderUtils {
         val minecraft = Minecraft.getMinecraft()
         val player = minecraft.thePlayer
         val x =
-            pos.xCoord - player.lastTickPosX + (pos.xCoord - player.posX - (pos.xCoord - player.lastTickPosX)) * partialTicks
+            pos.x - player.lastTickPosX + (pos.x - player.posX - (pos.x - player.lastTickPosX)) * partialTicks
         val y =
-            pos.yCoord - player.lastTickPosY + (pos.yCoord - player.posY - (pos.yCoord - player.lastTickPosY)) * partialTicks
+            pos.y - player.lastTickPosY + (pos.y - player.posY - (pos.y - player.lastTickPosY)) * partialTicks
         val z =
-            pos.zCoord - player.lastTickPosZ + (pos.zCoord - player.posZ - (pos.zCoord - player.lastTickPosZ)) * partialTicks
+            pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
         val f1 = 0.0266666688
         val width = minecraft.fontRendererObj.getStringWidth(text) / 2
         GlStateManager.pushMatrix()
