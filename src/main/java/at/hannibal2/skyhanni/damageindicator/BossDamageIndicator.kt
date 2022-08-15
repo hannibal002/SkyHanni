@@ -51,7 +51,8 @@ class BossDamageIndicator {
 
         val player = Minecraft.getMinecraft().thePlayer
 
-        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + 100 }.map { it.key }) {
+        //TODO config to define between 100ms and 5 sec
+        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead) 3_000 else 100 }.map { it.key }) {
             data.remove(uuid)
         }
 
@@ -308,7 +309,11 @@ class BossDamageIndicator {
                     }
                 }
             }
-            val color = percentageColor(calcHealth, calcMaxHealth)
+//            }
+            if (health == 0) {
+                customHealthText = "§cDead"
+                entityData.dead = true
+            }
 
             if (SkyHanniMod.feature.misc.damageIndicatorHealingMessage) {
                 if (data.containsKey(entity.uniqueID)) {
