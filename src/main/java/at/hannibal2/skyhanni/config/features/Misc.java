@@ -44,14 +44,14 @@ public class Misc {
                     "\u00a7bDungeon All",
                     "\u00a7bNether Mini Bosses",
                     "\u00a7bVanquisher",
-                    "\u00a7bEndstone Protector",
-                    "\u00a7bEnder Dragon",
-                    "\u00a7bRevenant Horror",
-                    "\u00a7bSpider Slayer",
-                    "\u00a7bWolf Slayer",
+                    "\u00a7bEndstone Protector (not tested)",
+                    "\u00a7bEnder Dragon (not finished)",
+                    "\u00a7bRevenant Horror (not finished)",
+                    "\u00a7bSpider Slayer (not implemented)",
+                    "\u00a7bWolf Slayer (not implemented)",
                     "\u00a7bVoidgloom Seraph",
-                    "\u00a7bBlaze Slayer",
-                    "\u00a7bHeadless Horseman"
+                    "\u00a7bBlaze Slayer (not implemented)",
+                    "\u00a7bHeadless Horseman (bugged)"
             }
     )
     @ConfigAccordionId(id = 1)
