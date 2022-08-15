@@ -216,7 +216,6 @@ class BossFinder {
                 }
             }
 
-            //TODO testing and make right and so
             if (entity is EntityWither) {
                 if (entity.hasNameTagWith(4, "§8[§7Lv100§8] §c§5Vanquisher§r ")) {
                     return EntityResult(bossType = BossType.NETHER_VANQUISHER)

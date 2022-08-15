@@ -324,26 +324,25 @@ object RenderUtils {
     fun drawLabel(
         pos: Vec3,
         text: String,
-        color: Color,
         partialTicks: Float,
         shadow: Boolean = false,
         scale: Float = 1f,
         yOff: Float = 0f,
     ) {
-        var mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer
+        val minecraft = Minecraft.getMinecraft()
+        val player = minecraft.thePlayer
         val x =
             pos.xCoord - player.lastTickPosX + (pos.xCoord - player.posX - (pos.xCoord - player.lastTickPosX)) * partialTicks
         val y =
             pos.yCoord - player.lastTickPosY + (pos.yCoord - player.posY - (pos.yCoord - player.lastTickPosY)) * partialTicks
         val z =
             pos.zCoord - player.lastTickPosZ + (pos.zCoord - player.posZ - (pos.zCoord - player.lastTickPosZ)) * partialTicks
-        val renderManager = mc.renderManager
         val f1 = 0.0266666688
-        val width = mc.fontRendererObj.getStringWidth(text) / 2
+        val width = minecraft.fontRendererObj.getStringWidth(text) / 2
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, z)
         GL11.glNormal3f(0f, 1f, 0f)
+        val renderManager = minecraft.renderManager
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
@@ -352,7 +351,7 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.enableTexture2D()
-        mc.fontRendererObj.drawString(text, (-width).toFloat(), yOff, color.rgb, shadow)
+        minecraft.fontRendererObj.drawString(text, (-width).toFloat(), yOff, LorenzColor.WHITE.toColor().rgb, shadow)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
     }
