@@ -189,14 +189,15 @@ class BossFinder {
             }
         } else {
 
+            val maxHealth = entity.baseMaxHealth.toInt()
             if (entity is EntityBlaze) {
                 if (entity.name != "Dinnerbone") {
                     if (entity.hasNameTagWith(2, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ")) {
-                        if (entity.baseMaxHealth == 50_000_000.0) {
+                        if (maxHealth == 50_000_000) {
                             return EntityResult(bossType = BossType.NETHER_ASHFANG)
                         }
                         //Derpy
-                        if (entity.baseMaxHealth == 100_000_000.0) {
+                        if (maxHealth == 100_000_000) {
                             return EntityResult(bossType = BossType.NETHER_ASHFANG)
                         }
                     }
@@ -226,7 +227,7 @@ class BossFinder {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
 
 
-                    when (entity.baseMaxHealth.toInt()) {
+                    when (maxHealth.toInt()) {
                         300_000, 600_000 -> {
                             return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
                         }
@@ -256,23 +257,35 @@ class BossFinder {
             }
 
             if (entity is EntityZombie) {
-                if (entity.hasNameTagWith(2, "§c☠ §fAtoned Horror ")) {
-                    if (entity.baseMaxHealth == 10_000_000.0) {
-                        return EntityResult(bossType = BossType.HUB_REVENANT_HORROR)
+                if (entity.hasNameTagWith(2, "§c☠ §bRevenant Horror")) {
+                    when (maxHealth) {
+                        500, 1_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
+                        }
+                        20_000, 40_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
+                        }
+                        400_000, 800_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
+                        }
+                        1_500_000, 3_000_000 -> {
+                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
+                        }
                     }
-                    //Derpy
-                    if (entity.baseMaxHealth == 20_000_000.0) {
-                        return EntityResult(bossType = BossType.HUB_REVENANT_HORROR)
+                }
+                if (entity.hasNameTagWith(2, "§c☠ §fAtoned Horror ")) {
+                    if (maxHealth == 10_000_000 || maxHealth == 20_000_000) {
+                        return EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
                     }
                 }
             }
             if (entity is EntityMagmaCube) {
                 if (entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")) {
-                    if (entity.baseMaxHealth == 200_000_000.0) {
+                    if (maxHealth == 200_000_000) {
                         return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
                     }
                     //Derpy
-                    if (entity.baseMaxHealth == 400_000_000.0) {
+                    if (maxHealth == 400_000_000) {
                         return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
                     }
                 }
@@ -280,11 +293,11 @@ class BossFinder {
 
             if (entity is EntityHorse) {
                 if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
-                    if (entity.baseMaxHealth == 3_000_000.0) {
+                    if (maxHealth == 3_000_000) {
                         return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
                     }
                     //Derpy
-                    if (entity.baseMaxHealth == 6_000_000.0) {
+                    if (maxHealth == 6_000_000) {
                         return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
                     }
                 }
