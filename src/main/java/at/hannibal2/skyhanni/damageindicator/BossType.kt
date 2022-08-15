@@ -17,5 +17,4 @@ enum class BossType(val bossName: String) {
 
     HUB_REVENANT_HORROR("§5Revenant Horror 5"),//TODO add other variants like voidgloom?
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman"),
-
 }

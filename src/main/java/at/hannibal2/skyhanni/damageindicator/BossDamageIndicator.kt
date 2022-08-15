@@ -83,8 +83,7 @@ class BossDamageIndicator {
             )
             RenderUtils.drawLabel(
                 pos,
-                text,
-                color.toColor(),
+                color.getChatColor() + text,
                 partialTicks,
                 true,
                 6f
@@ -104,7 +103,6 @@ class BossDamageIndicator {
             RenderUtils.drawLabel(
                 pos,
                 bossName,
-                LorenzColor.WHITE.toColor(),
                 partialTicks,
                 true,
                 scale2,
