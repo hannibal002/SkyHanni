@@ -88,7 +88,13 @@ class BossDamageIndicator {
                 6f
             )
 
-            var bossName = data.bossType.bossName
+            var bossName = when (SkyHanniMod.feature.misc.damageIndicatorBossName) {
+                0 -> ""
+                1 -> data.bossType.fullName
+                2 -> data.bossType.shortName
+                else -> data.bossType.fullName
+            }
+
             if (data.namePrefix.isNotEmpty()) {
                 bossName = data.namePrefix + bossName
             }
@@ -328,14 +334,21 @@ class BossDamageIndicator {
         val healed = health - lastHealth
         if (healed <= 0) return
 
-        //Hide auto heal every 10 ticks
-        if (healed == 15_000 && bossType == BossType.HUB_REVENANT_HORROR) return
+        //Hide auto heal every 10 ticks (with rounding errors)
+        if ((healed == 15_000 || healed == 15_001) && bossType == BossType.HUB_REVENANT_HORROR) return
 
         val formatLastHealth = NumberUtil.format(lastHealth)
         val formatHealth = NumberUtil.format(health)
         val healedFormat = NumberUtil.format(healed)
-        println(bossType.bossName + " §fhealed for $healed❤ ($lastHealth -> $health)")
-        LorenzUtils.chat(bossType.bossName + " §ehealed for §a$healedFormat❤ §8(§e$formatLastHealth -> $formatHealth§8)")
+
+
+        val bossName = when (SkyHanniMod.feature.misc.damageIndicatorBossName) {
+            2 -> bossType.shortName
+            else -> bossType.fullName
+        }
+
+        println(bossName + " §healed for $healed❤ ($lastHealth -> $health)")
+        LorenzUtils.chat("$bossName §ehealed for §a$healedFormat❤ §8(§e$formatLastHealth -> $formatHealth§8)")
     }
 
     private fun grabData(entity: EntityLivingBase): EntityData? {

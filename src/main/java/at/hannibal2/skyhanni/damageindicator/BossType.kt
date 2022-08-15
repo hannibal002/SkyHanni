@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.damageindicator
 
-enum class BossType(val bossName: String) {
-    DUNGEON("Generic Dungeon boss"),//TODO split in different bosses
+enum class BossType(val fullName: String, val shortName: String = fullName) {
+    DUNGEON("Generic Dungeon boss"),//TODO split into different bosses
 
     NETHER_BLADESOUL("§8Bladesoul"),
     NETHER_MAGMA_BOSS("§4Magma Boss"),
@@ -15,6 +15,6 @@ enum class BossType(val bossName: String) {
     END_ENDERMAN_SLAYER("Voidgloom Seraph"),//TODO use seperate enums per tier
     END_ENDER_DRAGON("Ender Dragon"),//TODO fix totally
 
-    HUB_REVENANT_HORROR("§5Revenant Horror 5"),//TODO add other variants like voidgloom?
+    HUB_REVENANT_HORROR("§5Revenant Horror 5", "§5Rev 5"),//TODO add other variants like voidgloom?
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman"),
 }

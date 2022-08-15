@@ -24,6 +24,14 @@ public class Misc {
     public boolean damageIndicatorHealingMessage = false;
 
     @Expose
+    @ConfigOption(
+            name = "Boss Name",
+            desc = "Change how the boss name should be displayed")
+    @ConfigEditorDropdown(values = {"Disabled", "Full Name", "Short Name"})
+    @ConfigAccordionId(id = 1)
+    public int damageIndicatorBossName = 0;
+
+    @Expose
     @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")
     @ConfigEditorBoolean
     public boolean petDisplay = false;
