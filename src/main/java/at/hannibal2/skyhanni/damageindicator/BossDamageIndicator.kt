@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -52,7 +53,8 @@ class BossDamageIndicator {
         val player = Minecraft.getMinecraft().thePlayer
 
         //TODO config to define between 100ms and 5 sec
-        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead) 3_000 else 100 }.map { it.key }) {
+        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead) 3_000 else 100 }
+            .map { it.key }) {
             data.remove(uuid)
         }
 
@@ -317,7 +319,18 @@ class BossDamageIndicator {
                     }
                 }
             }
-//            }
+            if (entityData.bossType == BossType.SLAYER_ZOMBIE_5) {
+                if (entity is EntityZombie) {
+                    entity.hasNameTagWith(3, "§fBoom!", consumer = {
+                        val ticksAlive = entity.ticksExisted % (20 * 5)
+                        val remainingTicks = (5 * 20).toLong() - ticksAlive
+                        val format = formatDelay(remainingTicks * 50)
+//                        entityData.nameSuffix = " §lBOOM - $format"
+                        entityData.nameSuffix = " §lBOOM!"
+                    })
+                }
+            }
+
             if (health == 0) {
                 customHealthText = "§cDead"
                 entityData.dead = true
