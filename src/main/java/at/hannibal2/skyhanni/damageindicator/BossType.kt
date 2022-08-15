@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.damageindicator
 
 enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName: String = fullName) {
-    DUNGEON("Generic Dungeon boss", 0),//TODO split into different bosses
+    GENERIC_DUNGEON_BOSS("Generic Dungeon boss", 0),//TODO split into different bosses
 
     //Nether Mini Bosses
     NETHER_BLADESOUL("§8Bladesoul", 1),
@@ -33,8 +33,29 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
 
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman", 10),
 
+    DUNGEON_F1("", 11),
+    DUNGEON_F2("", 12),
+    DUNGEON_F3("", 13),
+    DUNGEON_F4_THORN("§cThorn", 14),
+    DUNGEON_F5("", 15),
+    DUNGEON_F("", 16),
+    DUNGEON_75("", 17),
+
     //TODO arachne
 
     //TODO corelone
     //TODO bal
+
+
+    /**
+     * TODO dungeon mini bosses
+     * shadow assassin
+     * lost adventurer
+     * frozen adventurer
+     * king midas
+     * silverfish 2b one tap - deathmite outside trap
+     * in blood room: bonzo, scarf, ??
+     * f7 blood room giants
+     *
+     */
 }
