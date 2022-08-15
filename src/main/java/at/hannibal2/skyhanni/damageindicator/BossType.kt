@@ -12,7 +12,7 @@ enum class BossType(val bossName: String) {
     NETHER_VANQUISHER("§5Vanquisher"),
 
     END_ENDSTONE_PROTECTOR("§cEndstone Protector"),//TODO add color
-    END_ENDERMAN_SLAYER("Voidgloom Seraph"),
+    END_ENDERMAN_SLAYER("Voidgloom Seraph"),//TODO use seperate enums per tier
     END_ENDER_DRAGON("Ender Dragon"),//TODO fix totally
 
     HUB_REVENANT_HORROR("§5Revenant Horror 5"),//TODO add other variants like voidgloom?
