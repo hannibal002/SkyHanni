@@ -21,7 +21,11 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     SLAYER_ZOMBIE_4("§4Revenant Horror 4", 5, "§4Rev 4"),
     SLAYER_ZOMBIE_5("§5Revenant Horror 5", 5, "§5Rev 5"),
 
-    SPIDER_SLAYER("Spider Slayer", 6, "Spider"),
+    SLAYER_SPIDER_1("§aTarantula Broodfather 1", 6),
+    SLAYER_SPIDER_2("§eTarantula Broodfather 2", 6),
+    SLAYER_SPIDER_3("§cTarantula Broodfather 3", 6),
+    SLAYER_SPIDER_4("§4Tarantula Broodfather 4", 6),
+
     WOLF_SLAYER("Wolf Slayer", 7, "Wolf"),
 
     SLAYER_ENDERMAN_1("§aVoidgloom Seraph 1", 8),
