@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
 import at.hannibal2.skyhanni.damageindicator.BossDamageIndicator;
 import at.hannibal2.skyhanni.dungeon.*;
-import at.hannibal2.skyhanni.features.abilities.AshfangFreezeCooldown;
 import at.hannibal2.skyhanni.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.fishing.TrophyFishMessages;
@@ -20,6 +19,8 @@ import at.hannibal2.skyhanni.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.items.ItemDisplayOverlayFeatures;
 import at.hannibal2.skyhanni.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.misc.*;
+import at.hannibal2.skyhanni.misc.nether.ashfang.AshfangFreezeCooldown;
+import at.hannibal2.skyhanni.misc.nether.ashfang.AshfangNextResetCooldown;
 import at.hannibal2.skyhanni.repo.RepoManager;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import com.google.gson.Gson;
@@ -84,6 +85,7 @@ public class SkyHanniMod {
         registerEvent(new SeaCreatureMessageShortener());
 //        registerEvent(new GriffinBurrowFinder());
         registerEvent(new AshfangFreezeCooldown());
+        registerEvent(new AshfangNextResetCooldown());
         registerEvent(new SummoningSoulsName());
 
         Commands.init();

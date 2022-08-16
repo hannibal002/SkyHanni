@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.abilities
+package at.hannibal2.skyhanni.misc.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
