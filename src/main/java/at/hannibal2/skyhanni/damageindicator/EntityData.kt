@@ -9,6 +9,7 @@ class EntityData(
     var delayedStart: Long,
     val finalDungeonBoss: Boolean,
     val bossType: BossType,
+    val damageCounter: DamageCounter = DamageCounter(),
 
     var lastHealth: Int = 0,
     var healthText: String = "",
@@ -17,5 +18,5 @@ class EntityData(
     var namePrefix: String = "",
     var nameSuffix: String = "",
     var dead: Boolean = false,
-    var deathLocation: LorenzVec? = null
+    var deathLocation: LorenzVec? = null,
 )
