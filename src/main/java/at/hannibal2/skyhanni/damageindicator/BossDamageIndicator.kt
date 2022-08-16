@@ -65,6 +65,7 @@ class BossDamageIndicator {
         }
 
         for (data in data.values) {
+            tickDamage(data.damageCounter)
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
@@ -114,9 +115,41 @@ class BossDamageIndicator {
             }
 
             RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f)
+
+            if (SkyHanniMod.feature.misc.damageIndicatorShowDamageOverTime) {
+                var diff = 13f
+                val currentDamage = data.damageCounter.currentDamage
+                if (currentDamage != 0L) {
+                    val format = "§c" + NumberUtil.format(currentDamage)
+                    RenderUtils.drawLabel(location, format, partialTicks, true, 3.9f, diff)
+                    diff += 9f
+                }
+                for (damage in data.damageCounter.oldDamages) {
+                    val format = "§c" + NumberUtil.format(damage.damage) + "/s"
+                    RenderUtils.drawLabel(location, format, partialTicks, true, 3.9f, diff)
+                    diff += 9f
+                }
+            }
+
         }
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
+    }
+
+    private fun tickDamage(damageCounter: DamageCounter) {
+        val now = System.currentTimeMillis()
+        if (damageCounter.currentDamage != 0L) {
+            if (damageCounter.firstTick == 0L) {
+                damageCounter.firstTick = now
+            }
+
+            if (now > damageCounter.firstTick + 1_000) {
+                damageCounter.oldDamages.add(OldDamage(now, damageCounter.currentDamage))
+                damageCounter.firstTick = 0L
+                damageCounter.currentDamage = 0
+            }
+        }
+        damageCounter.oldDamages.removeIf { now > it.time + 5_000 }
     }
 
     private fun formatDelay(delay: Long): String {
@@ -360,12 +393,13 @@ class BossDamageIndicator {
                 entityData.dead = true
             }
 
-            if (SkyHanniMod.feature.misc.damageIndicatorHealingMessage) {
-                if (data.containsKey(entity.uniqueID)) {
-                    val lastHealth = data[entity.uniqueID]!!.lastHealth
-                    val bossType = entityData.bossType
+            if (data.containsKey(entity.uniqueID)) {
+                val lastHealth = data[entity.uniqueID]!!.lastHealth
+                val bossType = entityData.bossType
+                if (SkyHanniMod.feature.misc.damageIndicatorHealingMessage) {
                     checkHealed(health, lastHealth, bossType)
                 }
+                checkDamage(entityData, health, lastHealth, bossType)
             }
 
             entityData.lastHealth = health
@@ -381,6 +415,14 @@ class BossDamageIndicator {
         } catch (e: Throwable) {
             e.printStackTrace()
         }
+    }
+
+    private fun checkDamage(entityData: EntityData, health: Int, lastHealth: Int, bossType: BossType) {
+        val damage = lastHealth - health
+        if (damage <= 0) return
+
+        val damageCounter = entityData.damageCounter
+        damageCounter.currentDamage += damage
     }
 
     private fun percentageColor(
