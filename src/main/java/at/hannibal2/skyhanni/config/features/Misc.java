@@ -67,7 +67,7 @@ public class Misc {
     public List<Integer> damageIndicatorBossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9));
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes around the damage indicator")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean damageIndicatorHideDamageSplash = false;
