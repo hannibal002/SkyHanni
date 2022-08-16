@@ -34,6 +34,7 @@ public class Misc {
     @ConfigEditorDropdown(values = {"Disabled", "Full Name", "Short Name"})
     @ConfigAccordionId(id = 1)
     public int damageIndicatorBossName = 1;
+
     @Expose
     @ConfigOption(
             name = "Select Boss",
@@ -65,6 +66,11 @@ public class Misc {
     //TODO only show currently working and tested features
     public List<Integer> damageIndicatorBossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9));
 
+    @Expose
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes around the damage indicator")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean damageIndicatorHideDamageSplash = false;
 
     @Expose
     @ConfigOption(name = "Pet Display", desc = "Show the currently active pet.")

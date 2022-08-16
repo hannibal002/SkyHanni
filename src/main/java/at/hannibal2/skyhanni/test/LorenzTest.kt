@@ -10,6 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.network.play.server.S0EPacketSpawnObject
+import net.minecraft.network.play.server.S0FPacketSpawnMob
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -20,6 +23,7 @@ class LorenzTest {
 
     companion object {
         var enabled = false
+        var togglePacketLog = false
         var text = ""
 
         val debugLogger = LorenzLogger("debug/test")
@@ -95,6 +99,7 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
+            togglePacketLog = !togglePacketLog
         }
     }
 
@@ -109,7 +114,64 @@ class LorenzTest {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-//        packetLog.log(event.packet.toString())
+        val packet = event.packet
+        val name = packet.javaClass.simpleName
+        if (!togglePacketLog) return
+
+        packetLog.log(name)
+
+        if (packet is S0FPacketSpawnMob) {
+            packetLog.log("")
+            packetLog.log("Spawn Mob!")
+            for (watchableObject in packet.func_149027_c()) {
+                val any = watchableObject.`object`
+                val simpleName = any.javaClass.simpleName
+
+                packetLog.log("javaClass: $simpleName")
+                packetLog.log("object: $any")
+                packetLog.log(" ")
+            }
+            packetLog.log(" ")
+        }
+        if (packet is S1CPacketEntityMetadata) {
+            packetLog.log("")
+            packetLog.log("Entity Metadata")
+            for (watchableObject in packet.func_149376_c()) {
+                val any = watchableObject.`object`
+                val simpleName = any.javaClass.simpleName
+
+                packetLog.log("javaClass: $simpleName")
+                packetLog.log("object: $any")
+                packetLog.log(" ")
+            }
+            packetLog.log(" ")
+        }
+//        if (packet is S20PacketEntityProperties) {
+//            packetLog.log("")
+//            packetLog.log("Entity Properties")
+//            for (watchableObject in packet.func_149441_d()) {
+//                val any = watchableObject.`object`
+//                val simpleName = any.javaClass.simpleName
+//
+//                packetLog.log("javaClass: $simpleName")
+//                packetLog.log("object: $any")
+//                packetLog.log(" ")
+//            }
+//            packetLog.log(" ")
+//
+//
+//        }
+        if (packet is S0EPacketSpawnObject) {
+            packetLog.log("Spawn Object")
+        }
+
+
+//        if (packet is S2CPacketSpawnGlobalEntity) {
+//
+//        }
+//        if (packet is S2CPacketSpawnGlobalEntity) {
+//
+//        }
     }
 
 //    @SubscribeEvent

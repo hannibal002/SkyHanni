@@ -13,17 +13,21 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
+import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.text.DecimalFormat
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.math.max
 
 class BossDamageIndicator {
@@ -32,6 +36,7 @@ class BossDamageIndicator {
     private var bossFinder: BossFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
     private val maxHealth = mutableMapOf<UUID, Int>()
+    private val damagePattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
@@ -445,4 +450,26 @@ class BossDamageIndicator {
     fun onWorldRender(event: EntityJoinWorldEvent) {
         bossFinder?.handleNewEntity(event.entity)
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onRenderLiving(e: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+        if (!SkyHanniMod.feature.misc.damageIndicatorHideDamageSplash) return
+
+        val entity = e.entity
+        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
+        if (!entity.hasCustomName()) return
+        if (entity.isDead) return
+        val strippedName = entity.customNameTag.removeColor()
+        val damageMatcher = damagePattern.matcher(strippedName)
+        if (damageMatcher.matches()) {
+            if (data.values.any {
+                    val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
+                    val found = distance < 4.5
+                    found
+                }) {
+                e.isCanceled = true
+            }
+        }
+    }
+
 }
