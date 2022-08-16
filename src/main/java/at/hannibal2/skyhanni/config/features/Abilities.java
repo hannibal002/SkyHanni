@@ -27,4 +27,14 @@ public class Abilities {
     @ConfigOption(name = "Ashfang Freeze Position", desc = "")
     @ConfigEditorButton(runnableId = "ashfangFreezeCooldown", buttonText = "Edit")
     public Position ashfangFreezeCooldownPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Ashfang Reset", desc = "Shows the cooldown until ashfang pulls his underlings back")
+    @ConfigEditorBoolean
+    public boolean ashfangNextResetCooldown = false;
+
+    @Expose
+    @ConfigOption(name = "Ashfang Reset Position", desc = "")
+    @ConfigEditorButton(runnableId = "ashfangResetCooldown", buttonText = "Edit")
+    public Position ashfangNextResetCooldownPos = new Position(10, 10, false, true);
 }
