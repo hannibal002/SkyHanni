@@ -13,21 +13,17 @@ import java.text.DecimalFormat
 
 class AshfangNextResetCooldown {
 
-    var spawnTime = 1L
+    private var spawnTime = 1L
 
     @SubscribeEvent
     fun renderOverlay(event: ClientTickEvent) {
         if (!isEnabled()) return
 
-        if (spawnTime == -1L) {
-            val spawned = Minecraft.getMinecraft().theWorld.loadedEntityList.any {
-                it is EntityArmorStand && (it.name.contains("§c§8Ashfang Follower§r") ||
-                        it.name.contains("§c§9Ashfang Acolyte§r") ||
-                        it.name.contains("§c§cAshfang Underling§r"))
-            }
-            if (spawned) {
-                spawnTime = System.currentTimeMillis()
-            }
+        if (Minecraft.getMinecraft().theWorld.loadedEntityList.any {
+                it is EntityArmorStand && it.posY > 145 &&
+                        (it.name.contains("§c§9Ashfang Acolyte§r") || it.name.contains("§c§cAshfang Underling§r"))
+            }) {
+            spawnTime = System.currentTimeMillis()
         }
     }
 
@@ -36,8 +32,7 @@ class AshfangNextResetCooldown {
         if (!isEnabled()) return
         if (spawnTime == -1L) return
 
-        val remainingTime = spawnTime + 45_000 - System.currentTimeMillis()
-
+        val remainingTime = spawnTime + 46_100 - System.currentTimeMillis()
         if (remainingTime > 0) {
             val remaining = (remainingTime.toFloat() / 1000)
             val format = DecimalFormat("0.0").format(remaining + 0.1)
