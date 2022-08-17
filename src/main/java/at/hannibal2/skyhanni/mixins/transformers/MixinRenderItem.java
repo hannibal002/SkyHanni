@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixinhooks.RenderItemHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.RenderItemHookKt;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;

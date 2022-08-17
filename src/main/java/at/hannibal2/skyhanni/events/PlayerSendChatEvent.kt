@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.chat.PlayerMessageChannel
+import at.hannibal2.skyhanni.features.chat.PlayerMessageChannel
 
 
 class PlayerSendChatEvent(

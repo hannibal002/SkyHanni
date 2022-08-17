@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.misc.HypixelData
+import at.hannibal2.skyhanni.data.HypixelData
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes

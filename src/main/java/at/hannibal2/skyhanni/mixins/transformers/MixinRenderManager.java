@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixinhooks.RenderManagerHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.RenderManagerHookKt;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;

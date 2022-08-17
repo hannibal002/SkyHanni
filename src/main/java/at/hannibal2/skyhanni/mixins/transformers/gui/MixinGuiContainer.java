@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.mixinhooks.GuiContainerHook;
+import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
