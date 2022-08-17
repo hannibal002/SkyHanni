@@ -249,185 +249,23 @@ class DamageIndicatorManager {
         maxHealth: Int,
     ): String? {
         if (entityData.bossType == BossType.DUNGEON_F4_THORN) {
-            val thornHealth: Int
-            val thornMaxHealth: Int
-            if (DungeonData.isOneOf("F4")) {
-                thornHealth = when (health) {
-                    300_000, 600_000 -> 4
-                    222_000, 444_000 -> 3
-                    144_000, 288_000 -> 2
-                    66_000, 132_000 -> 1
-                    0 -> 0
-                    else -> {
-                        LorenzUtils.error("Unexpected health of thorn in f4! (${
-                            LorenzUtils.formatDouble(LorenzUtils.formatDouble(
-                                health.toDouble()).toDouble())
-                        })")
-                        return null
-                    }
-                }
-                thornMaxHealth = 4
-            } else if (DungeonData.isOneOf("M4")) {
-                thornHealth = when (health) {
-                    //TODO test all non derpy values!
-                    1_800_000 / 2, 1_800_000 -> 6
-                    1_494_000 / 2, 1_494_000 -> 5
-                    1_188_000 / 2, 1_188_000 -> 4
-                    882_000 / 2, 882_000 -> 3
-                    576_000 / 2, 576_000 -> 2
-                    270_000 / 2, 270_000 -> 1
-                    0 -> 0
-                    else -> {
-                        LorenzTest.enabled = true
-                        LorenzTest.text = "thorn has ${LorenzUtils.formatDouble(health.toDouble())} hp!"
-                        LorenzUtils.error("Unexpected health of thorn in m4! (${
-                            LorenzUtils.formatDouble(LorenzUtils.formatDouble(
-                                health.toDouble()).toDouble())
-                        })")
-                        return null
-                    }
-                }
-                thornMaxHealth = 4
-            } else {
-                LorenzUtils.error("Invalid thorn floor!")
-                return null
-            }
-            val color = percentageColor(thornHealth, thornMaxHealth)
-            return color.getChatColor() + thornHealth + "/" + thornMaxHealth
+            return checkThorn(health)
         }
+
         if (entityData.bossType == BossType.SLAYER_ENDERMAN_1 ||
             entityData.bossType == BossType.SLAYER_ENDERMAN_2 ||
             entityData.bossType == BossType.SLAYER_ENDERMAN_3 ||
             entityData.bossType == BossType.SLAYER_ENDERMAN_4
         ) {
-
-            //Hides the damage indicator when in hit phase or in laser phase
-            if (entity is EntityEnderman) {
-                val armorStandHits = entity.getNameTagWith(3, " Hit")
-                if (armorStandHits != null) {
-                    val name = armorStandHits.name.removeColor()
-
-                    val maxHits = when (entityData.bossType) {
-                        BossType.SLAYER_ENDERMAN_1 -> 15
-                        BossType.SLAYER_ENDERMAN_2 -> 30
-                        BossType.SLAYER_ENDERMAN_3 -> 60
-                        BossType.SLAYER_ENDERMAN_4 -> 100
-                        else -> 100
-                    }
-                    val hits = name.between("Seraph ", " Hit").toInt()
-                    val color = percentageColor(hits, maxHits)
-
-                    return color.getChatColor() + "$hits Hits"
-                }
-
-                if (entity.ridingEntity != null) {
-                    val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-                    //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-                    //                        val remainingTicks = 8 * 20 - ticksAlive
-                    val remainingTicks = (8.9 * 20).toLong() - ticksAlive
-                    return formatDelay(remainingTicks * 50)
-                }
-            }
-
-            var calcHealth = health
-            val calcMaxHealth: Int
-            val statePrefix: String
-            when (entityData.bossType) {
-                BossType.SLAYER_ENDERMAN_1,
-                BossType.SLAYER_ENDERMAN_2,
-                BossType.SLAYER_ENDERMAN_3,
-                -> {
-                    val step = maxHealth / 3
-                    calcMaxHealth = step
-                    if (health > step * 2) {
-                        calcHealth -= step * 2
-                        statePrefix = "§c1/3 "
-                    } else if (health > step) {
-                        calcHealth -= step
-                        statePrefix = "§e2/3 "
-                    } else {
-                        calcHealth = health
-                        statePrefix = "§a3/3 "
-                    }
-                }
-                BossType.SLAYER_ENDERMAN_4 -> {
-                    val step = maxHealth / 6
-                    calcMaxHealth = step
-                    if (health > step * 5) {
-                        calcHealth -= step * 5
-                        statePrefix = "§c1/6 "
-                    } else if (health > step * 4) {
-                        calcHealth -= step * 4
-                        statePrefix = "§e2/6 "
-                    } else if (health > step * 3) {
-                        calcHealth -= step * 3
-                        statePrefix = "§e3/6 "
-                    } else if (health > step * 2) {
-                        calcHealth -= step * 2
-                        statePrefix = "§e4/6 "
-                    } else if (health > step) {
-                        calcHealth -= step
-                        statePrefix = "§e5/6 "
-                    } else {
-                        calcHealth = health
-                        statePrefix = "§a6/6 "
-                    }
-                }
-                else -> return null
-            }
-            entityData.namePrefix = statePrefix + entityData.namePrefix
-            val color = percentageColor(calcHealth, calcMaxHealth)
-            return color.getChatColor() + NumberUtil.format(calcHealth)
+            return checkEnderSlayer(entity, entityData, health, maxHealth)
         }
+
         if (entityData.bossType == BossType.NETHER_MAGMA_BOSS) {
             if (entity is EntityMagmaCube) {
-                val slimeSize = entity.slimeSize
-                entityData.namePrefix = when (slimeSize) {
-                    24 -> "§c1/6"
-                    22 -> "§e2/6"
-                    20 -> "§e3/6"
-                    18 -> "§e4/6"
-                    16 -> "§e5/6"
-                    else -> {
-                        val color = percentageColor(health, 10_000_000)
-                        entityData.namePrefix = "§a6/6"
-                        return color.getChatColor() + NumberUtil.format(health)
-                    }
-                } + " §f"
-
-                //hide while in the middle
-                val position = entity.getLorenzVec()
-                entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
-
-                var calcHealth = -1
-                for (line in ScoreboardData.sidebarLinesRaw) {
-                    if (line.contains("▎")) {
-                        val color: String
-                        if (line.startsWith("§7")) {
-                            color = "§7"
-                        } else if (line.startsWith("§e")) {
-                            color = "§e"
-                        } else if (line.startsWith("§6") || line.startsWith("§a") || line.startsWith("§c")) {
-                            calcHealth = 0
-                            break
-                        } else {
-                            LorenzUtils.error("unknown magma boss health sidebar format!")
-                            break
-                        }
-
-                        val text = line.replace("\uD83C\uDF81" + color, "")
-                        val max = 25.0
-                        val length = text.split("§e", "§7")[1].length
-                        val missing = (health.toDouble() / max) * length
-                        calcHealth = (health - missing).toInt()
-                    }
-                }
-                if (calcHealth == -1) return null
-
-                val color = percentageColor(calcHealth, maxHealth)
-                return color.getChatColor() + NumberUtil.format(calcHealth)
+                return checkMagmaCube(entity, entityData, health, maxHealth)
             }
         }
+
         if (entityData.bossType == BossType.SLAYER_ZOMBIE_5) {
             if (entity is EntityZombie) {
                 if (entity.hasNameTagWith(3, "§fBoom!")) {
@@ -440,6 +278,7 @@ class DamageIndicatorManager {
                 }
             }
         }
+
         if (entityData.bossType == BossType.SLAYER_WOLF_3 ||
             entityData.bossType == BossType.SLAYER_WOLF_4
         ) {
@@ -451,6 +290,192 @@ class DamageIndicatorManager {
         }
 
         return ""
+    }
+
+    private fun checkMagmaCube(
+        entity: EntityMagmaCube,
+        entityData: EntityData,
+        health: Int,
+        maxHealth: Int,
+    ): String? {
+        val slimeSize = entity.slimeSize
+        entityData.namePrefix = when (slimeSize) {
+            24 -> "§c1/6"
+            22 -> "§e2/6"
+            20 -> "§e3/6"
+            18 -> "§e4/6"
+            16 -> "§e5/6"
+            else -> {
+                val color = percentageColor(health, 10_000_000)
+                entityData.namePrefix = "§a6/6"
+                return color.getChatColor() + NumberUtil.format(health)
+            }
+        } + " §f"
+
+        //hide while in the middle
+        val position = entity.getLorenzVec()
+        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
+
+        var calcHealth = -1
+        for (line in ScoreboardData.sidebarLinesRaw) {
+            if (line.contains("▎")) {
+                val color: String
+                if (line.startsWith("§7")) {
+                    color = "§7"
+                } else if (line.startsWith("§e")) {
+                    color = "§e"
+                } else if (line.startsWith("§6") || line.startsWith("§a") || line.startsWith("§c")) {
+                    calcHealth = 0
+                    break
+                } else {
+                    LorenzUtils.error("unknown magma boss health sidebar format!")
+                    break
+                }
+
+                val text = line.replace("\uD83C\uDF81" + color, "")
+                val max = 25.0
+                val length = text.split("§e", "§7")[1].length
+                val missing = (health.toDouble() / max) * length
+                calcHealth = (health - missing).toInt()
+            }
+        }
+        if (calcHealth == -1) return null
+
+        val color = percentageColor(calcHealth, maxHealth)
+        return color.getChatColor() + NumberUtil.format(calcHealth)
+    }
+
+    private fun checkEnderSlayer(
+        entity: EntityLivingBase,
+        entityData: EntityData,
+        health: Int,
+        maxHealth: Int,
+    ): String? {
+        //Hides the damage indicator when in hit phase or in laser phase
+        if (entity is EntityEnderman) {
+            val armorStandHits = entity.getNameTagWith(3, " Hit")
+            if (armorStandHits != null) {
+                val name = armorStandHits.name.removeColor()
+
+                val maxHits = when (entityData.bossType) {
+                    BossType.SLAYER_ENDERMAN_1 -> 15
+                    BossType.SLAYER_ENDERMAN_2 -> 30
+                    BossType.SLAYER_ENDERMAN_3 -> 60
+                    BossType.SLAYER_ENDERMAN_4 -> 100
+                    else -> 100
+                }
+                val hits = name.between("Seraph ", " Hit").toInt()
+                val color = percentageColor(hits, maxHits)
+
+                return color.getChatColor() + "$hits Hits"
+            }
+
+            if (entity.ridingEntity != null) {
+                val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
+                //TODO more tests, more exact values, better logic? idk make this working perfectly pls
+                //                        val remainingTicks = 8 * 20 - ticksAlive
+                val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+                return formatDelay(remainingTicks * 50)
+            }
+        }
+
+        var calcHealth = health
+        val calcMaxHealth: Int
+        val statePrefix: String
+        when (entityData.bossType) {
+            BossType.SLAYER_ENDERMAN_1,
+            BossType.SLAYER_ENDERMAN_2,
+            BossType.SLAYER_ENDERMAN_3,
+            -> {
+                val step = maxHealth / 3
+                calcMaxHealth = step
+                if (health > step * 2) {
+                    calcHealth -= step * 2
+                    statePrefix = "§c1/3 "
+                } else if (health > step) {
+                    calcHealth -= step
+                    statePrefix = "§e2/3 "
+                } else {
+                    calcHealth = health
+                    statePrefix = "§a3/3 "
+                }
+            }
+            BossType.SLAYER_ENDERMAN_4 -> {
+                val step = maxHealth / 6
+                calcMaxHealth = step
+                if (health > step * 5) {
+                    calcHealth -= step * 5
+                    statePrefix = "§c1/6 "
+                } else if (health > step * 4) {
+                    calcHealth -= step * 4
+                    statePrefix = "§e2/6 "
+                } else if (health > step * 3) {
+                    calcHealth -= step * 3
+                    statePrefix = "§e3/6 "
+                } else if (health > step * 2) {
+                    calcHealth -= step * 2
+                    statePrefix = "§e4/6 "
+                } else if (health > step) {
+                    calcHealth -= step
+                    statePrefix = "§e5/6 "
+                } else {
+                    calcHealth = health
+                    statePrefix = "§a6/6 "
+                }
+            }
+            else -> return null
+        }
+        entityData.namePrefix = statePrefix + entityData.namePrefix
+        val color = percentageColor(calcHealth, calcMaxHealth)
+        return color.getChatColor() + NumberUtil.format(calcHealth)
+    }
+
+    private fun checkThorn(health: Int): String? {
+        val thornHealth: Int
+        val thornMaxHealth: Int
+        if (DungeonData.isOneOf("F4")) {
+            thornHealth = when (health) {
+                300_000, 600_000 -> 4
+                222_000, 444_000 -> 3
+                144_000, 288_000 -> 2
+                66_000, 132_000 -> 1
+                0 -> 0
+                else -> {
+                    LorenzUtils.error("Unexpected health of thorn in f4! (${
+                        LorenzUtils.formatDouble(LorenzUtils.formatDouble(
+                            health.toDouble()).toDouble())
+                    })")
+                    return null
+                }
+            }
+            thornMaxHealth = 4
+        } else if (DungeonData.isOneOf("M4")) {
+            thornHealth = when (health) {
+                //TODO test all non derpy values!
+                1_800_000 / 2, 1_800_000 -> 6
+                1_494_000 / 2, 1_494_000 -> 5
+                1_188_000 / 2, 1_188_000 -> 4
+                882_000 / 2, 882_000 -> 3
+                576_000 / 2, 576_000 -> 2
+                270_000 / 2, 270_000 -> 1
+                0 -> 0
+                else -> {
+                    LorenzTest.enabled = true
+                    LorenzTest.text = "thorn has ${LorenzUtils.formatDouble(health.toDouble())} hp!"
+                    LorenzUtils.error("Unexpected health of thorn in m4! (${
+                        LorenzUtils.formatDouble(LorenzUtils.formatDouble(
+                            health.toDouble()).toDouble())
+                    })")
+                    return null
+                }
+            }
+            thornMaxHealth = 4
+        } else {
+            LorenzUtils.error("Invalid thorn floor!")
+            return null
+        }
+        val color = percentageColor(thornHealth, thornMaxHealth)
+        return color.getChatColor() + thornHealth + "/" + thornMaxHealth
     }
 
     private fun checkDamage(entityData: EntityData, health: Int, lastHealth: Int, bossType: BossType) {
