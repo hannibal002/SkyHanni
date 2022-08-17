@@ -242,7 +242,6 @@ class BossFinder {
                 return EntityResult(bossType = BossType.END_ENDER_DRAGON)
             }
             if (entity is EntityIronGolem) {
-                //TODO testing
                 if (entity.hasNameTagWith(3, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ")) {
                     return EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR, ignoreBlocks = true)
                 }
