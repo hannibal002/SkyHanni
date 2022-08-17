@@ -14,7 +14,7 @@ class EntityData(
     var lastHealth: Int = 0,
     var healthText: String = "",
     var timeLastTick: Long = 0,
-    var healthLineHidden: Boolean = false,
+//    var healthLineHidden: Boolean = false,
     var namePrefix: String = "",
     var nameSuffix: String = "",
     var dead: Boolean = false,

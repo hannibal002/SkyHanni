@@ -241,7 +241,7 @@ class BossFinder {
             }
             if (entity is EntityIronGolem) {
                 if (entity.hasNameTagWith(3, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ")) {
-                    return EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR, ignoreBlocks = true)
+                    return EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR)
                 }
             }
             if (entity is EntityZombie) {
@@ -265,6 +265,9 @@ class BossFinder {
                     if (maxHealth == 10_000_000 || maxHealth == 20_000_000) {
                         return EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
                     }
+                }
+                if (entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
+                    return EntityResult(bossType = BossType.DUMMY)
                 }
             }
             if (entity is EntityMagmaCube) {
