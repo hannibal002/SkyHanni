@@ -221,9 +221,6 @@ class DamageIndicatorManager {
             if (data.containsKey(entity.uniqueID)) {
                 val lastHealth = data[entity.uniqueID]!!.lastHealth
                 val bossType = entityData.bossType
-                if (SkyHanniMod.feature.damageIndicator.healingMessage) {
-                    checkHealed(health, lastHealth, bossType)
-                }
                 checkDamage(entityData, health, lastHealth, bossType)
             }
             entityData.lastHealth = health
@@ -257,7 +254,9 @@ class DamageIndicatorManager {
             entityData.bossType == BossType.SLAYER_ENDERMAN_3 ||
             entityData.bossType == BossType.SLAYER_ENDERMAN_4
         ) {
-            return checkEnderSlayer(entity, entityData, health, maxHealth)
+            if (entity is EntityEnderman) {
+                return checkEnderSlayer(entity, entityData, health, maxHealth)
+            }
         }
 
         if (entityData.bossType == BossType.NETHER_MAGMA_BOSS) {
@@ -346,43 +345,41 @@ class DamageIndicatorManager {
     }
 
     private fun checkEnderSlayer(
-        entity: EntityLivingBase,
+        entity: EntityEnderman,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
     ): String? {
-        //Hides the damage indicator when in hit phase or in laser phase
-        if (entity is EntityEnderman) {
-            val armorStandHits = entity.getNameTagWith(3, " Hit")
-            if (armorStandHits != null) {
-                val name = armorStandHits.name.removeColor()
 
-                val maxHits = when (entityData.bossType) {
-                    BossType.SLAYER_ENDERMAN_1 -> 15
-                    BossType.SLAYER_ENDERMAN_2 -> 30
-                    BossType.SLAYER_ENDERMAN_3 -> 60
-                    BossType.SLAYER_ENDERMAN_4 -> 100
-                    else -> 100
-                }
-                val hits = name.between("Seraph ", " Hit").toInt()
-                val color = percentageColor(hits, maxHits)
-
-                return color.getChatColor() + "$hits Hits"
+        //Hit phase
+        val armorStandHits = entity.getNameTagWith(3, " Hit")
+        if (armorStandHits != null) {
+            val maxHits = when (entityData.bossType) {
+                BossType.SLAYER_ENDERMAN_1 -> 15
+                BossType.SLAYER_ENDERMAN_2 -> 30
+                BossType.SLAYER_ENDERMAN_3 -> 60
+                BossType.SLAYER_ENDERMAN_4 -> 100
+                else -> 100
             }
+            val name = armorStandHits.name.removeColor()
+            val hits = name.between("Seraph ", " Hit").toInt()
+            val color = percentageColor(hits, maxHits)
 
-            if (entity.ridingEntity != null) {
-                val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-                //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-                //                        val remainingTicks = 8 * 20 - ticksAlive
-                val remainingTicks = (8.9 * 20).toLong() - ticksAlive
-                return formatDelay(remainingTicks * 50)
-            }
+            return color.getChatColor() + "$hits Hits"
+        }
+
+        //Laser phase
+        if (entity.ridingEntity != null) {
+            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
+            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
+            //                        val remainingTicks = 8 * 20 - ticksAlive
+            val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+            return formatDelay(remainingTicks * 50)
         }
 
         var calcHealth = health
         val calcMaxHealth: Int
-        val statePrefix: String
-        when (entityData.bossType) {
+        entityData.namePrefix = when (entityData.bossType) {
             BossType.SLAYER_ENDERMAN_1,
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
@@ -391,13 +388,13 @@ class DamageIndicatorManager {
                 calcMaxHealth = step
                 if (health > step * 2) {
                     calcHealth -= step * 2
-                    statePrefix = "§c1/3 "
+                    "§c1/3 "
                 } else if (health > step) {
                     calcHealth -= step
-                    statePrefix = "§e2/3 "
+                    "§e2/3 "
                 } else {
                     calcHealth = health
-                    statePrefix = "§a3/3 "
+                    "§a3/3 "
                 }
             }
             BossType.SLAYER_ENDERMAN_4 -> {
@@ -405,36 +402,35 @@ class DamageIndicatorManager {
                 calcMaxHealth = step
                 if (health > step * 5) {
                     calcHealth -= step * 5
-                    statePrefix = "§c1/6 "
+                    "§c1/6 "
                 } else if (health > step * 4) {
                     calcHealth -= step * 4
-                    statePrefix = "§e2/6 "
+                    "§e2/6 "
                 } else if (health > step * 3) {
                     calcHealth -= step * 3
-                    statePrefix = "§e3/6 "
+                    "§e3/6 "
                 } else if (health > step * 2) {
                     calcHealth -= step * 2
-                    statePrefix = "§e4/6 "
+                    "§e4/6 "
                 } else if (health > step) {
                     calcHealth -= step
-                    statePrefix = "§e5/6 "
+                    "§e5/6 "
                 } else {
                     calcHealth = health
-                    statePrefix = "§a6/6 "
+                    "§a6/6 "
                 }
             }
             else -> return null
         }
-        entityData.namePrefix = statePrefix + entityData.namePrefix
         val color = percentageColor(calcHealth, calcMaxHealth)
         return color.getChatColor() + NumberUtil.format(calcHealth)
     }
 
-    private fun checkThorn(health: Int): String? {
-        val thornHealth: Int
-        val thornMaxHealth: Int
-        if (DungeonData.isOneOf("F4")) {
-            thornHealth = when (health) {
+    private fun checkThorn(realHealth: Int): String? {
+        val maxHealth: Int
+        val health = if (DungeonData.isOneOf("F4")) {
+            maxHealth = 4
+            when (realHealth) {
                 300_000, 600_000 -> 4
                 222_000, 444_000 -> 3
                 144_000, 288_000 -> 2
@@ -443,14 +439,14 @@ class DamageIndicatorManager {
                 else -> {
                     LorenzUtils.error("Unexpected health of thorn in f4! (${
                         LorenzUtils.formatDouble(LorenzUtils.formatDouble(
-                            health.toDouble()).toDouble())
+                            realHealth.toDouble()).toDouble())
                     })")
                     return null
                 }
             }
-            thornMaxHealth = 4
         } else if (DungeonData.isOneOf("M4")) {
-            thornHealth = when (health) {
+            maxHealth = 6
+             when (realHealth) {
                 //TODO test all non derpy values!
                 1_800_000 / 2, 1_800_000 -> 6
                 1_494_000 / 2, 1_494_000 -> 5
@@ -461,21 +457,20 @@ class DamageIndicatorManager {
                 0 -> 0
                 else -> {
                     LorenzTest.enabled = true
-                    LorenzTest.text = "thorn has ${LorenzUtils.formatDouble(health.toDouble())} hp!"
+                    LorenzTest.text = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
                     LorenzUtils.error("Unexpected health of thorn in m4! (${
                         LorenzUtils.formatDouble(LorenzUtils.formatDouble(
-                            health.toDouble()).toDouble())
+                            realHealth.toDouble()).toDouble())
                     })")
                     return null
                 }
             }
-            thornMaxHealth = 4
         } else {
             LorenzUtils.error("Invalid thorn floor!")
             return null
         }
-        val color = percentageColor(thornHealth, thornMaxHealth)
-        return color.getChatColor() + thornHealth + "/" + thornMaxHealth
+        val color = percentageColor(health, maxHealth)
+        return color.getChatColor() + health + "/" + maxHealth
     }
 
     private fun checkDamage(entityData: EntityData, health: Int, lastHealth: Int, bossType: BossType) {
@@ -491,7 +486,6 @@ class DamageIndicatorManager {
 
             val damageCounter = entityData.damageCounter
             damageCounter.currentHealing += healing
-
         }
     }
 
@@ -507,28 +501,6 @@ class DamageIndicatorManager {
             percentage > 0.25 -> LorenzColor.GOLD
             else -> LorenzColor.RED
         }
-    }
-
-    private fun checkHealed(health: Int, lastHealth: Int, bossType: BossType) {
-        val healed = health - lastHealth
-        if (healed <= 0) return
-
-        //Hide auto heal every 10 ticks (with rounding errors)
-        if ((healed == 15_000 || healed == 15_001) && bossType == BossType.SLAYER_ZOMBIE_5) return
-
-        val formatLastHealth = NumberUtil.format(lastHealth)
-        val formatHealth = NumberUtil.format(health)
-        val healedFormat = NumberUtil.format(healed)
-
-
-        val bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
-            2 -> bossType.shortName
-            else -> bossType.fullName
-        }
-
-        //TODO fix rounding error (25+4=30)
-        println(bossName + " §healed for $healed❤ ($lastHealth -> $health)")
-        LorenzUtils.chat("$bossName §ehealed for §a$healedFormat❤ §8(§e$formatLastHealth -> $formatHealth§8)")
     }
 
     private fun grabData(entity: EntityLivingBase): EntityData? {
