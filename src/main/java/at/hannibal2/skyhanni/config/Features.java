@@ -88,6 +88,10 @@ public class Features {
     public Fishing fishing = new Fishing();
 
     @Expose
+    @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
+    public DamageIndicator damageIndicator = new DamageIndicator();
+
+    @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public Misc misc = new Misc();
 
