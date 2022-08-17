@@ -59,13 +59,17 @@ class DamageIndicatorManager {
         val player = Minecraft.getMinecraft().thePlayer
 
         //TODO config to define between 100ms and 5 sec
-        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead) 3_000 else 100 }
+        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead) 4_000 else 100 }
             .map { it.key }) {
             data.remove(uuid)
         }
 
         for (data in data.values) {
-            tickDamage(data.damageCounter)
+
+            //TODO test end stone protector in hole? - maybe change eye pos
+//            data.ignoreBlocks =
+//                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
+
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
@@ -96,9 +100,9 @@ class DamageIndicatorManager {
                 loc
             }
 
-            if (!data.healthLineHidden) {
-                RenderUtils.drawLabel(location, healthText, partialTicks, true, 6f)
-            }
+//            if (!data.healthLineHidden) {
+            RenderUtils.drawLabel(location, healthText, partialTicks, true, 6f)
+//            }
 
             var bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
                 0 -> ""
@@ -113,7 +117,9 @@ class DamageIndicatorManager {
             if (data.nameSuffix.isNotEmpty()) {
                 bossName += data.nameSuffix
             }
-
+            //TODO fix scaling problem
+//            val debug = Minecraft.getMinecraft().thePlayer.isSneaking
+//            RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f, debug = debug)
             RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f)
 
             if (SkyHanniMod.feature.damageIndicator.showDamageOverTime) {
@@ -222,6 +228,7 @@ class DamageIndicatorManager {
                 val lastHealth = data[entity.uniqueID]!!.lastHealth
                 val bossType = entityData.bossType
                 checkDamage(entityData, health, lastHealth, bossType)
+                tickDamage(entityData.damageCounter)
             }
             entityData.lastHealth = health
 
@@ -312,8 +319,9 @@ class DamageIndicatorManager {
         } + " §f"
 
         //hide while in the middle
-        val position = entity.getLorenzVec()
-        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
+//        val position = entity.getLorenzVec()
+        //TODO other logic or something
+//        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
 
         var calcHealth = -1
         for (line in ScoreboardData.sidebarLinesRaw) {
@@ -446,7 +454,7 @@ class DamageIndicatorManager {
             }
         } else if (DungeonData.isOneOf("M4")) {
             maxHealth = 6
-             when (realHealth) {
+            when (realHealth) {
                 //TODO test all non derpy values!
                 1_800_000 / 2, 1_800_000 -> 6
                 1_494_000 / 2, 1_494_000 -> 5
@@ -531,7 +539,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: EntityJoinWorldEvent) {
+    fun onEntityJoin(event: EntityJoinWorldEvent) {
         bossFinder?.handleNewEntity(event.entity)
     }
 

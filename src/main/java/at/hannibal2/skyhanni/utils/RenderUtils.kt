@@ -327,6 +327,7 @@ object RenderUtils {
         shadow: Boolean = false,
         scale: Float = 1f,
         yOff: Float = 0f,
+        debug: Boolean = false,
     ) {
         val minecraft = Minecraft.getMinecraft()
         val player = minecraft.thePlayer
@@ -336,8 +337,35 @@ object RenderUtils {
             pos.y - player.lastTickPosY + (pos.y - player.posY - (pos.y - player.lastTickPosY)) * partialTicks
         val z =
             pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
+
+
+        //7 - 25
+
+        val translate = LorenzVec(x, y, z)
+        val length = translate.length().toFloat()
+
+        var finalText = text
+        var factor = 1f
+        var finalScale = scale
+        if (debug) {
+//            if (tick++ % 60 == 0) {
+            finalText = "$text ${length.toInt()}"
+//                println("translate: $length")
+//            }
+            if (length < 8) {
+                factor = 8 / length
+//            translate = translate.multiply(8 / length)
+            }
+            if (length > 15) {
+                factor = 15 / length
+//            translate = translate.multiply(15 / length)
+            }
+//        val finalScale = scale * (1 / factor)
+            finalScale = scale * sqrt(factor.toDouble()).toFloat()
+        }
+
         val f1 = 0.0266666688
-        val width = minecraft.fontRendererObj.getStringWidth(text) / 2
+        val width = minecraft.fontRendererObj.getStringWidth(finalText) / 2
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, z)
         GL11.glNormal3f(0f, 1f, 0f)
@@ -345,12 +373,18 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-f1, -f1, -f1)
-        GlStateManager.scale(scale, scale, scale)
+//        GlStateManager.scale(scale, scale, scale)
+        GlStateManager.scale(finalScale, finalScale, finalScale)
+//        GlStateManager.scale(finalScale, finalScale, finalScale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.enableTexture2D()
-        minecraft.fontRendererObj.drawString(text, (-width).toFloat(), yOff, LorenzColor.WHITE.toColor().rgb, shadow)
+        minecraft.fontRendererObj.drawString(finalText,
+            (-width).toFloat(),
+            yOff,
+            LorenzColor.WHITE.toColor().rgb,
+            shadow)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
     }

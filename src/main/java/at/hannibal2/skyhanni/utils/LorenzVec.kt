@@ -4,10 +4,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.round
-import kotlin.math.sin
+import kotlin.math.*
 
 data class LorenzVec(
     val x: Double,
@@ -66,6 +63,10 @@ data class LorenzVec(
 
     private fun toCleanString(): String {
         return "$x $y $z"
+    }
+
+    fun length(): Double {
+        return sqrt(x * x + y * y + z * z)
     }
 
     companion object {
