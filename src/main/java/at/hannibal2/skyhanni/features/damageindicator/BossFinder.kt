@@ -6,18 +6,16 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.hasNameTagWith
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
-import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.*
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraft.util.AxisAlignedBB
 import java.util.*
 
 class BossFinder {
@@ -535,43 +533,5 @@ class BossFinder {
         }
 
         return null
-    }
-}
-
-//TODO move into utils method
-fun EntityLiving.hasNameTagWith(
-    y: Int,
-    contains: String,
-    debugRightEntity: Boolean = false,
-    inaccuracy: Double = 1.6,
-    debugWrongEntity: Boolean = false,
-): Boolean {
-    return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
-}
-
-fun EntityLiving.getNameTagWith(
-    y: Int,
-    contains: String,
-    debugRightEntity: Boolean = false,
-    inaccuracy: Double = 1.6,
-    debugWrongEntity: Boolean = false,
-): EntityArmorStand? {
-    val center = getLorenzVec().add(0, y, 0)
-    val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlocPos()
-    val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlocPos()
-    val alignedBB = AxisAlignedBB(a, b)
-    val clazz = EntityArmorStand::class.java
-    val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-    return found.find {
-        val result = it.name.contains(contains)
-        if (debugWrongEntity && !result) {
-            println("wrong entity in aabb: '" + it.name + "'")
-        }
-        if (debugRightEntity && result) {
-            println("mob: " + center.printWithAccuracy(2))
-            println("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-            println("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
-        }
-        result
     }
 }
