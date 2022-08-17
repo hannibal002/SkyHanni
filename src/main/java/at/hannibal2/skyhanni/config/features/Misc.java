@@ -73,7 +73,7 @@ public class Misc {
     public boolean damageIndicatorHideDamageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Damage Over Time", desc = "Show damage over time below the damage indicator")
+    @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean damageIndicatorShowDamageOverTime = false;
