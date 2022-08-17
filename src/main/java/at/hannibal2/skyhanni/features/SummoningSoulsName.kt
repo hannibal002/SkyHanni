@@ -1,0 +1,135 @@
+package at.hannibal2.skyhanni.features
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.damageindicator.hasNameTagWith
+import at.hannibal2.skyhanni.test.GriffinJavaUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
+import net.minecraft.entity.EntityLiving
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.concurrent.atomic.AtomicReference
+
+class SummoningSoulsName {
+
+    var tick = 0
+    val texture =
+        "ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU" +
+                "4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdH" +
+                "VyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgI" +
+                "nVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMx" +
+                "NjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ"
+
+    val souls = mutableMapOf<EntityArmorStand, String>()
+    val mobsLastLocation = mutableMapOf<EntityLiving, LorenzVec>()
+    val mobsName = mutableMapOf<EntityLiving, String>()
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!isEnabled()) return
+
+        tick++
+        //TODO use packets instead of this
+        if (tick % 1 == 0) {
+            check()
+        }
+    }
+
+    private fun check() {
+        val minecraft = Minecraft.getMinecraft()
+        val world = minecraft.theWorld
+        for (entity in world.loadedEntityList) {
+            if (souls.contains(entity)) continue
+
+            if (entity is EntityArmorStand) {
+                if (isSoul(entity)) {
+                    val soulLocation = entity.getLorenzVec()
+
+                    val map = mutableMapOf<EntityLiving, Double>()
+                    for ((mob, loc) in mobsLastLocation) {
+                        val distance = loc.distance(soulLocation)
+                        map[mob] = distance
+                    }
+
+                    val nearestMob = GriffinJavaUtils.sortByValueAsc(map).firstNotNullOfOrNull { it.key }
+                    if (nearestMob != null) {
+//                        val mobDistance = nearestMob.getLorenzVec().add(0.0, -1.4375, 0.0)
+//                        val distance = mobDistance.distance(soulLocation)
+//                        val diff = mobDistance.add(soulLocation.multiply(-1))
+
+//                        println(" ")
+//                        println("mobDistance: $mobDistance")
+//                        println("soulLocation: $soulLocation")
+//                        println("diff: $diff")
+//                        LorenzUtils.chat("distance: $distance")
+                        val name = mobsName[nearestMob]!!
+//                        LorenzUtils.chat("maybe its $name")
+                        souls[entity] = name
+                    }
+
+                }
+            }
+        }
+
+        for (entity in world.loadedEntityList) {
+
+            if (entity is EntityLiving) {
+                val boo = AtomicReference<String>()
+                if (entity.hasNameTagWith(2, "§c❤", consumer = {
+                        if (!it.name.contains("§e0")) {
+                            boo.set(it.name)
+                        }
+                    })) {
+                    val name = boo.get()
+                    if (name != null) {
+                        mobsLastLocation[entity] = entity.getLorenzVec()
+                        mobsName[entity] = name
+                    }
+                }
+            }
+        }
+
+        souls.keys.removeIf { it !in world.loadedEntityList }
+        //TODO fix overhead!
+//        mobs.keys.removeIf { it !in world.loadedEntityList }
+    }
+
+    @SubscribeEvent
+    fun onWorldRender(event: RenderWorldLastEvent) {
+        if (!isEnabled()) return
+
+        val playerLocation = LocationUtils.playerEyeLocation()
+        for ((entity, name) in souls) {
+            val vec = entity.getLorenzVec()
+            if (LocationUtils.canSee(playerLocation, vec.add(0.0, 2.0, 0.0))) {
+                event.drawString(vec.add(0.0, 2.5, 0.0), name, true)
+            }
+        }
+    }
+
+    private fun isSoul(entity: EntityArmorStand): Boolean {
+        for (stack in entity.inventory) {
+            if (stack != null) {
+                val skullTexture = stack.getSkullTexture()
+                if (skullTexture != null) {
+                    if (skullTexture == texture) {
+                        return true
+                    }
+                }
+            }
+        }
+
+        return false
+    }
+
+    private fun isEnabled(): Boolean {
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.summonSoulDisplay
+    }
+}

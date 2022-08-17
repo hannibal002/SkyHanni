@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixinhooks.NetHandlerPlayClientHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.Packet;
