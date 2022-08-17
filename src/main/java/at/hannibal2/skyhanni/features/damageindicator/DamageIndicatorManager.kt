@@ -351,32 +351,6 @@ class DamageIndicatorManager {
         maxHealth: Int,
     ): String? {
 
-        //Hit phase
-        val armorStandHits = entity.getNameTagWith(3, " Hit")
-        if (armorStandHits != null) {
-            val maxHits = when (entityData.bossType) {
-                BossType.SLAYER_ENDERMAN_1 -> 15
-                BossType.SLAYER_ENDERMAN_2 -> 30
-                BossType.SLAYER_ENDERMAN_3 -> 60
-                BossType.SLAYER_ENDERMAN_4 -> 100
-                else -> 100
-            }
-            val name = armorStandHits.name.removeColor()
-            val hits = name.between("Seraph ", " Hit").toInt()
-            val color = percentageColor(hits, maxHits)
-
-            return color.getChatColor() + "$hits Hits"
-        }
-
-        //Laser phase
-        if (entity.ridingEntity != null) {
-            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            //                        val remainingTicks = 8 * 20 - ticksAlive
-            val remainingTicks = (8.9 * 20).toLong() - ticksAlive
-            return formatDelay(remainingTicks * 50)
-        }
-
         var calcHealth = health
         val calcMaxHealth: Int
         entityData.namePrefix = when (entityData.bossType) {
@@ -422,8 +396,34 @@ class DamageIndicatorManager {
             }
             else -> return null
         }
-        val color = percentageColor(calcHealth, calcMaxHealth)
-        return color.getChatColor() + NumberUtil.format(calcHealth)
+        val result = percentageColor(calcHealth, calcMaxHealth).getChatColor() + NumberUtil.format(calcHealth)
+
+
+        //Hit phase
+        val armorStandHits = entity.getNameTagWith(3, " Hit")
+        if (armorStandHits != null) {
+            val maxHits = when (entityData.bossType) {
+                BossType.SLAYER_ENDERMAN_1 -> 15
+                BossType.SLAYER_ENDERMAN_2 -> 30
+                BossType.SLAYER_ENDERMAN_3 -> 60
+                BossType.SLAYER_ENDERMAN_4 -> 100
+                else -> 100
+            }
+            val name = armorStandHits.name.removeColor()
+            val hits = name.between("Seraph ", " Hit").toInt()
+            return percentageColor(hits, maxHits).getChatColor() + "$hits Hits"
+        }
+
+        //Laser phase
+        if (entity.ridingEntity != null) {
+            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
+            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
+            //val remainingTicks = 8 * 20 - ticksAlive
+            val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+            return formatDelay(remainingTicks * 50)
+        }
+
+        return result
     }
 
     private fun checkThorn(realHealth: Int): String? {
