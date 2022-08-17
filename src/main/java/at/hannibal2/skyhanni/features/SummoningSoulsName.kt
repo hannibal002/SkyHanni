@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.damageindicator.hasNameTagWith
+import at.hannibal2.skyhanni.features.damageindicator.getNameTagWith
 import at.hannibal2.skyhanni.test.GriffinJavaUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -15,7 +15,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.concurrent.atomic.AtomicReference
 
 class SummoningSoulsName {
 
@@ -79,18 +78,12 @@ class SummoningSoulsName {
         }
 
         for (entity in world.loadedEntityList) {
-
             if (entity is EntityLiving) {
-                val boo = AtomicReference<String>()
-                if (entity.hasNameTagWith(2, "§c❤", consumer = {
-                        if (!it.name.contains("§e0")) {
-                            boo.set(it.name)
-                        }
-                    })) {
-                    val name = boo.get()
-                    if (name != null) {
+                val consumer = entity.getNameTagWith(2, "§c❤")
+                if (consumer != null) {
+                    if (!consumer.name.contains("§e0")) {
                         mobsLastLocation[entity] = entity.getLorenzVec()
-                        mobsName[entity] = name
+                        mobsName[entity] = consumer.name
                     }
                 }
             }
