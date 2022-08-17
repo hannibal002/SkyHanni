@@ -119,14 +119,31 @@ class BossDamageIndicator {
             if (SkyHanniMod.feature.misc.damageIndicatorShowDamageOverTime) {
                 var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
-                if (currentDamage != 0L) {
-                    val format = "§c" + NumberUtil.format(currentDamage)
-                    RenderUtils.drawLabel(location, format, partialTicks, true, 3.9f, diff)
+                val currentHealing = data.damageCounter.currentHealing
+                if (currentDamage != 0L || currentHealing != 0L) {
+                    val formatDamage = "§c" + NumberUtil.format(currentDamage)
+                    val formatHealing = "§a+" + NumberUtil.format(currentHealing)
+                    val finalResult = if (currentHealing == 0L) {
+                        formatDamage
+                    } else if (currentDamage == 0L) {
+                        formatHealing
+                    } else {
+                        "$formatDamage §7/ $formatHealing"
+                    }
+                    RenderUtils.drawLabel(location, finalResult, partialTicks, true, 3.9f, diff)
                     diff += 9f
                 }
                 for (damage in data.damageCounter.oldDamages) {
-                    val format = "§c" + NumberUtil.format(damage.damage) + "/s"
-                    RenderUtils.drawLabel(location, format, partialTicks, true, 3.9f, diff)
+                    val formatDamage = "§c" + NumberUtil.format(damage.damage) + "/s"
+                    val formatHealing = "§a+" + NumberUtil.format(damage.healing) + "/s"
+                    val finalResult = if (damage.healing == 0L) {
+                        formatDamage
+                    } else if (damage.damage == 0L) {
+                        formatHealing
+                    } else {
+                        "$formatDamage §7/ $formatHealing"
+                    }
+                    RenderUtils.drawLabel(location, finalResult, partialTicks, true, 3.9f, diff)
                     diff += 9f
                 }
             }
@@ -138,15 +155,16 @@ class BossDamageIndicator {
 
     private fun tickDamage(damageCounter: DamageCounter) {
         val now = System.currentTimeMillis()
-        if (damageCounter.currentDamage != 0L) {
+        if (damageCounter.currentDamage != 0L || damageCounter.currentHealing != 0L) {
             if (damageCounter.firstTick == 0L) {
                 damageCounter.firstTick = now
             }
 
             if (now > damageCounter.firstTick + 1_000) {
-                damageCounter.oldDamages.add(OldDamage(now, damageCounter.currentDamage))
+                damageCounter.oldDamages.add(OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing))
                 damageCounter.firstTick = 0L
                 damageCounter.currentDamage = 0
+                damageCounter.currentHealing = 0
             }
         }
         damageCounter.oldDamages.removeIf { now > it.time + 5_000 }
@@ -419,10 +437,19 @@ class BossDamageIndicator {
 
     private fun checkDamage(entityData: EntityData, health: Int, lastHealth: Int, bossType: BossType) {
         val damage = lastHealth - health
-        if (damage <= 0) return
+        val healing = health - lastHealth
+        if (damage > 0) {
+            val damageCounter = entityData.damageCounter
+            damageCounter.currentDamage += damage
+        }
+        if (healing > 0) {
+            //Hide auto heal every 10 ticks (with rounding errors)
+            if ((healing == 15_000 || healing == 15_001) && bossType == BossType.SLAYER_ZOMBIE_5) return
 
-        val damageCounter = entityData.damageCounter
-        damageCounter.currentDamage += damage
+            val damageCounter = entityData.damageCounter
+            damageCounter.currentHealing += healing
+
+        }
     }
 
     private fun percentageColor(
