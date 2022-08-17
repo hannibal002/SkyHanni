@@ -30,7 +30,7 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.max
 
-class BossDamageIndicator {
+class DamageIndicatorManager {
 
     var data = mutableMapOf<UUID, EntityData>()
     private var bossFinder: BossFinder? = null
@@ -51,7 +51,7 @@ class BossDamageIndicator {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!SkyHanniMod.feature.misc.damageIndicator) return
+        if (!SkyHanniMod.feature.damageIndicator.enabled) return
 
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
@@ -69,7 +69,7 @@ class BossDamageIndicator {
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
-            if (data.bossType.bossTypeToggle !in SkyHanniMod.feature.misc.damageIndicatorBossesToShow) continue
+            if (data.bossType.bossTypeToggle !in SkyHanniMod.feature.damageIndicator.bossesToShow) continue
 
             val entity = data.entity
 
@@ -100,7 +100,7 @@ class BossDamageIndicator {
                 RenderUtils.drawLabel(location, healthText, partialTicks, true, 6f)
             }
 
-            var bossName = when (SkyHanniMod.feature.misc.damageIndicatorBossName) {
+            var bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
                 0 -> ""
                 1 -> data.bossType.fullName
                 2 -> data.bossType.shortName
@@ -116,7 +116,7 @@ class BossDamageIndicator {
 
             RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f)
 
-            if (SkyHanniMod.feature.misc.damageIndicatorShowDamageOverTime) {
+            if (SkyHanniMod.feature.damageIndicator.showDamageOverTime) {
                 var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
@@ -414,7 +414,7 @@ class BossDamageIndicator {
             if (data.containsKey(entity.uniqueID)) {
                 val lastHealth = data[entity.uniqueID]!!.lastHealth
                 val bossType = entityData.bossType
-                if (SkyHanniMod.feature.misc.damageIndicatorHealingMessage) {
+                if (SkyHanniMod.feature.damageIndicator.healingMessage) {
                     checkHealed(health, lastHealth, bossType)
                 }
                 checkDamage(entityData, health, lastHealth, bossType)
@@ -478,7 +478,7 @@ class BossDamageIndicator {
         val healedFormat = NumberUtil.format(healed)
 
 
-        val bossName = when (SkyHanniMod.feature.misc.damageIndicatorBossName) {
+        val bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
             2 -> bossType.shortName
             else -> bossType.fullName
         }
@@ -522,7 +522,7 @@ class BossDamageIndicator {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderLiving(e: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!SkyHanniMod.feature.misc.damageIndicatorHideDamageSplash) return
+        if (!SkyHanniMod.feature.damageIndicator.hideDamageSplash) return
 
         val entity = e.entity
         if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return

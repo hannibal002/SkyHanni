@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.chat.NewChatFilter;
 import at.hannibal2.skyhanni.chat.PlayerChatFilter;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
-import at.hannibal2.skyhanni.damageindicator.BossDamageIndicator;
+import at.hannibal2.skyhanni.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.dungeon.*;
 import at.hannibal2.skyhanni.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.fishing.SeaCreatureMessageShortener;
@@ -73,7 +73,7 @@ public class SkyHanniMod {
         registerEvent(new ItemDisplayOverlayFeatures());
         registerEvent(new CurrentPetDisplay());
         registerEvent(new ExpBottleOnGroundHider());
-        registerEvent(new BossDamageIndicator());
+        registerEvent(new DamageIndicatorManager());
         registerEvent(new ItemAbilityCooldown());
         registerEvent(new DungeonMilestoneDisplay());
         registerEvent(new DungeonDeathCounter());
