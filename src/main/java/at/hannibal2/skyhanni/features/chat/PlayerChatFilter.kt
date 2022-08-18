@@ -10,6 +10,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatFilter {
 
+    private val loggerPlayerChat = LorenzLogger("chat/player")
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.isOnHypixel) return
@@ -20,10 +22,8 @@ class PlayerChatFilter {
         }
     }
 
-    val loggerPlayerChat = LorenzLogger("chat/player")
-
-    fun shouldBlock(originalMessage: String): Boolean {
-        val split: List<String> = if (originalMessage.contains("§7§r§7: ")) {
+    private fun shouldBlock(originalMessage: String): Boolean {
+        val split = if (originalMessage.contains("§7§r§7: ")) {
             originalMessage.split("§7§r§7: ")
         } else if (originalMessage.contains("§f: ")) {
             originalMessage.split("§f: ")
@@ -32,25 +32,23 @@ class PlayerChatFilter {
         }
 
         var rawName = split[0]
+        val channel = grabChannel(rawName)
+
+        rawName = rawName.substring(channel.originalPrefix.length)
+        val name = grabName(rawName) ?: return false
+
         val message = split[1]
+        send(channel, name.removeColor(), message.removeColor())
+        return true
+    }
 
-        val channel: PlayerMessageChannel
-        if (rawName.startsWith("§9Party §8> ")) {
-            channel = PlayerMessageChannel.PARTY
-            rawName = rawName.substring(12)
-        } else if (rawName.startsWith("§2Guild > ")) {
-            channel = PlayerMessageChannel.GUILD
-            rawName = rawName.substring(10)
-        } else if (rawName.startsWith("§bCo-op > ")) {
-            channel = PlayerMessageChannel.COOP
-            rawName = rawName.substring(10)
-        } else {
-            channel = PlayerMessageChannel.ALL
-        }
+    private fun grabChannel(name: String): PlayerMessageChannel {
+        return PlayerMessageChannel.values()
+            .find { it != PlayerMessageChannel.ALL && name.startsWith(it.originalPrefix) } ?: PlayerMessageChannel.ALL
+    }
 
+    private fun grabName(rawName: String): String? {
         val nameSplit = rawName.split(" ")
-        val first = nameSplit[0]
-
         val last = nameSplit.last()
         val name = if (last.endsWith("]")) {
             nameSplit[nameSplit.size - 2]
@@ -58,15 +56,15 @@ class PlayerChatFilter {
             last
         }
 
+        val first = nameSplit[0]
         if (first != name) {
             if (!first.contains("VIP") && !first.contains("MVP")) {
                 //TODO support yt + admin
-                return false
+                return null
             }
         }
 
-        send(channel, name.removeColor(), message.removeColor())
-        return true
+        return name
     }
 
     private fun send(channel: PlayerMessageChannel, name: String, message: String) {
