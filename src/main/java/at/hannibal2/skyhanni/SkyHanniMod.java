@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.features.items.ItemDisplayOverlayFeatures;
 import at.hannibal2.skyhanni.features.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown;
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangGravityOrbs;
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import com.google.gson.Gson;
@@ -94,6 +95,7 @@ public class SkyHanniMod {
         registerEvent(new AshfangFreezeCooldown());
         registerEvent(new AshfangNextResetCooldown());
         registerEvent(new SummoningSoulsName());
+        registerEvent(new AshfangGravityOrbs());
 
         Commands.init();
 
