@@ -91,7 +91,8 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
 
             val itemName = itemNames.getOrDefault(apiName, null)
             if (itemName == null) {
-                LorenzUtils.error("Bazaar item name is null for '$apiName'! Restart to fix this problem!")
+                //TODO need to re enable this later again
+//                LorenzUtils.error("Bazaar item name is null for '$apiName'! Restart to fix this problem!")
                 continue
             }
 
