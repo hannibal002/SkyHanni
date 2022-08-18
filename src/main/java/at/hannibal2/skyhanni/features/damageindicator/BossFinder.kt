@@ -223,13 +223,13 @@ class BossFinder {
                         300_000, 600_000 -> {
                             return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
                         }
-                        15_000_000, 30_000_000 -> {
+                        12_000_000, 24_000_000 -> {
                             return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
                         }
-                        66_666_666, 66_666_666 * 2 -> {
+                        50_000_000, 100_000_000 -> {
                             return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
                         }
-                        300_000_000, 600_000_000 -> {
+                        210_000_000, 420_000_000 -> {
                             return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
                         }
                     }
