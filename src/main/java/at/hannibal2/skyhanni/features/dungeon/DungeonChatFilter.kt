@@ -130,9 +130,10 @@ class DungeonChatFilter {
         message.matchRegex("§6§lDUNGEON BUFF! §r§fA §r§dBlessing of (.*)§r§f was found! (.*)") -> true
         message.matchRegex("§eA §r§a§r§dBlessing of (.*)§r§e was picked up!") -> true
         message.matchRegex("(.*) §r§ehas obtained §r§a§r§dBlessing of (.*)§r§e!") -> true
-        message.matchRegex("     §r§7(Grants|Granted) you §r§a(.*) Strength §r§7and §r§a(.*) Crit Damage§r§7.") -> true
+        message.matchRegex("     §r§7Granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§c❁ Strength§r§7.") -> true
+        message.matchRegex("     §r§7Also granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§9☠ Crit Damage§r§7.") -> true
         message.matchRegex("     §r§7(Grants|Granted) you §r§a(.*) Defense §r§7and §r§a+(.*) Damage§r§7.") -> true
-        message.matchRegex("     §r§7(Grants|Granted) you §r§a(.*) HP §r§7and §r§a+(.*)% §r§7health regeneration.") -> true
+        message.matchRegex("     §r§7Granted you §r§a§r§a(.*)x HP §r§7and §r§a§r§a(.*)x §r§c❣ Health Regen§r§7.") -> true
         message.matchRegex("     §r§7(Grants|Granted) you §r§a(.*) Intelligence §r§7and §r§a+(.*)? Speed§r§7.") -> true
         message.matchRegex("     §r§7Granted you §r§a+(.*) HP§r§7, §r§a(.*) Defense§r§7, §r§a(.*) Intelligence§r§7, and §r§a(.*) Strength§r§7.") -> true
         message == "§a§lBUFF! §fYou have gained §r§cHealing V§r§f!" -> true
