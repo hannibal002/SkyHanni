@@ -544,14 +544,13 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(e: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        val entity = e.entity
+    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+        val entity = event.entity
         if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
-        val strippedName = entity.customNameTag.removeColor().replace(",", "")
-        val damageMatcher = damagePattern.matcher(strippedName)
-        if (!damageMatcher.matches()) return
+        val name = entity.customNameTag.removeColor().replace(",", "")
+        if (!damagePattern.matcher(name).matches()) return
 
         if (SkyHanniMod.feature.misc.fixSkytilsDamageSplash) {
             entity.customNameTag = entity.customNameTag.replace(",", "")
@@ -562,7 +561,7 @@ class DamageIndicatorManager {
                     val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
                     distance < 4.5
                 }) {
-                e.isCanceled = true
+                event.isCanceled = true
             }
         }
     }
