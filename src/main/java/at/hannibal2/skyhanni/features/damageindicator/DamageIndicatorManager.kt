@@ -543,25 +543,27 @@ class DamageIndicatorManager {
         bossFinder?.handleNewEntity(event.entity)
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(e: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!SkyHanniMod.feature.damageIndicator.hideDamageSplash) return
-
         val entity = e.entity
         if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
-        val strippedName = entity.customNameTag.removeColor()
+        val strippedName = entity.customNameTag.removeColor().replace(",", "")
         val damageMatcher = damagePattern.matcher(strippedName)
-        if (damageMatcher.matches()) {
+        if (!damageMatcher.matches()) return
+
+        if (SkyHanniMod.feature.misc.fixSkytilsDamageSplash) {
+            entity.customNameTag = entity.customNameTag.replace(",", "")
+        }
+
+        if (SkyHanniMod.feature.damageIndicator.hideDamageSplash) {
             if (data.values.any {
                     val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
-                    val found = distance < 4.5
-                    found
+                    distance < 4.5
                 }) {
                 e.isCanceled = true
             }
         }
     }
-
 }

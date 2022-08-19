@@ -29,6 +29,11 @@ public class Misc {
     public boolean summonSoulDisplay = false;
 
     @Expose
+    @ConfigOption(name = "Skytils Damage Splash", desc = "Fixing the custom damage splash feature from skytils.")
+    @ConfigEditorBoolean
+    public boolean fixSkytilsDamageSplash = true;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
