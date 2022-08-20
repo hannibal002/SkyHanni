@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.File
 
-class ApiData {
+class ApiKeyGrabber {
 
     private var currentProfileName = ""
 
@@ -35,11 +36,20 @@ class ApiData {
     private fun updateApiData() {
         val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
 
-        val apiKey = SkyHanniMod.feature.hidden.apiKey
+        var apiKey = SkyHanniMod.feature.hidden.apiKey
+        if (!verifyKey(apiKey)) {
+            LorenzUtils.chat("§c[SkyHanni] Invalid api key detected, deleting it!")
+            apiKey = ""
+            SkyHanniMod.feature.hidden.apiKey = ""
+        }
 
         if (apiKey.isEmpty()) {
-            LorenzUtils.error("SkyHanni has no API Key set. Type /api new to reload.")
-            return
+            readApiKeyFromOtherMods()
+            apiKey = SkyHanniMod.feature.hidden.apiKey
+            if (apiKey.isEmpty()) {
+                LorenzUtils.warning("SkyHanni has no API Key set. Type /api new to reload.")
+                return
+            }
         }
 
         val url = "https://api.hypixel.net/player?key=$apiKey&uuid=$uuid"
@@ -71,6 +81,48 @@ class ApiData {
         }
     }
 
+    private fun readApiKeyFromOtherMods() {
+        println("Trying to find the API Key from the config of other mods..")
+
+        var found = false
+        for (mod in OtherMod.values()) {
+            val modName = mod.modName
+            val file = File(mod.configPath)
+            if (file.exists()) {
+                val reader = APIUtil.readFile(file)
+                try {
+                    val key = mod.readKey(reader).replace("\n", "").replace(" ", "")
+                    if (verifyKey(key)) {
+                        println("- $modName: good key!")
+                        if (!found) {
+                            found = true
+                            LorenzUtils.chat("§e[SkyHanni] Grabbed the API key from $modName!")
+                            SkyHanniMod.feature.hidden.apiKey = key
+                        }
+                    } else {
+                        println("- $modName: wrong key!")
+                    }
+                } catch (e: Throwable) {
+                    println("- $modName: wrong config format! (" + e.message + ")")
+                    continue
+                }
+            } else {
+                println("- $modName: no config found!")
+            }
+        }
+    }
+
+    private fun verifyKey(key: String): Boolean {
+        return try {
+            val url = "https://api.hypixel.net/key?key=$key"
+            val bazaarData = APIUtil.getJSONResponse(url, silentError = true)
+            return bazaarData.get("success").asBoolean
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     private fun loadProfile(playerUuid: String, profileId: String) {
         val apiKey = SkyHanniMod.feature.hidden.apiKey
         val url = "https://api.hypixel.net/skyblock/profile?key=$apiKey&profile=$profileId"
@@ -83,7 +135,6 @@ class ApiData {
             if (entry.key == playerUuid) {
                 val profileData = entry.value.asJsonObject
                 ProfileApiDataLoadedEvent(profileData).postAndCatch()
-
             }
         }
     }
