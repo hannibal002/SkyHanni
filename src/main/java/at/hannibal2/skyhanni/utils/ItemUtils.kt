@@ -191,4 +191,11 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
+
+    //extra method for shorter name and kotlin nullability logic
+    var ItemStack.name: String?
+        get() = this.displayName
+        set(value) {
+            setStackDisplayName(value)
+        }
 }

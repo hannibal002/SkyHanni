@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -40,16 +41,15 @@ class BazaarOrderHelper {
             if (slot.stack == null) continue
 
             val stack = slot.stack
-            val displayName = stack.displayName
-            val isSelling = displayName.startsWith("§6§lSELL§7: ")
-            val isBuying = displayName.startsWith("§a§lBUY§7: ")
+            val itemName = stack.name ?: continue
+
+            val isSelling = itemName.startsWith("§6§lSELL ")
+            val isBuying = itemName.startsWith("§a§lBUY ")
             if (!isSelling && !isBuying) continue
 
-            val text = displayName.split("§7: ")[1]
-            val name = BazaarApi.getCleanBazaarName(text)
-            val data = BazaarApi.getBazaarDataForName(name)
-            val buyPrice = data.buyPrice
-            val sellPrice = data.sellPrice
+            val rawName = itemName.split(if (isBuying) "BUY " else "SELL ")[1]
+            val bazaarName = BazaarApi.getCleanBazaarName(rawName)
+            val data = BazaarApi.getBazaarDataForName(bazaarName)
 
             val itemLore = stack.getLore()
             for (line in itemLore) {
@@ -59,25 +59,15 @@ class BazaarOrderHelper {
                         continue@out
                     }
                 }
-            }
-            for (line in itemLore) {
                 if (line.startsWith("§7Price per unit:")) {
                     var text = line.split(": §6")[1]
                     text = text.substring(0, text.length - 6)
                     text = text.replace(",", "")
                     val price = text.toDouble()
-                    if (isSelling) {
-                        if (buyPrice < price) {
-                            slot highlight LorenzColor.GOLD
-                            continue@out
-                        }
-                    } else {
-                        if (sellPrice > price) {
-                            slot highlight LorenzColor.GOLD
-                            continue@out
-                        }
+                    if (isSelling && price > data.buyPrice || isBuying && price < data.sellPrice) {
+                        slot highlight LorenzColor.GOLD
+                        continue@out
                     }
-
                 }
             }
         }

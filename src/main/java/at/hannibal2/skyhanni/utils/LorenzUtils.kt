@@ -58,23 +58,6 @@ object LorenzUtils {
 
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
-    fun String.removeColor(): String {
-        val builder = StringBuilder()
-        var skipNext = false
-        for (c in this.toCharArray()) {
-            if (c == '§') {
-                skipNext = true
-                continue
-            }
-            if (skipNext) {
-                skipNext = false
-                continue
-            }
-            builder.append(c)
-        }
-
-        return builder.toString()
-    }
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
