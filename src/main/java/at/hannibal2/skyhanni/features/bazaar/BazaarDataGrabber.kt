@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.bazaar
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import kotlin.concurrent.fixedRateTimer
 
 internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, BazaarData>) {
@@ -84,19 +85,12 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
         for (entry in products.entrySet()) {
             val apiName = entry.key
 
+            //TODO use repo
             if (apiName == "ENCHANTED_CARROT_ON_A_STICK") continue
             if (apiName == "BAZAAR_COOKIE") continue
 
             val itemData = entry.value.asJsonObject
-
-            val itemName = itemNames.getOrDefault(apiName, null)
-            if (itemName == null) {
-                //TODO need to re enable this later again
-//                LorenzUtils.error("Bazaar item name is null for '$apiName'! Restart to fix this problem!")
-                continue
-            }
-
-            val sellPrice: Double = try {
+            val sellPrice = try {
                 itemData["sell_summary"].asJsonArray[0].asJsonObject["pricePerUnit"].asDouble.round(1)
             } catch (e: Exception) {
                 0.0
@@ -107,8 +101,27 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 0.0
             }
 
+            val itemName = getItemName(apiName) ?: continue
             val data = BazaarData(apiName, itemName, sellPrice, buyPrice)
             bazaarMap[itemName] = data
+        }
+    }
+
+    private fun getItemName(apiName: String): String? {
+        var itemName = itemNames.getOrDefault(apiName, null)
+
+        //Crimson Essence
+        //ESSENCE_CRIMSON
+        return itemName ?: if (apiName.startsWith("ESSENCE_")) {
+            val type = apiName.split("_")[1].firstLetterUppercase()
+            itemName = "$type Essence";
+            itemNames[apiName] = itemName
+            itemName
+        } else {
+            //TODO need to re enable this later again
+            println("unknown bazaar item: '$apiName'")
+//            LorenzUtils.error("Bazaar item name is null for '$apiName'! Restart to fix this problem!")
+            null
         }
     }
 }
