@@ -8,6 +8,11 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
 
 object APIUtil {
@@ -27,7 +32,7 @@ object APIUtil {
             )
             .useSystemProperties()
 
-    fun getJSONResponse(urlString: String): JsonObject {
+    fun getJSONResponse(urlString: String, silentError: Boolean = false): JsonObject {
         val client = builder.build()
         try {
             client.execute(HttpGet(urlString)).use { response ->
@@ -37,12 +42,20 @@ object APIUtil {
                     return parser.parse(retSrc) as JsonObject
                 }
             }
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            LorenzUtils.error("SkyHanni ran into an ${ex::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+        } catch (throwable: Throwable) {
+            if (silentError) {
+                throw throwable
+            } else {
+                throwable.printStackTrace()
+                LorenzUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+            }
         } finally {
             client.close()
         }
         return JsonObject()
+    }
+
+    fun readFile(file: File): BufferedReader {
+        return BufferedReader(InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8))
     }
 }

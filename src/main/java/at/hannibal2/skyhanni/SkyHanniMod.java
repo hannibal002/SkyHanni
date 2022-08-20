@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni;
 
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
-import at.hannibal2.skyhanni.data.ApiData;
+import at.hannibal2.skyhanni.data.ApiKeyGrabber;
 import at.hannibal2.skyhanni.data.HypixelData;
 import at.hannibal2.skyhanni.data.ItemRenderBackground;
 import at.hannibal2.skyhanni.data.ScoreboardData;
@@ -54,7 +54,7 @@ public class SkyHanniMod {
     public static Features feature;
     private File configFile;
 
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    public static final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
     public static File configDirectory;
     public static RepoManager repo;
@@ -67,7 +67,7 @@ public class SkyHanniMod {
         registerEvent(new HypixelData());
         registerEvent(new DungeonData());
         registerEvent(new ScoreboardData());
-        registerEvent(new ApiData());
+        registerEvent(new ApiKeyGrabber());
         registerEvent(new SeaCreatureManager());
         registerEvent(new ItemRenderBackground());
 
