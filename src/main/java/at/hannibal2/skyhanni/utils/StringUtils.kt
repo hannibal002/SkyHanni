@@ -11,7 +11,23 @@ object StringUtils {
     }
 
     fun String.removeColor(): String {
-        return replace("(?i)\\u00A7.", "")
+//        return replace("(?i)\\u00A7.", "")
+
+        val builder = StringBuilder()
+        var skipNext = false
+        for (c in this.toCharArray()) {
+            if (c == '§') {
+                skipNext = true
+                continue
+            }
+            if (skipNext) {
+                skipNext = false
+                continue
+            }
+            builder.append(c)
+        }
+
+        return builder.toString()
     }
 
 //    fun cleanColour(`in`: String): String? {
