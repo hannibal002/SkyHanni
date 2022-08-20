@@ -56,6 +56,7 @@ object LorenzUtils {
         thePlayer.addChatMessage(ChatComponentText(message))
     }
 
+    //TODO move into StringUtils
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
 
