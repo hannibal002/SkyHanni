@@ -17,7 +17,7 @@ class ItemRenderBackground {
 
         var ItemStack.background: Int
             get() {
-                if (System.currentTimeMillis() > mapTime.getOrDefault(this, 0) + 100) return -1
+                if (System.currentTimeMillis() > mapTime.getOrDefault(this, 0) + 200) return -1
                 return map.getOrDefault(this, -1)
             }
             set(value) {
