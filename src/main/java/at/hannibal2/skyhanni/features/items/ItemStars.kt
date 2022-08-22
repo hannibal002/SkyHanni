@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class CrimsonArmorTier {
+class ItemStars {
 
     private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
@@ -21,19 +21,21 @@ class CrimsonArmorTier {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyblock) return
-        if (!SkyHanniMod.feature.inventory.crimsonArmorStars) return
 
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
-        val number = getCrimsonNumber(stack.name ?: return)
+        if (!SkyHanniMod.feature.inventory.itemStars) return
 
-        if (number > 0) {
-            var name = stack.name!!
+        val itemName = stack.name ?: return
+        val stars = getStars(itemName)
+
+        if (stars > 0) {
+            var name = itemName
             while (STAR_FIND_PATCHER.matcher(name).matches()) {
                 name = name.replaceFirst("§.✪".toRegex(), "")
             }
             name = name.trim()
-            event.toolTip[0] = "$name §c$number✪"
+            event.toolTip[0] = "$name §c$stars✪"
         }
     }
 
@@ -66,7 +68,7 @@ class CrimsonArmorTier {
 
         val stack = event.stack ?: return
         if (stack.stackSize != 1) return
-        val number = getCrimsonNumber(stack.name ?: return)
+        val number = getCrimsonStars(stack.name ?: return)
         val stackTip = if (number == -1) "" else number.toString()
 
         if (stackTip.isNotEmpty()) {
@@ -84,32 +86,65 @@ class CrimsonArmorTier {
         }
     }
 
-    private fun getCrimsonNumber(fullName: String): Int {
-        var name = fullName
-        if (armorNames.any { name.contains(it) } && armorParts.any { name.contains(it) }) {
-            var gold = 0
-            var pink = 0
-            var aqua = 0
-            while (name.contains("§6✪")) {
-                name = name.replaceFirst("§6✪", "")
-                gold++
-            }
-            while (name.contains("§d✪")) {
-                name = name.replaceFirst("§d✪", "")
-                pink++
-            }
-            while (name.contains("§b✪")) {
-                name = name.replaceFirst("§b✪", "")
-                aqua++
-            }
-            return (tiers.entries.find { name.contains(it.key) }?.value ?: 0) + if (aqua > 0) {
-                10 + aqua
-            } else if (pink > 0) {
-                5 + pink
-            } else {
-                gold
-            }
+    private fun getStars(name: String): Int {
+        val stars = getCrimsonStars(name)
+        if (stars != -1) {
+            return stars
         }
+
+        return getOtherStars(name)
+    }
+
+    private fun getCrimsonStars(name: String): Int {
+        if (!armorNames.any { name.contains(it) } || !armorParts.any { name.contains(it) }) {
+            return -1
+        }
+        var name1 = name
+        var gold = 0
+        var pink = 0
+        var aqua = 0
+        while (name1.contains("§6✪")) {
+            name1 = name1.replaceFirst("§6✪", "")
+            gold++
+        }
+        while (name1.contains("§d✪")) {
+            name1 = name1.replaceFirst("§d✪", "")
+            pink++
+        }
+        while (name1.contains("§b✪")) {
+            name1 = name1.replaceFirst("§b✪", "")
+            aqua++
+        }
+        return (tiers.entries.find { name1.contains(it.key) }?.value ?: 0) + if (aqua > 0) {
+            10 + aqua
+        } else if (pink > 0) {
+            5 + pink
+        } else {
+            gold
+        }
+    }
+
+    private fun getOtherStars(originalName: String): Int {
+        var name = originalName
+
+        var gold = 0
+        var red = 0
+        while (name.contains("§6✪")) {
+            name = name.replaceFirst("§6✪", "")
+            gold++
+        }
+        while (name.contains("§c✪")) {
+            name = name.replaceFirst("§6✪", "")
+            red++
+        }
+        while (name.contains("§d✪")) {
+            name = name.replaceFirst("§6✪", "")
+            red++
+        }
+
+        if (red > 0) return 5 + red
+        if (gold > 0) return gold
+
         return -1
     }
 }
