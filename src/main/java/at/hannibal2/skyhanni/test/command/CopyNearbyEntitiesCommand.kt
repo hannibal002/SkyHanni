@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.config.gui.utils.Utils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -96,9 +96,9 @@ object CopyNearbyEntitiesCommand {
         if (counter != 0) {
             val string = resultList.joinToString("\n")
             Utils.copyToClipboard(string)
-            LorenzUtils.chat("§e$counter entities copied into the clipboard!")
+            LorenzUtils.chat("§e[SkyHanni] $counter entities copied into the clipboard!")
         } else {
-            LorenzUtils.chat("§eNo entities found in a search radius of $searchRadius!")
+            LorenzUtils.chat("§e[SkyHanni] No entities found in a search radius of $searchRadius!")
         }
     }
 }
