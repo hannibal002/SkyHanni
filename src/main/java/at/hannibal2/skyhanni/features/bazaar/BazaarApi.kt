@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 class BazaarApi {
 
@@ -29,22 +30,18 @@ class BazaarApi {
             if (name.endsWith(" Gemstone")) {
                 return name.substring(6)
             }
-            if (name.startsWith("§")) {
-                return name.substring(2)
-            }
-
-            return name
+            return name.removeColor()
         }
 
-        fun getBazaarDataForName(name: String): BazaarData {
+        fun getBazaarDataForName(name: String): BazaarData? {
             if (bazaarMap.containsKey(name)) {
                 val bazaarData = bazaarMap[name]
                 if (bazaarData != null) {
                     return bazaarData
                 }
-                LorenzUtils.error("Bazaar data is null for item '$name'")
+                LorenzUtils.error("Bazaar data not found! '$name'")
             }
-            throw Error("no bz data found for name '$name'")
+            return null
         }
 
         fun isBazaarItem(name: String): Boolean {
