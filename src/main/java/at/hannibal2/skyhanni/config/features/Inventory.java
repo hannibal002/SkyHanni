@@ -44,8 +44,8 @@ public class Inventory {
     public boolean anvilCombineHelper = false;
 
     @Expose
-    @ConfigOption(name = "Crimson Armor Stars",
-            desc = "Show a compact star count in the item name for the Aurora, Crimson, Terror and Fervor armor")
+    @ConfigOption(name = "Item Stars",
+            desc = "Show a compact star count in the item name for all items")
     @ConfigEditorBoolean
-    public boolean crimsonArmorStars = false;
+    public boolean itemStars = false;
 }
