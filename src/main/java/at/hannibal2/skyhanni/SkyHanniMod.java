@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.dungeon.*;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.features.fishing.TrophyFishMessages;
+import at.hannibal2.skyhanni.features.items.CrimsonArmorTier;
 import at.hannibal2.skyhanni.features.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.features.items.ItemDisplayOverlayFeatures;
 import at.hannibal2.skyhanni.features.items.abilitycooldown.ItemAbilityCooldown;
@@ -96,6 +97,7 @@ public class SkyHanniMod {
         registerEvent(new AshfangNextResetCooldown());
         registerEvent(new SummoningSoulsName());
         registerEvent(new AshfangGravityOrbs());
+        registerEvent(new CrimsonArmorTier());
 
         Commands.init();
 

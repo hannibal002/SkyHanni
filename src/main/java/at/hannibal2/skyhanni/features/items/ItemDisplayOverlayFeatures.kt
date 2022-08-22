@@ -17,11 +17,11 @@ class ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-        val item = event.stack ?: return
+        val stack = event.stack ?: return
 
-        if (!LorenzUtils.inSkyblock || item.stackSize != 1) return
+        if (!LorenzUtils.inSkyblock || stack.stackSize != 1) return
 
-        val stackTip = getStackTip(item)
+        val stackTip = getStackTip(stack)
 
         if (stackTip.isNotEmpty()) {
             GlStateManager.disableLighting()
@@ -36,7 +36,6 @@ class ItemDisplayOverlayFeatures {
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
         }
-
     }
 
     private fun getStackTip(item: ItemStack): String {
