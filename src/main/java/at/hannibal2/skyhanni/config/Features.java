@@ -85,6 +85,10 @@ public class Features {
     public Abilities abilities = new Abilities();
 
     @Expose
+    @Category(name = "Minion", desc = "Stuff about minions")
+    public Minions minions = new Minions();
+
+    @Expose
     @Category(name = "Bazaar", desc = "Bazaar settings.")
     public Bazaar bazaar = new Bazaar();
 
