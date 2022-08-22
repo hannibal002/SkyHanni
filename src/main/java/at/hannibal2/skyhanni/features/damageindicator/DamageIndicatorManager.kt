@@ -485,8 +485,10 @@ class DamageIndicatorManager {
         val damage = lastHealth - health
         val healing = health - lastHealth
         if (damage > 0) {
-            val damageCounter = entityData.damageCounter
-            damageCounter.currentDamage += damage
+            if (entityData.bossType != BossType.DUMMY) {
+                val damageCounter = entityData.damageCounter
+                damageCounter.currentDamage += damage
+            }
         }
         if (healing > 0) {
             //Hide auto heal every 10 ticks (with rounding errors)
@@ -543,6 +545,8 @@ class DamageIndicatorManager {
         bossFinder?.handleNewEntity(event.entity)
     }
 
+    private val dummyDamageCache = mutableListOf<UUID>()
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         val entity = event.entity
@@ -556,12 +560,21 @@ class DamageIndicatorManager {
             entity.customNameTag = entity.customNameTag.replace(",", "")
         }
 
-        if (SkyHanniMod.feature.damageIndicator.hideDamageSplash) {
-            if (data.values.any {
-                    val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
-                    distance < 4.5
-                }) {
+        val entityData = data.values.find {
+            val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
+            distance < 4.5
+        }
+        if (entityData != null) {
+            if (SkyHanniMod.feature.damageIndicator.hideDamageSplash) {
                 event.isCanceled = true
+            }
+            if (entityData.bossType == BossType.DUMMY) {
+
+                val uuid = entity.uniqueID
+                if (dummyDamageCache.contains(uuid)) return
+                dummyDamageCache.add(uuid)
+                val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
+                entityData.damageCounter.currentDamage += dmg
             }
         }
     }
