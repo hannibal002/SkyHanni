@@ -134,11 +134,11 @@ class ItemStars {
             gold++
         }
         while (name.contains("§c✪")) {
-            name = name.replaceFirst("§6✪", "")
+            name = name.replaceFirst("§c✪", "")
             red++
         }
         while (name.contains("§d✪")) {
-            name = name.replaceFirst("§6✪", "")
+            name = name.replaceFirst("§d✪", "")
             red++
         }
 
