@@ -50,5 +50,5 @@ public class Abilities {
             desc = "Color of the Ashfang Gravity Orbs"
     )
     @ConfigEditorColour
-    public String ashfangGravityOrbsColor = "0:135:255:85:85";
+    public String ashfangGravityOrbsColor = "0:245:255:85:85";
 }
