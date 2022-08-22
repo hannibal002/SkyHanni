@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.config.gui.commands;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.gui.config.ConfigEditor;
 import at.hannibal2.skyhanni.config.gui.core.GuiScreenElementWrapper;
-import at.hannibal2.skyhanni.test.CopyNearbyEntitiesCommand;
 import at.hannibal2.skyhanni.test.LorenzTest;
+import at.hannibal2.skyhanni.test.command.CopyItemCommand;
+import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -46,17 +47,6 @@ public class Commands {
                         }
                 )
         );
-
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "ii",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                LorenzTest.Companion.printLore();
-                            }
-                        }
-                )
-        );
         ClientCommandHandler.instance.registerCommand(
                 new SimpleCommand(
                         "testhanni",
@@ -73,6 +63,16 @@ public class Commands {
                         new SimpleCommand.ProcessCommandRunnable() {
                             public void processCommand(ICommandSender sender, String[] args) {
                                 CopyNearbyEntitiesCommand.INSTANCE.command(args);
+                            }
+                        }
+                )
+        );
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "copyitem",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                CopyItemCommand.INSTANCE.command(args);
                             }
                         }
                 )

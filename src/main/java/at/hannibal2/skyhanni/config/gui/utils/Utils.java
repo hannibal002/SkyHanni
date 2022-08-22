@@ -1,13 +1,5 @@
 package at.hannibal2.skyhanni.config.gui.utils;
 
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.math.RoundingMode;
-import java.nio.FloatBuffer;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.LinkedList;
-import java.util.Locale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -25,6 +17,15 @@ import net.minecraftforge.fml.common.Loader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.math.RoundingMode;
+import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.LinkedList;
+import java.util.Locale;
 
 public class Utils {
 
@@ -68,60 +69,6 @@ public class Utils {
     public static boolean isDrill(ItemStack stack) {
         NBTTagCompound tag = getSkyBlockTag(stack);
         return tag != null && tag.hasKey("drill_fuel");
-    }
-
-    public static int whatRomanNumeral(String roman) {
-        switch (roman.toLowerCase()) {
-            case "i":
-                return 1;
-            case "ii":
-                return 2;
-            case "iii":
-                return 3;
-            case "iv":
-                return 4;
-            case "v":
-                return 5;
-            case "vi":
-                return 6;
-            case "vii":
-                return 7;
-            case "viii":
-                return 8;
-            case "ix":
-                return 9;
-            case "x":
-                return 10;
-            default:
-                return 0;
-        }
-    }
-
-    public static String intToRomanNumeral(int i) {
-        switch (i) {
-            case 1:
-                return "I";
-            case 2:
-                return "II";
-            case 3:
-                return "III";
-            case 4:
-                return "IV";
-            case 5:
-                return "V";
-            case 6:
-                return "VI";
-            case 7:
-                return "VII";
-            case 8:
-                return "VIII";
-            case 9:
-                return "IX";
-            case 10:
-                return "X";
-            default:
-                return "";
-        }
     }
 
     public static boolean overlayShouldRender(RenderGameOverlayEvent.ElementType type, boolean... booleans) {
