@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.gui.core.config.Position
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -391,5 +394,28 @@ object RenderUtils {
 
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Float): Double {
         return lastValue + (currentValue - lastValue) * multiplier
+    }
+
+    fun Position.renderString(string: String) {
+        if (string == "") return
+        val textToRender = "§f$string"
+
+        GlStateManager.pushMatrix()
+        val resolution = ScaledResolution(Minecraft.getMinecraft())
+
+        val renderer = Minecraft.getMinecraft().renderManager.fontRenderer
+
+        val offsetX = (200 - renderer.getStringWidth(textToRender.removeColor())) / 2
+
+        val x = getAbsX(resolution, 200) + offsetX
+        val y = getAbsY(resolution, 16)
+
+
+
+        GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
+        renderer.drawStringWithShadow(textToRender, 0f, 0f, 0)
+
+
+        GlStateManager.popMatrix()
     }
 }
