@@ -49,7 +49,7 @@ class BazaarOrderHelper {
 
             val rawName = itemName.split(if (isBuying) "BUY " else "SELL ")[1]
             val bazaarName = BazaarApi.getCleanBazaarName(rawName)
-            val data = BazaarApi.getBazaarDataForName(bazaarName)
+            val data = BazaarApi.getBazaarDataForName(bazaarName) ?: return
 
             val itemLore = stack.getLore()
             for (line in itemLore) {

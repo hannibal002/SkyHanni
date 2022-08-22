@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.bazaar
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import kotlin.concurrent.fixedRateTimer
 
@@ -114,14 +116,39 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
         //ESSENCE_CRIMSON
         return itemName ?: if (apiName.startsWith("ESSENCE_")) {
             val type = apiName.split("_")[1].firstLetterUppercase()
-            itemName = "$type Essence";
+            itemName = "$type Essence"
             itemNames[apiName] = itemName
             itemName
         } else {
-            //TODO need to re enable this later again
-            println("unknown bazaar item: '$apiName'")
-//            LorenzUtils.error("Bazaar item name is null for '$apiName'! Restart to fix this problem!")
-            null
+            if (apiName.startsWith("ENCHANTMENT_ULTIMATE_")) {
+                val enchantmentName = getEnchantmentRealName(apiName.split("_ULTIMATE_")[1])
+                itemNames[apiName] = enchantmentName
+                enchantmentName
+            } else if (apiName.startsWith("ENCHANTMENT_")) {
+                val enchantmentName = getEnchantmentRealName(apiName.split("ENCHANTMENT_")[1])
+                itemNames[apiName] = enchantmentName
+                enchantmentName
+            } else {
+                null
+            }
         }
+    }
+
+    private fun getEnchantmentRealName(rawName: String): String {
+        val builder = StringBuilder()
+        for (word in rawName.lowercase().split("_")) {
+            if (word.isInt()) {
+                builder.append(word.toInt().toRoman())
+            } else {
+                if (word in listOf("of", "the")) {
+                    builder.append(word)
+                } else {
+                    builder.append(word.firstLetterUppercase())
+                }
+            }
+            builder.append(" ")
+        }
+        val string = builder.toString()
+        return string.substring(0, string.length - 1)
     }
 }
