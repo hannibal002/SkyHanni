@@ -13,7 +13,7 @@ import java.util.regex.Pattern
 
 class CrimsonArmorTier {
 
-    private val armors = mutableListOf<String>()
+    private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
     private val STAR_FIND_PATCHER = Pattern.compile("(.*)§.✪(.*)")
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
@@ -42,8 +42,8 @@ class CrimsonArmorTier {
         try {
             val items = event.getConstant("Items")!!
             if (items.has("crimson_armors")) {
-                armors.clear()
-                armors.addAll(items.getAsJsonArray("crimson_armors").map { it.asString })
+                armorNames.clear()
+                armorNames.addAll(items.getAsJsonArray("crimson_armors").map { it.asString })
             }
 
             tiers.clear()
@@ -86,7 +86,7 @@ class CrimsonArmorTier {
 
     private fun getCrimsonNumber(fullName: String): Int {
         var name = fullName
-        if (armors.any { name.contains(it) } && armorParts.any { name.contains(it) }) {
+        if (armorNames.any { name.contains(it) } && armorParts.any { name.contains(it) }) {
             var gold = 0
             var pink = 0
             var aqua = 0
