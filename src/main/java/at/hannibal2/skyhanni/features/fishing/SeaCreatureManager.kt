@@ -31,23 +31,6 @@ class SeaCreatureManager {
             }
             LorenzUtils.debug("loaded $counter sea creatures from repo")
 
-//            seaCreatures.asJsonArray.map { it.asJsonObject }.forEach {
-//                val displayName = it["display_name"].asString
-//                val chatMessage = it["chat_message"].asString
-//                val fishingExperience = it["fishing_experience"].asInt
-//                val variantName = it["variant"].asString
-//                val special = it["special"].asBoolean
-//
-//                val variant = try {
-//                    FishingVariant.fromString(variantName)
-//                } catch (e: FishingVariantNotFoundException) {
-//                    LorenzUtils.error("Error loading Sea Creature '$displayName': " + e.message)
-//                    return
-//                }
-//
-//                seaCreatureMap[chatMessage] = SeaCreature(displayName, fishingExperience, variant, special)
-//            }
-
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
@@ -55,7 +38,7 @@ class SeaCreatureManager {
     }
 
     companion object {
-        val seaCreatureMap = mutableMapOf<String, SeaCreature>()
+        private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
 
         fun getSeaCreature(message: String): SeaCreature? {
             return seaCreatureMap.getOrDefault(message, null)

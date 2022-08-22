@@ -27,7 +27,8 @@ public class Inventory {
                     "\u00a7bDungeon Head Floor Number",
                     "\u00a7bNew Year Cake",
                     "\u00a7bPet Level",
-                    "\u00a7bMinion Tier"
+                    "\u00a7bMinion Tier",
+                    "\u00a7bCrimson Armor",
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>();
@@ -41,4 +42,10 @@ public class Inventory {
     @ConfigOption(name = "Anvil Combine Helper", desc = "Suggests the same item in the inventory when trying to combine two items in the anvil.")
     @ConfigEditorBoolean
     public boolean anvilCombineHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Crimson Armor Stars",
+            desc = "Show a compact star count in the item name for the Aurora, Crimson, Terror and Fervor armor")
+    @ConfigEditorBoolean
+    public boolean crimsonArmorStars = false;
 }
