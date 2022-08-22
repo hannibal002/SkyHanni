@@ -61,6 +61,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, abilities.ashfangNextResetCooldownPos);
             return;
         }
+
+        if (runnableId.equals("realTime")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.realTimePos);
+            return;
+        }
     }
 
     @Expose
