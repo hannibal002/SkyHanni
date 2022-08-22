@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.hasNameTagWith
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.entity.boss.EntityWither
@@ -266,6 +267,8 @@ class BossFinder {
                         return EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
                     }
                 }
+            }
+            if (entity is EntityLiving) {
                 if (entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
                     return EntityResult(bossType = BossType.DUMMY)
                 }
