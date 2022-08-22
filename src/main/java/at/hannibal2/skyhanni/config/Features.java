@@ -81,7 +81,7 @@ public class Features {
     public Inventory inventory = new Inventory();
 
     @Expose
-    @Category(name = "Abilitiies", desc = "Stuff about abilities")
+    @Category(name = "Abilities", desc = "Stuff about abilities")
     public Abilities abilities = new Abilities();
 
     @Expose
