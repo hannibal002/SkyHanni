@@ -7,10 +7,7 @@ import at.hannibal2.skyhanni.data.HypixelData;
 import at.hannibal2.skyhanni.data.ItemRenderBackground;
 import at.hannibal2.skyhanni.data.ScoreboardData;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
-import at.hannibal2.skyhanni.features.ButtonOnPause;
-import at.hannibal2.skyhanni.features.CurrentPetDisplay;
-import at.hannibal2.skyhanni.features.ExpBottleOnGroundHider;
-import at.hannibal2.skyhanni.features.SummoningSoulsName;
+import at.hannibal2.skyhanni.features.*;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
@@ -98,6 +95,7 @@ public class SkyHanniMod {
         registerEvent(new SummoningSoulsName());
         registerEvent(new AshfangGravityOrbs());
         registerEvent(new CrimsonArmorTier());
+        registerEvent(new RealTime());
 
         Commands.init();
 

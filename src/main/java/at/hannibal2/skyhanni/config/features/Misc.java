@@ -37,4 +37,14 @@ public class Misc {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
+
+    @Expose
+    @ConfigOption(name = "Real Time", desc = "Show the real time. Useful while playing in full screen mode")
+    @ConfigEditorBoolean
+    public boolean realTime = false;
+
+    @Expose
+    @ConfigOption(name = "Ashfang Freeze Position", desc = "")
+    @ConfigEditorButton(runnableId = "realTime", buttonText = "Edit")
+    public Position realTimePos = new Position(10, 10, false, true);
 }
