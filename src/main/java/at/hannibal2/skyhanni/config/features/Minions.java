@@ -7,13 +7,13 @@ public class Minions {
 
     @ConfigOption(name = "Last Clicked", desc = "")
     @ConfigEditorAccordion(id = 0)
-    public boolean lastMinion = false;
+    public boolean lastClickedMinion = false;
 
     @Expose
-    @ConfigOption(name = "Last Minion Display", desc = "Show the last opened minion on your island")
+    @ConfigOption(name = "Last Minion Display", desc = "Marks the location of the last clicked minion (even through walls)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean lastOpenedMinionDisplay = false;
+    public boolean lastClickedMinionDisplay = false;
 
     @Expose
     @ConfigOption(
@@ -50,7 +50,7 @@ public class Minions {
     @Expose
     @ConfigOption(
             name = "Emptied Time Distance",
-            desc = "At what distance is this text displayed"
+            desc = "At what distance is this display shown"
     )
     @ConfigEditorSlider(
             minValue = 3,
