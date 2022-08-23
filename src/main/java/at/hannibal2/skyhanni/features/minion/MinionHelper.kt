@@ -151,7 +151,7 @@ class MinionHelper {
                 val format = StringUtils.formatDuration(duration / 1000)
 
                 val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(0.0, 2.0, 0.0), text, true)
+                event.drawString(location.add(0.0, 2.0, 0.0), text)
             }
         }
     }
