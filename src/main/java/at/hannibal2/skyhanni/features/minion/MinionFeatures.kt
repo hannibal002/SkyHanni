@@ -144,14 +144,16 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != "Private Island") return
 
         val playerLocation = LocationUtils.playerLocation()
+        var playerEyeLocation = LocationUtils.playerEyeLocation()
         for (minion in minions) {
             val location = minion.key
             if (playerLocation.distance(location) < SkyHanniMod.feature.minions.emptiedTimeDistance) {
                 val duration = System.currentTimeMillis() - minion.value
                 val format = StringUtils.formatDuration(duration / 1000)
-
-                val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(0.0, 2.0, 0.0), text)
+                if (LocationUtils.canSee(playerEyeLocation, location)) {
+                    val text = "§eHopper Emptied: $format"
+                    event.drawString(location.add(0.0, 2.0, 0.0), text, true)
+                }
             }
         }
     }
@@ -164,7 +166,6 @@ class MinionFeatures {
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
-//        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
 
@@ -176,5 +177,3 @@ class MinionFeatures {
         }
     }
 }
-
-//
