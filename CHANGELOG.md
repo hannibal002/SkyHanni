@@ -1,4 +1,4 @@
-# SkyHanni Change Log
+# SkyHanni - Change Log
 
 ## Version 0.5 - Minions and RNG Meter
 

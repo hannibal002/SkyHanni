@@ -1,4 +1,4 @@
-# List of Features in SkyHanni
+# SkyHanni - List of all Features
 
 ##Minion
 - A display that shows the last time the hopper inside a minion has been emptied
