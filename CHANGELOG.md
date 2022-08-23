@@ -1,6 +1,6 @@
 # SkyHanni Change Log
 
-## Version 0.5
+## Version 0.5 - Minions and RNG Meter
 
 ### New Features
 - Added a display that shows the last time the hopper inside a minion has been emptied
