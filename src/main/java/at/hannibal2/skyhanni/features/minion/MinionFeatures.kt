@@ -8,15 +8,19 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
 
-class MinionHelper {
+class MinionFeatures {
 
     var lastClickedEntity: LorenzVec? = null
     var lastMinion: LorenzVec? = null
@@ -40,17 +44,13 @@ class MinionHelper {
         if (!LorenzUtils.inSkyblock) return
         if (LorenzUtils.skyBlockIsland != "Private Island") return
 
-        val minecraft = Minecraft.getMinecraft()
-        val buttonState = Mouse.getEventButtonState()
-        val eventButton = Mouse.getEventButton()
+        if (!Mouse.getEventButtonState()) return
+        if (Mouse.getEventButton() != 1) return
 
-        if (buttonState) {
-            if (eventButton == 1) {
-                val entity = minecraft.pointedEntity
-                if (entity != null) {
-                    lastClickedEntity = entity.getLorenzVec()
-                }
-            }
+        val minecraft = Minecraft.getMinecraft()
+        val entity = minecraft.pointedEntity
+        if (entity != null) {
+            lastClickedEntity = entity.getLorenzVec()
         }
     }
 
@@ -155,4 +155,26 @@ class MinionHelper {
             }
         }
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+        if (!LorenzUtils.inSkyblock) return
+        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (!SkyHanniMod.feature.minions.hideMobsNametagNearby) return
+
+        val entity = event.entity
+        if (entity !is EntityArmorStand) return
+//        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
+        if (!entity.hasCustomName()) return
+        if (entity.isDead) return
+
+        if (entity.customNameTag.contains("§c❤")) {
+            var loc = entity.getLorenzVec()
+            if (minions.any { it.key.distance(loc) < 5 }) {
+                event.isCanceled = true
+            }
+        }
+    }
 }
+
+//

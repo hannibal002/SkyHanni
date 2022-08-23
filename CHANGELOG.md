@@ -3,8 +3,9 @@
 ## Version 0.5
 
 ### New Features
-- Added a display that shows the last time the hopper inside a minion has been emptied
+- Added a display that shows the last time the hopper inside an minion has been emptied
 - Added marker to the location of the last clicked minion (even through walls)
+- Added option to hide mob nametags close to minions
 - Added showing stars on all items (not only dungeon and master stars but also crimson armors and cloaks)
 - Added a display timer that shows the real time
 
