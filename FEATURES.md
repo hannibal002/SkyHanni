@@ -56,7 +56,7 @@
 - Option to hide the default (or Skytils) damage splash around the damage indicator
 - Show the collected damage over time (literally the DPS) for the last few seconds
 
-#Misc
+## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
 - Hiding exp Bottles lying on the ground
