@@ -94,7 +94,7 @@ class HideNotClickableItems {
         val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
 
         val stack = event.itemStack
-        if (ItemUtils.getItemsInOpenChest().contains(stack)) return
+        if (ItemUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
         if (!ItemUtils.getItemsInInventory().contains(stack)) return
 
         if (hide(chestName, stack)) {
@@ -104,7 +104,7 @@ class HideNotClickableItems {
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
-                LorenzUtils.warning("Not hide reason for not clickable item!")
+                LorenzUtils.warning("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
             }

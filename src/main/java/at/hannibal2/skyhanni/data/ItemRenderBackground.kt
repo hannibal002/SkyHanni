@@ -12,16 +12,16 @@ class ItemRenderBackground {
 
     companion object {
 
-        val map = mutableMapOf<ItemStack, Int>()
-        val mapTime = mutableMapOf<ItemStack, Long>()
+        private val mapColor = mutableMapOf<ItemStack, Int>()
+        private val mapTime = mutableMapOf<ItemStack, Long>()
 
         var ItemStack.background: Int
             get() {
                 if (System.currentTimeMillis() > mapTime.getOrDefault(this, 0) + 200) return -1
-                return map.getOrDefault(this, -1)
+                return mapColor.getOrDefault(this, -1)
             }
             set(value) {
-                map[this] = value
+                mapColor[this] = value
                 mapTime[this] = System.currentTimeMillis()
             }
     }

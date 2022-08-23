@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorDraggableList;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -48,4 +46,26 @@ public class Inventory {
             desc = "Show a compact star count in the item name for all items")
     @ConfigEditorBoolean
     public boolean itemStars = false;
+
+    @ConfigOption(name = "RNG Meter", desc = "")
+    @ConfigEditorAccordion(id = 0)
+    public boolean rngMeter = false;
+
+    @Expose
+    @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean rngMeterFloorName = false;
+
+    @Expose
+    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean rngMeterNoDrop = false;
+
+    @Expose
+    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs oder slayer rng meter inventory")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean rngMeterSelectedDrop = false;
 }

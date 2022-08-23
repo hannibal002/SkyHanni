@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.opengl.GL11
 
 class AnvilCombineHelper {
 
@@ -46,10 +44,6 @@ class AnvilCombineHelper {
             }
         }
 
-        val lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)
-        GlStateManager.disableLighting()
-        GlStateManager.color(1f, 1f, 1f, 1f)
-
         if (matchLore.isEmpty()) return
 
         for (slot in chest.inventorySlots) {
@@ -75,8 +69,6 @@ class AnvilCombineHelper {
 ////                slot highlight LorenzColor.YELLOW
 ////            }
 //            }
-
-            if (lightingState) GlStateManager.enableLighting()
         }
     }
 }
