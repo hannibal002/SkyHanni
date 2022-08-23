@@ -42,7 +42,7 @@ public class Minions {
     public boolean emptiedTime = false;
 
     @Expose
-    @ConfigOption(name = "Emptied Time Display", desc = "Show the time when the hopper in the minion was last empties")
+    @ConfigOption(name = "Emptied Time Display", desc = "Show the time when the hopper in the minion was last emptied")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean emptiedTimeDisplay = false;
