@@ -167,7 +167,7 @@ class DamageIndicatorManager {
             }
 
             if (now > damageCounter.firstTick + 1_000) {
-                damageCounter.oldDamages.add(OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing))
+                damageCounter.oldDamages.add(0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing))
                 damageCounter.firstTick = 0L
                 damageCounter.currentDamage = 0
                 damageCounter.currentHealing = 0
