@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -68,7 +68,7 @@ class RngMeterInventory {
 
         if (SkyHanniMod.feature.inventory.rngMeterNoDrop) {
             if (chestName == "Catacombs RNG Meter") {
-                for (slot in ItemUtils.getItemsInOpenChest()) {
+                for (slot in InventoryUtils.getItemsInOpenChest()) {
                     val stack = slot.stack
                     if (stack.getLore().any { it.contains("You don't have an RNG drop") }) {
                         slot highlight LorenzColor.RED
@@ -82,7 +82,7 @@ class RngMeterInventory {
 
         if (SkyHanniMod.feature.inventory.rngMeterSelectedDrop) {
             if (chestName.endsWith(" RNG Meter")) {
-                for (slot in ItemUtils.getItemsInOpenChest()) {
+                for (slot in InventoryUtils.getItemsInOpenChest()) {
                     val stack = slot.stack
                     if (stack.getLore().any { it.contains("§aSELECTED") }) {
                         slot highlight LorenzColor.YELLOW

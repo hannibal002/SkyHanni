@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.gui.core.config.Position;
 import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
@@ -64,4 +65,20 @@ public class Minions {
     @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions")
     @ConfigEditorBoolean
     public boolean hideMobsNametagNearby = false;
+
+    @ConfigOption(name = "Hopper Profit", desc = "")
+    @ConfigEditorAccordion(id = 2)
+    public boolean hopperProfit = false;
+
+    @Expose
+    @ConfigOption(name = "Hopper Profit Display", desc = "Using the held coins and the last empty time to calculate the coins a hopper collects in a day")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean hopperProfitDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Best Sell Method Position", desc = "")
+    @ConfigEditorButton(runnableId = "hopperProfitDisplay", buttonText = "Edit")
+    @ConfigAccordionId(id = 2)
+    public Position hopperProfitPos = new Position(10, 10, false, true);
 }
