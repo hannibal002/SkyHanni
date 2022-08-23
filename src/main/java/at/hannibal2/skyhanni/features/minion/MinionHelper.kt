@@ -58,7 +58,7 @@ class MinionHelper {
     fun onRenderLastClickedMinion(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyblock) return
         if (LorenzUtils.skyBlockIsland != "Private Island") return
-        if (!SkyHanniMod.feature.minions.lastOpenedMinionDisplay) return
+        if (!SkyHanniMod.feature.minions.lastClickedMinionDisplay) return
 
         val special = SkyHanniMod.feature.minions.lastOpenedMinionColor
         val color = Color(SpecialColour.specialToChromaRGB(special), true)
