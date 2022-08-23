@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import com.google.gson.JsonObject
 import java.io.BufferedReader
 
@@ -38,5 +38,5 @@ enum class OtherMod(val modName: String, val configPath: String, val readKey: (B
 }
 
 fun getJson(reader: BufferedReader): JsonObject {
-    return SkyHanniMod.gson.fromJson(reader, com.google.gson.JsonObject::class.java)
+    return ConfigManager.gson.fromJson(reader, com.google.gson.JsonObject::class.java)
 }

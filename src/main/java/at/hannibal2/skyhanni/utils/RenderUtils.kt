@@ -240,7 +240,7 @@ object RenderUtils {
         tessellator.draw()
     }
 
-    fun RenderWorldLastEvent.drawString(location: LorenzVec, text: String, seeThroughBlocks: Boolean = false) {
+    fun RenderWorldLastEvent.drawString(location: LorenzVec, text: String, seeThroughBlocks: Boolean = false, color: Color? = null) {
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.pushMatrix()
         val viewer = Minecraft.getMinecraft().renderViewEntity
@@ -263,6 +263,10 @@ object RenderUtils {
 
         GlStateManager.translate(x, y, z)
         GlStateManager.translate(0f, viewer.eyeHeight, 0f)
+        val c = color
+        if (c != null) {
+            GlStateManager.color(c.red.toFloat(), c.green.toFloat(), c.blue.toFloat())
+        }
         drawNametag(text)
         GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewX, 1.0f, 0.0f, 0.0f)

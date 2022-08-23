@@ -16,14 +16,17 @@ object GriffinUtils {
         GriffinJavaUtils.drawWaypoint(location, partialTicks, color.toColor(), beacon)
     }
 
-    fun RenderWorldLastEvent.drawWaypointFilled(location: LorenzVec, color: Color, beacon: Boolean = false) {
+    fun RenderWorldLastEvent.drawWaypointFilled(location: LorenzVec, color: Color, seeThroughBlocks: Boolean = false, beacon: Boolean = false) {
         val (viewerX, viewerY, viewerZ) = RenderUtils.getViewerPos(partialTicks)
         val x = location.x - viewerX
         val y = location.y - viewerY
         val z = location.z - viewerZ
         val distSq = x * x + y * y + z * z
-        GlStateManager.disableDepth()
-        GlStateManager.disableCull()
+
+        if (seeThroughBlocks) {
+            GlStateManager.disableDepth()
+            GlStateManager.disableCull()
+        }
         RenderUtils.drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
             color,
@@ -33,8 +36,11 @@ object GriffinUtils {
         if (distSq > 5 * 5 && beacon) RenderUtils.renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
-        GlStateManager.enableDepth()
-        GlStateManager.enableCull()
+
+        if (seeThroughBlocks) {
+            GlStateManager.enableDepth()
+            GlStateManager.enableCull()
+        }
     }
 
     fun RenderWorldLastEvent.draw3DLine(
