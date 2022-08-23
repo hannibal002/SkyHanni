@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.opengl.GL11
 
 class BazaarOrderHelper {
 
@@ -29,11 +27,7 @@ class BazaarOrderHelper {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
         val inventoryName = chest.lowerChestInventory.displayName.unformattedText.trim()
-
         if (!isBazaarOrderInventory(inventoryName)) return
-        val lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)
-        GlStateManager.disableLighting()
-        GlStateManager.color(1f, 1f, 1f, 1f)
 
         out@ for (slot in chest.inventorySlots) {
             if (slot == null) continue
@@ -71,7 +65,5 @@ class BazaarOrderHelper {
                 }
             }
         }
-
-        if (lightingState) GlStateManager.enableLighting()
     }
 }

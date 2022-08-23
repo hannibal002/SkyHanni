@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.fishing.TrophyFishMessages;
 import at.hannibal2.skyhanni.features.items.HideNotClickableItems;
 import at.hannibal2.skyhanni.features.items.ItemDisplayOverlayFeatures;
 import at.hannibal2.skyhanni.features.items.ItemStars;
+import at.hannibal2.skyhanni.features.items.RngMeterInventory;
 import at.hannibal2.skyhanni.features.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown;
@@ -91,6 +92,7 @@ public class SkyHanniMod {
         registerEvent(new ItemStars());
         registerEvent(new MinionFeatures());
         registerEvent(new RealTime());
+        registerEvent(new RngMeterInventory());
 
         Commands.init();
 

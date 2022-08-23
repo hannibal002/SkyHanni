@@ -7,6 +7,7 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
+import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.util.Constants
 import java.util.*
@@ -16,8 +17,8 @@ object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun getItemsInOpenChest(): List<ItemStack> {
-        val list = mutableListOf<ItemStack>()
+    fun getItemsInOpenChest(): List<Slot> {
+        val list = mutableListOf<Slot>()
         val guiChest = Minecraft.getMinecraft().currentScreen as GuiChest
         val inventorySlots = guiChest.inventorySlots.inventorySlots
         val skipAt = inventorySlots.size - 9 * 4
@@ -25,7 +26,7 @@ object ItemUtils {
         for (slot in inventorySlots) {
             val stack = slot.stack
             if (stack != null) {
-                list.add(stack)
+                list.add(slot)
             }
             i++
             if (i == skipAt) break

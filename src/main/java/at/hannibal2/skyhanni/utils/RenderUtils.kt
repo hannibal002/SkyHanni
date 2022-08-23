@@ -28,6 +28,11 @@ object RenderUtils {
     }
 
     infix fun Slot.highlight(color: Color) {
+        val lightingState = GL11.glIsEnabled(GL11.GL_LIGHTING)
+
+        GlStateManager.disableLighting()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
         Gui.drawRect(
@@ -38,6 +43,8 @@ object RenderUtils {
             color.rgb
         )
         GlStateManager.popMatrix()
+
+        if (lightingState) GlStateManager.enableLighting()
     }
 
     fun RenderWorldLastEvent.drawColor(location: LorenzVec, color: LorenzColor, beacon: Boolean = false) {
