@@ -6,6 +6,7 @@
     "MixinNetworkManager",
     "MixinNetHandlerPlayClient",
     "MixinRenderItem",
+    "AccessorGuiPlayerTabOverlay",
     "MixinRenderManager",
     "gui.MixinGuiContainer",
     "gui.inventory.GuiEditSignMixin",

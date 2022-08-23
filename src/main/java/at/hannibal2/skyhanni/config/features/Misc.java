@@ -44,7 +44,7 @@ public class Misc {
     public boolean realTime = false;
 
     @Expose
-    @ConfigOption(name = "Ashfang Freeze Position", desc = "")
+    @ConfigOption(name = "Real Time Position", desc = "")
     @ConfigEditorButton(runnableId = "realTime", buttonText = "Edit")
     public Position realTimePos = new Position(10, 10, false, true);
 }

@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.LocationChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.event.world.WorldEvent
@@ -17,6 +19,7 @@ class HypixelData {
         var hypixel = false
         var skyblock = false
         var dungeon = false
+        var mode: String = ""
     }
 
     @SubscribeEvent
@@ -74,21 +77,46 @@ class HypixelData {
         }
     }
 
-    var timerTick = 0
+    var tick = 0
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!hypixel) return
         if (event.phase != TickEvent.Phase.START) return
 
-        timerTick++
+        tick++
 
-        if (timerTick % 5 != 0) return
+        if (tick % 5 != 0) return
 
         val newState = checkScoreboard()
-        if (newState == skyblock) return
+        if (newState) {
+            checkMode()
+        }
 
+        if (newState == skyblock) return
         skyblock = newState
+    }
+
+    private fun checkMode() {
+        var location = ""
+        var guesting = false
+        for (line in TabListUtils.getTabList()) {
+            if (line.startsWith("§r§b§lArea: ")) {
+                location = line.split(": ")[1].removeColor()
+            }
+            if (line == "§r Status: §r§9Guest§r") {
+                guesting = true
+            }
+        }
+        if (guesting) {
+            location = "$location guesting"
+        }
+
+        if (mode != location) {
+            LocationChangeEvent(location, mode).postAndCatch()
+            println("SkyHanni location change: '$location'")
+            mode = location
+        }
     }
 
     private fun checkScoreboard(): Boolean {

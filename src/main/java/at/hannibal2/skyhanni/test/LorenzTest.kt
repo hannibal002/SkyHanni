@@ -37,7 +37,17 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
-            togglePacketLog = !togglePacketLog
+//            togglePacketLog = !togglePacketLog
+
+//            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
+//                .split("\n")) {
+//                println("footer: '$line'")
+//            }
+//
+//
+//            for (line in TabListUtils.getTabList()) {
+//                println("tablist: '$line'")
+//            }
         }
     }
 

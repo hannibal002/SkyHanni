@@ -77,5 +77,15 @@ public class Commands {
                         }
                 )
         );
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "shconfigsave",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                SkyHanniMod.configManager.saveConfig();
+                            }
+                        }
+                )
+        );
     }
 }

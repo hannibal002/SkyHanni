@@ -20,6 +20,9 @@ object LorenzUtils {
     val inDungeons: Boolean
         get() = inSkyblock && HypixelData.dungeon
 
+    val skyBlockIsland: String
+        get() = HypixelData.mode
+
     const val DEBUG_PREFIX = "[Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
 

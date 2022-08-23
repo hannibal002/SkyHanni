@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni;
 
+import at.hannibal2.skyhanni.config.ConfigManager;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
 import at.hannibal2.skyhanni.data.ApiKeyGrabber;
@@ -30,8 +31,6 @@ import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown;
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangGravityOrbs;
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown;
 import at.hannibal2.skyhanni.test.LorenzTest;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,9 +40,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
 @Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION)
 public class SkyHanniMod {
 
@@ -51,12 +47,9 @@ public class SkyHanniMod {
     public static final String VERSION = "0.4.2";
 
     public static Features feature;
-    private File configFile;
 
-    public static final Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
-
-    public static File configDirectory;
     public static RepoManager repo;
+    public static ConfigManager configManager;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -104,29 +97,12 @@ public class SkyHanniMod {
         registerEvent(new LorenzTest());
         registerEvent(new ButtonOnPause());
 
-        configDirectory = new File("config/skyhanni");
-        try {
-            //noinspection ResultOfMethodCallIgnored
-            configDirectory.mkdir();
-        } catch (Exception ignored) {
-        }
+        configManager = new ConfigManager(this);
+        configManager.firstLoad();
 
-        configFile = new File(configDirectory, "config.json");
+        Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
 
-        if (configFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
-                feature = gson.fromJson(reader, Features.class);
-            } catch (Exception ignored) {
-            }
-        }
-
-        if (feature == null) {
-            feature = new Features();
-            saveConfig();
-        }
-        Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
-
-        repo = new RepoManager(configDirectory);
+        repo = new RepoManager(configManager.getConfigDirectory());
         repo.loadRepoInformation();
     }
 
@@ -137,18 +113,6 @@ public class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(object);
         long duration = System.currentTimeMillis() - start;
         System.out.println("Done after " + duration + " ms!");
-    }
-
-    public void saveConfig() {
-        try {
-            //noinspection ResultOfMethodCallIgnored
-            configFile.createNewFile();
-
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
-                writer.write(gson.toJson(feature));
-            }
-        } catch (IOException ignored) {
-        }
     }
 
     public static GuiScreen screenToOpen = null;

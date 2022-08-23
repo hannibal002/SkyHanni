@@ -69,6 +69,11 @@ data class LorenzVec(
         return sqrt(x * x + y * y + z * z)
     }
 
+    //TODO make this class json serializable
+    fun encodeToString(): String {
+        return "$x:$y:$z"
+    }
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
@@ -78,6 +83,15 @@ data class LorenzVec(
             val y = sin(pitch) * sin(yaw)
             val z = cos(pitch)
             return LorenzVec(x, z, y)
+        }
+
+        //TODO make this class json serializable
+        fun decodeFromString(string: String): LorenzVec {
+            val split = string.split(":")
+            val x = split[0].toDouble()
+            val y = split[1].toDouble()
+            val z = split[2].toDouble()
+            return LorenzVec(x, y, z)
         }
     }
 }
