@@ -19,7 +19,7 @@ import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
 import java.util.*
 
-class BossFinder {
+class MobFinder {
 
     //F1
     private var floor1bonzo1 = false

@@ -33,20 +33,20 @@ import kotlin.math.max
 class DamageIndicatorManager {
 
     var data = mutableMapOf<UUID, EntityData>()
-    private var bossFinder: BossFinder? = null
+    private var mobFinder: MobFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
     private val maxHealth = mutableMapOf<UUID, Int>()
     private val damagePattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
-        bossFinder = BossFinder()
+        mobFinder = MobFinder()
         data.clear()
     }
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatMessage(event: LorenzChatEvent) {
-        bossFinder?.handleChat(event.message)
+        mobFinder?.handleChat(event.message)
     }
 
     @SubscribeEvent
@@ -516,7 +516,7 @@ class DamageIndicatorManager {
     private fun grabData(entity: EntityLivingBase): EntityData? {
         if (data.contains(entity.uniqueID)) return data[entity.uniqueID]
 
-        val entityResult = bossFinder?.tryAdd(entity) ?: return null
+        val entityResult = mobFinder?.tryAdd(entity) ?: return null
         return EntityData(
             entity,
             entityResult.ignoreBlocks,
@@ -542,7 +542,7 @@ class DamageIndicatorManager {
 
     @SubscribeEvent
     fun onEntityJoin(event: EntityJoinWorldEvent) {
-        bossFinder?.handleNewEntity(event.entity)
+        mobFinder?.handleNewEntity(event.entity)
     }
 
     private val dummyDamageCache = mutableListOf<UUID>()

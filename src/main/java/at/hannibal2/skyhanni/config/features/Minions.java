@@ -59,4 +59,9 @@ public class Minions {
     )
     @ConfigAccordionId(id = 1)
     public int emptiedTimeDistance = 10;
+
+    @Expose
+    @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions")
+    @ConfigEditorBoolean
+    public boolean hideMobsNametagNearby = false;
 }

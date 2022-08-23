@@ -24,7 +24,8 @@ public class Misc {
     public boolean hideExpBottles = false;
 
     @Expose
-    @ConfigOption(name = "Summon Soul Display", desc = "Shows the name above summoning souls that ready to pick up. §cNot working in Dungeon if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
+    @ConfigOption(name = "Summon Soul Display", desc = "Shows the name above summoning souls that ready to pick up. " +
+            "§cNot working in Dungeon if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
     @ConfigEditorBoolean
     public boolean summonSoulDisplay = false;
 
