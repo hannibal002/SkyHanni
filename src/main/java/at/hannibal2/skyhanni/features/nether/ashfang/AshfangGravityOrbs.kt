@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
@@ -40,13 +41,15 @@ class AshfangGravityOrbs {
 
         val color = Color(SpecialColour.specialToChromaRGB(special), true)
 
-        val playerEyeLocation = LocationUtils.playerEyeLocation()
+        val playerLocation = LocationUtils.playerLocation()
         for (orb in orbs) {
             if (orb.isDead) continue
             val orbLocation = orb.getLorenzVec()
-            if (!LocationUtils.canSee(playerEyeLocation, orbLocation.add(0.0, 2.0, 0.0))) continue
-
             event.drawWaypointFilled(orbLocation.add(-0.5, 1.25, -0.5), color)
+            if (orbLocation.distance(playerLocation) < 15) {
+                //TODO find way to dynamically change color
+                event.drawString(orbLocation.add(0.0, 2.5, 0.0), "§cGravity Orb")
+            }
         }
     }
 

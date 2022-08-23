@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinJavaUtils
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.getNameTagWith
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
@@ -94,12 +97,9 @@ class SummoningSoulsName {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
 
-        val playerLocation = LocationUtils.playerEyeLocation()
         for ((entity, name) in souls) {
             val vec = entity.getLorenzVec()
-            if (LocationUtils.canSee(playerLocation, vec.add(0.0, 2.0, 0.0))) {
-                event.drawString(vec.add(0.0, 2.5, 0.0), name, true)
-            }
+            event.drawString(vec.add(0.0, 2.5, 0.0), name)
         }
     }
 

@@ -240,7 +240,12 @@ object RenderUtils {
         tessellator.draw()
     }
 
-    fun RenderWorldLastEvent.drawString(location: LorenzVec, text: String, seeThroughBlocks: Boolean = false, color: Color? = null) {
+    fun RenderWorldLastEvent.drawString(
+        location: LorenzVec,
+        text: String,
+        seeThroughBlocks: Boolean = false,
+        color: Color? = null,
+    ) {
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.pushMatrix()
         val viewer = Minecraft.getMinecraft().renderViewEntity
@@ -263,11 +268,7 @@ object RenderUtils {
 
         GlStateManager.translate(x, y, z)
         GlStateManager.translate(0f, viewer.eyeHeight, 0f)
-        val c = color
-        if (c != null) {
-            GlStateManager.color(c.red.toFloat(), c.green.toFloat(), c.blue.toFloat())
-        }
-        drawNametag(text)
+        drawNametag(text, color)
         GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.translate(0f, -0.25f, 0f)
@@ -287,7 +288,7 @@ object RenderUtils {
     /**
      * @author Mojang
      */
-    fun drawNametag(str: String?) {
+    fun drawNametag(str: String, color: Color?) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         val f1 = 0.02666667f
         GlStateManager.pushMatrix()
@@ -316,7 +317,8 @@ object RenderUtils {
         worldrenderer.pos((j + 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
         tessellator.draw()
         GlStateManager.enableTexture2D()
-        fontRenderer.drawString(str, -j, i, 553648127)
+        val colorCode = color?.rgb ?: 553648127
+        fontRenderer.drawString(str, -j, i, colorCode)
         GlStateManager.depthMask(true)
         fontRenderer.drawString(str, -j, i, -1)
         GlStateManager.enableBlend()
