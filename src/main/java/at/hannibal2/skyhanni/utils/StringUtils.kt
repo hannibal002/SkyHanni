@@ -52,20 +52,16 @@ object StringUtils {
         val formatSeconds = durationFormat.format(sec)
 
         if (days > 0) {
-            return "" + days + "d " + formatHours + ":" + formatMinutes + ":" + formatSeconds
+            return "${days}d $formatHours:$formatMinutes:$formatSeconds ago"
         }
         if (hours > 0) {
-            return "$formatHours:$formatMinutes:$formatSeconds"
+            return "$formatHours:$formatMinutes:$formatSeconds ago"
         }
         if (minutes > 0) {
-            return "$formatMinutes:$formatSeconds"
+            return "$formatMinutes:$formatSeconds ago"
         }
         if (sec > 0) {
-            return if (sec == 1L) {
-                "$formatSeconds second"
-            } else {
-                "$formatSeconds seconds"
-            }
+            return "${sec}s ago"
         }
 
         return "Now"
