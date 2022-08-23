@@ -66,6 +66,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, misc.realTimePos);
             return;
         }
+
+        if (runnableId.equals("hopperProfitDisplay")) {
+            editOverlay(activeConfigCategory, 200, 16, minions.hopperProfitPos);
+            return;
+        }
     }
 
     @Expose

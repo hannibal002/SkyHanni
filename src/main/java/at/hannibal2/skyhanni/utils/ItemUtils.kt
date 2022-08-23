@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Items
-import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.util.Constants
 import java.util.*
@@ -17,30 +15,10 @@ object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun getItemsInOpenChest(): List<Slot> {
-        val list = mutableListOf<Slot>()
-        val guiChest = Minecraft.getMinecraft().currentScreen as GuiChest
-        val inventorySlots = guiChest.inventorySlots.inventorySlots
-        val skipAt = inventorySlots.size - 9 * 4
-        var i = 0
-        for (slot in inventorySlots) {
-            val stack = slot.stack
-            if (stack != null) {
-                list.add(slot)
-            }
-            i++
-            if (i == skipAt) break
-        }
-        return list
-    }
-
     fun isSack(name: String): Boolean = name.endsWith(" Sack")//TODO change
 
-    fun ItemStack.getLore() = getLoree(this)
-
-
-    fun getLoree(`is`: ItemStack): List<String> {
-        val tagCompound = `is`.tagCompound ?: return emptyList()
+    fun ItemStack.getLore(): List<String> {
+        val tagCompound = this.tagCompound ?: return emptyList()
         val tagList = tagCompound.getCompoundTag("display").getTagList("Lore", 8)
         val list: MutableList<String> = ArrayList()
         for (i in 0 until tagList.tagCount()) {

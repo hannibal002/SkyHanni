@@ -5,11 +5,16 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -30,6 +35,7 @@ class MinionFeatures {
     var lastCoinsRecived = 0L
     var lastMinionPickedUp = 0L
     val minions = mutableMapOf<LorenzVec, Long>()
+    var coinsPerDay = ""
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -103,6 +109,45 @@ class MinionFeatures {
                 }
             }
         }
+
+        if (SkyHanniMod.feature.minions.hopperProfitDisplay) {
+            coinsPerDay = if (minionInventoryOpen) {
+                updateCoinsPerDay()
+            } else {
+                ""
+            }
+        }
+    }
+
+    private fun updateCoinsPerDay(): String {
+        val loc = lastMinion!!
+        val slot = InventoryUtils.getItemsInOpenChest().find { it.slotNumber == 28 } ?: return ""
+
+        val stack = slot.stack
+        val line = stack.getLore().find { it.contains("Held Coins") } ?: return ""
+
+        if (coinsPerDay != "") return coinsPerDay
+
+        val lastClicked = minions.getOrDefault(loc, -1)
+        if (lastClicked == -1L) {
+            return "Can't calculate coins/day: No time data available!"
+        }
+        val duration = System.currentTimeMillis() - lastClicked
+
+//        println("line: '$line'")
+        //§7Held Coins: §b151,389
+        val coins = line.split(": §b")[1].replace(",", "").toDouble()
+
+        println(" ")
+        println("coins: $coins")
+        println("duration: $duration")
+
+        val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
+        println("coinsPerDay: $coinsPerDay")
+
+        val format = formatInteger(coinsPerDay.toInt())
+        val hopperName = stack.name
+        return "§7Coins/day with $hopperName§7: §6$format coins"
     }
 
     private fun saveConfig() {
@@ -144,7 +189,7 @@ class MinionFeatures {
         if (LorenzUtils.skyBlockIsland != "Private Island") return
 
         val playerLocation = LocationUtils.playerLocation()
-        var playerEyeLocation = LocationUtils.playerEyeLocation()
+        val playerEyeLocation = LocationUtils.playerEyeLocation()
         for (minion in minions) {
             val location = minion.key
             if (playerLocation.distance(location) < SkyHanniMod.feature.minions.emptiedTimeDistance) {
@@ -170,10 +215,17 @@ class MinionFeatures {
         if (entity.isDead) return
 
         if (entity.customNameTag.contains("§c❤")) {
-            var loc = entity.getLorenzVec()
+            val loc = entity.getLorenzVec()
             if (minions.any { it.key.distance(loc) < 5 }) {
                 event.isCanceled = true
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (SkyHanniMod.feature.minions.hopperProfitDisplay) {
+            SkyHanniMod.feature.minions.hopperProfitPos.renderString(coinsPerDay)
         }
     }
 }

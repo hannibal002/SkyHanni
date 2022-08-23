@@ -94,7 +94,7 @@ class HideNotClickableItems {
         val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
 
         val stack = event.itemStack
-        if (ItemUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
+        if (InventoryUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
         if (!ItemUtils.getItemsInInventory().contains(stack)) return
 
         if (hide(chestName, stack)) {
