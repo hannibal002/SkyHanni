@@ -103,7 +103,11 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 0.0
             }
 
-            val itemName = getItemName(apiName) ?: continue
+            val itemName = getItemName(apiName)
+            if (itemName == null) {
+                LorenzUtils.warning("§c[SkyHanni] bazaar item '$apiName' not found! Try restarting your minecraft to fix this.")
+                continue
+            }
             val data = BazaarData(apiName, itemName, sellPrice, buyPrice)
             bazaarMap[itemName] = data
         }
