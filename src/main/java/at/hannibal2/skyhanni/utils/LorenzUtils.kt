@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
@@ -18,7 +19,7 @@ object LorenzUtils {
         get() = isOnHypixel && HypixelData.skyblock
 
     val inDungeons: Boolean
-        get() = inSkyblock && HypixelData.dungeon
+        get() = inSkyblock && DungeonData.inDungeon()
 
     val skyBlockIsland: String
         get() = HypixelData.mode

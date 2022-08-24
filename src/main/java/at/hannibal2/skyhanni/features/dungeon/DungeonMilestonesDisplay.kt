@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
@@ -78,7 +78,7 @@ class DungeonMilestonesDisplay {
     }
 
     @SubscribeEvent
-    fun onDungeonStart(event: DungeonEnterEvent) {
+    fun onDungeonStart(event: DungeonStartEvent) {
         currentMilestone = 0
         update()
     }

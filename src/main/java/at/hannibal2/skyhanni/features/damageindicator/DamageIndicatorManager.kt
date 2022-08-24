@@ -36,7 +36,10 @@ class DamageIndicatorManager {
     private var mobFinder: MobFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
     private val maxHealth = mutableMapOf<UUID, Int>()
-    private val damagePattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
+
+    companion object {
+        val damagePattern: Pattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
+    }
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {

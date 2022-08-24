@@ -72,16 +72,17 @@ public class SkyHanniMod {
         registerEvent(new PlayerChatFilter());
         registerEvent(new DungeonChatFilter());
         registerEvent(new HideNotClickableItems());
-        registerEvent(new DungeonHighlightClickedBlocks());
         registerEvent(new ItemDisplayOverlayFeatures());
         registerEvent(new CurrentPetDisplay());
         registerEvent(new ExpBottleOnGroundHider());
         registerEvent(new DamageIndicatorManager());
         registerEvent(new ItemAbilityCooldown());
+        registerEvent(new DungeonHighlightClickedBlocks());
         registerEvent(new DungeonMilestonesDisplay());
         registerEvent(new DungeonDeathCounter());
         registerEvent(new DungeonCleanEnd());
         registerEvent(new DungeonBossMessages());
+        registerEvent(new DungeonBossHideDamageSplash());
         registerEvent(new TrophyFishMessages());
         registerEvent(new BazaarBestSellMethod());
         registerEvent(new AnvilCombineHelper());

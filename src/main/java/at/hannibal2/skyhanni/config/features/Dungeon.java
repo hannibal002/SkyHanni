@@ -59,4 +59,9 @@ public class Dungeon {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean cleanEndF3IgnoreGuardians = false;
+
+    @Expose
+    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room (fixing Skytils feature)")
+    @ConfigEditorBoolean
+    public boolean damageSplashBoss = false;
 }

@@ -5,6 +5,7 @@
 ### New Features
 - /wiki command (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - Added Ashfang Blazing Souls display
+- Added hiding damage splashes while inside the boss room (fixing Skytils feature)
 
 ### Minor Changes
 - Optimizing the highlight block size for minions, blazing souls and gravity orbs
