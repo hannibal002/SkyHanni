@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.test.command
 
-import at.hannibal2.skyhanni.config.gui.utils.Utils
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import net.minecraft.client.Minecraft
 
 object CopyItemCommand {
@@ -38,7 +38,7 @@ object CopyItemCommand {
             }
 
             val string = resultList.joinToString("\n")
-            Utils.copyToClipboard(string)
+            OSUtils.copyToClipboard(string)
             LorenzUtils.debug("item info printed!")
             LorenzUtils.chat("§e[SkyHanni] item info copied into the clipboard!")
         } catch (_: Throwable) {

@@ -1,15 +1,10 @@
 package at.hannibal2.skyhanni.config.gui.core.config.gui;
 
-import static at.hannibal2.skyhanni.config.gui.GuiTextures.DELETE;
-import static at.hannibal2.skyhanni.config.gui.GuiTextures.button_tex;
-
 import at.hannibal2.skyhanni.config.gui.core.config.struct.ConfigProcessor;
 import at.hannibal2.skyhanni.config.gui.core.util.lerp.LerpUtils;
 import at.hannibal2.skyhanni.config.gui.core.util.render.RenderUtils;
 import at.hannibal2.skyhanni.config.gui.core.util.render.TextRenderUtils;
-import at.hannibal2.skyhanni.config.gui.utils.Utils;
-import java.util.ArrayList;
-import java.util.List;
+import at.hannibal2.skyhanni.config.gui.utils.ConfigUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -18,6 +13,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static at.hannibal2.skyhanni.config.gui.GuiTextures.DELETE;
+import static at.hannibal2.skyhanni.config.gui.GuiTextures.button_tex;
 
 public class GuiOptionEditorDraggableList extends GuiOptionEditor {
 
@@ -72,7 +73,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
             GlStateManager.color(1, greenBlue, greenBlue, 1);
         }
         Minecraft.getMinecraft().getTextureManager().bindTexture(DELETE);
-        Utils.drawTexturedRect(x + width / 6 + 27, y + 45 - 7 - 13, 11, 14, GL11.GL_NEAREST);
+        ConfigUtils.drawTexturedRect(x + width / 6 + 27, y + 45 - 7 - 13, 11, 14, GL11.GL_NEAREST);
 
         Gui.drawRect(x + 5, y + 45, x + width - 5, y + height - 5, 0xffdddddd);
         Gui.drawRect(x + 6, y + 46, x + width - 6, y + height - 6, 0xff000000);
@@ -89,7 +90,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
             if (i++ != dragStartIndex) {
                 for (int multilineIndex = 0; multilineIndex < multilines.length; multilineIndex++) {
                     String line = multilines[multilineIndex];
-                    Utils.drawStringScaledMaxWidth(line + EnumChatFormatting.RESET, Minecraft.getMinecraft().fontRendererObj, x + 20, y + 50 + yOff + multilineIndex * 10, true, width - 20, 0xffffffff);
+                    ConfigUtils.drawStringScaledMaxWidth(line + EnumChatFormatting.RESET, Minecraft.getMinecraft().fontRendererObj, x + 20, y + 50 + yOff + multilineIndex * 10, true, width - 20, 0xffffffff);
                 }
                 Minecraft.getMinecraft().fontRendererObj.drawString("\u2261", x + 10, y + 50 + yOff + ySize / 2 - 4, 0xffffff, true);
             }
@@ -157,7 +158,7 @@ public class GuiOptionEditorDraggableList extends GuiOptionEditor {
             GlStateManager.enableBlend();
             for (int multilineIndex = 0; multilineIndex < multilines.length; multilineIndex++) {
                 String line = multilines[multilineIndex];
-                Utils.drawStringScaledMaxWidth(line + EnumChatFormatting.RESET, Minecraft.getMinecraft().fontRendererObj, dragOffsetX + mouseX + 10, dragOffsetY + mouseY + multilineIndex * 10, true, width - 20, 0xffffff | (opacity << 24));
+                ConfigUtils.drawStringScaledMaxWidth(line + EnumChatFormatting.RESET, Minecraft.getMinecraft().fontRendererObj, dragOffsetX + mouseX + 10, dragOffsetY + mouseY + multilineIndex * 10, true, width - 20, 0xffffff | (opacity << 24));
             }
 
             int ySize = multilines.length * 10;
