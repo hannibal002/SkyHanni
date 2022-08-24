@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.test.command
 
-import at.hannibal2.skyhanni.config.gui.utils.Utils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
@@ -95,7 +95,7 @@ object CopyNearbyEntitiesCommand {
 
         if (counter != 0) {
             val string = resultList.joinToString("\n")
-            Utils.copyToClipboard(string)
+            OSUtils.copyToClipboard(string)
             LorenzUtils.chat("§e[SkyHanni] $counter entities copied into the clipboard!")
         } else {
             LorenzUtils.chat("§e[SkyHanni] No entities found in a search radius of $searchRadius!")

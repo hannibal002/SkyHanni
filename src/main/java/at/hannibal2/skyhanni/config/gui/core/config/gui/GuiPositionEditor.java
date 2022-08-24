@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.config.gui.core.config.gui;
 
 import at.hannibal2.skyhanni.config.gui.core.config.Position;
-import at.hannibal2.skyhanni.config.gui.utils.Utils;
-import java.io.IOException;
+import at.hannibal2.skyhanni.config.gui.utils.ConfigUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+
+import java.io.IOException;
 
 public class GuiPositionEditor extends GuiScreen {
 
@@ -51,7 +52,7 @@ public class GuiPositionEditor extends GuiScreen {
         super.drawScreen(mouseX, mouseY, partialTicks);
         ScaledResolution scaledResolution;
         if (guiScaleOverride >= 0) {
-            scaledResolution = Utils.pushGuiScale(guiScaleOverride);
+            scaledResolution = ConfigUtils.pushGuiScale(guiScaleOverride);
         } else {
             scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         }
@@ -78,12 +79,12 @@ public class GuiPositionEditor extends GuiScreen {
         Gui.drawRect(x, y, x + elementWidth, y + elementHeight, 0x80404040);
 
         if (guiScaleOverride >= 0) {
-            Utils.pushGuiScale(-1);
+            ConfigUtils.pushGuiScale(-1);
         }
 
         scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        Utils.drawStringCentered("Position Editor", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2, 8, true, 0xffffff);
-        Utils.drawStringCentered("R to Reset - Arrow keys/mouse to move", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2, 18, true, 0xffffff);
+        ConfigUtils.drawStringCentered("Position Editor", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2, 8, true, 0xffffff);
+        ConfigUtils.drawStringCentered("R to Reset - Arrow keys/mouse to move", Minecraft.getMinecraft().fontRendererObj, scaledResolution.getScaledWidth() / 2, 18, true, 0xffffff);
     }
 
     @Override
@@ -93,7 +94,7 @@ public class GuiPositionEditor extends GuiScreen {
         if (mouseButton == 0) {
             ScaledResolution scaledResolution;
             if (guiScaleOverride >= 0) {
-                scaledResolution = Utils.pushGuiScale(guiScaleOverride);
+                scaledResolution = ConfigUtils.pushGuiScale(guiScaleOverride);
             } else {
                 scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
             }
@@ -112,7 +113,7 @@ public class GuiPositionEditor extends GuiScreen {
             }
 
             if (guiScaleOverride >= 0) {
-                Utils.pushGuiScale(-1);
+                ConfigUtils.pushGuiScale(-1);
             }
         }
     }
@@ -152,7 +153,7 @@ public class GuiPositionEditor extends GuiScreen {
         if (clicked) {
             ScaledResolution scaledResolution;
             if (guiScaleOverride >= 0) {
-                scaledResolution = Utils.pushGuiScale(guiScaleOverride);
+                scaledResolution = ConfigUtils.pushGuiScale(guiScaleOverride);
             } else {
                 scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
             }
@@ -164,7 +165,7 @@ public class GuiPositionEditor extends GuiScreen {
             positionChangedCallback.run();
 
             if (guiScaleOverride >= 0) {
-                Utils.pushGuiScale(-1);
+                ConfigUtils.pushGuiScale(-1);
             }
         }
     }

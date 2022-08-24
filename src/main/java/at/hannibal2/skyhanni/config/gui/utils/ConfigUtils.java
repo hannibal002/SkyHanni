@@ -18,8 +18,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
 import java.math.RoundingMode;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -27,7 +25,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.LinkedList;
 import java.util.Locale;
 
-public class Utils {
+public class ConfigUtils {
 
     private static final LinkedList<Integer> guiScales = new LinkedList<>();
     private static ScaledResolution lastScale = new ScaledResolution(Minecraft.getMinecraft());
@@ -312,9 +310,5 @@ public class Utils {
         if (!stack.getTagCompound().hasKey("ExtraAttributes")) return null;
         if (!stack.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id")) return null;
         return stack.getTagCompound().getCompoundTag("ExtraAttributes").getString("id");
-    }
-    public static void copyToClipboard(String str) {
-        Toolkit.getDefaultToolkit().getSystemClipboard()
-                .setContents(new StringSelection(str), null);
     }
 }
