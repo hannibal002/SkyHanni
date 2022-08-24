@@ -53,12 +53,12 @@ public class Features {
         }
 
         if (runnableId.equals("ashfangFreezeCooldown")) {
-            editOverlay(activeConfigCategory, 200, 16, abilities.ashfangFreezeCooldownPos);
+            editOverlay(activeConfigCategory, 200, 16, ashfang.freezeCooldownPos);
             return;
         }
 
         if (runnableId.equals("ashfangResetCooldown")) {
-            editOverlay(activeConfigCategory, 200, 16, abilities.ashfangNextResetCooldownPos);
+            editOverlay(activeConfigCategory, 200, 16, ashfang.nextResetCooldownPos);
             return;
         }
 
@@ -88,6 +88,10 @@ public class Features {
     @Expose
     @Category(name = "Abilities", desc = "Stuff about abilities")
     public Abilities abilities = new Abilities();
+
+    @Expose
+    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle")
+    public Ashfang ashfang = new Ashfang();
 
     @Expose
     @Category(name = "Minion", desc = "Stuff about minions")

@@ -35,6 +35,7 @@
 - Show a cooldown when the player gets an ability block effect during the ashfang fight
 - Show a timer until ashfang is going to pull his minions back to him
 - Ashfang Gravity Orbs display
+- Ashfang Blazing Souls display
 
 ## Minion
 - A display that shows the last time the hopper inside a minion has been emptied

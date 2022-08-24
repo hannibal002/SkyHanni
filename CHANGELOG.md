@@ -4,6 +4,7 @@
 
 ### New Features
 - /wiki command (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
+- Added Ashfang Blazing Souls display
 
 ## Version 0.5 - Minions and RNG Meter
 
