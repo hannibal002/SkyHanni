@@ -6,6 +6,9 @@
 - /wiki command (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - Added Ashfang Blazing Souls display
 
+### Minor Changes
+- Optimizing the highlight block size for minions, blazing souls and gravity orbs
+
 ## Version 0.5 - Minions and RNG Meter
 
 ### New Features
