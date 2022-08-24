@@ -36,7 +36,7 @@ class AshfangNextResetCooldown {
         if (remainingTime > 0) {
             val remaining = (remainingTime.toFloat() / 1000)
             val format = DecimalFormat("0.0").format(remaining + 0.1)
-            SkyHanniMod.feature.abilities.ashfangNextResetCooldownPos.renderString("§cAshfang next reset in: §a${format}s")
+            SkyHanniMod.feature.ashfang.nextResetCooldownPos.renderString("§cAshfang next reset in: §a${format}s")
         } else {
             spawnTime = -1
         }
@@ -48,6 +48,6 @@ class AshfangNextResetCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.abilities.ashfangNextResetCooldown
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.nextResetCooldown
     }
 }

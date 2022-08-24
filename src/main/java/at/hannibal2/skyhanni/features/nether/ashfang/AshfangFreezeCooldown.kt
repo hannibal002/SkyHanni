@@ -33,11 +33,11 @@ class AshfangFreezeCooldown {
         if (remainingLong > 0) {
             val remaining = (remainingLong.toFloat() / 1000)
             val format = DecimalFormat("0.0").format(remaining + 0.1)
-            SkyHanniMod.feature.abilities.ashfangFreezeCooldownPos.renderString("§cAshfang Freeze: §a${format}s")
+            SkyHanniMod.feature.ashfang.freezeCooldownPos.renderString("§cAshfang Freeze: §a${format}s")
         }
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.abilities.ashfangFreezeCooldown
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.freezeCooldown
     }
 }
