@@ -110,6 +110,10 @@ public class Features {
     public Misc misc = new Misc();
 
     @Expose
+    @Category(name = "Commands", desc = "Enable or disable mod commands")
+    public CommandsFeatures commands = new CommandsFeatures();
+
+    @Expose
     @Category(name = "Api", desc = "Api Data")
     public ApiData apiData = new ApiData();
 

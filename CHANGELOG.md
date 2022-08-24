@@ -2,6 +2,9 @@
 
 ## Version 0.6
 
+### New Features
+- /wiki command (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
+
 ## Version 0.5 - Minions and RNG Meter
 
 ### New Features
