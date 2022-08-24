@@ -37,8 +37,8 @@ public class Features {
             return;
         }
 
-        if (runnableId.equals("dungeonMilestoneDisplay")) {
-            editOverlay(activeConfigCategory, 200, 16, dungeon.milestoneDisplayPos);
+        if (runnableId.equals("dungeonMilestonesDisplay")) {
+            editOverlay(activeConfigCategory, 200, 16, dungeon.showMileStonesDisplayPos);
             return;
         }
 

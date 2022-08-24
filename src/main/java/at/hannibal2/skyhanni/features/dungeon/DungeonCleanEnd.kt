@@ -25,7 +25,7 @@ class DungeonCleanEnd {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.cleanEnd) return
+        if (!SkyHanniMod.feature.dungeon.cleanEndToggle) return
 
         val message = event.message
 
@@ -36,7 +36,7 @@ class DungeonCleanEnd {
 
     private fun shouldBlock(): Boolean {
         if (!LorenzUtils.inDungeons) return false
-        if (!SkyHanniMod.feature.dungeon.cleanEnd) return false
+        if (!SkyHanniMod.feature.dungeon.cleanEndToggle) return false
 
         if (!bossDone) return false
 
@@ -63,7 +63,7 @@ class DungeonCleanEnd {
     @SubscribeEvent
     fun onHealthUpdatePacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.cleanEnd) return
+        if (!SkyHanniMod.feature.dungeon.cleanEndToggle) return
 
         if (bossDone) return
         if (lastBossId == -1) return

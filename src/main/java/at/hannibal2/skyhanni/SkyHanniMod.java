@@ -78,7 +78,7 @@ public class SkyHanniMod {
         registerEvent(new ExpBottleOnGroundHider());
         registerEvent(new DamageIndicatorManager());
         registerEvent(new ItemAbilityCooldown());
-        registerEvent(new DungeonMilestoneDisplay());
+        registerEvent(new DungeonMilestonesDisplay());
         registerEvent(new DungeonDeathCounter());
         registerEvent(new DungeonCleanEnd());
         registerEvent(new DungeonBossMessages());

@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.gui.core.config.Position;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorButton;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
 public class Dungeon {
@@ -13,33 +11,52 @@ public class Dungeon {
     @ConfigEditorBoolean
     public boolean highlightClickedBlocks = false;
 
+    @ConfigOption(name = "Milestones", desc = "")
+    @ConfigEditorAccordion(id = 0)
+    public boolean showMilestone = false;
+
     @Expose
-    @ConfigOption(name = "Milestone Display", desc = "Show the current milestone inside Dungeons.")
+    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone inside Dungeons.")
     @ConfigEditorBoolean
-    public boolean showMilestoneDisplay = false;
+    @ConfigAccordionId(id = 0)
+    public boolean showMilestonesDisplay = false;
 
     @Expose
     @ConfigOption(name = "Milestone Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "dungeonMilestoneDisplay", buttonText = "Edit")
-    public Position milestoneDisplayPos = new Position(10, 10, false, true);
+    @ConfigEditorButton(runnableId = "dungeonMilestonesDisplay", buttonText = "Edit")
+    @ConfigAccordionId(id = 0)
+    public Position showMileStonesDisplayPos = new Position(10, 10, false, true);
+
+    @ConfigOption(name = "Death Counter", desc = "")
+    @ConfigEditorAccordion(id = 1)
+    public boolean deathCounter = false;
 
     @Expose
-    @ConfigOption(name = "Death Counter", desc = "Display the total amount of deaths in the current dungeon.")
+    @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeon.")
     @ConfigEditorBoolean
-    public boolean deathCounter = false;
+    @ConfigAccordionId(id = 1)
+    public boolean deathCounterDisplay = false;
 
     @Expose
     @ConfigOption(name = "Death Counter Position", desc = "")
     @ConfigEditorButton(runnableId = "dungeonDeathCounter", buttonText = "Edit")
+    @ConfigAccordionId(id = 1)
     public Position deathCounterPos = new Position(10, 10, false, true);
+
+    @ConfigOption(name = "Clean End", desc = "")
+    @ConfigEditorAccordion(id = 2)
+    public boolean cleanEnd = false;
 
     @Expose
     @ConfigOption(name = "Clean End", desc = "Hide entities and particles after the boss in Floor 1 - 6 has died.")
     @ConfigEditorBoolean
-    public boolean cleanEnd = false;
+    @ConfigAccordionId(id = 2)
+    public boolean cleanEndToggle = false;
 
     @Expose
-    @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 guardians from the clean end feature when sneaking. Makes it easier to kill them after the boss died already. Thanks hypixel.")
+    @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 guardians from the clean end feature when " +
+            "sneaking. Makes it easier to kill them after the boss died already. Thanks hypixel.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
     public boolean cleanEndF3IgnoreGuardians = false;
 }

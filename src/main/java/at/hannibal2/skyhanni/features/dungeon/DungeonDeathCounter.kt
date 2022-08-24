@@ -88,10 +88,10 @@ class DungeonDeathCounter {
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestoneDisplay.color + textToRender)
+        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestonesDisplay.color + textToRender)
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && SkyHanniMod.feature.dungeon.deathCounter
+        return LorenzUtils.inDungeons && SkyHanniMod.feature.dungeon.deathCounterDisplay
     }
 }
