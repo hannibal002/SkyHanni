@@ -11,7 +11,7 @@
 - Many other messages (Not separated into own categories yet)
 
 ## Chat
-+ Adding a fancy new chat format for player messages (removing the rank prefix, every player has the same color)
++ Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
 + Dungeon Filter (Removing annoying messages from inside dungeon)
 + Dungeon Boss Message hider (includes The Watcher as well)
 

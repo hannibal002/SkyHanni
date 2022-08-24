@@ -61,11 +61,6 @@ public class Minions {
     @ConfigAccordionId(id = 1)
     public int emptiedTimeDistance = 10;
 
-    @Expose
-    @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions")
-    @ConfigEditorBoolean
-    public boolean hideMobsNametagNearby = false;
-
     @ConfigOption(name = "Hopper Profit", desc = "")
     @ConfigEditorAccordion(id = 2)
     public boolean hopperProfit = false;
@@ -81,4 +76,9 @@ public class Minions {
     @ConfigEditorButton(runnableId = "hopperProfitDisplay", buttonText = "Edit")
     @ConfigAccordionId(id = 2)
     public Position hopperProfitPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions")
+    @ConfigEditorBoolean
+    public boolean hideMobsNametagNearby = false;
 }
