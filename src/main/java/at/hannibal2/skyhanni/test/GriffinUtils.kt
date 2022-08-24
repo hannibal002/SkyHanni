@@ -16,7 +16,15 @@ object GriffinUtils {
         GriffinJavaUtils.drawWaypoint(location, partialTicks, color.toColor(), beacon)
     }
 
-    fun RenderWorldLastEvent.drawWaypointFilled(location: LorenzVec, color: Color, seeThroughBlocks: Boolean = false, beacon: Boolean = false) {
+    fun RenderWorldLastEvent.drawWaypointFilled(
+        location: LorenzVec,
+        color: Color,
+        seeThroughBlocks: Boolean = false,
+        beacon: Boolean = false,
+        extraSize: Double = 0.0,
+        extraSizeTopY: Double = extraSize,
+        extraSizeBottomY: Double = extraSize
+    ) {
         val (viewerX, viewerY, viewerZ) = RenderUtils.getViewerPos(partialTicks)
         val x = location.x - viewerX
         val y = location.y - viewerY
@@ -28,7 +36,12 @@ object GriffinUtils {
             GlStateManager.disableCull()
         }
         RenderUtils.drawFilledBoundingBox(
-            AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
+            AxisAlignedBB(x - extraSize,
+                y - extraSizeBottomY,
+                z - extraSize,
+                x + 1 + extraSize,
+                y + 1 + extraSizeTopY,
+                z + 1 + extraSize).expandBlock(),
             color,
             (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
         )
@@ -48,7 +61,7 @@ object GriffinUtils {
         p2: LorenzVec,
         color: LorenzColor,
         lineWidth: Int,
-        depth: Boolean
+        depth: Boolean,
     ) {
 
         GriffinJavaUtils.draw3DLine(p1, p2, color.toColor(), lineWidth, depth, partialTicks)

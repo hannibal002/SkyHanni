@@ -73,7 +73,12 @@ class MinionFeatures {
         if (loc != null) {
             val time = SkyHanniMod.feature.minions.lastOpenedMinionTime * 1_000
             if (lastMinionOpened + time > System.currentTimeMillis()) {
-                event.drawWaypointFilled(loc.add(-0.5, 0.0, -0.5), color, true)
+                event.drawWaypointFilled(loc.add(-0.5, 0.0, -0.5),
+                    color,
+                    true,
+                    extraSize = -0.25,
+                    extraSizeTopY = 0.2,
+                    extraSizeBottomY = 0.0)
             }
         }
     }

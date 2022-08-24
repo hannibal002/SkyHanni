@@ -44,7 +44,7 @@ class AshfangBlazingSouls {
         for (orb in souls) {
             if (orb.isDead) continue
             val orbLocation = orb.getLorenzVec()
-            event.drawWaypointFilled(orbLocation.add(-0.5, 1.25, -0.5), color)
+            event.drawWaypointFilled(orbLocation.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
             if (orbLocation.distance(playerLocation) < 10) {
                 //TODO find way to dynamically change color
                 event.drawString(orbLocation.add(0.0, 2.5, 0.0), "§bBlazing Soul")
