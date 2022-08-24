@@ -1,5 +1,8 @@
 # SkyHanni - List of all Features
 
+## Commands
+- /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
+
 ## Chat Filter
 - Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message, radiating generosity, HyPixel tournaments)
 - Hiding Empty messages

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.ChatManager;
 import at.hannibal2.skyhanni.features.chat.NewChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerChatFilter;
+import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager;
@@ -93,6 +94,7 @@ public class SkyHanniMod {
         registerEvent(new MinionFeatures());
         registerEvent(new RealTime());
         registerEvent(new RngMeterInventory());
+        registerEvent(new WikiCommand());
 
         Commands.init();
 
