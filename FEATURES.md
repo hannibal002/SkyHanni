@@ -24,7 +24,8 @@
 - Hiding damage splashes while inside the boss room (fixing Skytils feature)
 
 ## Inventory
-- Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
+- Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
+- Option to change the gray-out opacity for 'Not Clickable Items'
 - Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number and the tier of master skull and master star)
 - Sack name (show hort name of sacks)
 - Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same enchantment are highlighted in the inventory)
