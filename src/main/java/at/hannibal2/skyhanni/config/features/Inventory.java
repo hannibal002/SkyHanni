@@ -8,15 +8,33 @@ import java.util.List;
 
 public class Inventory {
 
+    @ConfigOption(name = "Not Clickable Items", desc = "")
+    @ConfigEditorAccordion(id = 0)
+    public boolean hideNotClickable = false;
+
     @Expose
-    @ConfigOption(name = "Not Clickable Items", desc = "Hide items that are not clickable in " + "the current inventory: ah, bz, accessory bag, etc.")
+    @ConfigOption(name = "Enabled", desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
     public boolean hideNotClickableItems = false;
 
     @Expose
     @ConfigOption(
-            name = "Item number as stack size",
-            desc = ""
+            name = "Opacity",
+            desc = "How strong should the items be grayed out?"
+    )
+    @ConfigEditorSlider(
+            minValue = 0,
+            maxValue = 255,
+            minStep = 5
+    )
+    @ConfigAccordionId(id = 0)
+    public int hideNotClickableOpacity = 180;
+
+    @Expose
+    @ConfigOption(
+            name = "Item number",
+            desc = "Showing the item number as a stack size for these items"
     )
     @ConfigEditorDraggableList(
             exampleText = {
@@ -48,24 +66,24 @@ public class Inventory {
     public boolean itemStars = false;
 
     @ConfigOption(name = "RNG Meter", desc = "")
-    @ConfigEditorAccordion(id = 0)
+    @ConfigEditorAccordion(id = 1)
     public boolean rngMeter = false;
 
     @Expose
     @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
+    @ConfigAccordionId(id = 1)
     public boolean rngMeterFloorName = false;
 
     @Expose
     @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
+    @ConfigAccordionId(id = 1)
     public boolean rngMeterNoDrop = false;
 
     @Expose
     @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs oder slayer rng meter inventory")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
+    @ConfigAccordionId(id = 1)
     public boolean rngMeterSelectedDrop = false;
 }

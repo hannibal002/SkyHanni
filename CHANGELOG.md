@@ -9,6 +9,7 @@
 
 ### Minor Changes
 - Optimizing the highlight block size for minions, blazing souls and gravity orbs
+- Added option to change the gray-out opacity for 'Not Clickable Items' 
 
 ## Version 0.5 - Minions and RNG Meter
 

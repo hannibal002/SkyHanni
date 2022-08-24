@@ -78,7 +78,10 @@ class HideNotClickableItems {
             if (slot.stack == null) continue
 
             if (hide(chestName, slot.stack)) {
-                val color = LorenzColor.DARK_GRAY.addOpacity(160)
+//                val color = LorenzColor.DARK_GRAY.addOpacity(160)
+//                val color = LorenzColor.DARK_GRAY.addOpacity(LorenzTest.a.toInt())
+                val opacity = SkyHanniMod.feature.inventory.hideNotClickableOpacity
+                val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
                 slot.stack.background = color.rgb
             }
         }
