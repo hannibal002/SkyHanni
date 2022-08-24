@@ -21,6 +21,7 @@
 - Death Counter (Changing color depending on amount)
 - Clean End (Hiding all entities and particles from displaying after the last dungeon boss dies, showing dungeon chests, still)
 - Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
+- Hiding damage splashes while inside the boss room (fixing Skytils feature)
 
 ## Inventory
 - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)

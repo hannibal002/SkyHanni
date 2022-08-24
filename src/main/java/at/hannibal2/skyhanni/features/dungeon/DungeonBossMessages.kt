@@ -10,11 +10,12 @@ class DungeonBossMessages {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inDungeons) return
+        if (!isBoss(event.message)) return
 
-        if (!SkyHanniMod.feature.chat.dungeonBossMessages) return
+        DungeonData.handleBossMessage(event.message)
 
-        if (isBoss(event.message)) {
+        if (SkyHanniMod.feature.chat.dungeonBossMessages) {
             event.blockedReason = "dungeon_boss"
         }
     }
