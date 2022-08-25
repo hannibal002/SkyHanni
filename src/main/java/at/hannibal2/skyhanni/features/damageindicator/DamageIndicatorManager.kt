@@ -170,7 +170,8 @@ class DamageIndicatorManager {
             }
 
             if (now > damageCounter.firstTick + 1_000) {
-                damageCounter.oldDamages.add(0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing))
+                damageCounter.oldDamages.add(0,
+                    OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing))
                 damageCounter.firstTick = 0L
                 damageCounter.currentDamage = 0
                 damageCounter.currentHealing = 0
@@ -282,8 +283,8 @@ class DamageIndicatorManager {
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
 //                    val format = formatDelay(remainingTicks * 50)
-//                    entityData.nameSuffix = " §lBOOM - $format"
-                    entityData.nameSuffix = " §lBOOM!"
+//                    entityData.nameSuffix = " §f§lBOOM - $format"
+                    entityData.nameSuffix = " §f§lBOOM!"
                 }
             }
         }
@@ -431,7 +432,12 @@ class DamageIndicatorManager {
             //TODO more tests, more exact values, better logic? idk make this working perfectly pls
             //val remainingTicks = 8 * 20 - ticksAlive
             val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+
+            if (SkyHanniMod.feature.damageIndicator.showHealthDuringLaser) {
+                entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
+            } else {
             return formatDelay(remainingTicks * 50)
+            }
         }
 
         return result

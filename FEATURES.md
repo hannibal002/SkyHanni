@@ -59,8 +59,12 @@
 - Add a chat message when the boss is healing himself
 - Option to hide or shorten the boss name above the health display
 - Specify for what bosses the damage indicator should be used
-- Option to hide the default (or Skytils) damage splash around the damage indicator
+- Option to hide the damage splash around the damage indicator (Supporting the Skytils damage splash)
 - Show the collected damage over time (literally the DPS) for the last few seconds
+- Show the hits during the hit phase for Voidgloom Seraphs
+- Show the laser phase cooldown during the Voidgloom Seraph 4 fight 
+- Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
+- Show when Revenant Horror 5 is about to BOOM
 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
