@@ -13,7 +13,7 @@ public class Inventory {
     public boolean hideNotClickable = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.")
+    @ConfigOption(name = "Not Clickable Items Enabled", desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean hideNotClickableItems = false;

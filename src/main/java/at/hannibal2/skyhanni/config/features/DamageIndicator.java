@@ -13,7 +13,7 @@ import java.util.List;
 public class DamageIndicator {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the missing health of a boss.")
+    @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the missing health of a boss.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
@@ -69,4 +69,9 @@ public class DamageIndicator {
     @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator")
     @ConfigEditorBoolean
     public boolean showDamageOverTime = false;
+
+    @Expose
+    @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser phase")
+    @ConfigEditorBoolean
+    public boolean showHealthDuringLaser = false;
 }
