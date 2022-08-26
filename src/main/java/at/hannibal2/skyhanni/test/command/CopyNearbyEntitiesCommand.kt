@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 
 object CopyNearbyEntitiesCommand {
@@ -72,6 +73,10 @@ object CopyNearbyEntitiesCommand {
 
                         }
                     }
+                } else if (entity is EntityEnderman) {
+                    val enderman = entity as EntityEnderman
+                    val heldItem = enderman.heldItem
+                    resultList.add("enderman heldItem: $heldItem")
                 } else {
                     if (entity is EntityLivingBase) {
                         val baseMaxHealth = entity.baseMaxHealth

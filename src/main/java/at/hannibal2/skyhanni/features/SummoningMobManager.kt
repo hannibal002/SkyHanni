@@ -95,10 +95,12 @@ class SummoningMobManager {
                     it is EntityLiving && it !in summoningMobs.keys && it.getLorenzVec().distance(playerLocation) < 3
                 }
                 .forEach {
-                    summoningMobs[it as EntityLiving] = SummoningMob(System.currentTimeMillis(), name = "Mob")
-                    updateData()
-                    if (summoningMobs.size == summoningsSpawned) {
-                        searchMobs = false
+                    if (it.ticksExisted == 0) {
+                        summoningMobs[it as EntityLiving] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+                        updateData()
+                        if (summoningMobs.size == summoningsSpawned) {
+                            searchMobs = false
+                        }
                     }
                 }
         }
