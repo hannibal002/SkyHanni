@@ -5,7 +5,9 @@
 ### New Features
 - Added /wiki command (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - Added Ashfang Blazing Souls display
-- Added hiding damage splashes while inside the boss room (fixing Skytils feature)
+- Added hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
+- Added Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages) 
+- Added option to hide the nametag of your spawned summoning mobs
 
 ### Minor Changes
 - Optimizing the highlight block size for minions, blazing souls and gravity orbs
@@ -17,7 +19,7 @@
 ### New Features
 - Added a display that shows the last time the hopper inside a minion has been emptied
 - Added a marker to the last opened minion for a couple of seconds (Seen through walls)
-- Added option to hide mob name tags close to minions
+- Added option to hide mob nametags close to minions
 - Added showing stars on all items (Not only dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
 - Added a display timer that shows the real time
 - Added overlay features to the RNG meter inventory (Highlight selected drop and floors without a drop and show floor)
@@ -26,7 +28,7 @@
 ### Minor Changes
 - Summoning souls display is rendering better close to corners
 - Ashfang gravity orbs are now rendering better close to corners
-- Showing the name of ashfang gravity orbs as a name tag above
+- Showing the name of ashfang gravity orbs as a nametag above the orb
 - Bazaar how knows books and essences (Thanks again, HyPixel)
 
 ### Bug Fixes

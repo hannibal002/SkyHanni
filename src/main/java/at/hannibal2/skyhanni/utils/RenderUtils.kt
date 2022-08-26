@@ -409,7 +409,7 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.renderString(string: String) {
+    fun Position.renderString(string: String, offsetY: Int = 0) {
         if (string == "") return
         val textToRender = "§f$string"
 
@@ -421,14 +421,21 @@ object RenderUtils {
         val offsetX = (200 - renderer.getStringWidth(textToRender.removeColor())) / 2
 
         val x = getAbsX(resolution, 200) + offsetX
-        val y = getAbsY(resolution, 16)
-
-
+        val y = getAbsY(resolution, 16) + offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
         renderer.drawStringWithShadow(textToRender, 0f, 0f, 0)
 
-
         GlStateManager.popMatrix()
+    }
+
+    fun Position.renderStrings(list: List<String>) {
+        if (list.isEmpty()) return
+
+        var offsetY = 0
+        for (s in list) {
+            renderString(s, offsetY)
+            offsetY += 14
+        }
     }
 }
