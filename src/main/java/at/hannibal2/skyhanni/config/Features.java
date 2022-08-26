@@ -71,6 +71,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, minions.hopperProfitPos);
             return;
         }
+
+        if (runnableId.equals("summoningMobDisplay")) {
+            editOverlay(activeConfigCategory, 200, 16, abilities.summoningMobDisplayPos);
+            return;
+        }
     }
 
     @Expose

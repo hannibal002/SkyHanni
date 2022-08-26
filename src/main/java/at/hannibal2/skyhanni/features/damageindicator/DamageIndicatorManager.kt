@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
+import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -239,7 +241,7 @@ class DamageIndicatorManager {
             if (customHealthText.isNotEmpty()) {
                 entityData.healthText = customHealthText
             } else {
-                val color = percentageColor(health, maxHealth)
+                val color = NumberUtil.percentageColor(health, maxHealth)
                 entityData.healthText = color.getChatColor() + NumberUtil.format(health)
             }
             entityData.timeLastTick = System.currentTimeMillis()
@@ -316,7 +318,7 @@ class DamageIndicatorManager {
             18 -> "§e4/6"
             16 -> "§e5/6"
             else -> {
-                val color = percentageColor(health, 10_000_000)
+                val color = NumberUtil.percentageColor(health, 10_000_000)
                 entityData.namePrefix = "§a6/6"
                 return color.getChatColor() + NumberUtil.format(health)
             }
@@ -352,7 +354,7 @@ class DamageIndicatorManager {
         }
         if (calcHealth == -1) return null
 
-        val color = percentageColor(calcHealth, maxHealth)
+        val color = NumberUtil.percentageColor(calcHealth, maxHealth)
         return color.getChatColor() + NumberUtil.format(calcHealth)
     }
 
@@ -408,7 +410,8 @@ class DamageIndicatorManager {
             }
             else -> return null
         }
-        val result = percentageColor(calcHealth, calcMaxHealth).getChatColor() + NumberUtil.format(calcHealth)
+        val result =
+            NumberUtil.percentageColor(calcHealth, calcMaxHealth).getChatColor() + NumberUtil.format(calcHealth)
 
 
         //Hit phase
@@ -423,7 +426,7 @@ class DamageIndicatorManager {
             }
             val name = armorStandHits.name.removeColor()
             val hits = name.between("Seraph ", " Hit").toInt()
-            return percentageColor(hits, maxHits).getChatColor() + "$hits Hits"
+            return NumberUtil.percentageColor(hits, maxHits).getChatColor() + "$hits Hits"
         }
 
         //Laser phase
@@ -436,7 +439,7 @@ class DamageIndicatorManager {
             if (SkyHanniMod.feature.damageIndicator.showHealthDuringLaser) {
                 entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
             } else {
-            return formatDelay(remainingTicks * 50)
+                return formatDelay(remainingTicks * 50)
             }
         }
 
@@ -486,7 +489,7 @@ class DamageIndicatorManager {
             LorenzUtils.error("Invalid thorn floor!")
             return null
         }
-        val color = percentageColor(health, maxHealth)
+        val color = NumberUtil.percentageColor(health, maxHealth)
         return color.getChatColor() + health + "/" + maxHealth
     }
 
@@ -505,20 +508,6 @@ class DamageIndicatorManager {
 
             val damageCounter = entityData.damageCounter
             damageCounter.currentHealing += healing
-        }
-    }
-
-    private fun percentageColor(
-        have: Int,
-        max: Int,
-    ): LorenzColor {
-        val percentage = have.toDouble() / max.toDouble()
-        return when {
-            percentage > 0.9 -> LorenzColor.DARK_GREEN
-            percentage > 0.75 -> LorenzColor.GREEN
-            percentage > 0.5 -> LorenzColor.YELLOW
-            percentage > 0.25 -> LorenzColor.GOLD
-            else -> LorenzColor.RED
         }
     }
 

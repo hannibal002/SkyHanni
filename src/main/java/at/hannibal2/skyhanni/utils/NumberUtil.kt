@@ -156,4 +156,18 @@ object NumberUtil {
     fun String.isInt(): Boolean {
         return isNotEmpty() && pattern.matcher(this).matches()
     }
+
+    fun percentageColor(
+        have: Int,
+        max: Int,
+    ): LorenzColor {
+        val percentage = have.toDouble() / max.toDouble()
+        return when {
+            percentage > 0.9 -> LorenzColor.DARK_GREEN
+            percentage > 0.75 -> LorenzColor.GREEN
+            percentage > 0.5 -> LorenzColor.YELLOW
+            percentage > 0.25 -> LorenzColor.GOLD
+            else -> LorenzColor.RED
+        }
+    }
 }

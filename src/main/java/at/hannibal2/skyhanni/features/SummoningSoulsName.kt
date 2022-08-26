@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinJavaUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.getNameTagWith
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand

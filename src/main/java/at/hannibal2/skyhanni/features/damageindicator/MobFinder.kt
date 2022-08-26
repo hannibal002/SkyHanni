@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.hasNameTagWith
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
