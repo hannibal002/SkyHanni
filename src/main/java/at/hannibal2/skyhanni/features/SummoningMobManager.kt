@@ -2,12 +2,9 @@ package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
@@ -18,11 +15,40 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import java.awt.Color
 import java.util.regex.Pattern
 
 class SummoningMobManager {
 
-    private val summoningMobs = mutableMapOf<EntityLiving, SummoningMob>()
+    companion object {
+
+        @JvmStatic
+        fun <T> setColorMultiplier(
+            entity: T,
+            lightBrightness: Float,
+            partialTickTime: Float,
+            cir: CallbackInfoReturnable<Int>,
+        ) {
+            if (SkyHanniMod.feature.abilities.summoningMobColored) {
+                if (entity is EntityLiving && entity in summoningMobs.keys) {
+                    cir.returnValue = LorenzColor.GREEN.toColor().withAlpha(127)
+                }
+            }
+        }
+
+        @JvmStatic
+        fun replaceHurtTime(entity: EntityLivingBase): Int {
+            return if (SkyHanniMod.feature.abilities.summoningMobColored
+                && entity in summoningMobs.keys
+            ) 0 else entity.hurtTime
+        }
+
+        fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+
+        private val summoningMobs = mutableMapOf<EntityLiving, SummoningMob>()
+    }
+
     private val summoningMobNametags = mutableListOf<EntityArmorStand>()
     private var summoningsSpawned = 0
     private var searchArmorStands = false
@@ -95,7 +121,7 @@ class SummoningMobManager {
                     it is EntityLiving && it !in summoningMobs.keys && it.getLorenzVec().distance(playerLocation) < 3
                 }
                 .forEach {
-                    if (it.ticksExisted == 0) {
+                    if (it.ticksExisted < 2) {
                         summoningMobs[it as EntityLiving] = SummoningMob(System.currentTimeMillis(), name = "Mob")
                         updateData()
                         if (summoningMobs.size == summoningsSpawned) {
@@ -117,7 +143,7 @@ class SummoningMobManager {
             val name = summoningMob.name
             if (currentHealth == 0) {
                 summoningMobs.remove(entityLiving)
-                LorenzUtils.chat("§e[SkyHanni] your Summoning Mob just §cdied!")
+                LorenzUtils.chat("§e[SkyHanni] Your Summoning Mob just §cdied!")
                 continue
             }
 

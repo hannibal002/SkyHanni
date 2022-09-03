@@ -40,6 +40,7 @@
 - Ashfang Blazing Souls display
 - Summoning mob display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
 - Option to hide the nametag of your spawned summoning mobs
+- Option to mark the own summoning mobs in green
 
 ## Minion
 - A display that shows the last time the hopper inside a minion has been emptied

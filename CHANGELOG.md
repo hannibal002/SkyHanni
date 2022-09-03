@@ -8,6 +8,7 @@
 - Added hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
 - Added Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages) 
 - Added option to hide the nametag of your spawned summoning mobs
+- Added option to mark the own summoning mobs in green
 
 ### Minor Changes
 - Optimizing the highlight block size for minions, blazing souls and gravity orbs
