@@ -38,4 +38,10 @@ public class Abilities {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean summoningMobHideNametag = false;
+
+    @Expose
+    @ConfigOption(name = "Summoning Mob Color", desc = "Marks own summoning mobs green")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean summoningMobColored = false;
 }
