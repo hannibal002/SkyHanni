@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent
 import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -44,7 +43,7 @@ class CorruptedMobHighlight {
         val entity = event.entity
 
         if (entity in corruptedMobs) {
-            event.color = LorenzColor.DARK_PURPLE.toColor().withAlpha(LorenzTest.a.toInt())
+            event.color = LorenzColor.DARK_PURPLE.toColor().withAlpha(127)
         }
     }
 
