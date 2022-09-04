@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent
 import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsWith
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -62,7 +61,7 @@ class AshfangHighlightBlazes {
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!isEnabled()) return
         val entity = event.entity
-        event.color = blazes[entity]?.toColor()?.withAlpha(LorenzTest.a.toInt()) ?: 0
+        event.color = blazes[entity]?.toColor()?.withAlpha(40) ?: 0
     }
 
     @SubscribeEvent

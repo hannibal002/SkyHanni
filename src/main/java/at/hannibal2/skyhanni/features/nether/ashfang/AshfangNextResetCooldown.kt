@@ -43,7 +43,7 @@ class AshfangNextResetCooldown {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Load) {
         spawnTime = -1
     }
 
