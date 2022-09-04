@@ -54,7 +54,7 @@ class AshfangGravityOrbs {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Load) {
         orbs.clear()
     }
 

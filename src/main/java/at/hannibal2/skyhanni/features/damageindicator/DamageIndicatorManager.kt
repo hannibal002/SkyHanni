@@ -44,7 +44,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Load) {
         mobFinder = MobFinder()
         data.clear()
     }
