@@ -40,7 +40,16 @@ class DamageIndicatorManager {
 
     companion object {
         private var data = mutableMapOf<UUID, EntityData>()
-        val damagePattern: Pattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
+        private val damagePattern: Pattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
+
+        fun isDamageSplash(entity: EntityLivingBase): Boolean {
+            if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
+            if (!entity.hasCustomName()) return false
+            if (entity.isDead) return false
+            val name = entity.customNameTag.removeColor().replace(",", "")
+
+            return damagePattern.matcher(name).matches()
+        }
 
         fun isBossSpawned(type: BossType): Boolean {
             return data.entries.find { it.value.bossType == type } != null
@@ -176,8 +185,10 @@ class DamageIndicatorManager {
             }
 
             if (now > damageCounter.firstTick + 1_000) {
-                damageCounter.oldDamages.add(0,
-                    OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing))
+                damageCounter.oldDamages.add(
+                    0,
+                    OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing)
+                )
                 damageCounter.firstTick = 0L
                 damageCounter.currentDamage = 0
                 damageCounter.currentHealing = 0
@@ -389,6 +400,7 @@ class DamageIndicatorManager {
                     "§a3/3 "
                 }
             }
+
             BossType.SLAYER_ENDERMAN_4 -> {
                 val step = maxHealth / 6
                 calcMaxHealth = step
@@ -412,6 +424,7 @@ class DamageIndicatorManager {
                     "§a6/6 "
                 }
             }
+
             else -> return null
         }
         val result =
@@ -461,10 +474,15 @@ class DamageIndicatorManager {
                 66_000, 132_000 -> 1
                 0 -> 0
                 else -> {
-                    LorenzUtils.error("Unexpected health of thorn in f4! (${
-                        LorenzUtils.formatDouble(LorenzUtils.formatDouble(
-                            realHealth.toDouble()).toDouble())
-                    })")
+                    LorenzUtils.error(
+                        "Unexpected health of thorn in f4! (${
+                            LorenzUtils.formatDouble(
+                                LorenzUtils.formatDouble(
+                                    realHealth.toDouble()
+                                ).toDouble()
+                            )
+                        })"
+                    )
                     return null
                 }
             }
@@ -481,10 +499,15 @@ class DamageIndicatorManager {
                 0 -> 0
                 else -> {
                     LorenzTest.text = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
-                    LorenzUtils.error("Unexpected health of thorn in m4! (${
-                        LorenzUtils.formatDouble(LorenzUtils.formatDouble(
-                            realHealth.toDouble()).toDouble())
-                    })")
+                    LorenzUtils.error(
+                        "Unexpected health of thorn in m4! (${
+                            LorenzUtils.formatDouble(
+                                LorenzUtils.formatDouble(
+                                    realHealth.toDouble()
+                                ).toDouble()
+                            )
+                        })"
+                    )
                     return null
                 }
             }
@@ -551,11 +574,8 @@ class DamageIndicatorManager {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         val entity = event.entity
-        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return
-        if (!entity.hasCustomName()) return
-        if (entity.isDead) return
+        if (!isDamageSplash(entity)) return
         val name = entity.customNameTag.removeColor().replace(",", "")
-        if (!damagePattern.matcher(name).matches()) return
 
         if (SkyHanniMod.feature.misc.fixSkytilsDamageSplash) {
             entity.customNameTag = entity.customNameTag.replace(",", "")
