@@ -18,7 +18,7 @@ class ItemStars {
     private val STAR_FIND_PATCHER = Pattern.compile("(.*)§.✪(.*)")
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!LorenzUtils.inSkyblock) return
 
