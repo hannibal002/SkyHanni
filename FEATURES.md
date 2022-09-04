@@ -32,15 +32,21 @@
 - Added compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
 - RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
 
-## Abilities
+## Item Cooldown
 - Show the cooldown of items in the inventory
+- Option to change the item background according to the cooldown
+
+## Summoning Mobs
+- Option to hide the nametag of your spawned summoning mobs
+- Option to mark the own summoning mobs in green
+- Summoning mob display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
+
+
+## Ashfang
 - Show a cooldown when the player gets an ability block effect during the ashfang fight
 - Show a timer until ashfang is going to pull his minions back to him
 - Ashfang Gravity Orbs display
 - Ashfang Blazing Souls display
-- Summoning mob display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
-- Option to hide the nametag of your spawned summoning mobs
-- Option to mark the own summoning mobs in green
 - Highlight the different ashfang blazes in their respective color
 - Option to hide all the particles around the ashfang boss
 - Option to hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)
