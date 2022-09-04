@@ -73,12 +73,14 @@ class MinionFeatures {
         if (loc != null) {
             val time = SkyHanniMod.feature.minions.lastOpenedMinionTime * 1_000
             if (lastMinionOpened + time > System.currentTimeMillis()) {
-                event.drawWaypointFilled(loc.add(-0.5, 0.0, -0.5),
+                event.drawWaypointFilled(
+                    loc.add(-0.5, 0.0, -0.5),
                     color,
                     true,
                     extraSize = -0.25,
                     extraSizeTopY = 0.2,
-                    extraSizeBottomY = 0.0)
+                    extraSizeBottomY = 0.0
+                )
             }
         }
     }
@@ -105,6 +107,9 @@ class MinionFeatures {
                     if (System.currentTimeMillis() - lastCoinsRecived < 2_000) {
                         minions[location] = System.currentTimeMillis()
                         saveConfig()
+                    }
+                    if (location !in minions) {
+                        minions[location] = 0
                     }
 
                     if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
@@ -139,7 +144,6 @@ class MinionFeatures {
         }
         val duration = System.currentTimeMillis() - lastClicked
 
-//        println("line: '$line'")
         //§7Held Coins: §b151,389
         val coins = line.split(": §b")[1].replace(",", "").toDouble()
 
@@ -198,7 +202,9 @@ class MinionFeatures {
         for (minion in minions) {
             val location = minion.key
             if (playerLocation.distance(location) < SkyHanniMod.feature.minions.emptiedTimeDistance) {
-                val duration = System.currentTimeMillis() - minion.value
+                val lastEmptied = minion.value
+                if (lastEmptied == 0L) continue
+                val duration = System.currentTimeMillis() - lastEmptied
                 val format = StringUtils.formatDuration(duration / 1000)
                 if (LocationUtils.canSee(playerEyeLocation, location)) {
                     val text = "§eHopper Emptied: $format"

@@ -122,7 +122,6 @@ class DungeonCleanEnd {
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!shouldBlock()) return
 
-
         if (event.packet is S2APacketParticles) {
             event.isCanceled = true
         }
