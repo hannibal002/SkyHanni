@@ -16,6 +16,7 @@
 - Added option to change the gray-out opacity for 'Not Clickable Items' 
 - Added option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Fixed that items with stars don't gray out properly when hidden by the 'hide not clickable' feature
+- Fixed 'hiding the nametag of mobs close to minions' not working when minion nearby was never collected
 
 ## Version 0.5 - Minions and RNG Meter
 
