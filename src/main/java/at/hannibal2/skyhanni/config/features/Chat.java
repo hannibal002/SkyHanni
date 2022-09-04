@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigAccordionId;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorAccordion;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
 public class Chat {
@@ -45,9 +42,35 @@ public class Chat {
     public boolean others = false;
 
     @Expose
-    @ConfigOption(name = "Player Messages", desc = "Add a fancy new chat format for player messages.")
-    @ConfigEditorBoolean
+    @ConfigOption(name = "Player Messages", desc = "")
+    @ConfigEditorAccordion(id = 1)
     public boolean playerMessages = false;
+
+    @Expose
+    @ConfigOption(name = "Player Messages Format", desc = "Add a fancy new chat format for player messages.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean playerMessagesFormat = false;
+
+    @Expose
+    @ConfigOption(name = "Hide SkyBlock Level", desc = "Hiding the Skyblock Level from the chat messages")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean hideSkyblockLevel = false;
+
+    @Expose
+    @ConfigOption(
+            name = "SkyBlock Level Design",
+            desc = "Change the way the Skyblock Level gets displayed in the chat\n" +
+                    "§cRequires SkyBlock Level and player messages format both enabled"
+    )
+    @ConfigEditorDropdown(
+            values = {"§8[§6123§8] §bname §fmsg",
+                    "§6§l123 §bname §fmsg",
+                    "§bname §8[§6123§8]§f: msg"}
+    )
+    @ConfigAccordionId(id = 1)
+    public int skyblockLevelDesign = 0;
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages inside dungeon.")

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.ChatManager;
 import at.hannibal2.skyhanni.features.chat.PlayerChatFilter;
+import at.hannibal2.skyhanni.features.chat.SkyBlockLevelChatMessage;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
@@ -65,6 +66,7 @@ public class SkyHanniMod {
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());
         registerEvent(new PlayerChatFilter());
+        registerEvent(new SkyBlockLevelChatMessage());
         registerEvent(new DungeonChatFilter());
         registerEvent(new HideNotClickableItems());
         registerEvent(new ItemDisplayOverlayFeatures());
