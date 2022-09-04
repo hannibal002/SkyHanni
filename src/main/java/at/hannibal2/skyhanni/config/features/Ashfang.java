@@ -54,4 +54,9 @@ public class Ashfang {
     )
     @ConfigEditorColour
     public String blazingSoulsColor = "0:245:85:255:85";
+
+    @Expose
+    @ConfigOption(name = "Ashfang Highlight Blazes", desc = "Highlight the different blazes in their respected color")
+    @ConfigEditorBoolean
+    public boolean highlightBlazes = false;
 }

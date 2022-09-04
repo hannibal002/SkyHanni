@@ -9,6 +9,7 @@
 - Added Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages) 
 - Added option to hide the nametag of your spawned summoning mobs
 - Added option to mark the own summoning mobs in green
+- Added highlight for the different ashfang blazes in their respective color
 
 ### Minor Changes
 - Optimizing the highlight block size for minions, blazing souls and gravity orbs
