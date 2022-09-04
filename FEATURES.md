@@ -42,6 +42,9 @@
 - Option to hide the nametag of your spawned summoning mobs
 - Option to mark the own summoning mobs in green
 - Highlight the different ashfang blazes in their respective color
+- Option to hide all the particles around the ashfang boss
+- Option to hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)
+
 
 ## Minion
 - A display that shows the last time the hopper inside a minion has been emptied

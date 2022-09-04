@@ -59,4 +59,14 @@ public class Ashfang {
     @ConfigOption(name = "Ashfang Highlight Blazes", desc = "Highlight the different blazes in their respected color")
     @ConfigEditorBoolean
     public boolean highlightBlazes = false;
+
+    @Expose
+    @ConfigOption(name = "Ashfang Hide Particles", desc = "Hide all the particles around the ashfang boss")
+    @ConfigEditorBoolean
+    public boolean hideParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Ashfang Hide Names", desc = "Hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)")
+    @ConfigEditorBoolean
+    public boolean hideNames = false;
 }

@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.damageindicator.BossType
+import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -58,6 +60,7 @@ class AshfangBlazingSouls {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.blazingSouls
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.blazingSouls &&
+                DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

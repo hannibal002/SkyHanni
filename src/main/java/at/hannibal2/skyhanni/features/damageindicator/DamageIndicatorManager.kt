@@ -34,13 +34,17 @@ import kotlin.math.max
 
 class DamageIndicatorManager {
 
-    var data = mutableMapOf<UUID, EntityData>()
     private var mobFinder: MobFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
     private val maxHealth = mutableMapOf<UUID, Int>()
 
     companion object {
+        private var data = mutableMapOf<UUID, EntityData>()
         val damagePattern: Pattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
+
+        fun isBossSpawned(type: BossType): Boolean {
+            return data.entries.find { it.value.bossType == type } != null
+        }
     }
 
     @SubscribeEvent
@@ -476,7 +480,6 @@ class DamageIndicatorManager {
                 270_000 / 2, 270_000 -> 1
                 0 -> 0
                 else -> {
-                    LorenzTest.enabled = true
                     LorenzTest.text = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
                     LorenzUtils.error("Unexpected health of thorn in m4! (${
                         LorenzUtils.formatDouble(LorenzUtils.formatDouble(
