@@ -21,8 +21,6 @@ class CorruptedMobHighlight {
 
     @SubscribeEvent
     fun onHealthUpdatePacket(event: PacketEvent.ReceiveEvent) {
-        if (!isEnabled()) return
-
         val packet = event.packet
         if (packet !is S1CPacketEntityMetadata) return
 
@@ -66,6 +64,7 @@ class CorruptedMobHighlight {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.corruptedMobHighlight
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.corruptedMobHighlight &&
+                LorenzUtils.skyBlockIsland != "Private Island"
     }
 }
