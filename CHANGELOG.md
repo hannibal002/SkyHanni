@@ -12,6 +12,7 @@
 - Added highlight for the different ashfang blazes in their respective color
 - Added option to hide all the particles around the ashfang boss
 - Added option to hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)
+- Added option to hide damage splashes around ashfang
 
 ### Minor Changes
 - Optimizing the highlight block size for minions, blazing souls and gravity orbs

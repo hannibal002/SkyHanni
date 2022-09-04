@@ -44,6 +44,7 @@
 - Highlight the different ashfang blazes in their respective color
 - Option to hide all the particles around the ashfang boss
 - Option to hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)
+- Option to hide damage splashes around ashfang
 
 
 ## Minion

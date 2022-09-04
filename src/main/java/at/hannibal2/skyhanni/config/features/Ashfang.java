@@ -69,4 +69,9 @@ public class Ashfang {
     @ConfigOption(name = "Ashfang Hide Names", desc = "Hide the name of full health blazes around ashfang (only useful when highlight blazes is enabled)")
     @ConfigEditorBoolean
     public boolean hideNames = false;
+
+    @Expose
+    @ConfigOption(name = "Ashfang Hide Damage", desc = "Hide damage splashes around ashfang")
+    @ConfigEditorBoolean
+    public boolean hideDamageSplash = false;
 }
