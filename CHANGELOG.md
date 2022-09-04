@@ -3,6 +3,7 @@
 ## Version 0.6.1 - Skyblock Level
 - Added option to hide the Skyblock Level from the chat messages,
 - Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
+- Added highlight the voidling extremist in pink color
 
 ## Version 0.6 - Ashfang and Summoning Mobs
 

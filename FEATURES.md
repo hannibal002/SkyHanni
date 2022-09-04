@@ -89,3 +89,4 @@
 - Summon Soul Display (show the name of a dropped soul, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
 - Fixing Skytils custom Damage Splash
 - Gui element showing the real time
+- Highlight the voidling extremist in pink color

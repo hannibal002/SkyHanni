@@ -48,4 +48,9 @@ public class Misc {
     @ConfigOption(name = "Real Time Position", desc = "")
     @ConfigEditorButton(runnableId = "realTime", buttonText = "Edit")
     public Position realTimePos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Voidling Extremist Color", desc = "Highlight the voidling extremist in pink color")
+    @ConfigEditorBoolean
+    public boolean voidlingExtremistColor = false;
 }

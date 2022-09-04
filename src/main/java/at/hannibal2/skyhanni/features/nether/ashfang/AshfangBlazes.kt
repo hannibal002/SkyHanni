@@ -97,7 +97,6 @@ class AshfangBlazes {
         if (entity in blazeColor) {
             event.shouldReset = true
         }
-
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

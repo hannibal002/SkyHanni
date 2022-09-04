@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.chat.SkyBlockLevelChatMessage;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
+import at.hannibal2.skyhanni.features.end.VoidlingExtremistColor;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.features.fishing.TrophyFishMessages;
@@ -99,6 +100,7 @@ public class SkyHanniMod {
         registerEvent(new RngMeterInventory());
         registerEvent(new WikiCommand());
         registerEvent(new SummoningMobManager());
+        registerEvent(new VoidlingExtremistColor());
 
         Commands.init();
 
