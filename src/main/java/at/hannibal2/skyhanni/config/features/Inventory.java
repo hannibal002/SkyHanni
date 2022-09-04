@@ -47,7 +47,7 @@ public class Inventory {
                     "\u00a7bCrimson Armor",
             }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>();
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(3);
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")

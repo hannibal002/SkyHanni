@@ -7,6 +7,7 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ExpBottleOnGroundHider {
+
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!LorenzUtils.inSkyblock) return
