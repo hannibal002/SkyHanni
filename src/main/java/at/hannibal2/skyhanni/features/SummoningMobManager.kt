@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.RenderMobColoredEvent
+import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -15,40 +18,12 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import java.awt.Color
 import java.util.regex.Pattern
 
 class SummoningMobManager {
 
-    companion object {
 
-        @JvmStatic
-        fun <T> setColorMultiplier(
-            entity: T,
-            lightBrightness: Float,
-            partialTickTime: Float,
-            cir: CallbackInfoReturnable<Int>,
-        ) {
-            if (SkyHanniMod.feature.abilities.summoningMobColored) {
-                if (entity is EntityLiving && entity in summoningMobs.keys) {
-                    cir.returnValue = LorenzColor.GREEN.toColor().withAlpha(127)
-                }
-            }
-        }
-
-        @JvmStatic
-        fun replaceHurtTime(entity: EntityLivingBase): Int {
-            return if (SkyHanniMod.feature.abilities.summoningMobColored
-                && entity in summoningMobs.keys
-            ) 0 else entity.hurtTime
-        }
-
-        fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
-
-        private val summoningMobs = mutableMapOf<EntityLiving, SummoningMob>()
-    }
-
+    private val summoningMobs = mutableMapOf<EntityLiving, SummoningMob>()
     private val summoningMobNametags = mutableListOf<EntityArmorStand>()
     private var summoningsSpawned = 0
     private var searchArmorStands = false
@@ -174,7 +149,7 @@ class SummoningMobManager {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Load) {
         despawned()
     }
 
@@ -189,6 +164,24 @@ class SummoningMobManager {
         if (entity.isDead) return
 
         event.isCanceled = entity in summoningMobNametags
+    }
+
+    @SubscribeEvent
+    fun onRenderMobColored(event: RenderMobColoredEvent) {
+        if (SkyHanniMod.feature.abilities.summoningMobColored) {
+            val entity = event.entity
+            if (entity is EntityLiving && entity in summoningMobs.keys) {
+                event.color = LorenzColor.GREEN.toColor().withAlpha(127)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onResetEntityHurtTime(event: ResetEntityHurtTimeEvent) {
+        val entity = event.entity
+        if (SkyHanniMod.feature.abilities.summoningMobColored && entity in summoningMobs.keys) {
+            event.shouldReset = true
+        }
     }
 
     private fun despawned() {

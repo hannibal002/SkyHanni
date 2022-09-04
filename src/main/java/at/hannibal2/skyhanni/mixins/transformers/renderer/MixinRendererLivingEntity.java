@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.features.SummoningMobManager;
+import at.hannibal2.skyhanni.events.RenderMobColoredEvent;
+import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
@@ -20,11 +21,15 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
 
     @Inject(method = "getColorMultiplier", at = @At("HEAD"), cancellable = true)
     private void setColorMultiplier(T entity, float lightBrightness, float partialTickTime, CallbackInfoReturnable<Integer> cir) {
-        SummoningMobManager.setColorMultiplier(entity, lightBrightness, partialTickTime, cir);
+        RenderMobColoredEvent event = new RenderMobColoredEvent(entity, 0);
+        event.postAndCatch();
+        cir.setReturnValue(event.getColor());
     }
 
     @Redirect(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
-    private int changeHurtTime(EntityLivingBase instance) {
-        return SummoningMobManager.replaceHurtTime(instance);
+    private int changeHurtTime(EntityLivingBase entity) {
+        ResetEntityHurtTimeEvent event = new ResetEntityHurtTimeEvent(entity, false);
+        event.postAndCatch();
+        return event.getShouldReset() ? 0 : entity.hurtTime;
     }
 }
