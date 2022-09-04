@@ -53,4 +53,9 @@ public class Misc {
     @ConfigOption(name = "Voidling Extremist Color", desc = "Highlight the voidling extremist in pink color")
     @ConfigEditorBoolean
     public boolean voidlingExtremistColor = false;
+
+    @Expose
+    @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")
+    @ConfigEditorBoolean
+    public boolean corruptedMobHighlight = false;
 }

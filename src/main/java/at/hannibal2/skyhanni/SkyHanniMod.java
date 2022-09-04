@@ -101,6 +101,7 @@ public class SkyHanniMod {
         registerEvent(new WikiCommand());
         registerEvent(new SummoningMobManager());
         registerEvent(new VoidlingExtremistColor());
+        registerEvent(new CorruptedMobHighlight());
 
         Commands.init();
 
