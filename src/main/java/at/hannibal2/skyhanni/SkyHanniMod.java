@@ -88,7 +88,8 @@ public class SkyHanniMod {
         registerEvent(new SummoningSoulsName());
         registerEvent(new AshfangGravityOrbs());
         registerEvent(new AshfangBlazingSouls());
-        registerEvent(new AshfangHighlightBlazes());
+        registerEvent(new AshfangBlazes());
+        registerEvent(new AshfangHideParticles());
         registerEvent(new ItemStars());
         registerEvent(new MinionFeatures());
         registerEvent(new RealTime());

@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.damageindicator.BossType
+import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
@@ -48,6 +50,7 @@ class AshfangNextResetCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.nextResetCooldown
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.nextResetCooldown &&
+                DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }
