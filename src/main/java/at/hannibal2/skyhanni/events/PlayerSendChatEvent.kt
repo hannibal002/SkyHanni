@@ -6,5 +6,5 @@ class PlayerSendChatEvent(
     val channel: PlayerMessageChannel,
     val playerName: String,
     var message: String,
-    var cancelledReason: String = ""
+    var cancelledReason: String = "",
 ) : LorenzEvent()
