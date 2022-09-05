@@ -64,4 +64,9 @@ public class Dungeon {
     @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room (fixing Skytils feature)")
     @ConfigEditorBoolean
     public boolean damageSplashBoss = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color")
+    @ConfigEditorBoolean
+    public boolean highlightDeathmites = false;
 }
