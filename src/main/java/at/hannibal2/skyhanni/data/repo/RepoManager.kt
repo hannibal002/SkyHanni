@@ -28,7 +28,7 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private val atomicShouldManuallyReload = AtomicBoolean(false)//TODO FIX
+    private val atomicShouldManuallyReload = AtomicBoolean(false)//TODO remove the workaround
 
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)

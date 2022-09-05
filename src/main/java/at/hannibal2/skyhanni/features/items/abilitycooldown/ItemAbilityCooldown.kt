@@ -123,7 +123,6 @@ class ItemAbilityCooldown {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
-            //TODO add option to change the size
             event.fontRenderer.drawStringWithShadow(
                 stackTip,
                 (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),

@@ -92,7 +92,7 @@ class ChatFilter {
         message == "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!" -> true
         message == "§cWhoa! Slow down there!" -> true
         message == "§cWait a moment before confirming!" -> true
-        message == "§cYou need to be out of combat for 3 seconds before opening the SkyBlock Menu!" -> true//TODO prevent in the future
+        message == "§cYou cannot open the SkyBlock menu while in combat!" -> true
 
         else -> false
     }

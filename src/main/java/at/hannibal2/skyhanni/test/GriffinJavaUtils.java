@@ -15,10 +15,11 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
+//TODO delte this class after next diana mayor
 public class GriffinJavaUtils {
     public static <T> void permute(ArrayList<ArrayList<T>> result, T[] a, int k) {
         if (k == a.length) {
