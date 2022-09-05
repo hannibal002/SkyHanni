@@ -52,45 +52,47 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("ridingEntity: $ridingEntity")
 
 
-                if (entity is EntityArmorStand) {
-                    resultList.add("armor stand data:")
-                    val headRotation = entity.headRotation.toLorenzVec()
-                    val bodyRotation = entity.bodyRotation.toLorenzVec()
-                    resultList.add("headRotation: $headRotation")
-                    resultList.add("bodyRotation: $bodyRotation")
+                when (entity) {
+                    is EntityArmorStand -> {
+                        resultList.add("armor stand data:")
+                        val headRotation = entity.headRotation.toLorenzVec()
+                        val bodyRotation = entity.bodyRotation.toLorenzVec()
+                        resultList.add("headRotation: $headRotation")
+                        resultList.add("bodyRotation: $bodyRotation")
 
-                    for ((id, stack) in entity.inventory.withIndex()) {
-                        resultList.add("id $id = $stack")
-                        if (stack != null) {
-                            val skullTexture = stack.getSkullTexture()
-                            if (skullTexture != null) {
-                                resultList.add("skullTexture: $skullTexture")
+                        for ((id, stack) in entity.inventory.withIndex()) {
+                            resultList.add("id $id = $stack")
+                            if (stack != null) {
+                                val skullTexture = stack.getSkullTexture()
+                                if (skullTexture != null) {
+                                    resultList.add("skullTexture: $skullTexture")
+                                }
+                                val cleanName = stack.cleanName()
+                                val type = stack.javaClass.name
+                                resultList.add("cleanName: $cleanName")
+                                resultList.add("type: $type")
+
                             }
-                            val cleanName = stack.cleanName()
-                            val type = stack.javaClass.name
-                            resultList.add("cleanName: $cleanName")
-                            resultList.add("type: $type")
-
                         }
                     }
-                } else if (entity is EntityEnderman) {
-                    val enderman = entity as EntityEnderman
-                    val heldItem = enderman.heldItem
-                    resultList.add("enderman heldItem: $heldItem")
-                } else {
-                    if (entity is EntityLivingBase) {
-                        val baseMaxHealth = entity.baseMaxHealth
-                        val health = entity.health.toInt()
-                        resultList.add("baseMaxHealth: $baseMaxHealth")
-                        resultList.add("health: $health")
+
+                    is EntityEnderman -> {
+                        val heldItem = entity.heldItem
+                        resultList.add("enderman heldItem: $heldItem")
                     }
-                    if (entity is EntityMagmaCube) {
+
+                    is EntityMagmaCube -> {
                         val squishFactor = entity.squishFactor
                         val slimeSize = entity.slimeSize
                         resultList.add("factor: $squishFactor")
                         resultList.add("slimeSize: $slimeSize")
-
                     }
+                }
+                if (entity is EntityLivingBase) {
+                    val baseMaxHealth = entity.baseMaxHealth.toInt()
+                    val health = entity.health.toInt()
+                    resultList.add("baseMaxHealth: $baseMaxHealth")
+                    resultList.add("health: $health")
                 }
                 resultList.add("")
                 resultList.add("")
