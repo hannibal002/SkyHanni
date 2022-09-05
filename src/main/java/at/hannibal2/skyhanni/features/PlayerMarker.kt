@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent
 import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -67,7 +66,7 @@ class PlayerMarker {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity in markedPlayers.values) {
-            event.color = LorenzColor.YELLOW.toColor().withAlpha(LorenzTest.a.toInt())
+            event.color = LorenzColor.YELLOW.toColor().withAlpha(127)
         }
     }
 
