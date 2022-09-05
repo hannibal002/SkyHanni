@@ -10,6 +10,9 @@
 - Added command /shmarkplayer (marking a player with yellow color)
 - Added highlight slayer miniboss in blue color
 
+### Fixes
+- Fixed small bazaar Message Hider
+
 ## Version 0.6 - Ashfang and Summoning Mobs
 
 ### New Features
