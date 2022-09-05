@@ -206,21 +206,22 @@ class ChatFilter {
 
     private fun bazaarAndAHMiniMessages(message: String): Boolean = when (message) {
         "§7Putting item in escrow...",
-        "§7Putting goods in escrow...",
         "§7Putting coins in escrow...",
 
             //Auction House
         "§7Setting up the auction...",
         "§7Processing purchase...",
-        "§7Claiming order...",
         "§7Processing bid...",
         "§7Claiming BIN auction...",
 
             //Bazaar
-        "§7Submitting sell offer...",
-        "§7Submitting buy order...",
-        "§7Executing instant sell...",
-        "§7Executing instant buy...",
+        "§6[Bazaar] §r§7Submitting sell offer...",
+        "§6[Bazaar] §r§7Submitting buy order...",
+        "§6[Bazaar] §r§7Executing instant sell...",
+        "§6[Bazaar] §r§7Executing instant buy...",
+        "§6[Bazaar] §r§7Cancelling order...",
+        "§6[Bazaar] §r§7Claiming order...",
+        "§6[Bazaar] §r§7Putting goods in escrow...",
 
             //Bank
         "§8Depositing coins...",
