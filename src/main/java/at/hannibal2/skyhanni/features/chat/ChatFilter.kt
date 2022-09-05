@@ -72,13 +72,13 @@ class ChatFilter {
     }
 
     private fun uselessNotification(message: String): Boolean {
-        return when {
-            message == "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!" -> true
+        if (message.matchRegex("§aYou tipped (\\d) (player|players)!")) return true
 
-            message == "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!" -> true
-            message == "§cYour Mining Speed Boost has expired!" -> true
-            message == "§a§r§6Mining Speed Boost §r§ais now available!" -> true
-
+        return when (message) {
+            "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!" -> true
+            "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!" -> true
+            "§cYour Mining Speed Boost has expired!" -> true
+            "§a§r§6Mining Speed Boost §r§ais now available!" -> true
             else -> false
         }
     }
