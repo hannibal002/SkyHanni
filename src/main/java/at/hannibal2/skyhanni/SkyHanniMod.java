@@ -102,6 +102,7 @@ public class SkyHanniMod {
         registerEvent(new HighlightSlayerMiniboss());
         registerEvent(new HideFarDeathMessages());
         registerEvent(new HighlightDungeonDeathmite());
+        registerEvent(new DungeonHideTNT());
 
         Commands.init();
 

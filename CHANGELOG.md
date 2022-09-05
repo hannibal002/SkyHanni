@@ -11,6 +11,7 @@
 - Added highlight slayer miniboss in blue color
 - Added option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
 - Added highlight deathmites in dungeon in red color
+- Added hide TNT laying around in dungeon
 
 ### Fixes
 - Fixed small bazaar Message Hider

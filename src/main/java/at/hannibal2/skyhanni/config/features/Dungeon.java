@@ -69,4 +69,9 @@ public class Dungeon {
     @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color")
     @ConfigEditorBoolean
     public boolean highlightDeathmites = false;
+
+    @Expose
+    @ConfigOption(name = "Hide TNT", desc = "Hide TNT laying around in dungeon")
+    @ConfigEditorBoolean
+    public boolean hideTNT = false;
 }
