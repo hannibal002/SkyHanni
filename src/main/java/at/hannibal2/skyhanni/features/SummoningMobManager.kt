@@ -190,7 +190,6 @@ class SummoningMobManager {
         summoningsSpawned = 0
         searchArmorStands = false
         searchMobs = false
-        println("despawning")
     }
 
     private fun isEnabled(): Boolean {
