@@ -37,19 +37,15 @@ class HighlightSlayerMiniboss {
         val list = mutableListOf<Entity>()
 
         list.addAll(entityList.filterIsInstance<EntityZombie>().filter {
-            it.baseMaxHealth % 24_000 == 0.0 || it.baseMaxHealth % 90_000 == 0.0 ||
-                    it.baseMaxHealth % 360_000 == 0.0 || it.baseMaxHealth % 600_000 == 0.0 ||
-                    it.baseMaxHealth % 2_400_000 == 0.0
+            it.baseMaxHealth % 24_000 == 0.0 || it.baseMaxHealth % 90_000 == 0.0 || it.baseMaxHealth % 360_000 == 0.0 || it.baseMaxHealth % 600_000 == 0.0 || it.baseMaxHealth % 2_400_000 == 0.0
         })
 
         list.addAll(entityList.filterIsInstance<EntitySpider>().filter {
-            it.baseMaxHealth % 54_000 == 0.0 || it.baseMaxHealth % 144_000 == 0.0 ||
-                    it.baseMaxHealth % 576_000 == 0.0
+            it.baseMaxHealth % 54_000 == 0.0 || it.baseMaxHealth % 144_000 == 0.0 || it.baseMaxHealth % 576_000 == 0.0
         })
 
         list.addAll(entityList.filterIsInstance<EntityWolf>().filter {
-            it.baseMaxHealth % 45_000 == 0.0 || it.baseMaxHealth % 120_000 == 0.0 ||
-                    it.baseMaxHealth % 450_000 == 0.0
+            it.baseMaxHealth % 45_000 == 0.0 || it.baseMaxHealth % 120_000 == 0.0 || it.baseMaxHealth % 450_000 == 0.0
         })
 
         list.addAll(entityList.filterIsInstance<EntityEnderman>().filter {
@@ -89,6 +85,6 @@ class HighlightSlayerMiniboss {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.slayerMinibossHighlight
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.slayerMinibossHighlight && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
     }
 }

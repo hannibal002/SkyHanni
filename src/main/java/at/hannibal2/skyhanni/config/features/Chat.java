@@ -73,12 +73,18 @@ public class Chat {
     public int skyblockLevelDesign = 0;
 
     @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages inside dungeon.")
+    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in the dungeon.")
     @ConfigEditorBoolean
     public boolean dungeonMessages = false;
 
     @Expose
-    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from watcher and bosses inside dungeon.")
+    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from watcher and bosses in the dungeon.")
     @ConfigEditorBoolean
     public boolean dungeonBossMessages = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Far Deaths", desc = "Hide the death messages of other players, " +
+            "except for players who are close to the player, inside dungeon or doing a Kuudra fight.")
+    @ConfigEditorBoolean
+    public boolean hideFarDeathMessages = false;
 }

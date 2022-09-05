@@ -14,10 +14,11 @@
 
 ## Chat
 + Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
-+ Dungeon Filter (Removing annoying messages from inside dungeon)
++ Dungeon Filter (Removing annoying messages from in the dungeon)
 + Dungeon Boss Message hider (includes The Watcher as well)
 - Option to hide the Skyblock Level from the chat messages,
 - Option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
+- Option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)

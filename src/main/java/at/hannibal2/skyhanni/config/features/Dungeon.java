@@ -16,7 +16,7 @@ public class Dungeon {
     public boolean showMilestone = false;
 
     @Expose
-    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone inside Dungeons.")
+    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in the Dungeon.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showMilestonesDisplay = false;

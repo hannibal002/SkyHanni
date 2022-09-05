@@ -10,10 +10,7 @@ import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
-import at.hannibal2.skyhanni.features.chat.ChatFilter;
-import at.hannibal2.skyhanni.features.chat.ChatManager;
-import at.hannibal2.skyhanni.features.chat.PlayerChatFilter;
-import at.hannibal2.skyhanni.features.chat.SkyBlockLevelChatMessage;
+import at.hannibal2.skyhanni.features.chat.*;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
@@ -103,6 +100,7 @@ public class SkyHanniMod {
         registerEvent(new CorruptedMobHighlight());
         registerEvent(new PlayerMarker());
         registerEvent(new HighlightSlayerMiniboss());
+        registerEvent(new HideFarDeathMessages());
 
         Commands.init();
 
