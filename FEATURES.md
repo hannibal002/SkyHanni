@@ -92,4 +92,5 @@
 - Fixing Skytils custom Damage Splash
 - Gui element showing the real time
 - Highlight the voidling extremist in pink color
-1- Highlight corrupted mobs in purple color
+- Highlight corrupted mobs in purple color
+- Highlight slayer miniboss in blue color

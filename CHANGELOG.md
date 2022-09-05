@@ -8,6 +8,7 @@
 - Added highlight the voidling extremist in pink color
 - Added highlight corrupted mobs in purple color
 - Added command /shmarkplayer (marking a player with yellow color)
+- Added highlight slayer miniboss in blue color
 
 ## Version 0.6 - Ashfang and Summoning Mobs
 

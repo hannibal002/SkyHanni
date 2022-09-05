@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.items.RngMeterInventory;
 import at.hannibal2.skyhanni.features.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
+import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -101,6 +102,7 @@ public class SkyHanniMod {
         registerEvent(new VoidlingExtremistColor());
         registerEvent(new CorruptedMobHighlight());
         registerEvent(new PlayerMarker());
+        registerEvent(new HighlightSlayerMiniboss());
 
         Commands.init();
 

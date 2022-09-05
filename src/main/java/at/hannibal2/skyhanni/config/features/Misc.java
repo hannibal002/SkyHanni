@@ -58,4 +58,9 @@ public class Misc {
     @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")
     @ConfigEditorBoolean
     public boolean corruptedMobHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Slayer Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
+    @ConfigEditorBoolean
+    public boolean slayerMinibossHighlight = false;
 }
