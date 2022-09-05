@@ -17,14 +17,14 @@ class CorruptedMobHighlight {
     private val corruptedMobs = mutableListOf<EntityLivingBase>()
 
     @SubscribeEvent
-    fun onHealthUpdatePacket(event: EntityHealthUpdateEvent) {
+    fun onHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inSkyblock) return
 
         val entity = event.entity
-        val health = event.health
+        if (entity in corruptedMobs) return
 
         val baseMaxHealth = entity.baseMaxHealth.toFloat()
-        if (health == baseMaxHealth * 3) {
+        if (event.health == baseMaxHealth * 3) {
             corruptedMobs.add(entity)
         }
     }
