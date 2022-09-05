@@ -1,16 +1,14 @@
 package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,21 +17,15 @@ class CorruptedMobHighlight {
     private val corruptedMobs = mutableListOf<EntityLivingBase>()
 
     @SubscribeEvent
-    fun onHealthUpdatePacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet !is S1CPacketEntityMetadata) return
+    fun onHealthUpdatePacket(event: EntityHealthUpdateEvent) {
+        if (!LorenzUtils.inSkyblock) return
 
-        for (watchableObject in packet.func_149376_c()) {
-            if (watchableObject.dataValueId != 6) continue
+        val entity = event.entity
+        val health = event.health
 
-            val entity = Minecraft.getMinecraft().theWorld.getEntityByID(packet.entityId) ?: continue
-            if (entity !is EntityLivingBase) continue
-
-            val health = watchableObject.`object` as Float
-            val baseMaxHealth = entity.baseMaxHealth.toFloat()
-            if (health == baseMaxHealth * 3) {
-                corruptedMobs.add(entity)
-            }
+        val baseMaxHealth = entity.baseMaxHealth.toFloat()
+        if (health == baseMaxHealth * 3) {
+            corruptedMobs.add(entity)
         }
     }
 

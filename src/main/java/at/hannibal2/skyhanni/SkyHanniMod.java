@@ -3,10 +3,7 @@ package at.hannibal2.skyhanni;
 import at.hannibal2.skyhanni.config.ConfigManager;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
-import at.hannibal2.skyhanni.data.ApiKeyGrabber;
-import at.hannibal2.skyhanni.data.HypixelData;
-import at.hannibal2.skyhanni.data.ItemRenderBackground;
-import at.hannibal2.skyhanni.data.ScoreboardData;
+import at.hannibal2.skyhanni.data.*;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.features.*;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
@@ -63,6 +60,7 @@ public class SkyHanniMod {
         registerEvent(new ApiKeyGrabber());
         registerEvent(new SeaCreatureManager());
         registerEvent(new ItemRenderBackground());
+        registerEvent(new EntityData());
 
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());
