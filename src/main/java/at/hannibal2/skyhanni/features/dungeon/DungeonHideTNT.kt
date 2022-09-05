@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -47,7 +46,7 @@ class DungeonHideTNT {
             val packetLocation = LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate)
             for (armorStand in tnt.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
                 val distance = packetLocation.distance(armorStand.getLorenzVec())
-                if (distance < LorenzTest.a) {
+                if (distance < 2) {
                     //only hiding white "sparkling" particles
                     if (packet.particleType.particleID == 3) {
                         event.isCanceled = true
