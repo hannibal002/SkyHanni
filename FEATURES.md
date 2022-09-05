@@ -1,7 +1,9 @@
 # SkyHanni - List of all Features
 
 ## Commands
+- /skyhanni or /sh (opening the SkyHanni config in game)
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
+- /shmarkplayer (marking a player with yellow color)
 
 ## Chat Filter
 - Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message, radiating generosity, HyPixel tournaments)

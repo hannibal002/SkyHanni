@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.gui.commands;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.gui.config.ConfigEditor;
 import at.hannibal2.skyhanni.config.gui.core.GuiScreenElementWrapper;
+import at.hannibal2.skyhanni.features.PlayerMarker;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.test.command.CopyItemCommand;
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand;
@@ -83,6 +84,16 @@ public class Commands {
                         new SimpleCommand.ProcessCommandRunnable() {
                             public void processCommand(ICommandSender sender, String[] args) {
                                 SkyHanniMod.configManager.saveConfig();
+                            }
+                        }
+                )
+        );
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "shmarkplayer",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                PlayerMarker.Companion.command(args);
                             }
                         }
                 )

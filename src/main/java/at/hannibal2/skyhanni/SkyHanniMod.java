@@ -100,6 +100,7 @@ public class SkyHanniMod {
         registerEvent(new SummoningMobManager());
         registerEvent(new VoidlingExtremistColor());
         registerEvent(new CorruptedMobHighlight());
+        registerEvent(new PlayerMarker());
 
         Commands.init();
 

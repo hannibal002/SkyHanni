@@ -1,10 +1,13 @@
 # SkyHanni - Change Log
 
 ## Version 0.6.1 - Skyblock Level
+
+### New Features
 - Added option to hide the Skyblock Level from the chat messages,
 - Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
 - Added highlight the voidling extremist in pink color
 - Added highlight corrupted mobs in purple color
+- Added command /shmarkplayer (marking a player with yellow color)
 
 ## Version 0.6 - Ashfang and Summoning Mobs
 
