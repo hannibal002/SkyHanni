@@ -70,41 +70,39 @@ public class Dungeon {
     @ConfigEditorBoolean
     public boolean highlightDeathmites = false;
 
+    @ConfigOption(name = "Item Hider", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    public boolean itemHider = false;
+
     @Expose
     @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeon.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
     public boolean hideSuperboomTNT = false;
 
     @Expose
     @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeon.")
     @ConfigEditorBoolean
-    public boolean hideBlessings = false;
+    @ConfigAccordionId(id = 3)
+    public boolean hideBlessing = false;
 
     @Expose
     @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeon.")
     @ConfigEditorBoolean
-    public boolean hideReviveStones = false;
+    @ConfigAccordionId(id = 3)
+    public boolean hideReviveStone = false;
 
     @Expose
     @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeon.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
     public boolean hidePremiumFlesh = false;
 
-    @ConfigOption(name = "Dungeon Copilot", desc = "")
-    @ConfigEditorAccordion(id = 3)
-    public boolean dungeonCopilot = false;
-
     @Expose
-    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeon.")
+    @ConfigOption(name = "Hide Journal Entry", desc = "Hide Journal Entry pages laying around in dungeon.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
-    public boolean copilotEnabled = false;
-
-    @Expose
-    @ConfigOption(name = "Copilot Pos", desc = "")
-    @ConfigEditorButton(runnableId = "dungeonCopilot", buttonText = "Edit")
-    @ConfigAccordionId(id = 3)
-    public Position copilotPos = new Position(10, 10, false, true);
+    public boolean hideJournalEntry = false;
 
     @ConfigOption(name = "Message Filter", desc = "")
     @ConfigEditorAccordion(id = 4)
@@ -115,4 +113,20 @@ public class Dungeon {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean messageFilterKeysAndDoors = false;
+
+    @ConfigOption(name = "Dungeon Copilot", desc = "")
+    @ConfigEditorAccordion(id = 5)
+    public boolean dungeonCopilot = false;
+
+    @Expose
+    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean copilotEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Copilot Pos", desc = "")
+    @ConfigEditorButton(runnableId = "dungeonCopilot", buttonText = "Edit")
+    @ConfigAccordionId(id = 5)
+    public Position copilotPos = new Position(10, 10, false, true);
 }

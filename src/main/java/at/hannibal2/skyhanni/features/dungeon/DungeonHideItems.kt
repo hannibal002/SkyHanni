@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.item.EntityItem
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,6 +34,22 @@ class DungeonHideItems {
         if (!LorenzUtils.inDungeons) return
 
         val entity = event.entity
+
+        if (entity is EntityItem) {
+            val stack = entity.entityItem
+            if (SkyHanniMod.feature.dungeon.hideReviveStone) {
+                if (stack.cleanName() == "Revive Stone") {
+                    event.isCanceled = true
+                }
+            }
+
+            if (SkyHanniMod.feature.dungeon.hideJournalEntry) {
+                if (stack.cleanName() == "Journal Entry") {
+                    event.isCanceled = true
+                }
+            }
+        }
+
         if (entity !is EntityArmorStand) return
 
         if (SkyHanniMod.feature.dungeon.hideSuperboomTNT) {
@@ -49,7 +66,7 @@ class DungeonHideItems {
             }
         }
 
-        if (SkyHanniMod.feature.dungeon.hideBlessings) {
+        if (SkyHanniMod.feature.dungeon.hideBlessing) {
             if (entity.name.startsWith("§dBlessing of ")) {
                 event.isCanceled = true
             }
@@ -62,7 +79,7 @@ class DungeonHideItems {
             }
         }
 
-        if (SkyHanniMod.feature.dungeon.hideReviveStones) {
+        if (SkyHanniMod.feature.dungeon.hideReviveStone) {
             if (entity.name == "§6Revive Stone") {
                 event.isCanceled = true
             }
@@ -77,6 +94,7 @@ class DungeonHideItems {
         }
 
         if (SkyHanniMod.feature.dungeon.hidePremiumFlesh) {
+            //TODO this feature is not tested yet. remove when tested
             if (entity.name == "§9Premium Flesh") {
                 event.isCanceled = true
             }
@@ -94,7 +112,7 @@ class DungeonHideItems {
     @SubscribeEvent
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.hideSuperboomTNT && !SkyHanniMod.feature.dungeon.hideReviveStones) return
+        if (!SkyHanniMod.feature.dungeon.hideSuperboomTNT && !SkyHanniMod.feature.dungeon.hideReviveStone) return
 
         val packet = event.packet
         if (packet is S2APacketParticles) {
