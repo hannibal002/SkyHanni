@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent
+import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
@@ -83,7 +83,7 @@ class AshfangBlazes {
     }
 
     @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtTimeEvent) {
+    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         if (!isEnabled()) return
         if (!SkyHanniMod.feature.ashfang.highlightBlazes) return
         val entity = event.entity

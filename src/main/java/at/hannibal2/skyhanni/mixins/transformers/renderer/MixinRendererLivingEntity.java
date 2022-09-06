@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent;
-import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent;
+import at.hannibal2.skyhanni.events.ResetEntityHurtEvent;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
@@ -28,7 +28,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
 
     @Redirect(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
     private int changeHurtTime(EntityLivingBase entity) {
-        ResetEntityHurtTimeEvent event = new ResetEntityHurtTimeEvent(entity, false);
+        ResetEntityHurtEvent event = new ResetEntityHurtEvent(entity, false);
         event.postAndCatch();
         return event.getShouldReset() ? 0 : entity.hurtTime;
     }

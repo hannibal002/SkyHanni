@@ -104,6 +104,12 @@ public class Dungeon {
     @ConfigAccordionId(id = 3)
     public boolean hideJournalEntry = false;
 
+    @Expose
+    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideSkeletonSkull = false;
+
     @ConfigOption(name = "Message Filter", desc = "")
     @ConfigEditorAccordion(id = 4)
     public boolean messageFilter = false;

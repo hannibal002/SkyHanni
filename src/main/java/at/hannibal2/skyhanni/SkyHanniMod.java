@@ -59,6 +59,7 @@ public class SkyHanniMod {
         registerEvent(new SeaCreatureManager());
         registerEvent(new ItemRenderBackground());
         registerEvent(new EntityData());
+        registerEvent(new EntityMovementHelper());
 
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());

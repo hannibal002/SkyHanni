@@ -98,5 +98,15 @@ public class Commands {
                         }
                 )
         );
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "togglepacketlog",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                LorenzTest.Companion.togglePacketLog();
+                            }
+                        }
+                )
+        );
     }
 }

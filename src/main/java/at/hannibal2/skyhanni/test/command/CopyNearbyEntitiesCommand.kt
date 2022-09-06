@@ -73,8 +73,10 @@ object CopyNearbyEntitiesCommand {
                                     resultList.add("-     $skullTexture")
                                 }
                                 val cleanName = stack.cleanName()
+                                var stackName = stack.name
                                 val type = stack.javaClass.name
-                                resultList.add("-     cleanName: $cleanName")
+                                resultList.add("-     name: '$stackName'")
+                                resultList.add("-     cleanName: '$cleanName'")
                                 resultList.add("-     type: $type")
                             }
                         }

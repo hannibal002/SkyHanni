@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtTimeEvent
+import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -40,7 +40,7 @@ class CorruptedMobHighlight {
     }
 
     @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtTimeEvent) {
+    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         if (!isEnabled()) return
         val entity = event.entity
 
