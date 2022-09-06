@@ -26,6 +26,9 @@ class DungeonHideItems {
             "lcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZ" +
             "jVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0K"
 
+    private val premiumFleshTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0" +
+            "L3RleHR1cmUvMWE3NWU4YjA0NGM3MjAxYTRiMmU4NTZiZTRmYzMxNmE1YWFlYzY2NTc2MTY5YmFiNTg3MmE4ODUzNGI4MDI1NiJ9fX0K"
+
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!LorenzUtils.inDungeons) return
@@ -68,6 +71,20 @@ class DungeonHideItems {
             val itemStack = entity.inventory[4]
             if (itemStack != null) {
                 if (itemStack.getSkullTexture() == reviveStoneTexture) {
+                    event.isCanceled = true
+                    hideParticles[entity] = System.currentTimeMillis()
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.dungeon.hidePremiumFlesh) {
+            if (entity.name == "§9Premium Flesh") {
+                event.isCanceled = true
+            }
+
+            val itemStack = entity.inventory[4]
+            if (itemStack != null) {
+                if (itemStack.getSkullTexture() == premiumFleshTexture) {
                     event.isCanceled = true
                     hideParticles[entity] = System.currentTimeMillis()
                 }

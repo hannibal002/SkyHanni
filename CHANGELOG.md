@@ -14,6 +14,7 @@
 - Added hide Superboom TNT laying around in dungeon
 - Added hide Blessings laying around in dungeon
 - Added hide Revive Stones laying around in dungeon
+- Added hide Premium Flesh laying around in dungeon
 
 ### Fixes
 - Fixed small bazaar Message Hider

@@ -61,27 +61,32 @@ public class Dungeon {
     public boolean cleanEndF3IgnoreGuardians = false;
 
     @Expose
-    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room (fixing Skytils feature)")
+    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room. (fixing Skytils feature)")
     @ConfigEditorBoolean
     public boolean damageSplashBoss = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color")
+    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color.")
     @ConfigEditorBoolean
     public boolean highlightDeathmites = false;
 
     @Expose
-    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeon")
+    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeon.")
     @ConfigEditorBoolean
     public boolean hideSuperboomTNT = false;
 
     @Expose
-    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeon")
+    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeon.")
     @ConfigEditorBoolean
     public boolean hideBlessings = false;
 
     @Expose
-    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeon")
+    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeon.")
     @ConfigEditorBoolean
     public boolean hideReviveStones = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeon.")
+    @ConfigEditorBoolean
+    public boolean hidePremiumFlesh = false;
 }
