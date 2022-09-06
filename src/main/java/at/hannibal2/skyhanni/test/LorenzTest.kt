@@ -18,9 +18,13 @@ class LorenzTest {
     var packetLog = LorenzLogger("debug/packets")
 
     companion object {
-        var enabled = false
-        var togglePacketLog = false
+        private var togglePacketLog = false
         var text = ""
+
+        //        var a = 127.0
+        var a = 2.0
+        var b = 0.0
+        var c = 0.0
 
         val debugLogger = LorenzLogger("debug/test")
 
@@ -37,6 +41,11 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
+
+            a = args[0].toDouble()
+            b = args[1].toDouble()
+            c = args[2].toDouble()
+
 //            togglePacketLog = !togglePacketLog
 
 //            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
@@ -55,9 +64,7 @@ class LorenzTest {
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (!SkyHanniMod.feature.debug.enabled) return
 
-        if (enabled) {
-            SkyHanniMod.feature.debug.testPos.renderString(text)
-        }
+        SkyHanniMod.feature.debug.testPos.renderString(text)
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
