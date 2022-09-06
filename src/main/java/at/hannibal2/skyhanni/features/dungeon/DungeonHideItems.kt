@@ -2,11 +2,10 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EntityMovementHelper
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -162,6 +161,36 @@ class DungeonHideItems {
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderMobColored(event: RenderMobColoredEvent) {
+        if (!LorenzUtils.inDungeons) return
+        if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
+        val entity = event.entity
+        if (entity is EntityArmorStand) {
+            if (isSkeletonSkull(entity)) {
+                val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
+                if (lastMove + 100 > System.currentTimeMillis()) {
+                    event.color = LorenzColor.GOLD.toColor().withAlpha(60)
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
+        if (!LorenzUtils.inDungeons) return
+        if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
+        val entity = event.entity
+        if (entity is EntityArmorStand) {
+            if (isSkeletonSkull(entity)) {
+                val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
+                if (lastMove + 100 > System.currentTimeMillis()) {
+                    event.shouldReset = true
+                }
+            }
         }
     }
 
