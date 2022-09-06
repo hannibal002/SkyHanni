@@ -32,6 +32,8 @@
 - Hide Blessings laying around in dungeon
 - Hide Revive Stones laying around in dungeon
 - Hide Premium Flesh laying around in dungeon
+- Dungeon Copilot (Suggests to you what to do next in dungeon)
+- Option to hide dungeon key pickup and door open messages
 
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)

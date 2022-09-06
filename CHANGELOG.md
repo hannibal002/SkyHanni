@@ -15,6 +15,8 @@
 - Added hide Blessings laying around in dungeon
 - Added hide Revive Stones laying around in dungeon
 - Added hide Premium Flesh laying around in dungeon
+- Added Dungeon Copilot (Suggests to you what to do next in dungeon)
+- Added separate option to hide dungeon key pickup and door open messages
 
 ### Fixes
 - Fixed small bazaar Message Hider

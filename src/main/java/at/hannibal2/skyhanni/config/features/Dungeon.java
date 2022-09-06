@@ -89,4 +89,30 @@ public class Dungeon {
     @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeon.")
     @ConfigEditorBoolean
     public boolean hidePremiumFlesh = false;
+
+    @ConfigOption(name = "Dungeon Copilot", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    public boolean dungeonCopilot = false;
+
+    @Expose
+    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean copilotEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Copilot Pos", desc = "")
+    @ConfigEditorButton(runnableId = "dungeonCopilot", buttonText = "Edit")
+    @ConfigAccordionId(id = 3)
+    public Position copilotPos = new Position(10, 10, false, true);
+
+    @ConfigOption(name = "Message Filter", desc = "")
+    @ConfigEditorAccordion(id = 4)
+    public boolean messageFilter = false;
+
+    @Expose
+    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 4)
+    public boolean messageFilterKeysAndDoors = false;
 }
