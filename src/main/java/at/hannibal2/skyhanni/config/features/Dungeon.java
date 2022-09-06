@@ -135,4 +135,10 @@ public class Dungeon {
     @ConfigEditorButton(runnableId = "dungeonCopilot", buttonText = "Edit")
     @ConfigAccordionId(id = 5)
     public Position copilotPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Show Building Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into a " +
+            "skeleton in orange color (not useful combined with feature Hide Skeleton Skull)")
+    @ConfigEditorBoolean
+    public boolean highlightSkeletonSkull = false;
 }
