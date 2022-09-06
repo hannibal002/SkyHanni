@@ -71,7 +71,17 @@ public class Dungeon {
     public boolean highlightDeathmites = false;
 
     @Expose
-    @ConfigOption(name = "Hide TNT", desc = "Hide TNT laying around in dungeon")
+    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeon")
     @ConfigEditorBoolean
-    public boolean hideTNT = false;
+    public boolean hideSuperboomTNT = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeon")
+    @ConfigEditorBoolean
+    public boolean hideBlessings = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeon")
+    @ConfigEditorBoolean
+    public boolean hideReviveStones = false;
 }

@@ -28,7 +28,9 @@
 - Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
 - Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
 - Highlight deathmites in red color
-- Hide TNT laying around in dungeon
+- Hide Superboom TNT laying around in dungeon
+- Hide Blessings laying around in dungeon
+- Hide Revive Stones laying around in dungeon
 
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
