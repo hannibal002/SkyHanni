@@ -55,6 +55,7 @@ class DungeonChatFilter {
         message.matchRegex("§7Your Guided Sheep hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.") -> true
         message == "§6Rapid Fire§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!" -> true
         message == "§6Castle of Stone§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!" -> true
+        message == "§6Ragnarok§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!" -> true
 
 
         message.matchRegex("§a§lBUFF! §fYou were splashed by (.*) §fwith §r§cHealing VIII§r§f!") -> true

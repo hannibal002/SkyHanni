@@ -107,9 +107,9 @@ class DungeonHideItems {
         }
 
         if (SkyHanniMod.feature.dungeon.hidePremiumFlesh) {
-            //TODO this feature is not tested yet. remove when tested
             if (entity.name == "§9Premium Flesh") {
                 event.isCanceled = true
+                hideParticles[entity] = System.currentTimeMillis()
             }
 
             val itemStack = entity.inventory[4]
