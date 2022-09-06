@@ -35,6 +35,7 @@
 - Hide Journal Entry pages laying around in dungeon.
 - Dungeon Copilot (Suggests to you what to do next in dungeon)
 - Option to hide key pickup and door open messages in dungeon.
+- Hide Skeleton Skulls laying around in dungeon.
 
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)

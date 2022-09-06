@@ -18,6 +18,7 @@
 - Added Dungeon Copilot (Suggests to you what to do next in dungeon)
 - Added separate option to hide dungeon key pickup and door open messages
 - Added hide Journal Entry pages laying around in dungeon.
+- Added hide Skeleton Skulls laying around in dungeon.
 
 ### Fixes
 - Fixed message filter for small bazaar messages
