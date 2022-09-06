@@ -19,7 +19,7 @@
 - Added separate option to hide dungeon key pickup and door open messages
 - Added hide Journal Entry pages laying around in dungeon.
 - Added hide Skeleton Skulls laying around in dungeon.
-- Added highlight Skeleton Skulls when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
+- Added highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
 
 ### Fixes
 - Fixed message filter for small bazaar messages
