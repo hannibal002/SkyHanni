@@ -1,8 +1,14 @@
 # SkyHanni - Change Log
 
+## Version 0.7.1
+
+### Misc
+- Added hiding the flame particles when using the Fire Veil Wand ability
+
+
 ## Version 0.7 - Dungeon and Colored Highlight
 
-## New Dungeon Features
+### New Dungeon Features
 - Added highlight deathmites in dungeon in red color
 - Added hide Superboom TNT laying around in dungeon
 - Added hide Blessings laying around in dungeon

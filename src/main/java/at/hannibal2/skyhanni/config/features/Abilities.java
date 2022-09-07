@@ -50,4 +50,9 @@ public class Abilities {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean summoningMobColored = false;
+
+    @Expose
+    @ConfigOption(name = "Fire Veil Particles", desc = "Hiding the flame particles when using the Fire Veil Wand ability.")
+    @ConfigEditorBoolean
+    public boolean fireVeilWandHider = false;
 }

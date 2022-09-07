@@ -71,10 +71,7 @@ class GriffinBurrowFinder {
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
         if (packet is S2APacketParticles) {
-            val x = packet.xCoordinate
-            val y = packet.yCoordinate
-            val z = packet.zCoordinate
-            val distance = LorenzVec(x, y, z).distance(LocationUtils.playerLocation())
+            val distance = packet.toLorenzVec().distance(LocationUtils.playerLocation())
             if (distance < 20) {
 //                LorenzDebug.log("")
 //                LorenzDebug.log("S2APacketParticles close")

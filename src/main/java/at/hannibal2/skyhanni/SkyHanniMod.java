@@ -60,7 +60,8 @@ public class SkyHanniMod {
         registerEvent(new SeaCreatureManager());
         registerEvent(new ItemRenderBackground());
         registerEvent(new EntityData());
-        registerEvent(new EntityMovementHelper());
+        registerEvent(new EntityMovementData());
+        registerEvent(new ItemClickData());
 
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());
@@ -107,6 +108,7 @@ public class SkyHanniMod {
         registerEvent(new DungeonHideItems());
         registerEvent(new DungeonCopilot());
         registerEvent(new EndermanSlayerBeacon());
+        registerEvent(new FireVeilWandParticles());
 
         Commands.init();
 
