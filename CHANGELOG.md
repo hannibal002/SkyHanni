@@ -6,6 +6,9 @@
 - Added hiding the flame particles when using the Fire Veil Wand ability
 - Added circle around the player when having the Fire Veil Wand ability running
 
+### Small Changes
+- Changed the ashfang gravity orb highlight from square to cylinder
+
 ### Fixes
 - Fixed enchanted books in bazaar
 
