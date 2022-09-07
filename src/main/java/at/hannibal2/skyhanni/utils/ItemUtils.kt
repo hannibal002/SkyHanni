@@ -11,7 +11,6 @@ import net.minecraftforge.common.util.Constants
 import java.util.*
 
 object ItemUtils {
-    private val gson = GsonBuilder().setPrettyPrinting().create()
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
