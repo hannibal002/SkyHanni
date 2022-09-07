@@ -3,13 +3,9 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -39,15 +35,14 @@ class AshfangGravityOrbs {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
 
-        val special = SkyHanniMod.feature.ashfang.gravityOrbsColor
-
-        val color = Color(SpecialColour.specialToChromaRGB(special), true)
-
+        val color = Color(SpecialColour.specialToChromaRGB(SkyHanniMod.feature.ashfang.gravityOrbsColor), true)
         val playerLocation = LocationUtils.playerLocation()
         for (orb in orbs) {
             if (orb.isDead) continue
             val orbLocation = orb.getLorenzVec()
-            event.drawWaypointFilled(orbLocation.add(-0.5, 1.25, -0.5), color, extraSize = 1.0)
+            val center = orbLocation.add(-0.5, -2.0, -0.5)
+            RenderUtils.drawCylinderInWorld(color, center.x, center.y, center.z, 3.5f, 4.5f, event.partialTicks)
+
             if (orbLocation.distance(playerLocation) < 15) {
                 //TODO find way to dynamically change color
                 event.drawString(orbLocation.add(0.0, 2.5, 0.0), "§cGravity Orb")

@@ -40,7 +40,7 @@ public class Ashfang {
             desc = "Color of the Ashfang Gravity Orbs"
     )
     @ConfigEditorColour
-    public String gravityOrbsColor = "0:245:255:85:85";
+    public String gravityOrbsColor = "0:120:255:85:85";
 
     @Expose
     @ConfigOption(name = "Ashfang Blazing Souls", desc = "Showing the Blazing Souls more clearly")

@@ -8,12 +8,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColour
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 class FireVeilWandParticles {
@@ -58,33 +56,9 @@ class FireVeilWandParticles {
         if (SkyHanniMod.feature.abilities.fireVeilWandDisplay != 1) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
-        val color = Color(SpecialColour.specialToChromaRGB(SkyHanniMod.feature.abilities.fireVeilWandDisplayColor), true)
+        val color =
+            Color(SpecialColour.specialToChromaRGB(SkyHanniMod.feature.abilities.fireVeilWandDisplayColor), true)
 
-        GlStateManager.pushMatrix()
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
-
-        GlStateManager.enableDepth()
-        GlStateManager.enableBlend()
-        GlStateManager.depthFunc(GL11.GL_LEQUAL)
-        GlStateManager.disableCull()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        GlStateManager.enableAlpha()
-        GlStateManager.disableTexture2D()
-
-        GlStateManager.disableDepth()
-        RenderUtils.drawCircle(
-            Minecraft.getMinecraft().thePlayer,
-            event.partialTicks,
-            3.5,
-            color
-        )
-        GlStateManager.enableDepth()
-
-        GlStateManager.enableCull()
-        GlStateManager.enableTexture2D()
-        GlStateManager.enableDepth()
-        GlStateManager.disableBlend()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        GlStateManager.popMatrix()
+        RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)
     }
 }
