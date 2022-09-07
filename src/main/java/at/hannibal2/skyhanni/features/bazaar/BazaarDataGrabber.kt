@@ -13,9 +13,7 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
     companion object {
         private val itemNames = mutableMapOf<String, String>()
 
-        private var lastData = ""
         var lastTime = 0L
-        var blockNoChange = false
         var currentlyUpdating = false
     }
 
@@ -60,32 +58,21 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
     }
 
     private fun checkIfUpdateNeeded() {
-        if (lastData != "") {
-            if (System.currentTimeMillis() - lastTime > 9_000) {
-                blockNoChange = true
-            } else {
-                if (blockNoChange) {
-                    return
-                }
-            }
+        if (System.currentTimeMillis() > lastTime + 10_000) {
+            currentlyUpdating = true
+            lastTime = System.currentTimeMillis()
+            updateBazaarData()
+            currentlyUpdating = false
         }
-
-        currentlyUpdating = true
-        updateBazaarData()
-        currentlyUpdating = false
     }
 
     private fun updateBazaarData() {
         val bazaarData = APIUtil.getJSONResponse("https://api.hypixel.net/skyblock/bazaar")
-        if (bazaarData.toString() != lastData) {
-            lastData = bazaarData.toString()
-            lastTime = System.currentTimeMillis()
-        }
 
         val products = bazaarData["products"].asJsonObject
 
         for (entry in products.entrySet()) {
-            val apiName = entry.key
+            var apiName = entry.key
 
             //TODO use repo
             if (apiName == "ENCHANTED_CARROT_ON_A_STICK") continue
@@ -108,6 +95,16 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 LorenzUtils.warning("§c[SkyHanni] bazaar item '$apiName' not found! Try restarting your minecraft to fix this.")
                 continue
             }
+
+            //parse bazaar api format into internal name format
+            if (apiName.startsWith("ENCHANTMENT_")) {
+                val split = apiName.split("_")
+                val last = split.last()
+                val dropLast = split.drop(1).dropLast(1)
+                val text = dropLast.joinToString("_") + ";" + last
+                apiName = text
+            }
+
             val data = BazaarData(apiName, itemName, sellPrice, buyPrice)
             bazaarMap[itemName] = data
         }
