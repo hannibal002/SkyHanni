@@ -105,3 +105,4 @@
 - Highlight the voidling extremist in pink color
 - Highlight corrupted mobs in purple color
 - Highlight slayer miniboss in blue color
+- Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)

@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
@@ -34,7 +36,7 @@ class HighlightSlayerMiniboss {
 
     private fun find() {
         val entityList = Minecraft.getMinecraft().theWorld.loadedEntityList
-        val list = mutableListOf<Entity>()
+        val list = mutableListOf<EntityLivingBase>()
 
         list.addAll(entityList.filterIsInstance<EntityZombie>().filter {
             it.baseMaxHealth % 24_000 == 0.0 || it.baseMaxHealth % 90_000 == 0.0 || it.baseMaxHealth % 360_000 == 0.0 || it.baseMaxHealth % 600_000 == 0.0 || it.baseMaxHealth % 2_400_000 == 0.0
@@ -56,7 +58,7 @@ class HighlightSlayerMiniboss {
             it.baseMaxHealth % 12_000_000 == 0.0 || it.baseMaxHealth % 25_000_000 == 0.0
         })
 
-        list.filter { it !in miniBosses }.forEach(miniBosses::add)
+        list.filter { it !in miniBosses && !DamageIndicatorManager.isBoss(it) }.forEach(miniBosses::add)
     }
 
     @SubscribeEvent

@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.items.RngMeterInventory;
 import at.hannibal2.skyhanni.features.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
+import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import net.minecraft.client.Minecraft;
@@ -105,6 +106,7 @@ public class SkyHanniMod {
         registerEvent(new HighlightDungeonDeathmite());
         registerEvent(new DungeonHideItems());
         registerEvent(new DungeonCopilot());
+        registerEvent(new EndermanSlayerBeacon());
 
         Commands.init();
 
