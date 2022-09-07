@@ -51,7 +51,7 @@
 - Show the cooldown of items in the inventory
 - Option to change the item background according to the cooldown
 - Hiding the flame particles when using the Fire Veil Wand ability.
-- Circle around the player when having the Fire Veil Wand ability running.
+- Circle around the player when having the Fire Veil Wand ability is running.
 
 ## Summoning Mobs
 - Summoning Soul Display (Show the name of dropped soul laying on the ground, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
