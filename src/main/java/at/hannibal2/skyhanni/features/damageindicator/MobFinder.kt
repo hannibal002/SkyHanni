@@ -237,7 +237,7 @@ class MobFinder {
                 }
             }
             if (entity is EntityDragon) {
-                //TODO testing and make right and so
+                //TODO testing and use sidebar data
                 return EntityResult(bossType = BossType.END_ENDER_DRAGON)
             }
             if (entity is EntityIronGolem) {

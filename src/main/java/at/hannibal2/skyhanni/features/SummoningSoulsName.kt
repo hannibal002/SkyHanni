@@ -12,22 +12,23 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class SummoningSoulsName {
 
     var tick = 0
-    val texture =
+    private val texture =
         "ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU" +
                 "4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdH" +
                 "VyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgI" +
                 "nVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMx" +
                 "NjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ"
 
-    val souls = mutableMapOf<EntityArmorStand, String>()
-    val mobsLastLocation = mutableMapOf<EntityLiving, LorenzVec>()
-    val mobsName = mutableMapOf<EntityLiving, String>()
+    private val souls = mutableMapOf<EntityArmorStand, String>()
+    private val mobsLastLocation = mutableMapOf<EntityLiving, LorenzVec>()
+    private val mobsName = mutableMapOf<EntityLiving, String>()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -101,6 +102,13 @@ class SummoningSoulsName {
             val vec = entity.getLorenzVec()
             event.drawString(vec.add(0.0, 2.5, 0.0), name)
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        souls.clear()
+        mobsLastLocation.clear()
+        mobsName.clear()
     }
 
     private fun isSoul(entity: EntityArmorStand): Boolean {

@@ -24,6 +24,9 @@ object LorenzUtils {
     val skyBlockIsland: String
         get() = HypixelData.mode
 
+    val inKuudraFight: Boolean
+        get() = skyBlockIsland == "Instanced"
+
     const val DEBUG_PREFIX = "[Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
 

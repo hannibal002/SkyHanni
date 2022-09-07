@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.play.server.S0EPacketSpawnObject
-import net.minecraft.network.play.server.S0FPacketSpawnMob
-import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,9 +16,13 @@ class LorenzTest {
     var packetLog = LorenzLogger("debug/packets")
 
     companion object {
-        var enabled = false
-        var togglePacketLog = false
+        private var shouldLogPackets = false
         var text = ""
+
+        //        var a = 127.0
+        var a = 2.0
+        var b = 0.0
+        var c = 0.0
 
         val debugLogger = LorenzLogger("debug/test")
 
@@ -37,6 +39,11 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
+
+            a = args[0].toDouble()
+            b = args[1].toDouble()
+            c = args[2].toDouble()
+
 //            togglePacketLog = !togglePacketLog
 
 //            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
@@ -49,51 +56,72 @@ class LorenzTest {
 //                println("tablist: '$line'")
 //            }
         }
+
+        fun togglePacketLog() {
+            shouldLogPackets = !shouldLogPackets
+        }
     }
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (!SkyHanniMod.feature.debug.enabled) return
 
-        if (enabled) {
-            SkyHanniMod.feature.debug.testPos.renderString(text)
-        }
+        SkyHanniMod.feature.debug.testPos.renderString(text)
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
         val name = packet.javaClass.simpleName
-        if (!togglePacketLog) return
+        if (!shouldLogPackets) return
 
         packetLog.log(name)
 
-        if (packet is S0FPacketSpawnMob) {
-            packetLog.log("")
-            packetLog.log("Spawn Mob!")
-            for (watchableObject in packet.func_149027_c()) {
-                val any = watchableObject.`object`
-                val simpleName = any.javaClass.simpleName
+//        if (packet is S18PacketEntityTeleport) {
+//            val entityId = packet.entityId
+//            packetLog.log("entityId: $entityId")
+//            val entity = Minecraft.getMinecraft().theWorld.loadedEntityList.find { it.entityId == entityId }
+//            val className = entity?.javaClass?.name ?: "null"
+//            packetLog.log("className: $className")
+//
+//            if (Minecraft.getMinecraft().thePlayer.isSneaking) {
+//                if (entity is EntityArmorStand) {
+//                    event.isCanceled = true
+//                }
+//            }
+//        }
 
-                packetLog.log("javaClass: $simpleName")
-                packetLog.log("object: $any")
-                packetLog.log(" ")
-            }
-            packetLog.log(" ")
-        }
-        if (packet is S1CPacketEntityMetadata) {
-            packetLog.log("")
-            packetLog.log("Entity Metadata")
-            for (watchableObject in packet.func_149376_c()) {
-                val any = watchableObject.`object`
-                val simpleName = any.javaClass.simpleName
 
-                packetLog.log("javaClass: $simpleName")
-                packetLog.log("object: $any")
-                packetLog.log(" ")
-            }
-            packetLog.log(" ")
-        }
+//        if (packet is S0FPacketSpawnMob) {
+//            packetLog.log("")
+//            packetLog.log("Spawn Mob!")
+//            for (watchableObject in packet.func_149027_c()) {
+//                val any = watchableObject.`object`
+//                val simpleName = any.javaClass.simpleName
+//
+//                packetLog.log("javaClass: $simpleName")
+//                packetLog.log("object: $any")
+//                packetLog.log(" ")
+//            }
+//            packetLog.log(" ")
+//        }
+
+
+//        if (packet is S1CPacketEntityMetadata) {
+//            packetLog.log("")
+//            packetLog.log("Entity Metadata")
+//            for (watchableObject in packet.func_149376_c()) {
+//                val any = watchableObject.`object`
+//                val simpleName = any.javaClass.simpleName
+//
+//                packetLog.log("javaClass: $simpleName")
+//                packetLog.log("object: $any")
+//                packetLog.log(" ")
+//            }
+//            packetLog.log(" ")
+//        }
+
+
 //        if (packet is S20PacketEntityProperties) {
 //            packetLog.log("")
 //            packetLog.log("Entity Properties")

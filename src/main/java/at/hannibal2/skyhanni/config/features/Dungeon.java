@@ -16,7 +16,7 @@ public class Dungeon {
     public boolean showMilestone = false;
 
     @Expose
-    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone inside Dungeons.")
+    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in the Dungeon.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showMilestonesDisplay = false;
@@ -61,7 +61,84 @@ public class Dungeon {
     public boolean cleanEndF3IgnoreGuardians = false;
 
     @Expose
-    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room (fixing Skytils feature)")
+    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room. (fixing Skytils feature)")
     @ConfigEditorBoolean
     public boolean damageSplashBoss = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color.")
+    @ConfigEditorBoolean
+    public boolean highlightDeathmites = false;
+
+    @ConfigOption(name = "Item Hider", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    public boolean itemHider = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideSuperboomTNT = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideBlessing = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideReviveStone = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hidePremiumFlesh = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Journal Entry", desc = "Hide Journal Entry pages laying around in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideJournalEntry = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideSkeletonSkull = false;
+
+    @ConfigOption(name = "Message Filter", desc = "")
+    @ConfigEditorAccordion(id = 4)
+    public boolean messageFilter = false;
+
+    @Expose
+    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 4)
+    public boolean messageFilterKeysAndDoors = false;
+
+    @ConfigOption(name = "Dungeon Copilot", desc = "")
+    @ConfigEditorAccordion(id = 5)
+    public boolean dungeonCopilot = false;
+
+    @Expose
+    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean copilotEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Copilot Pos", desc = "")
+    @ConfigEditorButton(runnableId = "dungeonCopilot", buttonText = "Edit")
+    @ConfigAccordionId(id = 5)
+    public Position copilotPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into a " +
+            "Skeletor in orange color (not useful combined with feature Hide Skeleton Skull)")
+    @ConfigEditorBoolean
+    public boolean highlightSkeletonSkull = false;
 }

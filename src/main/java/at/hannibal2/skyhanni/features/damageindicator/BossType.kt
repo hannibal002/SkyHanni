@@ -62,7 +62,6 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
      * lost adventurer
      * frozen adventurer
      * king midas
-     * silverfish 2b one tap - deathmite outside trap
      * in blood room: bonzo, scarf, ??
      * f7 blood room giants
      *

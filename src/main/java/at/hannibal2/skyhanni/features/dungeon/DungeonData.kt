@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
+import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -32,7 +34,10 @@ class DungeonData {
             val message = rawMessage.removeColor()
             val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
             if (bossName != "The Watcher" && dungeonFloor != null && checkBossName(dungeonFloor!!, bossName)) {
-                inBossRoom = true
+                if (!inBossRoom) {
+                    DungeonBossRoomEnterEvent().postAndCatch()
+                    inBossRoom = true
+                }
             }
         }
 
@@ -59,8 +64,11 @@ class DungeonData {
         if (event.phase != TickEvent.Phase.START) return
         if (dungeonFloor == null) {
             for (line in ScoreboardData.sidebarLines) {
+                //TODO mixins
                 if (line.contains("The Catacombs (")) {
-                    dungeonFloor = line.substringAfter("(").substringBefore(")")
+                    val floor = line.substringAfter("(").substringBefore(")")
+                    dungeonFloor = floor
+                    DungeonEnterEvent(floor).postAndCatch()
                     break
                 }
             }

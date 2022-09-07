@@ -72,13 +72,13 @@ class ChatFilter {
     }
 
     private fun uselessNotification(message: String): Boolean {
-        return when {
-            message == "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!" -> true
+        if (message.matchRegex("§aYou tipped (\\d) (player|players)!")) return true
 
-            message == "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!" -> true
-            message == "§cYour Mining Speed Boost has expired!" -> true
-            message == "§a§r§6Mining Speed Boost §r§ais now available!" -> true
-
+        return when (message) {
+            "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!" -> true
+            "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!" -> true
+            "§cYour Mining Speed Boost has expired!" -> true
+            "§a§r§6Mining Speed Boost §r§ais now available!" -> true
             else -> false
         }
     }
@@ -92,7 +92,7 @@ class ChatFilter {
         message == "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!" -> true
         message == "§cWhoa! Slow down there!" -> true
         message == "§cWait a moment before confirming!" -> true
-        message == "§cYou need to be out of combat for 3 seconds before opening the SkyBlock Menu!" -> true//TODO prevent in the future
+        message == "§cYou cannot open the SkyBlock menu while in combat!" -> true
 
         else -> false
     }
@@ -206,21 +206,22 @@ class ChatFilter {
 
     private fun bazaarAndAHMiniMessages(message: String): Boolean = when (message) {
         "§7Putting item in escrow...",
-        "§7Putting goods in escrow...",
         "§7Putting coins in escrow...",
 
             //Auction House
         "§7Setting up the auction...",
         "§7Processing purchase...",
-        "§7Claiming order...",
         "§7Processing bid...",
         "§7Claiming BIN auction...",
 
             //Bazaar
-        "§7Submitting sell offer...",
-        "§7Submitting buy order...",
-        "§7Executing instant sell...",
-        "§7Executing instant buy...",
+        "§6[Bazaar] §r§7Submitting sell offer...",
+        "§6[Bazaar] §r§7Submitting buy order...",
+        "§6[Bazaar] §r§7Executing instant sell...",
+        "§6[Bazaar] §r§7Executing instant buy...",
+        "§6[Bazaar] §r§7Cancelling order...",
+        "§6[Bazaar] §r§7Claiming order...",
+        "§6[Bazaar] §r§7Putting goods in escrow...",
 
             //Bank
         "§8Depositing coins...",

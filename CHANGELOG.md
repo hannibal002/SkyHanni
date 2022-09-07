@@ -1,5 +1,33 @@
 # SkyHanni - Change Log
 
+## Version 0.7 - Dungeon and Colored Highlight
+
+## New Dungeon Features
+- Added highlight deathmites in dungeon in red color
+- Added hide Superboom TNT laying around in dungeon
+- Added hide Blessings laying around in dungeon
+- Added hide Revive Stones laying around in dungeon
+- Added hide Premium Flesh laying around in dungeon
+- Added Dungeon Copilot (Suggests to you what to do next in dungeon)
+- Added separate option to hide dungeon key pickup and door open messages
+- Added hide Journal Entry pages laying around in dungeon.
+- Added hide Skeleton Skulls laying around in dungeon.
+- Added highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
+
+
+### Other Misc Features
+- Added option to hide the Skyblock Level from the chat messages (alpha only atm)
+- Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
+- Added highlight the voidling extremist in pink color
+- Added highlight corrupted mobs in purple color
+- Added command /shmarkplayer (marking a player with yellow color)
+- Added highlight slayer miniboss in blue color
+- Added option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
+- Added highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
+
+### Fixes
+- Fixed message filter for small bazaar messages
+
 ## Version 0.6 - Ashfang and Summoning Mobs
 
 ### New Features

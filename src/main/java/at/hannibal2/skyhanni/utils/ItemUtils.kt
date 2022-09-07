@@ -15,7 +15,7 @@ object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun isSack(name: String): Boolean = name.endsWith(" Sack")//TODO change
+    fun isSack(name: String): Boolean = name.endsWith(" Sack")//TODO use item id or api or something? or dont, its working fine now
 
     fun ItemStack.getLore(): List<String> {
         val tagCompound = this.tagCompound ?: return emptyList()
