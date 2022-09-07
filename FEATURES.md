@@ -18,7 +18,7 @@
 + Dungeon Boss Message hider (includes The Watcher as well)
 - Option to hide the Skyblock Level from the chat messages,
 - Option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
-- Option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
+- Option to hide the death messages of other players, except for players who are close to the player, inside dungeon or during a Kuudra fight.
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
