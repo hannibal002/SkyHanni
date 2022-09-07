@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -48,7 +49,10 @@ class BazaarBestSellMethod {
                 if (slot.slotNumber == slot.slotIndex) continue
                 if (slot.stack == null) continue
                 val stack = slot.stack
-                val displayName = stack.displayName
+                var displayName = stack.displayName
+                if (displayName.endsWith("Enchanted Book")) {
+                    displayName = stack.getLore()[0]
+                }
                 if (BazaarApi.getCleanBazaarName(displayName) == name) {
                     having += stack.stackSize
                 }

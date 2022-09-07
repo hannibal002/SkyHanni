@@ -121,8 +121,8 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
             itemNames[apiName] = itemName
             itemName
         } else {
-            if (apiName.startsWith("ENCHANTMENT_ULTIMATE_")) {
-                val enchantmentName = getEnchantmentRealName(apiName.split("_ULTIMATE_")[1])
+            if (apiName.startsWith("ENCHANTMENT_ULTIMATE_") && !apiName.contains("JERRY") && !apiName.contains("WISE")) {
+                val enchantmentName = getEnchantmentRealName(apiName.split("ENCHANTMENT_ULTIMATE_")[1])
                 itemNames[apiName] = enchantmentName
                 enchantmentName
             } else if (apiName.startsWith("ENCHANTMENT_")) {
