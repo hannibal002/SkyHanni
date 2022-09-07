@@ -22,7 +22,7 @@
 - Added highlight corrupted mobs in purple color
 - Added command /shmarkplayer (marking a player with yellow color)
 - Added highlight slayer miniboss in blue color
-- Added option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
+- Added option to hide the death messages of other players, except for players who are close to the player, inside dungeon or during a Kuudra fight.
 - Added highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
 
 ### Fixes
