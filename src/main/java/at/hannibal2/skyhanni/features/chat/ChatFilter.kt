@@ -72,7 +72,7 @@ class ChatFilter {
     }
 
     private fun uselessNotification(message: String): Boolean {
-        if (message.matchRegex("§aYou tipped (\\d) (player|players)!")) return true
+        if (message.matchRegex("§aYou tipped (\\d+) (player|players)!")) return true
 
         return when (message) {
             "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!" -> true
