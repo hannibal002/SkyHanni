@@ -76,6 +76,11 @@ public class Features {
             editOverlay(activeConfigCategory, 200, 16, abilities.summoningMobDisplayPos);
             return;
         }
+
+        if (runnableId.equals("dungeonCopilot")) {
+            editOverlay(activeConfigCategory, 200, 16, dungeon.copilotPos);
+            return;
+        }
     }
 
     @Expose

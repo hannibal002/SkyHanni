@@ -3,22 +3,18 @@ package at.hannibal2.skyhanni;
 import at.hannibal2.skyhanni.config.ConfigManager;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.gui.commands.Commands;
-import at.hannibal2.skyhanni.data.ApiKeyGrabber;
-import at.hannibal2.skyhanni.data.HypixelData;
-import at.hannibal2.skyhanni.data.ItemRenderBackground;
-import at.hannibal2.skyhanni.data.ScoreboardData;
+import at.hannibal2.skyhanni.data.*;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.features.*;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
-import at.hannibal2.skyhanni.features.chat.ChatFilter;
-import at.hannibal2.skyhanni.features.chat.ChatManager;
-import at.hannibal2.skyhanni.features.chat.PlayerChatFilter;
+import at.hannibal2.skyhanni.features.chat.*;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
+import at.hannibal2.skyhanni.features.end.VoidlingExtremistColor;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.features.fishing.TrophyFishMessages;
@@ -29,6 +25,8 @@ import at.hannibal2.skyhanni.features.items.RngMeterInventory;
 import at.hannibal2.skyhanni.features.items.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
+import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
+import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -43,7 +41,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.6";
+    public static final String VERSION = "0.7";
 
     public static Features feature;
 
@@ -61,10 +59,13 @@ public class SkyHanniMod {
         registerEvent(new ApiKeyGrabber());
         registerEvent(new SeaCreatureManager());
         registerEvent(new ItemRenderBackground());
+        registerEvent(new EntityData());
+        registerEvent(new EntityMovementHelper());
 
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());
         registerEvent(new PlayerChatFilter());
+        registerEvent(new SkyBlockLevelChatMessage());
         registerEvent(new DungeonChatFilter());
         registerEvent(new HideNotClickableItems());
         registerEvent(new ItemDisplayOverlayFeatures());
@@ -97,6 +98,15 @@ public class SkyHanniMod {
         registerEvent(new RngMeterInventory());
         registerEvent(new WikiCommand());
         registerEvent(new SummoningMobManager());
+        registerEvent(new VoidlingExtremistColor());
+        registerEvent(new CorruptedMobHighlight());
+        registerEvent(new PlayerMarker());
+        registerEvent(new HighlightSlayerMiniboss());
+        registerEvent(new HideFarDeathMessages());
+        registerEvent(new HighlightDungeonDeathmite());
+        registerEvent(new DungeonHideItems());
+        registerEvent(new DungeonCopilot());
+        registerEvent(new EndermanSlayerBeacon());
 
         Commands.init();
 

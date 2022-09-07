@@ -48,4 +48,24 @@ public class Misc {
     @ConfigOption(name = "Real Time Position", desc = "")
     @ConfigEditorButton(runnableId = "realTime", buttonText = "Edit")
     public Position realTimePos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Voidling Extremist Color", desc = "Highlight the voidling extremist in pink color")
+    @ConfigEditorBoolean
+    public boolean voidlingExtremistColor = false;
+
+    @Expose
+    @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")
+    @ConfigEditorBoolean
+    public boolean corruptedMobHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Slayer Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
+    @ConfigEditorBoolean
+    public boolean slayerMinibossHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Slayer Enderman Beacon", desc = "Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)")
+    @ConfigEditorBoolean
+    public boolean slayerEndermanBeacon = false;
 }

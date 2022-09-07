@@ -29,8 +29,7 @@ class DungeonChatFilter {
         if (!LorenzUtils.inDungeons) return ""
 
         return when {
-            isKey(message) -> "key"
-            isDoor(message) -> "door"
+            isUnsortedBlockedMessage(message) -> "unsorted"
             isPickup(message) -> "pickup"
             isReminder(message) -> "reminder"
             isBuff(message) -> "buff"
@@ -44,8 +43,6 @@ class DungeonChatFilter {
         }
     }
 
-    private fun isDoor(message: String): Boolean = message == "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
-
     private fun isEnd(message: String): Boolean = when {
         message.matchRegex("(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!") -> true
         message.matchRegex("    §r§d(.*) Essence §r§8x(.*)") -> true
@@ -58,6 +55,7 @@ class DungeonChatFilter {
         message.matchRegex("§7Your Guided Sheep hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.") -> true
         message == "§6Rapid Fire§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!" -> true
         message == "§6Castle of Stone§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!" -> true
+        message == "§6Ragnarok§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!" -> true
 
 
         message.matchRegex("§a§lBUFF! §fYou were splashed by (.*) §fwith §r§cHealing VIII§r§f!") -> true
@@ -159,14 +157,10 @@ class DungeonChatFilter {
         else -> false
     }
 
-    private fun isKey(message: String): Boolean = when {
-        message.matchRegex("(.*) §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!") -> true
-        message.matchRegex("(.*) opened a §r§8§lWITHER §r§adoor!") -> true
-        message.matchRegex("(.*) §r§ehas obtained §r§a§r§c§r§cBlood Key§r§e!") -> true
+    //TODO sort out and filter separately
+    private fun isUnsortedBlockedMessage(message: String): Boolean = when {
         message.matchRegex("(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!") -> true
         message == "§5A shiver runs down your spine..." -> true
-        message == "§eA §r§a§r§6§r§8Wither Key§r§e was picked up!" -> true
-        message == "§eA §r§a§r§c§r§cBlood Key§r§e was picked up!" -> true
 
         else -> false
     }
@@ -216,7 +210,7 @@ class DungeonChatFilter {
         message == "§aYour active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons." -> true
         message.matchRegex("(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.") -> true
         message.matchRegex("§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.") -> true
-        message.matchRegex("(.*) §a is now ready!") -> true
+        message.matchRegex("(.*)§a is now ready!") -> true
         message.matchRegex("§aDungeon starts in (.*) seconds.") -> true
         message == "§aDungeon starts in 1 second." -> true
         message == "§aYou can no longer consume or splash any potions during the remainder of this Dungeon run!" -> true

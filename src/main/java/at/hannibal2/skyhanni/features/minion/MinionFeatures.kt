@@ -147,12 +147,7 @@ class MinionFeatures {
         //§7Held Coins: §b151,389
         val coins = line.split(": §b")[1].replace(",", "").toDouble()
 
-        println(" ")
-        println("coins: $coins")
-        println("duration: $duration")
-
         val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
-        println("coinsPerDay: $coinsPerDay")
 
         val format = formatInteger(coinsPerDay.toInt())
         val hopperName = stack.name
@@ -186,7 +181,6 @@ class MinionFeatures {
             lastCoinsRecived = System.currentTimeMillis()
         }
         if (event.message.startsWith("§aYou picked up a minion!")) {
-            println("pick up minion message")
             lastMinionPickedUp = System.currentTimeMillis()
         }
     }

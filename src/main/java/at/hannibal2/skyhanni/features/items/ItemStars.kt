@@ -77,7 +77,7 @@ class ItemStars {
             GlStateManager.disableBlend()
             event.fontRenderer.drawStringWithShadow(
                 stackTip,
-                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),
+                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),//TODO search for this line and replace all other methods into an api
                 (event.y + 9).toFloat(),
                 16777215
             )

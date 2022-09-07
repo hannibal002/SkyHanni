@@ -1,7 +1,9 @@
 # SkyHanni - List of all Features
 
 ## Commands
+- /skyhanni or /sh (opening the SkyHanni config in game)
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
+- /shmarkplayer (marking a player with yellow color)
 
 ## Chat Filter
 - Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message, radiating generosity, HyPixel tournaments)
@@ -12,8 +14,11 @@
 
 ## Chat
 + Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
-+ Dungeon Filter (Removing annoying messages from inside dungeon)
++ Dungeon Filter (Removing annoying messages from in the dungeon)
 + Dungeon Boss Message hider (includes The Watcher as well)
+- Option to hide the Skyblock Level from the chat messages,
+- Option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
+- Option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
@@ -22,6 +27,16 @@
 - Clean End (Hiding all entities and particles from displaying after the last dungeon boss dies, showing dungeon chests, still)
 - Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
 - Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
+- Highlight deathmites in red color
+- Hide Superboom TNT laying around in dungeon
+- Hide Blessings laying around in dungeon
+- Hide Revive Stones laying around in dungeon
+- Hide Premium Flesh laying around in dungeon
+- Hide Journal Entry pages laying around in dungeon.
+- Dungeon Copilot (Suggests to you what to do next in dungeon)
+- Option to hide key pickup and door open messages in dungeon.
+- Hide Skeleton Skulls laying around in dungeon.
+- Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
 
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
@@ -87,3 +102,7 @@
 - Summon Soul Display (show the name of a dropped soul, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
 - Fixing Skytils custom Damage Splash
 - Gui element showing the real time
+- Highlight the voidling extremist in pink color
+- Highlight corrupted mobs in purple color
+- Highlight slayer miniboss in blue color
+- Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)

@@ -72,9 +72,6 @@ class RngMeterInventory {
                     val stack = slot.stack
                     if (stack.getLore().any { it.contains("You don't have an RNG drop") }) {
                         slot highlight LorenzColor.RED
-//                        val color = LorenzColor.RED.addOpacity(160)
-//                        slot.stack.background = color.rgb
-                        //TODO use other coloring logic
                     }
                 }
             }
@@ -86,8 +83,6 @@ class RngMeterInventory {
                     val stack = slot.stack
                     if (stack.getLore().any { it.contains("§aSELECTED") }) {
                         slot highlight LorenzColor.YELLOW
-//                        val color = LorenzColor.YELLOW.addOpacity(160)
-//                        slot.stack.background = color.rgb
                     }
                 }
             }

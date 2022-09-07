@@ -42,6 +42,10 @@ class DamageIndicatorManager {
         private var data = mutableMapOf<UUID, EntityData>()
         private val damagePattern: Pattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
 
+        fun isBoss(entity: EntityLivingBase): Boolean {
+            return data.values.any { it.entity == entity }
+        }
+
         fun isDamageSplash(entity: EntityLivingBase): Boolean {
             if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
             if (!entity.hasCustomName()) return false
