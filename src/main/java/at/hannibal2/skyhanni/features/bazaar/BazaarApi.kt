@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.bazaar
 
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.item.ItemStack
 
 class BazaarApi {
 
@@ -44,9 +46,10 @@ class BazaarApi {
             return null
         }
 
-        fun isBazaarItem(name: String): Boolean {
-            val bazaarName = getCleanBazaarName(name)
-            return bazaarMap.containsKey(bazaarName)
+        fun isBazaarItem(stack: ItemStack): Boolean {
+            val internalName = stack.getInternalName()
+            return bazaarMap.any { it.value.apiName == internalName }
+
         }
     }
 
