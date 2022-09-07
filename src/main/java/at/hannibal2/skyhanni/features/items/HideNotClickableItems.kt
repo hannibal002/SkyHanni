@@ -384,8 +384,7 @@ class HideNotClickableItems {
             return true
         }
 
-        val displayName = stack.displayName
-        if (bazaarInventory != BazaarApi.isBazaarItem(displayName)) {
+        if (bazaarInventory != BazaarApi.isBazaarItem(stack)) {
             if (bazaarInventory) hideReason = "This item is not a Bazaar Product!"
             if (auctionHouseInventory) hideReason = "Bazaar Products cannot be auctioned!"
 
