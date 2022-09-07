@@ -1,8 +1,17 @@
 # SkyHanni - Change Log
 
+## Version 0.7.1
+
+### Misc
+- Added hiding the flame particles when using the Fire Veil Wand ability
+
+### Fixes
+- Fixed enchanted books in bazaar
+
+
 ## Version 0.7 - Dungeon and Colored Highlight
 
-## New Dungeon Features
+### New Dungeon Features
 - Added highlight deathmites in dungeon in red color
 - Added hide Superboom TNT laying around in dungeon
 - Added hide Blessings laying around in dungeon
@@ -22,7 +31,7 @@
 - Added highlight corrupted mobs in purple color
 - Added command /shmarkplayer (marking a player with yellow color)
 - Added highlight slayer miniboss in blue color
-- Added option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
+- Added option to hide the death messages of other players, except for players who are close to the player, inside dungeon or during a Kuudra fight.
 - Added highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
 
 ### Fixes

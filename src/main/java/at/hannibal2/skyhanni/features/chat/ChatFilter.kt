@@ -66,13 +66,13 @@ class ChatFilter {
             message.matchRegex("§aFriend > §r(.*) §r§e(joined|left).") -> {
                 true
             }
+
             else -> false
         }
-
     }
 
     private fun uselessNotification(message: String): Boolean {
-        if (message.matchRegex("§aYou tipped (\\d) (player|players)!")) return true
+        if (message.matchRegex("§aYou tipped (\\d+) (player|players)!")) return true
 
         return when (message) {
             "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!" -> true
@@ -225,7 +225,9 @@ class ChatFilter {
 
             //Bank
         "§8Depositing coins...",
-        "§8Withdrawing coins..." -> true
+        "§8Withdrawing coins...",
+        -> true
+
         else -> false
     }
 
@@ -296,7 +298,9 @@ class ChatFilter {
 
         "",
         "§f",
-        "§c" -> true
+        "§c",
+        -> true
+
         else -> false
     }
 }

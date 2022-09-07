@@ -9,7 +9,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class EntityMovementHelper {
+class EntityMovementData {
 
     companion object {
         private val entityLocation = mutableMapOf<Entity, LorenzVec>()

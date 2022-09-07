@@ -82,7 +82,7 @@ public class Inventory {
     public boolean rngMeterNoDrop = false;
 
     @Expose
-    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs oder slayer rng meter inventory")
+    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs or slayer rng meter inventory")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterSelectedDrop = false;

@@ -18,7 +18,7 @@
 + Dungeon Boss Message hider (includes The Watcher as well)
 - Option to hide the Skyblock Level from the chat messages,
 - Option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
-- Option to hide the death messages of other players, except for players who are close to the player, inside dungeon or doing a Kuudra fight.
+- Option to hide the death messages of other players, except for players who are close to the player, inside dungeon or during a Kuudra fight.
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
@@ -47,14 +47,16 @@
 - Added compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
 - RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
 
-## Item Cooldown
+## Item Abilities
 - Show the cooldown of items in the inventory
 - Option to change the item background according to the cooldown
+- Hiding the flame particles when using the Fire Veil Wand ability.
 
 ## Summoning Mobs
+- Summoning Soul Display (Show the name of dropped soul laying on the ground, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
 - Option to hide the nametag of your spawned summoning mobs
 - Option to mark the own summoning mobs in green
-- Summoning mob display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
+- Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
 
 
 ## Ashfang
@@ -99,7 +101,6 @@
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
 - Hiding exp Bottles lying on the ground
-- Summon Soul Display (show the name of a dropped soul, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
 - Fixing Skytils custom Damage Splash
 - Gui element showing the real time
 - Highlight the voidling extremist in pink color
