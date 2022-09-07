@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.play.server.S0EPacketSpawnObject
+import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,9 +21,8 @@ class LorenzTest {
         private var shouldLogPackets = false
         var text = ""
 
-        //        var a = 127.0
-        var a = 2.0
-        var b = 0.0
+        var a = 127.0
+        var b = 60.0
         var c = 0.0
 
         val debugLogger = LorenzLogger("debug/test")
@@ -62,6 +63,15 @@ class LorenzTest {
         }
     }
 
+//    @SubscribeEvent
+//    fun onItemTooltipLow(event: ItemTooltipEvent) {
+//        val itemStack = event.itemStack
+//        if (itemStack != null) {
+//            val internalName = itemStack.getInternalName()
+//            event.toolTip.add("internal name: $internalName")
+//        }
+//    }
+
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (!SkyHanniMod.feature.debug.enabled) return
@@ -70,12 +80,53 @@ class LorenzTest {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+    fun onHypExplosions(event: PacketEvent.ReceiveEvent) {
+        val packet = event.packet
+        if (packet !is S2APacketParticles) return
+        if (packet.particleType == EnumParticleTypes.EXPLOSION_LARGE) {
+            event.isCanceled = true
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
         val name = packet.javaClass.simpleName
+
         if (!shouldLogPackets) return
 
-        packetLog.log(name)
+//        if (packet is S2APacketParticles) {
+//
+//
+//            val particleType = packet.particleType
+//            println("")
+//            println("particleType: $particleType")
+//
+////            val particleType = packet.particleType
+////            val particleCount = packet.particleCount
+////
+////            var lorenzVec = packet.toLorenzVec()
+//////            if (lorenzVec.distance(LocationUtils.playerLocation()) > 20) return
+////
+////            if (particleType == EnumParticleTypes.FLAME) {
+////
+////                println(" ")
+////                val particleSpeed = packet.particleSpeed
+////                val xOffset = packet.xOffset
+////                val yOffset = packet.yOffset
+////                val zOffset = packet.zOffset
+////                println("particleCount: $particleCount")
+////                println("particleSpeed: $particleSpeed")
+////                println("xOffset: $xOffset")
+////                println("yOffset: $yOffset")
+////                println("zOffset: $zOffset")
+////            }
+//
+//
+//        }
+
+        println(name)
+//        packetLog.log(name)
 
 //        if (packet is S18PacketEntityTeleport) {
 //            val entityId = packet.entityId
