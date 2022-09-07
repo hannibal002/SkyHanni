@@ -204,21 +204,25 @@ class LorenzTest {
 //    @SubscribeEvent
 //    fun onGetBlockModel(event: RenderBlockInWorldEvent) {
 //        if (!LorenzUtils.inSkyblock || !SkyHanniMod.feature.debug.enabled) return
+//
 //        val state = event.state
 //
 //        if (event.state != null && event.pos != null) {
 ////            if ((event.pos as BlockPos).y <= 76) {
-//            val block = (state as IBlockState).block
+////            val block = (state as IBlockState).block
+////
+////            if (block == Blocks.wool || block == Blocks.stained_hardened_clay || block == Blocks.bedrock ||
+////                block == Blocks.netherrack || block == Blocks.nether_brick || block == Blocks.coal_block) {
+////                event.state = Blocks.stained_hardened_clay.blockState.block.defaultState
+////            }
 //
+////            if (block === Blocks.flowing_lava) {
+////                event.state = Blocks.flowing_water.blockState.block.defaultState
+////            }
 //
-//            if (block === Blocks.flowing_lava) {
-//                event.state = Blocks.flowing_water.blockState.block.defaultState
-//            }
-//
-//            if (block === Blocks.lava) {
-//                event.state = Blocks.water.blockState.block.defaultState
-//            }
-//
+////            if (block === Blocks.lava) {
+////                event.state = Blocks.water.blockState.block.defaultState
+////            }
 //
 //
 ////            if (block === Blocks.redstone_lamp) {
