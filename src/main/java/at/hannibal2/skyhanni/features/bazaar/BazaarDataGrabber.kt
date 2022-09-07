@@ -85,7 +85,7 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
         val products = bazaarData["products"].asJsonObject
 
         for (entry in products.entrySet()) {
-            val apiName = entry.key
+            var apiName = entry.key
 
             //TODO use repo
             if (apiName == "ENCHANTED_CARROT_ON_A_STICK") continue
@@ -108,6 +108,16 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 LorenzUtils.warning("§c[SkyHanni] bazaar item '$apiName' not found! Try restarting your minecraft to fix this.")
                 continue
             }
+
+            //parse bazaar api format into internal name format
+            if (apiName.startsWith("ENCHANTMENT_")) {
+                val split = apiName.split("_")
+                val last = split.last()
+                val dropLast = split.drop(1).dropLast(1)
+                val text = dropLast.joinToString("_") + ";" + last
+                apiName = text
+            }
+
             val data = BazaarData(apiName, itemName, sellPrice, buyPrice)
             bazaarMap[itemName] = data
         }

@@ -5,6 +5,9 @@
 ### Misc
 - Added hiding the flame particles when using the Fire Veil Wand ability
 
+### Fixes
+- Fixed enchanted books in bazaar
+
 
 ## Version 0.7 - Dungeon and Colored Highlight
 
