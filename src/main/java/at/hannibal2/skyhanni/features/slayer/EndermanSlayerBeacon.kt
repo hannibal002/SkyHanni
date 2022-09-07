@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -76,7 +75,7 @@ class EndermanSlayerBeacon {
         if (!isEnabled()) return
 
         if (event.entity in armorStands) {
-            event.color = LorenzColor.DARK_RED.toColor().withAlpha(LorenzTest.a.toInt())
+            event.color = LorenzColor.DARK_RED.toColor().withAlpha(1)
         }
     }
 

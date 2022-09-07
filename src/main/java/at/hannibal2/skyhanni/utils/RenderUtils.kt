@@ -8,6 +8,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
@@ -443,4 +444,35 @@ object RenderUtils {
             offsetY += 14
         }
     }
+
+    // totally not modified Autumn Client's TargetStrafe
+    fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
+        var il = 0.0
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+        while (il < 0.05) {
+            GlStateManager.pushMatrix()
+            GlStateManager.disableTexture2D()
+            GL11.glLineWidth(2F)
+            worldRenderer.begin(1, DefaultVertexFormats.POSITION)
+            val renderManager = Minecraft.getMinecraft().renderManager
+            val x: Double =
+                entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - renderManager.viewerPosX
+            val y: Double =
+                entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - renderManager.viewerPosY
+            val z: Double =
+                entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - renderManager.viewerPosZ
+            val pix2 = Math.PI * 2.0
+            for (i in 0..90) {
+                color.bindColor()
+                worldRenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
+            }
+            tessellator.draw()
+            GlStateManager.enableTexture2D()
+            GlStateManager.popMatrix()
+            il += 0.0006
+        }
+    }
+
+    private fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
 }
