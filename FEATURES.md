@@ -47,9 +47,10 @@
 - Added compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
 - RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
 
-## Item Cooldown
+## Item Abilities
 - Show the cooldown of items in the inventory
 - Option to change the item background according to the cooldown
+- Hiding the flame particles when using the Fire Veil Wand ability.
 
 ## Summoning Mobs
 - Summoning Soul Display (Show the name of dropped soul laying on the ground, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)

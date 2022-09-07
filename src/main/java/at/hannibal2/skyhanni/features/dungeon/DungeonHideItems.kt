@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.EntityMovementHelper
+import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.network.play.server.S2APacketParticles
@@ -121,7 +121,7 @@ class DungeonHideItems {
         }
 
         if (isSkeletonSkull(entity)) {
-            EntityMovementHelper.addToTrack(entity)
+            EntityMovementData.addToTrack(entity)
             if (SkyHanniMod.feature.dungeon.hideSkeletonSkull) {
                 val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
                 if (lastMove + 100 > System.currentTimeMillis()) {
@@ -139,7 +139,7 @@ class DungeonHideItems {
 
         val packet = event.packet
         if (packet is S2APacketParticles) {
-            val packetLocation = LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate)
+            val packetLocation = packet.toLorenzVec()
             for (armorStand in hideParticles.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
                 val distance = packetLocation.distance(armorStand.getLorenzVec())
                 if (distance < 2) {

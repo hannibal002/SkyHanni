@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import net.minecraft.entity.Entity
+import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
@@ -108,3 +109,5 @@ fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 
 fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
+
+fun S2APacketParticles.toLorenzVec(): LorenzVec = LorenzVec(xCoordinate, yCoordinate, zCoordinate)
