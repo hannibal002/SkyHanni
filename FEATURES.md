@@ -52,9 +52,10 @@
 - Option to change the item background according to the cooldown
 
 ## Summoning Mobs
+- Summoning Soul Display (Show the name of dropped soul laying on the ground, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
 - Option to hide the nametag of your spawned summoning mobs
 - Option to mark the own summoning mobs in green
-- Summoning mob display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
+- Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
 
 
 ## Ashfang
@@ -99,7 +100,6 @@
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
 - Hiding exp Bottles lying on the ground
-- Summon Soul Display (show the name of a dropped soul, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
 - Fixing Skytils custom Damage Splash
 - Gui element showing the real time
 - Highlight the voidling extremist in pink color
