@@ -14,6 +14,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.item.ItemStack
 
 object CopyNearbyEntitiesCommand {
 
@@ -66,26 +67,18 @@ object CopyNearbyEntitiesCommand {
                         resultList.add("-  inventory:")
                         for ((id, stack) in entity.inventory.withIndex()) {
                             resultList.add("-  id $id ($stack)")
-                            if (stack != null) {
-                                val skullTexture = stack.getSkullTexture()
-                                if (skullTexture != null) {
-                                    resultList.add("-     skullTexture:")
-                                    resultList.add("-     $skullTexture")
-                                }
-                                val cleanName = stack.cleanName()
-                                var stackName = stack.name
-                                val type = stack.javaClass.name
-                                resultList.add("-     name: '$stackName'")
-                                resultList.add("-     cleanName: '$cleanName'")
-                                resultList.add("-     type: $type")
-                            }
+                            printItemStackData(stack, resultList)
                         }
                     }
 
                     is EntityEnderman -> {
                         resultList.add("EntityEnderman:")
-                        val heldItem = entity.heldItem
-                        resultList.add("-  heldItem: $heldItem")
+                        val heldBlockState = entity.heldBlockState
+                        resultList.add("-  heldBlockState: $heldBlockState")
+                        if (heldBlockState != null) {
+                            val block = heldBlockState.block
+                            resultList.add("-  block: $block")
+                        }
                     }
 
                     is EntityMagmaCube -> {
@@ -135,6 +128,22 @@ object CopyNearbyEntitiesCommand {
             LorenzUtils.chat("§e[SkyHanni] $counter entities copied into the clipboard!")
         } else {
             LorenzUtils.chat("§e[SkyHanni] No entities found in a search radius of $searchRadius!")
+        }
+    }
+
+    private fun printItemStackData(stack: ItemStack?, resultList: MutableList<String>) {
+        if (stack != null) {
+            val skullTexture = stack.getSkullTexture()
+            if (skullTexture != null) {
+                resultList.add("-     skullTexture:")
+                resultList.add("-     $skullTexture")
+            }
+            val cleanName = stack.cleanName()
+            val stackName = stack.name
+            val type = stack.javaClass.name
+            resultList.add("-     name: '$stackName'")
+            resultList.add("-     cleanName: '$cleanName'")
+            resultList.add("-     type: $type")
         }
     }
 }
