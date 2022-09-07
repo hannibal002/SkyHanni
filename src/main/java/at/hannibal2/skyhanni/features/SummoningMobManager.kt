@@ -36,6 +36,9 @@ class SummoningMobManager {
     //§a§ohannibal2's Tank Zombie§r §a160k§c❤
     private val healthPattern = Pattern.compile("§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤")
 
+    //§cThe Seraph recalled your 3 summoned allies!
+    private val seraphRecallPattern = Pattern.compile("§cThe Seraph recalled your (\\d) summoned allies!")
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.isOnHypixel) return
@@ -54,6 +57,12 @@ class SummoningMobManager {
         if (despawnPatter.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
             despawned()
             if (SkyHanniMod.feature.abilities.summoningMobDisplay && !message.contains("☠")) {
+                event.blockedReason = "summoning_soul"
+            }
+        }
+        if (message == "§cThe Seraph recalled your summoned ally!" || seraphRecallPattern.matcher(message).matches()) {
+            despawned()
+            if (SkyHanniMod.feature.abilities.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
         }

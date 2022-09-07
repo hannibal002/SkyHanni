@@ -17,6 +17,12 @@ public class Abilities {
     public boolean itemAbilityCooldownBackground = false;
 
     @Expose
+    @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped summoning souls laying on the ground. " +
+            "§cNot working in Dungeon if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
+    @ConfigEditorBoolean
+    public boolean summoningSoulDisplay = false;
+
+    @Expose
     @ConfigOption(name = "Summoning Mob", desc = "")
     @ConfigEditorAccordion(id = 0)
     public boolean summoningMob = false;
