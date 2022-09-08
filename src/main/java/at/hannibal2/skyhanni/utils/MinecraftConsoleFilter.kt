@@ -14,15 +14,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
     val lorenzLogger = LorenzLogger("debug/mc_console_log")
 
-//    var printUnfilteredDebugs = false
-//    var printUnfilteredDebugsOutsideSkyBlock = false
-//    var printFilteredReason = false
-//
-//    var filterChat = false
-//    var filterGrowBuffer = false
-//    var filterUnknownSound = false
-//    var filterScoreboardErrors = false
-
     companion object {
         @JvmStatic
         fun initLogging() {
@@ -36,15 +27,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
     }
 
     override fun filter(event: LogEvent?): Filter.Result {
-//        printUnfilteredDebugs = true
-//        printUnfilteredDebugsOutsideSkyBlock = false
-//        printFilteredReason = false
-//
-//        filterChat = true
-//        filterGrowBuffer = true
-//        filterUnknownSound = true
-//        filterScoreboardErrors = true
-
         if (event == null) return Filter.Result.ACCEPT
 
         val loggerName = event.loggerName
@@ -72,6 +54,61 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 return Filter.Result.DENY
             }
         }
+        //TODO testing
+        if (SkyHanniMod.feature.dev.filterParticleVillagerHappy) {
+            if (formattedMessage == "Could not spawn particle effect VILLAGER_HAPPY") {
+                filterConsole("particle VILLAGER_HAPPY")
+                return Filter.Result.DENY
+            }
+        }
+
+        if (SkyHanniMod.feature.dev.filterOptiFine) {
+            if (formattedMessage.startsWith("[OptiFine] CustomItems: ")) {
+                filterConsole("OptiFine CustomItems")
+                return Filter.Result.DENY
+            }
+            if (formattedMessage.startsWith("[OptiFine] ConnectedTextures: ")) {
+                filterConsole("OptiFine ConnectedTextures")
+                return Filter.Result.DENY
+            }
+        }
+        if (SkyHanniMod.feature.dev.filterAmsHelperTransformer) {
+            if (loggerName == "AsmHelper") {
+                if (formattedMessage.startsWith("Transforming class ")) {
+                    filterConsole("AsmHelper Transforming")
+                    return Filter.Result.DENY
+                }
+            }
+        }
+        //TODO find a way to load the filter earlier to filter these messages too
+//        if (loggerName == "LaunchWrapper") {
+//            //The jar file C:\Users\Lorenz\AppData\Roaming\.minecraft\libraries\org\lwjgl\lwjgl\lwjgl\2.9.4-nightly-20150209\lwjgl-2.9.4-nightly-20150209.jar has a security seal for path org.lwjgl.opengl, but that path is defined and not secure
+//            if (formattedMessage.startsWith("The jar file ")) {
+//                if (formattedMessage.endsWith(
+//                        ".jar has a security seal for path org.lwjgl.opengl, " +
+//                                "but that path is defined and not secure"
+//                    )
+//                ) {
+//                    filterConsole("LaunchWrapper org.lwjgl.opengl security seal")
+//                    return Filter.Result.DENY
+//                }
+//                if (formattedMessage.endsWith(
+//                        ".jar has a security seal for path org.lwjgl, " +
+//                                "but that path is defined and not secure"
+//                    )
+//                ) {
+//                    filterConsole("LaunchWrapper org.lwjgl security seal")
+//                    return Filter.Result.DENY
+//                }
+//            }
+//        }
+//        if (loggerName == "mixin") {
+//            if (formattedMessage.startsWith("Mixing ") && formattedMessage.contains(" into ")) {
+//                filterConsole("Mixing")
+//                return Filter.Result.DENY
+//            }
+//        }
+
         if (thrown != null) {
             val cause = thrown.cause
             if (cause != null) {
@@ -103,6 +140,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
         if (!SkyHanniMod.feature.dev.printUnfilteredDebugs) return Filter.Result.ACCEPT
         if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyblock) return Filter.Result.ACCEPT
+        if (formattedMessage == "filtered console: ") return Filter.Result.ACCEPT
 
         println(" ")
         println("filter 4/event ('$loggerConfigName'/'$loggerName')")

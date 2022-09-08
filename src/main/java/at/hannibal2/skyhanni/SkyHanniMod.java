@@ -55,8 +55,7 @@ public class SkyHanniMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        logger = LogManager.getLogger(MODID);
-        MinecraftConsoleFilter.initLogging();
+        logger = LogManager.getLogger("SkyHanni");
 
         new BazaarApi();
         registerEvent(this);
@@ -125,6 +124,7 @@ public class SkyHanniMod {
 
         configManager = new ConfigManager(this);
         configManager.firstLoad();
+        MinecraftConsoleFilter.initLogging();
 
         Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
 

@@ -87,4 +87,22 @@ public class DevData {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean filterScoreboardErrors = false;
+
+    @Expose
+    @ConfigOption(name = "Filter Particle", desc = "Filter message 'Could not spawn particle effect VILLAGER_HAPPY'")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean filterParticleVillagerHappy = false;
+
+    @Expose
+    @ConfigOption(name = "Filter OptiFine", desc = "Filter OptiFine messages CustomItems and ConnectedTextures during loading")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean filterOptiFine = false;
+
+    @Expose
+    @ConfigOption(name = "Filter AsmHelper Transformer", desc = "Filter messages when AsmHelper is Transforming a class during loading")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean filterAmsHelperTransformer = false;
 }
