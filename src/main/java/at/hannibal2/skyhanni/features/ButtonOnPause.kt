@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.gui.config.ConfigEditor
-import at.hannibal2.skyhanni.config.gui.core.GuiScreenElementWrapper
+import at.hannibal2.skyhanni.config.ConfigEditor
+import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu

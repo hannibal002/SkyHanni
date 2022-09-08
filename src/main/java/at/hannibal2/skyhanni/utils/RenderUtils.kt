@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.gui.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils.drawStringScaled
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -48,7 +50,12 @@ object RenderUtils {
         if (lightingState) GlStateManager.enableLighting()
     }
 
-    fun RenderWorldLastEvent.drawColor(location: LorenzVec, color: LorenzColor, beacon: Boolean = false, alpha: Float = -1f) {
+    fun RenderWorldLastEvent.drawColor(
+        location: LorenzVec,
+        color: LorenzColor,
+        beacon: Boolean = false,
+        alpha: Float = -1f,
+    ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
         val y = location.y - viewerY
@@ -402,11 +409,13 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.enableTexture2D()
-        minecraft.fontRendererObj.drawString(finalText,
+        minecraft.fontRendererObj.drawString(
+            finalText,
             (-width).toFloat(),
             yOff,
             LorenzColor.WHITE.toColor().rgb,
-            shadow)
+            shadow
+        )
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
     }
@@ -495,7 +504,16 @@ object RenderUtils {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
     }
-    fun drawCylinderInWorld(color: Color,x: Double, y: Double, z: Double, radius: Float, height: Float, partialTicks: Float) {
+
+    fun drawCylinderInWorld(
+        color: Color,
+        x: Double,
+        y: Double,
+        z: Double,
+        radius: Float,
+        height: Float,
+        partialTicks: Float,
+    ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0.0f, 1.0f, 0.0f)
 
@@ -545,5 +563,21 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    private fun Color.bindColor() = GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
+    private fun Color.bindColor() =
+        GlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
+
+    fun drawStringScaledMaxWidth(
+        str: String?,
+        fr: FontRenderer,
+        x: Float,
+        y: Float,
+        shadow: Boolean,
+        len: Int,
+        colour: Int,
+    ) {
+        val strLen = fr.getStringWidth(str)
+        var factor = len / strLen.toFloat()
+        factor = Math.min(1f, factor)
+        drawStringScaled(str, fr, x, y, shadow, colour, factor)
+    }
 }

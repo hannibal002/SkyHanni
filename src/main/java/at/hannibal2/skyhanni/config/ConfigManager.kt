@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder
 import java.io.*
 import java.nio.charset.StandardCharsets
 
-class ConfigManager(val mod: SkyHanniMod) {
+class ConfigManager {
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create()
     }

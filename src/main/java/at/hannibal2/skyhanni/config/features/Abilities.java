@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.gui.core.config.Position;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.*;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
 public class Abilities {

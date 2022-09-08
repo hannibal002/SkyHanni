@@ -1,22 +1,25 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
+import at.hannibal2.skyhanni.config.core.GuiElement;
+import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
+import at.hannibal2.skyhanni.config.core.config.Config;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.core.config.annotations.Category;
+import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
-import at.hannibal2.skyhanni.config.gui.config.ConfigEditor;
-import at.hannibal2.skyhanni.config.gui.core.GuiElement;
-import at.hannibal2.skyhanni.config.gui.core.GuiScreenElementWrapper;
-import at.hannibal2.skyhanni.config.gui.core.config.Position;
-import at.hannibal2.skyhanni.config.gui.core.config.annotations.Category;
-import at.hannibal2.skyhanni.config.gui.core.config.gui.GuiPositionEditor;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 
-public class Features {
 
+public class Features extends Config {
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {}, () -> {}, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
+        }, () -> {
+        }, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
     }
 
+    @Override
     public void executeRunnable(String runnableId) {
         String activeConfigCategory = null;
         if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenElementWrapper) {
