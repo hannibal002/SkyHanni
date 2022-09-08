@@ -84,8 +84,10 @@ class RepoManager(private val configLocation: File) {
                         )
                     }
                 } catch (e: IOException) {
-                    e.printStackTrace()
-                    System.err.println("Failed to download SkyHanni Repo! Please report this issue to the mod creator")
+                    Exception(
+                        "Failed to download SkyHanni Repo! Please report this issue on the discord!",
+                        e
+                    ).printStackTrace()
                     if (command) {
                         LorenzUtils.error("An error occurred while trying to reload the repo! See logs for more info.")
                     }

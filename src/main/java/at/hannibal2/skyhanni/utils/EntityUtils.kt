@@ -32,12 +32,12 @@ object EntityUtils {
         return found.filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                println("wrong entity in aabb: '" + it.name + "'")
+                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                println("mob: " + center.printWithAccuracy(2))
-                println("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                println("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
+                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                LorenzUtils.consoleLog("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
             }
             result
         }
@@ -59,12 +59,12 @@ object EntityUtils {
         return found.find {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                println("wrong entity in aabb: '" + it.name + "'")
+                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                println("mob: " + center.printWithAccuracy(2))
-                println("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                println("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
+                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                LorenzUtils.consoleLog("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
             }
             result
         }
