@@ -32,8 +32,8 @@ public class Features {
             return;
         }
 
-        if (runnableId.equals("testPos")) {
-            editOverlay(activeConfigCategory, 200, 16, debug.testPos);
+        if (runnableId.equals("debugPos")) {
+            editOverlay(activeConfigCategory, 200, 16, dev.debugPos);
             return;
         }
 
@@ -128,12 +128,8 @@ public class Features {
     public CommandsFeatures commands = new CommandsFeatures();
 
     @Expose
-    @Category(name = "Api", desc = "Api Data")
-    public ApiData apiData = new ApiData();
-
-    @Expose
-    @Category(name = "Debug", desc = "Debug and test stuff.")
-    public Debug debug = new Debug();
+    @Category(name = "Dev", desc = "Debug and test stuff.")
+    public DevData dev = new DevData();
 
     @Expose
     public Hidden hidden = new Hidden();
