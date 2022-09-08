@@ -6,7 +6,7 @@ object LorenzDebug {
 
     fun log(text: String) {
         logger.log(text)
-        println("debug logger: $text")
+        LorenzUtils.consoleLog("debug logger: $text")
     }
 
     fun chatAndLog(text: String) {

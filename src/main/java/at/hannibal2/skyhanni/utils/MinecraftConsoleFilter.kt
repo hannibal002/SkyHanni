@@ -142,34 +142,34 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyblock) return Filter.Result.ACCEPT
         if (formattedMessage == "filtered console: ") return Filter.Result.ACCEPT
 
-        println(" ")
-        println("filter 4/event ('$loggerConfigName'/'$loggerName')")
-        println("formattedMessage: '$formattedMessage'")
+        LorenzUtils.consoleLog(" ")
+        LorenzUtils.consoleLog("filter 4/event ('$loggerConfigName'/'$loggerName')")
+        LorenzUtils.consoleLog("formattedMessage: '$formattedMessage'")
         val threadName = event.threadName
-        println("threadName: '$threadName'")
+        LorenzUtils.consoleLog("threadName: '$threadName'")
         val level = event.level
-        println("level: '$level'")
+        LorenzUtils.consoleLog("level: '$level'")
         val marker = event.marker
         if (marker != null) {
             val name = marker.name
-            println("marker name: '$name'")
+            LorenzUtils.consoleLog("marker name: '$name'")
         } else {
-            println("marker is null")
+            LorenzUtils.consoleLog("marker is null")
         }
-        println("thrown: '$thrown'")
+        LorenzUtils.consoleLog("thrown: '$thrown'")
         if (thrown != null) {
             if (thrown.stackTrace.isNotEmpty()) {
                 var element = thrown.stackTrace[0]
-                println("thrown first element: '$element'")
+                LorenzUtils.consoleLog("thrown first element: '$element'")
                 val cause = thrown.cause
                 if (cause != null) {
-                    println("throw cause: '$cause'")
+                    LorenzUtils.consoleLog("throw cause: '$cause'")
                     element = cause.stackTrace[0]
-                    println("thrown cause first element: '$element'")
+                    LorenzUtils.consoleLog("thrown cause first element: '$element'")
                 }
             }
         }
-        println(" ")
+        LorenzUtils.consoleLog(" ")
 
         return Filter.Result.ACCEPT
     }
@@ -182,12 +182,12 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
     }
 
     override fun getOnMismatch(): Filter.Result {
-        println("getOnMismatch ($loggerConfigName)")
+        LorenzUtils.consoleLog("getOnMismatch ($loggerConfigName)")
         return Filter.Result.DENY
     }
 
     override fun getOnMatch(): Filter.Result {
-        println("getOnMatch ($loggerConfigName)")
+        LorenzUtils.consoleLog("getOnMatch ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 
@@ -198,7 +198,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         msg: String?,
         vararg params: Any?,
     ): Filter.Result {
-        println("filter 1 ($loggerConfigName)")
+        LorenzUtils.consoleLog("filter 1 ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 
@@ -209,7 +209,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         msg: Any?,
         t: Throwable?,
     ): Filter.Result {
-        println("filter 2 ($loggerConfigName)")
+        LorenzUtils.consoleLog("filter 2 ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 
@@ -220,7 +220,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         msg: Message?,
         t: Throwable?,
     ): Filter.Result {
-        println("filter 3 ($loggerConfigName)")
+        LorenzUtils.consoleLog("filter 3 ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 }

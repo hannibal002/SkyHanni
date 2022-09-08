@@ -20,7 +20,6 @@ object CopyItemCommand {
             resultList.add("")
             for (line in itemStack.getLore()) {
                 resultList.add("'$line'")
-                println(line)
             }
             resultList.add("")
             resultList.add("getTagCompound")
