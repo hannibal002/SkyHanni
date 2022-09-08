@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -13,14 +14,14 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
     val lorenzLogger = LorenzLogger("debug/mc_console_log")
 
-    var printUnfilteredDebugs = false
-    var printUnfilteredDebugsOutsideSkyBlock = false
-    var printFilteredReason = false
-
-    var filterChat = false
-    var filterGrowBuffer = false
-    var filterUnknownSound = false
-    var filterScoreboardErrors = false
+//    var printUnfilteredDebugs = false
+//    var printUnfilteredDebugsOutsideSkyBlock = false
+//    var printFilteredReason = false
+//
+//    var filterChat = false
+//    var filterGrowBuffer = false
+//    var filterUnknownSound = false
+//    var filterScoreboardErrors = false
 
     companion object {
         @JvmStatic
@@ -53,19 +54,19 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         val formattedMessage = message.formattedMessage
         val thrown = event.thrown
 
-        if (filterChat) {
+        if (SkyHanniMod.feature.dev.filterChat) {
             if (formattedMessage.startsWith("[CHAT] ")) {
                 filterConsole("chat")
                 return Filter.Result.DENY
             }
         }
-        if (filterGrowBuffer) {
+        if (SkyHanniMod.feature.dev.filterGrowBuffer) {
             if (formattedMessage.startsWith("Needed to grow BufferBuilder buffer: Old size ")) {
                 filterConsole("Grow BufferBuilder buffer")
                 return Filter.Result.DENY
             }
         }
-        if (filterUnknownSound) {
+        if (SkyHanniMod.feature.dev.filterUnknownSound) {
             if (formattedMessage == "Unable to play unknown soundEvent: minecraft:") {
                 filterConsole("Unknown soundEvent (minecraft:)")
                 return Filter.Result.DENY
@@ -76,7 +77,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             if (cause != null) {
                 if (cause.stackTrace.isNotEmpty()) {
                     val first = cause.stackTrace[0]
-                    if (filterScoreboardErrors) {
+                    if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
                         if (first.toString() == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)") {
                             filterConsole("NullPointerException at Scoreboard.removeTeam")
                             return Filter.Result.DENY
@@ -92,7 +93,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                     }
                 }
             }
-            if (filterScoreboardErrors) {
+            if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
                 if (thrown.toString() == "java.util.concurrent.ExecutionException: java.lang.IllegalArgumentException: A team with the name '") {
                     filterConsole("IllegalArgumentException because scoreboard team already exists")
                     return Filter.Result.DENY
@@ -100,8 +101,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
 
-        if (!printUnfilteredDebugs) return Filter.Result.ACCEPT
-        if (!printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyblock) return Filter.Result.ACCEPT
+        if (!SkyHanniMod.feature.dev.printUnfilteredDebugs) return Filter.Result.ACCEPT
+        if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyblock) return Filter.Result.ACCEPT
 
         println(" ")
         println("filter 4/event ('$loggerConfigName'/'$loggerName')")
@@ -137,7 +138,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
     private fun filterConsole(message: String) {
         lorenzLogger.log(message)
-        if (printFilteredReason) {
+        if (SkyHanniMod.feature.dev.printFilteredReason) {
             LorenzUtils.consoleLog("filtered console: $message")
         }
     }
