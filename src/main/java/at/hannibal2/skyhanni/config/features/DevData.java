@@ -37,7 +37,7 @@ public class DevData {
     @ConfigOption(name = "Unfiltered Debug", desc = "Print the debug information for unfiltered console messages")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean printUnfilteredDebugs = true;
+    public boolean printUnfilteredDebugs = false;
 
     @Expose
     @ConfigOption(
@@ -46,7 +46,7 @@ public class DevData {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean printUnfilteredDebugsOutsideSkyBlock = true;
+    public boolean printUnfilteredDebugsOutsideSkyBlock = false;
 
     @Expose
     @ConfigOption(
@@ -55,7 +55,7 @@ public class DevData {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean printFilteredReason = true;
+    public boolean printFilteredReason = false;
 
     @Expose
     @ConfigOption(name = "Console Filters", desc = "")
@@ -67,24 +67,24 @@ public class DevData {
     @ConfigOption(name = "Filter Chat", desc = "Filter chat messages")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterChat = true;
+    public boolean filterChat = false;
 
     @Expose
     @ConfigOption(name = "Filter Grow Buffer", desc = "Filter 'Needed to grow BufferBuilder buffer:'")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterGrowBuffer = true;
+    public boolean filterGrowBuffer = false;
 
     @Expose
     @ConfigOption(name = "Filter Chat", desc = "Filter 'Unable to play unknown soundEvent'")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterUnknownSound = true;
+    public boolean filterUnknownSound = false;
 
     @Expose
     @ConfigOption(name = "Filter Scoreboard Errors", desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " +
             "removeObjective and 'scoreboard team already exists'")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterScoreboardErrors = true;
+    public boolean filterScoreboardErrors = false;
 }
