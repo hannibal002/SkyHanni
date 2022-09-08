@@ -11,6 +11,7 @@
 
 ### Fixes
 - Fixed enchanted books in bazaar
+- Fixed LorenzLogger printing output into console
 
 
 ## Version 0.7 - Dungeon and Colored Highlight
