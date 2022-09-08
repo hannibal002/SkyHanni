@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import java.text.DecimalFormat
+import java.util.*
 
 object StringUtils {
 
@@ -65,5 +66,22 @@ object StringUtils {
         }
 
         return "Now"
+    }
+
+    /**
+     * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
+     */
+    fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): Map<String?, T>? {
+        if ("" == prefix) return map
+        val lastKey = createLexicographicallyNextStringOfTheSameLength(prefix)
+        return map.subMap(prefix, true, lastKey, false)
+    }
+
+    fun createLexicographicallyNextStringOfTheSameLength(input: String): String {
+        val lastCharPosition = input.length - 1
+        val inputWithoutLastChar = input.substring(0, lastCharPosition)
+        val lastChar = input[lastCharPosition]
+        val incrementedLastChar = (lastChar.code + 1).toChar()
+        return inputWithoutLastChar + incrementedLastChar
     }
 }

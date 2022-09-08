@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni;
 
 import at.hannibal2.skyhanni.config.ConfigManager;
 import at.hannibal2.skyhanni.config.Features;
-import at.hannibal2.skyhanni.config.gui.commands.Commands;
+import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.data.*;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.features.*;
@@ -122,7 +122,7 @@ public class SkyHanniMod {
         registerEvent(new LorenzTest());
         registerEvent(new ButtonOnPause());
 
-        configManager = new ConfigManager(this);
+        configManager = new ConfigManager();
         configManager.firstLoad();
         MinecraftConsoleFilter.initLogging();
 

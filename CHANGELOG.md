@@ -5,6 +5,7 @@
 ### Misc
 - Added hiding the flame particles when using the Fire Veil Wand ability
 - Added circle around the player when having the Fire Veil Wand ability is active
+- The config GUI how has a search function (top right corner) 
 
 ### Small Changes
 - Changed the ashfang gravity orb highlight from square to cylinder
