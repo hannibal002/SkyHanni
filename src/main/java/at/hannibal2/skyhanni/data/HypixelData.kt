@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.LocationChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListUtils
 import net.minecraft.client.Minecraft
@@ -20,6 +20,8 @@ class HypixelData {
         var mode: String = ""
     }
 
+    var loggerLocationChange = LorenzLogger("debug/location_change")
+
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
         hypixel = Minecraft.getMinecraft().runCatching {
@@ -27,8 +29,6 @@ class HypixelData {
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
     }
-
-    val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
@@ -95,7 +95,7 @@ class HypixelData {
 
         if (mode != location) {
             LocationChangeEvent(location, mode).postAndCatch()
-            LorenzUtils.consoleLog("SkyHanni location change: '$location'")
+            loggerLocationChange.log(location)
             mode = location
         }
     }
