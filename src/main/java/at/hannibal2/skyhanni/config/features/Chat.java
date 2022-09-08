@@ -87,10 +87,4 @@ public class Chat {
             "except for players who are close to the player, inside dungeon or during a Kuudra fight.")
     @ConfigEditorBoolean
     public boolean hideFarDeathMessages = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Far Deaths 2", desc = "Hide the death messages of other players, " +
-            "except for players who are close to the player, inside dungeon or during a Kuudra fight.")
-    @ConfigEditorBoolean
-    public boolean hideFarDeathMessages2 = false;
 }

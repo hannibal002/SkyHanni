@@ -9,6 +9,7 @@
 
 ### Small Changes
 - Changed the ashfang gravity orb highlight from square to cylinder
+- added msg support to fancy chat format
 
 ### Fixes
 - Fixed enchanted books in bazaar

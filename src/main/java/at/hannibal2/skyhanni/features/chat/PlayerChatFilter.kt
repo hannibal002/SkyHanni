@@ -16,6 +16,9 @@ class PlayerChatFilter {
     //§8[§9109§8] §b[MVP§c+§b] 4Apex§f§r§f: omg selling
     private val patternSkyBlockLevel = Pattern.compile("§8\\[§(.)(\\d+)§8] (.+)")
 
+    //§dTo §r§b[MVP§r§3+§r§b] Skyfall55§r§7: §r§7hello :)
+    var patternPrivateMessage: Pattern = Pattern.compile("§d(To|From) §r(.+)§r§7: §r§7(.+)")
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.isOnHypixel) return
@@ -26,6 +29,8 @@ class PlayerChatFilter {
     }
 
     private fun shouldBlock(originalMessage: String): Boolean {
+        if (handlePrivateMessage(originalMessage)) return true
+
         //since hypixel sends own chat messages really weird " §r§8[§r§d205§r§8] §r§6[MVP§r§c++§r§6] hannibal2"
         var rawMessage = originalMessage.replace("§r", "").trim()
 
@@ -59,6 +64,21 @@ class PlayerChatFilter {
 
         val message = split[1]
         send(channel, name.removeColor(), message.removeColor())
+        return true
+    }
+
+    private fun handlePrivateMessage(originalMessage: String): Boolean {
+        if (!SkyHanniMod.feature.chat.playerMessagesFormat) return false
+
+        val matcher = patternPrivateMessage.matcher(originalMessage)
+        if (!matcher.matches()) return false
+        val direction = matcher.group(1)
+        val rawName = matcher.group(2)
+        val name = grabName(rawName) ?: return false
+
+        val message = matcher.group(3)
+        LorenzUtils.chat("§d$direction §b$name §f$message")
+        loggerPlayerChat.log("[Msg_$direction] $name: $message")
         return true
     }
 
