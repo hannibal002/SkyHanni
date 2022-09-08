@@ -6,7 +6,7 @@
 - /shmarkplayer (marking a player with yellow color)
 
 ## Chat Filter
-- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message, radiating generosity, HyPixel tournaments)
+- Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message, radiating generosity, Hypixel tournaments)
 - Hiding Empty messages.
 - Warping messages (Sending requests and switching servers)
 - Welcome Message when entering SkyBlock.
