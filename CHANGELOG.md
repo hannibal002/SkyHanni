@@ -78,7 +78,7 @@
 - Summoning souls display is rendering better close to corners
 - Ashfang gravity orbs are now rendering better close to corners
 - Showing the name of ashfang gravity orbs as a nametag above the orb
-- Bazaar how knows books and essences (Thanks again, HyPixel)
+- Bazaar how knows books and essences (Thanks again, Hypixel)
 
 ### Bug Fixes
 - Fixed damage Indicator damage over time display order swapping sometimes
