@@ -75,9 +75,9 @@ class LorenzTest {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (!SkyHanniMod.feature.debug.enabled) return
+        if (!SkyHanniMod.feature.dev.debugEnabled) return
 
-        SkyHanniMod.feature.debug.testPos.renderString(text)
+        SkyHanniMod.feature.dev.debugPos.renderString(text)
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)

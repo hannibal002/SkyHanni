@@ -21,7 +21,7 @@ class RepoManager(private val configLocation: File) {
 
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
-        if (SkyHanniMod.feature.apiData.repoAutoUpdate) {
+        if (SkyHanniMod.feature.dev.repoAutoUpdate) {
             fetchRepository().thenRun(this::reloadRepository)
         } else {
             reloadRepository()
