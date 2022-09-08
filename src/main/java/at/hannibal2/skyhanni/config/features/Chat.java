@@ -11,7 +11,7 @@ public class Chat {
     public boolean filterTypes = false;
 
     @Expose
-    @ConfigOption(name = "HyPixel Hub", desc = "Block messages outside SkyBlock in the HyPixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and HyPixel tournaments.")
+    @ConfigOption(name = "Hypixel Hub", desc = "Block messages outside SkyBlock in the Hypixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and Hypixel tournaments.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean hypixelHub = false;
