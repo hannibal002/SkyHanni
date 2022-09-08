@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.LocationChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListUtils
 import net.minecraft.client.Minecraft
@@ -94,7 +95,7 @@ class HypixelData {
 
         if (mode != location) {
             LocationChangeEvent(location, mode).postAndCatch()
-            println("SkyHanni location change: '$location'")
+            LorenzUtils.consoleLog("SkyHanni location change: '$location'")
             mode = location
         }
     }

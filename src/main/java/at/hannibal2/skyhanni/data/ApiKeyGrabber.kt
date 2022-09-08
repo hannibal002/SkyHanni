@@ -82,7 +82,7 @@ class ApiKeyGrabber {
     }
 
     private fun readApiKeyFromOtherMods() {
-        println("Trying to find the API Key from the config of other mods..")
+        LorenzUtils.consoleLog("Trying to find the API Key from the config of other mods..")
 
         var found = false
         for (mod in OtherMod.values()) {
@@ -93,21 +93,21 @@ class ApiKeyGrabber {
                 try {
                     val key = mod.readKey(reader).replace("\n", "").replace(" ", "")
                     if (verifyKey(key)) {
-                        println("- $modName: good key!")
+                        LorenzUtils.consoleLog("- $modName: good key!")
                         if (!found) {
                             found = true
                             LorenzUtils.chat("§e[SkyHanni] Grabbed the API key from $modName!")
                             SkyHanniMod.feature.hidden.apiKey = key
                         }
                     } else {
-                        println("- $modName: wrong key!")
+                        LorenzUtils.consoleLog("- $modName: wrong key!")
                     }
                 } catch (e: Throwable) {
-                    println("- $modName: wrong config format! (" + e.message + ")")
+                    LorenzUtils.consoleLog("- $modName: wrong config format! (" + e.message + ")")
                     continue
                 }
             } else {
-                println("- $modName: no config found!")
+                LorenzUtils.consoleLog("- $modName: no config found!")
             }
         }
     }
