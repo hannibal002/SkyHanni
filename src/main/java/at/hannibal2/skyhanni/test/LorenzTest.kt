@@ -10,6 +10,7 @@ import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -63,14 +64,14 @@ class LorenzTest {
         }
     }
 
-//    @SubscribeEvent
-//    fun onItemTooltipLow(event: ItemTooltipEvent) {
+    @SubscribeEvent
+    fun onItemTooltipLow(event: ItemTooltipEvent) {
 //        val itemStack = event.itemStack
 //        if (itemStack != null) {
 //            val internalName = itemStack.getInternalName()
 //            event.toolTip.add("internal name: $internalName")
 //        }
-//    }
+    }
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {

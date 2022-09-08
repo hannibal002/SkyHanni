@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
 import at.hannibal2.skyhanni.test.LorenzTest;
+import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +37,9 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION)
 public class SkyHanniMod {
@@ -47,9 +51,13 @@ public class SkyHanniMod {
 
     public static RepoManager repo;
     public static ConfigManager configManager;
+    private static Logger logger;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        logger = LogManager.getLogger(MODID);
+        MinecraftConsoleFilter.initLogging();
+
         new BazaarApi();
         registerEvent(this);
         registerEvent(new ChatManager());
@@ -126,11 +134,11 @@ public class SkyHanniMod {
 
     private void registerEvent(Object object) {
         String simpleName = object.getClass().getSimpleName();
-        System.out.println("SkyHanni registering '" + simpleName + "'");
+        consoleLog("SkyHanni registering '" + simpleName + "'");
         long start = System.currentTimeMillis();
         MinecraftForge.EVENT_BUS.register(object);
         long duration = System.currentTimeMillis() - start;
-        System.out.println("Done after " + duration + " ms!");
+        consoleLog("Done after " + duration + " ms!");
     }
 
     public static GuiScreen screenToOpen = null;
@@ -145,6 +153,14 @@ public class SkyHanniMod {
                 screenTicks = 0;
                 screenToOpen = null;
             }
+        }
+    }
+
+    public static void consoleLog(String message) {
+        if (logger != null) {
+            logger.log(Level.INFO, message);
+        } else {
+            System.out.println("consoleLog: (" + message + ")");
         }
     }
 }

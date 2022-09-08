@@ -35,7 +35,7 @@ class LorenzLogger(filePath: String) {
     }
 
     private fun initLogger(): Logger {
-        val logger = Logger.getLogger("" + System.nanoTime())
+        val logger = Logger.getLogger("Lorenz-Logger-" + System.nanoTime())
         try {
             createParent(File(fileName))
             val handler = FileHandler(fileName)

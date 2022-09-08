@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
@@ -50,13 +52,13 @@ object LorenzUtils {
         log.log(message)
         val minecraft = Minecraft.getMinecraft()
         if (minecraft == null) {
-            println(message)
+            consoleLog(message.removeColor())
             return
         }
 
         val thePlayer = minecraft.thePlayer
         if (thePlayer == null) {
-            println(message)
+            consoleLog(message.removeColor())
             return
         }
 
@@ -103,4 +105,8 @@ object LorenzUtils {
         DecimalFormat(format).format(d).replace(',', 'x').replace('.', ',').replace('x', '.')
 
     fun formatDouble(d: Double): String = formatDouble(d, "#,##0.0")
+
+    fun consoleLog(text: String) {
+        SkyHanniMod.consoleLog(text)
+    }
 }
