@@ -41,6 +41,7 @@ class LorenzLogger(filePath: String) {
             val handler = FileHandler(fileName)
             handler.encoding ="utf-8"
             logger.addHandler(handler)
+            logger.useParentHandlers = false
             handler.formatter = object : Formatter() {
                 override fun format(logRecord: LogRecord): String {
                     val message = logRecord.message
