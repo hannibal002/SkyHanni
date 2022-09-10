@@ -6,6 +6,7 @@
 - Added hiding the flame particles when using the Fire Veil Wand ability
 - Added circle around the player when having the Fire Veil Wand ability is active
 - The config GUI how has a search function (top right corner)
+- Added more player chat format options (show all channel prefix, hide player rank, hide colon after player name, hide/change elite position format, channel prefix design)
 
 ### Small Changes
 - Changed the ashfang gravity orb highlight from square to cylinder

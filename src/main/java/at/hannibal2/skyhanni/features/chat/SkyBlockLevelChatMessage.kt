@@ -10,11 +10,7 @@ class SkyBlockLevelChatMessage {
     companion object {
         var level = -1
         var levelColor = ""
-
-        fun setData(level: Int, levelColor: String) {
-            this.level = level
-            this.levelColor = levelColor
-        }
+        var elitePrefix = ""
     }
 
     @SubscribeEvent
@@ -22,26 +18,31 @@ class SkyBlockLevelChatMessage {
         if (level == -1) return
         event.cancelledReason = "skyblock level"
 
-        val finalMessage = event.message
-        val name = event.playerName
-        val prefix = event.channel.prefix
+        val message = event.message
+        val name = event.formattedName
+        var prefix = if (event.channel == PlayerMessageChannel.ALL && !SkyHanniMod.feature.chat.allChannelPrefix)
+            "" else PlayerChatFilter.getChannelPrefix(event.channel)
 
-        if (SkyHanniMod.feature.chat.hideSkyblockLevel) {
-            LorenzUtils.chat("$prefix §b$name §f$finalMessage")
-        } else {
+        if (elitePrefix != "") {
+            prefix = "$prefix $elitePrefix".trim()
+        }
+        val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
 
-            when (SkyHanniMod.feature.chat.skyblockLevelDesign) {
-                0 -> {
-                    LorenzUtils.chat("$prefix §8[§${levelColor}${level}§8] §b$name §f$finalMessage")
-                }
+        when (SkyHanniMod.feature.chat.skyblockLevelDesign) {
+            0 -> {
+                LorenzUtils.chat("$prefix §8[§$levelColor$level§8] $name§f$colon $message")
+            }
 
-                1 -> {
-                    LorenzUtils.chat("$prefix §${levelColor}§l${level} §b$name §f$finalMessage")
-                }
+            1 -> {
+                LorenzUtils.chat("$prefix §$levelColor§l$level $name§f$colon $message")
+            }
 
-                2 -> {
-                    LorenzUtils.chat("$prefix §b$name §8[§${levelColor}${level}§8]§f: $finalMessage")
-                }
+            2 -> {
+                LorenzUtils.chat("$prefix $name §8[§$levelColor$level§8]§f$colon $message")
+            }
+
+            3 -> {
+                LorenzUtils.chat("$prefix $name§f$colon $message")
             }
         }
         level = -1

@@ -6,12 +6,17 @@ import at.hannibal2.skyhanni.events.PlayerSendChatEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.client.Minecraft
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class PlayerChatFilter {
 
     private val loggerPlayerChat = LorenzLogger("chat/player")
+
+    //§6[⌬57] §r§8[§r§b235§r§8] §r§6[MVP§r§c++§r§6] hannibal2§r§f: Hello World!
+    private val patternElitePrefix = Pattern.compile("§6\\[⌬(\\d+)] (.+)")
 
     //§8[§9109§8] §b[MVP§c+§b] 4Apex§f§r§f: omg selling
     private val patternSkyBlockLevel = Pattern.compile("§8\\[§(.)(\\d+)§8] (.+)")
@@ -34,9 +39,25 @@ class PlayerChatFilter {
         //since hypixel sends own chat messages really weird " §r§8[§r§d205§r§8] §r§6[MVP§r§c++§r§6] hannibal2"
         var rawMessage = originalMessage.replace("§r", "").trim()
 
+        val matcherElite = patternElitePrefix.matcher(rawMessage)
+        val elitePrefix = if (matcherElite.matches()) {
+            val elitePosition = matcherElite.group(1).toInt()
+            rawMessage = matcherElite.group(2)
+            when (SkyHanniMod.feature.chat.eliteFormat) {
+                0 -> "§6[⌬$elitePosition]"
+                1 -> "§6§l⌬$elitePosition"
+                2 -> ""
+                else -> ""
+            }
+        } else {
+            ""
+        }
+        SkyBlockLevelChatMessage.elitePrefix = elitePrefix
+
         val matcher = patternSkyBlockLevel.matcher(rawMessage)
         if (matcher.matches()) {
-            SkyBlockLevelChatMessage.setData(matcher.group(2).toInt(), matcher.group(1))
+            SkyBlockLevelChatMessage.levelColor = matcher.group(1)
+            SkyBlockLevelChatMessage.level = matcher.group(2).toInt()
             rawMessage = matcher.group(3)
         }
 
@@ -54,21 +75,12 @@ class PlayerChatFilter {
         rawName = rawName.substring(channel.originalPrefix.length)
         val name = grabName(rawName) ?: return false
 
-        if (!SkyHanniMod.feature.chat.playerMessagesFormat) {
-            if (SkyHanniMod.feature.chat.hideSkyblockLevel) {
-                LorenzUtils.chat(rawMessage)
-                return true
-            }
-            return false
-        }
-
         val message = split[1]
-        send(channel, name.removeColor(), message.removeColor())
+        send(channel, name, message.removeColor(), if (elitePrefix != "") " $elitePrefix" else elitePrefix)
         return true
     }
 
     private fun handlePrivateMessage(originalMessage: String): Boolean {
-        if (!SkyHanniMod.feature.chat.playerMessagesFormat) return false
 
         val matcher = patternPrivateMessage.matcher(originalMessage)
         if (!matcher.matches()) return false
@@ -77,52 +89,89 @@ class PlayerChatFilter {
         val name = grabName(rawName) ?: return false
 
         val message = matcher.group(3)
-        LorenzUtils.chat("§d$direction §b$name §f$message")
+        val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
+        LorenzUtils.chat("§d$direction $name§f$colon $message")
         loggerPlayerChat.log("[Msg_$direction] $name: $message")
         return true
     }
 
     private fun grabChannel(name: String): PlayerMessageChannel {
         return PlayerMessageChannel.values()
-            .find { it != PlayerMessageChannel.ALL && name.startsWith(it.originalPrefix) } ?: PlayerMessageChannel.ALL
+            .find { it != PlayerMessageChannel.ALL && name.startsWith(it.originalPrefix) }
+            ?: PlayerMessageChannel.ALL
     }
 
     private fun grabName(rawName: String): String? {
         val nameSplit = rawName.split(" ")
         val last = nameSplit.last()
-        val name = if (last.endsWith("]")) {
+        val cleanName = if (last.endsWith("]")) {
             nameSplit[nameSplit.size - 2]
         } else {
             last
         }
 
         val first = nameSplit[0]
-        if (first != name) {
+        if (first != cleanName) {
             if (!first.contains("VIP") && !first.contains("MVP")) {
                 //TODO support yt + admin
                 return null
             }
         }
-
-        return name
+        return if (SkyHanniMod.feature.chat.playerRankHider) {
+            "§b$cleanName"
+        } else {
+            rawName
+        }
     }
 
-    private fun send(channel: PlayerMessageChannel, name: String, message: String) {
-        loggerPlayerChat.log("[$channel] $name: $message")
+    private fun send(channel: PlayerMessageChannel, name: String, message: String, elitePrefix: String) {
+        loggerPlayerChat.log("[$channel] ${name.removeColor()}: $message")
         val event = PlayerSendChatEvent(channel, name, message)
         event.postAndCatch()
 
         if (event.cancelledReason != "") {
             loggerPlayerChat.log("cancelled: " + event.cancelledReason)
-        } else {
-            val finalMessage = event.message
-            if (finalMessage != message) {
-                loggerPlayerChat.log("message changed: $finalMessage")
-            }
-
-            val prefix = channel.prefix
-            LorenzUtils.chat("$prefix §b$name §f$finalMessage")
+            return
         }
+
+        val finalMessage = event.message
+        if (finalMessage != message) {
+            loggerPlayerChat.log("message changed: $finalMessage")
+        }
+
+        val prefix = if (channel == PlayerMessageChannel.ALL && !SkyHanniMod.feature.chat.allChannelPrefix)
+            "" else getChannelPrefix(channel)
+
+        val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
+        LorenzUtils.chat("$prefix$elitePrefix $name§f$colon $finalMessage")
     }
 
+    companion object {
+
+        fun getChannelPrefix(channel: PlayerMessageChannel): String {
+            val color = channel.prefixColor
+            val small = channel.prefixSmall
+            val large = channel.prefixLarge
+            return when (SkyHanniMod.feature.chat.channelDesign) {
+                0 -> "$color$large §8>"
+                1 -> "$color$small>"
+                2 -> "§8<$color$small§8>"
+                3 -> "§8[$color$small§8]"
+                4 -> "§8($color$small§8)"
+                else -> "$color$large §8>"
+            }
+        }
+
+        fun testAllChat() {
+            val name = Minecraft.getMinecraft().thePlayer.name
+            val message = "§6[⌬499] §8[§b123§8] §6[MVP§c++§6] $name§f: This is a all chat test message and will not be sent to hypixel."
+            LorenzChatEvent(message, ChatComponentText(message)).postAndCatch()
+        }
+
+        fun testGuildChat() {
+            val name = Minecraft.getMinecraft().thePlayer.name
+            val message = "§2Guild > §6[MVP§f++§6] $name §2[GuildRank]§f: This is a guild chat test message and will not be sent to hypixel."
+            LorenzChatEvent(message, ChatComponentText(message)).postAndCatch()
+        }
+    }
 }

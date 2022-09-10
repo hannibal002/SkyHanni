@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.Category;
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
+import at.hannibal2.skyhanni.features.chat.PlayerChatFilter;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 
@@ -82,6 +83,16 @@ public class Features extends Config {
 
         if (runnableId.equals("dungeonCopilot")) {
             editOverlay(activeConfigCategory, 200, 16, dungeon.copilotPos);
+            return;
+        }
+
+        if (runnableId.equals("testAllChat")) {
+            PlayerChatFilter.Companion.testAllChat();
+            return;
+        }
+
+        if (runnableId.equals("testGuildChat")) {
+            PlayerChatFilter.Companion.testGuildChat();
             return;
         }
     }
