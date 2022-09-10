@@ -47,30 +47,77 @@ public class Chat {
     public boolean playerMessages = false;
 
     @Expose
-    @ConfigOption(name = "Player Messages Format", desc = "Add a fancy new chat format for player messages.")
+    @ConfigOption(name = "All Channel Prefix", desc = "Show the prefix for the all channel chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean playerMessagesFormat = false;
+    public boolean allChannelPrefix = false;
 
     @Expose
-    @ConfigOption(name = "Hide SkyBlock Level", desc = "Hiding the Skyblock Level from the chat messages")
+    @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks in the chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean hideSkyblockLevel = false;
+    public boolean playerRankHider = false;
+
+    @Expose
+    @ConfigOption(name = "Player Colon Hider", desc = "Hide the colon after the player name in the chat.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean playerColonHider = false;
 
     @Expose
     @ConfigOption(
             name = "SkyBlock Level Design",
-            desc = "Change the way the Skyblock Level gets displayed in the chat\n" +
-                    "§cRequires SkyBlock Level and player messages format both enabled"
+            desc = "Change the design of the Skyblock Level in the chat.\n" +
+                    "§cRequires 'SkyBlock Level in Chat' enabled in the SkyBlock Menu."
     )
     @ConfigEditorDropdown(
-            values = {"§8[§6123§8] §bname §fmsg",
-                    "§6§l123 §bname §fmsg",
-                    "§bname §8[§6123§8]§f: msg"}
+            values = {"§8[§6123§8] §bname§f: msg",
+                    "§6§l123 §bname§f: §fmsg",
+                    "§bname §8[§6123§8]§f: msg",
+            "§cHide SkyBlock Level"}
     )
     @ConfigAccordionId(id = 1)
     public int skyblockLevelDesign = 0;
+
+    @Expose
+    @ConfigOption(
+            name = "Elite Design",
+            desc = "Change the design of the Elite position in the chat."
+    )
+    @ConfigEditorDropdown(
+            values = {"§6[⌬55]",
+                    "§6§l⌬55",
+                    "§cHide Elite Position"}
+    )
+    @ConfigAccordionId(id = 1)
+    public int eliteFormat = 0;
+
+    @Expose
+    @ConfigOption(
+            name = "Channel Design",
+            desc = "Change the design of the Channel Prefix in the chat."
+    )
+    @ConfigEditorDropdown(
+            values = {"§2Guild >",
+                    "§2G>",
+                    "§8<§2G§8>",
+                    "§8[§2G§8]",
+                    "§8(§2G§8)"}
+    )
+    @ConfigAccordionId(id = 1)
+    public int channelDesign = 0;
+
+    @Expose
+    @ConfigOption(name = "Test All Chat", desc = "Test the All Chat message format locally (no message gets sent to hypixel)")
+    @ConfigEditorButton(runnableId = "testAllChat")
+    @ConfigAccordionId(id = 1)
+    public boolean testAllChat = false;
+
+    @Expose
+    @ConfigOption(name = "Test Guild Chat", desc = "Test the Guild Chat message format locally (no message gets sent to hypixel)")
+    @ConfigEditorButton(runnableId = "testGuildChat")
+    @ConfigAccordionId(id = 1)
+    public boolean testGuildChat = false;
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in the dungeon.")
