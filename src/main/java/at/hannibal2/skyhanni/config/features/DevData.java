@@ -76,7 +76,7 @@ public class DevData {
     public boolean filterGrowBuffer = false;
 
     @Expose
-    @ConfigOption(name = "Filter Chat", desc = "Filter 'Unable to play unknown soundEvent'")
+    @ConfigOption(name = "Filter Sound Error", desc = "Filter 'Unable to play unknown soundEvent'")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean filterUnknownSound = false;

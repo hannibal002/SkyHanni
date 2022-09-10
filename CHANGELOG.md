@@ -5,11 +5,12 @@
 ### Misc
 - Added hiding the flame particles when using the Fire Veil Wand ability
 - Added circle around the player when having the Fire Veil Wand ability is active
-- The config GUI how has a search function (top right corner) 
+- The config GUI how has a search function (top right corner)
 
 ### Small Changes
 - Changed the ashfang gravity orb highlight from square to cylinder
-- added msg support to fancy chat format
+- Added msg support to fancy chat format
+- Added damage indicator for diana mobs
 
 ### Fixes
 - Fixed enchanted books in bazaar
@@ -36,7 +37,7 @@
 - Added option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
 - Added highlight the voidling extremist in pink color
 - Added highlight corrupted mobs in purple color
-- Added command /shmarkplayer (marking a player with yellow color)
+- Added command /shmarkplayer <player> (marking a player with yellow color)
 - Added highlight slayer miniboss in blue color
 - Added option to hide the death messages of other players, except for players who are close to the player, inside dungeon or during a Kuudra fight.
 - Added highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)

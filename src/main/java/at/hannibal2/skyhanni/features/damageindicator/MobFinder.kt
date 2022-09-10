@@ -340,6 +340,22 @@ class MobFinder {
                     }
                 }
             }
+            if (entity is EntityOtherPlayerMP) {
+                if (entity.name == "Minos Inquisitor") {
+                    return EntityResult(bossType = BossType.MINOS_INQUISITOR)
+                }
+                if (entity.name == "Minos Champion") {
+                    return EntityResult(bossType = BossType.MINOS_CHAMPION)
+                }
+                if (entity.name == "Minotaur ") {
+                    return EntityResult(bossType = BossType.MINOTAUR)
+                }
+            }
+            if (entity is EntityIronGolem) {
+                if (entity.baseMaxHealth % 1_500_000 == 0.0) {
+                    return EntityResult(bossType = BossType.GAIA_CONSTURUCT)
+                }
+            }
         }
 
         return null
