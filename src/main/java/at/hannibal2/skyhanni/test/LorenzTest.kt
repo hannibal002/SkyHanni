@@ -46,8 +46,6 @@ class LorenzTest {
             b = args[1].toDouble()
             c = args[2].toDouble()
 
-//            togglePacketLog = !togglePacketLog
-
 //            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
 //                .split("\n")) {
 //                println("footer: '$line'")
@@ -61,6 +59,7 @@ class LorenzTest {
 
         fun togglePacketLog() {
             shouldLogPackets = !shouldLogPackets
+            println("shouldLogPackets: $shouldLogPackets")
         }
     }
 
@@ -92,41 +91,69 @@ class LorenzTest {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
-        val name = packet.javaClass.simpleName
 
-        if (!shouldLogPackets) return
+//        if (Minecraft.getMinecraft().thePlayer.isSneaking) {
 
 //        if (packet is S2APacketParticles) {
-//
-//
 //            val particleType = packet.particleType
+//
+//            // FIREWORKS_SPARK ENCHANTMENT_TABLE DRIP_LAVA
+//            if (particleType != EnumParticleTypes.FIREWORKS_SPARK) return
+//            val loc = packet.toLorenzVec()
+//            val distance = loc.distance(LocationUtils.playerLocation())
+//            if (distance > 15) return
+//            list.add(loc)
+//            while (list.size > 3) {
+//                list.removeFirst()
+//            }
+//
 //            println("")
 //            println("particleType: $particleType")
 //
-////            val particleType = packet.particleType
-////            val particleCount = packet.particleCount
-////
-////            var lorenzVec = packet.toLorenzVec()
-//////            if (lorenzVec.distance(LocationUtils.playerLocation()) > 20) return
-////
-////            if (particleType == EnumParticleTypes.FLAME) {
-////
-////                println(" ")
-////                val particleSpeed = packet.particleSpeed
-////                val xOffset = packet.xOffset
-////                val yOffset = packet.yOffset
-////                val zOffset = packet.zOffset
-////                println("particleCount: $particleCount")
-////                println("particleSpeed: $particleSpeed")
-////                println("xOffset: $xOffset")
-////                println("yOffset: $yOffset")
-////                println("zOffset: $zOffset")
+//            val particleCount = packet.particleCount
+//
+//            println("distance: $distance")
+//
+//            val particleArgs = packet.particleArgs
+//            println("args: " + particleArgs.size)
+//            for ((i, particleArg) in particleArgs.withIndex()) {
+//                println("$i $particleArg")
+//            }
+//
+//            val particleSpeed = packet.particleSpeed
+//            val x = packet.xOffset
+//            val y = packet.yOffset
+//            val z = packet.zOffset
+//            println("particleCount: $particleCount")
+//            println("particleSpeed: $particleSpeed")
+//            println("xOffset: $x")
+//            println("yOffset: $y")
+//            println("zOffset: $z")
 ////            }
-//
-//
 //        }
 
-        println(name)
+
+        if (!shouldLogPackets) return
+        val name = packet.javaClass.simpleName
+//
+//        if (name == "S2APacketParticles") return
+//        if (name == "S3BPacketScoreboardObjective") return
+//        if (name == "S18PacketEntityTeleport") return
+//        if (name == "S38PacketPlayerListItem") return
+//        if (name == "S17PacketEntityLookMove") return
+//        if (name == "S00PacketKeepAlive") return
+//        if (name == "S23PacketBlockChange") return
+//        if (name == "S32PacketConfirmTransaction") return
+//        if (name == "S47PacketPlayerListHeaderFooter") return
+//        if (name == "S29PacketSoundEffect") return
+//        if (name == "S04PacketEntityEquipment") return
+//        if (name == "S16PacketEntityLook") return
+//
+//        println(name)
+
+//        }
+
+
 //        packetLog.log(name)
 
 //        if (packet is S18PacketEntityTeleport) {
