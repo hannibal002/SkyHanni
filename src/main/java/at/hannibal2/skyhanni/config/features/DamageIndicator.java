@@ -54,6 +54,7 @@ public class DamageIndicator {
                     "\u00a7bDungeon Floor 5",
                     "\u00a7bDungeon Floor 6",
                     "\u00a7bDungeon Floor 7",
+                    "\u00a7bDiana Mobs",
                     "Dummy"
             }
     )

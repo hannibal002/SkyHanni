@@ -48,7 +48,12 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     DUNGEON_F("", 16),
     DUNGEON_75("", 17),
 
-    DUMMY("Dummy", 18),
+    MINOS_INQUISITOR("§5Minos Inquisitor", 18),
+    MINOS_CHAMPION("§2Minos Champion", 18),
+    GAIA_CONSTURUCT("§2Gaia Construct", 18),
+    MINOTAUR("§2Minotaur", 18),
+
+    DUMMY("Dummy", 19),
 
     //TODO arachne
 
