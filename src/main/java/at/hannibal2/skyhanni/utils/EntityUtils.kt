@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.entity.EntityLiving
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 
@@ -43,13 +45,13 @@ object EntityUtils {
         }
     }
 
-        fun EntityLiving.getNameTagWith(
-            y: Int,
-            contains: String,
-            debugRightEntity: Boolean = false,
-            inaccuracy: Double = 1.6,
-            debugWrongEntity: Boolean = false,
-        ): EntityArmorStand? {
+    fun EntityLiving.getNameTagWith(
+        y: Int,
+        contains: String,
+        debugRightEntity: Boolean = false,
+        inaccuracy: Double = 1.6,
+        debugWrongEntity: Boolean = false,
+    ): EntityArmorStand? {
         val center = getLorenzVec().add(0, y, 0)
         val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlocPos()
         val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlocPos()
@@ -67,6 +69,23 @@ object EntityUtils {
                 LorenzUtils.consoleLog("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
             }
             result
+        }
+    }
+
+    fun EntityLivingBase.hasMaxHealth(health: Int): Boolean {
+        return when (this.baseMaxHealth) {
+            health.toDouble() -> true
+
+            //Derpy
+            health.toDouble() * 2 -> true
+
+            //Corrupted
+            health.toDouble() * 3 -> true
+
+            //Derpy + Corrupted
+            health.toDouble() * 2 * 3 -> true
+
+            else -> false
         }
     }
 }

@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -154,11 +154,12 @@ class MobFinder {
 
             if (DungeonData.isOneOf("F4", "M4")) {
                 if (entity is EntityGhast) {
-                    return EntityResult(bossType = BossType.DUNGEON_F4_THORN,
+                    return EntityResult(
+                        bossType = BossType.DUNGEON_F4_THORN,
                         ignoreBlocks = true,
-                        finalDungeonBoss = true)
+                        finalDungeonBoss = true
+                    )
                 }
-
             }
 
             if (DungeonData.isOneOf("F5", "M5")) {
@@ -186,15 +187,10 @@ class MobFinder {
             }
         } else {
 
-            val maxHealth = entity.baseMaxHealth.toInt()
             if (entity is EntityBlaze) {
                 if (entity.name != "Dinnerbone") {
                     if (entity.hasNameTagWith(2, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ")) {
-                        if (maxHealth == 50_000_000) {
-                            return EntityResult(bossType = BossType.NETHER_ASHFANG)
-                        }
-                        //Derpy
-                        if (maxHealth == 100_000_000) {
+                        if (entity.hasMaxHealth(50_000_000)) {
                             return EntityResult(bossType = BossType.NETHER_ASHFANG)
                         }
                     }
@@ -220,19 +216,11 @@ class MobFinder {
             }
             if (entity is EntityEnderman) {
                 if (entity.hasNameTagWith(3, "§c☠ §bVoidgloom Seraph ")) {
-                    when (maxHealth) {
-                        300_000, 600_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
-                        }
-                        12_000_000, 24_000_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
-                        }
-                        50_000_000, 100_000_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
-                        }
-                        210_000_000, 420_000_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
-                        }
+                    when {
+                        entity.hasMaxHealth(300_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_1)
+                        entity.hasMaxHealth(12_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_2)
+                        entity.hasMaxHealth(50_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_3)
+                        entity.hasMaxHealth(210_000_000) -> return EntityResult(bossType = BossType.SLAYER_ENDERMAN_4)
                     }
                 }
             }
@@ -247,23 +235,15 @@ class MobFinder {
             }
             if (entity is EntityZombie) {
                 if (entity.hasNameTagWith(2, "§c☠ §bRevenant Horror")) {
-                    when (maxHealth) {
-                        500, 1_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
-                        }
-                        20_000, 40_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
-                        }
-                        400_000, 800_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
-                        }
-                        1_500_000, 3_000_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
-                        }
+                    when {
+                        entity.hasMaxHealth(500) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_1)
+                        entity.hasMaxHealth(20_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_2)
+                        entity.hasMaxHealth(400_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_3)
+                        entity.hasMaxHealth(1_500_000) -> return EntityResult(bossType = BossType.SLAYER_ZOMBIE_4)
                     }
                 }
                 if (entity.hasNameTagWith(2, "§c☠ §fAtoned Horror ")) {
-                    if (maxHealth == 10_000_000 || maxHealth == 20_000_000) {
+                    if (entity.hasMaxHealth(10_000_000)) {
                         return EntityResult(bossType = BossType.SLAYER_ZOMBIE_5)
                     }
                 }
@@ -275,30 +255,22 @@ class MobFinder {
             }
             if (entity is EntityMagmaCube) {
                 if (entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")) {
-                    if (maxHealth == 200_000_000) {
-                        return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
-                    }
-                    //Derpy
-                    if (maxHealth == 400_000_000) {
+                    if (entity.hasMaxHealth(200_000_000)) {
                         return EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
                     }
                 }
             }
             if (entity is EntityHorse) {
                 if (entity.hasNameTagWith(15, "§8[§7Lv100§8] §c§6Headless Horseman§r ")) {
-                    if (maxHealth == 3_000_000) {
-                        return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
-                    }
-                    //Derpy
-                    if (maxHealth == 6_000_000) {
+                    if (entity.hasMaxHealth(3_000_000)) {
                         return EntityResult(bossType = BossType.HUB_HEADLESS_HORSEMAN)
                     }
                 }
             }
             if (entity is EntityBlaze) {
                 if (entity.hasNameTagWith(2, "§c☠ §bInferno Demonlord ")) {
-                    when (maxHealth) {
-                        2_500_000, 5_000_000 -> {
+                    when {
+                        entity.hasMaxHealth(2_500_000) -> {
                             return EntityResult(bossType = BossType.SLAYER_BLAZE_1)
                         }
                     }
@@ -306,53 +278,31 @@ class MobFinder {
             }
             if (entity is EntitySpider) {
                 if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
-                    when (maxHealth) {
-                        740, 1_500 -> {
-                            return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
-                        }
-                        30_000, 60_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
-                        }
-                        900_000, 1_800_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
-                        }
-                        2_400_000, 4_800_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
-                        }
+                    when {
+                        entity.hasMaxHealth(740) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+                        entity.hasMaxHealth(30_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+                        entity.hasMaxHealth(900_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+                        entity.hasMaxHealth(2_400_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
                     }
                 }
             }
             if (entity is EntityWolf) {
                 if (entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
-                    when (maxHealth) {
-                        2_000, 4_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_WOLF_1)
-                        }
-                        40_000, 80_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_WOLF_2)
-                        }
-                        750_000, 1_500_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_WOLF_3)
-                        }
-                        2_000_000, 4_000_000 -> {
-                            return EntityResult(bossType = BossType.SLAYER_WOLF_4)
-                        }
+                    when {
+                        entity.hasMaxHealth(2_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_1)
+                        entity.hasMaxHealth(40_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_2)
+                        entity.hasMaxHealth(750_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_3)
+                        entity.hasMaxHealth(2_000_000) -> return EntityResult(bossType = BossType.SLAYER_WOLF_4)
                     }
                 }
             }
             if (entity is EntityOtherPlayerMP) {
-                if (entity.name == "Minos Inquisitor") {
-                    return EntityResult(bossType = BossType.MINOS_INQUISITOR)
-                }
-                if (entity.name == "Minos Champion") {
-                    return EntityResult(bossType = BossType.MINOS_CHAMPION)
-                }
-                if (entity.name == "Minotaur ") {
-                    return EntityResult(bossType = BossType.MINOTAUR)
-                }
+                if (entity.name == "Minos Inquisitor") return EntityResult(bossType = BossType.MINOS_INQUISITOR)
+                if (entity.name == "Minos Champion") return EntityResult(bossType = BossType.MINOS_CHAMPION)
+                if (entity.name == "Minotaur ") return EntityResult(bossType = BossType.MINOTAUR)
             }
             if (entity is EntityIronGolem) {
-                if (entity.baseMaxHealth % 1_500_000 == 0.0) {
+                if (entity.hasMaxHealth(1_500_000)) {
                     return EntityResult(bossType = BossType.GAIA_CONSTURUCT)
                 }
             }
@@ -519,26 +469,13 @@ class MobFinder {
 
         for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
             if (entity is EntityGuardian) {
-
-                val maxHealth = entity.baseMaxHealth.toInt()
-
                 //F3
-                if (maxHealth == 1_000_000 || maxHealth == 1_200_000) {
-                    guardians.add(entity)
-                }
-
-                //F3  Derpy
-                if (maxHealth == 2_000_000 || maxHealth == 2_400_000) {
+                if (entity.hasMaxHealth(1_000_000) || entity.hasMaxHealth(1_200_000)) {
                     guardians.add(entity)
                 }
 
                 //M3
-                if (maxHealth == 240_000_000 || maxHealth == 280_000_000) {
-                    guardians.add(entity)
-                }
-
-                //M3 Derpy
-                if (maxHealth == 120_000_000 || maxHealth == 140_000_000) {
+                if (entity.hasMaxHealth(120_000_000) || entity.hasMaxHealth(240_000_000)) {
                     guardians.add(entity)
                 }
             }

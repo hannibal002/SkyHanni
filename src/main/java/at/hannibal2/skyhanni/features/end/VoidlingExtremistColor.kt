@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraftforge.event.world.WorldEvent
@@ -54,7 +54,7 @@ class VoidlingExtremistColor {
 
     private fun find() {
         Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityEnderman>()
-            .filter { it !in extremists && it.baseMaxHealth % 8_000_000 == 0.0 }.forEach { extremists.add(it) }
+            .filter { it !in extremists && it.hasMaxHealth(8_000_000) }.forEach { extremists.add(it) }
     }
 
     private fun isEnabled(): Boolean {

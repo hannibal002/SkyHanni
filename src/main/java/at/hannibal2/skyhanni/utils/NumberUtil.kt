@@ -106,26 +106,32 @@ object NumberUtil {
                     decimal = processDecimal(1000, lastNumber, decimal)
                     lastNumber = 1000
                 }
+
                 'D' -> {
                     decimal = processDecimal(500, lastNumber, decimal)
                     lastNumber = 500
                 }
+
                 'C' -> {
                     decimal = processDecimal(100, lastNumber, decimal)
                     lastNumber = 100
                 }
+
                 'L' -> {
                     decimal = processDecimal(50, lastNumber, decimal)
                     lastNumber = 50
                 }
+
                 'X' -> {
                     decimal = processDecimal(10, lastNumber, decimal)
                     lastNumber = 10
                 }
+
                 'V' -> {
                     decimal = processDecimal(5, lastNumber, decimal)
                     lastNumber = 5
                 }
+
                 'I' -> {
                     decimal = processDecimal(1, lastNumber, decimal)
                     lastNumber = 1
@@ -157,10 +163,7 @@ object NumberUtil {
         return isNotEmpty() && pattern.matcher(this).matches()
     }
 
-    fun percentageColor(
-        have: Int,
-        max: Int,
-    ): LorenzColor {
+    fun percentageColor(have: Long, max: Long): LorenzColor {
         val percentage = have.toDouble() / max.toDouble()
         return when {
             percentage > 0.9 -> LorenzColor.DARK_GREEN

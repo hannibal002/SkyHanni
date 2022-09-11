@@ -36,7 +36,7 @@ class DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
     private val decimalFormat = DecimalFormat("0.0")
-    private val maxHealth = mutableMapOf<UUID, Int>()
+    private val maxHealth = mutableMapOf<UUID, Long>()
 
     companion object {
         private var data = mutableMapOf<UUID, EntityData>()
@@ -229,11 +229,11 @@ class DamageIndicatorManager {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
 
-            val health = entity.health.toInt()
-            val maxHealth: Int
+            val health = entity.health.toLong()
+            val maxHealth: Long
             val biggestHealth = getMaxHealthFor(entity)
-            if (biggestHealth == 0) {
-                val currentMaxHealth = entity.baseMaxHealth.toInt()
+            if (biggestHealth == 0L) {
+                val currentMaxHealth = entity.baseMaxHealth.toLong()
                 maxHealth = max(currentMaxHealth, health)
                 setMaxHealth(entity, maxHealth)
             } else {
@@ -242,7 +242,7 @@ class DamageIndicatorManager {
 
             entityData.namePrefix = ""
             entityData.nameSuffix = ""
-            val customHealthText = if (health == 0) {
+            val customHealthText = if (health == 0L) {
                 entityData.dead = true
                 "§cDead"
             } else {
@@ -273,9 +273,9 @@ class DamageIndicatorManager {
 
     private fun getCustomHealth(
         entityData: EntityData,
-        health: Int,
+        health: Long,
         entity: EntityLivingBase,
-        maxHealth: Int,
+        maxHealth: Long,
     ): String? {
         if (entityData.bossType == BossType.DUNGEON_F4_THORN) {
             return checkThorn(health)
@@ -287,13 +287,13 @@ class DamageIndicatorManager {
             entityData.bossType == BossType.SLAYER_ENDERMAN_4
         ) {
             if (entity is EntityEnderman) {
-                return checkEnderSlayer(entity, entityData, health, maxHealth)
+                return checkEnderSlayer(entity, entityData, health.toInt(), maxHealth.toInt())
             }
         }
 
         if (entityData.bossType == BossType.NETHER_MAGMA_BOSS) {
             if (entity is EntityMagmaCube) {
-                return checkMagmaCube(entity, entityData, health, maxHealth)
+                return checkMagmaCube(entity, entityData, health.toInt(), maxHealth.toInt())
             }
         }
 
@@ -337,7 +337,7 @@ class DamageIndicatorManager {
             18 -> "§e4/6"
             16 -> "§e5/6"
             else -> {
-                val color = NumberUtil.percentageColor(health, 10_000_000)
+                val color = NumberUtil.percentageColor(health.toLong(), 10_000_000)
                 entityData.namePrefix = "§a6/6"
                 return color.getChatColor() + NumberUtil.format(health)
             }
@@ -373,7 +373,7 @@ class DamageIndicatorManager {
         }
         if (calcHealth == -1) return null
 
-        val color = NumberUtil.percentageColor(calcHealth, maxHealth)
+        val color = NumberUtil.percentageColor(calcHealth.toLong(), maxHealth.toLong())
         return color.getChatColor() + NumberUtil.format(calcHealth)
     }
 
@@ -432,7 +432,7 @@ class DamageIndicatorManager {
             else -> return null
         }
         val result =
-            NumberUtil.percentageColor(calcHealth, calcMaxHealth).getChatColor() + NumberUtil.format(calcHealth)
+            NumberUtil.percentageColor(calcHealth.toLong(), calcMaxHealth.toLong()).getChatColor() + NumberUtil.format(calcHealth)
 
 
         //Hit phase
@@ -447,7 +447,7 @@ class DamageIndicatorManager {
             }
             val name = armorStandHits.name.removeColor()
             val hits = name.between("Seraph ", " Hit").toInt()
-            return NumberUtil.percentageColor(hits, maxHits).getChatColor() + "$hits Hits"
+            return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
         //Laser phase
@@ -467,11 +467,11 @@ class DamageIndicatorManager {
         return result
     }
 
-    private fun checkThorn(realHealth: Int): String? {
+    private fun checkThorn(realHealth: Long): String? {
         val maxHealth: Int
         val health = if (DungeonData.isOneOf("F4")) {
             maxHealth = 4
-            when (realHealth) {
+            when (realHealth.toInt()) {
                 300_000, 600_000 -> 4
                 222_000, 444_000 -> 3
                 144_000, 288_000 -> 2
@@ -480,11 +480,7 @@ class DamageIndicatorManager {
                 else -> {
                     LorenzUtils.error(
                         "Unexpected health of thorn in f4! (${
-                            LorenzUtils.formatDouble(
-                                LorenzUtils.formatDouble(
-                                    realHealth.toDouble()
-                                ).toDouble()
-                            )
+                            LorenzUtils.formatDouble(realHealth.toDouble())
                         })"
                     )
                     return null
@@ -492,7 +488,7 @@ class DamageIndicatorManager {
             }
         } else if (DungeonData.isOneOf("M4")) {
             maxHealth = 6
-            when (realHealth) {
+            when (realHealth.toInt()) {
                 //TODO test all non derpy values!
                 1_800_000 / 2, 1_800_000 -> 6
                 1_494_000 / 2, 1_494_000 -> 5
@@ -519,11 +515,11 @@ class DamageIndicatorManager {
             LorenzUtils.error("Invalid thorn floor!")
             return null
         }
-        val color = NumberUtil.percentageColor(health, maxHealth)
+        val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong())
         return color.getChatColor() + health + "/" + maxHealth
     }
 
-    private fun checkDamage(entityData: EntityData, health: Int, lastHealth: Int, bossType: BossType) {
+    private fun checkDamage(entityData: EntityData, health: Long, lastHealth: Long, bossType: BossType) {
         val damage = lastHealth - health
         val healing = health - lastHealth
         if (damage > 0) {
@@ -534,7 +530,7 @@ class DamageIndicatorManager {
         }
         if (healing > 0) {
             //Hide auto heal every 10 ticks (with rounding errors)
-            if ((healing == 15_000 || healing == 15_001) && bossType == BossType.SLAYER_ZOMBIE_5) return
+            if ((healing == 15_000L || healing == 15_001L) && bossType == BossType.SLAYER_ZOMBIE_5) return
 
             val damageCounter = entityData.damageCounter
             damageCounter.currentHealing += healing
@@ -560,12 +556,12 @@ class DamageIndicatorManager {
         }
     }
 
-    private fun setMaxHealth(entity: EntityLivingBase, currentMaxHealth: Int) {
+    private fun setMaxHealth(entity: EntityLivingBase, currentMaxHealth: Long) {
         maxHealth[entity.uniqueID!!] = currentMaxHealth
     }
 
-    private fun getMaxHealthFor(entity: EntityLivingBase): Int {
-        return maxHealth.getOrDefault(entity.uniqueID!!, 0)
+    private fun getMaxHealthFor(entity: EntityLivingBase): Long {
+        return maxHealth.getOrDefault(entity.uniqueID!!, 0L)
     }
 
     @SubscribeEvent
