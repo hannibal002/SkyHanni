@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.items.abilitycooldown
+package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils

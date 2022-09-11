@@ -1,7 +1,8 @@
 # SkyHanni - List of all Features
 
+> Use '/skyhanni or /sh to open the SkyHanni config in game
+
 ## Commands
-- /skyhanni or /sh (opening the SkyHanni config in game)
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - /shmarkplayer <player> (marking a player with yellow color)
 
@@ -13,13 +14,11 @@
 - Many other messages (Not separated into own categories yet)
 
 ## Chat
-- Options to change the player chat format (show all channel prefix, hide player rank, hide colon after player name, hide/change elite position format, channel prefix design
+- Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
 - Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
 - Dungeon Filter (Removing annoying messages from in the dungeon)
 - Dungeon Boss Message hider (includes The Watcher as well)
-- Option to hide the Skyblock Level from the chat messages.
-- Option to change the way the Skyblock Level gets displayed in the chat (only working when skyblock level and fancy player message format are enabled)
-- Option to hide the death messages of other players, except for players who are close to the player, inside dungeon or during a Kuudra fight.
+- Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon or during a Kuudra fight.
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
@@ -29,15 +28,15 @@
 - Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
 - Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
 - Highlight deathmites in red color.
-- Hide Superboom TNT laying around in dungeon.
-- Hide Blessings laying around in dungeon.
-- Hide Revive Stones laying around in dungeon.
-- Hide Premium Flesh laying around in dungeon.
-- Hide Journal Entry pages laying around in dungeon.
+- Hide Superboom TNT lying around in dungeon.
+- Hide Blessings lying around in dungeon.
+- Hide Revive Stones lying around in dungeon.
+- Hide Premium Flesh lying around in dungeon.
+- Hide Journal Entry pages lying around in dungeon.
 - Dungeon Copilot (Suggests to you what to do next in dungeon)
 - Option to hide key pickup and door open messages in dungeon.
-- Hide Skeleton Skulls laying around in dungeon.
-- Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
+- Hide Skeleton Skulls lying around in dungeon.
+- Highlight Skeleton Skulls in the dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
 
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
@@ -52,10 +51,10 @@
 - Show the cooldown of items in the inventory.
 - Option to change the item background according to the cooldown.
 - Hiding the flame particles when using the Fire Veil Wand ability.
-- Circle around the player when having the Fire Veil Wand ability is running.
+- Circle around the player when having the Fire Veil Wand ability active.
 
 ## Summoning Mobs
-- Summoning Soul Display (Show the name of dropped soul laying on the ground, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
+- Summoning Soul Display (Show the name of dropped soul lying on the ground, not working in dungeon when Skytils' "Hide Non-Starred Mobs Nametags" is enabled)
 - Option to hide the nametag of your spawned summoning mobs.
 - Option to mark the own summoning mobs in green.
 - Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the corresponding spawning/despawning chat messages)
@@ -63,7 +62,7 @@
 
 ## Ashfang
 - Show a cooldown when the player gets an ability block effect during the ashfang fight.
-- Show a timer until ashfang is going to pull his minions back to him.
+- Display a timer until Ashfang brings his underlings back to him.
 - Ashfang Gravity Orbs display.
 - Ashfang Blazing Souls display.
 - Highlight the different ashfang blazes in their respective color.

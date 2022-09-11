@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.items.abilitycooldown
+package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
@@ -54,7 +54,7 @@ class ItemAbilityCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.abilities.itemAbilityCooldown
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
     }
 
     private fun click(ability: Ability) {
@@ -111,7 +111,7 @@ class ItemAbilityCooldown {
         val color = itemText.color
         stackTip = color.getChatColor() + itemText.text
 
-        if (SkyHanniMod.feature.abilities.itemAbilityCooldownBackground) {
+        if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
             var opacity = 130
             if (color == LorenzColor.GREEN) {
                 opacity = 80

@@ -24,14 +24,14 @@
 
 ### New Dungeon Features
 - Added highlight deathmites in dungeon in red color
-- Added hide Superboom TNT laying around in dungeon
-- Added hide Blessings laying around in dungeon
-- Added hide Revive Stones laying around in dungeon
-- Added hide Premium Flesh laying around in dungeon
+- Added hide Superboom TNT lying around in dungeon
+- Added hide Blessings lying around in dungeon
+- Added hide Revive Stones lying around in dungeon
+- Added hide Premium Flesh lying around in dungeon
 - Added Dungeon Copilot (Suggests to you what to do next in dungeon)
 - Added separate option to hide dungeon key pickup and door open messages
-- Added hide Journal Entry pages laying around in dungeon.
-- Added hide Skeleton Skulls laying around in dungeon.
+- Added hide Journal Entry pages lying around in dungeon.
+- Added hide Skeleton Skulls lying around in dungeon.
 - Added highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
 
 

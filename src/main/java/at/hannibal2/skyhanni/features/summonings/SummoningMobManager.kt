@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -46,7 +46,7 @@ class SummoningMobManager {
         val message = event.message
         val matcher = spawnPatter.matcher(message)
         if (matcher.matches()) {
-            if (SkyHanniMod.feature.abilities.summoningMobDisplay) {
+            if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
             summoningsSpawned++
@@ -56,13 +56,13 @@ class SummoningMobManager {
 
         if (despawnPatter.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
             despawned()
-            if (SkyHanniMod.feature.abilities.summoningMobDisplay && !message.contains("☠")) {
+            if (SkyHanniMod.feature.summonings.summoningMobDisplay && !message.contains("☠")) {
                 event.blockedReason = "summoning_soul"
             }
         }
         if (message == "§cThe Seraph recalled your summoned ally!" || seraphRecallPattern.matcher(message).matches()) {
             despawned()
-            if (SkyHanniMod.feature.abilities.summoningMobDisplay) {
+            if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
         }
@@ -74,7 +74,7 @@ class SummoningMobManager {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        if (SkyHanniMod.feature.abilities.summoningMobDisplay) {
+        if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
             if (tick++ % 20 == 0) {
                 updateData()
             }
@@ -138,7 +138,7 @@ class SummoningMobManager {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (!SkyHanniMod.feature.abilities.summoningMobDisplay) return
+        if (!SkyHanniMod.feature.summonings.summoningMobDisplay) return
         if (summoningMobs.isEmpty()) return
 
         val list = mutableListOf<String>()
@@ -150,7 +150,7 @@ class SummoningMobManager {
             id++
         }
 
-        SkyHanniMod.feature.abilities.summoningMobDisplayPos.renderStrings(list)
+        SkyHanniMod.feature.summonings.summoningMobDisplayPos.renderStrings(list)
     }
 
     @SubscribeEvent
@@ -161,7 +161,7 @@ class SummoningMobManager {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyblock) return
-        if (!SkyHanniMod.feature.abilities.summoningMobHideNametag) return
+        if (!SkyHanniMod.feature.summonings.summoningMobHideNametag) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
@@ -173,7 +173,7 @@ class SummoningMobManager {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (SkyHanniMod.feature.abilities.summoningMobColored) {
+        if (SkyHanniMod.feature.summonings.summoningMobColored) {
             val entity = event.entity
             if (entity is EntityLiving && entity in summoningMobs.keys) {
                 event.color = LorenzColor.GREEN.toColor().withAlpha(127)
@@ -184,7 +184,7 @@ class SummoningMobManager {
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
         val entity = event.entity
-        if (SkyHanniMod.feature.abilities.summoningMobColored && entity in summoningMobs.keys) {
+        if (SkyHanniMod.feature.summonings.summoningMobColored && entity in summoningMobs.keys) {
             event.shouldReset = true
         }
     }
@@ -198,7 +198,7 @@ class SummoningMobManager {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && (SkyHanniMod.feature.abilities.summoningMobDisplay || SkyHanniMod.feature.abilities.summoningMobHideNametag)
+        return LorenzUtils.inSkyblock && (SkyHanniMod.feature.summonings.summoningMobDisplay || SkyHanniMod.feature.summonings.summoningMobHideNametag)
     }
 
     class SummoningMob(

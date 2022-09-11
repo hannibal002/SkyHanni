@@ -99,7 +99,7 @@ class EndermanSlayerBeacon {
         }
     }
 
-    private fun isEnabled(): Boolean = LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.slayerEndermanBeacon &&
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyblock && SkyHanniMod.feature.slayer.slayerEndermanBeacon &&
             LorenzUtils.skyBlockIsland == "The End" &&
             (DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_2) ||
                     DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_3) ||
