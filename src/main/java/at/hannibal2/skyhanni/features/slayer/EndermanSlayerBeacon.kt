@@ -54,7 +54,7 @@ class EndermanSlayerBeacon {
 
         if (entity is EntityEnderman) {
             if (hasBeaconInHand(entity)) {
-                if (LocationUtils.canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                if (canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
                     endermans.add(entity)
                 }
             }
@@ -63,11 +63,15 @@ class EndermanSlayerBeacon {
         if (entity is EntityArmorStand) {
             val stack = entity.inventory[4] ?: return
             if (stack.name == "Beacon") {
-                if (LocationUtils.canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                if (canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
                     armorStands.add(entity)
                 }
             }
         }
+    }
+
+    private fun canSee(a: LorenzVec, b: LorenzVec): Boolean {
+        return LocationUtils.canSee(a, b) || a.distance(b) < 15
     }
 
     @SubscribeEvent
@@ -92,7 +96,7 @@ class EndermanSlayerBeacon {
 
         for (location in blocks) {
             event.drawColor(location, LorenzColor.DARK_RED, alpha = 1f)
-            event.drawString(location.add(0.5, -0.5, 0.5), "Beacon", true)
+            event.drawString(location.add(0.5, 0.5, 0.5), "§4Beacon", true)
         }
     }
 
