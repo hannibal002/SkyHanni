@@ -11,7 +11,7 @@ class EntityData(
     val bossType: BossType,
     val damageCounter: DamageCounter = DamageCounter(),
 
-    var lastHealth: Int = 0,
+    var lastHealth: Long = 0L,
     var healthText: String = "",
     var timeLastTick: Long = 0,
 //    var healthLineHidden: Boolean = false,

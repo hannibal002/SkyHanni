@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -39,23 +39,23 @@ class HighlightSlayerMiniboss {
         val list = mutableListOf<EntityLivingBase>()
 
         list.addAll(entityList.filterIsInstance<EntityZombie>().filter {
-            it.baseMaxHealth % 24_000 == 0.0 || it.baseMaxHealth % 90_000 == 0.0 || it.baseMaxHealth % 360_000 == 0.0 || it.baseMaxHealth % 600_000 == 0.0 || it.baseMaxHealth % 2_400_000 == 0.0
+            it.hasMaxHealth(24_000) || it.hasMaxHealth(90_000) || it.hasMaxHealth(360_000) || it.hasMaxHealth(600_000) || it.hasMaxHealth(2_400_000)
         })
 
         list.addAll(entityList.filterIsInstance<EntitySpider>().filter {
-            it.baseMaxHealth % 54_000 == 0.0 || it.baseMaxHealth % 144_000 == 0.0 || it.baseMaxHealth % 576_000 == 0.0
+            it.hasMaxHealth(54_000) || it.hasMaxHealth(144_000) || it.hasMaxHealth(576_000)
         })
 
         list.addAll(entityList.filterIsInstance<EntityWolf>().filter {
-            it.baseMaxHealth % 45_000 == 0.0 || it.baseMaxHealth % 120_000 == 0.0 || it.baseMaxHealth % 450_000 == 0.0
+            it.hasMaxHealth(45_000) || it.hasMaxHealth(120_000) || it.hasMaxHealth(450_000)
         })
 
         list.addAll(entityList.filterIsInstance<EntityEnderman>().filter {
-            it.baseMaxHealth % 12_000_000 == 0.0 || it.baseMaxHealth % 25_000_000 == 0.0
+            it.hasMaxHealth(12_000_000) || it.hasMaxHealth(25_000_000)
         })
 
         list.addAll(entityList.filterIsInstance<EntityBlaze>().filter {
-            it.baseMaxHealth % 12_000_000 == 0.0 || it.baseMaxHealth % 25_000_000 == 0.0
+            it.hasMaxHealth(12_000_000) || it.hasMaxHealth(25_000_000)
         })
 
         list.filter { it !in miniBosses && !DamageIndicatorManager.isBoss(it) }.forEach(miniBosses::add)

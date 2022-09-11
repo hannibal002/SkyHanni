@@ -127,8 +127,8 @@ class SummoningMobManager {
                 continue
             }
 
-            val maxHealth = entityLiving.baseMaxHealth.toInt()
-            val color = NumberUtil.percentageColor(currentHealth, maxHealth).getChatColor()
+            val maxHealth = entityLiving.baseMaxHealth
+            val color = NumberUtil.percentageColor(currentHealth.toLong(), maxHealth.toLong()).getChatColor()
 
             val currentFormat = NumberUtil.format(currentHealth)
             val maxFormat = NumberUtil.format(maxHealth)
