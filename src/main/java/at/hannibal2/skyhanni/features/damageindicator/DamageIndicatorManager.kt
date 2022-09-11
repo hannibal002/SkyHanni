@@ -310,6 +310,12 @@ class DamageIndicatorManager {
                 }
             }
 
+            BossType.NETHER_BARBARIAN_DUKE,
+            -> {
+                val location = entity.getLorenzVec()
+                entityData.ignoreBlocks = location.y == 117.0
+            }
+
             else -> return ""
         }
         return ""
