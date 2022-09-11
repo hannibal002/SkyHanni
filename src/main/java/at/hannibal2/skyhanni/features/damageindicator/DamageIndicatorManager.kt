@@ -276,25 +276,23 @@ class DamageIndicatorManager {
         entity: EntityLivingBase,
         maxHealth: Long,
     ): String? {
-        if (entityData.bossType == BossType.DUNGEON_F4_THORN) {
-            return checkThorn(health)
-        }
 
-        if (entityData.bossType == BossType.SLAYER_ENDERMAN_1 || entityData.bossType == BossType.SLAYER_ENDERMAN_2 || entityData.bossType == BossType.SLAYER_ENDERMAN_3 || entityData.bossType == BossType.SLAYER_ENDERMAN_4) {
-            if (entity is EntityEnderman) {
-                return checkEnderSlayer(entity, entityData, health.toInt(), maxHealth.toInt())
+        when (entityData.bossType) {
+            BossType.DUNGEON_F4_THORN -> return checkThorn(health)
+            BossType.SLAYER_ENDERMAN_1,
+            BossType.SLAYER_ENDERMAN_2,
+            BossType.SLAYER_ENDERMAN_3,
+            BossType.SLAYER_ENDERMAN_4,
+            -> {
+                return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
             }
-        }
 
-        if (entityData.bossType == BossType.NETHER_MAGMA_BOSS) {
-            if (entity is EntityMagmaCube) {
-                return checkMagmaCube(entity, entityData, health.toInt(), maxHealth.toInt())
+            BossType.NETHER_MAGMA_BOSS -> {
+                return checkMagmaCube(entity as EntityMagmaCube, entityData, health.toInt(), maxHealth.toInt())
             }
-        }
 
-        if (entityData.bossType == BossType.SLAYER_ZOMBIE_5) {
-            if (entity is EntityZombie) {
-                if (entity.hasNameTagWith(3, "§fBoom!")) {
+            BossType.SLAYER_ZOMBIE_5 -> {
+                if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
                     //TODO fix
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
@@ -303,16 +301,17 @@ class DamageIndicatorManager {
                     entityData.nameSuffix = " §f§lBOOM!"
                 }
             }
-        }
 
-        if (entityData.bossType == BossType.SLAYER_WOLF_3 || entityData.bossType == BossType.SLAYER_WOLF_4) {
-            if (entity is EntityWolf) {
-                if (entity.hasNameTagWith(2, "§bCalling the pups!")) {
+            BossType.SLAYER_WOLF_3,
+            BossType.SLAYER_WOLF_4,
+            -> {
+                if ((entity as EntityWolf).hasNameTagWith(2, "§bCalling the pups!")) {
                     return "Pups!"
                 }
             }
-        }
 
+            else -> return ""
+        }
         return ""
     }
 
