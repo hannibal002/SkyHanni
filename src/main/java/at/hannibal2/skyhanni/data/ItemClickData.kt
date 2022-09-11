@@ -13,17 +13,9 @@ class ItemClickData {
         if (!Mouse.getEventButtonState()) return
 
         val clickType = when (Mouse.getEventButton()) {
-            0 -> {
-                ItemClickInHandEvent.ClickType.LEFT_CLICK
-            }
-
-            1 -> {
-                ItemClickInHandEvent.ClickType.RIGHT_CLICK
-            }
-
-            else -> {
-                return
-            }
+            0 -> ItemClickInHandEvent.ClickType.LEFT_CLICK
+            1 -> ItemClickInHandEvent.ClickType.RIGHT_CLICK
+            else -> return
         }
 
         val itemStack = Minecraft.getMinecraft().thePlayer.heldItem

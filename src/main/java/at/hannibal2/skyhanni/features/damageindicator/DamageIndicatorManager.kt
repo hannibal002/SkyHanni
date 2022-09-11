@@ -190,8 +190,7 @@ class DamageIndicatorManager {
 
             if (now > damageCounter.firstTick + 1_000) {
                 damageCounter.oldDamages.add(
-                    0,
-                    OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing)
+                    0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing)
                 )
                 damageCounter.firstTick = 0L
                 damageCounter.currentDamage = 0
@@ -281,11 +280,7 @@ class DamageIndicatorManager {
             return checkThorn(health)
         }
 
-        if (entityData.bossType == BossType.SLAYER_ENDERMAN_1 ||
-            entityData.bossType == BossType.SLAYER_ENDERMAN_2 ||
-            entityData.bossType == BossType.SLAYER_ENDERMAN_3 ||
-            entityData.bossType == BossType.SLAYER_ENDERMAN_4
-        ) {
+        if (entityData.bossType == BossType.SLAYER_ENDERMAN_1 || entityData.bossType == BossType.SLAYER_ENDERMAN_2 || entityData.bossType == BossType.SLAYER_ENDERMAN_3 || entityData.bossType == BossType.SLAYER_ENDERMAN_4) {
             if (entity is EntityEnderman) {
                 return checkEnderSlayer(entity, entityData, health.toInt(), maxHealth.toInt())
             }
@@ -310,9 +305,7 @@ class DamageIndicatorManager {
             }
         }
 
-        if (entityData.bossType == BossType.SLAYER_WOLF_3 ||
-            entityData.bossType == BossType.SLAYER_WOLF_4
-        ) {
+        if (entityData.bossType == BossType.SLAYER_WOLF_3 || entityData.bossType == BossType.SLAYER_WOLF_4) {
             if (entity is EntityWolf) {
                 if (entity.hasNameTagWith(2, "§bCalling the pups!")) {
                     return "Pups!"
@@ -431,8 +424,9 @@ class DamageIndicatorManager {
 
             else -> return null
         }
-        val result =
-            NumberUtil.percentageColor(calcHealth.toLong(), calcMaxHealth.toLong()).getChatColor() + NumberUtil.format(calcHealth)
+        val result = NumberUtil.percentageColor(
+            calcHealth.toLong(), calcMaxHealth.toLong()
+        ).getChatColor() + NumberUtil.format(calcHealth)
 
 
         //Hit phase

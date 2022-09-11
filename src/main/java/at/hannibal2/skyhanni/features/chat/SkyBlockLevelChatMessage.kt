@@ -29,21 +29,10 @@ class SkyBlockLevelChatMessage {
         val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
 
         when (SkyHanniMod.feature.chat.skyblockLevelDesign) {
-            0 -> {
-                LorenzUtils.chat("$prefix §8[§$levelColor$level§8] $name§f$colon $message")
-            }
-
-            1 -> {
-                LorenzUtils.chat("$prefix §$levelColor§l$level $name§f$colon $message")
-            }
-
-            2 -> {
-                LorenzUtils.chat("$prefix $name §8[§$levelColor$level§8]§f$colon $message")
-            }
-
-            3 -> {
-                LorenzUtils.chat("$prefix $name§f$colon $message")
-            }
+            0 -> LorenzUtils.chat("$prefix §8[§$levelColor$level§8] $name§f$colon $message")
+            1 -> LorenzUtils.chat("$prefix §$levelColor§l$level $name§f$colon $message")
+            2 -> LorenzUtils.chat("$prefix $name §8[§$levelColor$level§8]§f$colon $message")
+            3 -> LorenzUtils.chat("$prefix $name§f$colon $message")
         }
         level = -1
     }
