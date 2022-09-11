@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.items
+package at.hannibal2.skyhanni.data
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject

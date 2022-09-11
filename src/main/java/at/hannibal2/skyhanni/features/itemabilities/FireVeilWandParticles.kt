@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ItemClickInHandEvent
@@ -21,7 +21,7 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyblock) return
-        if (SkyHanniMod.feature.abilities.fireVeilWandDisplay == 0) return
+        if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay == 0) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
         val packet = event.packet
@@ -53,11 +53,11 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyblock) return
-        if (SkyHanniMod.feature.abilities.fireVeilWandDisplay != 1) return
+        if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay != 1) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
         val color =
-            Color(SpecialColour.specialToChromaRGB(SkyHanniMod.feature.abilities.fireVeilWandDisplayColor), true)
+            Color(SpecialColour.specialToChromaRGB(SkyHanniMod.feature.itemAbilities.fireVeilWandDisplayColor), true)
 
         RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)
     }

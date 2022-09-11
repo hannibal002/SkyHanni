@@ -77,7 +77,7 @@ public class Features extends Config {
         }
 
         if (runnableId.equals("summoningMobDisplay")) {
-            editOverlay(activeConfigCategory, 200, 16, abilities.summoningMobDisplayPos);
+            editOverlay(activeConfigCategory, 200, 16, summonings.summoningMobDisplayPos);
             return;
         }
 
@@ -110,8 +110,12 @@ public class Features extends Config {
     public Inventory inventory = new Inventory();
 
     @Expose
-    @Category(name = "Abilities", desc = "Stuff about abilities")
-    public Abilities abilities = new Abilities();
+    @Category(name = "Item Abilities", desc = "Stuff about item abilities")
+    public ItemAbilities itemAbilities = new ItemAbilities();
+
+    @Expose
+    @Category(name = "Summonings", desc = "Ashfang fight in Crimson Isle")
+    public Summonings summonings = new Summonings();
 
     @Expose
     @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle")
@@ -132,6 +136,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
     public DamageIndicator damageIndicator = new DamageIndicator();
+
+    @Expose
+    @Category(name = "Slayer", desc = "Slayer Features.")
+    public Slayer slayer = new Slayer();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")

@@ -87,6 +87,6 @@ class HighlightSlayerMiniboss {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.slayerMinibossHighlight && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.slayer.slayerMinibossHighlight && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
     }
 }

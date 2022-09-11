@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinJavaUtils
@@ -127,6 +127,6 @@ class SummoningSoulsName {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.abilities.summoningSoulDisplay
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.summonings.summoningSoulDisplay
     }
 }
