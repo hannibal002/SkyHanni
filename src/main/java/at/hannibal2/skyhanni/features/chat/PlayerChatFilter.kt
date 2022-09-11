@@ -102,7 +102,7 @@ class PlayerChatFilter {
     }
 
     private fun grabName(rawName: String): String? {
-        val nameSplit = rawName.split(" ")
+        val nameSplit = rawName.removeColor().split(" ")
         val last = nameSplit.last()
         val cleanName = if (last.endsWith("]")) {
             nameSplit[nameSplit.size - 2]
