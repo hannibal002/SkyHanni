@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlin.concurrent.fixedRateTimer
 
 internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, BazaarData>) {
@@ -25,7 +26,7 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 val jsonObject = element.asJsonObject
                 val name = jsonObject["name"].asString
                 val id = jsonObject["id"].asString
-                itemNames[id] = name
+                itemNames[id] = name.removeColor()
             }
             currentlyUpdating = false
             return true

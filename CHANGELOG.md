@@ -16,6 +16,7 @@
 ### Fixes
 - Fixed enchanted books in bazaar
 - Fixed LorenzLogger printing output into console
+- Fixed best sell method not working for some bazaar items
 
 
 ## Version 0.7 - Dungeon and Colored Highlight
