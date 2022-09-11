@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
@@ -23,56 +22,36 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EndermanSlayerBeacon {
 
-    private val endermans = mutableListOf<EntityEnderman>()
+    private val endermens = mutableListOf<EntityEnderman>()
     private val armorStands = mutableListOf<EntityArmorStand>()
     private val blocks = mutableListOf<LorenzVec>()
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (isEnabled()) {
-            findEntities(event.entity)
-        }
-    }
-
-    private fun hasBeaconInHand(entity: EntityEnderman): Boolean {
-        val heldBlockState = entity.heldBlockState
-        if (heldBlockState != null) {
-            val block = heldBlockState.block
-            if (block != null) {
-                if (block == Blocks.beacon) {
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
-
-    private fun findEntities(entity: Entity) {
-        if (entity in endermans) return
-        if (entity in armorStands) return
+        val entity = event.entity
+        if (entity in endermens || entity in armorStands) return
 
         if (entity is EntityEnderman) {
-            if (hasBeaconInHand(entity)) {
-                if (canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                    endermans.add(entity)
-                }
+            if (hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                endermens.add(entity)
             }
         }
 
         if (entity is EntityArmorStand) {
             val stack = entity.inventory[4] ?: return
-            if (stack.name == "Beacon") {
-                if (canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                    armorStands.add(entity)
-                }
+            if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                armorStands.add(entity)
             }
         }
     }
 
-    private fun canSee(a: LorenzVec, b: LorenzVec): Boolean {
-        return LocationUtils.canSee(a, b) || a.distance(b) < 15
+    private fun hasBeaconInHand(entity: EntityEnderman): Boolean {
+        val heldBlockState = entity.heldBlockState ?: return false
+        val block = heldBlockState.block ?: return false
+        return block == Blocks.beacon
     }
+
+    private fun canSee(a: LorenzVec, b: LorenzVec): Boolean = LocationUtils.canSee(a, b) || a.distance(b) < 15
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
@@ -87,12 +66,10 @@ class EndermanSlayerBeacon {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
 
-        endermans.removeIf { it.isDead || !hasBeaconInHand(it) }
+        endermens.removeIf { it.isDead || !hasBeaconInHand(it) }
 
-        for (enderman in endermans) {
-            val location = enderman.getLorenzVec().add(-0.5, 0.2, -0.5)
-            event.drawColor(location, LorenzColor.DARK_RED, alpha = 1f)
-        }
+        endermens.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }
+            .forEach { event.drawColor(it, LorenzColor.DARK_RED, alpha = 1f) }
 
         for (location in blocks) {
             event.drawColor(location, LorenzColor.DARK_RED, alpha = 1f)
@@ -109,7 +86,9 @@ class EndermanSlayerBeacon {
             val vec = packet.blockPosition.toLorenzVec()
             val block = packet.blockState.block
             if (block == Blocks.beacon) {
-                if (armorStands.any { vec.distance(it.getLorenzVec()) < 3 }) {
+                val armorStand = armorStands.find { vec.distance(it.getLorenzVec()) < 3 }
+                if (armorStand != null) {
+                    armorStands.remove(armorStand)
                     blocks.add(vec)
                 }
             } else {
@@ -120,17 +99,15 @@ class EndermanSlayerBeacon {
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.slayerEndermanBeacon &&
-                LorenzUtils.skyBlockIsland == "The End" &&
-                (DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_2) ||
-                        DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_3) ||
-                        DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_4))
-    }
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.slayerEndermanBeacon &&
+            LorenzUtils.skyBlockIsland == "The End" &&
+            (DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_2) ||
+                    DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_3) ||
+                    DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_4))
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        endermans.clear()
+        endermens.clear()
         armorStands.clear()
         blocks.clear()
     }
