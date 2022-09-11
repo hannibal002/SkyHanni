@@ -17,6 +17,7 @@
 - Fixed enchanted books in bazaar
 - Fixed LorenzLogger printing output into console
 - Fixed best sell method not working for some bazaar items
+- Fixed summoning mobs display don't track mobs when moving too fast while spawning summoning mobs
 
 
 ## Version 0.7 - Dungeon and Colored Highlight

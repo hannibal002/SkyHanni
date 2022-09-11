@@ -81,8 +81,7 @@ class SummoningMobManager {
         }
 
         if (searchArmorStands) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList
-                .filter { it is EntityArmorStand && it !in summoningMobNametags }
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filter { it is EntityArmorStand && it !in summoningMobNametags }
                 .forEach {
                     val name = it.displayName.unformattedText
                     val matcher = healthPattern.matcher(name)
@@ -97,22 +96,19 @@ class SummoningMobManager {
                     }
                 }
         }
-        if (searchMobs) {
 
+        if (searchMobs) {
             val playerLocation = LocationUtils.playerLocation()
-            Minecraft.getMinecraft().theWorld.loadedEntityList
-                .filter {
-                    it is EntityLiving && it !in summoningMobs.keys && it.getLorenzVec().distance(playerLocation) < 3
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filter {
+                it is EntityLiving && it !in summoningMobs.keys && it.getLorenzVec()
+                    .distance(playerLocation) < 10 && it.ticksExisted < 2
+            }.forEach {
+                summoningMobs[it as EntityLiving] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+                updateData()
+                if (summoningMobs.size == summoningsSpawned) {
+                    searchMobs = false
                 }
-                .forEach {
-                    if (it.ticksExisted < 2) {
-                        summoningMobs[it as EntityLiving] = SummoningMob(System.currentTimeMillis(), name = "Mob")
-                        updateData()
-                        if (summoningMobs.size == summoningsSpawned) {
-                            searchMobs = false
-                        }
-                    }
-                }
+            }
         }
     }
 
