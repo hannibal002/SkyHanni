@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
@@ -23,7 +22,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class HighlightSlayerMiniboss {
 
     private var tick = 0
-    private val miniBosses = mutableListOf<Entity>()
+    private val miniBosses = mutableListOf<EntityLivingBase>()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -59,6 +58,7 @@ class HighlightSlayerMiniboss {
         })
 
         list.filter { it !in miniBosses && !DamageIndicatorManager.isBoss(it) }.forEach(miniBosses::add)
+        miniBosses.removeIf { DamageIndicatorManager.isBoss(it) }
     }
 
     @SubscribeEvent
