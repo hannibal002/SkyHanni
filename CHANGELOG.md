@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.7.1
+[## Version 0.8
 
 ### Misc
 - Added hiding the flame particles when using the Fire Veil Wand ability
