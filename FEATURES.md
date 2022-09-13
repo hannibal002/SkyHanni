@@ -1,10 +1,6 @@
 # SkyHanni - List of all Features
 
-> Use '/skyhanni or /sh to open the SkyHanni config in game
-
-## Commands
-- /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
-- /shmarkplayer <player> (marking a player with yellow color)
+> Use /skyhanni or /sh to open the SkyHanni config in game
 
 ## Chat Filter
 - Hiding annoying messages in the Hub of Hypixel (MVP player joins, other player loot boxes, prototype message, radiating generosity, Hypixel tournaments)
@@ -98,6 +94,10 @@
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 
+## Commands
+- /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
+- /shmarkplayer <player> (marking a player with yellow color)
+- 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)

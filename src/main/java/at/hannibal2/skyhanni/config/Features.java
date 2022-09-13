@@ -142,12 +142,12 @@ public class Features extends Config {
     public Slayer slayer = new Slayer();
 
     @Expose
-    @Category(name = "Misc", desc = "Settings without a category.")
-    public Misc misc = new Misc();
-
-    @Expose
     @Category(name = "Commands", desc = "Enable or disable mod commands")
     public CommandsFeatures commands = new CommandsFeatures();
+
+    @Expose
+    @Category(name = "Misc", desc = "Settings without a category.")
+    public Misc misc = new Misc();
 
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff.")
