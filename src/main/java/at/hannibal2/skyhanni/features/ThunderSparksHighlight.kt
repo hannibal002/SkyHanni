@@ -1,0 +1,62 @@
+package at.hannibal2.skyhanni.features
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.awt.Color
+
+class ThunderSparksHighlight {
+
+    private val texture =
+        "ewogICJ0aW1lc3RhbXAiIDogMTY0MzUwNDM3MjI1NiwKICAicHJvZmlsZUlkIiA6ICI2MzMyMDgwZTY3YTI0Y2MxYjE3ZGJhNzZmM2MwMGYxZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJUZWFtSHlkcmEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2IzMzI4ZDNlOWQ3MTA0MjAzMjI1NTViMTcyMzkzMDdmMTIyNzBhZGY4MWJmNjNhZmM1MGZhYTA0YjVjMDZlMSIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private val sparks = mutableListOf<EntityArmorStand>()
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!isEnabled()) return
+
+        Minecraft.getMinecraft().theWorld.loadedEntityList
+            .filter { it ->
+                it is EntityArmorStand && it !in sparks && it.inventory
+                    .any { it != null && it.getSkullTexture() == texture }
+            }.forEach { sparks.add(it as EntityArmorStand) }
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!isEnabled()) return
+
+        val special = SkyHanniMod.feature.fishing.thunderSparkColor
+        val color = Color(SpecialColour.specialToChromaRGB(special), true)
+
+        val playerLocation = LocationUtils.playerLocation()
+        for (spark in sparks) {
+            if (spark.isDead) continue
+            val sparkLocation = spark.getLorenzVec()
+            event.drawWaypointFilled(sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25)
+            if (sparkLocation.distance(playerLocation) < 10) {
+                event.drawString(sparkLocation.add(0.0, 1.5, 0.0), "Thunder Spark")
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        sparks.clear()
+    }
+
+    private fun isEnabled(): Boolean {
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.fishing.thunderSparkHighlight
+    }
+}

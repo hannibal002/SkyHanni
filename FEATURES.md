@@ -81,6 +81,7 @@
 - Trophy Counter (After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total)
 - Hide Bronze Duplicates (Hiding chat message when picking up a duplicate bronze trophy fish)
 - Shorten Fishing Message (Replacing the green chat message when fishing a sea creature with a more clean format)
+- Highlight Thunder Sparks after killing a Thunder
 
 ## Damage Indicator
 - Show the remaining health of selected bosses in the game in a bigger GUI.

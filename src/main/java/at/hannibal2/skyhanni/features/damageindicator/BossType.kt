@@ -53,7 +53,9 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     GAIA_CONSTURUCT("§2Gaia Construct", 18),
     MINOTAUR("§2Minotaur", 18),
 
-    DUMMY("Dummy", 19),
+    THUNDER("§cThunder", 19),
+
+    DUMMY("Dummy", 20),
 
     //TODO arachne
 

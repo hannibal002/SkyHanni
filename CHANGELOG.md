@@ -4,7 +4,9 @@
 
 ### Misc
 - Added hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
-- Added Option to hide all damage splashes, from anywhere in Skyblock.
+- Added option to hide all damage splashes, from anywhere in Skyblock.
+- Added highlight Thunder Sparks after killing a Thunder
+- Added Thunder to damage indicator
 
 ## Version 0.8
 

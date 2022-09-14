@@ -122,6 +122,7 @@ public class SkyHanniMod {
         registerEvent(new FireVeilWandParticles());
         registerEvent(new HideMobNames());
         registerEvent(new HideDamageSplash());
+        registerEvent(new ThunderSparksHighlight());
 
         Commands.init();
 

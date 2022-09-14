@@ -306,6 +306,11 @@ class MobFinder {
                     return EntityResult(bossType = BossType.GAIA_CONSTURUCT)
                 }
             }
+            if (entity is EntityGuardian) {
+                if (entity.hasMaxHealth(35_000_000)) {
+                    return EntityResult(bossType = BossType.THUNDER)
+                }
+            }
         }
 
         return null
