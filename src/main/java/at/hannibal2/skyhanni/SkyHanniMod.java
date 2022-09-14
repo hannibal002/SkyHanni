@@ -49,7 +49,7 @@ import org.apache.logging.log4j.Logger;
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.8";
+    public static final String VERSION = "0.8.1";
 
     public static Features feature;
 
