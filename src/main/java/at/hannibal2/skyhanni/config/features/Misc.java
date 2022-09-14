@@ -52,4 +52,9 @@ public class Misc {
     @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")
     @ConfigEditorBoolean
     public boolean corruptedMobHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes, from anywhere in Skyblock.")
+    @ConfigEditorBoolean
+    public boolean hideDamageSplash = false;
 }

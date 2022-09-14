@@ -15,4 +15,9 @@ public class Slayer {
     @ConfigOption(name = "Slayer Enderman Beacon", desc = "Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)")
     @ConfigEditorBoolean
     public boolean slayerEndermanBeacon = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Mob Names", desc = "Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.")
+    @ConfigEditorBoolean
+    public boolean hideMobNames = false;
 }

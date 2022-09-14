@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityC
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
+import at.hannibal2.skyhanni.features.slayer.HideMobNames;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager;
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName;
@@ -119,6 +120,8 @@ public class SkyHanniMod {
         registerEvent(new DungeonCopilot());
         registerEvent(new EndermanSlayerBeacon());
         registerEvent(new FireVeilWandParticles());
+        registerEvent(new HideMobNames());
+        registerEvent(new HideDamageSplash());
 
         Commands.init();
 
