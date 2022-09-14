@@ -43,5 +43,5 @@ public class Fishing {
     )
     @ConfigEditorColour
     @ConfigAccordionId(id = 1)
-    public String thunderSparkColor = "0:245:FF:FF:FF";
+    public String thunderSparkColor = "0:255:255:255:255";
 }
