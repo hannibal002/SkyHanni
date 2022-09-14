@@ -1,5 +1,11 @@
 # SkyHanni - Change Log
 
+## Version 0.8.1
+
+### Misc
+- Added hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
+- Added Option to hide all damage splashes, from anywhere in Skyblock.
+
 ## Version 0.8
 
 ### Misc

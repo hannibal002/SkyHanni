@@ -94,6 +94,11 @@
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 
+## Slayer
+- Highlight slayer miniboss in blue color.
+- Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
+- Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
+
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - /shmarkplayer <player> (marking a player with yellow color)
@@ -106,5 +111,4 @@
 - Gui element showing the real time.
 - Highlight the voidling extremist in pink color.
 - Highlight corrupted mobs in purple color.
-- Highlight slayer miniboss in blue color.
-- Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
+- Option to hide all damage splashes, from anywhere in Skyblock.

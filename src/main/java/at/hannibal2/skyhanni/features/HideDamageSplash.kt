@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.dungeon
+package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
@@ -8,13 +8,12 @@ import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonBossHideDamageSplash {
+class HideDamageSplash {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.damageSplashBoss) return
-        if (!DungeonData.inBossRoom) return
+    fun onRenderDamage(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+        if (!LorenzUtils.inSkyblock) return
+        if (!SkyHanniMod.feature.misc.hideDamageSplash) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.isCanceled = true
