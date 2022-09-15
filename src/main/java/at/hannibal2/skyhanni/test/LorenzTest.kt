@@ -62,6 +62,15 @@ class LorenzTest {
             shouldLogPackets = !shouldLogPackets
             println("shouldLogPackets: $shouldLogPackets")
         }
+
+        var highestStep = 0
+
+        fun highStep(step: Int) {
+            if (step > highestStep) {
+                highestStep = step
+                text = "" + highestStep
+            }
+        }
     }
 
     @SubscribeEvent
@@ -75,6 +84,7 @@ class LorenzTest {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+        if (!LorenzUtils.inSkyblock) return
         if (!SkyHanniMod.feature.dev.debugEnabled) return
 
         SkyHanniMod.feature.dev.debugPos.renderString(text)

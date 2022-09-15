@@ -138,6 +138,7 @@ class SummoningMobManager {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+        if (!LorenzUtils.inSkyblock) return
         if (!SkyHanniMod.feature.summonings.summoningMobDisplay) return
         if (summoningMobs.isEmpty()) return
 
