@@ -19,7 +19,7 @@ enum class ItemAbility(
     ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA"),
 
 
-    // Old logic, need to replace in the future
+    // TODO replace old logic
 
     HEAL_1("Small Heal", 7, "Wand of Healing"),
     HEAL_2("Medium Heal", 7, "Wand of Mending"),
