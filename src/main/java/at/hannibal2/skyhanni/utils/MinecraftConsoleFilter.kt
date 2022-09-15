@@ -9,10 +9,14 @@ import org.apache.logging.log4j.core.LogEvent
 import org.apache.logging.log4j.core.Logger
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.message.Message
+import java.util.regex.Pattern
 
 class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
-    val lorenzLogger = LorenzLogger("debug/mc_console_log")
+    private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
+    private val loggerUnfiltered = LorenzLogger("debug/mc_console/unfiltered")
+
+    private val patternBiomeIdBounds = Pattern.compile("Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)")
 
     companion object {
         @JvmStatic
@@ -30,7 +34,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         if (event == null) return Filter.Result.ACCEPT
 
         val loggerName = event.loggerName
-        if (loggerName == "skyhanni") return Filter.Result.ACCEPT
+        if (loggerName == "SkyHanni") return Filter.Result.ACCEPT
 
         val message = event.message
         val formattedMessage = message.formattedMessage
@@ -72,10 +76,16 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 return Filter.Result.DENY
             }
         }
-        if (SkyHanniMod.feature.dev.filterAmsHelperTransformer) {
-            if (loggerName == "AsmHelper") {
+        if (loggerName == "AsmHelper") {
+            if (SkyHanniMod.feature.dev.filterAmsHelperTransformer) {
                 if (formattedMessage.startsWith("Transforming class ")) {
                     filterConsole("AsmHelper Transforming")
+                    return Filter.Result.DENY
+                }
+            }
+            if (SkyHanniMod.feature.dev.filterAsmHelperApplying) {
+                if (formattedMessage.startsWith("Applying AsmWriter ModifyWriter")) {
+                    filterConsole("AsmHelper Applying AsmWriter")
                     return Filter.Result.DENY
                 }
             }
@@ -108,6 +118,12 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 //                return Filter.Result.DENY
 //            }
 //        }
+        if (SkyHanniMod.feature.dev.filterBiomeIdBounds) {
+            if (patternBiomeIdBounds.matcher(formattedMessage).matches()) {
+                filterConsole("Biome ID bounds")
+                return Filter.Result.DENY
+            }
+        }
 
         if (thrown != null) {
             val cause = thrown.cause
@@ -142,52 +158,58 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyblock) return Filter.Result.ACCEPT
         if (formattedMessage == "filtered console: ") return Filter.Result.ACCEPT
 
-        LorenzUtils.consoleLog(" ")
-        LorenzUtils.consoleLog("filter 4/event ('$loggerConfigName'/'$loggerName')")
-        LorenzUtils.consoleLog("formattedMessage: '$formattedMessage'")
+        debug(" ")
+        debug("filter 4/event ('$loggerConfigName'/'$loggerName')")
+        debug("formattedMessage: '$formattedMessage'")
         val threadName = event.threadName
-        LorenzUtils.consoleLog("threadName: '$threadName'")
+        debug("threadName: '$threadName'")
         val level = event.level
-        LorenzUtils.consoleLog("level: '$level'")
+        debug("level: '$level'")
         val marker = event.marker
         if (marker != null) {
             val name = marker.name
-            LorenzUtils.consoleLog("marker name: '$name'")
+            debug("marker name: '$name'")
         } else {
-            LorenzUtils.consoleLog("marker is null")
+            debug("marker is null")
         }
-        LorenzUtils.consoleLog("thrown: '$thrown'")
+        debug("thrown: '$thrown'")
         if (thrown != null) {
             if (thrown.stackTrace.isNotEmpty()) {
                 var element = thrown.stackTrace[0]
-                LorenzUtils.consoleLog("thrown first element: '$element'")
+                debug("thrown first element: '$element'")
                 val cause = thrown.cause
                 if (cause != null) {
-                    LorenzUtils.consoleLog("throw cause: '$cause'")
+                    debug("throw cause: '$cause'")
                     element = cause.stackTrace[0]
-                    LorenzUtils.consoleLog("thrown cause first element: '$element'")
+                    debug("thrown cause first element: '$element'")
                 }
             }
         }
-        LorenzUtils.consoleLog(" ")
+        debug(" ")
 
         return Filter.Result.ACCEPT
     }
 
+    private fun debug(text: String) {
+        if (SkyHanniMod.feature.dev.logUnfilteredFile) {
+            loggerUnfiltered.log(text)
+        } else {
+            LorenzUtils.consoleLog(text)
+        }
+    }
+
     private fun filterConsole(message: String) {
-        lorenzLogger.log(message)
+        loggerFiltered.log(message)
         if (SkyHanniMod.feature.dev.printFilteredReason) {
             LorenzUtils.consoleLog("filtered console: $message")
         }
     }
 
     override fun getOnMismatch(): Filter.Result {
-        LorenzUtils.consoleLog("getOnMismatch ($loggerConfigName)")
         return Filter.Result.DENY
     }
 
     override fun getOnMatch(): Filter.Result {
-        LorenzUtils.consoleLog("getOnMatch ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 
@@ -198,7 +220,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         msg: String?,
         vararg params: Any?,
     ): Filter.Result {
-        LorenzUtils.consoleLog("filter 1 ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 
@@ -209,7 +230,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         msg: Any?,
         t: Throwable?,
     ): Filter.Result {
-        LorenzUtils.consoleLog("filter 2 ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 
@@ -220,7 +240,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         msg: Message?,
         t: Throwable?,
     ): Filter.Result {
-        LorenzUtils.consoleLog("filter 3 ($loggerConfigName)")
         return Filter.Result.ACCEPT
     }
 }
