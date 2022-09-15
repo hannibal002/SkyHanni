@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
+import net.minecraft.event.HoverEvent
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -43,9 +45,23 @@ class LorenzTest {
 
         fun testCommand(args: Array<String>) {
 
-            a = args[0].toDouble()
-            b = args[1].toDouble()
-            c = args[2].toDouble()
+
+            val textA = ChatComponentText("a")
+
+            textA.chatStyle.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("hey :)"))
+
+            val textB = ChatComponentText("b")
+            val text1 = ChatComponentText("1")
+            text1.appendSibling(textA)
+            text1.appendSibling(textB)
+
+            Minecraft.getMinecraft().thePlayer.addChatMessage(text1)
+
+
+
+//            a = args[0].toDouble()
+//            b = args[1].toDouble()
+//            c = args[2].toDouble()
 
 //            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
 //                .split("\n")) {

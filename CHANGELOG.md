@@ -7,6 +7,7 @@
 - Added option to hide all damage splashes, from anywhere in Skyblock.
 - Added highlight Thunder Sparks after killing a Thunder
 - Added Thunder to damage indicator
+- Added support for links in player chat
 
 ## Version 0.8
 

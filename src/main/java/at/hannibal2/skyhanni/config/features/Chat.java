@@ -85,8 +85,8 @@ public class Chat {
             desc = "Change the design of the Elite position in the chat."
     )
     @ConfigEditorDropdown(
-            values = {"§6[⌬55]",
-                    "§6§l⌬55",
+            values = {"§6[⌬499]",
+                    "§6§l⌬499",
                     "§cHide Elite Position"}
     )
     @ConfigAccordionId(id = 1)
