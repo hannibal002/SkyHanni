@@ -14,7 +14,7 @@ object BlockUtils {
     fun LorenzVec.isInLoadedChunk(): Boolean =
         Minecraft.getMinecraft().theWorld.chunkProvider.provideChunk(toBlocPos()).isLoaded
 
-    fun getSkinFromSkull(position: BlockPos?): String? {
+    fun getTextureFromSkull(position: BlockPos?): String? {
         val entity = Minecraft.getMinecraft().theWorld.getTileEntity(position) as TileEntitySkull
         val serializeNBT = entity.serializeNBT()
         return serializeNBT.getCompoundTag("Owner").getCompoundTag("Properties")
