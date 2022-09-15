@@ -180,8 +180,12 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 val cause = thrown.cause
                 if (cause != null) {
                     debug("throw cause: '$cause'")
-                    element = cause.stackTrace[0]
-                    debug("thrown cause first element: '$element'")
+                    if (cause.stackTrace.isNotEmpty()) {
+                        element = cause.stackTrace[0]
+                        debug("thrown cause first element: '$element'")
+                    } else {
+                        debug("thrown cause has no elements")
+                    }
                 }
             }
         }
