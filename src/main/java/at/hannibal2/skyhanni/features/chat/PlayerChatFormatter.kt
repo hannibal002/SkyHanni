@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
+import net.minecraft.event.ClickEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class PlayerChatFilter {
+class PlayerChatFormatter {
 
     private val loggerPlayerChat = LorenzLogger("chat/player")
 
@@ -22,7 +23,10 @@ class PlayerChatFilter {
     private val patternSkyBlockLevel = Pattern.compile("§8\\[§(.)(\\d+)§8] (.+)")
 
     //§dTo §r§b[MVP§r§3+§r§b] Skyfall55§r§7: §r§7hello :)
-    var patternPrivateMessage: Pattern = Pattern.compile("§d(To|From) §r(.+)§r§7: §r§7(.+)")
+    private var patternPrivateMessage: Pattern = Pattern.compile("§d(To|From) §r(.+)§r§7: §r§7(.+)")
+
+    private val patternUrl =
+        Pattern.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -52,13 +56,18 @@ class PlayerChatFilter {
         } else {
             ""
         }
-        SkyBlockLevelChatMessage.elitePrefix = elitePrefix
 
+
+        val level: Int
+        val levelColor: String
         val matcher = patternSkyBlockLevel.matcher(rawMessage)
         if (matcher.matches()) {
-            SkyBlockLevelChatMessage.levelColor = matcher.group(1)
-            SkyBlockLevelChatMessage.level = matcher.group(2).toInt()
+            levelColor = matcher.group(1)
+            level = matcher.group(2).toInt()
             rawMessage = matcher.group(3)
+        } else {
+            level = -1
+            levelColor = ""
         }
 
         val split = if (rawMessage.contains("§7§7: ")) {
@@ -76,12 +85,11 @@ class PlayerChatFilter {
         val name = grabName(rawName) ?: return false
 
         val message = split[1]
-        send(channel, name, message.removeColor(), if (elitePrefix != "") " $elitePrefix" else elitePrefix)
+        callEvent(channel, name, message.removeColor(), level, levelColor, elitePrefix)
         return true
     }
 
     private fun handlePrivateMessage(originalMessage: String): Boolean {
-
         val matcher = patternPrivateMessage.matcher(originalMessage)
         if (!matcher.matches()) return false
         val direction = matcher.group(1)
@@ -124,7 +132,14 @@ class PlayerChatFilter {
         }
     }
 
-    private fun send(channel: PlayerMessageChannel, name: String, message: String, elitePrefix: String) {
+    private fun callEvent(
+        channel: PlayerMessageChannel,
+        name: String,
+        message: String,
+        level: Int,
+        levelColor: String,
+        elitePrefix: String,
+    ) {
         loggerPlayerChat.log("[$channel] ${name.removeColor()}: $message")
         val event = PlayerSendChatEvent(channel, name, message)
         event.postAndCatch()
@@ -134,33 +149,59 @@ class PlayerChatFilter {
             return
         }
 
-        val finalMessage = event.message
-        if (finalMessage != message) {
-            loggerPlayerChat.log("message changed: $finalMessage")
-        }
-
         val channelPrefix = getChannelPrefix(channel)
         val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
-        LorenzUtils.chat("$channelPrefix$elitePrefix$name§f$colon $finalMessage")
+        val levelFormat = getLevelFormat(name, level, levelColor)
+
+        sendWithLink("$channelPrefix$elitePrefix$levelFormat§f$colon", event.message)
+    }
+
+    private fun sendWithLink(prefix: String, message: String) {
+        val fullText = ChatComponentText(prefix)
+
+        for (lines in message.split(" ")) {
+            fullText.appendSibling(ChatComponentText(" "))
+            if (patternUrl.matcher(lines).matches()) {
+                val oneWord = ChatComponentText(lines)
+                oneWord.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, lines)
+                fullText.appendSibling(oneWord)
+            } else {
+                fullText.appendSibling(ChatComponentText(lines))
+            }
+        }
+
+        Minecraft.getMinecraft().thePlayer.addChatMessage(fullText)
+    }
+
+    private fun getLevelFormat(name: String, level: Int, levelColor: String): String {
+        if (level == -1) return name
+
+        return when (SkyHanniMod.feature.chat.skyblockLevelDesign) {
+            0 -> "§8[§${levelColor}${level}§8] $name"
+            1 -> "§${levelColor}§l${level} $name"
+            2 -> "$name §8[§${levelColor}${level}§8]"
+            3 -> name
+            else -> "§8[§${levelColor}${level}§8] $name"
+        }
+    }
+
+    private fun getChannelPrefix(channel: PlayerMessageChannel): String {
+        if (channel == PlayerMessageChannel.ALL && !SkyHanniMod.feature.chat.allChannelPrefix) return ""
+
+        val color = channel.prefixColor
+        val small = channel.prefixSmall
+        val large = channel.prefixLarge
+        return when (SkyHanniMod.feature.chat.channelDesign) {
+            0 -> "$color$large §8> "
+            1 -> "$color$small> "
+            2 -> "§8<$color$small§8> "
+            3 -> "§8[$color$small§8] "
+            4 -> "§8($color$small§8) "
+            else -> "$color$large §8> "
+        }
     }
 
     companion object {
-
-        fun getChannelPrefix(channel: PlayerMessageChannel): String {
-            if (channel == PlayerMessageChannel.ALL && !SkyHanniMod.feature.chat.allChannelPrefix) return ""
-
-            val color = channel.prefixColor
-            val small = channel.prefixSmall
-            val large = channel.prefixLarge
-            return when (SkyHanniMod.feature.chat.channelDesign) {
-                0 -> "$color$large §8> "
-                1 -> "$color$small> "
-                2 -> "§8<$color$small§8> "
-                3 -> "§8[$color$small§8] "
-                4 -> "§8($color$small§8) "
-                else -> "$color$large §8> "
-            }
-        }
 
         fun testAllChat() {
             val name = Minecraft.getMinecraft().thePlayer.name
