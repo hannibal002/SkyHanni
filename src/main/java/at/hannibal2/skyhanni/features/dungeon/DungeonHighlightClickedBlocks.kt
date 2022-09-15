@@ -39,8 +39,9 @@ class DungeonHighlightClickedBlocks {
     fun onSendPacket(event: PacketEvent.SendEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!LorenzUtils.inDungeons) return
-        if (!DungeonData.inBossRoom) return
-        if (event.packet !is C08PacketPlayerBlockPlacement || event.packet.stack == null) return
+        if (DungeonData.inBossRoom) return
+        if (event.packet !is C08PacketPlayerBlockPlacement) return
+        if (event.packet.stack == null) return
 
         val position = event.packet.position.toLorenzVec()
 
