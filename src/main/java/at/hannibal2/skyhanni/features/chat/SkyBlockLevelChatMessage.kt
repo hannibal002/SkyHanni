@@ -20,20 +20,20 @@ class SkyBlockLevelChatMessage {
 
         val message = event.message
         val name = event.formattedName
-        var prefix = if (event.channel == PlayerMessageChannel.ALL && !SkyHanniMod.feature.chat.allChannelPrefix)
-            "" else PlayerChatFilter.getChannelPrefix(event.channel)
+        val channelPrefix = PlayerChatFilter.getChannelPrefix(event.channel)
 
-        if (elitePrefix != "") {
-            prefix = "$prefix $elitePrefix".trim()
-        }
         val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
 
-        when (SkyHanniMod.feature.chat.skyblockLevelDesign) {
-            0 -> LorenzUtils.chat("$prefix §8[§$levelColor$level§8] $name§f$colon $message")
-            1 -> LorenzUtils.chat("$prefix §$levelColor§l$level $name§f$colon $message")
-            2 -> LorenzUtils.chat("$prefix $name §8[§$levelColor$level§8]§f$colon $message")
-            3 -> LorenzUtils.chat("$prefix $name§f$colon $message")
-        }
+        val levelFormat = getLevelFormat(name)
+        LorenzUtils.chat("$channelPrefix$elitePrefix$levelFormat§f$colon $message")
         level = -1
+    }
+
+    private fun getLevelFormat(name: String) = when (SkyHanniMod.feature.chat.skyblockLevelDesign) {
+        0 -> "§8[§$levelColor${level}§8] $name"
+        1 -> "§${levelColor}§l$level $name"
+        2 -> "$name §8[§$levelColor${level}§8]"
+        3 -> name
+        else -> "§8[§$levelColor${level}§8] $name"
     }
 }
