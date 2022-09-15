@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -16,8 +17,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -27,36 +26,33 @@ class ItemAbilityCooldown {
     var tick = 0
     val items = mutableMapOf<ItemStack, ItemText>()
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet is S29PacketSoundEffect) {
-            if (packet.soundName == "mob.zombie.remedy") {
-                if (packet.pitch == 0.6984127f && packet.volume == 1f) {
+    @SubscribeEvent
+    fun onSoundEvent(event: PlaySoundEvent) {
+            if (event.soundName == "mob.zombie.remedy") {
+                if (event.pitch == 0.6984127f && event.volume == 1f) {
                     ItemAbility.HYPERION.sound()
                 }
             }
-            if (packet.soundName == "mob.enderdragon.growl") {
-                if (packet.pitch == 1f && packet.volume == 1f) {
+            if (event.soundName == "mob.enderdragon.growl") {
+                if (event.pitch == 1f && event.volume == 1f) {
                     ItemAbility.ICE_SPRAY_WAND.sound()
                 }
             }
-            if (packet.soundName == "mob.endermen.portal") {
-                if (packet.pitch == 0.61904764f && packet.volume == 1f) {
+            if (event.soundName == "mob.endermen.portal") {
+                if (event.pitch == 0.61904764f && event.volume == 1f) {
                     ItemAbility.GYROKINETIC_WAND.sound()
                 }
             }
-            if (packet.soundName == "random.anvil_land") {
-                if (packet.pitch == 0.4920635f && packet.volume == 1f) {
+            if (event.soundName == "random.anvil_land") {
+                if (event.pitch == 0.4920635f && event.volume == 1f) {
                     ItemAbility.GIANTS_SWORD.sound()
                 }
             }
-            if (packet.soundName == "mob.ghast.affectionate_scream") {
-                if (packet.pitch == 0.4920635f && packet.volume == 0.15f) {
+            if (event.soundName == "mob.ghast.affectionate_scream") {
+                if (event.pitch == 0.4920635f && event.volume == 0.15f) {
                     ItemAbility.ATOMSPLIT_KATANA.sound()
                 }
             }
-        }
     }
 
     @SubscribeEvent

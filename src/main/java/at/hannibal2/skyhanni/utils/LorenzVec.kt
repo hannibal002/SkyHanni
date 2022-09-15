@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import net.minecraft.entity.Entity
-import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
@@ -75,6 +74,8 @@ data class LorenzVec(
         return "$x:$y:$z"
     }
 
+    fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
@@ -109,5 +110,3 @@ fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 
 fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
-
-fun S2APacketParticles.toLorenzVec(): LorenzVec = LorenzVec(xCoordinate, yCoordinate, zCoordinate)

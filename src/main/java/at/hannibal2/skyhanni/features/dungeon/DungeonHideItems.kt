@@ -8,10 +8,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
-import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -133,22 +131,19 @@ class DungeonHideItems {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
+    fun onReceivePacket(event: PlayParticleEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.hideSuperboomTNT && !SkyHanniMod.feature.dungeon.hideReviveStone) return
 
-        val packet = event.packet
-        if (packet is S2APacketParticles) {
-            val packetLocation = packet.toLorenzVec()
+            val packetLocation = event.location
             for (armorStand in hideParticles.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
                 val distance = packetLocation.distance(armorStand.getLorenzVec())
                 if (distance < 2) {
                     //only hiding white "sparkling" particles
-                    if (packet.particleType.particleID == 3) {
+                    if (event.type.particleID == 3) {
                         event.isCanceled = true
                     }
                 }
-            }
         }
     }
 

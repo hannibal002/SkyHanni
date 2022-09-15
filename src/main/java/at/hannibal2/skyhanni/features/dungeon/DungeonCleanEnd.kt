@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityGuardian
-import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -106,10 +105,8 @@ class DungeonCleanEnd {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
-        if (!shouldBlock()) return
-
-        if (event.packet is S2APacketParticles) {
+    fun onReceivePacket(event: PlayParticleEvent) {
+        if (shouldBlock()) {
             event.isCanceled = true
         }
     }
