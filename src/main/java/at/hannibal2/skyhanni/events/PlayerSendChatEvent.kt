@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.features.chat.PlayerMessageChannel
 
 class PlayerSendChatEvent(
     val channel: PlayerMessageChannel,
-    val formattedName: String,
+    val name: String,
     var message: String,
     var cancelledReason: String = "",
 ) : LorenzEvent()

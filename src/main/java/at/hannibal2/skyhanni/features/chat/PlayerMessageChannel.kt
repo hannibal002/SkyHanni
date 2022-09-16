@@ -7,7 +7,7 @@ enum class PlayerMessageChannel(
     val originalPrefix: String,
 ) {
 
-    ALL("§f", "A", "", ""),
+    ALL("§f", "A", "All", ""),
     ALL_GUESTING("§a", "g", "Guest", "§a[✌] "),
     ALL_DUNGEON_DEAD("§7", "D", "Dead", "§7[GHOST] "),
     PARTY("§9", "P", "Party", "§9Party §8> "),

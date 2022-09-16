@@ -8,7 +8,11 @@
 - Added highlight Thunder Sparks after killing a Thunder
 - Added Thunder to damage indicator
 - Added support for links in player chat
-- Option to enable that clicking on a player name in chat opens the profile viewer of NotEnoughUpdates (to fix SkyHanni breaking the default NEU feature).
+- Added option to enable that clicking on a player name in chat opens the profile viewer of NotEnoughUpdates (to fix SkyHanni breaking the default NEU feature).
+- Added support for new SBA chat icon feature (show profile type and faction in chat)
+
+### Fixed
+- Links in player chat are clickable again
 
 ## Version 0.8
 
