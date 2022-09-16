@@ -110,6 +110,12 @@ public class Dungeon {
     @ConfigAccordionId(id = 3)
     public boolean hideSkeletonSkull = false;
 
+    @Expose
+    @ConfigOption(name = "Hide Healer Orbs", desc = "Hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideHealerOrbs = false;
+
     @ConfigOption(name = "Message Filter", desc = "")
     @ConfigEditorAccordion(id = 4)
     public boolean messageFilter = false;
