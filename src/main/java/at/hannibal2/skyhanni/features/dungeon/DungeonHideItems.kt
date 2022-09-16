@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,15 +20,21 @@ class DungeonHideItems {
     private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, Long>()
 
     private val blessingTexture =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZT" +
-                "kzZTIwNjg2MTc4NzJjNTQyZWNkYTFkMjdkZjRlY2U5MWM2OTk5MDdiZjMyN2M0ZGRiODUzMDk0MTJkMzkzOSJ9fX0="
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZT" + "kzZTIwNjg2MTc4NzJjNTQyZWNkYTFkMjdkZjRlY2U5MWM2OTk5MDdiZjMyN2M0ZGRiODUzMDk0MTJkMzkzOSJ9fX0="
 
-    private val reviveStoneTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJ" +
-            "lcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZ" +
-            "jVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0K"
+    private val reviveStoneTexture =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJ" + "lcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZ" + "jVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0K"
 
-    private val premiumFleshTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0" +
-            "L3RleHR1cmUvMWE3NWU4YjA0NGM3MjAxYTRiMmU4NTZiZTRmYzMxNmE1YWFlYzY2NTc2MTY5YmFiNTg3MmE4ODUzNGI4MDI1NiJ9fX0K"
+    private val premiumFleshTexture =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0" + "L3RleHR1cmUvMWE3NWU4YjA0NGM3MjAxYTRiMmU4NTZiZTRmYzMxNmE1YWFlYzY2NTc2MTY5YmFiNTg3MmE4ODUzNGI4MDI1NiJ9fX0K"
+
+    private val abilityOrbTexture =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTAxZTA0MGNiMD" + "FjZjJjY2U0NDI4MzU4YWUzMWQyZTI2NjIwN2M0N2NiM2FkMTM5NzA5YzYyMDEzMGRjOGFkNCJ9fX0="
+    private val supportOrbTexture =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTMxYTRmYWIyZ" + "jg3ZGI1NDMzMDEzNjUxN2I0NTNhYWNiOWQ3YzBmZTc4NDMwMDcwOWU5YjEwOWNiYzUxNGYwMCJ9fX0="
+    private val damageOrbTexture =
+        "eyJ0aW1lc3RhbXAiOjE1NzQ5NTEzMTkwNDQsInByb2ZpbGVJZCI6IjE5MjUyMWI0ZWZkYjQyNWM4OTMxZjAyYTg0OTZlMTFiIiwic" + "HJvZmlsZU5hbWUiOiJTZXJpYWxpemFibGUiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2FiODZkYTJlMjQzYzA1ZGMwODk4YjBjYzVkM2U2NDg3NzE3MzE3N2UwYTIzOTQ0MjVjZWMxMDAyNTljYjQ1MjYifX19"
+
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean {
         val itemStack = entity.inventory[4]
@@ -128,6 +135,26 @@ class DungeonHideItems {
                 event.isCanceled = true
             }
         }
+
+        if (SkyHanniMod.feature.dungeon.hideHealerOrbs) {
+            when {
+                entity.name.startsWith("§c§lDAMAGE §e") -> event.isCanceled = true
+                entity.name.startsWith("§c§lABILITY DAMAGE §e") -> event.isCanceled = true
+                entity.name.startsWith("§a§lDEFENSE §e") -> event.isCanceled = true
+            }
+
+            val itemStack = entity.inventory[4] ?: return
+            when (itemStack.getSkullTexture()) {
+                abilityOrbTexture,
+                supportOrbTexture,
+                damageOrbTexture,
+                -> {
+                    event.isCanceled = true
+                    hideParticles[entity] = System.currentTimeMillis()
+                    return
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -135,15 +162,17 @@ class DungeonHideItems {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.hideSuperboomTNT && !SkyHanniMod.feature.dungeon.hideReviveStone) return
 
-            val packetLocation = event.location
-            for (armorStand in hideParticles.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
-                val distance = packetLocation.distance(armorStand.getLorenzVec())
-                if (distance < 2) {
-                    //only hiding white "sparkling" particles
-                    if (event.type.particleID == 3) {
-                        event.isCanceled = true
-                    }
+        val packetLocation = event.location
+        for (armorStand in hideParticles.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
+            val distance = packetLocation.distance(armorStand.getLorenzVec())
+            if (distance < 2) {
+                if (event.type == EnumParticleTypes.FIREWORKS_SPARK) {
+                    event.isCanceled = true
                 }
+                if (event.type == EnumParticleTypes.REDSTONE) {
+                    event.isCanceled = true
+                }
+            }
         }
     }
 
