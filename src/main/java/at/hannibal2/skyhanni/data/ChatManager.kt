@@ -32,6 +32,8 @@ class ChatManager {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
+        if (event.type.toInt() == 2) return
+
         val messageComponent = event.message
         val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
 

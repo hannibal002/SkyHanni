@@ -28,11 +28,11 @@ class PlayerMarker {
             if (name !in playerNamesToMark) {
                 playerNamesToMark.add(name)
                 findPlayers()
-                LorenzUtils.chat("§e[SkyHanni] §amarked §eplayer §b$displayName!")
+                LorenzUtils.chat("§e[SkyHanni] §aMarked §eplayer §b$displayName!")
             } else {
                 playerNamesToMark.remove(name)
                 markedPlayers.remove(name)
-                LorenzUtils.chat("§e[SkyHanni] §cunmarked §eplayer §b$displayName!")
+                LorenzUtils.chat("§e[SkyHanni] §cUnmarked §eplayer §b$displayName!")
             }
         }
 

@@ -17,14 +17,28 @@ class PlayerChatFormatter {
 
     private val loggerPlayerChat = LorenzLogger("chat/player")
 
+    private val sbaIconList = listOf(
+        "§5ቾ", // mage
+        "§c⚒", // barbarian
+        "§7♲", // ironman
+        //TODO test if bingo is working
+        "§aⒷ", // bingo rank 1
+        "§9Ⓑ", // bingo rank 2
+        "§5Ⓑ" // bingo rank 3
+
+        //maybe coming soon
+        //"§6Ⓑ" // bingo rank 4
+    )
+
     //§6[⌬57] §r§8[§r§b235§r§8] §r§6[MVP§r§c++§r§6] hannibal2§r§f: Hello World!
     private val patternElitePrefix = Pattern.compile("§6\\[⌬(\\d+)] (.+)")
 
     //§8[§9109§8] §b[MVP§c+§b] 4Apex§f§r§f: omg selling
     private val patternSkyBlockLevel = Pattern.compile("§8\\[§(.)(\\d+)§8] (.+)")
 
+    // SBA is adding another §d in front of the message
     //§dTo §r§b[MVP§r§3+§r§b] Skyfall55§r§7: §r§7hello :)
-    private var patternPrivateMessage: Pattern = Pattern.compile("§d(To|From) §r(.+)§r§7: §r§7(.+)")
+    private var patternPrivateMessage: Pattern = Pattern.compile("(§d)+(To|From) §r(.+)§r§7: §r§7(.+)")
 
     private val patternUrl =
         Pattern.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
@@ -83,23 +97,58 @@ class PlayerChatFormatter {
         val channel = grabChannel(rawName)
 
         rawName = rawName.substring(channel.originalPrefix.length)
+
+        val sbaData = fetchSBAIcons(rawName)
+        val sbaIcons = sbaData.first
+        rawName = sbaData.second
+
         val name = grabName(rawName) ?: return false
 
-        val message = split[1]
-        callEvent(channel, name, message.removeColor(), level, levelColor, elitePrefix)
+        val message = split[1].removeColor()
+        callEvent(channel, name, message, level, levelColor, elitePrefix, sbaIcons)
         return true
+    }
+
+    private fun fetchSBAIcons(rawName: String): Pair<String, String> {
+        val iconsSplit = rawName.split(" ")
+        var sbaIcons = ""
+        var toRemove = 0
+        for (text in iconsSplit) {
+            sbaIconList.find { text.contains(it) }?.let {
+                sbaIcons += " $it"
+                toRemove++
+            }
+        }
+        var name = iconsSplit.dropLast(toRemove).joinToString(" ")
+
+        // Test if any unknown icons are left
+        if (!name.split(" ").last().any { it in 'A'..'Z' || it in 'a'..'z' }) {
+            println(" ")
+            println("Unknown chat icon detected!")
+            LorenzUtils.chat("§c[SkyHanni] Unknown chat icon detected!")
+            println("name 1: '$rawName'")
+            println("name 2: '$name'")
+            name = rawName
+        }
+
+        return Pair(sbaIcons, name)
     }
 
     private fun handlePrivateMessage(originalMessage: String): Boolean {
         val matcher = patternPrivateMessage.matcher(originalMessage)
         if (!matcher.matches()) return false
-        val direction = matcher.group(1)
-        val rawName = matcher.group(2)
+        val direction = matcher.group(2)
+        var rawName = matcher.group(3)
+
+        val sbaData = fetchSBAIcons(rawName)
+        val sbaIcons = sbaData.first
+        rawName = sbaData.second
+
         val name = grabName(rawName) ?: return false
 
-        val message = matcher.group(3)
+        val message = matcher.group(4)
         val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
-        LorenzUtils.chat("§d$direction $name§f$colon $message")
+        LorenzUtils.chat("§d$direction $name$sbaIcons§f$colon $message")
         loggerPlayerChat.log("[Msg_$direction] $name: $message")
         return true
     }
@@ -110,7 +159,7 @@ class PlayerChatFormatter {
             ?: PlayerMessageChannel.ALL
     }
 
-    private fun grabName(rawName: String, nameOnly: Boolean = false): String? {
+    private fun grabName(rawName: String, clean: Boolean = false): String? {
         val nameSplit = rawName.removeColor().split(" ")
         val last = nameSplit.last()
         val cleanName = if (last.endsWith("]")) {
@@ -127,7 +176,7 @@ class PlayerChatFormatter {
             }
         }
 
-        if (nameOnly) {
+        if (clean) {
             return cleanName
         }
 
@@ -140,15 +189,16 @@ class PlayerChatFormatter {
 
     private fun callEvent(
         channel: PlayerMessageChannel,
-        name: String,
+        formattedName: String,
         message: String,
         level: Int,
         levelColor: String,
         elitePrefix: String,
+        sbaIcons: String,
     ) {
-        val cleanName = grabName(name, true)
+        val cleanName = grabName(formattedName, true)!!
         loggerPlayerChat.log("[$channel] $cleanName: $message")
-        val event = PlayerSendChatEvent(channel, name, message)
+        val event = PlayerSendChatEvent(channel, cleanName, message)
         event.postAndCatch()
 
         if (event.cancelledReason != "") {
@@ -158,14 +208,14 @@ class PlayerChatFormatter {
 
         val channelPrefix = getChannelPrefix(channel)
         val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
-        val levelFormat = getLevelFormat(name, level, levelColor)
+        val levelFormat = getLevelFormat(formattedName + sbaIcons, level, levelColor)
 
         val nameText = ChatComponentText("$channelPrefix$elitePrefix$levelFormat§f$colon")
         if (SkyHanniMod.feature.chat.neuProfileViewer) {
             nameText.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pv $cleanName")
             nameText.chatStyle.chatHoverEvent = HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText("§7Click to open the §cNEU Profile Viewer §7for $name")
+                ChatComponentText("§7Click to open the §cNEU Profile Viewer §7for $formattedName")
             )
         }
 
