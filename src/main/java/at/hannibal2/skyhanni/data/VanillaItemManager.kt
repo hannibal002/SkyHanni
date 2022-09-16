@@ -8,15 +8,13 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-class VanillaItemManager {
+object VanillaItemManager {
     private val gson = GsonBuilder().setPrettyPrinting().create()
 
-    companion object {
-        private val vanillaItems: MutableList<String> = ArrayList()
+    private val vanillaItems: MutableList<String> = ArrayList()
 
-        fun isVanillaItem(internalName: String): Boolean {
-            return vanillaItems.contains(internalName)
-        }
+    fun isVanillaItem(internalName: String): Boolean {
+        return vanillaItems.contains(internalName)
     }
 
     init {
@@ -43,9 +41,9 @@ class VanillaItemManager {
 
     private fun getJsonFromFile(file: File): JsonObject? {
         try {
-            BufferedReader(InputStreamReader(FileInputStream(file),
-                StandardCharsets.UTF_8
-            )).use { reader -> return gson.fromJson(reader, JsonObject::class.java) }
+            BufferedReader(
+                InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8)
+            ).use { reader -> return gson.fromJson(reader, JsonObject::class.java) }
         } catch (e: Exception) {
             return null
         }
