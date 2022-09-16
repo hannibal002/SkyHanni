@@ -13,6 +13,7 @@
 
 ### Fixed
 - Links in player chat are clickable again
+- Fixed vanilla items not being sellable to npc
 
 ## Version 0.8
 
