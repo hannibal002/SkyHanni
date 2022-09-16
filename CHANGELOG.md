@@ -8,6 +8,7 @@
 - Added highlight Thunder Sparks after killing a Thunder
 - Added Thunder to damage indicator
 - Added support for links in player chat
+- Option to enable that clicking on a player name in chat opens the profile viewer of NotEnoughUpdates (to fix SkyHanni breaking the default NEU feature).
 
 ## Version 0.8
 

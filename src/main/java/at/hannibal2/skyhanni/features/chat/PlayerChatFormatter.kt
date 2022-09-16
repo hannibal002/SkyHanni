@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -109,7 +110,7 @@ class PlayerChatFormatter {
             ?: PlayerMessageChannel.ALL
     }
 
-    private fun grabName(rawName: String): String? {
+    private fun grabName(rawName: String, nameOnly: Boolean = false): String? {
         val nameSplit = rawName.removeColor().split(" ")
         val last = nameSplit.last()
         val cleanName = if (last.endsWith("]")) {
@@ -125,6 +126,11 @@ class PlayerChatFormatter {
                 return null
             }
         }
+
+        if (nameOnly) {
+            return cleanName
+        }
+
         return if (SkyHanniMod.feature.chat.playerRankHider) {
             "§b$cleanName"
         } else {
@@ -140,7 +146,8 @@ class PlayerChatFormatter {
         levelColor: String,
         elitePrefix: String,
     ) {
-        loggerPlayerChat.log("[$channel] ${name.removeColor()}: $message")
+        val cleanName = grabName(name, true)
+        loggerPlayerChat.log("[$channel] $cleanName: $message")
         val event = PlayerSendChatEvent(channel, name, message)
         event.postAndCatch()
 
@@ -153,20 +160,29 @@ class PlayerChatFormatter {
         val colon = if (SkyHanniMod.feature.chat.playerColonHider) "" else ":"
         val levelFormat = getLevelFormat(name, level, levelColor)
 
-        sendWithLink("$channelPrefix$elitePrefix$levelFormat§f$colon", event.message)
+        val nameText = ChatComponentText("$channelPrefix$elitePrefix$levelFormat§f$colon")
+        if (SkyHanniMod.feature.chat.neuProfileViewer) {
+            nameText.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pv $cleanName")
+            nameText.chatStyle.chatHoverEvent = HoverEvent(
+                HoverEvent.Action.SHOW_TEXT,
+                ChatComponentText("§7Click to open the §cNEU Profile Viewer §7for $name")
+            )
+        }
+
+        addChat(nameText, event.message)
     }
 
-    private fun sendWithLink(prefix: String, message: String) {
-        val fullText = ChatComponentText(prefix)
-
-        for (lines in message.split(" ")) {
+    private fun addChat(text: ChatComponentText, message: String) {
+        val fullText = ChatComponentText("")
+        fullText.appendSibling(text)
+        for (word in message.split(" ")) {
             fullText.appendSibling(ChatComponentText(" "))
-            if (patternUrl.matcher(lines).matches()) {
-                val oneWord = ChatComponentText(lines)
-                oneWord.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, lines)
+            if (patternUrl.matcher(word).matches()) {
+                val oneWord = ChatComponentText(word)
+                oneWord.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, word)
                 fullText.appendSibling(oneWord)
             } else {
-                fullText.appendSibling(ChatComponentText(lines))
+                fullText.appendSibling(ChatComponentText(word))
             }
         }
 

@@ -108,6 +108,12 @@ public class Chat {
     public int channelDesign = 0;
 
     @Expose
+    @ConfigOption(name = "NEU Profile Viewer", desc = "Click on a player name to open the Profile Viewer from NotEnoughUpdates")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean neuProfileViewer = false;
+
+    @Expose
     @ConfigOption(name = "Test All Chat", desc = "Test the All Chat message format locally (no message gets sent to hypixel)")
     @ConfigEditorButton(runnableId = "testAllChat")
     @ConfigAccordionId(id = 1)
