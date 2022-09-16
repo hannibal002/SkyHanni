@@ -16,7 +16,7 @@ public class Dungeon {
     public boolean showMilestone = false;
 
     @Expose
-    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in the Dungeon.")
+    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in dungeon.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showMilestonesDisplay = false;
@@ -70,9 +70,9 @@ public class Dungeon {
     @ConfigEditorBoolean
     public boolean highlightDeathmites = false;
 
-    @ConfigOption(name = "Item Hider", desc = "")
+    @ConfigOption(name = "Object Hider", desc = "Hide various things in dungeon.")
     @ConfigEditorAccordion(id = 3)
-    public boolean itemHider = false;
+    public boolean objectHider = false;
 
     @Expose
     @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeon.")
@@ -105,16 +105,22 @@ public class Dungeon {
     public boolean hideJournalEntry = false;
 
     @Expose
-    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeon.")
+    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide skeleton skulls laying around in dungeon.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideSkeletonSkull = false;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Orbs", desc = "Hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs")
+    @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the healer kills mobs.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideHealerOrbs = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the golden fairy that follows the healer in dungeon.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean hideHealerFairy = false;
 
     @ConfigOption(name = "Message Filter", desc = "")
     @ConfigEditorAccordion(id = 4)

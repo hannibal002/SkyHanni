@@ -12,7 +12,7 @@
 ## Chat
 - Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
 - Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
-- Dungeon Filter (Removing annoying messages from in the dungeon)
+- Dungeon Filter (Removing annoying chat messages from the dungeon)
 - Dungeon Boss Message hider (includes The Watcher as well)
 - Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon or during a Kuudra fight.
 
@@ -32,11 +32,12 @@
 - Dungeon Copilot (Suggests to you what to do next in dungeon)
 - Option to hide key pickup and door open messages in dungeon.
 - Hide Skeleton Skulls lying around in dungeon.
-- Highlight Skeleton Skulls in the dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
+- Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
 - Hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs.
+- Hide the golden fairy that follows the healer in dungeon.
 
 ## Inventory
-- Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
+- Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
 - Option to change the gray-out opacity for 'Not Clickable Items'.
 - Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number and the tier of master skull and master star)
 - Sack name (show short name of sacks)
