@@ -211,7 +211,7 @@ class DungeonHideItems {
         if (entity is EntityArmorStand) {
             if (isSkeletonSkull(entity)) {
                 val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-                if (lastMove + 100 > System.currentTimeMillis()) {
+                if (lastMove + 200 > System.currentTimeMillis()) {
                     event.color = LorenzColor.GOLD.toColor().withAlpha(60)
                 }
             }
