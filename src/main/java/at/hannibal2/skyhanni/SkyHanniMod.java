@@ -47,6 +47,9 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION)
 public class SkyHanniMod {
 
@@ -58,6 +61,8 @@ public class SkyHanniMod {
     public static RepoManager repo;
     public static ConfigManager configManager;
     private static Logger logger;
+
+    public static List<Object> listenerClasses = new ArrayList<>();
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -142,6 +147,7 @@ public class SkyHanniMod {
     }
 
     private void registerEvent(Object object) {
+        listenerClasses.add(object);
         String simpleName = object.getClass().getSimpleName();
         consoleLog("SkyHanni registering '" + simpleName + "'");
         long start = System.currentTimeMillis();

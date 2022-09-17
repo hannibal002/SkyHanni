@@ -5,7 +5,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 
 abstract class LorenzEvent: Event() {
-    val eventName by lazy {
+    private val eventName by lazy {
         this::class.simpleName
     }
 

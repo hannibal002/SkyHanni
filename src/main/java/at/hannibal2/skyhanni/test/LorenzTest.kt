@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlayParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -14,6 +15,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -86,6 +88,15 @@ class LorenzTest {
                 highestStep = step
                 text = "" + highestStep
             }
+        }
+
+        fun reloadListeners() {
+            val listenerClasses = SkyHanniMod.listenerClasses
+            for (any in listenerClasses) {
+                MinecraftForge.EVENT_BUS.unregister(any)
+                MinecraftForge.EVENT_BUS.register(any)
+            }
+            LorenzUtils.chat("§e[SkyHanni] reloaded ${listenerClasses.size} listener classes.")
         }
     }
 

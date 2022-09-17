@@ -108,5 +108,15 @@ public class Commands {
                         }
                 )
         );
+        ClientCommandHandler.instance.registerCommand(
+                new SimpleCommand(
+                        "shreloadlisteners",
+                        new SimpleCommand.ProcessCommandRunnable() {
+                            public void processCommand(ICommandSender sender, String[] args) {
+                                LorenzTest.Companion.reloadListeners();
+                            }
+                        }
+                )
+        );
     }
 }
