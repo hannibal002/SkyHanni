@@ -24,7 +24,7 @@ object LorenzUtils {
         get() = inSkyblock && DungeonData.inDungeon()
 
     val skyBlockIsland: String
-        get() = HypixelData.mode
+        get() = HypixelData.skyBlockArea
 
     val inKuudraFight: Boolean
         get() = skyBlockIsland == "Instanced"
