@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
@@ -55,6 +57,13 @@ object CopyNearbyEntitiesCommand {
                 val ridingEntity = entity.ridingEntity
                 resultList.add("ridingEntity: $ridingEntity")
 
+                if (entity is EntityLivingBase) {
+                    resultList.add("EntityLivingBase:")
+                    val baseMaxHealth = entity.baseMaxHealth.toInt()
+                    val health = entity.health.toInt()
+                    resultList.add("-  baseMaxHealth: $baseMaxHealth")
+                    resultList.add("-  health: $health")
+                }
 
                 when (entity) {
                     is EntityArmorStand -> {
@@ -106,15 +115,36 @@ object CopyNearbyEntitiesCommand {
                         resultList.add("-  itemDamage: '$itemDamage'")
                         resultList.add("-  stackSize: '$stackSize'")
                         resultList.add("-  maxStackSize: '$maxStackSize'")
-
                     }
-                }
-                if (entity is EntityLivingBase) {
-                    resultList.add("EntityLivingBase:")
-                    val baseMaxHealth = entity.baseMaxHealth.toInt()
-                    val health = entity.health.toInt()
-                    resultList.add("-  baseMaxHealth: $baseMaxHealth")
-                    resultList.add("-  health: $health")
+
+                    is EntityOtherPlayerMP -> {
+                        resultList.add("EntityOtherPlayerMP:")
+
+                        val skinTexture = entity.getSkinTexture()
+                        resultList.add("-  skin texture: $skinTexture")
+
+//                        val gameProfile = entity.gameProfile
+//                        if (gameProfile == null) {
+//                            resultList.add("-  gameProfile is null!")
+//                        } else {
+//                            val id = gameProfile.id
+//                            val name = gameProfile.name
+//
+//                            resultList.add("-  gameProfile id: $id")
+//                            resultList.add("-  gameProfile name: $name")
+//                            val properties = gameProfile.properties
+//                            resultList.add("-  gameProfile properties: (${properties.size()})")
+//                            for (entry in properties.entries()) {
+//                                val key = entry.key
+//                                val property = entry.value
+//                                resultList.add("-     key: '$key'")
+//                                val name1 = property.name
+//                                val value = property.value
+//                                resultList.add("-        property name: '$name1'")
+//                                resultList.add("-        property value: '$value'")
+//                            }
+//                        }
+                    }
                 }
                 resultList.add("")
                 resultList.add("")
