@@ -2,22 +2,27 @@
 
 ## Version 0.8.1
 
+### Chat
++ Added option to enable that clicking on a player name in chat opens the profile viewer of NotEnoughUpdates (to fix SkyHanni breaking the default NEU feature).
++ Added support for new SBA chat icon feature (show profile type and faction in chat)
++ Highlight marked player names in chat.
++ Scan messages sent by players in all-chat for blacklisted words and greys out the message
++ Links in player chat are clickable again
+
+### Dungeon
++ Added hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs in dungeon
++ Added hide the golden fairy that follows the healer in dungeon.
++ Added hidden music for the clean end of the dungeon
+
+
 ### Misc
 + Added hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
 + Added option to hide all damage splashes, from anywhere in Skyblock.
 + Added highlight Thunder Sparks after killing a Thunder
 + Added Thunder to damage indicator
-+ Added option to enable that clicking on a player name in chat opens the profile viewer of NotEnoughUpdates (to fix SkyHanni breaking the default NEU feature).
-+ Added support for new SBA chat icon feature (show profile type and faction in chat)
-+ Added hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs
-+ Added hide the golden fairy that follows the healer in dungeon.
-+ Added hidden music for the clean end of the dungeon
-+ Highlight marked player names in chat.
-+ Mark the own player name.
-+ Scan messages sent by players in all-chat for blacklisted words and greys out the message
++ Mark the own player name (for Chat messages)
 
 ### Fixed
-- Links in player chat are clickable again
 - Fixed vanilla items not being sellable to npc
 
 ## Version 0.8
