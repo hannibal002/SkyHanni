@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -13,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
 
-class HideFarDeathMessages {
+class PlayerDeathMessages {
 
     private var tick = 0
     private val lastTimePlayerSeen = mutableMapOf<String, Long>()
@@ -23,7 +25,7 @@ class HideFarDeathMessages {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!isEnabled()) return
+        if (!isHideFarDeathsEnabled()) return
 
         if (tick++ % 20 == 0) {
             checkOtherPlayers()
@@ -32,14 +34,30 @@ class HideFarDeathMessages {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyblock) return
 
         val message = event.message
         val matcher = pattern.matcher(message)
         if (matcher.matches()) {
             val name = matcher.group(1)
-            if (System.currentTimeMillis() > lastTimePlayerSeen.getOrDefault(name, 0) + 30_000) {
-                event.blockedReason = "far_away_player_death"
+            if (SkyHanniMod.feature.markedPlayers.highlightInChat && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight) {
+                if (MarkedPlayerManager.isMarkedPlayer(name)) {
+                    val reason = matcher.group(2).removeColor()
+                    LorenzUtils.chat(" §c☠ §e$name §7$reason")
+                    event.blockedReason = "marked_player_death"
+                    return
+                }
+            }
+
+
+            if (isHideFarDeathsEnabled()) {
+                if (System.currentTimeMillis() > lastTimePlayerSeen.getOrDefault(name, 0) + 30_000) {
+                    event.blockedReason = "far_away_player_death"
+                }
+            }
+        } else {
+            if (message.contains("☠")) {
+                println("wrong death message: '$message'")
             }
         }
     }
@@ -58,7 +76,7 @@ class HideFarDeathMessages {
         }
     }
 
-    private fun isEnabled(): Boolean {
+    private fun isHideFarDeathsEnabled(): Boolean {
         return LorenzUtils.inSkyblock && SkyHanniMod.feature.chat.hideFarDeathMessages && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
     }
 }

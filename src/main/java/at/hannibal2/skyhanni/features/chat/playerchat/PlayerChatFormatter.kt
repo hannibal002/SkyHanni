@@ -1,8 +1,9 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlayerSendChatEvent
+import at.hannibal2.skyhanni.features.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -180,10 +181,19 @@ class PlayerChatFormatter {
             return cleanName
         }
 
+        val markedPlayer = MarkedPlayerManager.isMarkedPlayer(cleanName) && SkyHanniMod.feature.markedPlayers.highlightInChat
         return if (SkyHanniMod.feature.chat.playerRankHider) {
-            "§b$cleanName"
+            if (markedPlayer) "§e$cleanName" else "§b$cleanName"
         } else {
-            rawName
+            if (markedPlayer) {
+                if (rawName.contains(" ")) {
+                    rawName[0] + " §e" + cleanName
+                } else {
+                    "§e$cleanName"
+                }
+            } else {
+                rawName
+            }
         }
     }
 

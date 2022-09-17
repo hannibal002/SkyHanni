@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.Category;
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
-import at.hannibal2.skyhanni.features.chat.PlayerChatFormatter;
+import at.hannibal2.skyhanni.features.MarkedPlayerManager;
+import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFormatter;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 
@@ -95,6 +96,11 @@ public class Features extends Config {
             PlayerChatFormatter.Companion.testGuildChat();
             return;
         }
+
+        if (runnableId.equals("markOwnPlayer")) {
+            MarkedPlayerManager.toggleOwn();
+            return;
+        }
     }
 
     @Expose
@@ -144,6 +150,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Commands", desc = "Enable or disable mod commands")
     public CommandsFeatures commands = new CommandsFeatures();
+
+    @Expose
+    @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer")
+    public MarkedPlayers markedPlayers = new MarkedPlayers();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")

@@ -16,7 +16,7 @@ class EntityData {
         if (packet !is S1CPacketEntityMetadata) return
 
         if (packet == null) {
-            LorenzUtils.debug("packet is null in CorruptedMobHigh   light!")
+            LorenzUtils.debug("packet is null in EntityData!")
             return
         }
 
@@ -26,12 +26,12 @@ class EntityData {
 
             val theWorld = Minecraft.getMinecraft().theWorld
             if (theWorld == null) {
-                LorenzUtils.debug("theWorld is null in CorruptedMobHighlight!")
+                LorenzUtils.debug("theWorld is null in EntityData!")
                 continue
             }
             val entityId = packet.entityId
             if (entityId == null) {
-                LorenzUtils.debug("entityId is null in CorruptedMobHighlight!")
+                LorenzUtils.debug("entityId is null in EntityData!")
                 continue
             }
 
