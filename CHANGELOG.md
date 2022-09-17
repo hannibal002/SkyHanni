@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.8.1
+## Version 0.9 - Chat + Dungeon
 
 ### Chat
 + Added option to enable that clicking on a player name in chat opens the profile viewer of NotEnoughUpdates (to fix SkyHanni breaking the default NEU feature).
