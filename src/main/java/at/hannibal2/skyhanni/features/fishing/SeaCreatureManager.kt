@@ -29,7 +29,7 @@ class SeaCreatureManager {
                     counter++
                 }
             }
-            LorenzUtils.debug("loaded $counter sea creatures from repo")
+            LorenzUtils.debug("Loaded $counter sea creatures from repo")
 
         } catch (e: Exception) {
             e.printStackTrace()

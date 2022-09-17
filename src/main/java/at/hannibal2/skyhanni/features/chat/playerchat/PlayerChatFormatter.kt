@@ -31,6 +31,9 @@ class PlayerChatFormatter {
         //"§6Ⓑ" // bingo rank 4
     )
 
+    private val patternUrl =
+        Pattern.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
+
     //§6[⌬57] §r§8[§r§b235§r§8] §r§6[MVP§r§c++§r§6] hannibal2§r§f: Hello World!
     private val patternElitePrefix = Pattern.compile("§6\\[⌬(\\d+)] (.+)")
 
@@ -41,15 +44,24 @@ class PlayerChatFormatter {
     //§dTo §r§b[MVP§r§3+§r§b] Skyfall55§r§7: §r§7hello :)
     private var patternPrivateMessage: Pattern = Pattern.compile("(§d)+(To|From) §r(.+)§r§7: §r§7(.+)")
 
-    private val patternUrl =
-        Pattern.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
-
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.isOnHypixel) return
 
         if (shouldBlock(event.message)) {
             event.blockedReason = "player_chat"
+        }
+    }
+
+    @SubscribeEvent(receiveCanceled = true)
+    fun onChatWithUrl(event: PlayerSendChatEvent) {
+        if (!LorenzUtils.inSkyblock) return
+
+        for (chatComponent in event.chatComponents) {
+            val text = chatComponent.unformattedText
+            if (patternUrl.matcher(text).matches()) {
+                chatComponent.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, text)
+            }
         }
     }
 
@@ -208,7 +220,14 @@ class PlayerChatFormatter {
     ) {
         val cleanName = grabName(formattedName, true)!!
         loggerPlayerChat.log("[$channel] $cleanName: $message")
-        val event = PlayerSendChatEvent(channel, cleanName, message)
+
+
+        val chatComponents = mutableListOf<ChatComponentText>()
+        for (line in message.split(" ")) {
+            chatComponents.add(ChatComponentText(line))
+        }
+
+        val event = PlayerSendChatEvent(channel, cleanName, message, chatComponents)
         event.postAndCatch()
 
         if (event.cancelledReason != "") {
@@ -229,24 +248,21 @@ class PlayerChatFormatter {
             )
         }
 
-        addChat(nameText, event.message)
+        addChat(nameText, chatComponents)
     }
 
-    private fun addChat(text: ChatComponentText, message: String) {
-        val fullText = ChatComponentText("")
-        fullText.appendSibling(text)
-        for (word in message.split(" ")) {
-            fullText.appendSibling(ChatComponentText(" "))
-            if (patternUrl.matcher(word).matches()) {
-                val oneWord = ChatComponentText(word)
-                oneWord.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, word)
-                fullText.appendSibling(oneWord)
-            } else {
-                fullText.appendSibling(ChatComponentText(word))
-            }
+    private fun addChat(prefixComponent: ChatComponentText, chatComponents: MutableList<ChatComponentText>) {
+        val empty = ChatComponentText(" ")
+
+        val result = ChatComponentText("")
+        result.appendSibling(prefixComponent)
+
+        for (chatComponent in chatComponents) {
+            result.appendSibling(empty)
+            result.appendSibling(chatComponent)
         }
 
-        Minecraft.getMinecraft().thePlayer.addChatMessage(fullText)
+        Minecraft.getMinecraft().thePlayer.addChatMessage(result)
     }
 
     private fun getLevelFormat(name: String, level: Int, levelColor: String): String {

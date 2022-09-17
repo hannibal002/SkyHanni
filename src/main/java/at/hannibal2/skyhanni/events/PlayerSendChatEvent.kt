@@ -6,6 +6,7 @@ import net.minecraft.util.ChatComponentText
 class PlayerSendChatEvent(
     val channel: PlayerMessageChannel,
     val name: String,
-    var message: String,
+    val message: String,
+    val chatComponents: MutableList<ChatComponentText>,
     var cancelledReason: String = "",
 ) : LorenzEvent()

@@ -14,6 +14,7 @@
 + Added hidden music for the clean end of the dungeon
 + Highlight marked player names in chat.
 + Mark the own player name.
++ Scan messages sent by players in all-chat for blacklisted words and greys out the message
 
 ### Fixed
 - Links in player chat are clickable again

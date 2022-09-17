@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages;
+import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter;
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFormatter;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
@@ -130,6 +131,7 @@ public class SkyHanniMod {
         registerEvent(new HideMobNames());
         registerEvent(new HideDamageSplash());
         registerEvent(new ThunderSparksHighlight());
+        registerEvent(new PlayerChatFilter());
 
         Commands.init();
 
