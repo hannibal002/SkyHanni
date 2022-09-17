@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlayParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -59,8 +58,6 @@ class LorenzTest {
 
             Minecraft.getMinecraft().thePlayer.addChatMessage(text1)
 
-
-
 //            a = args[0].toDouble()
 //            b = args[1].toDouble()
 //            c = args[2].toDouble()
@@ -81,7 +78,7 @@ class LorenzTest {
             println("shouldLogPackets: $shouldLogPackets")
         }
 
-        var highestStep = 0
+        private var highestStep = 0
 
         fun highStep(step: Int) {
             if (step > highestStep) {
@@ -120,9 +117,13 @@ class LorenzTest {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onHypExplosions(event: PlayParticleEvent) {
 //        if (!LorenzUtils.inSkyblock) return
+//        when (event.type) {
+//            EnumParticleTypes.EXPLOSION_LARGE,
+//            EnumParticleTypes.EXPLOSION_HUGE,
+//            EnumParticleTypes.EXPLOSION_NORMAL,
+//            -> event.isCanceled = true
 //
-//        if (event.type == EnumParticleTypes.EXPLOSION_LARGE) {
-//            event.isCanceled = true
+//            else -> {}
 //        }
     }
 
@@ -375,8 +376,57 @@ class LorenzTest {
 //        if (name == "S29PacketSoundEffect") return
 //        if (name == "S04PacketEntityEquipment") return
 //        if (name == "S16PacketEntityLook") return
-//
-//        println(name)
+
+//        if (name == "S18PacketEntityTeleport") return
+
+//        if (packet is S18PacketEntityTeleport) {
+//            val entityId = packet.entityId
+//            val x = packet.x
+//            val y = packet.y
+//            val z = packet.z
+//            val location = LorenzVec(x, y, z)
+//            val distance = location.distance(LocationUtils.playerLocation())
+//            println(" ")
+//            println("S18PacketEntityTeleport $entityId (" + distance.toInt() + ")")
+//            println("location: $location")
+//            println("distance: " + distance.toInt())
+//            println("entityId: $entityId")
+//        }
+
+//        if (packet is S19PacketEntityHeadLook) {
+//            val theWorld = Minecraft.getMinecraft().theWorld
+//            val entity = packet.getEntity(theWorld) ?: return
+//            val entityId = entity.entityId
+//            println(" ")
+//            println("S19PacketEntityHeadLook")
+//            println("entityId: $entityId")
+//            val lorenzVec = entity.getLorenzVec()
+//            val distance = lorenzVec.distance(LocationUtils.playerLocation())
+//            if (distance > 20) return
+//            println("distance: $distance")
+//            println("location: ${lorenzVec.printWithAccuracy(1)}")
+//            return
+//        }
+
+//        if (packet is S15PacketEntityRelMove) {
+//            val theWorld = Minecraft.getMinecraft().theWorld
+//            val entity = packet.getEntity(theWorld) ?: return
+//            val entityId = entity.entityId
+//            println(" ")
+//            println("S15PacketEntityRelMove")
+//            println("entityId: $entityId")
+//            val lorenzVec = entity.getLorenzVec()
+//            val distance = lorenzVec.distance(LocationUtils.playerLocation())
+//            if (distance > 20) return
+//            println("distance: $distance")
+//            println("location: ${lorenzVec.printWithAccuracy(1)}")
+//            return
+//        }
+
+
+
+
+
 
 
 //        if (packet is S18PacketEntityTeleport) {
