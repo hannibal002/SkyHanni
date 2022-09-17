@@ -47,21 +47,27 @@ public class Chat {
     public boolean playerMessages = false;
 
     @Expose
+    @ConfigOption(name = "Message Format", desc = "")
+    @ConfigAccordionId(id = 1)
+    @ConfigEditorAccordion(id = 2)
+    public boolean messageFormat = false;
+
+    @Expose
     @ConfigOption(name = "All Channel Prefix", desc = "Show the prefix for the all channel chat.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 2)
     public boolean allChannelPrefix = false;
 
     @Expose
     @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks in the chat.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 2)
     public boolean playerRankHider = false;
 
     @Expose
     @ConfigOption(name = "Player Colon Hider", desc = "Hide the colon after the player name in the chat.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 2)
     public boolean playerColonHider = false;
 
     @Expose
@@ -76,7 +82,7 @@ public class Chat {
                     "§bname §8[§6123§8]§f: msg",
             "§cHide SkyBlock Level"}
     )
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 2)
     public int skyblockLevelDesign = 0;
 
     @Expose
@@ -89,7 +95,7 @@ public class Chat {
                     "§6§l⌬499",
                     "§cHide Elite Position"}
     )
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 2)
     public int eliteFormat = 0;
 
     @Expose
@@ -104,8 +110,20 @@ public class Chat {
                     "§8[§2G§8]",
                     "§8(§2G§8)"}
     )
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 2)
     public int channelDesign = 0;
+
+    @Expose
+    @ConfigOption(name = "Test All Chat", desc = "Test the All Chat message format locally (no message gets sent to hypixel)")
+    @ConfigEditorButton(runnableId = "testAllChat")
+    @ConfigAccordionId(id = 2)
+    public boolean testAllChat = false;
+
+    @Expose
+    @ConfigOption(name = "Test Guild Chat", desc = "Test the Guild Chat message format locally (no message gets sent to hypixel)")
+    @ConfigEditorButton(runnableId = "testGuildChat")
+    @ConfigAccordionId(id = 2)
+    public boolean testGuildChat = false;
 
     @Expose
     @ConfigOption(name = "NEU Profile Viewer", desc = "Click on a player name to open the Profile Viewer from NotEnoughUpdates")
@@ -114,16 +132,10 @@ public class Chat {
     public boolean neuProfileViewer = false;
 
     @Expose
-    @ConfigOption(name = "Test All Chat", desc = "Test the All Chat message format locally (no message gets sent to hypixel)")
-    @ConfigEditorButton(runnableId = "testAllChat")
+    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players in all-chat for blacklisted words and greys out the message")
+    @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean testAllChat = false;
-
-    @Expose
-    @ConfigOption(name = "Test Guild Chat", desc = "Test the Guild Chat message format locally (no message gets sent to hypixel)")
-    @ConfigEditorButton(runnableId = "testGuildChat")
-    @ConfigAccordionId(id = 1)
-    public boolean testGuildChat = false;
+    public boolean chatFilter = false;
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in the dungeon.")
