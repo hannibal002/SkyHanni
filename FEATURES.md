@@ -102,6 +102,12 @@
 - Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
 - Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
 
+## Marked Players
++ Adding or removing players as marked with command /shmarkplayer
++ Highlight marked players in the world.
++ Highlight marked player names in chat.
++ Mark the own player name.
+
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - /shmarkplayer <player> (marking a player with yellow color)

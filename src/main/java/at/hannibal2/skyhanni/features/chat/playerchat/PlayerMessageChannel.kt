@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat.playerchat
 
 enum class PlayerMessageChannel(
     val prefixColor: String,

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.commands;
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.ConfigEditor;
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
-import at.hannibal2.skyhanni.features.PlayerMarker;
+import at.hannibal2.skyhanni.features.MarkedPlayerManager;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.test.command.CopyItemCommand;
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand;
@@ -93,7 +93,7 @@ public class Commands {
                         "shmarkplayer",
                         new SimpleCommand.ProcessCommandRunnable() {
                             public void processCommand(ICommandSender sender, String[] args) {
-                                PlayerMarker.Companion.command(args);
+                                MarkedPlayerManager.Companion.command(args);
                             }
                         }
                 )
