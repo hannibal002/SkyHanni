@@ -19,8 +19,8 @@
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
 - Current milestone display.
-- Death Counter (Changing color depending on amount)
-- Clean End (Hiding all entities and particles from displaying after the last dungeon boss dies, showing dungeon chests, still)
+- Death Counter (Changing color depending on amount, hidden at 0 deaths)
+- Clean Ending (After the last dungeon boss has died, all entities and particles are no longer displayed and the music stops playing, but the dungeon chests are still displayed)
 - Option to exclude guardians in F3 and M3 from the clean end feature (only when sneaking)
 - Hiding damage splashes while inside the boss room (replacing a broken feature from Skytils)
 - Highlight deathmites in red color.

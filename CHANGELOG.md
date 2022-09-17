@@ -7,11 +7,11 @@
 - Added option to hide all damage splashes, from anywhere in Skyblock.
 - Added highlight Thunder Sparks after killing a Thunder
 - Added Thunder to damage indicator
-- Added support for links in player chat
 - Added option to enable that clicking on a player name in chat opens the profile viewer of NotEnoughUpdates (to fix SkyHanni breaking the default NEU feature).
 - Added support for new SBA chat icon feature (show profile type and faction in chat)
 - Added hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs
 - Added hide the golden fairy that follows the healer in dungeon.
+- Added hidden music for the clean end of the dungeon
 
 ### Fixed
 - Links in player chat are clickable again

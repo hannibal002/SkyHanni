@@ -48,7 +48,8 @@ public class Dungeon {
     public boolean cleanEnd = false;
 
     @Expose
-    @ConfigOption(name = "Clean End", desc = "Hide entities and particles after the boss in Floor 1 - 6 has died.")
+    @ConfigOption(name = "Clean Ending", desc = "After the last dungeon boss has died, all entities and " +
+            "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean cleanEndToggle = false;

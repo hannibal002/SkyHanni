@@ -105,9 +105,18 @@ class DungeonCleanEnd {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: PlayParticleEvent) {
+    fun onPlayParticle(event: PlayParticleEvent) {
         if (shouldBlock()) {
             event.isCanceled = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (shouldBlock() && !chestsSpawned) {
+            if (event.soundName.startsWith("note.")) {
+                event.isCanceled = true
+            }
         }
     }
 }
