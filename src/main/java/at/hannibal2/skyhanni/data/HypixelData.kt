@@ -17,7 +17,7 @@ class HypixelData {
     companion object {
         var hypixel = false
         var skyblock = false
-        var mode: String = ""
+        var skyBlockArea: String = ""
     }
 
     var loggerLocationChange = LorenzLogger("debug/location_change")
@@ -79,24 +79,24 @@ class HypixelData {
     }
 
     private fun checkMode() {
-        var location = ""
+        var newArea = ""
         var guesting = false
         for (line in TabListUtils.getTabList()) {
             if (line.startsWith("§r§b§lArea: ")) {
-                location = line.split(": ")[1].removeColor()
+                newArea = line.split(": ")[1].removeColor()
             }
             if (line == "§r Status: §r§9Guest§r") {
                 guesting = true
             }
         }
         if (guesting) {
-            location = "$location guesting"
+            newArea = "$newArea guesting"
         }
 
-        if (mode != location) {
-            LocationChangeEvent(location, mode).postAndCatch()
-            loggerLocationChange.log(location)
-            mode = location
+        if (skyBlockArea != newArea) {
+            LocationChangeEvent(newArea, skyBlockArea).postAndCatch()
+            loggerLocationChange.log(newArea)
+            skyBlockArea = newArea
         }
     }
 
