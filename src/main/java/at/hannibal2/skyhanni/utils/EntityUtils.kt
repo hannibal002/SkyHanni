@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
 
 object EntityUtils {
@@ -87,5 +88,15 @@ object EntityUtils {
 
             else -> false
         }
+    }
+
+    fun EntityPlayer.getSkinTexture(): String? {
+        val gameProfile = gameProfile ?: return null
+
+        return gameProfile.properties.entries()
+            .filter { it.key == "textures" }
+            .map { it.value }
+            .firstOrNull { it.name == "textures" }
+            ?.value
     }
 }
