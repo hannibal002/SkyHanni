@@ -121,7 +121,7 @@ class MarkedPlayerManager {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
+    @SubscribeEvent
     fun onMarkedChatMessage(event: PlayerSendChatEvent) {
         if (!LorenzUtils.inSkyblock) return
 
