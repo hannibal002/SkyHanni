@@ -40,7 +40,7 @@ class DamageIndicatorManager {
 
     companion object {
         private var data = mutableMapOf<UUID, EntityData>()
-        private val damagePattern: Pattern = Pattern.compile("✧?(\\d+[⚔+✧❤♞☄✷ﬗ]*)")
+        private val damagePattern: Pattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)")
 
         fun isBoss(entity: EntityLivingBase): Boolean {
             return data.values.any { it.entity == entity }

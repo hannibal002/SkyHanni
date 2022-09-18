@@ -43,7 +43,7 @@ class PlayerChatFilter {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onEvent(event: PlayerSendChatEvent) {
         if (!SkyHanniMod.feature.chat.chatFilter) return
         if (event.channel != PlayerMessageChannel.ALL) return
