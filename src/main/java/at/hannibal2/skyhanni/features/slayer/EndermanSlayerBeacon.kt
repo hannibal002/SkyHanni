@@ -78,7 +78,7 @@ class EndermanSlayerBeacon {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
 
         val packet = event.packet
