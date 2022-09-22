@@ -17,30 +17,9 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
 
-// Minecraft configuration:
-loom {
-    launchConfigs {
-        "client" {
-            // If you don't want mixins, remove these lines
-            property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--mixin", "mixins.skyhanni.json")
-        }
-    }
-    forge {
-        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
-        mixinConfig("mixins.skyhanni.json")
-    }
-    // If you don't want mixins, remove these lines
-    mixin {
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
-    }
-}
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/kotlin/main"))
+    output.setResourcesDir(file("$buildDir/classes/java/main"))
 }
 
 // Dependencies:
@@ -50,10 +29,20 @@ repositories {
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://jitpack.io") {
+        content {
+            includeGroupByRegex("com\\.github\\..*")
+        }
+    }
 }
 
 val shadowImpl by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
+}
+
+val devenvMod by configurations.creating {
+    isTransitive = false
+    isVisible = false
 }
 
 dependencies {
@@ -71,6 +60,33 @@ dependencies {
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
     implementation(kotlin("stdlib-jdk8"))
 
+    devenvMod("com.github.romangraef:notenoughupdates:b3e3583:all")
+
+}
+
+// Minecraft configuration:
+loom {
+    launchConfigs {
+        "client" {
+            // If you don't want mixins, remove these lines
+            property("mixin.debug", "true")
+            property("asmhelper.verbose", "true")
+            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--mixin", "mixins.skyhanni.json")
+            val modFiles = devenvMod
+                .incoming.artifacts.resolvedArtifacts.get()
+            arg("--mods", modFiles.joinToString(",") { it.file.relativeTo(file("run")).path })
+        }
+    }
+    forge {
+        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
+        // If you don't want mixins, remove this lines
+        mixinConfig("mixins.skyhanni.json")
+    }
+    // If you don't want mixins, remove these lines
+    mixin {
+        defaultRefmapName.set("mixins.skyhanni.refmap.json")
+    }
 }
 
 // Tasks:
@@ -81,6 +97,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(Jar::class) {
     archiveBaseName.set("SkyHanni")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest.attributes.run {
         this["FMLCorePluginContainsFMLMod"] = "true"
         this["ForceLoadAsMod"] = "true"
