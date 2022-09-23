@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
-import at.hannibal2.skyhanni.features.slayer.blaze.SwordMode
+import at.hannibal2.skyhanni.features.slayer.blaze.DaggerMode
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
@@ -342,7 +342,7 @@ class DamageIndicatorManager {
     }
 
     private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData): String {
-        for (swordMode in SwordMode.values()) {
+        for (swordMode in DaggerMode.values()) {
             if (entity.hasNameTagWith(3, swordMode.name)) {
                 entityData.namePrefix = swordMode.formattedName + " "
                 entityData.color = swordMode.color

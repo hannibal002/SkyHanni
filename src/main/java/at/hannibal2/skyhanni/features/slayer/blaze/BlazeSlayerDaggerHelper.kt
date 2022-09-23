@@ -15,43 +15,43 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class BlazeSlayerWeaponHelper {
+class BlazeSlayerDaggerHelper {
 
-    var textToRenderA = ""
-    var textToRenderB = ""
+    var textToRenderMain = ""
+    var textToRenderOther = ""
     var clientSideClicked = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        val sword = getSwordInHand()
-        if (sword != null) {
-            textToRenderA = getSwordText(sword)
-            textToRenderB = getSwordText(sword.other())
+        val dagger = getDaggerInHand()
+        if (dagger != null) {
+            textToRenderMain = getDaggerText(dagger)
+            textToRenderOther = getDaggerText(dagger.other())
             return
         }
 
-        textToRenderA = ""
-        textToRenderB = ""
+        textToRenderMain = ""
+        textToRenderOther = ""
     }
 
-    private fun getSwordInHand(): Sword? {
+    private fun getDaggerInHand(): Dagger? {
         val player = Minecraft.getMinecraft().thePlayer
         val itemName = getName(player)
-        for (sword in Sword.values()) {
-            if (itemName.contains(sword.swordName)) {
-                return sword
+        for (dagger in Dagger.values()) {
+            if (dagger.daggerNames.any { itemName.contains(it) }) {
+                return dagger
             }
         }
 
         return null
     }
 
-    private fun getSwordText(sword: Sword): String {
+    private fun getDaggerText(dagger: Dagger): String {
         var activeAbility = ""
         var inactiveAbility = ""
-        for (mode in sword.modes) {
+        for (mode in dagger.modes) {
             if (mode.active) {
                 activeAbility = mode.chatColor + "§l" + mode
             } else {
@@ -78,12 +78,12 @@ class BlazeSlayerWeaponHelper {
         val message = packet.message ?: return
         val formattedText = message.formattedText
 
-        for (swordMode in SwordMode.values()) {
-            if (swordMode.formattedName + "§r" == formattedText) {
-                Sword.values().filter { swordMode in it.modes }.forEach {
+        for (mode in DaggerMode.values()) {
+            if (mode.formattedName + "§r" == formattedText) {
+                Dagger.values().filter { mode in it.modes }.forEach {
                     it.modes.forEach { mode -> mode.active = false }
                 }
-                swordMode.active = true
+                mode.active = true
                 event.isCanceled = true
                 clientSideClicked = false
                 return
@@ -106,19 +106,27 @@ class BlazeSlayerWeaponHelper {
         if (packet is C07PacketPlayerDigging) {
             val status = packet.status
             if (status == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
-                val sword = getSwordInHand()
-                sword?.modes?.forEach { mode -> mode.active = !mode.active }
+                val dagger = getDaggerInHand()
+                dagger?.modes?.forEach { mode -> mode.active = !mode.active }
                 clientSideClicked = true
             }
         }
     }
 
-    enum class Sword(val swordName: String, vararg val modes: SwordMode) {
-        TWILIGHT("Twilight Dagger", SwordMode.SPIRIT, SwordMode.CRYSTAL),
-        FIREDUST("Firedust Dagger", SwordMode.ASHEN, SwordMode.AURIC),
+    enum class Dagger(val daggerNames: List<String>, vararg val modes: DaggerMode) {
+        TWILIGHT(
+            listOf("Twilight Dagger", "Mawdredge Dagger", "Deathripper Dagger"),
+            DaggerMode.SPIRIT,
+            DaggerMode.CRYSTAL
+        ),
+        FIREDUST(
+            listOf("Firedust Dagger", "Kindlebane Dagger", "Pyrochaos Dagger"),
+            DaggerMode.ASHEN,
+            DaggerMode.AURIC
+        ),
         ;
 
-        fun other(): Sword = if (this == TWILIGHT) {
+        fun other(): Dagger = if (this == TWILIGHT) {
             FIREDUST
         } else {
             TWILIGHT
@@ -143,13 +151,13 @@ class BlazeSlayerWeaponHelper {
         GlStateManager.pushMatrix()
         GlStateManager.translate((width / 2).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderA, renderer, 0f, 0f, false, 55, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderMain, renderer, 0f, 0f, false, 55, 0)
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate((width / 2).toFloat(), (height / 3.2).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderB, renderer, 0f, 0f, false, 40, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderOther, renderer, 0f, 0f, false, 40, 0)
         GlStateManager.popMatrix()
     }
 }
