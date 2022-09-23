@@ -16,6 +16,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
 object CopyNearbyEntitiesCommand {
@@ -43,6 +44,7 @@ object CopyNearbyEntitiesCommand {
                 val displayName = entity.displayName
                 resultList.add("name: '" + entity.name + "'")
                 resultList.add("displayName: '${displayName.formattedText}'")
+                resultList.add("entityId: ${entity.entityId}")
                 resultList.add("location data:")
                 resultList.add("-  vec: $vec")
                 resultList.add("-  distance: $distance")
@@ -63,6 +65,17 @@ object CopyNearbyEntitiesCommand {
                     val health = entity.health.toInt()
                     resultList.add("-  baseMaxHealth: $baseMaxHealth")
                     resultList.add("-  health: $health")
+                }
+
+                if (entity is EntityPlayer) {
+                    val inventory = entity.inventory
+                    if (inventory != null) {
+                        resultList.add("armor:")
+                        for ((i, itemStack) in inventory.armorInventory.withIndex()) {
+                            val name = itemStack?.name ?: "null"
+                            resultList.add("-  at: $i: $name")
+                        }
+                    }
                 }
 
                 when (entity) {
