@@ -42,7 +42,7 @@ class PlayerChatFormatter {
 
     // SBA is adding another §d in front of the message
     //§dTo §r§b[MVP§r§3+§r§b] Skyfall55§r§7: §r§7hello :)
-    private var patternPrivateMessage: Pattern = Pattern.compile("(§d)+(To|From) §r(.+)§r§7: §r§7(.+)")
+    private var patternPrivateMessage = Pattern.compile("(§d)+(To|From) §r(.+)§r§7: §r§7(.+)")
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {

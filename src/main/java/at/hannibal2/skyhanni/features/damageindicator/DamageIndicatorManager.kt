@@ -43,7 +43,7 @@ class DamageIndicatorManager {
 
     companion object {
         private var data = mutableMapOf<UUID, EntityData>()
-        private val damagePattern: Pattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)")
+        private val damagePattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)")
 
         fun isBoss(entity: EntityLivingBase): Boolean {
             return data.values.any { it.entity == entity }
@@ -257,8 +257,7 @@ class DamageIndicatorManager {
 
             if (data.containsKey(entity.uniqueID)) {
                 val lastHealth = data[entity.uniqueID]!!.lastHealth
-                val bossType = entityData.bossType
-                checkDamage(entityData, health, lastHealth, bossType)
+                checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
                 BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
             }
@@ -287,6 +286,7 @@ class DamageIndicatorManager {
 
         when (entityData.bossType) {
             BossType.DUNGEON_F4_THORN -> return checkThorn(health)
+
             BossType.SLAYER_ENDERMAN_1,
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
@@ -550,7 +550,7 @@ class DamageIndicatorManager {
         return color.getChatColor() + health + "/" + maxHealth
     }
 
-    private fun checkDamage(entityData: EntityData, health: Long, lastHealth: Long, bossType: BossType) {
+    private fun checkDamage(entityData: EntityData, health: Long, lastHealth: Long) {
         val damage = lastHealth - health
         val healing = health - lastHealth
         if (damage > 0) {
@@ -561,7 +561,7 @@ class DamageIndicatorManager {
         }
         if (healing > 0) {
             //Hide auto heal every 10 ticks (with rounding errors)
-            if ((healing == 15_000L || healing == 15_001L) && bossType == BossType.SLAYER_ZOMBIE_5) return
+            if ((healing == 15_000L || healing == 15_001L) && entityData.bossType == BossType.SLAYER_ZOMBIE_5) return
 
             val damageCounter = entityData.damageCounter
             damageCounter.currentHealing += healing
