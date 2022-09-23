@@ -2,6 +2,10 @@
 
 ## Version 0.9.1
 
+### Slayer
++ Added a cooldown when the Fire Pillars from the blaze slayer will kill you.
++ Added a faster and permanent display for the blaze slayer daggers
+
 ### Misc
 + Added option to hide armor or just helmet of other player or yourself
 

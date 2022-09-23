@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.slayer.blaze.SwordMode
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
@@ -57,6 +60,10 @@ class DamageIndicatorManager {
 
         fun isBossSpawned(type: BossType): Boolean {
             return data.entries.find { it.value.bossType == type } != null
+        }
+
+        fun isBossSpawned(vararg types: BossType): Boolean {
+            return types.any { isBossSpawned(it) }
         }
     }
 
@@ -253,6 +260,7 @@ class DamageIndicatorManager {
                 val bossType = entityData.bossType
                 checkDamage(entityData, health, lastHealth, bossType)
                 tickDamage(entityData.damageCounter)
+                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
             }
             entityData.lastHealth = health
 
@@ -287,6 +295,19 @@ class DamageIndicatorManager {
                 return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
             }
 
+            BossType.SLAYER_BLAZE_2,
+            BossType.SLAYER_BLAZE_3,
+            BossType.SLAYER_BLAZE_4,
+            BossType.SLAYER_BLAZE_QUAZII_2,
+            BossType.SLAYER_BLAZE_QUAZII_3,
+            BossType.SLAYER_BLAZE_QUAZII_4,
+            BossType.SLAYER_BLAZE_TYPHOEUS_2,
+            BossType.SLAYER_BLAZE_TYPHOEUS_3,
+            BossType.SLAYER_BLAZE_TYPHOEUS_4,
+            -> {
+                return checkBlazeSlayer(entity as EntityLiving, entityData)
+            }
+
             BossType.NETHER_MAGMA_BOSS -> {
                 return checkMagmaCube(entity as EntityMagmaCube, entityData, health.toInt(), maxHealth.toInt())
             }
@@ -318,6 +339,17 @@ class DamageIndicatorManager {
 
             else -> return ""
         }
+        return ""
+    }
+
+    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData): String {
+        for (swordMode in SwordMode.values()) {
+            if (entity.hasNameTagWith(3, swordMode.name)) {
+                entityData.namePrefix = swordMode.formattedName + " "
+                return ""
+            }
+        }
+
         return ""
     }
 

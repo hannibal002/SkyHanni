@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+1import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -267,23 +268,37 @@ class MobFinder {
                     }
                 }
             }
-            if (entity is EntityBlaze) {
-                if (entity.hasNameTagWith(2, "§c☠ §bInferno Demonlord ")) {
-                    when {
-                        entity.hasMaxHealth(2_500_000) -> {
-                            return EntityResult(bossType = BossType.SLAYER_BLAZE_1)
-                        }
-                    }
+            if (entity is EntityBlaze && entity.hasNameTagWith(2, "§c☠ §bInferno Demonlord ")) {
+                when {
+                    entity.hasBossHealth(2_500_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_1)
+                    entity.hasBossHealth(10_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_2)
+                    entity.hasBossHealth(45_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_3)
+                    entity.hasBossHealth(150_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_4)
                 }
             }
-            if (entity is EntitySpider) {
-                if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
-                    when {
-                        entity.hasMaxHealth(740) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
-                        entity.hasMaxHealth(30_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
-                        entity.hasMaxHealth(900_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
-                        entity.hasMaxHealth(2_400_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
-                    }
+            if (entity is EntityPigZombie && entity.hasNameTagWith(2, "§c☠ §6ⓉⓎⓅⒽⓄⒺⓊⓈ ")) {
+                when {
+                    entity.hasBossHealth(500_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_1)
+                    entity.hasBossHealth(1_750_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_2)
+                    entity.hasBossHealth(5_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_3)
+                    entity.hasBossHealth(10_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_4)
+                }
+            }
+            if (entity is EntitySkeleton && entity.hasNameTagWith(2, "§c☠ §3ⓆⓊⒶⓏⒾⒾ ")) {
+                when {
+                    entity.hasBossHealth(500_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_1)
+                    entity.hasBossHealth(1_750_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_2)
+                    entity.hasBossHealth(5_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_3)
+                    entity.hasBossHealth(10_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_4)
+                }
+            }
+
+            if (entity is EntitySpider && entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
+                when {
+                    entity.hasMaxHealth(740) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+                    entity.hasMaxHealth(30_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+                    entity.hasMaxHealth(900_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+                    entity.hasMaxHealth(2_400_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
                 }
             }
             if (entity is EntityWolf) {
