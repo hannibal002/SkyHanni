@@ -139,13 +139,13 @@ class BlazeSlayerWeaponHelper {
         val renderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.pushMatrix()
-        GlStateManager.translate((width / 2).toFloat(), (height / 1.85).toFloat(), 0.0f)
+        GlStateManager.translate((width / 2).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderA, renderer, 0f, 0f, false, 55, 0)
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
-        GlStateManager.translate((width / 2).toFloat(), (height / 1.65).toFloat(), 0.0f)
+        GlStateManager.translate((width / 2).toFloat(), (height / 3.2).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderB, renderer, 0f, 0f, false, 40, 0)
         GlStateManager.popMatrix()
