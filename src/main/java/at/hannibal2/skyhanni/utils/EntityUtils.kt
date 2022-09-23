@@ -73,21 +73,23 @@ object EntityUtils {
         }
     }
 
-    fun EntityLivingBase.hasMaxHealth(health: Int): Boolean {
-        return when (this.baseMaxHealth) {
-            health.toDouble() -> true
+    fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-            //Derpy
-            health.toDouble() * 2 -> true
+    fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false): Boolean {
+        if (this.baseMaxHealth == health.toDouble()) return true
 
+        //Derpy
+        if (this.baseMaxHealth == health.toDouble() * 2) return true
+
+        if (!boss) {
             //Corrupted
-            health.toDouble() * 3 -> true
+            if (this.baseMaxHealth == health.toDouble() * 3) return true
 
             //Derpy + Corrupted
-            health.toDouble() * 2 * 3 -> true
-
-            else -> false
+            if (this.baseMaxHealth == health.toDouble() * 2 * 3) return true
         }
+
+        return false
     }
 
     fun EntityPlayer.getSkinTexture(): String? {
