@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.BossHealthChangeEvent
-import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.slayer.blaze.SwordMode
 import at.hannibal2.skyhanni.test.LorenzTest
@@ -80,7 +78,7 @@ class DamageIndicatorManager {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!SkyHanniMod.feature.damageIndicator.enabled) return
+        if (!isEnabled()) return
 
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
@@ -248,6 +246,7 @@ class DamageIndicatorManager {
 
             entityData.namePrefix = ""
             entityData.nameSuffix = ""
+            entityData.color = null
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
                 "§cDead"
@@ -346,6 +345,7 @@ class DamageIndicatorManager {
         for (swordMode in SwordMode.values()) {
             if (entity.hasNameTagWith(3, swordMode.name)) {
                 entityData.namePrefix = swordMode.formattedName + " "
+                entityData.color = swordMode.color
                 return ""
             }
         }
@@ -629,5 +629,32 @@ class DamageIndicatorManager {
                 entityData.damageCounter.currentDamage += dmg
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onRenderMobColored(event: RenderMobColoredEvent) {
+        if (!isEnabled()) return
+        val entity = event.entity
+
+        data.values
+            .filter { it.entity == entity }
+            .forEach { data ->
+                data.color?.let {
+                    event.color = it.toColor().withAlpha(80)
+                }
+            }
+    }
+
+    @SubscribeEvent
+    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
+        if (!isEnabled()) return
+        val entity = event.entity
+        if (data.values.any { it.entity == entity && it.color != null }) {
+            event.shouldReset = true
+        }
+    }
+
+    fun isEnabled(): Boolean {
+        return LorenzUtils.inSkyblock && SkyHanniMod.feature.damageIndicator.enabled
     }
 }
