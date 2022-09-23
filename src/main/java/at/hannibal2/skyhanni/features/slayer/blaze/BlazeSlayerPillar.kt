@@ -16,15 +16,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.text.DecimalFormat
 import java.util.regex.Pattern
 
-class BlazeSlayerPillarTimer {
+class BlazeSlayerPillar {
 
-    private var pattern = Pattern.compile("§cYou took §r§f(.+) §r§ctrue damage from an exploding fire pillar!")
-
-    private var lastFound = -1L
-
-    private val pillarTimerEntities = mutableListOf<EntityArmorStand>()
-
-    var tick = 0
+    private var patternPillarExploded = Pattern.compile("§cYou took §r§f(.+) §r§ctrue damage from an exploding fire pillar!")
+    private var lastPillarSpawnTime = -1L
+    private val pillarEntities = mutableListOf<EntityArmorStand>()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -32,9 +28,9 @@ class BlazeSlayerPillarTimer {
         for (armorStand in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
             val name = armorStand.name
             if (name.matchRegex("§6§l.s §c§l8 hits")) {
-                if (armorStand !in pillarTimerEntities) {
-                    pillarTimerEntities.add(armorStand)
-                    lastFound = System.currentTimeMillis()
+                if (armorStand !in pillarEntities) {
+                    pillarEntities.add(armorStand)
+                    lastPillarSpawnTime = System.currentTimeMillis()
                 }
             }
         }
@@ -45,25 +41,25 @@ class BlazeSlayerPillarTimer {
         if (!isEnabled()) return
 
         val message = event.message
-        val matcher = pattern.matcher(message)
+        val matcher = patternPillarExploded.matcher(message)
         if (matcher.matches()) {
-            lastFound = -1L
+            lastPillarSpawnTime = -1L
         }
         if (message == "  §r§a§lSLAYER QUEST COMPLETE!") {
-            lastFound = -1L
+            lastPillarSpawnTime = -1L
         }
 
         if (message == "§eYour Slayer boss was despawned, but you have kept your quest progress!") {
-            lastFound = -1L
+            lastPillarSpawnTime = -1L
         }
     }
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (!isEnabled()) return
-        if (lastFound == -1L) return
+        if (lastPillarSpawnTime == -1L) return
 
-        val duration = System.currentTimeMillis() - lastFound
+        val duration = System.currentTimeMillis() - lastPillarSpawnTime
         val maxDuration = 7_000
 
         val remainingLong = maxDuration - duration
@@ -80,6 +76,6 @@ class BlazeSlayerPillarTimer {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        pillarTimerEntities.clear()
+        pillarEntities.clear()
     }
 }
