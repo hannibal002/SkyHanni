@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.10
+## Version 0.9.1
 
 ### Misc
 + Added option to hide armor or just helmet of other player or yourself
