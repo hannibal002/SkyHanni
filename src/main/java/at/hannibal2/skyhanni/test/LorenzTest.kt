@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlayParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -9,10 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraft.client.Minecraft
-import net.minecraft.event.HoverEvent
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
@@ -26,7 +24,7 @@ class LorenzTest {
         private var shouldLogPackets = false
         var text = ""
 
-        var a = 127.0
+        var a = 1.0
         var b = 60.0
         var c = 0.0
 
@@ -45,19 +43,6 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
-
-
-            val textA = ChatComponentText("a")
-
-            textA.chatStyle.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("hey :)"))
-
-            val textB = ChatComponentText("b")
-            val text1 = ChatComponentText("1")
-            text1.appendSibling(textA)
-            text1.appendSibling(textB)
-
-            Minecraft.getMinecraft().thePlayer.addChatMessage(text1)
-
 //            a = args[0].toDouble()
 //            b = args[1].toDouble()
 //            c = args[2].toDouble()
@@ -103,6 +88,17 @@ class LorenzTest {
 //        if (itemStack != null) {
 //            val internalName = itemStack.getInternalName()
 //            event.toolTip.add("internal name: $internalName")
+//        }
+    }
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+//        val message = event.message
+//        if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!")) {
+//            event.blockedReason = "lorenz_test"
+//        }
+//        if (message == "§cYour hit was reduced by Hellion Shield!") {
+//            event.blockedReason = "lorenz_test"
 //        }
     }
 
@@ -320,6 +316,9 @@ class LorenzTest {
 
 
         if (soundName == "game.player.hurt") return
+        if (soundName.startsWith("step.")) return
+
+//        if (soundName != "mob.chicken.plop") return
 
 //        println("")
 //        println("PlaySoundEvent")
@@ -363,179 +362,58 @@ class LorenzTest {
         val packet = event.packet
 
         val name = packet.javaClass.simpleName
-//
-//        if (name == "S2APacketParticles") return
-//        if (name == "S3BPacketScoreboardObjective") return
-//        if (name == "S18PacketEntityTeleport") return
-//        if (name == "S38PacketPlayerListItem") return
-//        if (name == "S17PacketEntityLookMove") return
-//        if (name == "S00PacketKeepAlive") return
-//        if (name == "S23PacketBlockChange") return
-//        if (name == "S32PacketConfirmTransaction") return
-//        if (name == "S47PacketPlayerListHeaderFooter") return
-//        if (name == "S29PacketSoundEffect") return
-//        if (name == "S04PacketEntityEquipment") return
-//        if (name == "S16PacketEntityLook") return
 
-//        if (name == "S18PacketEntityTeleport") return
+        if (name == "S2APacketParticles") return
+        if (name == "S3BPacketScoreboardObjective") return
+        if (name == "S18PacketEntityTeleport") return
+        if (name == "S38PacketPlayerListItem") return
+        if (name == "S17PacketEntityLookMove") return
+        if (name == "S00PacketKeepAlive") return
+        if (name == "S23PacketBlockChange") return
+        if (name == "S32PacketConfirmTransaction") return
+        if (name == "S47PacketPlayerListHeaderFooter") return
+        if (name == "S29PacketSoundEffect") return
+        if (name == "S04PacketEntityEquipment") return
+        if (name == "S16PacketEntityLook") return
 
-//        if (packet is S18PacketEntityTeleport) {
-//            val entityId = packet.entityId
-//            val x = packet.x
-//            val y = packet.y
-//            val z = packet.z
-//            val location = LorenzVec(x, y, z)
-//            val distance = location.distance(LocationUtils.playerLocation())
-//            println(" ")
-//            println("S18PacketEntityTeleport $entityId (" + distance.toInt() + ")")
-//            println("location: $location")
-//            println("distance: " + distance.toInt())
-//            println("entityId: $entityId")
-//        }
+        if (name == "S15PacketEntityRelMove") return
+        if (name == "S12PacketEntityVelocity") return
+        if (name == "S19PacketEntityHeadLook") return
+        if (name == "S06PacketUpdateHealth") return
+        if (name == "S1FPacketSetExperience") return
+        if (name == "S02PacketChat") return
+        if (name == "S03PacketTimeUpdate") return
+        if (name == "S1DPacketEntityEffect") return
+        if (name == "S1EPacketRemoveEntityEffect") return
+        if (name == "S43PacketCamera") return
+        if (name == "S07PacketRespawn") return
+        if (name == "S01PacketJoinGame") return
+        if (name == "S05PacketSpawnPosition") return
+        if (name == "S08PacketPlayerPosLook") return
+        if (name == "S09PacketHeldItemChange") return
+        if (name == "S37PacketStatistics") return
+        if (name == "S39PacketPlayerAbilities") return
 
-//        if (packet is S19PacketEntityHeadLook) {
-//            val theWorld = Minecraft.getMinecraft().theWorld
-//            val entity = packet.getEntity(theWorld) ?: return
-//            val entityId = entity.entityId
-//            println(" ")
-//            println("S19PacketEntityHeadLook")
-//            println("entityId: $entityId")
-//            val lorenzVec = entity.getLorenzVec()
-//            val distance = lorenzVec.distance(LocationUtils.playerLocation())
-//            if (distance > 20) return
-//            println("distance: $distance")
-//            println("location: ${lorenzVec.printWithAccuracy(1)}")
-//            return
-//        }
+        if (name == "S3EPacketTeams") return
+        if (name == "S3CPacketUpdateScore") return
 
-//        if (packet is S15PacketEntityRelMove) {
-//            val theWorld = Minecraft.getMinecraft().theWorld
-//            val entity = packet.getEntity(theWorld) ?: return
-//            val entityId = entity.entityId
-//            println(" ")
-//            println("S15PacketEntityRelMove")
-//            println("entityId: $entityId")
-//            val lorenzVec = entity.getLorenzVec()
-//            val distance = lorenzVec.distance(LocationUtils.playerLocation())
-//            if (distance > 20) return
-//            println("distance: $distance")
-//            println("location: ${lorenzVec.printWithAccuracy(1)}")
-//            return
-//        }
+        //TODO find out what that is
+        if (name == "S0BPacketAnimation") return
 
+        //world
+        if (name == "S34PacketMaps") return
+        if (name == "S21PacketChunkData") return
+        if (name == "S22PacketMultiBlockChange") return
+//        if (name == "S0EPacketSpawnObject") return
+        if (name == "S13PacketDestroyEntities") return
+        if (name == "S33PacketUpdateSign") return
+//        if (name == "S0FPacketSpawnMob") return
 
+        //inventory
+//        if (name == "S2FPacketSetSlot") return
+        if (name == "S2DPacketOpenWindow") return
+//        if (name == "S30PacketWindowItems") return
+        if (name == "S2EPacketCloseWindow") return
 
-
-
-
-
-//        if (packet is S18PacketEntityTeleport) {
-//            val entityId = packet.entityId
-//            packetLog.log("entityId: $entityId")
-//            val entity = Minecraft.getMinecraft().theWorld.loadedEntityList.find { it.entityId == entityId }
-//            val className = entity?.javaClass?.name ?: "null"
-//            packetLog.log("className: $className")
-//
-//            if (Minecraft.getMinecraft().thePlayer.isSneaking) {
-//                if (entity is EntityArmorStand) {
-//                    event.isCanceled = true
-//                }
-//            }
-//        }
-
-
-//        if (packet is S0FPacketSpawnMob) {
-//            packetLog.log("")
-//            packetLog.log("Spawn Mob!")
-//            for (watchableObject in packet.func_149027_c()) {
-//                val any = watchableObject.`object`
-//                val simpleName = any.javaClass.simpleName
-//
-//                packetLog.log("javaClass: $simpleName")
-//                packetLog.log("object: $any")
-//                packetLog.log(" ")
-//            }
-//            packetLog.log(" ")
-//        }
-
-
-//        if (packet is S1CPacketEntityMetadata) {
-//            packetLog.log("")
-//            packetLog.log("Entity Metadata")
-//            for (watchableObject in packet.func_149376_c()) {
-//                val any = watchableObject.`object`
-//                val simpleName = any.javaClass.simpleName
-//
-//                packetLog.log("javaClass: $simpleName")
-//                packetLog.log("object: $any")
-//                packetLog.log(" ")
-//            }
-//            packetLog.log(" ")
-//        }
-
-
-//        if (packet is S20PacketEntityProperties) {
-//            packetLog.log("")
-//            packetLog.log("Entity Properties")
-//            for (watchableObject in packet.func_149441_d()) {
-//                val any = watchableObject.`object`
-//                val simpleName = any.javaClass.simpleName
-//
-//                packetLog.log("javaClass: $simpleName")
-//                packetLog.log("object: $any")
-//                packetLog.log(" ")
-//            }
-//            packetLog.log(" ")
-//
-//
-//        }
-
-
-//        if (packet is S2CPacketSpawnGlobalEntity) {
-//
-//        }
-//        if (packet is S2CPacketSpawnGlobalEntity) {
-//
-//        }
     }
-
-//    @SubscribeEvent
-//    fun onGetBlockModel(event: RenderBlockInWorldEvent) {
-//        if (!LorenzUtils.inSkyblock || !SkyHanniMod.feature.debug.enabled) return
-//
-//        val state = event.state
-//
-//        if (event.state != null && event.pos != null) {
-////            if ((event.pos as BlockPos).y <= 76) {
-////            val block = (state as IBlockState).block
-////
-////            if (block == Blocks.wool || block == Blocks.stained_hardened_clay || block == Blocks.bedrock ||
-////                block == Blocks.netherrack || block == Blocks.nether_brick || block == Blocks.coal_block) {
-////                event.state = Blocks.stained_hardened_clay.blockState.block.defaultState
-////            }
-//
-////            if (block === Blocks.flowing_lava) {
-////                event.state = Blocks.flowing_water.blockState.block.defaultState
-////            }
-//
-////            if (block === Blocks.lava) {
-////                event.state = Blocks.water.blockState.block.defaultState
-////            }
-//
-//
-////            if (block === Blocks.redstone_lamp) {
-////                val blockState = Blocks.redstone_lamp.blockState
-////                event.state = blockState.block.defaultState
-////            }
-////                if (block === Blocks.flowing_lava &&
-////                    (state as IBlockState).getValue(BlockStainedGlass.COLOR) == EnumDyeColor.WHITE
-////                ) {
-////                    event.state = state.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)
-////                }
-////                if (block === Blocks.carpet && (state as IBlockState).getValue(BlockCarpet.COLOR) == EnumDyeColor.WHITE) {
-////                    event.state = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
-////                }
-////            }
-//        }
-//    }
 }
