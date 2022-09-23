@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.Category;
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
+import at.hannibal2.skyhanni.features.HideArmor;
 import at.hannibal2.skyhanni.features.MarkedPlayerManager;
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFormatter;
 import com.google.gson.annotations.Expose;
@@ -99,6 +100,11 @@ public class Features extends Config {
 
         if (runnableId.equals("markOwnPlayer")) {
             MarkedPlayerManager.toggleOwn();
+            return;
+        }
+
+        if (runnableId.equals("hideArmor")) {
+            HideArmor.Companion.updateArmor();
             return;
         }
     }
