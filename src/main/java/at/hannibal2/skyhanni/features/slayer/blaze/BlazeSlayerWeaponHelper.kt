@@ -127,8 +127,10 @@ class BlazeSlayerWeaponHelper {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (!isEnabled()) return
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+        if (!isEnabled()) return
+
+        if (Minecraft.getMinecraft().currentScreen != null) return
 
         val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
         val width = scaledResolution.scaledWidth
