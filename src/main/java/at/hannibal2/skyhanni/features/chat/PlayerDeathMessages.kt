@@ -56,7 +56,7 @@ class PlayerDeathMessages {
                 }
             }
         } else {
-            if (message.contains("☠")) {
+            if (message.contains("☠") && !message.startsWith("§c ☠ §r§7You ")) {
                 println("wrong death message: '$message'")
             }
         }
