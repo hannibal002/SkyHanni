@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HideMobNames;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper;
-import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerPillarTimer;
+import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerPillar;
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager;
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName;
 import at.hannibal2.skyhanni.test.LorenzTest;
@@ -133,7 +133,7 @@ public class SkyHanniMod {
         registerEvent(new HideMobNames());
         registerEvent(new HideDamageSplash());
         registerEvent(new ThunderSparksHighlight());
-        registerEvent(new BlazeSlayerPillarTimer());
+        registerEvent(new BlazeSlayerPillar());
         registerEvent(new BlazeSlayerDaggerHelper());
         registerEvent(new PlayerChatFilter());
         registerEvent(new HideArmor());
