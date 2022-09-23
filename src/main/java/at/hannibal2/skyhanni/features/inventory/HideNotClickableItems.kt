@@ -285,7 +285,6 @@ class HideNotClickableItems {
         }
 
         val result = hidePlayerTradeFilter.match(name)
-        LorenzDebug.log("hidePlayerTradeList filter result for '$name': $result")
 
         if (result) hideReason = "This item cannot be traded!"
         return result

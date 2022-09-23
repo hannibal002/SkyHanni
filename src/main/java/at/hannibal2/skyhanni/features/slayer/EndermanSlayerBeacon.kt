@@ -22,25 +22,25 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EndermanSlayerBeacon {
 
-    private val endermens = mutableListOf<EntityEnderman>()
-    private val armorStands = mutableListOf<EntityArmorStand>()
-    private val blocks = mutableListOf<LorenzVec>()
+    private val endermenWithBeacons = mutableListOf<EntityEnderman>()
+    private val flyingBeacons = mutableListOf<EntityArmorStand>()
+    private val sittingBeacon = mutableListOf<LorenzVec>()
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         val entity = event.entity
-        if (entity in endermens || entity in armorStands) return
+        if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
         if (entity is EntityEnderman) {
             if (hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                endermens.add(entity)
+                endermenWithBeacons.add(entity)
             }
         }
 
         if (entity is EntityArmorStand) {
             val stack = entity.inventory[4] ?: return
             if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                armorStands.add(entity)
+                flyingBeacons.add(entity)
             }
         }
     }
@@ -57,7 +57,7 @@ class EndermanSlayerBeacon {
     fun onRenderMobColored(event: RenderMobColoredEvent) {
         if (!isEnabled()) return
 
-        if (event.entity in armorStands) {
+        if (event.entity in flyingBeacons) {
             event.color = LorenzColor.DARK_RED.toColor().withAlpha(1)
         }
     }
@@ -66,12 +66,12 @@ class EndermanSlayerBeacon {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
 
-        endermens.removeIf { it.isDead || !hasBeaconInHand(it) }
+        endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
-        endermens.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }
+        endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }
             .forEach { event.drawColor(it, LorenzColor.DARK_RED, alpha = 1f) }
 
-        for (location in blocks) {
+        for (location in sittingBeacon) {
             event.drawColor(location, LorenzColor.DARK_RED, alpha = 1f)
             event.drawString(location.add(0.5, 0.5, 0.5), "§4Beacon", true)
         }
@@ -83,32 +83,34 @@ class EndermanSlayerBeacon {
 
         val packet = event.packet
         if (packet is S23PacketBlockChange) {
-            val vec = packet.blockPosition.toLorenzVec()
-            val block = packet.blockState.block
-            if (block == Blocks.beacon) {
-                val armorStand = armorStands.find { vec.distance(it.getLorenzVec()) < 3 }
+            val location = packet.blockPosition.toLorenzVec()
+            if (packet.blockState.block == Blocks.beacon) {
+                val armorStand = flyingBeacons.find { location.distance(it.getLorenzVec()) < 3 }
                 if (armorStand != null) {
-                    armorStands.remove(armorStand)
-                    blocks.add(vec)
+                    flyingBeacons.remove(armorStand)
+                    sittingBeacon.add(location)
                 }
             } else {
-                if (vec in blocks) {
-                    blocks.remove(vec)
+                if (location in sittingBeacon) {
+                    sittingBeacon.remove(location)
                 }
             }
         }
     }
 
-    private fun isEnabled(): Boolean = LorenzUtils.inSkyblock && SkyHanniMod.feature.slayer.slayerEndermanBeacon &&
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyblock &&
+            SkyHanniMod.feature.slayer.slayerEndermanBeacon &&
             LorenzUtils.skyBlockIsland == "The End" &&
-            (DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_2) ||
-                    DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_3) ||
-                    DamageIndicatorManager.isBossSpawned(BossType.SLAYER_ENDERMAN_4))
+            DamageIndicatorManager.isBossSpawned(
+                BossType.SLAYER_ENDERMAN_2,
+                BossType.SLAYER_ENDERMAN_3,
+                BossType.SLAYER_ENDERMAN_4
+            )
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        endermens.clear()
-        armorStands.clear()
-        blocks.clear()
+        endermenWithBeacons.clear()
+        flyingBeacons.clear()
+        sittingBeacon.clear()
     }
 }
