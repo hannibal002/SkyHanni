@@ -53,9 +53,9 @@ class BlazeSlayerWeaponHelper {
         var inactiveAbility = ""
         for (mode in sword.modes) {
             if (mode.active) {
-                activeAbility = mode.color + "§l" + mode
+                activeAbility = mode.chatColor + "§l" + mode
             } else {
-                inactiveAbility = " §7/ " + mode.color + mode.toString().lowercase()
+                inactiveAbility = " §7/ " + mode.chatColor + mode.toString().lowercase()
             }
         }
         if (activeAbility == "") return ""
