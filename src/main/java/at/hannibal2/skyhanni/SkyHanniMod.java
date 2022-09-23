@@ -132,6 +132,7 @@ public class SkyHanniMod {
         registerEvent(new HideDamageSplash());
         registerEvent(new ThunderSparksHighlight());
         registerEvent(new PlayerChatFilter());
+        registerEvent(new HideArmor());
 
         Commands.init();
 

@@ -1,5 +1,14 @@
 # SkyHanni - Change Log
 
+## Version 0.10
+
+### Misc
++ Added option to hide armor or just helmet of other player or yourself
+
+### Fixes
++Fixed overload damage gets not detected as damage splash
+
+
 ## Version 0.9 - Chat + Dungeon
 
 ### Chat
