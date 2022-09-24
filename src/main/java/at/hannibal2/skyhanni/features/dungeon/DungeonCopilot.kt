@@ -126,6 +126,7 @@ class DungeonCopilot {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.copilotEnabled) return
 

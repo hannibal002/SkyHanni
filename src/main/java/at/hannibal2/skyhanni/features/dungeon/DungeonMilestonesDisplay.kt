@@ -85,6 +85,7 @@ class DungeonMilestonesDisplay {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
 
         SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(color + textToRender)
