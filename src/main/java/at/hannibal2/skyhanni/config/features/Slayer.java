@@ -48,12 +48,12 @@ public class Slayer {
     public boolean firePitsWarning = false;
 
     @Expose
-    @ConfigOption(name = "Slayer Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
+    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
     @ConfigEditorBoolean
     public boolean slayerMinibossHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Slayer Enderman Beacon", desc = "Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)")
+    @ConfigOption(name = "Enderman Beacon", desc = "Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)")
     @ConfigEditorBoolean
     public boolean slayerEndermanBeacon = false;
 
