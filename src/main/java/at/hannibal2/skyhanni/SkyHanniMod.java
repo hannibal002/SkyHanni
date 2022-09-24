@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HideMobNames;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper;
+import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerPillar;
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager;
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName;
@@ -135,6 +136,7 @@ public class SkyHanniMod {
         registerEvent(new ThunderSparksHighlight());
         registerEvent(new BlazeSlayerPillar());
         registerEvent(new BlazeSlayerDaggerHelper());
+        registerEvent(new BlazeSlayerFirePitsWarning());
         registerEvent(new PlayerChatFilter());
         registerEvent(new HideArmor());
 

@@ -7,6 +7,7 @@
 + Added a faster and permanent display for the blaze slayer daggers
 + Added custom countdown sound for the Fire Pillar timer for the blaze slayer.
 + Added hide sound and entities when building the Fire Pillar for the blaze slayer.
++ Added warning when the fire pit phase starts for the blaze slayer tier 3
 
 ### Misc
 + Added option to hide armor or just helmet of other player or yourself

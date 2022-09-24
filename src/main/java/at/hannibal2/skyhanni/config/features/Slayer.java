@@ -55,4 +55,11 @@ public class Slayer {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean blazeDaggers = false;
+
+    @Expose
+    //TODO blaze slayer tier 4
+    @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the blaze slayer tier 3")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean firePitsWarning = false;
 }
