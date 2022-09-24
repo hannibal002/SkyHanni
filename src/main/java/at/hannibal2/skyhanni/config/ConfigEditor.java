@@ -57,7 +57,7 @@ public class ConfigEditor extends GuiElement {
     };
     private static final String[] socialsLink = new String[]{
             "https://discord.gg/8DXVN4BJz3",
-            "https://github.com/hannibal00212/SkyHanni"
+            "https://github.com/hannibal002/SkyHanni"
     };
     private static final ResourceLocation SEARCH_ICON = new ResourceLocation("notenoughupdates:core/search.png");
     public static ConfigEditor editor = new ConfigEditor(SkyHanniMod.feature);
