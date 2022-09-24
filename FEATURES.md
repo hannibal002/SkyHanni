@@ -102,8 +102,10 @@
 + Highlight slayer miniboss in blue color.
 + Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
-+ Cooldown when the Fire Pillars from the blaze slayer will kill you.
-+ Faster and permanent display for the blaze slayer daggers
++ Cooldown when the Fire Pillar from the blaze slayer will kill you.
++ Custom countdown sound for the Fire Pillar timer for the blaze slayer.
++ Option to hide sound and entities when building the Fire Pillar for the blaze slayer.
++ Faster and permanent display for the blaze slayer daggers.
 
 ## Marked Players
 + Adding or removing players as marked with command /shmarkplayer
