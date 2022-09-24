@@ -280,16 +280,14 @@ class MobFinder {
                 when {
                     entity.hasBossHealth(500_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_1)
                     entity.hasBossHealth(1_750_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_2)
-                    entity.hasBossHealth(5_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_3)
-                    entity.hasBossHealth(10_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_4)
+                    entity.hasBossHealth(5_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_TYPHOEUS_34)
                 }
             }
             if (entity is EntitySkeleton && entity.hasNameTagWith(2, "§c☠ §3ⓆⓊⒶⓏⒾⒾ ")) {
                 when {
                     entity.hasBossHealth(500_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_1)
                     entity.hasBossHealth(1_750_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_2)
-                    entity.hasBossHealth(5_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_3)
-                    entity.hasBossHealth(10_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_4)
+                    entity.hasBossHealth(5_000_000) -> return EntityResult(bossType = BossType.SLAYER_BLAZE_QUAZII_34)
                 }
             }
 
