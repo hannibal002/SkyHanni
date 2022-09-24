@@ -1,21 +1,23 @@
 # SkyHanni - Change Log
 
-## Version 0.9.1
+## Version 0.10 - Slayer
 
-### Slayer
+### Blaze Slayer
 + Added a cooldown when the Fire Pillars from the Blaze Slayer will kill you.
-+ Added a faster and permanent display for the Blaze Slayer daggers
++ Added a faster and permanent display for the Blaze Slayer daggers.
 + Added custom countdown sound for the Fire Pillar timer for the Blaze Slayer.
 + Added hide sound and entities when building the Fire Pillar for the Blaze Slayer.
 + Added warning when the fire pit phase starts for the Blaze Slayer tier 3.
+
+### Slayer
 + Added warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.
 + Added hide more poor slayer drop chat messages.
 
 ### Misc
-+ Added option to hide armor or just helmet of other player or yourself
++ Added option to hide armor or just helmet of other player or yourself.
 
 ### Fixes
-+Fixed overload damage gets not detected as damage splash
++ Fixed overload damage gets not detected as damage splash.
 
 
 ## Version 0.9 - Chat + Dungeon

@@ -59,7 +59,7 @@ import java.util.List;
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.9.1";
+    public static final String VERSION = "0.10";
 
     public static Features feature;
 
