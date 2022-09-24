@@ -43,13 +43,11 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
 
     SLAYER_BLAZE_TYPHOEUS_1("§aInferno Typhoeus 1", 9, "§aTyphoeus 1"),
     SLAYER_BLAZE_TYPHOEUS_2("§eInferno Typhoeus 2", 9, "§eTyphoeus 2"),
-    SLAYER_BLAZE_TYPHOEUS_3("§cInferno Typhoeus 3", 9, "§cTyphoeus 3"),
-    SLAYER_BLAZE_TYPHOEUS_4("§4Inferno Typhoeus 4", 9, "§4Typhoeus 4"),
+    SLAYER_BLAZE_TYPHOEUS_34("§cInferno Typhoeus 3/4", 9, "§cTyphoeus 3/4"),
 
     SLAYER_BLAZE_QUAZII_1("§aInferno Quazii 1", 9, "§aQuazii 1"),
     SLAYER_BLAZE_QUAZII_2("§eInferno Quazii 2", 9, "§eQuazii 2"),
-    SLAYER_BLAZE_QUAZII_3("§cInferno Quazii 3", 9, "§cQuazii 3"),
-    SLAYER_BLAZE_QUAZII_4("§4Inferno Quazii 4", 9, "§4Quazii 4"),
+    SLAYER_BLAZE_QUAZII_34("§cInferno Quazii 3/4", 9, "§cQuazii 3/4"),
 
 
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman", 10),
