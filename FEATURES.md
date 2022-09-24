@@ -106,6 +106,7 @@
 + Custom countdown sound for the Fire Pillar timer for the blaze slayer.
 + Option to hide sound and entities when building the Fire Pillar for the blaze slayer.
 + Faster and permanent display for the blaze slayer daggers.
++ Warning when the fire pit phase starts for the blaze slayer tier 3
 
 ## Marked Players
 + Adding or removing players as marked with command /shmarkplayer

@@ -131,7 +131,7 @@ class HideArmor {
             val equipmentSlot = packet.equipmentSlot - 1
             if (equipmentSlot == -1) return
 
-            val entity = Minecraft.getMinecraft().theWorld.getEntityByID(entityID)
+            val entity = Minecraft.getMinecraft().theWorld?.getEntityByID(entityID)
             if (entity == null) {
                 laterCheck.add(entityID)
                 return

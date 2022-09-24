@@ -139,7 +139,6 @@ class BlazeSlayerPillar {
         } else time % 1.0 == 0.0
 
         if (playSound) {
-//            SoundUtils.createSound("random.orb", 11.2f).playSound()
             SoundUtils.createSound("random.click", 1.3f).playSound()
         }
     }
@@ -165,7 +164,6 @@ class BlazeSlayerPillar {
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
         if (!isEnabled()) return
-
         if (!SkyHanniMod.feature.slayer.firePillarBuildHider) return
 
         when (event.soundName) {
@@ -176,8 +174,4 @@ class BlazeSlayerPillar {
             }
         }
     }
-
-    private fun isPillarWarningEntity(armorStand: EntityArmorStand) =
-        armorStand.inventory.any { it != null && it.getSkullTexture() == pillarWarningTexture }
-
 }
