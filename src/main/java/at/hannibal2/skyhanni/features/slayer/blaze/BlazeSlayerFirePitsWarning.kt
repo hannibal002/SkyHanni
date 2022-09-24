@@ -53,8 +53,7 @@ class BlazeSlayerFirePitsWarning {
             if (lastHealth > percentHealth) {
                 when (entityData.bossType) {
                     BossType.SLAYER_BLAZE_3,
-                        //TODO blaze slayer tier 4
-                        //BossType.SLAYER_BLAZE_4,
+                    BossType.SLAYER_BLAZE_4,
                     -> {
                         fireFirePits()
                     }
@@ -68,8 +67,7 @@ class BlazeSlayerFirePitsWarning {
     private fun isEnabled(): Boolean {
         return LorenzUtils.inSkyblock && DamageIndicatorManager.isBossSpawned(
             BossType.SLAYER_BLAZE_3,
-            //TODO blaze slayer tier 4
-//            BossType.SLAYER_BLAZE_4,
+            BossType.SLAYER_BLAZE_4,
             BossType.SLAYER_BLAZE_QUAZII_3,
             BossType.SLAYER_BLAZE_QUAZII_4,
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
