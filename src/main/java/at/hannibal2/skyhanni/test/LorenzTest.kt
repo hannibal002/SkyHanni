@@ -43,6 +43,18 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
+
+//            for ((i, s) in ScoreboardData.sidebarLinesFormatted().withIndex()) {
+//                println("$i: '$s'")
+//            }
+
+//            val name = args[0]
+//            val pitch = args[1].toFloat()
+//            val sound = SoundUtils.createSound("note.harp", 1.35f)
+//            val sound = SoundUtils.createSound("random.orb", 11.2f)
+//            SoundUtils.createSound(name, pitch).playSound()
+
+
 //            a = args[0].toDouble()
 //            b = args[1].toDouble()
 //            c = args[2].toDouble()
@@ -104,6 +116,7 @@ class LorenzTest {
 
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!LorenzUtils.inSkyblock) return
         if (!SkyHanniMod.feature.dev.debugEnabled) return
 
@@ -144,7 +157,7 @@ class LorenzTest {
     }
 
     @SubscribeEvent
-    fun onSoundEvent(event: PlaySoundEvent) {
+    fun onSoundPlay(event: PlaySoundEvent) {
         if (!shouldLogPackets) return
 
 
@@ -329,7 +342,7 @@ class LorenzTest {
     }
 
     @SubscribeEvent
-    fun onParticleEvent(event: PlayParticleEvent) {
+    fun onParticlePlay(event: PlayParticleEvent) {
         if (!shouldLogPackets) return
 
 //        val particleType = event.type
