@@ -17,7 +17,7 @@ class CorruptedMobHighlight {
     private val corruptedMobs = mutableListOf<EntityLivingBase>()
 
     @SubscribeEvent
-    fun onHealthUpdateEvent(event: EntityHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inSkyblock) return
 
         val entity = event.entity

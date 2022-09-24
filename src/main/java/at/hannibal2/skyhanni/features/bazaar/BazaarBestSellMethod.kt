@@ -24,7 +24,7 @@ class BazaarBestSellMethod {
     }
 
     @SubscribeEvent
-    fun onGuiDrawEvent(event: GuiScreenEvent.DrawScreenEvent.Post) {
+    fun onGuiDraw(event: GuiScreenEvent.DrawScreenEvent.Post) {
         if (!isEnabled()) return
         textToRender = getNewText(event)
     }

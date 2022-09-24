@@ -162,7 +162,7 @@ class BlazeSlayerPillar {
     }
 
     @SubscribeEvent
-    fun onSoundEvent(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (!SkyHanniMod.feature.slayer.firePillarBuildHider) return
 
