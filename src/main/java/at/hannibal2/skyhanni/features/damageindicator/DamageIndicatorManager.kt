@@ -298,9 +298,11 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,
             BossType.SLAYER_BLAZE_QUAZII_2,
-            BossType.SLAYER_BLAZE_QUAZII_34,
+            BossType.SLAYER_BLAZE_QUAZII_3,
+            BossType.SLAYER_BLAZE_QUAZII_4,
             BossType.SLAYER_BLAZE_TYPHOEUS_2,
-            BossType.SLAYER_BLAZE_TYPHOEUS_34,
+            BossType.SLAYER_BLAZE_TYPHOEUS_3,
+            BossType.SLAYER_BLAZE_TYPHOEUS_4,
             -> {
                 return checkBlazeSlayer(entity as EntityLiving, entityData)
             }
