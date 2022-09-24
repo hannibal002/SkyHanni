@@ -24,7 +24,11 @@ object LorenzUtils {
         get() = inSkyblock && DungeonData.inDungeon()
 
     val skyBlockIsland: String
-        get() = HypixelData.skyBlockArea
+        get() = HypixelData.skyBlockIsland
+
+    //TODO add cache
+    val skyBlockArea: String
+        get() = HypixelData.readSkyBlockArea()
 
     val inKuudraFight: Boolean
         get() = skyBlockIsland == "Instanced"

@@ -217,7 +217,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onTickEvent(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.inSkyblock) return
         for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
             if (entity is EntityLivingBase) {

@@ -149,7 +149,7 @@ class ChatFilter {
     }
 
     private fun slayerDrop(message: String): Boolean {
-        //Revenant
+        //Zombie
         if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)")) return true
         if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)")) return true
         if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)")) return true
@@ -160,6 +160,15 @@ class ChatFilter {
         }
         if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)")) return true
         if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)")) return true
+        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)")) return true
+
+        //Tarantula
+        if (message.matchRegex("§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)")) return true
+        if (message.matchRegex("§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)")) return true
+        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)")) return true
+        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.+)x §r§f§r§aToxic Arrow Poison§r§7\\) (.+)")) return true
+        if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)")) return true
+        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)")) return true
 
         //Enderman
         if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)")) return true
@@ -240,6 +249,7 @@ class ChatFilter {
         //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
         return when {
             message.matchRegex("§.§l\\+(.*) Kill Combo §r§8\\+(.*)") -> true
+            message == "§6§l+50 Kill Combo" -> true
             message.matchRegex("§cYour Kill Combo has expired! You reached a (.*) Kill Combo!") -> true
             else -> false
         }

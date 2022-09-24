@@ -99,14 +99,16 @@
 - Show when Revenant Horror 5 is about to BOOM.
 
 ## Slayer
++ Hide poor slayer drop chat messages.
 + Highlight slayer miniboss in blue color.
 + Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
-+ Cooldown when the Fire Pillar from the blaze slayer will kill you.
-+ Custom countdown sound for the Fire Pillar timer for the blaze slayer.
-+ Option to hide sound and entities when building the Fire Pillar for the blaze slayer.
-+ Faster and permanent display for the blaze slayer daggers.
-+ Warning when the fire pit phase starts for the blaze slayer tier 3
++ Cooldown when the Fire Pillar from the Blaze Slayer will kill you.
++ Custom countdown sound for the Fire Pillar timer for the Blaze Slayer.
++ Option to hide sound and entities when building the Fire Pillar for the Blaze Slayer.
++ Faster and permanent display for the Blaze Slayer daggers.
++ Warning when the fire pit phase starts for the Blaze Slayer tier 3
++ Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.
 
 ## Marked Players
 + Adding or removing players as marked with command /shmarkplayer

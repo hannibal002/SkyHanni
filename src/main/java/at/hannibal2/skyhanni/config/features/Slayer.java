@@ -7,6 +7,48 @@ import com.google.gson.annotations.Expose;
 public class Slayer {
 
     @Expose
+    @ConfigOption(name = "Blaze", desc = "")
+    @ConfigEditorAccordion(id = 0)
+    public boolean damageSplash = false;
+
+    @Expose
+    @ConfigOption(name = "Pillar Display", desc = "Cooldown when the Fire Pillar from the Blaze Slayer will kill you.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean firePillarDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Pillar Display Position", desc = "")
+    @ConfigEditorButton(runnableId = "firePillar", buttonText = "Edit")
+    @ConfigAccordionId(id = 0)
+    public Position firePillarPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer for the Blaze Slayer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean firePillarSound = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Pillar", desc = "Hide sound and entities when building the Fire Pillar for the Blaze Slayer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean firePillarBuildHider = false;
+
+    @Expose
+    @ConfigOption(name = "Blaze Daggers", desc = "Faster and permanent display for the Blaze Slayer daggers")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean blazeDaggers = false;
+
+    @Expose
+    //TODO Blaze Slayer tier 4
+    @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean firePitsWarning = false;
+
+    @Expose
     @ConfigOption(name = "Slayer Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
     @ConfigEditorBoolean
     public boolean slayerMinibossHighlight = false;
@@ -22,44 +64,7 @@ public class Slayer {
     public boolean hideMobNames = false;
 
     @Expose
-    @ConfigOption(name = "Blaze", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean damageSplash = false;
-
-    @Expose
-    @ConfigOption(name = "Pillar Display", desc = "Cooldown when the Fire Pillar from the blaze slayer will kill you.")
+    @ConfigOption(name = "Quest Warning", desc = "Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean firePillarDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Pillar Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "firePillar", buttonText = "Edit")
-    @ConfigAccordionId(id = 0)
-    public Position firePillarPos = new Position(10, 10, false, true);
-
-    @Expose
-    @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer for the blaze slayer.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean firePillarSound = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Pillar", desc = "Hide sound and entities when building the Fire Pillar for the blaze slayer.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean firePillarBuildHider = false;
-
-    @Expose
-    @ConfigOption(name = "Blaze Daggers", desc = "Faster and permanent display for the blaze slayer daggers")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean blazeDaggers = false;
-
-    @Expose
-    //TODO blaze slayer tier 4
-    @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the blaze slayer tier 3")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean firePitsWarning = false;
+    public boolean questWarning = false;
 }
