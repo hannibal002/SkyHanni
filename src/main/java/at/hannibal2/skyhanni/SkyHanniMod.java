@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HideMobNames;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
+import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerPillar;
@@ -85,6 +86,7 @@ public class SkyHanniMod {
         registerEvent(new EntityMovementData());
         registerEvent(new ItemClickData());
         registerEvent(new MinecraftData());
+        registerEvent(new SendTitleHelper());
 
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());
@@ -139,6 +141,7 @@ public class SkyHanniMod {
         registerEvent(new BlazeSlayerFirePitsWarning());
         registerEvent(new PlayerChatFilter());
         registerEvent(new HideArmor());
+        registerEvent(new SlayerQuestWarning());
 
         Commands.init();
 

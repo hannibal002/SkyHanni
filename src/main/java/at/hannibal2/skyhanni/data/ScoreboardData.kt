@@ -11,6 +11,42 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class ScoreboardData {
 
     companion object {
+
+        private val splitIcons = listOf(
+            "\uD83C\uDF6B",
+            "\uD83D\uDCA3",
+            "\uD83D\uDC7D",
+            "\uD83D\uDD2E",
+            "\uD83D\uDC0D",
+            "\uD83D\uDC7E",
+            "\uD83C\uDF20",
+            "\uD83C\uDF6D",
+            "⚽",
+            "\uD83C\uDFC0",
+            "\uD83D\uDC79",
+            "\uD83C\uDF81",
+            "\uD83C\uDF89",
+            "\uD83C\uDF82",
+        )
+
+        fun sidebarLinesFormatted(): List<String> {
+            val list = mutableListOf<String>()
+            for (line in sidebarLinesRaw) {
+                val seperator = splitIcons.find { line.contains(it) }!!
+                val split = line.split(seperator)
+                val start = split[0]
+                var end = split[1]
+                if (end.length >= 2) {
+                    end = end.substring(2)
+                }
+
+                list.add(start+end)
+
+            }
+
+            return list
+        }
+
         var sidebarLines: List<String> = emptyList()
         var sidebarLinesRaw: List<String> = emptyList()
     }
@@ -33,8 +69,7 @@ class ScoreboardData {
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
-            input != null && input.playerName != null && !input.playerName
-                .startsWith("#")
+            input != null && input.playerName != null && !input.playerName.startsWith("#")
         }
         scores = if (list.size > 15) {
             list.drop(15)

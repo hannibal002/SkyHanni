@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.LocationChangeEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -17,10 +17,21 @@ class HypixelData {
     companion object {
         var hypixel = false
         var skyblock = false
-        var skyBlockArea: String = ""
+        var skyBlockIsland: String = ""
+
+        fun readSkyBlockArea(): String {
+            for (line in ScoreboardData.sidebarLinesFormatted()) {
+                if (line.startsWith(" §7⏣ ")) {
+                    return line.substring(5).removeColor()
+                }
+            }
+
+            return "invalid"
+        }
+
     }
 
-    var loggerLocationChange = LorenzLogger("debug/location_change")
+    var loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
@@ -79,24 +90,24 @@ class HypixelData {
     }
 
     private fun checkMode() {
-        var newArea = ""
+        var newIsland = ""
         var guesting = false
         for (line in TabListUtils.getTabList()) {
             if (line.startsWith("§r§b§lArea: ")) {
-                newArea = line.split(": ")[1].removeColor()
+                newIsland = line.split(": ")[1].removeColor()
             }
             if (line == "§r Status: §r§9Guest§r") {
                 guesting = true
             }
         }
         if (guesting) {
-            newArea = "$newArea guesting"
+            newIsland = "$newIsland guesting"
         }
 
-        if (skyBlockArea != newArea) {
-            LocationChangeEvent(newArea, skyBlockArea).postAndCatch()
-            loggerLocationChange.log(newArea)
-            skyBlockArea = newArea
+        if (skyBlockIsland != newIsland) {
+            IslandChangeEvent(newIsland, skyBlockIsland).postAndCatch()
+            loggerIslandChange.log(newIsland)
+            skyBlockIsland = newIsland
         }
     }
 
