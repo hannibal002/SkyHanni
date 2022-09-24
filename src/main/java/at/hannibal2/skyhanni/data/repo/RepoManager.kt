@@ -149,14 +149,14 @@ class RepoManager(private val configLocation: File) {
     }
 
     private fun getCommitApiUrl(): String {
-        val repoUser = "hannibal00212"
+        val repoUser = "hannibal002"
         val repoName = "SkyHanni-REPO"
         val repoBranch = "main"
         return String.format("https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
     }
 
     private fun getDownloadUrl(commitId: String?): String {
-        val repoUser = "hannibal00212"
+        val repoUser = "hannibal002"
         val repoName = "SkyHanni-REPO"
         return String.format("https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
     }
