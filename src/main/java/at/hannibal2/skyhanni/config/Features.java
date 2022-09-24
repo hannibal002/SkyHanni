@@ -63,8 +63,8 @@ public class Features extends Config {
             return;
         }
 
-        if (runnableId.equals("firePillars")) {
-            editOverlay(activeConfigCategory, 200, 16, slayer.firePillarsPos);
+        if (runnableId.equals("firePillar")) {
+            editOverlay(activeConfigCategory, 200, 16, slayer.firePillarPos);
             return;
         }
 

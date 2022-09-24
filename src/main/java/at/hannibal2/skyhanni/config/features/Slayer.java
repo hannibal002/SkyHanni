@@ -27,16 +27,28 @@ public class Slayer {
     public boolean damageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Fire Pillars", desc = "Cooldown when the Fire Pillars from the blaze slayer will kill you.")
+    @ConfigOption(name = "Pillar Display", desc = "Cooldown when the Fire Pillar from the blaze slayer will kill you.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean firePillars = false;
+    public boolean firePillarDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Fire Pillars Position", desc = "")
-    @ConfigEditorButton(runnableId = "firePillars", buttonText = "Edit")
+    @ConfigOption(name = "Pillar Display Position", desc = "")
+    @ConfigEditorButton(runnableId = "firePillar", buttonText = "Edit")
     @ConfigAccordionId(id = 0)
-    public Position firePillarsPos = new Position(10, 10, false, true);
+    public Position firePillarPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer for the blaze slayer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean firePillarSound = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Pillar", desc = "Hide sound and entities when building the Fire Pillar for the blaze slayer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean firePillarBuildHider = false;
 
     @Expose
     @ConfigOption(name = "Blaze Daggers", desc = "Faster and permanent display for the blaze slayer daggers")
