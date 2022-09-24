@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui.inventory;
 
 import at.hannibal2.skyhanni.sign.*;
-import java.io.IOException;
-import java.util.List;
+import at.hannibal2.skyhanni.utils.LorenzUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -19,6 +18,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.io.IOException;
+import java.util.List;
 
 @Mixin(GuiEditSign.class)
 public class GuiEditSignMixin extends GuiScreen implements IEditSign {
@@ -42,7 +44,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
         //        this.textInputUtil = new TextInputUtil(this.fontRendererObj, () -> ((IModifiedSign) this.that.tileSign).getText(this.editLine).getUnformattedText(), text -> ((IModifiedSign) this.that.tileSign).setText(this.editLine, new ChatComponentText(text)), 90);
         this.textInputUtil = new TextInputUtil(this.fontRendererObj, () -> ((IModifiedSign) getTileSign(this.that)).getText(this.editLine).getUnformattedText(), text -> ((IModifiedSign) getTileSign(this.that)).setText(this.editLine, new ChatComponentText(text)), 90);
 
-        if (SkyBlockEventHandler.isSkyBlock && SkyBlockcatiaConfig.enableSignSelectionList) {
+        if (LorenzUtils.INSTANCE.getInSkyblock() && SkyBlockcatiaConfig.enableSignSelectionList) {
             List<SignSelectionList.Entry> list = null;
             String title = null;
 
@@ -85,7 +87,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
         if (SkyBlockcatiaConfig.enableSignSelectionList) {
             Keyboard.enableRepeatEvents(false);
 
-            if (SkyBlockEventHandler.isSkyBlock) {
+            if (LorenzUtils.INSTANCE.getInSkyblock()) {
                 //                String text = this.that.tileSign.signText[0].getUnformattedText();
                 String text = getTileSign(this.that).signText[0].getUnformattedText();
                 //                if (!StringUtils.isNullOrEmpty(text))
@@ -194,7 +196,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
             GlStateManager.popMatrix();
             super.drawScreen(mouseX, mouseY, partialTicks);
 
-            if (SkyBlockEventHandler.isSkyBlock && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
+            if (LorenzUtils.INSTANCE.getInSkyblock() && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
                 this.globalSelector.drawScreen(mouseX, mouseY, partialTicks);
             }
             info.cancel();
@@ -203,7 +205,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
 
     @Inject(method = "drawScreen(IIF)V", cancellable = true, at = @At("RETURN"))
     private void drawScreenPost(int mouseX, int mouseY, float partialTicks, CallbackInfo info) {
-        if (!SkyBlockcatiaConfig.enableOverwriteSignEditing && SkyBlockEventHandler.isSkyBlock && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
+        if (!SkyBlockcatiaConfig.enableOverwriteSignEditing && LorenzUtils.INSTANCE.getInSkyblock() && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
             this.globalSelector.drawScreen(mouseX, mouseY, partialTicks);
         }
     }
