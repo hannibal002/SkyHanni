@@ -58,7 +58,7 @@ class AshfangBlazes {
     }
 
     @SubscribeEvent
-    fun onHealthUpdateEvent(event: EntityHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
 
         val entityId = event.entity.entityId

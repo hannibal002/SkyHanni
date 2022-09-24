@@ -138,7 +138,7 @@ class SlayerQuestWarning {
     }
 
     @SubscribeEvent
-    fun onHealthUpdateEvent(event: EntityHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
 
         val entity = event.entity

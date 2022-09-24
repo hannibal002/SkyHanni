@@ -56,7 +56,7 @@ class DungeonCleanEnd {
     }
 
     @SubscribeEvent
-    fun onHealthUpdateEvent(event: EntityHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.cleanEndToggle) return
         if (bossDone) return

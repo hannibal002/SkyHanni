@@ -30,7 +30,7 @@ class MinecraftData {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onParticleEvent(event: PacketEvent.ReceiveEvent) {
+    fun onParticlePacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyblock) return
 
         val packet = event.packet
