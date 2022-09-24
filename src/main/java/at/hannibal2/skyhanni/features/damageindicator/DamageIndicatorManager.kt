@@ -86,7 +86,8 @@ class DamageIndicatorManager {
         val player = Minecraft.getMinecraft().thePlayer
 
         //TODO config to define between 100ms and 5 sec
-        for (uuid in data.filter { System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead) 4_000 else 100 }
+        for (uuid in data.filter { (System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100) ||
+                (it.value.dead && noDeathDisplay(it.value.bossType)) }
             .map { it.key }) {
             data.remove(uuid)
         }
@@ -184,6 +185,24 @@ class DamageIndicatorManager {
         }
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
+    }
+
+    private fun noDeathDisplay(bossType: BossType): Boolean {
+        return when (bossType) {
+            BossType.SLAYER_BLAZE_TYPHOEUS_1,
+            BossType.SLAYER_BLAZE_TYPHOEUS_2,
+            BossType.SLAYER_BLAZE_TYPHOEUS_3,
+            BossType.SLAYER_BLAZE_TYPHOEUS_4,
+            BossType.SLAYER_BLAZE_QUAZII_1,
+            BossType.SLAYER_BLAZE_QUAZII_2,
+            BossType.SLAYER_BLAZE_QUAZII_3,
+            BossType.SLAYER_BLAZE_QUAZII_4,
+
+                //TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+                -> true
+
+            else -> false
+        }
     }
 
     private fun tickDamage(damageCounter: DamageCounter) {
