@@ -50,6 +50,7 @@ class SlayerQuestWarning {
 
         if (message == "§aYour Slayer Quest has been cancelled!") {
             activeSlayer = null
+            needSlayerQuest = false
         }
 
         //TODO hyp does no damage anymore
