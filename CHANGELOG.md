@@ -2,6 +2,11 @@
 
 ## Version 0.10.1
 
+### Slayer
++ Added toggle to ender slayer phase display
++ Added blaze slayer phase display
++ Added toggle for blaze slayer colored mobs
+
 ### Misc
 + Added Lord Jawbus to damage indicator.
 

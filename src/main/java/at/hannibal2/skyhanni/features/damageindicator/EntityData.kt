@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.entity.EntityLivingBase
 
@@ -15,10 +14,9 @@ class EntityData(
     var lastHealth: Long = 0L,
     var healthText: String = "",
     var timeLastTick: Long = 0,
-//    var healthLineHidden: Boolean = false,
     var namePrefix: String = "",
     var nameSuffix: String = "",
-    var color: LorenzColor? = null,
+    var nameAbove: String = "",
     var dead: Boolean = false,
     var deathLocation: LorenzVec? = null,
 )

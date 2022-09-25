@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning;
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerPillar;
+import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper;
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager;
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName;
 import at.hannibal2.skyhanni.test.LorenzTest;
@@ -138,6 +139,7 @@ public class SkyHanniMod {
         registerEvent(new ThunderSparksHighlight());
         registerEvent(new BlazeSlayerPillar());
         registerEvent(new BlazeSlayerDaggerHelper());
+        registerEvent(new HellionShieldHelper());
         registerEvent(new BlazeSlayerFirePitsWarning());
         registerEvent(new PlayerChatFilter());
         registerEvent(new HideArmor());
