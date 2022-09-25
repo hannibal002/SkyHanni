@@ -5,6 +5,9 @@
 ### Misc
 + Added Lord Jawbus to damage indicator.
 
+### Changes
+~ Showing Thunder Sparks under lava
+
 ## Version 0.10 - Slayer
 
 ### Blaze Slayer
