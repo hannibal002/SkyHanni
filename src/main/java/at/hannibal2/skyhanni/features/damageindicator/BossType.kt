@@ -68,8 +68,9 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     MINOTAUR("§2Minotaur", 18),
 
     THUNDER("§cThunder", 19),
+    LORD_JAWBUS("§cLord Jawbus", 19),
 
-    DUMMY("Dummy", 20),
+    DUMMY("Dummy", 21),
 
     //TODO arachne
 
