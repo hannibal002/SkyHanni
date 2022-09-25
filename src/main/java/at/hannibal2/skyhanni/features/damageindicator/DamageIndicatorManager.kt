@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
-import at.hannibal2.skyhanni.features.slayer.blaze.DaggerMode
+import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
+import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
@@ -86,8 +89,10 @@ class DamageIndicatorManager {
         val player = Minecraft.getMinecraft().thePlayer
 
         //TODO config to define between 100ms and 5 sec
-        for (uuid in data.filter { (System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100) ||
-                (it.value.dead && noDeathDisplay(it.value.bossType)) }
+        for (uuid in data.filter {
+            (System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100) ||
+                    (it.value.dead && noDeathDisplay(it.value.bossType))
+        }
             .map { it.key }) {
             data.remove(uuid)
         }
@@ -146,6 +151,12 @@ class DamageIndicatorManager {
                 bossName += data.nameSuffix
             }
             //TODO fix scaling problem
+
+            if (data.nameAbove.isNotEmpty()) {
+//                RenderUtils.drawLabel(location, data.nameAbove, partialTicks, true, 3.9f, -9.0f)
+                RenderUtils.drawLabel(location, data.nameAbove, partialTicks, true, 3.9f, -18.0f)
+            }
+
 //            val debug = Minecraft.getMinecraft().thePlayer.isSneaking
 //            RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f, debug = debug)
             RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f)
@@ -199,7 +210,7 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_QUAZII_4,
 
                 //TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
-                -> true
+            -> true
 
             else -> false
         }
@@ -265,7 +276,7 @@ class DamageIndicatorManager {
 
             entityData.namePrefix = ""
             entityData.nameSuffix = ""
-            entityData.color = null
+            entityData.nameAbove = ""
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
                 "§cDead"
@@ -313,6 +324,7 @@ class DamageIndicatorManager {
                 return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
             }
 
+            BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,
@@ -323,7 +335,7 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
             -> {
-                return checkBlazeSlayer(entity as EntityLiving, entityData)
+                return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
             }
 
             BossType.NETHER_MAGMA_BOSS -> {
@@ -360,16 +372,55 @@ class DamageIndicatorManager {
         return ""
     }
 
-    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData): String {
-        for (swordMode in DaggerMode.values()) {
-            if (entity.hasNameTagWith(3, swordMode.name)) {
-                entityData.namePrefix = swordMode.formattedName + " "
-                entityData.color = swordMode.color
-                return ""
-            }
+    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String? {
+        val shield = HellionShield.values().firstOrNull { entity.hasNameTagWith(3, it.name) }
+        entity.setHellionShield(shield)
+        if (shield != null) {
+            entityData.nameAbove = shield.formattedName
         }
 
-        return ""
+        if (!SkyHanniMod.feature.slayer.blazePhaseDisplay) return ""
+
+        var calcHealth = health
+        val calcMaxHealth: Int
+        entityData.namePrefix = when (entityData.bossType) {
+            BossType.SLAYER_BLAZE_1,
+            BossType.SLAYER_BLAZE_2,
+            -> {
+                val step = maxHealth / 2
+                calcMaxHealth = step
+                if (health > step) {
+                    calcHealth -= step
+                    "§c1/2 "
+                } else {
+                    calcHealth = health
+                    "§a2/2 "
+                }
+            }
+
+            BossType.SLAYER_BLAZE_3,
+            BossType.SLAYER_BLAZE_4,
+            -> {
+                val step = maxHealth / 3
+                calcMaxHealth = step
+                if (health > step * 2) {
+                    calcHealth -= step * 2
+                    "§c1/3 "
+                } else if (health > step) {
+                    calcHealth -= step
+                    "§e2/3 "
+                } else {
+                    calcHealth = health
+                    "§a3/3 "
+                }
+            }
+
+            else -> return ""
+        }
+
+        return NumberUtil.percentageColor(
+            calcHealth.toLong(), calcMaxHealth.toLong()
+        ).getChatColor() + NumberUtil.format(calcHealth)
     }
 
     private fun checkMagmaCube(
@@ -480,9 +531,14 @@ class DamageIndicatorManager {
 
             else -> return null
         }
-        val result = NumberUtil.percentageColor(
+        var result = NumberUtil.percentageColor(
             calcHealth.toLong(), calcMaxHealth.toLong()
         ).getChatColor() + NumberUtil.format(calcHealth)
+
+        if (!SkyHanniMod.feature.slayer.endermanPhaseDisplay) {
+            result = ""
+            entityData.namePrefix = ""
+        }
 
 
         //Hit phase
@@ -647,29 +703,6 @@ class DamageIndicatorManager {
                 val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
                 entityData.damageCounter.currentDamage += dmg
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!isEnabled()) return
-        val entity = event.entity
-
-        data.values
-            .filter { it.entity == entity }
-            .forEach { data ->
-                data.color?.let {
-                    event.color = it.toColor().withAlpha(80)
-                }
-            }
-    }
-
-    @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!isEnabled()) return
-        val entity = event.entity
-        if (data.values.any { it.entity == entity && it.color != null }) {
-            event.shouldReset = true
         }
     }
 

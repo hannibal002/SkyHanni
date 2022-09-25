@@ -52,16 +52,15 @@ class BlazeSlayerDaggerHelper {
     private fun getDaggerText(dagger: Dagger): String {
         var activeAbility = ""
         var inactiveAbility = ""
-        for (mode in dagger.modes) {
-            if (mode.active) {
-                activeAbility = mode.chatColor + "§l" + mode
+        for (shield in dagger.shields) {
+            if (shield.active) {
+                activeAbility = shield.chatColor + "§l" + shield
             } else {
-                inactiveAbility = " §7/ " + mode.chatColor + mode.toString().lowercase()
+                inactiveAbility = " §7/ " + shield.chatColor + shield.toString().lowercase()
             }
         }
         if (activeAbility == "") return ""
         return "$activeAbility$inactiveAbility"
-
     }
 
     private fun getName(player: EntityPlayerSP): String {
@@ -70,7 +69,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     @SubscribeEvent
-    fun onReceiveCurrentMode(event: PacketEvent.ReceiveEvent) {
+    fun onReceiveCurrentShield(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
 
         val packet = event.packet
@@ -79,12 +78,12 @@ class BlazeSlayerDaggerHelper {
         val message = packet.message ?: return
         val formattedText = message.formattedText
 
-        for (mode in DaggerMode.values()) {
-            if (mode.formattedName + "§r" == formattedText) {
-                Dagger.values().filter { mode in it.modes }.forEach {
-                    it.modes.forEach { mode -> mode.active = false }
+        for (shield in HellionShield.values()) {
+            if (shield.formattedName + "§r" == formattedText) {
+                Dagger.values().filter { shield in it.shields }.forEach {
+                    it.shields.forEach { shield -> shield.active = false }
                 }
-                mode.active = true
+                shield.active = true
                 event.isCanceled = true
                 clientSideClicked = false
                 return
@@ -108,22 +107,22 @@ class BlazeSlayerDaggerHelper {
             val status = packet.status
             if (status == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
                 val dagger = getDaggerInHand()
-                dagger?.modes?.forEach { mode -> mode.active = !mode.active }
+                dagger?.shields?.forEach { shield -> shield.active = !shield.active }
                 clientSideClicked = true
             }
         }
     }
 
-    enum class Dagger(val daggerNames: List<String>, vararg val modes: DaggerMode) {
+    enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield) {
         TWILIGHT(
             listOf("Twilight Dagger", "Mawdredge Dagger", "Deathripper Dagger"),
-            DaggerMode.SPIRIT,
-            DaggerMode.CRYSTAL
+            HellionShield.SPIRIT,
+            HellionShield.CRYSTAL
         ),
         FIREDUST(
             listOf("Firedust Dagger", "Kindlebane Dagger", "Pyrochaos Dagger"),
-            DaggerMode.ASHEN,
-            DaggerMode.AURIC
+            HellionShield.ASHEN,
+            HellionShield.AURIC
         ),
         ;
 
