@@ -1,5 +1,10 @@
 # SkyHanni - Change Log
 
+## Version 0.10.1
+
+### Misc
++ Added Lord Jawbus to damage indicator.
+
 ## Version 0.10 - Slayer
 
 ### Blaze Slayer

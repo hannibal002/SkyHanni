@@ -187,7 +187,6 @@ class MobFinder {
                 }
             }
         } else {
-
             if (entity is EntityBlaze) {
                 if (entity.name != "Dinnerbone") {
                     if (entity.hasNameTagWith(2, "§e﴾ §8[§7Lv200§8] §l§8§lAshfang§r ")) {
@@ -324,6 +323,12 @@ class MobFinder {
             if (entity is EntityGuardian) {
                 if (entity.hasMaxHealth(35_000_000)) {
                     return EntityResult(bossType = BossType.THUNDER)
+                }
+            }
+
+            if (entity is EntityIronGolem) {
+                if (entity.hasMaxHealth(100_000_000)) {
+                    return EntityResult(bossType = BossType.LORD_JAWBUS)
                 }
             }
         }
