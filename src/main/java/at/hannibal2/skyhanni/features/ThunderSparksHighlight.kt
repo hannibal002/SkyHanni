@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -26,10 +28,8 @@ class ThunderSparksHighlight {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        Minecraft.getMinecraft().theWorld.loadedEntityList
-            .filter { it ->
-                it is EntityArmorStand && it !in sparks && it.inventory
-                    .any { it != null && it.getSkullTexture() == texture }
+        Minecraft.getMinecraft().theWorld.loadedEntityList.filter { it ->
+                it is EntityArmorStand && it !in sparks && it.inventory.any { it != null && it.getSkullTexture() == texture }
             }.forEach { sparks.add(it as EntityArmorStand) }
     }
 
@@ -44,9 +44,14 @@ class ThunderSparksHighlight {
         for (spark in sparks) {
             if (spark.isDead) continue
             val sparkLocation = spark.getLorenzVec()
-            event.drawWaypointFilled(sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25)
+            val block = sparkLocation.getBlockAt()
+            val seeThroughBlocks =
+                sparkLocation.distance(LocationUtils.playerLocation()) < 6 && (block == Blocks.flowing_lava || block == Blocks.lava)
+            event.drawWaypointFilled(
+                sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks
+            )
             if (sparkLocation.distance(playerLocation) < 10) {
-                event.drawString(sparkLocation.add(0.0, 1.5, 0.0), "Thunder Spark")
+                event.drawString(sparkLocation.add(0.0, 1.5, 0.0), "Thunder Spark", seeThroughBlocks = seeThroughBlocks)
             }
         }
     }
