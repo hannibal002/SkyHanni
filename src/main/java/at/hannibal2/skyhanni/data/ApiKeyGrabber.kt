@@ -9,10 +9,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
+import java.util.concurrent.Executors
 
 class ApiKeyGrabber {
 
     private var currentProfileName = ""
+    private val executors = Executors.newFixedThreadPool(1)
+
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
@@ -34,49 +37,51 @@ class ApiKeyGrabber {
     }
 
     private fun updateApiData() {
-        val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
+        executors.submit {
+            val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
 
-        var apiKey = SkyHanniMod.feature.hidden.apiKey
-        if (!verifyKey(apiKey)) {
-            LorenzUtils.chat("§c[SkyHanni] Invalid api key detected, deleting it!")
-            apiKey = ""
-            SkyHanniMod.feature.hidden.apiKey = ""
-        }
+            var apiKey = SkyHanniMod.feature.hidden.apiKey
+            if (!verifyKey(apiKey)) {
+                LorenzUtils.chat("§c[SkyHanni] Invalid api key detected, deleting it!")
+                apiKey = ""
+                SkyHanniMod.feature.hidden.apiKey = ""
+            }
 
-        if (apiKey.isEmpty()) {
-            readApiKeyFromOtherMods()
-            apiKey = SkyHanniMod.feature.hidden.apiKey
             if (apiKey.isEmpty()) {
-                LorenzUtils.warning("SkyHanni has no API Key set. Type /api new to reload.")
-                return
+                readApiKeyFromOtherMods()
+                apiKey = SkyHanniMod.feature.hidden.apiKey
+                if (apiKey.isEmpty()) {
+                    LorenzUtils.warning("SkyHanni has no API Key set. Type /api new to reload.")
+                    return@submit
+                }
             }
-        }
 
-        val url = "https://api.hypixel.net/player?key=$apiKey&uuid=$uuid"
+            val url = "https://api.hypixel.net/player?key=$apiKey&uuid=$uuid"
 
-        val jsonObject = APIUtil.getJSONResponse(url)
+            val jsonObject = APIUtil.getJSONResponse(url)
 
-        if (!jsonObject["success"].asBoolean) {
-            val cause = jsonObject["cause"].asString
-            if (cause == "Invalid API key") {
-                LorenzUtils.error("SkyHanni got an API error: Invalid API key! Type /api new to reload.")
-                return
-            } else {
-                throw RuntimeException("API error for url '$url': $cause")
+            if (!jsonObject["success"].asBoolean) {
+                val cause = jsonObject["cause"].asString
+                if (cause == "Invalid API key") {
+                    LorenzUtils.error("SkyHanni got an API error: Invalid API key! Type /api new to reload.")
+                    return@submit
+                } else {
+                    throw RuntimeException("API error for url '$url': $cause")
+                }
             }
-        }
 
-        val player = jsonObject["player"].asJsonObject
-        val stats = player["stats"].asJsonObject
-        val skyblock = stats["SkyBlock"].asJsonObject
-        val profiles = skyblock["profiles"].asJsonObject
-        for (entry in profiles.entrySet()) {
-            val asJsonObject = entry.value.asJsonObject
-            val name = asJsonObject["cute_name"].asString
-            val profileId = asJsonObject["profile_id"].asString
-            if (currentProfileName == name.lowercase()) {
-                loadProfile(uuid, profileId)
-                return
+            val player = jsonObject["player"].asJsonObject
+            val stats = player["stats"].asJsonObject
+            val skyblock = stats["SkyBlock"].asJsonObject
+            val profiles = skyblock["profiles"].asJsonObject
+            for (entry in profiles.entrySet()) {
+                val asJsonObject = entry.value.asJsonObject
+                val name = asJsonObject["cute_name"].asString
+                val profileId = asJsonObject["profile_id"].asString
+                if (currentProfileName == name.lowercase()) {
+                    loadProfile(uuid, profileId)
+                    return@submit
+                }
             }
         }
     }
