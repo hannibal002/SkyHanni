@@ -6,16 +6,18 @@ import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
-import java.util.concurrent.Executors
+import java.util.*
 
 class ApiKeyGrabber {
 
     private var currentProfileName = ""
-    private val executors = Executors.newFixedThreadPool(1)
-
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
@@ -36,60 +38,58 @@ class ApiKeyGrabber {
         updateApiData()
     }
 
+
+    private suspend fun tryUpdateProfileDataAndVerifyKey(apiKey: String): Boolean {
+        val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
+        val url = "https://api.hypixel.net/player?key=$apiKey&uuid=$uuid"
+        val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
+
+        if (jsonObject["success"]?.asBoolean == false) {
+            if (jsonObject["throttle"]?.asBoolean == true) return true // 429 Too Many Requests does not make an invalid key.
+            val cause = jsonObject["cause"].asString
+            if (cause == "Invalid API key") {
+                return false
+            } else {
+                throw RuntimeException("API error for url '$url': $cause")
+            }
+        }
+        val player = jsonObject["player"].asJsonObject
+        val stats = player["stats"].asJsonObject
+        val skyblock = stats["SkyBlock"].asJsonObject
+        val profiles = skyblock["profiles"].asJsonObject
+        for (entry in profiles.entrySet()) {
+            val asJsonObject = entry.value.asJsonObject
+            val name = asJsonObject["cute_name"].asString
+            val profileId = asJsonObject["profile_id"].asString
+            if (currentProfileName == name.lowercase()) {
+                loadProfile(apiKey, uuid, profileId)
+            }
+        }
+        return true
+    }
+
     private fun updateApiData() {
-        executors.submit {
-            val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
-
-            var apiKey = SkyHanniMod.feature.hidden.apiKey
-            if (!verifyKey(apiKey)) {
-                LorenzUtils.chat("§c[SkyHanni] Invalid api key detected, deleting it!")
-                apiKey = ""
-                SkyHanniMod.feature.hidden.apiKey = ""
+        SkyHanniMod.coroutineScope.launch {
+            val oldApiKey = SkyHanniMod.feature.hidden.apiKey
+            if (oldApiKey.isNotEmpty() && tryUpdateProfileDataAndVerifyKey(oldApiKey)) {
+                return@launch
             }
-
-            if (apiKey.isEmpty()) {
-                readApiKeyFromOtherMods()
-                apiKey = SkyHanniMod.feature.hidden.apiKey
-                if (apiKey.isEmpty()) {
-                    LorenzUtils.warning("SkyHanni has no API Key set. Type /api new to reload.")
-                    return@submit
-                }
-            }
-
-            val url = "https://api.hypixel.net/player?key=$apiKey&uuid=$uuid"
-
-            val jsonObject = APIUtil.getJSONResponse(url)
-
-            if (!jsonObject["success"].asBoolean) {
-                val cause = jsonObject["cause"].asString
-                if (cause == "Invalid API key") {
-                    LorenzUtils.error("SkyHanni got an API error: Invalid API key! Type /api new to reload.")
-                    return@submit
+            findApiCandidatesFromOtherMods().forEach { (modName, newApiKey) ->
+                if (tryUpdateProfileDataAndVerifyKey(newApiKey)) {
+                    SkyHanniMod.feature.hidden.apiKey = newApiKey
+                    LorenzUtils.chat("§e[SkyHanni] Imported valid new API key from $modName.")
+                    return@launch
                 } else {
-                    throw RuntimeException("API error for url '$url': $cause")
+                    LorenzUtils.error("§c[SkyHanni] Invalid API key from $modName")
                 }
             }
-
-            val player = jsonObject["player"].asJsonObject
-            val stats = player["stats"].asJsonObject
-            val skyblock = stats["SkyBlock"].asJsonObject
-            val profiles = skyblock["profiles"].asJsonObject
-            for (entry in profiles.entrySet()) {
-                val asJsonObject = entry.value.asJsonObject
-                val name = asJsonObject["cute_name"].asString
-                val profileId = asJsonObject["profile_id"].asString
-                if (currentProfileName == name.lowercase()) {
-                    loadProfile(uuid, profileId)
-                    return@submit
-                }
-            }
+            LorenzUtils.error("§c[SkyHanni] SkyHanni has no API key set. Please run /api new")
         }
     }
 
-    private fun readApiKeyFromOtherMods() {
+    private fun findApiCandidatesFromOtherMods(): Map<String, String> {
         LorenzUtils.consoleLog("Trying to find the API Key from the config of other mods..")
-
-        var found = false
+        val candidates = mutableMapOf<String, String>()
         for (mod in OtherMod.values()) {
             val modName = mod.modName
             val file = File(mod.configPath)
@@ -97,16 +97,8 @@ class ApiKeyGrabber {
                 val reader = APIUtil.readFile(file)
                 try {
                     val key = mod.readKey(reader).replace("\n", "").replace(" ", "")
-                    if (verifyKey(key)) {
-                        LorenzUtils.consoleLog("- $modName: good key!")
-                        if (!found) {
-                            found = true
-                            LorenzUtils.chat("§e[SkyHanni] Grabbed the API key from $modName!")
-                            SkyHanniMod.feature.hidden.apiKey = key
-                        }
-                    } else {
-                        LorenzUtils.consoleLog("- $modName: wrong key!")
-                    }
+                    UUID.fromString(key)
+                    candidates[modName] = key
                 } catch (e: Throwable) {
                     LorenzUtils.consoleLog("- $modName: wrong config format! (" + e.message + ")")
                     continue
@@ -115,27 +107,16 @@ class ApiKeyGrabber {
                 LorenzUtils.consoleLog("- $modName: no config found!")
             }
         }
+        return candidates
     }
 
-    private fun verifyKey(key: String): Boolean {
-        return try {
-            val url = "https://api.hypixel.net/key?key=$key"
-            val bazaarData = APIUtil.getJSONResponse(url, silentError = true)
-            return bazaarData.get("success").asBoolean
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            false
-        }
-    }
-
-    private fun loadProfile(playerUuid: String, profileId: String) {
-        val apiKey = SkyHanniMod.feature.hidden.apiKey
+    private suspend fun loadProfile(apiKey: String, playerUuid: String, profileId: String) {
         val url = "https://api.hypixel.net/skyblock/profile?key=$apiKey&profile=$profileId"
 
-        val jsonObject = APIUtil.getJSONResponse(url)
+        val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
 
-        val profile = jsonObject["profile"].asJsonObject
-        val members = profile["members"].asJsonObject
+        val profile = jsonObject["profile"]?.asJsonObject ?: return
+        val members = profile["members"]?.asJsonObject ?: return
         for (entry in members.entrySet()) {
             if (entry.key == playerUuid) {
                 val profileData = entry.value.asJsonObject
