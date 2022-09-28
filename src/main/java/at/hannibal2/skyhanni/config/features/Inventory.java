@@ -87,4 +87,32 @@ public class Inventory {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterSelectedDrop = false;
+
+    @ConfigOption(name = "Stats Tuning", desc = "")
+    @ConfigEditorAccordion(id = 2)
+    public boolean statsTuning = false;
+
+    @Expose
+    @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean statsTuningSelectedStats = false;
+
+    @Expose
+    @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected tuning points in the stats tuning inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean statsTuningPoints = false;
+
+    @Expose
+    @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the stats tuning inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean statsTuningSelectedTemplate = false;
+
+    @Expose
+    @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the tuning point templates.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean statsTuningTemplateStats = false;
 }

@@ -7,11 +7,17 @@
 + Added blaze slayer phase display
 + Added toggle for blaze slayer colored mobs
 
+### Stats Tuning
++ Show the tuning stats in the Thaumaturgy inventory.
++ Show the amount of selected tuning points in the stats tuning inventory.
++ Highlight the selected template in the stats tuning inventory.
++ Show the type of stats for the tuning point templates.
+
 ### Misc
-+ Added Lord Jawbus to damage indicator.
++ Added Lord Jawbus to damage indicator
 
 ### Changes
-~ Showing Thunder Sparks under lava
++ Showing Thunder Sparks under lava
 
 ## Version 0.10 - Slayer
 

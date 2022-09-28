@@ -45,6 +45,10 @@
 - Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same enchantment are highlighted in the inventory)
 - Added compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
 - RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
++ Show the tuning stats in the Thaumaturgy inventory.
++ Show the amount of selected tuning points in the stats tuning inventory.
++ Highlight the selected template in the stats tuning inventory.
++ Show the type of stats for the tuning point templates.
 
 ## Item Abilities
 - Show the cooldown of items in the inventory.
