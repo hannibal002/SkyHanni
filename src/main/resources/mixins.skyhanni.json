@@ -9,6 +9,7 @@
     "AccessorGuiPlayerTabOverlay",
     "MixinRenderManager",
     "gui.MixinGuiContainer",
+    "gui.AccessorGuiContainer",
     "gui.inventory.GuiEditSignMixin",
     "tileentity.TileEntitySignMixin",
     "renderer.MixinBlockRendererDispatcher",

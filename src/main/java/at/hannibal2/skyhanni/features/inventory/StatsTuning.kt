@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -21,7 +21,7 @@ class StatsTuning {
     private val patternStatPoints = Pattern.compile("§7Stat has: §e(\\d+) point(s)?")
 
     @SubscribeEvent
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         val screen = Minecraft.getMinecraft().currentScreen
         if (screen !is GuiChest) return
         val chest = screen.inventorySlots as ContainerChest
