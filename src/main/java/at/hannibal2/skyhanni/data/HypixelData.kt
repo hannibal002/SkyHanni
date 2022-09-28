@@ -82,14 +82,14 @@ class HypixelData {
 
         val newState = checkScoreboard()
         if (newState) {
-            checkMode()
+            checkIsland()
         }
 
         if (newState == skyblock) return
         skyblock = newState
     }
 
-    private fun checkMode() {
+    private fun checkIsland() {
         var newIsland = ""
         var guesting = false
         for (line in TabListUtils.getTabList()) {
