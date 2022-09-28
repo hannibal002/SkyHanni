@@ -60,8 +60,8 @@ class ApiKeyGrabber {
         for (entry in profiles.entrySet()) {
             val asJsonObject = entry.value.asJsonObject
             val name = asJsonObject["cute_name"].asString
-            val profileId = asJsonObject["profile_id"].asString
             if (currentProfileName == name.lowercase()) {
+                val profileId = asJsonObject["profile_id"].asString
                 loadProfile(apiKey, uuid, profileId)
             }
         }
