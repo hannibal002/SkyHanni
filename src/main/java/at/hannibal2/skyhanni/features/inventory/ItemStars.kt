@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -62,28 +61,12 @@ class ItemStars {
     }
 
     @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-        if (!LorenzUtils.inSkyblock) return
+    fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(6)) return
 
-        val stack = event.stack ?: return
-        if (stack.stackSize != 1) return
+        val stack = event.stack
         val number = getCrimsonStars(stack.name ?: return)
-        val stackTip = if (number == -1) "" else number.toString()
-
-        if (stackTip.isNotEmpty()) {
-            GlStateManager.disableLighting()
-            GlStateManager.disableDepth()
-            GlStateManager.disableBlend()
-            event.fontRenderer.drawStringWithShadow(
-                stackTip,
-                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),//TODO search for this line and replace all other methods into an api
-                (event.y + 9).toFloat(),
-                16777215
-            )
-            GlStateManager.enableLighting()
-            GlStateManager.enableDepth()
-        }
+        event.stackTip = if (number == -1) "" else number.toString()
     }
 
     private fun getStars(name: String): Int {

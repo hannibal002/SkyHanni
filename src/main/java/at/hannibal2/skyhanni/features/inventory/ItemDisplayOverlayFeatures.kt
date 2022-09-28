@@ -1,41 +1,21 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-        val stack = event.stack ?: return
-
-        if (!LorenzUtils.inSkyblock || stack.stackSize != 1) return
-
-        val stackTip = getStackTip(stack)
-
-        if (stackTip.isNotEmpty()) {
-            GlStateManager.disableLighting()
-            GlStateManager.disableDepth()
-            GlStateManager.disableBlend()
-            event.fontRenderer.drawStringWithShadow(
-                stackTip,
-                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),
-                (event.y + 9).toFloat(),
-                16777215
-            )
-            GlStateManager.enableLighting()
-            GlStateManager.enableDepth()
-        }
+    fun onRenderItemTip(event: RenderItemTipEvent) {
+        event.stackTip = getStackTip(event.stack)
     }
 
     private fun getStackTip(item: ItemStack): String {

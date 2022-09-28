@@ -79,6 +79,7 @@ public class SkyHanniMod {
     public void preInit(FMLPreInitializationEvent event) {
         logger = LogManager.getLogger("SkyHanni");
 
+        //API and utils
         new BazaarApi();
         registerEvent(this);
         registerEvent(new ChatManager());
@@ -93,7 +94,9 @@ public class SkyHanniMod {
         registerEvent(new ItemClickData());
         registerEvent(new MinecraftData());
         registerEvent(new SendTitleHelper());
+        registerEvent(new ItemTipHelper());
 
+        //features
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());
         registerEvent(new PlayerChatFormatter());
