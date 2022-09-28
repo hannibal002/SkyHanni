@@ -63,10 +63,11 @@ class ItemStars {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(6)) return
-
         val stack = event.stack
         val number = getCrimsonStars(stack.name ?: return)
-        event.stackTip = if (number == -1) "" else number.toString()
+        if (number != -1) {
+            event.stackTip = number.toString()
+        }
     }
 
     private fun getStars(name: String): Int {

@@ -76,15 +76,6 @@ class LorenzTest {
             println("shouldLogPackets: $shouldLogPackets")
         }
 
-        private var highestStep = 0
-
-        fun highStep(step: Int) {
-            if (step > highestStep) {
-                highestStep = step
-                text = "" + highestStep
-            }
-        }
-
         fun reloadListeners() {
             val blockedFeatures = try {
                 File("config/skyhanni/blocked-features.txt").readLines().toList()
