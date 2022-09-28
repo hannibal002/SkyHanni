@@ -110,7 +110,7 @@ class SlayerQuestWarning {
                 if (bossSlain) {
                     needNewQuest("You have no Auto-Slayer active!")
                 } else if (slayBoss) {
-                    needNewQuest("You probably switched the server during an active boss and how hypixel doesn't know what to do.")
+                    needNewQuest("You probably switched the server during an active boss and now hypixel doesn't know what to do.")
                 }
             }
         }

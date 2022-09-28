@@ -53,7 +53,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
         if (SkyHanniMod.feature.dev.filterUnknownSound) {
-            if (formattedMessage == "Unable to play unknown soundEvent: minecraft:") {
+            if (formattedMessage.startsWith("Unable to play unknown soundEvent: minecraft:")) {
                 filterConsole("Unknown soundEvent (minecraft:)")
                 return Filter.Result.DENY
             }
