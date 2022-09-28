@@ -17,6 +17,7 @@ import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.File
 
 class LorenzTest {
 
@@ -85,10 +86,23 @@ class LorenzTest {
         }
 
         fun reloadListeners() {
+            val blockedFeatures = try {
+                File("config/skyhanni/blocked-features.txt").readLines().toList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+
             val listenerClasses = SkyHanniMod.listenerClasses
             for (any in listenerClasses) {
+                val simpleName = any.javaClass.simpleName
                 MinecraftForge.EVENT_BUS.unregister(any)
-                MinecraftForge.EVENT_BUS.register(any)
+                println("Unregistered listener $simpleName")
+                if (simpleName !in blockedFeatures) {
+                    MinecraftForge.EVENT_BUS.register(any)
+                    println("Registered listener $simpleName")
+                } else {
+                    println("Skipped registering listener $simpleName")
+                }
             }
             LorenzUtils.chat("§e[SkyHanni] reloaded ${listenerClasses.size} listener classes.")
         }
