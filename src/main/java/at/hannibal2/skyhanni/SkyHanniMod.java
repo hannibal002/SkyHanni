@@ -21,10 +21,7 @@ import at.hannibal2.skyhanni.features.end.VoidlingExtremistColor;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.features.fishing.TrophyFishMessages;
-import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems;
-import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures;
-import at.hannibal2.skyhanni.features.inventory.ItemStars;
-import at.hannibal2.skyhanni.features.inventory.RngMeterInventory;
+import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
@@ -152,6 +149,7 @@ public class SkyHanniMod {
         registerEvent(new PlayerChatFilter());
         registerEvent(new HideArmor());
         registerEvent(new SlayerQuestWarning());
+        registerEvent(new StatsTuning());
 
         Commands.init();
 
