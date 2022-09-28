@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixinhooks.render
+package at.hannibal2.skyhanni.mixins.hooks.render
 
 import at.hannibal2.skyhanni.events.RenderBlockInWorldEvent
 import net.minecraft.block.state.IBlockState
