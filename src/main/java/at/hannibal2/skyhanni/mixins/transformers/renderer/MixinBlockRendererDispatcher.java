@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.render.BlockRendererDispatcherHookKt;
+import at.hannibal2.skyhanni.mixinhooks.render.BlockRendererDispatcherHookKt;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
