@@ -1,122 +1,51 @@
-package at.hannibal2.skyhanni.config.commands;
+package at.hannibal2.skyhanni.config.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.ConfigEditor;
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
-import at.hannibal2.skyhanni.features.MarkedPlayerManager;
-import at.hannibal2.skyhanni.test.LorenzTest;
-import at.hannibal2.skyhanni.test.command.CopyItemCommand;
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraftforge.client.ClientCommandHandler;
-import org.apache.commons.lang3.StringUtils;
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigEditor
+import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
+import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
+import at.hannibal2.skyhanni.features.MarkedPlayerManager
+import at.hannibal2.skyhanni.test.LorenzTest
+import at.hannibal2.skyhanni.test.command.CopyItemCommand
+import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
+import net.minecraft.command.ICommandSender
+import net.minecraftforge.client.ClientCommandHandler
+import org.apache.commons.lang3.StringUtils
 
-public class Commands {
+object Commands {
 
-    private static final SimpleCommand.ProcessCommandRunnable mainMenu = new SimpleCommand.ProcessCommandRunnable() {
-        public void processCommand(ICommandSender sender, String[] args) {
-            if (args.length > 0) {
-                SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, StringUtils.join(args, " ")));
-            } else {
-                SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature));
+    private val openMainMenu: (Array<String>) -> Unit = {
+        if (it.isNotEmpty()) {
+            SkyHanniMod.screenToOpen =
+                GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature, StringUtils.join(it, " ")))
+        } else {
+            SkyHanniMod.screenToOpen = GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature))
+        }
+    }
+
+    @JvmStatic
+    fun init() {
+        registerCommand("sh", openMainMenu)
+        registerCommand("skyhanni", openMainMenu)
+        registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
+        registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
+        registerCommand("testhanni") { LorenzTest.testCommand(it) }
+        registerCommand("copyentities") { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand("copyitem") { CopyItemCommand.command(it) }
+        registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig() }
+        registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
+        registerCommand("togglepacketlog") { LorenzTest.togglePacketLog() }
+        registerCommand("shreloadlisteners") { LorenzTest.reloadListeners() }
+    }
+
+    private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
+        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+    }
+
+    private fun createCommand(function: (Array<String>) -> Unit) =
+        object : ProcessCommandRunnable() {
+            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
+                function(args.asList().toTypedArray())
             }
         }
-    };
-
-    public static void init() {
-        ClientCommandHandler.instance.registerCommand(new SimpleCommand("sh", mainMenu));
-        ClientCommandHandler.instance.registerCommand(new SimpleCommand("skyhanni", mainMenu));
-
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "shreloadlocalrepo",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                SkyHanniMod.repo.reloadLocalRepo();
-                            }
-                        }
-                )
-        );
-
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "shupdaterepo",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                SkyHanniMod.repo.updateRepo();
-                            }
-                        }
-                )
-        );
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "testhanni",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                LorenzTest.Companion.testCommand(args);
-                            }
-                        }
-                )
-        );
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "copyentities",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                CopyNearbyEntitiesCommand.INSTANCE.command(args);
-                            }
-                        }
-                )
-        );
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "copyitem",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                CopyItemCommand.INSTANCE.command(args);
-                            }
-                        }
-                )
-        );
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "shconfigsave",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                SkyHanniMod.configManager.saveConfig();
-                            }
-                        }
-                )
-        );
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "shmarkplayer",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                MarkedPlayerManager.Companion.command(args);
-                            }
-                        }
-                )
-        );
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "togglepacketlog",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                LorenzTest.Companion.togglePacketLog();
-                            }
-                        }
-                )
-        );
-        ClientCommandHandler.instance.registerCommand(
-                new SimpleCommand(
-                        "shreloadlisteners",
-                        new SimpleCommand.ProcessCommandRunnable() {
-                            public void processCommand(ICommandSender sender, String[] args) {
-                                LorenzTest.Companion.reloadListeners();
-                            }
-                        }
-                )
-        );
-    }
 }
