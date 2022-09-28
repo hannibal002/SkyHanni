@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,39 +20,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class RngMeterInventory {
 
     @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-        if (!LorenzUtils.inSkyblock) return
-
+    fun onRenderItemTip(event: RenderItemTipEvent) {
         val screen = Minecraft.getMinecraft().currentScreen
         if (screen !is GuiChest) return
         val chest = screen.inventorySlots as ContainerChest
         val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
 
-        var stackTip = ""
 
-        val stack = event.stack ?: return
+        val stack = event.stack
         if (SkyHanniMod.feature.inventory.rngMeterFloorName) {
             if (chestName == "Catacombs RNG Meter") {
                 val name = stack.name ?: return
                 if (name.removeColor() == "RNG Meter") {
-                    stackTip = stack.getLore()[0].between("(", ")")
+                    event.stackTip = stack.getLore()[0].between("(", ")")
                 }
             }
-        }
-
-
-        if (stackTip.isNotEmpty()) {
-            GlStateManager.disableLighting()
-            GlStateManager.disableDepth()
-            GlStateManager.disableBlend()
-            event.fontRenderer.drawStringWithShadow(
-                stackTip,
-                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),
-                (event.y + 9).toFloat(),
-                16777215
-            )
-            GlStateManager.enableLighting()
-            GlStateManager.enableDepth()
         }
     }
 

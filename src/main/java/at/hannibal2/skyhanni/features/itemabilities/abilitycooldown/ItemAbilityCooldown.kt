@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -136,42 +135,25 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
+    fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
 
-        val item = event.stack ?: return
-        if (item.stackSize != 1) return
-
-        var stackTip = ""
+        val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val itemText = items.filter { it.key == item }
+        val itemText = items.filter { it.key == stack }
             .firstNotNullOfOrNull { it.value } ?: return
         if (guiOpen && !itemText.onCooldown) return
 
         val color = itemText.color
-        stackTip = color.getChatColor() + itemText.text
+        event.stackTip = color.getChatColor() + itemText.text
 
         if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
             var opacity = 130
             if (color == LorenzColor.GREEN) {
                 opacity = 80
             }
-            item.background = color.addOpacity(opacity).rgb
-        }
-
-        if (stackTip.isNotEmpty()) {
-            GlStateManager.disableLighting()
-            GlStateManager.disableDepth()
-            GlStateManager.disableBlend()
-            event.fontRenderer.drawStringWithShadow(
-                stackTip,
-                (event.x + 17 - event.fontRenderer.getStringWidth(stackTip)).toFloat(),
-                (event.y + 9).toFloat(),
-                16777215
-            )
-            GlStateManager.enableLighting()
-            GlStateManager.enableDepth()
+            stack.background = color.addOpacity(opacity).rgb
         }
     }
 
