@@ -84,4 +84,8 @@ object StringUtils {
         val incrementedLastChar = (lastChar.code + 1).toChar()
         return inputWithoutLastChar + incrementedLastChar
     }
+    fun UUID.toDashlessUUID(): String {
+        return toString().replace("-", "")
+    }
+
 }

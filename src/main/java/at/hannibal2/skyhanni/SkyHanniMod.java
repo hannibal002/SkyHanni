@@ -41,6 +41,8 @@ import at.hannibal2.skyhanni.features.summonings.SummoningMobManager;
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
+import kotlin.coroutines.EmptyCoroutineContext;
+import kotlinx.coroutines.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -69,6 +71,12 @@ public class SkyHanniMod {
     private static Logger logger;
 
     public static List<Object> listenerClasses = new ArrayList<>();
+    public static Job globalJob = JobKt.Job(null);
+    public static CoroutineScope coroutineScope =
+            CoroutineScopeKt.CoroutineScope(
+                    EmptyCoroutineContext.INSTANCE
+                            .plus(new CoroutineName("SkyHanni")) // I love calling KotLin from JaVa
+                            .plus(SupervisorKt.SupervisorJob(globalJob)));
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {

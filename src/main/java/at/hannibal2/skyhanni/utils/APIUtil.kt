@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.apache.http.client.config.RequestConfig
@@ -19,7 +20,7 @@ object APIUtil {
     private val parser = JsonParser()
 
     val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("SkyHanni")
+        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),
