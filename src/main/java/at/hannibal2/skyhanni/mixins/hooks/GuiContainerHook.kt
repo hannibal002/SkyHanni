@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
@@ -20,13 +21,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
-        GuiContainerEvent.BackgroundDrawnEvent(
-            gui,
-            gui.inventorySlots,
-            mouseX,
-            mouseY,
-            partialTicks
-        ).postAndCatch()
+        GuiContainerEvent.BackgroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
     fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
@@ -34,12 +29,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
-        if (GuiContainerEvent.DrawSlotEvent.Pre(
-                gui,
-                gui.inventorySlots,
-                slot
-            ).postAndCatch()
-        ) ci.cancel()
+        if (GuiContainerEvent.DrawSlotEvent.Pre(gui, gui.inventorySlots, slot).postAndCatch()) ci.cancel()
     }
 
     fun onDrawSlotPost(slot: Slot, ci: CallbackInfo) {
@@ -47,15 +37,14 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
-        if (
-            SlotClickEvent(
-                gui,
-                gui.inventorySlots,
-                slot,
-                slotId,
-                clickedButton,
-                clickType
-            ).postAndCatch()
-        ) ci.cancel()
+        if (SlotClickEvent(gui, gui.inventorySlots, slot, slotId, clickedButton, clickType).postAndCatch()) ci.cancel()
+    }
+
+    fun onDrawScreenAfter(
+        mouseX: Int,
+        mouseY: Int,
+        ci: CallbackInfo,
+    ) {
+        if (DrawScreenAfterEvent(mouseX, mouseY, ci).postAndCatch()) ci.cancel()
     }
 }

@@ -45,4 +45,15 @@ public abstract class MixinGuiContainer extends GuiScreen {
     private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
         hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
     }
+
+    @Inject(method = "drawScreen",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/GlStateManager;popMatrix()V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        hook.onDrawScreenAfter(mouseX, mouseY, ci);
+    }
 }
