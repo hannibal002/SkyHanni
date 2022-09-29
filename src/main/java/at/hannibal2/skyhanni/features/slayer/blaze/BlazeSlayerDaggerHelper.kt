@@ -52,8 +52,8 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.TWILIGHT
-        val second = Dagger.FIREDUST
+        val first = Dagger.values()[SkyHanniMod.feature.slayer.blazeFirstDagger]
+        val second = first.other()
 
         textTopLeft = format(holding, true, first, lastNearest)
         textTopRight = format(holding, true, second, lastNearest)
@@ -106,7 +106,6 @@ class BlazeSlayerDaggerHelper {
                 shield.chatColor + shield.cleanName
             }
         }
-
     }
 
     private fun checkActiveDagger() {
