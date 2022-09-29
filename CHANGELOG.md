@@ -20,6 +20,9 @@
 ### Changes
 + Showing Thunder Sparks while in lava
 
+### Fixes
++ Reduced lags after world switch
+
 ## Version 0.10 - Slayer
 
 ### Blaze Slayer
