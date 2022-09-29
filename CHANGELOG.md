@@ -20,6 +20,7 @@
 
 ### Changes
 + Showing Thunder Sparks while in lava
++ Damage indicator switches into cleaner design when close to boss and not in f5 view
 
 ### Fixes
 + Reduced lags after world switch
