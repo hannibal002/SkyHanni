@@ -18,7 +18,7 @@
 + Added Lord Jawbus to damage indicator
 
 ### Changes
-+ Showing Thunder Sparks under lava
++ Showing Thunder Sparks while in lava
 
 ## Version 0.10 - Slayer
 
