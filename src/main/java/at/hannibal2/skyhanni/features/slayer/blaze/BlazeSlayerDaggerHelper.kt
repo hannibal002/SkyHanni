@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.network.play.client.C07PacketPlayerDigging
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,9 +18,13 @@ import org.lwjgl.input.Keyboard
 
 class BlazeSlayerDaggerHelper {
 
-    var textToRenderMain = ""
-    var textToRenderOther = ""
     var clientSideClicked = false
+    var textTopLeft = ""
+    var textTopRight = ""
+    var textBottomLeft = ""
+    var textBottomRight = ""
+
+    var lastCheck = 0L
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -28,13 +32,59 @@ class BlazeSlayerDaggerHelper {
 
         val dagger = getDaggerInHand()
         if (dagger != null) {
-            textToRenderMain = getDaggerText(dagger)
-            textToRenderOther = getDaggerText(dagger.other())
+            setDaggerText(dagger)
             return
         }
 
-        textToRenderMain = ""
-        textToRenderOther = ""
+        textTopLeft = ""
+        textTopRight = ""
+        textBottomLeft = ""
+        textBottomRight = ""
+    }
+
+    private fun setDaggerText(holding: Dagger) {
+        checkActiveDagger()
+
+        val first = Dagger.TWILIGHT
+        val second = Dagger.FIREDUST
+
+        textTopLeft = format(holding, true, first)
+        textTopRight = format(holding, true, second)
+        textBottomLeft = format(holding, false, first)
+        textBottomRight = format(holding, false, second)
+    }
+
+    private fun format(dagger: Dagger, active: Boolean, compareInHand: Dagger): String {
+        var daggerInHand = dagger
+        val inHand = dagger == compareInHand
+
+        if (!inHand) {
+            daggerInHand = daggerInHand.other()
+        }
+
+        var shield = daggerInHand.getActive()
+        if (!active) {
+            shield = shield.other()
+        }
+
+        return if (inHand && active) {
+            "§7[" + shield.chatColor + shield.cleanName + "§7]"
+        } else {
+            shield.chatColor + shield.cleanName
+        }
+
+    }
+
+    private fun checkActiveDagger() {
+        if (lastCheck + 1_000 > System.currentTimeMillis()) return
+        lastCheck = System.currentTimeMillis()
+
+        for (dagger in Dagger.values()) {
+            val first = dagger.shields[0]
+            if (!first.active && !dagger.shields[1].active) {
+                first.active = true
+            }
+        }
     }
 
     private fun getDaggerInHand(): Dagger? {
@@ -47,20 +97,6 @@ class BlazeSlayerDaggerHelper {
         }
 
         return null
-    }
-
-    private fun getDaggerText(dagger: Dagger): String {
-        var activeAbility = ""
-        var inactiveAbility = ""
-        for (shield in dagger.shields) {
-            if (shield.active) {
-                activeAbility = shield.chatColor + "§l" + shield
-            } else {
-                inactiveAbility = " §7/ " + shield.chatColor + shield.toString().lowercase()
-            }
-        }
-        if (activeAbility == "") return ""
-        return "$activeAbility$inactiveAbility"
     }
 
     private fun getName(player: EntityPlayerSP): String {
@@ -98,18 +134,14 @@ class BlazeSlayerDaggerHelper {
     @SubscribeEvent
     fun onRightClick(event: PacketEvent.SendEvent) {
         if (!isEnabled()) return
-
         if (clientSideClicked) return
 
         val packet = event.packet
 
-        if (packet is C07PacketPlayerDigging) {
-            val status = packet.status
-            if (status == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
-                val dagger = getDaggerInHand()
-                dagger?.shields?.forEach { shield -> shield.active = !shield.active }
-                clientSideClicked = true
-            }
+        if (packet is C08PacketPlayerBlockPlacement) {
+            val dagger = getDaggerInHand()
+            dagger?.shields?.forEach { shield -> shield.active = !shield.active }
+            clientSideClicked = true
         }
     }
 
@@ -131,6 +163,15 @@ class BlazeSlayerDaggerHelper {
         } else {
             TWILIGHT
         }
+
+        fun getActive(): HellionShield {
+            for (shield in shields) {
+                if (shield.active) {
+                    return shield
+                }
+            }
+            throw RuntimeException("no active shield found for dagger $this")
+        }
     }
 
     @SubscribeEvent
@@ -151,15 +192,41 @@ class BlazeSlayerDaggerHelper {
         val renderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.pushMatrix()
-        GlStateManager.translate((width / 2).toFloat(), (height / 3.8).toFloat(), 0.0f)
+        GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderMain, renderer, 0f, 0f, false, 55, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopLeft, renderer, 0f, 0f, false, 60, 0)
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
-        GlStateManager.translate((width / 2).toFloat(), (height / 3.2).toFloat(), 0.0f)
+        GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRenderOther, renderer, 0f, 0f, false, 40, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopRight, renderer, 0f, 0f, false, 60, 0)
+        GlStateManager.popMatrix()
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
+        GlStateManager.scale(4.0f, 4.0f, 4.0f)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomLeft, renderer, 0f, 0f, false, 20, 0)
+        GlStateManager.popMatrix()
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
+        GlStateManager.scale(4.0f, 4.0f, 4.0f)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomRight, renderer, 0f, 0f, false, 20, 0)
         GlStateManager.popMatrix()
     }
+}
+
+private fun HellionShield.other(): HellionShield {
+    for (dagger in BlazeSlayerDaggerHelper.Dagger.values()) {
+        if (this in dagger.shields) {
+            for (shield in dagger.shields) {
+                if (shield != this) {
+                    return shield
+                }
+            }
+        }
+    }
+
+    throw RuntimeException("Found no other shield for $this")
 }
