@@ -2,15 +2,15 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
+import at.hannibal2.skyhanni.events.ItemClickInHandEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,7 +31,8 @@ class BlazeSlayerDaggerHelper {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        val dagger = getDaggerInHand()
+        val player = Minecraft.getMinecraft().thePlayer
+        val dagger = getDaggerInHand(player.inventory.mainInventory[player.inventory.currentItem])
         if (dagger != null) {
             setDaggerText(dagger)
             return
@@ -88,9 +89,8 @@ class BlazeSlayerDaggerHelper {
         }
     }
 
-    private fun getDaggerInHand(): Dagger? {
-        val player = Minecraft.getMinecraft().thePlayer
-        val itemName = getName(player)
+    private fun getDaggerInHand(stack: ItemStack?): Dagger? {
+        val itemName = stack?.name ?: ""
         for (dagger in Dagger.values()) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger
@@ -98,11 +98,6 @@ class BlazeSlayerDaggerHelper {
         }
 
         return null
-    }
-
-    private fun getName(player: EntityPlayerSP): String {
-        val itemStack = player.inventory.mainInventory[player.inventory.currentItem] ?: return ""
-        return itemStack.name ?: ""
     }
 
     @SubscribeEvent
@@ -133,17 +128,16 @@ class BlazeSlayerDaggerHelper {
     }
 
     @SubscribeEvent
-    fun onRightClick(event: PacketEvent.SendEvent) {
+    fun onItemClick(event: ItemClickInHandEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return
+        if (event.clickType != ItemClickInHandEvent.ClickType.RIGHT_CLICK) return
 
-        val packet = event.packet
+        val itemInHand = event.itemInHand ?: return
+        val dagger = getDaggerInHand(itemInHand)
+        dagger?.shields?.forEach { shield -> shield.active = !shield.active }
+        clientSideClicked = true
 
-        if (packet is C08PacketPlayerBlockPlacement) {
-            val dagger = getDaggerInHand()
-            dagger?.shields?.forEach { shield -> shield.active = !shield.active }
-            clientSideClicked = true
-        }
     }
 
     enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield) {
