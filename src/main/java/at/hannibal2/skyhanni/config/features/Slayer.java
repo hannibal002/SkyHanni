@@ -53,6 +53,12 @@ public class Slayer {
     public boolean blazeMarkRightHellionShield = false;
 
     @Expose
+    @ConfigOption(name = "First Dagger", desc = "Select the first, left sided dagger for the display.")
+    @ConfigEditorDropdown(values = {"Spirit/Crystal", "Ashen/Auric"})
+    @ConfigAccordionId(id = 2)
+    public int blazeFirstDagger = 0;
+
+    @Expose
     @ConfigOption(name = "Fire Pillars", desc = "")
     @ConfigEditorAccordion(id = 3)
     @ConfigAccordionId(id = 1)
