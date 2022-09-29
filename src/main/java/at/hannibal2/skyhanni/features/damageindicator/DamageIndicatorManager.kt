@@ -90,11 +90,8 @@ class DamageIndicatorManager {
 
         //TODO config to define between 100ms and 5 sec
         for (uuid in data.filter {
-            (System.currentTimeMillis() > it.value.timeLastTick + if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100) ||
-                    (it.value.dead && noDeathDisplay(it.value.bossType))
-        }
-            .map { it.key }) {
-            data.remove(uuid)
+            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
+            (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType)) }.map { it.key }) { data.remove(uuid)
         }
 
         var playerLocation = LocationUtils.playerLocation()
@@ -145,7 +142,9 @@ class DamageIndicatorManager {
             RenderUtils.drawLabel(location, healthText, partialTicks, true, 6f)
 
             if (data.nameAbove.isNotEmpty()) {
-                RenderUtils.drawLabel(location, data.nameAbove, partialTicks, true, 3.9f, if (tooClose) -9.0f else -18.0f)
+                RenderUtils.drawLabel(
+                    location, data.nameAbove, partialTicks, true, 3.9f, if (tooClose) -9.0f else -18.0f
+                )
             }
 
             if (tooClose) continue
@@ -372,7 +371,7 @@ class DamageIndicatorManager {
             BossType.NETHER_BARBARIAN_DUKE,
             -> {
                 val location = entity.getLorenzVec()
-                entityData.ignoreBlocks = location.y == 117.0
+                entityData.ignoreBlocks = location.y == 117.0 && location.distance(LocationUtils.playerLocation()) < 15
             }
 
             else -> return ""
