@@ -6,6 +6,7 @@
 + Added toggle to ender slayer phase display
 + Added blaze slayer phase display
 + Added toggle for blaze slayer colored mobs
++ Mark the right dagger to use for blaze slayer in the dagger overlay.
 
 ### Stats Tuning
 + Show the tuning stats in the Thaumaturgy inventory.

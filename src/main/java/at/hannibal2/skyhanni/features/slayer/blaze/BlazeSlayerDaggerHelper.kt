@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
 import at.hannibal2.skyhanni.events.ItemClickInHandEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -19,13 +21,15 @@ import org.lwjgl.input.Keyboard
 
 class BlazeSlayerDaggerHelper {
 
-    var clientSideClicked = false
-    var textTopLeft = ""
-    var textTopRight = ""
-    var textBottomLeft = ""
-    var textBottomRight = ""
+    private var clientSideClicked = false
+    private var textTopLeft = ""
+    private var textTopRight = ""
+    private var textBottomLeft = ""
+    private var textBottomRight = ""
 
-    var lastCheck = 0L
+    private var lastDaggerCheck = 0L
+    private var lastNearestCheck = 0L
+    private var lastNearest: HellionShield? = null
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -46,17 +50,33 @@ class BlazeSlayerDaggerHelper {
 
     private fun setDaggerText(holding: Dagger) {
         checkActiveDagger()
+        lastNearest = findNearest()
 
         val first = Dagger.TWILIGHT
         val second = Dagger.FIREDUST
 
-        textTopLeft = format(holding, true, first)
-        textTopRight = format(holding, true, second)
-        textBottomLeft = format(holding, false, first)
-        textBottomRight = format(holding, false, second)
+        textTopLeft = format(holding, true, first, lastNearest)
+        textTopRight = format(holding, true, second, lastNearest)
+        textBottomLeft = format(holding, false, first, lastNearest)
+        textBottomRight = format(holding, false, second, lastNearest)
     }
 
-    private fun format(dagger: Dagger, active: Boolean, compareInHand: Dagger): String {
+    private fun findNearest(): HellionShield? {
+        if (!SkyHanniMod.feature.slayer.blazeMarkRightHellionShield) return null
+
+        if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
+        lastNearestCheck = System.currentTimeMillis()
+
+
+        val playerLocation = LocationUtils.playerLocation()
+        return HellionShieldHelper.hellionShieldMobs
+            .filter { it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.health > 0 }
+            .toSortedMap { a, b ->
+                if (a.getLorenzVec().distance(playerLocation) < b.getLorenzVec().distance(playerLocation)) 1 else 0
+            }.firstNotNullOfOrNull { it.value }
+    }
+
+    private fun format(dagger: Dagger, active: Boolean, compareInHand: Dagger, nearestShield: HellionShield?): String {
         var daggerInHand = dagger
         val inHand = dagger == compareInHand
 
@@ -70,16 +90,28 @@ class BlazeSlayerDaggerHelper {
         }
 
         return if (inHand && active) {
-            "§7[" + shield.chatColor + shield.cleanName + "§7]"
+            if (nearestShield == null) {
+                "§7[" + shield.chatColor + shield.cleanName + "§7]"
+            } else {
+                if ((shield == nearestShield)) {
+                    "§a[" + shield.chatColor + shield.cleanName.uppercase() + "§a]"
+                } else {
+                    "§c[§m" + shield.chatColor + shield.cleanName + "§c]"
+                }
+            }
         } else {
-            shield.chatColor + shield.cleanName
+            if (shield == nearestShield) {
+                "§6[" + shield.chatColor + shield.cleanName + "§6]"
+            } else {
+                shield.chatColor + shield.cleanName
+            }
         }
 
     }
 
     private fun checkActiveDagger() {
-        if (lastCheck + 1_000 > System.currentTimeMillis()) return
-        lastCheck = System.currentTimeMillis()
+        if (lastDaggerCheck + 1_000 > System.currentTimeMillis()) return
+        lastDaggerCheck = System.currentTimeMillis()
 
         for (dagger in Dagger.values()) {
             val first = dagger.shields[0]
@@ -191,25 +223,57 @@ class BlazeSlayerDaggerHelper {
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopLeft, renderer, 0f, 0f, false, (60f * sizeFactor).toInt(), 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(
+            textTopLeft,
+            renderer,
+            0f,
+            0f,
+            false,
+            (60f * sizeFactor).toInt(),
+            0
+        )
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopRight, renderer, 0f, 0f, false, (60f * sizeFactor).toInt(), 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(
+            textTopRight,
+            renderer,
+            0f,
+            0f,
+            false,
+            (60f * sizeFactor).toInt(),
+            0
+        )
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomLeft, renderer, 0f, 0f, false, (20f * sizeFactor).toInt(), 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(
+            textBottomLeft,
+            renderer,
+            0f,
+            0f,
+            false,
+            (20f * sizeFactor).toInt(),
+            0
+        )
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomRight, renderer, 0f, 0f, false, (20f * sizeFactor).toInt(), 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(
+            textBottomRight,
+            renderer,
+            0f,
+            0f,
+            false,
+            (20f * sizeFactor).toInt(),
+            0
+        )
         GlStateManager.popMatrix()
     }
 }
