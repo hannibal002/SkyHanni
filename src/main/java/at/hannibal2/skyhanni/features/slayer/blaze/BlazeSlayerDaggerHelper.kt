@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
 import at.hannibal2.skyhanni.events.ItemClickInHandEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -36,7 +37,7 @@ class BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
         val player = Minecraft.getMinecraft().thePlayer
-        val dagger = getDaggerInHand(player.inventory.mainInventory[player.inventory.currentItem])
+        val dagger = getDaggerFromStack(player.inventory.mainInventory[player.inventory.currentItem])
         if (dagger != null) {
             setDaggerText(dagger)
             return
@@ -113,14 +114,42 @@ class BlazeSlayerDaggerHelper {
         lastDaggerCheck = System.currentTimeMillis()
 
         for (dagger in Dagger.values()) {
+            if (dagger.updated) continue
+
             val first = dagger.shields[0]
             if (!first.active && !dagger.shields[1].active) {
-                first.active = true
+
+                val shield = readFromInventory(dagger)
+                if (shield != null) {
+                    shield.active = true
+                    dagger.updated = true
+                } else {
+                    first.active = true
+                }
             }
         }
     }
 
-    private fun getDaggerInHand(stack: ItemStack?): Dagger? {
+    private fun readFromInventory(dagger: Dagger): HellionShield? {
+        val player = Minecraft.getMinecraft().thePlayer
+        for (stack in player.inventory.mainInventory) {
+            val otherDagger = getDaggerFromStack(stack) ?: continue
+            if (dagger != otherDagger) continue
+            for (line in stack.getLore()) {
+                if (!line.contains("§7Attuned: ")) continue
+
+                for (shield in dagger.shields) {
+                    if (line.contains(shield.cleanName)) {
+                        return shield
+                    }
+                }
+            }
+        }
+
+        return null
+    }
+
+    private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
         val itemName = stack?.name ?: ""
         for (dagger in Dagger.values()) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
@@ -145,6 +174,7 @@ class BlazeSlayerDaggerHelper {
             if (shield.formattedName + "§r" == formattedText) {
                 Dagger.values().filter { shield in it.shields }.forEach {
                     it.shields.forEach { shield -> shield.active = false }
+                    it.updated = true
                 }
                 shield.active = true
                 event.isCanceled = true
@@ -165,13 +195,13 @@ class BlazeSlayerDaggerHelper {
         if (event.clickType != ItemClickInHandEvent.ClickType.RIGHT_CLICK) return
 
         val itemInHand = event.itemInHand ?: return
-        val dagger = getDaggerInHand(itemInHand)
+        val dagger = getDaggerFromStack(itemInHand)
         dagger?.shields?.forEach { shield -> shield.active = !shield.active }
         clientSideClicked = true
 
     }
 
-    enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield) {
+    enum class Dagger(val daggerNames: List<String>, vararg val shields: HellionShield, var updated: Boolean = false) {
         TWILIGHT(
             listOf("Twilight Dagger", "Mawdredge Dagger", "Deathripper Dagger"),
             HellionShield.SPIRIT,
