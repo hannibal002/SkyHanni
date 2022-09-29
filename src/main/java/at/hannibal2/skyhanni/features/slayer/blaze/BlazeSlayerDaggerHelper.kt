@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.ScaledResolution
@@ -178,14 +179,16 @@ class BlazeSlayerDaggerHelper {
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
+        if (textTopLeft.isEmpty()) return
 
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindPlayerList.keyCode)) return
 
-
         val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
         val width = scaledResolution.scaledWidth
         val height = scaledResolution.scaledHeight
+
+        val sizeFactor = (width.toFloat() / 960f).roundToPrecision(3)
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
@@ -194,25 +197,25 @@ class BlazeSlayerDaggerHelper {
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopLeft, renderer, 0f, 0f, false, 60, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopLeft, renderer, 0f, 0f, false, (60f * sizeFactor).toInt(), 0)
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopRight, renderer, 0f, 0f, false, 60, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textTopRight, renderer, 0f, 0f, false, (60f * sizeFactor).toInt(), 0)
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) / 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomLeft, renderer, 0f, 0f, false, 20, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomLeft, renderer, 0f, 0f, false, (20f * sizeFactor).toInt(), 0)
         GlStateManager.popMatrix()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(((width / 2) * 1.18).toFloat(), (height / 3.0).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomRight, renderer, 0f, 0f, false, 20, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(textBottomRight, renderer, 0f, 0f, false, (20f * sizeFactor).toInt(), 0)
         GlStateManager.popMatrix()
     }
 }
