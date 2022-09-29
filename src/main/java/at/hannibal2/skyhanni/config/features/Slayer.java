@@ -29,34 +29,58 @@ public class Slayer {
     public boolean blaze = false;
 
     @Expose
+    @ConfigOption(name = "Hellion Shields", desc = "")
+    @ConfigEditorAccordion(id = 2)
+    @ConfigAccordionId(id = 1)
+    public boolean blazeHellion = false;
+
+    @Expose
+    @ConfigOption(name = "Colored Mobs", desc = "Color the blaze slayer boss and the demons in the right hellion shield color.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean blazeColoredMobs = false;
+
+    @Expose
+    @ConfigOption(name = "Blaze Daggers", desc = "Faster and permanent display for the Blaze Slayer daggers.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean blazeDaggers = false;
+
+    @Expose
+    @ConfigOption(name = "Right Dagger", desc = "Mark the right dagger to use for blaze slayer in the dagger overlay.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean blazeMarkRightHellionShield = false;
+
+    @Expose
+    @ConfigOption(name = "Fire Pillars", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    @ConfigAccordionId(id = 1)
+    public boolean blazePillars = false;
+
+    @Expose
     @ConfigOption(name = "Pillar Display", desc = "Cooldown when the Fire Pillar from the Blaze Slayer will kill you.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 3)
     public boolean firePillarDisplay = false;
 
     @Expose
     @ConfigOption(name = "Pillar Display Position", desc = "")
     @ConfigEditorButton(runnableId = "firePillar", buttonText = "Edit")
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 3)
     public Position firePillarPos = new Position(10, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer for the Blaze Slayer.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 3)
     public boolean firePillarSound = false;
 
     @Expose
     @ConfigOption(name = "Hide Pillar", desc = "Hide sound and entities when building the Fire Pillar for the Blaze Slayer.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
+    @ConfigAccordionId(id = 3)
     public boolean firePillarBuildHider = false;
-
-    @Expose
-    @ConfigOption(name = "Blaze Daggers", desc = "Faster and permanent display for the Blaze Slayer daggers.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    public boolean blazeDaggers = false;
 
     @Expose
     @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4.")
@@ -69,12 +93,6 @@ public class Slayer {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean blazePhaseDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Colored Mobs", desc = "Color the blaze slayer boss and the demons in the right hellion shield color.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    public boolean blazeColoredMobs = false;
 
     @Expose
     @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
