@@ -112,6 +112,11 @@ public class Features extends Config {
             HideArmor.Companion.updateArmor();
             return;
         }
+
+        if (runnableId.equals("nonGodPotEffect")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.nonGodPotEffectPos);
+            return;
+        }
     }
 
     @Expose

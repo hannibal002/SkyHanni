@@ -135,3 +135,4 @@
 - Highlight corrupted mobs in purple color.
 - Option to hide all damage splashes, from anywhere in Skyblock.
 - Hide armor or just helmet of other player or yourself
+- Display the active non-god potion effects.

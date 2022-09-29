@@ -106,4 +106,21 @@ public class Misc {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
+
+    @Expose
+    @ConfigOption(name = "Potion Effects", desc = "")
+    @ConfigEditorAccordion(id = 5)
+    public boolean potionEffects = false;
+
+    @Expose
+    @ConfigOption(name = "Non-God Pot Effects", desc = "Display the active non-god potion effects.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean nonGodPotEffectDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Real Time Position", desc = "")
+    @ConfigEditorButton(runnableId = "nonGodPotEffect", buttonText = "Edit")
+    @ConfigAccordionId(id = 5)
+    public Position nonGodPotEffectPos = new Position(10, 10, false, true);
 }
