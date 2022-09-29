@@ -97,6 +97,8 @@ class DamageIndicatorManager {
             data.remove(uuid)
         }
 
+        var playerLocation = LocationUtils.playerLocation()
+
         for (data in data.values) {
 
             //TODO test end stone protector in hole? - maybe change eye pos
@@ -120,7 +122,7 @@ class DamageIndicatorManager {
             }
 
             val partialTicks = event.partialTicks
-
+            var tooClose = false
             val location = if (data.dead && data.deathLocation != null) {
                 data.deathLocation!!
             } else {
@@ -130,12 +132,23 @@ class DamageIndicatorManager {
                     RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
                 )
                 if (data.dead) data.deathLocation = loc
-                loc
+                val distance = loc.distance(playerLocation)
+                Minecraft.getMinecraft().renderManager
+                tooClose = distance < 5 && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
+                if (tooClose) {
+                    loc.add(0.0, -1.0, 0.0)
+                } else {
+                    loc
+                }
             }
 
-//            if (!data.healthLineHidden) {
             RenderUtils.drawLabel(location, healthText, partialTicks, true, 6f)
-//            }
+
+            if (data.nameAbove.isNotEmpty()) {
+                RenderUtils.drawLabel(location, data.nameAbove, partialTicks, true, 3.9f, if (tooClose) -9.0f else -18.0f)
+            }
+
+            if (tooClose) continue
 
             var bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
                 0 -> ""
@@ -151,11 +164,6 @@ class DamageIndicatorManager {
                 bossName += data.nameSuffix
             }
             //TODO fix scaling problem
-
-            if (data.nameAbove.isNotEmpty()) {
-//                RenderUtils.drawLabel(location, data.nameAbove, partialTicks, true, 3.9f, -9.0f)
-                RenderUtils.drawLabel(location, data.nameAbove, partialTicks, true, 3.9f, -18.0f)
-            }
 
 //            val debug = Minecraft.getMinecraft().thePlayer.isSneaking
 //            RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f, debug = debug)
