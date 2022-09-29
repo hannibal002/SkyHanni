@@ -16,6 +16,7 @@
 
 ### Misc
 + Added Lord Jawbus to damage indicator
++ Display the active non-god potion effects.
 
 ### Changes
 + Showing Thunder Sparks while in lava

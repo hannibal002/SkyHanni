@@ -53,16 +53,16 @@ object StringUtils {
         val formatSeconds = durationFormat.format(sec)
 
         if (days > 0) {
-            return "${days}d $formatHours:$formatMinutes:$formatSeconds ago"
+            return "${days}d $formatHours:$formatMinutes:$formatSeconds"
         }
         if (hours > 0) {
-            return "$formatHours:$formatMinutes:$formatSeconds ago"
+            return "$formatHours:$formatMinutes:$formatSeconds".removeAtBeginning("0")
         }
         if (minutes > 0) {
-            return "$formatMinutes:$formatSeconds ago"
+            return "$formatMinutes:$formatSeconds".removeAtBeginning("0")
         }
         if (sec > 0) {
-            return "${sec}s ago"
+            return "${sec}s"
         }
 
         return "Now"
@@ -89,3 +89,5 @@ object StringUtils {
     }
 
 }
+
+private fun String.removeAtBeginning(text: String): String = if (this.startsWith(text)) substring(text.length) else this

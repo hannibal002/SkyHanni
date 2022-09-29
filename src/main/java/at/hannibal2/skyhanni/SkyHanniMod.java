@@ -153,6 +153,7 @@ public class SkyHanniMod {
         registerEvent(new HideArmor());
         registerEvent(new SlayerQuestWarning());
         registerEvent(new StatsTuning());
+        registerEvent(new NonGodPotEffectDisplay());
 
         Commands.init();
 
