@@ -134,6 +134,7 @@ class NonGodPotEffectDisplay {
             if (!lines.any { it.contains("§a§lActive Effects") }) return
             checkFooter = false
 
+            var effectsCount = 0
             for (line in lines) {
                 if (line.startsWith("§2Mushed Glowy Tonic I")) {
                     val duration = readDuration(line.split("§f")[1])
@@ -143,9 +144,10 @@ class NonGodPotEffectDisplay {
                 val matcher = patternEffectsCount.matcher(line)
                 if (matcher.matches()) {
                     val group = matcher.group(1)
-                    totalEffectsCount = group.toInt()
+                    effectsCount = group.toInt()
                 }
             }
+            totalEffectsCount = effectsCount
         }
     }
 
