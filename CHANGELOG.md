@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.10.1
+## Version 0.11
 
 ### Slayer
 + Added toggle to ender slayer phase display
