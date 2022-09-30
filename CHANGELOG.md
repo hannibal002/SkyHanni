@@ -9,6 +9,7 @@
 ### Changes
 + Removed more blaze slayer item drop message spam.
 + Showing number next to custom hellion shield from damage indicator
++ Blaze particles next to ashfang are now hidden when particles are disabled for ashfang.
 
 ## Version 0.11
 
