@@ -66,6 +66,10 @@ class DamageIndicatorManager {
         fun isBossSpawned(vararg types: BossType): Boolean {
             return types.any { isBossSpawned(it) }
         }
+
+        fun getBosses(): Collection<EntityData> {
+            return data.values
+        }
     }
 
     @SubscribeEvent
