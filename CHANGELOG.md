@@ -2,10 +2,13 @@
 
 ## Version 0.11.1
 
+### Features
++ Option to remove the wrong dagger messages from chat.
++ Hide particles and fireballs near blaze slayer bosses and demons.
+
 ### Changes
 + Removed more blaze slayer item drop message spam.
-+ Hide particles and fireballs near blaze slayer bosses and demons.
-+ Option to remove the wrong dagger messages from chat.
++ Showing number next to custom hellion shield from damage indicator
 
 ## Version 0.11
 
