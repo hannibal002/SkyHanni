@@ -1,5 +1,10 @@
 # SkyHanni - Change Log
 
+## Version 0.11.1
+
+### Changes
++ Removed more blaze slayer item drop message spam
+
 ## Version 0.11
 
 ### Slayer

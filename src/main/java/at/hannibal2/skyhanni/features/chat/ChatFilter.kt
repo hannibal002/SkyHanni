@@ -184,8 +184,7 @@ class ChatFilter {
         //Blaze
         if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)")) return true
         if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\dx §r§f§r§9Gabagool Distillate§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\dx §r§f§r§9Glowstone Distillate§r§7\\) (.*)")) return true
+        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§7\\dx §r§f§r§9(Gabagool|Glowstone|Blaze Rod) Distillate§r§7\\) (.*)")) return true
 
         return false
     }
