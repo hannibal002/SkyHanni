@@ -56,10 +56,10 @@ class BlazeSlayerDaggerHelper {
         val first = Dagger.values()[SkyHanniMod.feature.slayer.blazeFirstDagger]
         val second = first.other()
 
-        textTopLeft = format(holding, true, first, lastNearest)
-        textTopRight = format(holding, true, second, lastNearest)
-        textBottomLeft = format(holding, false, first, lastNearest)
-        textBottomRight = format(holding, false, second, lastNearest)
+        textTopLeft = format(holding, true, first)
+        textTopRight = format(holding, true, second)
+        textBottomLeft = format(holding, false, first)
+        textBottomRight = format(holding, false, second)
     }
 
     private fun findNearest(): HellionShield? {
@@ -73,11 +73,11 @@ class BlazeSlayerDaggerHelper {
         return HellionShieldHelper.hellionShieldMobs
             .filter { it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.health > 0 }
             .toSortedMap { a, b ->
-                if (a.getLorenzVec().distance(playerLocation) < b.getLorenzVec().distance(playerLocation)) 1 else 0
+                if (a.getLorenzVec().distance(playerLocation) > b.getLorenzVec().distance(playerLocation)) 1 else 0
             }.firstNotNullOfOrNull { it.value }
     }
 
-    private fun format(dagger: Dagger, active: Boolean, compareInHand: Dagger, nearestShield: HellionShield?): String {
+    private fun format(dagger: Dagger, active: Boolean, compareInHand: Dagger): String {
         var daggerInHand = dagger
         val inHand = dagger == compareInHand
 
@@ -91,17 +91,17 @@ class BlazeSlayerDaggerHelper {
         }
 
         return if (inHand && active) {
-            if (nearestShield == null) {
+            if (lastNearest == null) {
                 "§7[" + shield.chatColor + shield.cleanName + "§7]"
             } else {
-                if ((shield == nearestShield)) {
+                if ((shield == lastNearest)) {
                     "§a[" + shield.chatColor + shield.cleanName.uppercase() + "§a]"
                 } else {
                     "§c[§m" + shield.chatColor + shield.cleanName + "§c]"
                 }
             }
         } else {
-            if (shield == nearestShield) {
+            if (shield == lastNearest) {
                 "§6[" + shield.chatColor + shield.cleanName + "§6]"
             } else {
                 shield.chatColor + shield.cleanName
