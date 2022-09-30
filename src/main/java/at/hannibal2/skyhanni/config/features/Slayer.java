@@ -101,6 +101,12 @@ public class Slayer {
     public boolean blazePhaseDisplay = false;
 
     @Expose
+    @ConfigOption(name = "Clear View", desc = "Hide particles and fireballs near blaze slayer bosses and demons.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean blazeClearView = false;
+
+    @Expose
     @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
     @ConfigEditorBoolean
     public boolean slayerMinibossHighlight = false;

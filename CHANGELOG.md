@@ -3,7 +3,8 @@
 ## Version 0.11.1
 
 ### Changes
-+ Removed more blaze slayer item drop message spam
++ Removed more blaze slayer item drop message spam.
++ Hide particles and fireballs near blaze slayer bosses and demons.
 
 ## Version 0.11
 

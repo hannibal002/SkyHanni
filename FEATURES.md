@@ -113,6 +113,7 @@
 + Faster and permanent display for the Blaze Slayer daggers.
 + Mark the right dagger to use for blaze slayer in the dagger overlay.
 + Warning when the fire pit phase starts for the Blaze Slayer tier 3
++ Hide particles and fireballs near blaze slayer bosses and demons.
 + Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.
 
 ## Marked Players
