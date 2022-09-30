@@ -110,13 +110,7 @@ class LorenzTest {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-//        val message = event.message
-//        if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!")) {
-//            event.blockedReason = "lorenz_test"
-//        }
-//        if (message == "§cYour hit was reduced by Hellion Shield!") {
-//            event.blockedReason = "lorenz_test"
-//        }
+
     }
 
     @SubscribeEvent
