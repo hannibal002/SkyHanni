@@ -384,10 +384,20 @@ class DamageIndicatorManager {
     }
 
     private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String? {
-        val shield = HellionShield.values().firstOrNull { entity.hasNameTagWith(3, it.name) }
-        entity.setHellionShield(shield)
-        if (shield != null) {
-            entityData.nameAbove = shield.formattedName
+        val shields = HellionShield.values()
+        var found = false
+        for (shield in shields) {
+            val armorStand = entity.getNameTagWith(3, shield.name)
+            if (armorStand != null) {
+                val number = armorStand.name.split(" ♨")[1].substring(0, 1)
+                entity.setHellionShield(shield)
+                entityData.nameAbove = shield.formattedName + " $number"
+                found = true
+                break
+            }
+        }
+        if (!found) {
+            entity.setHellionShield(null)
         }
 
         if (!SkyHanniMod.feature.slayer.blazePhaseDisplay) return ""
