@@ -3,16 +3,17 @@
   "refmap": "mixins.skyhanni.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinNetworkManager",
-    "MixinNetHandlerPlayClient",
-    "MixinRenderItem",
     "AccessorGuiPlayerTabOverlay",
+    "MixinEntityBlaze",
+    "MixinNetHandlerPlayClient",
+    "MixinNetworkManager",
+    "MixinRenderItem",
     "MixinRenderManager",
-    "gui.MixinGuiContainer",
     "gui.AccessorGuiContainer",
+    "gui.MixinGuiContainer",
     "gui.inventory.GuiEditSignMixin",
-    "tileentity.TileEntitySignMixin",
     "renderer.MixinBlockRendererDispatcher",
-    "renderer.MixinRendererLivingEntity"
+    "renderer.MixinRendererLivingEntity",
+    "tileentity.TileEntitySignMixin"
   ]
 }
