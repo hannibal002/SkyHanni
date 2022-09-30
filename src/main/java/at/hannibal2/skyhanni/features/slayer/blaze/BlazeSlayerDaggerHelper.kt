@@ -3,11 +3,13 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
 import at.hannibal2.skyhanni.events.ItemClickInHandEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
@@ -31,6 +33,18 @@ class BlazeSlayerDaggerHelper {
     private var lastDaggerCheck = 0L
     private var lastNearestCheck = 0L
     private var lastNearest: HellionShield? = null
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyblock) return
+        if (!SkyHanniMod.feature.slayer.blazeHideDaggerWarning) return
+
+        val message = event.message
+        if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
+            message == "§cYour hit was reduced by Hellion Shield!") {
+            event.blockedReason = "blaze_slayer_dagger"
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

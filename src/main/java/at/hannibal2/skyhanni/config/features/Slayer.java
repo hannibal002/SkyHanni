@@ -59,6 +59,12 @@ public class Slayer {
     public int blazeFirstDagger = 0;
 
     @Expose
+    @ConfigOption(name = "Hide Chat", desc = "Remove the wrong dagger messages from chat.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean blazeHideDaggerWarning = false;
+
+    @Expose
     @ConfigOption(name = "Fire Pillars", desc = "")
     @ConfigEditorAccordion(id = 3)
     @ConfigAccordionId(id = 1)

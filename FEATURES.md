@@ -114,6 +114,7 @@
 + Mark the right dagger to use for blaze slayer in the dagger overlay.
 + Warning when the fire pit phase starts for the Blaze Slayer tier 3
 + Hide particles and fireballs near blaze slayer bosses and demons.
++ Option to remove the wrong dagger messages from chat.
 + Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.
 
 ## Marked Players

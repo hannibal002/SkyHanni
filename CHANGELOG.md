@@ -5,6 +5,7 @@
 ### Changes
 + Removed more blaze slayer item drop message spam.
 + Hide particles and fireballs near blaze slayer bosses and demons.
++ Option to remove the wrong dagger messages from chat.
 
 ## Version 0.11
 
