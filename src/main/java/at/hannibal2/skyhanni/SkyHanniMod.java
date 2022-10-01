@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
+import at.hannibal2.skyhanni.features.nether.MilleniaAgedBlazeColor;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HideMobNames;
@@ -130,6 +131,7 @@ public class SkyHanniMod {
         registerEvent(new WikiCommand());
         registerEvent(new SummoningMobManager());
         registerEvent(new VoidlingExtremistColor());
+        registerEvent(new MilleniaAgedBlazeColor());
         registerEvent(new CorruptedMobHighlight());
         registerEvent(new MarkedPlayerManager());
         registerEvent(new HighlightSlayerMiniboss());
