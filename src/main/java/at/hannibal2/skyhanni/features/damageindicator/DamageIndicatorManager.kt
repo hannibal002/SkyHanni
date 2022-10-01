@@ -67,8 +67,14 @@ class DamageIndicatorManager {
             return types.any { isBossSpawned(it) }
         }
 
-        fun getBosses(): Collection<EntityData> {
-            return data.values
+        fun getDistanceTo(vararg types: BossType): Double {
+            val playerLocation = LocationUtils.playerLocation()
+            val list = data.values.filter { it.bossType in types }.map { it.entity.getLorenzVec().distance(playerLocation) }
+            return if (list.isEmpty()) {
+                Double.MAX_VALUE
+            } else {
+                list.minOf { it }
+            }
         }
     }
 

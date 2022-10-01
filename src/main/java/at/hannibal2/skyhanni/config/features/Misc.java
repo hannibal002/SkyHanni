@@ -98,16 +98,6 @@ public class Misc {
     public boolean hideDamageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
-    @ConfigEditorBoolean
-    public boolean hideExpBottles = false;
-
-    @Expose
-    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
-    @ConfigEditorBoolean
-    public boolean configButtonOnPause = true;
-
-    @Expose
     @ConfigOption(name = "Potion Effects", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean potionEffects = false;
@@ -123,4 +113,19 @@ public class Misc {
     @ConfigEditorButton(runnableId = "nonGodPotEffect", buttonText = "Edit")
     @ConfigAccordionId(id = 5)
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
+    @ConfigEditorBoolean
+    public boolean hideExpBottles = false;
+
+    @Expose
+    @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze Particles")
+    @ConfigEditorBoolean
+    public boolean hideBlazeParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
+    @ConfigEditorBoolean
+    public boolean configButtonOnPause = true;
 }
