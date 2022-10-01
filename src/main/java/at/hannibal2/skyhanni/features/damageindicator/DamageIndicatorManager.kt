@@ -69,7 +69,8 @@ class DamageIndicatorManager {
 
         fun getDistanceTo(vararg types: BossType): Double {
             val playerLocation = LocationUtils.playerLocation()
-            val list = data.values.filter { it.bossType in types }.map { it.entity.getLorenzVec().distance(playerLocation) }
+            val list =
+                data.values.filter { it.bossType in types }.map { it.entity.getLorenzVec().distance(playerLocation) }
             return if (list.isEmpty()) {
                 Double.MAX_VALUE
             } else {
@@ -101,7 +102,9 @@ class DamageIndicatorManager {
         //TODO config to define between 100ms and 5 sec
         for (uuid in data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
-            (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType)) }.map { it.key }) { data.remove(uuid)
+            (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
+        }.map { it.key }) {
+            data.remove(uuid)
         }
 
         var playerLocation = LocationUtils.playerLocation()
@@ -707,28 +710,43 @@ class DamageIndicatorManager {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         val entity = event.entity
-        if (!isDamageSplash(entity)) return
-        val name = entity.customNameTag.removeColor().replace(",", "")
-
-        if (SkyHanniMod.feature.misc.fixSkytilsDamageSplash) {
-            entity.customNameTag = entity.customNameTag.replace(",", "")
-        }
 
         val entityData = data.values.find {
             val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
             distance < 4.5
         }
-        if (entityData != null) {
-            if (SkyHanniMod.feature.damageIndicator.hideDamageSplash) {
-                event.isCanceled = true
-            }
-            if (entityData.bossType == BossType.DUMMY) {
 
-                val uuid = entity.uniqueID
-                if (dummyDamageCache.contains(uuid)) return
-                dummyDamageCache.add(uuid)
-                val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
-                entityData.damageCounter.currentDamage += dmg
+        if (isDamageSplash(entity)) {
+            val name = entity.customNameTag.removeColor().replace(",", "")
+
+            if (SkyHanniMod.feature.misc.fixSkytilsDamageSplash) {
+                entity.customNameTag = entity.customNameTag.replace(",", "")
+            }
+            if (entityData != null) {
+                if (SkyHanniMod.feature.damageIndicator.hideDamageSplash) {
+                    event.isCanceled = true
+                }
+                if (entityData.bossType == BossType.DUMMY) {
+
+                    val uuid = entity.uniqueID
+                    if (dummyDamageCache.contains(uuid)) return
+                    dummyDamageCache.add(uuid)
+                    val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
+                    entityData.damageCounter.currentDamage += dmg
+                }
+            }
+        } else {
+            if (entityData != null) {
+                if (isEnabled()) {
+                    if (SkyHanniMod.feature.damageIndicator.hideVanillaNametag) {
+                        val name = entity.name
+                        if (name.contains("Plaesmaflux")) return
+                        if (name.contains("Overflux")) return
+                        if (name.contains("Mana Flux")) return
+                        if (name.contains("Radiant")) return
+                        event.isCanceled = true
+                    }
+                }
             }
         }
     }

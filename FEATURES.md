@@ -101,6 +101,7 @@
 - Show the laser phase cooldown during the Voidgloom Seraph 4 fight. 
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
+- Hide the vanilla nametag of damage indicator bosses.
 
 ## Slayer
 + Hide poor slayer drop chat messages.

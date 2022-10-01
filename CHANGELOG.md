@@ -7,6 +7,7 @@
 + Hide particles and fireballs near blaze slayer bosses and demons.
 + Added Option to hide blaze particles.
 + Highlight millenia aged blaze color in red
++ Hide the vanilla nametag of damage indicator bosses.
 
 ### Changes
 + Removed more blaze slayer item drop message spam.

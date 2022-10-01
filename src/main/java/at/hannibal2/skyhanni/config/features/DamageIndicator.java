@@ -25,7 +25,7 @@ public class DamageIndicator {
     @Expose
     @ConfigOption(
             name = "Boss Name",
-            desc = "Change how the boss name should be displayed")
+            desc = "Change how the boss name should be displayed.")
     @ConfigEditorDropdown(values = {"Disabled", "Full Name", "Short Name"})
     public int bossName = 1;
 
@@ -63,17 +63,22 @@ public class DamageIndicator {
     public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19));
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")
     @ConfigEditorBoolean
     public boolean hideDamageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator")
+    @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator.")
     @ConfigEditorBoolean
     public boolean showDamageOverTime = false;
 
     @Expose
-    @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser phase")
+    @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser phase.")
     @ConfigEditorBoolean
     public boolean showHealthDuringLaser = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of damage indicator bosses.")
+    @ConfigEditorBoolean
+    public boolean hideVanillaNametag = false;
 }
