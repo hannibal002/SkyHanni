@@ -37,7 +37,16 @@ class AshfangHideParticles {
         if (!isEnabled()) return
         if (!hideParticles) return
 
-        event.isCanceled = true
+
+        when (event.callerClass) {
+            "net.minecraft.block.BlockFire",
+            "net.minecraft.entity.monster.EntityBlaze",
+            "net.minecraft.entity.projectile.EntityFireball",
+            -> {
+                event.isCanceled = true
+            }
+        }
+
     }
 
     private fun isEnabled() = LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.hideParticles

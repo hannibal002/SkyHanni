@@ -47,7 +47,15 @@ class BlazeSlayerClearView {
     @SubscribeEvent
     fun onSpawnParticle(event: SpawnParticleEvent) {
         if (isEnabled()) {
-            event.isCanceled = true
+            when (event.callerClass) {
+                "net.minecraft.block.BlockFire",
+                "net.minecraft.entity.monster.EntityBlaze",
+                "net.minecraft.entity.projectile.EntityFireball",
+                -> {
+                    event.isCanceled = true
+                    return
+                }
+            }
         }
     }
 
