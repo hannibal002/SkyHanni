@@ -61,7 +61,6 @@ class MarkedPlayerManager {
 
         fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
-        @JvmStatic
         fun toggleOwn() {
             val ownName = SkyHanniMod.feature.markedPlayers.markOwnName
             val name = Minecraft.getMinecraft().thePlayer.name

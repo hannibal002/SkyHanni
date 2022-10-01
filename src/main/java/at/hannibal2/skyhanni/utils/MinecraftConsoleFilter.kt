@@ -19,7 +19,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
     private val patternBiomeIdBounds = Pattern.compile("Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)")
 
     companion object {
-        @JvmStatic
         fun initLogging() {
             val ctx: LoggerContext = LogManager.getContext(false) as LoggerContext
 

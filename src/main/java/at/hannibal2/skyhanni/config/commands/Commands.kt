@@ -23,7 +23,6 @@ object Commands {
         }
     }
 
-    @JvmStatic
     fun init() {
         registerCommand("sh", openMainMenu)
         registerCommand("skyhanni", openMainMenu)

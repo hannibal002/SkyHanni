@@ -156,14 +156,14 @@ public class SkyHanniMod {
         registerEvent(new NonGodPotEffectDisplay());
         registerEvent(new HideBlazeParticles());
 
-        Commands.init();
+        Commands.INSTANCE.init();
 
         registerEvent(new LorenzTest());
         registerEvent(new ButtonOnPause());
 
         configManager = new ConfigManager();
         configManager.firstLoad();
-        MinecraftConsoleFilter.initLogging();
+        MinecraftConsoleFilter.Companion.initLogging();
 
         Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
 
