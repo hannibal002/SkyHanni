@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.EntityLiving
@@ -110,5 +111,10 @@ object EntityUtils {
         radius: Double
     ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
         entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
+    }
+
+    fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
+        if (inventory == null) return false
+        return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 }

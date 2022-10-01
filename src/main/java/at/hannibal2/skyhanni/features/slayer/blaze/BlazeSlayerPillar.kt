@@ -27,8 +27,10 @@ class BlazeSlayerPillar {
     private var patternPillarExploded =
         Pattern.compile("§cYou took §r§f(.+) §r§ctrue damage from an exploding fire pillar!")
     private val pillarEntities = mutableListOf<EntityArmorStand>()
-    private val pillarWarningTexture =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMyZTlkODM5NWNhY2Q5OTIyODY5YzE1MzczY2Y3Y2IxNmRhMGE1Y2U1ZjNjNjMyYjE5Y2ViMzkyOWM5YTExIn19fQ=="
+    companion object {
+        const val pillarWarningTexture =
+            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMyZTlkODM5NWNhY2Q5OTIyODY5YzE1MzczY2Y3Y2IxNmRhMGE1Y2U1ZjNjNjMyYjE5Y2ViMzkyOWM5YTExIn19fQ=="
+    }
 
     private var lastPillarSpawnTime = -1L
     private var lastSoundMoment = 0.0
@@ -57,12 +59,6 @@ class BlazeSlayerPillar {
             if (armorStand in pillarBuildEntityList || armorStand.inventory.any { it != null && it.getSkullTexture() == pillarWarningTexture }) {
                 if (armorStand !in pillarBuildEntityList) {
                     pillarBuildEntityList.add(armorStand)
-                    if (SkyHanniMod.feature.slayer.firePillarBuildHider) {
-                        armorStand.inventory[0] = null
-                        armorStand.inventory[1] = null
-                        armorStand.inventory[2] = null
-                        armorStand.inventory[3] = null
-                    }
                 }
                 if (armorStand.getLorenzVec().distance(playerLocation) < 15) {
                     list.add(armorStand)
@@ -167,7 +163,7 @@ class BlazeSlayerPillar {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.slayer.firePillarBuildHider) return
+        if (!SkyHanniMod.feature.slayer.firePillarSound) return
 
         when (event.soundName) {
             "mob.chicken.plop",
