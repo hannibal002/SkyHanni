@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.SpawnParticleEvent;
+import at.hannibal2.skyhanni.mixins.hooks.RenderGlobalHook;
 import net.minecraft.client.renderer.RenderGlobal;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,9 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinRenderGlobal {
 
     @Inject(method = "spawnParticle(IZDDDDDD[I)V", at = @At("HEAD"), cancellable = true)
-    private void spawnParticle(int id, boolean ignoreRange, double x, double y, double z, double xOffset, double yOffset, double zOffset, int[] p_180442_15_, CallbackInfo ci) {
-        if (new SpawnParticleEvent(id, x, y, z).postAndCatch()) {
-            ci.cancel();
-        }
+    private void spawnParticle(int particleId, boolean ignoreRange, double x, double y, double z, double xOffset, double yOffset, double zOffset, int[] p_180442_15_, CallbackInfo ci) {
+        RenderGlobalHook.spawnParticle(particleId, x, y, z, ci);
     }
 }

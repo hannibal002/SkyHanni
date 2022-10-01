@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
 
@@ -100,5 +102,13 @@ object EntityUtils {
             .map { it.value }
             .firstOrNull { it.name == "textures" }
             ?.value
+    }
+
+    fun WorldClient.getEntitiesNearby(
+        clazz: Class<EntityBlaze>,
+        location: LorenzVec,
+        radius: Double
+    ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
+        entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
     }
 }
