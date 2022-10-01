@@ -52,6 +52,12 @@ public class Misc {
     public boolean voidlingExtremistColor = false;
 
     @Expose
+    @ConfigOption(name = "Millenia Aged Blaze Color", desc = "Highlight the millenia aged blaze in red color")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean milleniaAgedBlazeColor = false;
+
+    @Expose
     @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)

@@ -6,12 +6,13 @@
 + Option to remove the wrong dagger messages from chat.
 + Hide particles and fireballs near blaze slayer bosses and demons.
 + Added Option to hide blaze particles.
++ Highlight millenia aged blaze color in red
 
 ### Changes
 + Removed more blaze slayer item drop message spam.
 + Showing number next to custom hellion shield from damage indicator
-+ All particles next to ashfang are now hidden when particles are disabled for ashfang.
-+ All particles around blaze slayer are hidden
++ All particles next to ashfang are now hidden when clear ashfang view is enabled
++ All particles around blaze slayer are hidden when blaze particles is enabled
 
 ## Version 0.11
 

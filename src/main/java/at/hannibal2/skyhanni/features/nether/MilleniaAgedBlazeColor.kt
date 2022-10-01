@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.end
+package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
@@ -8,23 +8,23 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.monster.EntityEnderman
+import net.minecraft.entity.monster.EntityBlaze
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class VoidlingExtremistColor {
+class MilleniaAgedBlazeColor {
 
     private var tick = 0
-    private val extremists = mutableListOf<EntityEnderman>()
+    private val blazes = mutableListOf<EntityBlaze>()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
         if (tick++ % 60 == 0) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityEnderman>()
-                .filter { it !in extremists && it.hasMaxHealth(8_000_000) }.forEach { extremists.add(it) }
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityBlaze>()
+                .filter { it !in blazes && it.hasMaxHealth(30_000_000) }.forEach { blazes.add(it) }
         }
     }
 
@@ -33,8 +33,8 @@ class VoidlingExtremistColor {
         if (!isEnabled()) return
         val entity = event.entity
 
-        if (entity in extremists) {
-            event.color = LorenzColor.LIGHT_PURPLE.toColor().withAlpha(127)
+        if (entity in blazes) {
+            event.color = LorenzColor.DARK_RED.toColor().withAlpha(60)
         }
     }
 
@@ -43,16 +43,16 @@ class VoidlingExtremistColor {
         if (!isEnabled()) return
         val entity = event.entity
 
-        if (entity in extremists) {
+        if (entity in blazes) {
             event.shouldReset = true
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        extremists.clear()
+        blazes.clear()
     }
 
-    private fun isEnabled(): Boolean =
-        LorenzUtils.inSkyblock && LorenzUtils.skyBlockIsland == "The End" && SkyHanniMod.feature.misc.milleniaAgedBlazeColor
+    private fun isEnabled() =
+        LorenzUtils.inSkyblock && LorenzUtils.skyBlockIsland == "Crimson Isle" && SkyHanniMod.feature.misc.milleniaAgedBlazeColor
 }
