@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -28,9 +28,9 @@ class ThunderSparksHighlight {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        Minecraft.getMinecraft().theWorld.loadedEntityList.filter { it ->
-                it is EntityArmorStand && it !in sparks && it.inventory.any { it != null && it.getSkullTexture() == texture }
-            }.forEach { sparks.add(it as EntityArmorStand) }
+        Minecraft.getMinecraft().theWorld.loadedEntityList.filter {
+            it is EntityArmorStand && it !in sparks && it.hasSkullTexture(texture)
+        }.forEach { sparks.add(it as EntityArmorStand) }
     }
 
     @SubscribeEvent

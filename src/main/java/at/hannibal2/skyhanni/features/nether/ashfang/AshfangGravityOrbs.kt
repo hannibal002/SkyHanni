@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
@@ -25,9 +25,8 @@ class AshfangGravityOrbs {
         if (!isEnabled()) return
 
         Minecraft.getMinecraft().theWorld.loadedEntityList
-            .filter { it ->
-                it is EntityArmorStand && it !in orbs && it.inventory
-                    .any { it != null && it.getSkullTexture() == texture }
+            .filter {
+                it is EntityArmorStand && it !in orbs && it.hasSkullTexture(texture)
             }.forEach { orbs.add(it as EntityArmorStand) }
     }
 

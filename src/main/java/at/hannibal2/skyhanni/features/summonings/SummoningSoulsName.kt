@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.summonings
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinJavaUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -48,7 +48,7 @@ class SummoningSoulsName {
             if (souls.contains(entity)) continue
 
             if (entity is EntityArmorStand) {
-                if (isSoul(entity)) {
+                if (entity.hasSkullTexture(texture)) {
                     val soulLocation = entity.getLorenzVec()
 
                     val map = mutableMapOf<EntityLiving, Double>()
@@ -109,21 +109,6 @@ class SummoningSoulsName {
         souls.clear()
         mobsLastLocation.clear()
         mobsName.clear()
-    }
-
-    private fun isSoul(entity: EntityArmorStand): Boolean {
-        for (stack in entity.inventory) {
-            if (stack != null) {
-                val skullTexture = stack.getSkullTexture()
-                if (skullTexture != null) {
-                    if (skullTexture == texture) {
-                        return true
-                    }
-                }
-            }
-        }
-
-        return false
     }
 
     private fun isEnabled(): Boolean {

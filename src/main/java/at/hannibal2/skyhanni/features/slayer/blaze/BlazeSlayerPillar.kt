@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
@@ -27,6 +27,7 @@ class BlazeSlayerPillar {
     private var patternPillarExploded =
         Pattern.compile("§cYou took §r§f(.+) §r§ctrue damage from an exploding fire pillar!")
     private val pillarEntities = mutableListOf<EntityArmorStand>()
+
     companion object {
         const val pillarWarningTexture =
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMyZTlkODM5NWNhY2Q5OTIyODY5YzE1MzczY2Y3Y2IxNmRhMGE1Y2U1ZjNjNjMyYjE5Y2ViMzkyOWM5YTExIn19fQ=="
@@ -56,7 +57,7 @@ class BlazeSlayerPillar {
                 }
             }
 
-            if (armorStand in pillarBuildEntityList || armorStand.inventory.any { it != null && it.getSkullTexture() == pillarWarningTexture }) {
+            if (armorStand in pillarBuildEntityList || armorStand.hasSkullTexture(pillarWarningTexture)) {
                 if (armorStand !in pillarBuildEntityList) {
                     pillarBuildEntityList.add(armorStand)
                 }
