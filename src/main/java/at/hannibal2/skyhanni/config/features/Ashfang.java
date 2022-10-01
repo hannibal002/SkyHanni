@@ -20,7 +20,7 @@ public class Ashfang {
     public Position freezeCooldownPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Reset Time", desc = "Shows the cooldown until ashfang pulls his underlings back")
+    @ConfigOption(name = "Reset Time", desc = "Shows the cooldown until ashfang pulls his underlings back.")
     @ConfigEditorBoolean
     public boolean nextResetCooldown = false;
 
@@ -30,38 +30,32 @@ public class Ashfang {
     public Position nextResetCooldownPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Gravity Orbs", desc = "Showing the Gravity Orbs more clearly")
+    @ConfigOption(name = "Gravity Orbs", desc = "Showing the Gravity Orbs more clearly.")
     @ConfigEditorBoolean
     public boolean gravityOrbs = false;
 
     @Expose
-    @ConfigOption(
-            name = "Orbs Color",
-            desc = "Color of the Ashfang Gravity Orbs"
-    )
+    @ConfigOption(name = "Orbs Color", desc = "Color of the Ashfang Gravity Orbs.")
     @ConfigEditorColour
     public String gravityOrbsColor = "0:120:255:85:85";
 
     @Expose
-    @ConfigOption(name = "Blazing Souls", desc = "Showing the Blazing Souls more clearly")
+    @ConfigOption(name = "Blazing Souls", desc = "Showing the Blazing Souls more clearly.")
     @ConfigEditorBoolean
     public boolean blazingSouls = false;
 
     @Expose
-    @ConfigOption(
-            name = "Souls Color",
-            desc = "Color of the Ashfang Blazing Souls"
-    )
+    @ConfigOption(name = "Souls Color", desc = "Color of the Ashfang Blazing Souls.")
     @ConfigEditorColour
     public String blazingSoulsColor = "0:245:85:255:85";
 
     @Expose
-    @ConfigOption(name = "Highlight Blazes", desc = "Highlight the different blazes in their respected color")
+    @ConfigOption(name = "Highlight Blazes", desc = "Highlight the different blazes in their respected color.")
     @ConfigEditorBoolean
     public boolean highlightBlazes = false;
 
     @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide all the particles around the ashfang boss")
+    @ConfigOption(name = "Hide Particles", desc = "Hide particles around the ashfang boss.")
     @ConfigEditorBoolean
     public boolean hideParticles = false;
 
@@ -71,7 +65,7 @@ public class Ashfang {
     public boolean hideNames = false;
 
     @Expose
-    @ConfigOption(name = "Hide Damage", desc = "Hide damage splashes around ashfang")
+    @ConfigOption(name = "Hide Damage", desc = "Hide damage splashes around ashfang.")
     @ConfigEditorBoolean
     public boolean hideDamageSplash = false;
 }
