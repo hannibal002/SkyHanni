@@ -125,11 +125,13 @@ class BlazeSlayerPillar {
             true
         } else if (time <= 2.1) {
             when (time) {
-                0.9 -> true
-                1.2 -> true
-                1.5 -> true
-                1.8 -> true
-                2.1 -> true
+                0.9,
+                1.2,
+                1.5,
+                1.8,
+                2.1,
+                -> true
+
                 else -> false
             }
         } else if (time <= 4 && time % 0.5 == 0.0) {
