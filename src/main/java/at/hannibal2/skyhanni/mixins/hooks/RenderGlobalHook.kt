@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
 class RenderGlobalHook {
     companion object {
-        @JvmStatic
         fun spawnParticle(
             particleId: Int,
             x: Double,

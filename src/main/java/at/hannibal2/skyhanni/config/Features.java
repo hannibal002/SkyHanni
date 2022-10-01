@@ -104,7 +104,7 @@ public class Features extends Config {
         }
 
         if (runnableId.equals("markOwnPlayer")) {
-            MarkedPlayerManager.toggleOwn();
+            MarkedPlayerManager.Companion.toggleOwn();
             return;
         }
 

@@ -12,6 +12,6 @@ public class MixinRenderGlobal {
 
     @Inject(method = "spawnParticle(IZDDDDDD[I)V", at = @At("HEAD"), cancellable = true)
     private void spawnParticle(int particleId, boolean ignoreRange, double x, double y, double z, double xOffset, double yOffset, double zOffset, int[] p_180442_15_, CallbackInfo ci) {
-        RenderGlobalHook.spawnParticle(particleId, x, y, z, ci);
+        RenderGlobalHook.Companion.spawnParticle(particleId, x, y, z, ci);
     }
 }
