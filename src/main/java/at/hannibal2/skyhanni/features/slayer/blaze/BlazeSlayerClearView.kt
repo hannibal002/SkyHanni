@@ -6,15 +6,17 @@ import at.hannibal2.skyhanni.events.PlayParticleEvent
 import at.hannibal2.skyhanni.events.SpawnParticleEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFireball
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BlazeSlayerClearView {
 
-    var tick = 0
-    var hideParticles = false
+    private var tick = 0
+    private var hideParticles = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -62,8 +64,15 @@ class BlazeSlayerClearView {
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (isEnabled()) {
-            if (event.entity is EntityFireball) {
+            val entity = event.entity
+            if (entity is EntityFireball) {
                 event.isCanceled = true
+            }
+
+            if (entity is EntityArmorStand) {
+                if (entity.hasSkullTexture(BlazeSlayerPillar.pillarWarningTexture)) {
+                    event.isCanceled = true
+                }
             }
         }
     }

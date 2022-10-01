@@ -83,16 +83,11 @@ public class Slayer {
     public Position firePillarPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer for the Blaze Slayer.")
+    @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer and hide pillar build sound for the Blaze Slayer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean firePillarSound = false;
 
-    @Expose
-    @ConfigOption(name = "Hide Pillar", desc = "Hide sound and entities when building the Fire Pillar for the Blaze Slayer.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean firePillarBuildHider = false;
 
     @Expose
     @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4.")
