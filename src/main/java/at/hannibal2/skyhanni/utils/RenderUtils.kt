@@ -431,7 +431,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         val resolution = ScaledResolution(Minecraft.getMinecraft())
 
-        val renderer = Minecraft.getMinecraft().renderManager.fontRenderer
+        val renderer = Minecraft.getMinecraft().renderManager.fontRenderer ?: return
 
         val offsetX = (200 - renderer.getStringWidth(textToRender.removeColor())) / 2
 
