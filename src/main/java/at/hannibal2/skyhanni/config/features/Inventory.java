@@ -32,40 +32,6 @@ public class Inventory {
     @ConfigAccordionId(id = 0)
     public int hideNotClickableOpacity = 180;
 
-    @Expose
-    @ConfigOption(
-            name = "Item number",
-            desc = "Showing the item number as a stack size for these items"
-    )
-    @ConfigEditorDraggableList(
-            exampleText = {
-                    "\u00a7bMaster Star Tier",
-                    "\u00a7bMaster Skull Tier",
-                    "\u00a7bDungeon Head Floor Number",
-                    "\u00a7bNew Year Cake",
-                    "\u00a7bPet Level",
-                    "\u00a7bMinion Tier",
-                    "\u00a7bCrimson Armor",
-            }
-    )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Collections.singletonList(3));
-
-    @Expose
-    @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
-    @ConfigEditorBoolean
-    public boolean displaySackName = false;
-
-    @Expose
-    @ConfigOption(name = "Anvil Combine Helper", desc = "Suggests the same item in the inventory when trying to combine two items in the anvil.")
-    @ConfigEditorBoolean
-    public boolean anvilCombineHelper = false;
-
-    @Expose
-    @ConfigOption(name = "Item Stars",
-            desc = "Show a compact star count in the item name for all items")
-    @ConfigEditorBoolean
-    public boolean itemStars = false;
-
     @ConfigOption(name = "RNG Meter", desc = "")
     @ConfigEditorAccordion(id = 1)
     public boolean rngMeter = false;
@@ -115,4 +81,38 @@ public class Inventory {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean statsTuningTemplateStats = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Item number",
+            desc = "Showing the item number as a stack size for these items"
+    )
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "\u00a7bMaster Star Tier",
+                    "\u00a7bMaster Skull Tier",
+                    "\u00a7bDungeon Head Floor Number",
+                    "\u00a7bNew Year Cake",
+                    "\u00a7bPet Level",
+                    "\u00a7bMinion Tier",
+                    "\u00a7bCrimson Armor",
+            }
+    )
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Collections.singletonList(3));
+
+    @Expose
+    @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
+    @ConfigEditorBoolean
+    public boolean displaySackName = false;
+
+    @Expose
+    @ConfigOption(name = "Anvil Combine Helper", desc = "Suggests the same item in the inventory when trying to combine two items in the anvil.")
+    @ConfigEditorBoolean
+    public boolean anvilCombineHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Item Stars",
+            desc = "Show a compact star count in the item name for all items")
+    @ConfigEditorBoolean
+    public boolean itemStars = false;
 }
