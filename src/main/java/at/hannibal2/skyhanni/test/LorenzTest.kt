@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.PlayParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -123,7 +123,7 @@ class LorenzTest {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onHypExplosions(event: PlayParticleEvent) {
+    fun onHypExplosions(event: ReceiveParticleEvent) {
 //        if (!LorenzUtils.inSkyblock) return
 //        when (event.type) {
 //            EnumParticleTypes.EXPLOSION_LARGE,
@@ -341,7 +341,7 @@ class LorenzTest {
     }
 
     @SubscribeEvent
-    fun onParticlePlay(event: PlayParticleEvent) {
+    fun onParticlePlay(event: ReceiveParticleEvent) {
         if (!shouldLogPackets) return
 
 //        val particleType = event.type

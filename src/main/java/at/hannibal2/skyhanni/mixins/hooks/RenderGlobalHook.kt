@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.events.SpawnParticleEvent
+import at.hannibal2.skyhanni.events.RenderParticleEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
@@ -22,7 +22,7 @@ class RenderGlobalHook {
                 "net.minecraft.network.play.server.S2APacketParticles",
             ) ?: "null"
 
-            if (SpawnParticleEvent(particleId, callerClass, x, y, z).postAndCatch()) {
+            if (RenderParticleEvent(particleId, callerClass, x, y, z).postAndCatch()) {
                 ci.cancel()
                 return
             }

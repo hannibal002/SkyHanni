@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.PlayParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.network.play.server.S29PacketSoundEffect
@@ -36,7 +36,7 @@ class MinecraftData {
         val packet = event.packet
         if (packet !is S2APacketParticles) return
 
-        if (PlayParticleEvent(
+        if (ReceiveParticleEvent(
                 packet.particleType!!,
                 LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
                 packet.particleCount,

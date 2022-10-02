@@ -105,7 +105,7 @@ class DungeonCleanEnd {
     }
 
     @SubscribeEvent
-    fun onPlayParticle(event: PlayParticleEvent) {
+    fun onPlayParticle(event: ReceiveParticleEvent) {
         if (shouldBlock()) {
             event.isCanceled = true
         }

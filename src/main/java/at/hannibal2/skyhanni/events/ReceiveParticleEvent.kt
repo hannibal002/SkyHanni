@@ -5,7 +5,7 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 @Cancelable
-class PlayParticleEvent(
+class ReceiveParticleEvent(
     val type: EnumParticleTypes,
     val location: LorenzVec,
     val count: Int,
