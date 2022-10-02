@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.SpawnParticleEvent
+import at.hannibal2.skyhanni.events.RenderParticleEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.client.Minecraft
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HideBlazeParticles {
 
     @SubscribeEvent
-    fun onSpawnParticle(event: SpawnParticleEvent) {
+    fun onSpawnParticle(event: RenderParticleEvent) {
         val particleId = event.particleId
         if (!SkyHanniMod.feature.misc.hideBlazeParticles) return
 

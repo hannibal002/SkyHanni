@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ItemClickInHandEvent
-import at.hannibal2.skyhanni.events.PlayParticleEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -18,7 +18,7 @@ class FireVeilWandParticles {
     var lastClick = 0L
 
     @SubscribeEvent
-    fun onChatPacket(event: PlayParticleEvent) {
+    fun onChatPacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyblock) return
         if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay == 0) return
         if (System.currentTimeMillis() > lastClick + 5_500) return

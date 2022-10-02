@@ -173,7 +173,7 @@ class DungeonHideItems {
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: PlayParticleEvent) {
+    fun onReceivePacket(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inDungeons) return
         if (!SkyHanniMod.feature.dungeon.hideSuperboomTNT && !SkyHanniMod.feature.dungeon.hideReviveStone) return
 
