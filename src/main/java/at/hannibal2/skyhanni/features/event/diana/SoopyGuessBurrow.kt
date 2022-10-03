@@ -158,14 +158,6 @@ class SoopyGuessBurrow {
                         atan((a.x - b.x) / (a.z - b.z))
                     }
 
-//                    val slopeThing = mutableListOf<Double>()
-//                    for ((index, current) in locs.withIndex()) {
-//                        if (index != 0) {
-//                            val last = locs[index - 1]
-//                            slopeThing.add(atan((current.x - last.x) / (current.z - last.z)))
-//                        }
-//                    }
-
                     val (a, b, c) = solveEquationThing(
                         LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1), LorenzVec(
                             slopeThing[slopeThing.size - 5],
