@@ -122,6 +122,7 @@
 + Show burrows near you.
 + Uses Soopy's Guess Logic to find the next burrow. Does not require SoopyV2 or chat triggers to be installed.
 + Show the way from one burrow to another smoothly.
++ Warps to the nearest warp point on the hub, if closer to the next burrow.
 
 ## Marked Players
 + Adding or removing players as marked with command /shmarkplayer
