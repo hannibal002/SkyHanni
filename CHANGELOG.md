@@ -1,11 +1,12 @@
 # SkyHanni - Change Log
 
-## Version 0.11.1
+## Version 0.12
 
 ### Diana
 + Show burrows near you.
 + Uses Soopy's Guess Logic to find the next burrow. Does not require SoopyV2 or chat triggers to be installed.
 + Let Soopy guess the next burrow location for you.
++ Warps to the nearest warp point on the hub, if closer to the next burrow.
 
 ### Crimson Isle
 + Option to remove the wrong blaze slayer dagger messages from chat.
