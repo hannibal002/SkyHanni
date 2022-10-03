@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class ScoreboardData {
 
     companion object {
-
         private val splitIcons = listOf(
             "\uD83C\uDF6B",
             "\uD83D\uDCA3",
@@ -32,7 +31,7 @@ class ScoreboardData {
         fun sidebarLinesFormatted(): List<String> {
             val list = mutableListOf<String>()
             for (line in sidebarLinesRaw) {
-                val seperator = splitIcons.find { line.contains(it) }!!
+                val seperator = splitIcons.find { line.contains(it) } ?: continue
                 val split = line.split(seperator)
                 val start = split[0]
                 var end = split[1]
@@ -40,7 +39,7 @@ class ScoreboardData {
                     end = end.substring(2)
                 }
 
-                list.add(start+end)
+                list.add(start + end)
 
             }
 
