@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
+import at.hannibal2.skyhanni.test.GriffinUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -114,7 +115,7 @@ class GriffinBurrowHelper {
         if (SkyHanniMod.feature.diana.burrowSmoothTransition) {
             animationLocation?.let {
                 event.drawColor(it, LorenzColor.WHITE)
-                animationLocation = moveAnimation(it)
+                animationLocation = moveAnimation(it, event)
             }
         }
 
@@ -131,7 +132,7 @@ class GriffinBurrowHelper {
         }
     }
 
-    private fun moveAnimation(animation: LorenzVec): LorenzVec? {
+    private fun moveAnimation(animation: LorenzVec, event: RenderWorldLastEvent): LorenzVec? {
         val list = mutableListOf<LorenzVec>()
         list.addAll(particleBurrows.keys)
         guessLocation?.let {
@@ -147,6 +148,8 @@ class GriffinBurrowHelper {
         if (distance < 0.20) return null
 
         var vector = target.subtract(animation)
+
+        event.draw3DLine(animation.add(0.5, 0.5, 0.5), target.add(0.5, 0.5, 0.5), LorenzColor.WHITE, 2, true)
 
         vector = vector.multiply(1 / vector.length())
         vector = vector.multiply(0.18)
