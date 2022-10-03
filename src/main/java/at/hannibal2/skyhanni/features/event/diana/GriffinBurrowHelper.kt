@@ -24,8 +24,6 @@ class GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onSoopyGuessBurrow(event: SoopyGuessBurrowEvent) {
-//        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
-
         if (SkyHanniMod.feature.diana.burrowsSoopyGuess) {
             if (guessLocation == null) {
                 animationLocation = lastDug ?: LocationUtils.playerLocation()

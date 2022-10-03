@@ -118,6 +118,11 @@
 + Option to remove the wrong dagger messages from chat.
 + Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.
 
+### Diana
++ Show burrows near you.
++ Uses Soopy's Guess Logic to find the next burrow. Does not require SoopyV2 or chat triggers to be installed.
++ Show the way from one burrow to another smoothly.
+
 ## Marked Players
 + Adding or removing players as marked with command /shmarkplayer
 + Highlight marked players in the world.

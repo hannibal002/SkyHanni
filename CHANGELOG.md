@@ -3,9 +3,9 @@
 ## Version 0.11.1
 
 ### Diana
-+ Let Soopy guess the next burrow location for you.
 + Show burrows near you.
-+ Show the way from one burrow to another smoothly.
++ Uses Soopy's Guess Logic to find the next burrow. Does not require SoopyV2 or chat triggers to be installed.
++ Let Soopy guess the next burrow location for you.
 
 ### Crimson Isle
 + Option to remove the wrong blaze slayer dagger messages from chat.
