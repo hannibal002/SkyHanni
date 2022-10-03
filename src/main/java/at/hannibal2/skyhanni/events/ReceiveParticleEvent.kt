@@ -11,5 +11,6 @@ class ReceiveParticleEvent(
     val count: Int,
     val speed: Float,
     val offset: LorenzVec,
+    val longDistance: Boolean,
     val particleArgs: IntArray
 ) : LorenzEvent()
