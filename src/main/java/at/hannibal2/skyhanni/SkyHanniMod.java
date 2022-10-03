@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
 import at.hannibal2.skyhanni.features.end.VoidlingExtremistColor;
+import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
@@ -161,6 +162,7 @@ public class SkyHanniMod {
         registerEvent(new SoopyGuessBurrow());
         registerEvent(new GriffinBurrowHelper());
         registerEvent(new GriffinBurrowParticleFinder());
+        registerEvent(new BurrowWarpHelper());
 
         Commands.INSTANCE.init();
 

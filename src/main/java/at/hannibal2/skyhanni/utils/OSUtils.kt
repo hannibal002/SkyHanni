@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import net.minecraft.client.settings.KeyBinding
+import org.lwjgl.input.Keyboard
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -23,5 +25,12 @@ object OSUtils {
 
     fun copyToClipboard(text: String) {
         Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+    }
+
+    fun KeyBinding.isActive() : Boolean {
+        if (!Keyboard.isCreated()) return false
+        if (Keyboard.isKeyDown(this.keyCode)) return true
+        if (this.isKeyDown || this.isPressed) return true
+        return false
     }
 }
