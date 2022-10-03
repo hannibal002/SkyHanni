@@ -31,4 +31,10 @@ public class Diana {
     @ConfigAccordionId(id = 0)
     public boolean burrowSmoothTransition = false;
 
+    @Expose
+    @ConfigOption(name = "Nearest Warp", desc = "Warps to the nearest warp point on the hub, if closer to the next burrow.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean burrowNearestWarp = false;
+
 }

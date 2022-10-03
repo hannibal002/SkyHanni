@@ -35,7 +35,7 @@ class EntityMovementData {
             val distance = newLocation.distance(oldLocation)
             if (distance > 0.01) {
                 entityLocation[entity] = newLocation
-                EntityMoveEvent(entity, oldLocation, newLocation).postAndCatch()
+                EntityMoveEvent(entity, oldLocation, newLocation, distance).postAndCatch()
             }
         }
     }

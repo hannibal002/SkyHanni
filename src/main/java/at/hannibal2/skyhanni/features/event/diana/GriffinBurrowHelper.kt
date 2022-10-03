@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -11,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -22,14 +25,21 @@ class GriffinBurrowHelper {
     private var particleBurrows = mutableMapOf<LorenzVec, BurrowType>()
     private var animationLocation: LorenzVec? = null
     private var lastDug: LorenzVec? = null
+    private var teleportedLocation: LorenzVec? = null
+    private var lastGuessTime = 0L
 
     @SubscribeEvent
     fun onSoopyGuessBurrow(event: SoopyGuessBurrowEvent) {
-        if (SkyHanniMod.feature.diana.burrowsSoopyGuess) {
-            if (guessLocation == null) {
-                animationLocation = lastDug ?: LocationUtils.playerLocation()
-            }
+        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        if (System.currentTimeMillis() > lastGuessTime + 1_000) {
+            animationLocation = LocationUtils.playerLocation().add(-0.5, -1.0, -0.5)
         }
+        lastGuessTime = System.currentTimeMillis()
+
+        if (SkyHanniMod.feature.diana.burrowNearestWarp) {
+            BurrowWarpHelper.shouldUseWarps(event.guessLocation)
+        }
+
         guessLocation = event.guessLocation
         if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
             checkRemoveGuess(false)
@@ -38,6 +48,7 @@ class GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
+        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         particleBurrows[event.burrowLocation] = event.type
 
         if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
@@ -65,6 +76,15 @@ class GriffinBurrowHelper {
             animationLocation = location
         }
         lastDug = location
+    }
+
+    @SubscribeEvent
+    fun onPlayerMove(event: EntityMoveEvent) {
+        if (event.distance > 10) {
+            if (event.entity == Minecraft.getMinecraft().thePlayer) {
+                teleportedLocation = event.newLocation
+            }
+        }
     }
 
     @SubscribeEvent
@@ -112,12 +132,7 @@ class GriffinBurrowHelper {
             }
         }
 
-        if (SkyHanniMod.feature.diana.burrowSmoothTransition) {
-            animationLocation?.let {
-                event.drawColor(it, LorenzColor.WHITE)
-                animationLocation = moveAnimation(it, event)
-            }
-        }
+        sendTip(event)
 
         if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
             for (burrow in particleBurrows) {
@@ -132,9 +147,43 @@ class GriffinBurrowHelper {
         }
     }
 
+    private fun sendTip(event: RenderWorldLastEvent) {
+        teleportedLocation?.let {
+            teleportedLocation = null
+
+            if (BurrowWarpHelper.currentWarp != null) {
+                BurrowWarpHelper.currentWarp = null
+                if (SkyHanniMod.feature.diana.burrowNearestWarp) {
+                    animationLocation = it
+                    return
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.diana.burrowNearestWarp) {
+            BurrowWarpHelper.currentWarp?.let { warp ->
+                animationLocation?.let {
+                    event.drawColor(it.add(0.0, 1.0, 0.0), LorenzColor.AQUA)
+                    if (it.distance(LocationUtils.playerLocation()) < 10) {
+                        event.drawString(it.add(0.5, 1.5, 0.5), "§bWarp to " + warp.displayName, true)
+                    }
+                    return
+                }
+            }
+        }
+        if (SkyHanniMod.feature.diana.burrowSmoothTransition) {
+            animationLocation?.let {
+                event.drawColor(it, LorenzColor.WHITE)
+                animationLocation = moveAnimation(it, event)
+            }
+        }
+    }
+
     private fun moveAnimation(animation: LorenzVec, event: RenderWorldLastEvent): LorenzVec? {
         val list = mutableListOf<LorenzVec>()
-        list.addAll(particleBurrows.keys)
+        if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
+            list.addAll(particleBurrows.keys)
+        }
         guessLocation?.let {
             val loc = findBlock(it)
             if (loc.y > 200) {
