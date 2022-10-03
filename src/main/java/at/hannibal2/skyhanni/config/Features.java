@@ -164,6 +164,10 @@ public class Features extends Config {
     public Slayer slayer = new Slayer();
 
     @Expose
+    @Category(name = "Diana", desc = "Diana's mythological event.")
+    public Diana diana = new Diana();
+
+    @Expose
     @Category(name = "Commands", desc = "Enable or disable mod commands")
     public CommandsFeatures commands = new CommandsFeatures();
 

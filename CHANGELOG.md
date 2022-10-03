@@ -2,12 +2,16 @@
 
 ## Version 0.11.1
 
-### Features
-+ Option to remove the wrong dagger messages from chat.
+### Diana
++ Let Soopy guess the next burrow location for you.
++ Show burrows near you.
++ Show the way from one burrow to another smoothly.
+
+### Crimson Isle
++ Option to remove the wrong blaze slayer dagger messages from chat.
 + Hide particles and fireballs near blaze slayer bosses and demons.
 + Added Option to hide blaze particles.
 + Highlight millenia aged blaze color in red
-+ Hide the vanilla nametag of damage indicator bosses.
 
 ### Changes
 + Removed more blaze slayer item drop message spam.
@@ -15,6 +19,7 @@
 + All particles next to ashfang are now hidden when clear ashfang view is enabled.
 + All particles around blaze slayer are hidden when blaze particles is enabled.
 + Hide blocks circling around ashfang.
++ Hide the vanilla nametag of damage indicator bosses.
 
 ## Version 0.11
 

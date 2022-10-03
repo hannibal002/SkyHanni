@@ -76,6 +76,12 @@ data class LorenzVec(
 
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
+    fun clone(): LorenzVec = LorenzVec(x, y, z)
+
+    fun toDoubleArray(): Array<Double> {
+        return arrayOf(x, y, z)
+    }
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
@@ -110,3 +116,7 @@ fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 
 fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
+
+fun Array<Double>.toLorenzVec(): LorenzVec {
+    return LorenzVec(this[0], this[1], this[2])
+}

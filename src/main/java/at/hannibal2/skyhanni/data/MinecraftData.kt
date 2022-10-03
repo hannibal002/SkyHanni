@@ -42,7 +42,8 @@ class MinecraftData {
                 packet.particleCount,
                 packet.particleSpeed,
                 LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
-                packet.particleArgs
+                packet.isLongDistance,
+                packet.particleArgs,
             ).postAndCatch()
         ) {
             event.isCanceled = true
