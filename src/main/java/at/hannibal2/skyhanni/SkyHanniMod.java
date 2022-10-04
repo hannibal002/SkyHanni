@@ -57,11 +57,11 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION)
+@Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION, clientSideOnly = true, useMetadata = true, guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop")
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.12.1";
+    public static final String VERSION = "0.12.2";
 
     public static Features feature;
 
