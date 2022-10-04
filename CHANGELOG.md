@@ -1,5 +1,10 @@
 # SkyHanni - Change Log
 
+## Version 0.12.1
+
+### Fixes
++ Fixed a crash when checking if the hotkey is pressed.
+
 ## Version 0.12
 
 ### Diana
