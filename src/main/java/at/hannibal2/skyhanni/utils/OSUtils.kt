@@ -29,7 +29,13 @@ object OSUtils {
 
     fun KeyBinding.isActive() : Boolean {
         if (!Keyboard.isCreated()) return false
-        if (Keyboard.isKeyDown(this.keyCode)) return true
+        try {
+            if (Keyboard.isKeyDown(this.keyCode)) return true
+        } catch (e: IndexOutOfBoundsException) {
+            println("KeyBinding isActive caused an IndexOutOfBoundsException with keyCode: $keyCode")
+            e.printStackTrace()
+            return false
+        }
         if (this.isKeyDown || this.isPressed) return true
         return false
     }
