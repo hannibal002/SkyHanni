@@ -1,5 +1,10 @@
 # SkyHanni - Change Log
 
+## Version 0.12.2
+
+### Changes
++ Made the config button in the forge mod list work. 
+
 ## Version 0.12.1
 
 ### Fixes
