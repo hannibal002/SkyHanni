@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
@@ -75,12 +74,6 @@ public class Slayer {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean firePillarDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Pillar Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "firePillar", buttonText = "Edit")
-    @ConfigAccordionId(id = 3)
-    public Position firePillarPos = new Position(10, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer and hide pillar build sound for the Blaze Slayer.")

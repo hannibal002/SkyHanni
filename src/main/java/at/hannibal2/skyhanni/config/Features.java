@@ -63,11 +63,6 @@ public class Features extends Config {
             return;
         }
 
-        if (runnableId.equals("firePillar")) {
-            editOverlay(activeConfigCategory, 200, 16, slayer.firePillarPos);
-            return;
-        }
-
         if (runnableId.equals("ashfangResetCooldown")) {
             editOverlay(activeConfigCategory, 200, 16, ashfang.nextResetCooldownPos);
             return;

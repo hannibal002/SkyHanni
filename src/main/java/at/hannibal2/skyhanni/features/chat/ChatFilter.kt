@@ -279,8 +279,8 @@ class ChatFilter {
 
     private fun guild(message: String): Boolean = when {
         message.matchRegex("§2Guild > (.*) §r§e(joined|left).") -> true
-        message.matchRegex("§aYou earned §r§2(.*) GEXP §r§afrom playing SkyBlock!") -> true
-        message.matchRegex("§aYou earned §r§2(.*) GEXP §r§a\\+ §r§e(.*) Event EXP §r§afrom playing SkyBlock!") -> true
+        message.matchRegex("§aYou earned §r§2\\d+ GEXP §r§afrom playing SkyBlock!") -> true
+        message.matchRegex("§aYou earned §r§2(\\d|,)+ GEXP §r§a\\+ §r§[e5](\\d|,)+ Event EXP §r§afrom playing SkyBlock!") -> true
         message == "§b§m-----------------------------------------------------" -> true
         else -> false
     }
