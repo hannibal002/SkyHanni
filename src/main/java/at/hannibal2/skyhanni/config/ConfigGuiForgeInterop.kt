@@ -1,49 +1,33 @@
-package at.hannibal2.skyhanni.config;
+package at.hannibal2.skyhanni.config
 
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.client.IModGuiFactory;
-import org.lwjgl.input.Keyboard;
+import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
+import net.minecraftforge.fml.client.IModGuiFactory
+import net.minecraftforge.fml.client.IModGuiFactory.RuntimeOptionCategoryElement
+import net.minecraftforge.fml.client.IModGuiFactory.RuntimeOptionGuiHandler
+import org.lwjgl.input.Keyboard
+import java.io.IOException
 
-import java.io.IOException;
-import java.util.Set;
-
-public class ConfigGuiForgeInterop implements IModGuiFactory {
-    @Override
-    public void initialize(Minecraft minecraft) {}
-
-    @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
-        return WrappedSkyHanniConfig.class;
+class ConfigGuiForgeInterop : IModGuiFactory {
+    override fun initialize(minecraft: Minecraft) {}
+    override fun mainConfigGuiClass(): Class<out GuiScreen> {
+        return WrappedSkyHanniConfig::class.java
     }
 
-    @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
-        return null;
-    }
+    override fun runtimeGuiCategories(): Set<RuntimeOptionCategoryElement>? = null
 
-    @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement runtimeOptionCategoryElement) {
-        return null;
-    }
+    override fun getHandlerFor(runtimeOptionCategoryElement: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? =
+        null
 
-    public static class WrappedSkyHanniConfig extends GuiScreenElementWrapper {
-
-        private final GuiScreen parent;
-
-        public WrappedSkyHanniConfig(GuiScreen parent) {
-            super(ConfigEditor.editor);
-            this.parent = parent;
-        }
-
-        @Override
-        public void handleKeyboardInput() throws IOException {
+    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigEditor.editor) {
+        @Throws(IOException::class)
+        override fun handleKeyboardInput() {
             if (Keyboard.getEventKeyState() && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
-                Minecraft.getMinecraft().displayGuiScreen(parent);
-                return;
+                Minecraft.getMinecraft().displayGuiScreen(parent)
+                return
             }
-            super.handleKeyboardInput();
+            super.handleKeyboardInput()
         }
     }
 }
