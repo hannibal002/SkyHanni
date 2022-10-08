@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -84,6 +84,7 @@ class BlazeSlayerPillar {
         if (matcher.matches()) {
             lastPillarSpawnTime = -1L
             SoundUtils.createSound("note.pling", 0.7f).playSound()
+            SendTitleHelper.sendTitle("§cBlaze Pillar: §aExploded!", 500)
         }
 
         when (message) {
@@ -109,8 +110,10 @@ class BlazeSlayerPillar {
         }
 
         if (SkyHanniMod.feature.slayer.firePillarDisplay) {
-            val format = DecimalFormat("0.0").format(remaining + 0.1)
-            SkyHanniMod.feature.slayer.firePillarPos.renderString("§cBlaze Pillar: §a${format}s")
+            if (remaining > -0.5) {
+                val format = DecimalFormat("0.0").format(remaining + 0.1)
+                SendTitleHelper.sendTitle("§cBlaze Pillar: §a${format}s", 200)
+            }
         }
     }
 

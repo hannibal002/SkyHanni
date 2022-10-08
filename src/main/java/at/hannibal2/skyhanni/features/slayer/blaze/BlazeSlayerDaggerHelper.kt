@@ -41,7 +41,8 @@ class BlazeSlayerDaggerHelper {
 
         val message = event.message
         if (message.matchRegex("§cStrike using the §r(.+) §r§cattunement on your dagger!") ||
-            message == "§cYour hit was reduced by Hellion Shield!") {
+            message == "§cYour hit was reduced by Hellion Shield!"
+        ) {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }
@@ -82,10 +83,9 @@ class BlazeSlayerDaggerHelper {
         if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
         lastNearestCheck = System.currentTimeMillis()
 
-
         val playerLocation = LocationUtils.playerLocation()
         return HellionShieldHelper.hellionShieldMobs
-            .filter { it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.health > 0 }
+            .filter { !it.key.isDead && it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.health > 0 }
             .toSortedMap { a, b ->
                 if (a.getLorenzVec().distance(playerLocation) > b.getLorenzVec().distance(playerLocation)) 1 else 0
             }.firstNotNullOfOrNull { it.value }
