@@ -3,6 +3,7 @@
 ## Version 0.12.2
 
 ### Changes
++ Add Bonzo's Mask highlight timer
 + Made the config button in the forge mod list work.
 + Blaze slayer pillar warning text is now much bigger.
 + Hides the new 'you earn x event exp' message.

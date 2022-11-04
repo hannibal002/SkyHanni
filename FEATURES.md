@@ -49,6 +49,7 @@
 + Show the amount of selected tuning points in the stats tuning inventory.
 + Highlight the selected template in the stats tuning inventory.
 + Show the type of stats for the tuning point templates.
++ Highlight depleted Bonzo's Masks in your inventory.
 
 ## Item Abilities
 - Show the cooldown of items in the inventory.
