@@ -16,6 +16,7 @@
 - Dungeon Boss Message hider (includes The Watcher as well)
 - Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon or during a Kuudra fight.
 - Scan messages sent by players in all-chat for blacklisted words and greys out the message.
+- Chat peeking (holding key to display chat without opening the chat gui)
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
