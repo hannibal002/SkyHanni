@@ -15,5 +15,8 @@
     "renderer.MixinBlockRendererDispatcher",
     "renderer.MixinRendererLivingEntity",
     "tileentity.TileEntitySignMixin"
+  ],
+  "client": [
+    "gui.MixinGuiNewChat"
   ]
 }

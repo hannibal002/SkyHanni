@@ -6,6 +6,7 @@
 + Made the config button in the forge mod list work.
 + Blaze slayer pillar warning text is now much bigger.
 + Hides the new 'you earn x event exp' message.
++ Added Peek Chat feature.
 
 ### Fixes
 + Fixed a bug that caused the right blaze slayer dagger highlight to show wrong values.

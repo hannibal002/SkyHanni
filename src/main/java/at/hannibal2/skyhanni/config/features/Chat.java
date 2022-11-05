@@ -2,8 +2,14 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
+import org.lwjgl.input.Keyboard;
 
 public class Chat {
+
+    @Expose
+    @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
+    public int peekChat = Keyboard.KEY_Z;
 
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
