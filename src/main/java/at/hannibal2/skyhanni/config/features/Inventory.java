@@ -115,4 +115,10 @@ public class Inventory {
             desc = "Show a compact star count in the item name for all items")
     @ConfigEditorBoolean
     public boolean itemStars = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Depleted Bonzo's Masks",
+            desc = "Highlights used Bonzo's Masks with a background")
+    @ConfigEditorBoolean
+    public boolean highlightDepletedBonzosMasks = false;
 }

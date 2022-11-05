@@ -163,6 +163,7 @@ public class SkyHanniMod {
         registerEvent(new GriffinBurrowHelper());
         registerEvent(new GriffinBurrowParticleFinder());
         registerEvent(new BurrowWarpHelper());
+        registerEvent(new HighlightBonzoMasks());
 
         Commands.INSTANCE.init();
 
