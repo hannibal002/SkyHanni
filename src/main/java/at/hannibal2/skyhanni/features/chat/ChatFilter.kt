@@ -248,7 +248,7 @@ class ChatFilter {
     private fun killCombo(message: String): Boolean {
         //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
         return when {
-            message.matchRegex("§.§l\\+(.*) Kill Combo §r§8\\+(.*)") -> true
+            message.matchRegex("§.§l\\+(.*) Kill Combo (.*)") -> true
             message == "§6§l+50 Kill Combo" -> true
             message.matchRegex("§cYour Kill Combo has expired! You reached a (.*) Kill Combo!") -> true
             else -> false
