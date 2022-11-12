@@ -11,6 +11,7 @@
 
 ### Fixes
 + Fixed a bug that caused the right blaze slayer dagger highlight to show wrong values.
++ Fixed kill combo message filter format
 
 ## Version 0.12.1
 
