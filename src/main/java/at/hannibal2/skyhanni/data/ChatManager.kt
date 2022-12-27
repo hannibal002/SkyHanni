@@ -54,15 +54,13 @@ class ChatManager {
         }
 
         val modified = chatEvent.chatComponent
-        if (modified.formattedText == original.formattedText) {
-            loggerAllowed.log(message)
-            loggerAll.log("[allowed] $message")
-        } else {
+        loggerAllowed.log("[allowed] $message")
+        loggerAll.log("[allowed] $message")
+        if (modified.formattedText != original.formattedText) {
             event.message = chatEvent.chatComponent
             loggerModified.log(" ")
             loggerModified.log("[original] " + original.formattedText)
             loggerModified.log("[modified] " + modified.formattedText)
-            loggerAll.log("[modified] " + modified.formattedText)
         }
     }
 }

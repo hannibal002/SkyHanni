@@ -260,13 +260,14 @@ class ChatFilter {
 
     private fun lobby(message: String): Boolean = when {
         //player join
-        message.matchRegex("(.*) §6joined the lobby!") -> true
-        message.matchRegex("(.*) §6slid into the lobby!") -> true
-        message.matchRegex(" §b>§c>§a>§r (.*) §6joined the lobby!§r §a<§c<§b<") -> true
+        message.matchRegex(".* §6joined the lobby!") -> true
+        message.matchRegex(" §b>§c>§a>§r §r.*§f §6slid into the lobby!§r §a<§c<§b<") -> true
+        message.matchRegex(".* §6slid into the lobby!") -> true
+        message.matchRegex(" §b>§c>§a>§r .* §6joined the lobby!§r §a<§c<§b<") -> true
 
         //mystery box
-        message.matchRegex("§b✦ §r(.*) §r§7found a §r§e(.*) §r§bMystery Box§r§7!") -> true
-        message.matchRegex("§b✦ §r(.*) §r§7found (a|an) §r(.*) §r§7in a §r§aMystery Box§r§7!") -> true
+        message.matchRegex("§b✦ §r.* §r§7found a §r§e.* §r§bMystery Box§r§7!") -> true
+        message.matchRegex("§b✦ §r.* §r§7found (a|an) §r.* §r§7in a §r§aMystery Box§r§7!") -> true
 
         //prototype
         message.contains("§r§6§lWelcome to the Prototype Lobby§r") -> true

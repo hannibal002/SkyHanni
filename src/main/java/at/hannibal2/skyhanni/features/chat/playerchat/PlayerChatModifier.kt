@@ -12,9 +12,9 @@ class PlayerChatModifier {
     private val patterns = mutableListOf<Regex>()
 
     init {
-        patterns.add("§(?:a|b|6)\\[(?:VIP|MVP)(?:(?:§.|\\+)*)] (\\w{2,16})".toRegex()) // ranked player everywhere
+        patterns.add("§(?:a|b|6)\\[(?:VIP|MVP)(?:(?:§.|\\+)*)](?: {1,2})(?:§[7ab6])?(\\w{2,16})".toRegex()) // ranked player everywhere
         patterns.add("§(?:7|a|b|6)((?:\\w+){2,16})§r(?!§7x)".toRegex()) // nons in notification message
-        patterns.add("§7((?:\\w+){2,16})§7§r".toRegex()) // nons user chat
+        patterns.add("(?:§7 )?§7((?:\\w+){2,16})§7§r".toRegex()) // nons user chat
     }
 
     @SubscribeEvent
