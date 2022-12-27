@@ -4,6 +4,7 @@
 
 ### Features
 + Player Rank Hider works now with all messages
++ Add two more chat filter categories: Powder Mining and Winter Gifts
 
 ### Removals
 - Removed additional settings for the chat design, like channel prefix and skyblock level  

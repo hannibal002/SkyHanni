@@ -20,25 +20,49 @@ public class Chat {
     @ConfigOption(name = "Hypixel Hub", desc = "Block messages outside SkyBlock in the Hypixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and Hypixel tournaments.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean hypixelHub = false;
+    public boolean hypixelHub = true;
 
     @Expose
     @ConfigOption(name = "Empty", desc = "Hide all the empty messages from the chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean empty = false;
+    public boolean empty = true;
 
     @Expose
     @ConfigOption(name = "Warping", desc = "Block 'sending request to join ..' and 'warping ..' messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean warping = false;
+    public boolean warping = true;
 
     @Expose
     @ConfigOption(name = "Welcome", desc = "Hide the 'welcome to skyblock' message.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean welcome = false;
+    public boolean welcome = true;
+
+    @Expose
+    @ConfigOption(name = "Guild Exp", desc = "Hide Guild Exp messages.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean guildExp = true;
+
+    @Expose
+    @ConfigOption(name = "Friend Join Left", desc = "Hide friend join/left messages.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean friendJoinLeft = false;
+
+    @Expose
+    @ConfigOption(name = "Winter Gifts", desc = "Hide useless winter gift messages.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean winterGift = true;
+
+    @Expose
+    @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in crystal hollows.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean powderMining = true;
 
     //TODO remove
     @Expose

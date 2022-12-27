@@ -24,7 +24,8 @@ class DungeonBossMessages {
         when {
             message.matchRegex("§([cd4])\\[BOSS] (.*)") -> {
                 when {
-                    message.contains(" The Watcher§r§f: ") -> return true
+                    message.contains(" The Watcher§r§f: ") ->
+                        message != "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass."
                     message.contains(" Bonzo§r§f: ") -> return true
                     message.contains(" Scarf§r§f:") -> return true
                     message.contains("Professor§r§f") -> return true

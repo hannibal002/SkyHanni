@@ -18,7 +18,7 @@ class DungeonCopilot {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!isEnabled()) return
 
         val message = event.message
 
@@ -71,6 +71,7 @@ class DungeonCopilot {
         }
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
+            event.blockedReason = "dungeon copilot"
             changeNextStep("Enter Boss Room")
         }
     }
@@ -127,8 +128,7 @@ class DungeonCopilot {
     @SubscribeEvent
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
-        if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.copilotEnabled) return
+        if (!isEnabled()) return
 
         SkyHanniMod.feature.dungeon.copilotPos.renderString(nextStep)
     }
