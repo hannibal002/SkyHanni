@@ -24,7 +24,9 @@ class ChatFilter {
         empty(message) && SkyHanniMod.feature.chat.empty -> "empty"
         warping(message) && SkyHanniMod.feature.chat.warping -> "warping"
         welcome(message) && SkyHanniMod.feature.chat.welcome -> "welcome"
-        guild(message) && SkyHanniMod.feature.chat.others -> "guild"
+        isGuildExp(message) && SkyHanniMod.feature.chat.guildExp -> "guild_exp"
+        friendJoin(message) && SkyHanniMod.feature.chat.friendJoinLeft -> "friend_join"
+
         killCombo(message) && SkyHanniMod.feature.chat.others -> "kill_combo"
         bazaarAndAHMiniMessages(message) && SkyHanniMod.feature.chat.others -> "bz_ah_minis"
         watchdogAnnouncement(message) && SkyHanniMod.feature.chat.others -> "watchdog"
@@ -36,8 +38,10 @@ class ChatFilter {
         money(message) && SkyHanniMod.feature.chat.others -> "money"
         winterIsland(message) && SkyHanniMod.feature.chat.others -> "winter_island"
         uselessWarning(message) && SkyHanniMod.feature.chat.others -> "useless_warning"
-        friendJoin(message) && SkyHanniMod.feature.chat.others -> "friend_join"
         annoyingSpam(message) && SkyHanniMod.feature.chat.others -> "annoying_spam"
+
+        isWinterGift(message) && SkyHanniMod.feature.chat.winterGift -> "winter_gift"
+        isPowderMining(message) && SkyHanniMod.feature.chat.powderMining -> "powder_mining"
 
 
         else -> ""
@@ -142,7 +146,6 @@ class ChatFilter {
     }
 
     private fun party(message: String): Boolean {
-        if (message == "§9§m-----------------------------") return true
         if (message == "§9§m-----------------------------------------------------") return true
 
         return false
@@ -278,13 +281,10 @@ class ChatFilter {
         else -> false
     }
 
-    private fun guild(message: String): Boolean = when {
-        message.matchRegex("§2Guild > (.*) §r§e(joined|left).") -> true
-        message.matchRegex("§aYou earned §r§2\\d+ GEXP §r§afrom playing SkyBlock!") -> true
-        message.matchRegex("§aYou earned §r§2(\\d|,)+ GEXP §r§a\\+ §r§[e5](\\d|,)+ Event EXP §r§afrom playing SkyBlock!") -> true
-        message == "§b§m-----------------------------------------------------" -> true
-        else -> false
-    }
+    private fun isGuildExp(message: String) =
+        // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
+        // §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
+        message.matchRegex("§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!")
 
     private fun welcome(message: String): Boolean = message == "§eWelcome to §r§aHypixel SkyBlock§r§e!"
 
@@ -316,6 +316,59 @@ class ChatFilter {
         "§f",
         "§c",
         -> true
+
+        else -> false
+    }
+
+    private fun isWinterGift(message: String): Boolean = when {
+        //winter gifts useless
+        message.matchRegex("§f§lCOMMON! §r§3.* XP §r§egift with §r.*§r§e!") -> true
+        message.matchRegex("(§f§lCOMMON|§9§lRARE)! §r.* XP Boost .* Potion §r.*§r§e!") -> true
+        message.matchRegex("(§f§lCOMMON|§9§lRARE)! §r§6.* coins §r§egift with §r.*§r§e!") -> true
+
+        //enchanted book
+        message.matchRegex("§9§lRARE! §r§9Scavenger IV §r§egift with §r.*§r§e!") -> true
+        message.matchRegex("§9§lRARE! §r§9Looting IV §r§egift with §r.*§r§e!") -> true
+        message.matchRegex("§9§lRARE! §r§9Luck VI §r§egift with §r.*§r§e!") -> true
+
+        message.matchRegex("§e§lSWEET! §r§f(Grinch|Santa|Gingerbread Man) Minion Skin §r§egift with §r.*§r§e!") -> true
+        message.matchRegex("§9§lRARE! §r§f◆ Ice Rune §r§egift with §r.*§r§e!") -> true
+
+        //furniture
+        message.matchRegex("§e§lSWEET! §r§fTall Holiday Tree §r§egift with §r.*§r§e!") -> true
+        message.matchRegex("§e§lSWEET! §r§fNutcracker §r§egift with §r.*§r§e!") -> true
+        message.matchRegex("§e§lSWEET! §r§fPresent Stack §r§egift with §r.*§r§e!") -> true
+
+        message.matchRegex("§e§lSWEET! §r§9(Winter|Battle) Disc §r§egift with §r.*§r§e!") -> true
+
+        //winter gifts a bit useful
+        message.matchRegex("§e§lSWEET! §r§9Winter Sack §r§egift with §r.*§r§e!") -> true
+        message.matchRegex("§e§lSWEET! §r§5Snow Suit .* §r§egift with §r.*§r§e!") -> true
+
+        //winter gifts not your gifts
+        message.matchRegex("§cThis gift is for §r.*§r§c, sorry!") -> true
+
+        else -> false
+    }
+
+    private fun isPowderMining(message: String) = when {
+        message.matchRegex("§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire) Gemstone Block§r§c.") -> true
+
+        message.matchRegex("§aYou received §r§f\\d* §r§f[❤❈☘⸕✎] §r§fRough (Ruby|Amethyst|Jade|Amber|Sapphire) Gemstone§r§a\\.") -> true
+        message.matchRegex("§aYou received §r§f\\d §r§a[❤❈☘⸕✎] §r§aFlawed (Ruby|Amethyst|Jade|Amber|Sapphire) Gemstone§r§a\\.") -> true
+
+
+        message == "§aYou uncovered a treasure chest!" -> true
+        message == "§aYou received §r§f1 §r§aWishing Compass§r§a." -> true
+        message == "§aYou received §r§f1 §r§9Ascension Rope§r§a." -> true
+
+        //Jungle
+        message.matchRegex("§aYou received §r§f\\d* §r§aSludge Juice§r§a\\.") -> true
+        message == "§aYou received §r§f1 §r§aOil Barrel§r§a." -> true
+
+        //Useful, maybe in another chat
+        message.matchRegex("§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder") -> true
+        message == "§6You have successfully picked the lock on this chest!" -> true
 
         else -> false
     }

@@ -7,6 +7,8 @@
 - Hiding Empty messages.
 - Warping messages (Sending requests and switching servers)
 - Welcome Message when entering SkyBlock.
+- Powder Mining messages hider
+- Winter gift messages hider
 - Many other messages (Not separated into own categories yet)
 
 ## Chat
