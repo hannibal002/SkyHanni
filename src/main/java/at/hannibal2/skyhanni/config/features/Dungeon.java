@@ -149,6 +149,16 @@ public class Dungeon {
     @ConfigAccordionId(id = 5)
     public Position copilotPos = new Position(10, 10, false, true);
 
+    @ConfigOption(name = "Party Finder", desc = "")
+    @ConfigEditorAccordion(id = 6)
+    public boolean partyFinder = false;
+
+    @Expose
+    @ConfigOption(name = "Colored Class Level", desc = "Show the class levels in party finder in colors.")
+    @ConfigAccordionId(id = 6)
+    @ConfigEditorBoolean
+    public boolean partyFinderColoredClassLevel = true;
+
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into a " +
             "Skeletor in orange color (not useful combined with feature Hide Skeleton Skull)")

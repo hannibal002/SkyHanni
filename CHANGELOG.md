@@ -3,8 +3,9 @@
 ## Version 0.13
 
 ### Features
-+ Player Rank Hider works now with all messages
-+ Add two more chat filter categories: Powder Mining and Winter Gifts
++ Player Rank Hider works now with all messages.
++ Add two more chat filter categories: Powder Mining and Winter Gifts.
++ Add catacombs class level color to party finder.
 
 ### Removals
 - Removed additional settings for the chat design, like channel prefix and skyblock level  

@@ -39,6 +39,7 @@
 - Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
 - Hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs.
 - Hide the golden fairy that follows the healer in dungeon.
+- Catacombs class level color in party finder inventory.
 
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs (in NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)

@@ -164,6 +164,7 @@ public class SkyHanniMod {
         registerEvent(new GriffinBurrowParticleFinder());
         registerEvent(new BurrowWarpHelper());
         registerEvent(new HighlightBonzoMasks());
+        registerEvent(new DungeonLevelColor());
 
         Commands.INSTANCE.init();
 
