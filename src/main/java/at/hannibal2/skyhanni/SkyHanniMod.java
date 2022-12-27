@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages;
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter;
-import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFormatter;
+import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
@@ -61,7 +61,7 @@ import java.util.List;
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.12.2";
+    public static final String VERSION = "0.13";
 
     public static Features feature;
 
@@ -101,7 +101,7 @@ public class SkyHanniMod {
         //features
         registerEvent(new BazaarOrderHelper());
         registerEvent(new ChatFilter());
-        registerEvent(new PlayerChatFormatter());
+        registerEvent(new PlayerChatModifier());
         registerEvent(new DungeonChatFilter());
         registerEvent(new HideNotClickableItems());
         registerEvent(new ItemDisplayOverlayFeatures());

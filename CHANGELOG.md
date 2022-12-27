@@ -1,5 +1,13 @@
 # SkyHanni - Change Log
 
+## Version 0.13
+
+### Features
++ Player Rank Hider works now with all messages
+
+### Removals
+- Removed additional settings for the chat design, like channel prefix and skyblock level  
+
 ## Version 0.12.2
 
 ### Changes
