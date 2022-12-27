@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.PlayerSendChatEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -9,7 +8,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -17,7 +15,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class MarkedPlayerManager {
 
     companion object {
-        private val playerNamesToMark = mutableListOf<String>()
+        val playerNamesToMark = mutableListOf<String>()
         private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
 
         fun command(args: Array<String>) {
@@ -116,18 +114,6 @@ class MarkedPlayerManager {
             val name = Minecraft.getMinecraft().thePlayer.name
             if (!playerNamesToMark.contains(name)) {
                 playerNamesToMark.add(name)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onMarkedChatMessage(event: PlayerSendChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
-
-        for (chatComponent in event.chatComponents) {
-            val text = chatComponent.unformattedText
-            if (isMarkedPlayer(text) && SkyHanniMod.feature.markedPlayers.highlightInChat) {
-                chatComponent.chatStyle.color = EnumChatFormatting.YELLOW
             }
         }
     }
