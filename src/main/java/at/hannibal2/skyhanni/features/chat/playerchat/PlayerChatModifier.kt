@@ -81,7 +81,7 @@ class PlayerChatModifier {
 
         if (SkyHanniMod.feature.markedPlayers.highlightInChat) {
             for (markedPlayer in MarkedPlayerManager.playerNamesToMark) {
-                string = string.replace(markedPlayer, "§e$markedPlayer")
+                string = string.replace(markedPlayer, "§e$markedPlayer§r")
             }
         }
 
