@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -14,14 +15,26 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemTipHelper {
 
+    private val lastColorCacheTime = HashMap<String, Long>()
+    private val cache = HashMap<String, String>()
+
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyblock || stack.stackSize != 1) return
 
-        val itemTipEvent = RenderItemTipEvent(stack)
-        itemTipEvent.postAndCatch()
-        val stackTip = itemTipEvent.stackTip
+        val uuid = stack.getLore().joinToString { ", " }
+        val stackTip: String
+        if (lastColorCacheTime.getOrDefault(uuid, 0L) + 1000 > System.currentTimeMillis()) {
+            stackTip = cache[uuid]!!
+        } else {
+            val itemTipEvent = RenderItemTipEvent(stack)
+            itemTipEvent.postAndCatch()
+            stackTip = itemTipEvent.stackTip
+            cache[uuid] = stackTip
+            lastColorCacheTime[uuid] = System.currentTimeMillis()
+        }
+
         if (stackTip.isEmpty()) return
 
         GlStateManager.disableLighting()
