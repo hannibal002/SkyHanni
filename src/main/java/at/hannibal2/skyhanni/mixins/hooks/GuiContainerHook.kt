@@ -29,11 +29,11 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
-        if (GuiContainerEvent.DrawSlotEvent.Pre(gui, gui.inventorySlots, slot).postAndCatch()) ci.cancel()
+        if (GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, gui.inventorySlots, slot).postAndCatch()) ci.cancel()
     }
 
     fun onDrawSlotPost(slot: Slot, ci: CallbackInfo) {
-        GuiContainerEvent.DrawSlotEvent.Post(gui, gui.inventorySlots, slot).postAndCatch()
+        GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPost(gui, gui.inventorySlots, slot).postAndCatch()
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {

@@ -27,10 +27,10 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     abstract class DrawSlotEvent(gui: GuiContainer, container: Container, open val slot: Slot) :
         GuiContainerEvent(gui, container) {
         @Cancelable
-        data class Pre(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
+        data class GuiContainerDrawSlotPre(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
             DrawSlotEvent(gui, container, slot)
 
-        data class Post(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
+        data class GuiContainerDrawSlotPost(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
             DrawSlotEvent(gui, container, slot)
     }
 

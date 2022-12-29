@@ -19,7 +19,7 @@ class ItemTipHelper {
     private val cache = HashMap<String, String>()
 
     @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
+    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyblock || stack.stackSize != 1) return
 

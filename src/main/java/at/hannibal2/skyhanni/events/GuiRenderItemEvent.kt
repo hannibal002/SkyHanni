@@ -11,7 +11,7 @@ abstract class GuiRenderItemEvent : LorenzEvent() {
         open val y: Int,
         open val text: String?
     ) : GuiRenderItemEvent() {
-        data class Post(
+        data class GuiRenderItemPost(
             override val fontRenderer: FontRenderer,
             override val stack: ItemStack?,
             override val x: Int,

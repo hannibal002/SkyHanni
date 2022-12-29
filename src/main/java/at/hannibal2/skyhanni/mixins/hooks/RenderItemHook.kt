@@ -19,7 +19,7 @@ fun renderItemOverlayPost(
     text: String?,
     ci: CallbackInfo
 ) {
-    GuiRenderItemEvent.RenderOverlayEvent.Post(
+    GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost(
         fr,
         stack,
         xPosition,
