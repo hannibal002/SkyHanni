@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.RenderParticleEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -43,21 +42,6 @@ class BlazeSlayerClearView {
     fun onReceivePacket(event: ReceiveParticleEvent) {
         if (isEnabled()) {
             event.isCanceled = true
-        }
-    }
-
-    @SubscribeEvent
-    fun onSpawnParticle(event: RenderParticleEvent) {
-        if (isEnabled()) {
-            when (event.callerClass) {
-                "net.minecraft.block.BlockFire",
-                "net.minecraft.entity.monster.EntityBlaze",
-                "net.minecraft.entity.projectile.EntityFireball",
-                -> {
-                    event.isCanceled = true
-                    return
-                }
-            }
         }
     }
 
