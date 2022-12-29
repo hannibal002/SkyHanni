@@ -8,7 +8,10 @@
 + Add catacombs class level color to party finder.
 
 ### Removals
-- Removed additional settings for the chat design, like channel prefix and skyblock level  
+- Removed additional settings for the chat design, like channel prefix and skyblock level
+
+### Fixes
++ Fixed void slayer mini bosses not being detected and colored.
 
 ## Version 0.12.2
 

@@ -71,7 +71,7 @@ class EndermanSlayerBeacon {
         endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }
             .forEach { event.drawColor(it, LorenzColor.DARK_RED, alpha = 1f) }
 
-        for (location in sittingBeacon) {
+        for (location in sittingBeacon.toMutableList()) {
             event.drawColor(location, LorenzColor.DARK_RED, alpha = 1f)
             event.drawString(location.add(0.5, 0.5, 0.5), "§4Beacon", true)
         }

@@ -50,7 +50,7 @@ class HighlightSlayerMiniboss {
         })
 
         list.addAll(entityList.filterIsInstance<EntityEnderman>().filter {
-            it.hasMaxHealth(12_000_000) || it.hasMaxHealth(25_000_000)
+            it.hasMaxHealth(12_000_000) || it.hasMaxHealth(17_500_000) || it.hasMaxHealth(52_500_000)
         })
 
         list.addAll(entityList.filterIsInstance<EntityBlaze>().filter {
