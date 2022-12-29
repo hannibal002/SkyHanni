@@ -88,6 +88,7 @@
 ## Bazaar
 - Showing colors in the order inventory for outbid or fully bought/sold items.
 - Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
+- Saves missing items from cancelled buy orders to clipboard for faster re-entry.
 
 ## Fishing
 - Trophy Counter (After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total)

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.*;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
+import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard;
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages;
@@ -164,6 +165,7 @@ public class SkyHanniMod {
         registerEvent(new BurrowWarpHelper());
         registerEvent(new HighlightBonzoMasks());
         registerEvent(new DungeonLevelColor());
+        registerEvent(new BazaarCancelledBuyOrderClipboard());
 
         Commands.INSTANCE.init();
 

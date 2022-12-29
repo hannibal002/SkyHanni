@@ -22,4 +22,9 @@ public class Bazaar {
     @ConfigOption(name = "Best Sell Method Position", desc = "")
     @ConfigEditorButton(runnableId = "bestSellMethod", buttonText = "Edit")
     public Position bestSellMethodPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Cancelled Buy Order Clipboard", desc = "Saves missing items from cancelled buy orders to clipboard for faster re-entry.")
+    @ConfigEditorBoolean
+    public boolean cancelledBuyOrderClipboard = true;
 }
