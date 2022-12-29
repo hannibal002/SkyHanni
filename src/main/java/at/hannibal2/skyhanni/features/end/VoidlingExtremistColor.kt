@@ -54,5 +54,5 @@ class VoidlingExtremistColor {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.inSkyblock && LorenzUtils.skyBlockIsland == "The End" && SkyHanniMod.feature.misc.milleniaAgedBlazeColor
+        LorenzUtils.inSkyblock && LorenzUtils.skyBlockIsland == "The End" && SkyHanniMod.feature.misc.voidlingExtremistColor
 }
