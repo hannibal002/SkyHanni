@@ -166,6 +166,7 @@ public class SkyHanniMod {
         registerEvent(new HighlightBonzoMasks());
         registerEvent(new DungeonLevelColor());
         registerEvent(new BazaarCancelledBuyOrderClipboard());
+        registerEvent(new CroesusUnopenedChestTracker());
 
         Commands.INSTANCE.init();
 

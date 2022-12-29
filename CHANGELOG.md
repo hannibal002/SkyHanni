@@ -8,6 +8,7 @@
 + Add catacombs class level color to party finder.
 + Add wishing compass uses amount display.
 + Saves missing items from cancelled buy orders to clipboard for faster re-entry.
++ Adds a visual highlight to the Croesus inventory that shows what chests have not yet been opened.
 
 ### Removals
 - Removed additional settings for the chat design, like channel prefix and skyblock level

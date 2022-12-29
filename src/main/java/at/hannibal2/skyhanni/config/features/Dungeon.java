@@ -69,7 +69,7 @@ public class Dungeon {
     @Expose
     @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color.")
     @ConfigEditorBoolean
-    public boolean highlightDeathmites = false;
+    public boolean highlightDeathmites = true;
 
     @ConfigOption(name = "Object Hider", desc = "Hide various things in dungeon.")
     @ConfigEditorAccordion(id = 3)
@@ -109,7 +109,7 @@ public class Dungeon {
     @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide skeleton skulls laying around in dungeon.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
-    public boolean hideSkeletonSkull = false;
+    public boolean hideSkeletonSkull = true;
 
     @Expose
     @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the healer kills mobs.")
@@ -163,5 +163,11 @@ public class Dungeon {
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into a " +
             "Skeletor in orange color (not useful combined with feature Hide Skeleton Skull)")
     @ConfigEditorBoolean
-    public boolean highlightSkeletonSkull = false;
+    public boolean highlightSkeletonSkull = true;
+
+    @Expose
+    @ConfigOption(name = "Croesus Unopened Chest Tracker", desc = "Adds a visual highlight to the Croesus inventory that " +
+            "shows what chests have not yet been opened.")
+    @ConfigEditorBoolean
+    public boolean croesusUnopenedChestTracker = true;
 }
