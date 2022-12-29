@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.RenderParticleEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -33,21 +32,6 @@ class AshfangHideParticles {
         if (!isEnabled()) return
 
         event.isCanceled = true
-    }
-
-    @SubscribeEvent
-    fun onSpawnParticle(event: RenderParticleEvent) {
-        if (!isEnabled()) return
-
-
-        when (event.callerClass) {
-            "net.minecraft.block.BlockFire",
-            "net.minecraft.entity.monster.EntityBlaze",
-            "net.minecraft.entity.projectile.EntityFireball",
-            -> {
-                event.isCanceled = true
-            }
-        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

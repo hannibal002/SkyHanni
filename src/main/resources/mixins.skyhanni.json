@@ -4,9 +4,9 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "AccessorGuiPlayerTabOverlay",
+    "MixinEntityBlaze",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
-    "MixinRenderGlobal",
     "MixinRenderItem",
     "MixinRenderManager",
     "gui.AccessorGuiContainer",

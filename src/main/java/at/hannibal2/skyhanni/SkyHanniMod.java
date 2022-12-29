@@ -158,7 +158,6 @@ public class SkyHanniMod {
         registerEvent(new SlayerQuestWarning());
         registerEvent(new StatsTuning());
         registerEvent(new NonGodPotEffectDisplay());
-        registerEvent(new HideBlazeParticles());
         registerEvent(new SoopyGuessBurrow());
         registerEvent(new GriffinBurrowHelper());
         registerEvent(new GriffinBurrowParticleFinder());
