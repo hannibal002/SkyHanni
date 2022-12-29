@@ -353,10 +353,10 @@ class ChatFilter {
     }
 
     private fun isPowderMining(message: String) = when {
-        message.matchRegex("§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire) Gemstone Block§r§c.") -> true
+        message.matchRegex("§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c.") -> true
 
-        message.matchRegex("§aYou received §r§f\\d* §r§f[❤❈☘⸕✎] §r§fRough (Ruby|Amethyst|Jade|Amber|Sapphire) Gemstone§r§a\\.") -> true
-        message.matchRegex("§aYou received §r§f\\d §r§a[❤❈☘⸕✎] §r§aFlawed (Ruby|Amethyst|Jade|Amber|Sapphire) Gemstone§r§a\\.") -> true
+        message.matchRegex("§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] §r§fRough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.") -> true
+        message.matchRegex("§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] §r§aFlawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.") -> true
 
 
         message == "§aYou uncovered a treasure chest!" -> true
