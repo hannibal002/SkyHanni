@@ -89,13 +89,14 @@ public class Inventory {
     )
     @ConfigEditorDraggableList(
             exampleText = {
-                    "\u00a7bMaster Star Tier",
-                    "\u00a7bMaster Skull Tier",
-                    "\u00a7bDungeon Head Floor Number",
-                    "\u00a7bNew Year Cake",
-                    "\u00a7bPet Level",
-                    "\u00a7bMinion Tier",
-                    "\u00a7bCrimson Armor",
+                    "§bMaster Star Tier",
+                    "§bMaster Skull Tier",
+                    "§bDungeon Head Floor Number",
+                    "§bNew Year Cake",
+                    "§bPet Level",
+                    "§bMinion Tier",
+                    "§bCrimson Armor",
+                    "§bWishing Compass"
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Collections.singletonList(3));

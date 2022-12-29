@@ -10,8 +10,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
 class ItemDisplayOverlayFeatures {
+
+    private val wishingCompassPattern = Pattern.compile("§7Remaining Uses: §e(.*)§8/§e3")
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -80,6 +83,20 @@ class ItemDisplayOverlayFeatures {
             if (ItemUtils.isSack(name)) {
                 val sackName = grabSackName(name)
                 return (if (name.contains("Enchanted")) "§5" else "") + sackName.substring(0, 2)
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(7)) {
+            if (name.contains("Wishing Compass")) {
+                for (line in item.getLore()) {
+                    val matcher = wishingCompassPattern.matcher(line)
+                    if (matcher.matches()) {
+                        val uses = matcher.group(1)
+                        if (uses != "3") {
+                            return uses
+                        }
+                    }
+                }
             }
         }
 

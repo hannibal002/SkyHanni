@@ -152,3 +152,4 @@
 - Hide armor or just helmet of other player or yourself
 - Display the active non-god potion effects.
 - Option to hide blaze particles.
+- Wishing compass uses amount display.
