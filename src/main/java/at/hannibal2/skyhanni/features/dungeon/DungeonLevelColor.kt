@@ -45,7 +45,7 @@ class DungeonLevelColor {
         if (level >= 50) return "§c§l"
         if (level >= 45) return "§c"
         if (level >= 40) return "§d"
-        if (level >= 35) return "§b"
+        if (level >= 35) return "§6"
         if (level >= 30) return "§5"
         if (level >= 25) return "§9"
         if (level >= 20) return "§a"
