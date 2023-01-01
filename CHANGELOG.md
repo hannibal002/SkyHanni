@@ -1,5 +1,10 @@
 # SkyHanni - Change Log
 
+## Version 0.13.1
+
+### Fixes
++ Dungeon level color fixed wrong colors.
+
 ## Version 0.13
 
 ### Features
