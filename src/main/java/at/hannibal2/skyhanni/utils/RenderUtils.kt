@@ -424,7 +424,8 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.renderString(string: String, offsetY: Int = 0) {
+    fun Position.renderString(string: String?, offsetY: Int = 0) {
+        if (string == null) return
         if (string == "") return
         val textToRender = "§f$string"
 
