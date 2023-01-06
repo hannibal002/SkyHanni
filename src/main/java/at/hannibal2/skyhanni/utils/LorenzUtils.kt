@@ -33,11 +33,17 @@ object LorenzUtils {
     val inKuudraFight: Boolean
         get() = skyBlockIsland == "Instanced"
 
-    const val DEBUG_PREFIX = "[Debug] §7"
+    const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
 
     fun debug(message: String) {
-        internalChat(DEBUG_PREFIX + message)
+        if (SkyHanniMod.feature.dev.debugEnabled) {
+            if (internalChat(DEBUG_PREFIX + message)) {
+                consoleLog("[Debug] $message")
+            }
+        } else {
+            consoleLog("[Debug] $message")
+        }
     }
 
     fun warning(message: String) {
@@ -52,21 +58,22 @@ object LorenzUtils {
         internalChat(message)
     }
 
-    private fun internalChat(message: String) {
+    private fun internalChat(message: String): Boolean {
         log.log(message)
         val minecraft = Minecraft.getMinecraft()
         if (minecraft == null) {
             consoleLog(message.removeColor())
-            return
+            return false
         }
 
         val thePlayer = minecraft.thePlayer
         if (thePlayer == null) {
             consoleLog(message.removeColor())
-            return
+            return false
         }
 
         thePlayer.addChatMessage(ChatComponentText(message))
+        return true
     }
 
     //TODO move into StringUtils

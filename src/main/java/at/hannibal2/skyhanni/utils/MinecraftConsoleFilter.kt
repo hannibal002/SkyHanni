@@ -130,15 +130,19 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 if (cause.stackTrace.isNotEmpty()) {
                     val first = cause.stackTrace[0]
                     if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
-                        if (first.toString() == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)") {
+                        val firstName = first.toString()
+                        if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
+                            firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)"
+                        ) {
                             filterConsole("NullPointerException at Scoreboard.removeTeam")
                             return Filter.Result.DENY
                         }
-                        if (first.toString() == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
+                        if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
                             filterConsole("IllegalArgumentException at Scoreboard.createTeam")
                             return Filter.Result.DENY
                         }
-                        if (first.toString() == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)") {
+                        if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
+                            firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)") {
                             filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
                             return Filter.Result.DENY
                         }

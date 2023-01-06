@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack
 class BazaarApi {
 
     companion object {
-        private val bazaarMap = mutableMapOf<String, BazaarData>()
+        val bazaarMap = mutableMapOf<String, BazaarData>()
 
         fun isBazaarInventory(inventoryName: String): Boolean {
             if (inventoryName.contains(" ➜ ") && !inventoryName.contains("Museum")) return true
