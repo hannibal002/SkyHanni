@@ -37,6 +37,11 @@ public class Features extends Config {
             return;
         }
 
+        if (runnableId.equals("collectionCounter")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.collectionCounterPos);
+            return;
+        }
+
         if (runnableId.equals("debugPos")) {
             editOverlay(activeConfigCategory, 200, 16, dev.debugPos);
             return;

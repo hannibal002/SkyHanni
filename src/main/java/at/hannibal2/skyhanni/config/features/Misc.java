@@ -134,4 +134,9 @@ public class Misc {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
+
+    @Expose
+    @ConfigOption(name = "Collection Counter Position", desc = "Tracking the number of items you collect. §cDoes not work with sacks.")
+    @ConfigEditorButton(runnableId = "collectionCounter", buttonText = "Edit")
+    public Position collectionCounterPos = new Position(10, 10, false, true);
 }
