@@ -140,6 +140,7 @@
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - /shmarkplayer <player> (marking a player with yellow color)
+- /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
 - 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
