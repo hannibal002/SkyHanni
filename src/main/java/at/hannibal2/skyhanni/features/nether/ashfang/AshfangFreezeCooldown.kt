@@ -26,7 +26,7 @@ class AshfangFreezeCooldown {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
         val duration = System.currentTimeMillis() - lastHit

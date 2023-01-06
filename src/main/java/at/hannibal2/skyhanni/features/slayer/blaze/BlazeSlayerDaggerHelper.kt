@@ -245,7 +245,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
         if (textTopLeft.isEmpty()) return
