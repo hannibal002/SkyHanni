@@ -12,12 +12,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.util.*
 
-class ApiKeyGrabber {
+class ApiDataLoader {
 
     private var currentProfileName = ""
+
+    private var nextApiCallTime = -1L
+    private var currentProfileId = ""
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
+        thePlayer.worldObj ?: return
+
+        if (nextApiCallTime != -1L && System.currentTimeMillis() > nextApiCallTime) {
+            nextApiCallTime = System.currentTimeMillis() + 60_000 * 5
+            SkyHanniMod.coroutineScope.launch {
+                val apiKey = SkyHanniMod.feature.hidden.apiKey
+                val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
+                loadProfileData(apiKey, uuid, currentProfileId)
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
@@ -38,7 +57,6 @@ class ApiKeyGrabber {
         updateApiData()
     }
 
-
     private suspend fun tryUpdateProfileDataAndVerifyKey(apiKey: String): Boolean {
         val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
         val url = "https://api.hypixel.net/player?key=$apiKey&uuid=$uuid"
@@ -55,20 +73,21 @@ class ApiKeyGrabber {
         }
         val player = jsonObject["player"].asJsonObject
         val stats = player["stats"].asJsonObject
-        val skyblock = stats["SkyBlock"].asJsonObject
-        val profiles = skyblock["profiles"].asJsonObject
+        val skyBlock = stats["SkyBlock"].asJsonObject
+        val profiles = skyBlock["profiles"].asJsonObject
         for (entry in profiles.entrySet()) {
             val asJsonObject = entry.value.asJsonObject
             val name = asJsonObject["cute_name"].asString
             if (currentProfileName == name.lowercase()) {
-                val profileId = asJsonObject["profile_id"].asString
-                loadProfile(apiKey, uuid, profileId)
+                currentProfileId = asJsonObject["profile_id"].asString
+                loadProfileData(apiKey, uuid, currentProfileId)
             }
         }
         return true
     }
 
     private fun updateApiData() {
+        nextApiCallTime = -1
         SkyHanniMod.coroutineScope.launch {
             val oldApiKey = SkyHanniMod.feature.hidden.apiKey
             if (oldApiKey.isNotEmpty() && tryUpdateProfileDataAndVerifyKey(oldApiKey)) {
@@ -110,17 +129,17 @@ class ApiKeyGrabber {
         return candidates
     }
 
-    private suspend fun loadProfile(apiKey: String, playerUuid: String, profileId: String) {
+    private suspend fun loadProfileData(apiKey: String, playerUuid: String, profileId: String) {
         val url = "https://api.hypixel.net/skyblock/profile?key=$apiKey&profile=$profileId"
 
         val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
-
         val profile = jsonObject["profile"]?.asJsonObject ?: return
         val members = profile["members"]?.asJsonObject ?: return
         for (entry in members.entrySet()) {
             if (entry.key == playerUuid) {
                 val profileData = entry.value.asJsonObject
                 ProfileApiDataLoadedEvent(profileData).postAndCatch()
+                nextApiCallTime = System.currentTimeMillis() + 60_000 * 3
             }
         }
     }
