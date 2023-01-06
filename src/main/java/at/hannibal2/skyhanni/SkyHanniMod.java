@@ -89,7 +89,7 @@ public class SkyHanniMod {
         registerEvent(new HypixelData());
         registerEvent(new DungeonData());
         registerEvent(new ScoreboardData());
-        registerEvent(new ApiKeyGrabber());
+        registerEvent(new ApiDataLoader());
         registerEvent(new SeaCreatureManager());
         registerEvent(new ItemRenderBackground());
         registerEvent(new EntityData());
