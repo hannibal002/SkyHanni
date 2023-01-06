@@ -186,11 +186,9 @@ public class SkyHanniMod {
     private void registerEvent(Object object) {
         listenerClasses.add(object);
         String simpleName = object.getClass().getSimpleName();
-        consoleLog("SkyHanni registering '" + simpleName + "'");
         long start = System.currentTimeMillis();
         MinecraftForge.EVENT_BUS.register(object);
         long duration = System.currentTimeMillis() - start;
-        consoleLog("Done after " + duration + " ms!");
     }
 
     public static GuiScreen screenToOpen = null;
