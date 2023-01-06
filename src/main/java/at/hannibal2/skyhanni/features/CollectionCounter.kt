@@ -15,14 +15,20 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CollectionCounter {
 
+    private val RECENT_GAIN_TIME = 1_500
+
     companion object {
 
-        private var textToRender = ""
+        private var display = ""
+
         private var itemName = ""
         private var itemApiName = ""
         private var itemAmount = -1
 
         private var lastAmountInInventory = -1
+
+        private var recentGain = 0
+        private var lastGainTime = -1L
 
         private val apiCollectionData = mutableMapOf<String, Int>()
 
@@ -32,7 +38,7 @@ class CollectionCounter {
                     LorenzUtils.chat("§c/shtrackcollection <item name>")
                     return
                 }
-                LorenzUtils.chat("§e[SkyHanni] Disabled collection tracking for $itemName")
+                LorenzUtils.chat("§e[SkyHanni] Stopped collection tracker.")
                 apiCollectionData[itemApiName] = itemAmount
                 resetData()
                 return
@@ -49,14 +55,14 @@ class CollectionCounter {
             }
 
             if (data == null) {
-                LorenzUtils.error("Item '$name' not found!")
+                LorenzUtils.chat("§c[SkyHanni] Item '$name' not found!")
                 return
             }
             name = data.itemName
 
             val apiName = data.apiName
             if (!apiCollectionData.contains(apiName)) {
-                LorenzUtils.error("Item '$name' not in collection data!")
+                LorenzUtils.chat("§c[SkyHanni] Item $name not in collection data!")
                 return
             }
 
@@ -69,8 +75,8 @@ class CollectionCounter {
             itemAmount = apiCollectionData[apiName]!!
 
             lastAmountInInventory = countCurrentlyInInventory()
-            update()
-            LorenzUtils.chat("§e[SkyHanni] Enabled collection tracking for $itemName")
+            updateDisplay()
+            LorenzUtils.chat("§e[SkyHanni] Started tracking $itemName collection.")
         }
 
         private fun resetData() {
@@ -79,12 +85,20 @@ class CollectionCounter {
             itemApiName = ""
 
             lastAmountInInventory = -1
-            textToRender = ""
+            display = ""
+
+            recentGain = 0
         }
 
-        private fun update() {
+        private fun updateDisplay() {
             val format = GriffinJavaUtils.formatInteger(itemAmount)
-            textToRender = "$itemName collection: $format"
+
+            var gainText = ""
+            if (recentGain != 0) {
+                gainText = "§a+" + GriffinJavaUtils.formatInteger(recentGain)
+            }
+
+            display = "$itemName collection: §e$format $gainText"
         }
 
         private fun countCurrentlyInInventory(): Int {
@@ -106,22 +120,46 @@ class CollectionCounter {
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
         thePlayer.worldObj ?: return
 
-        if (lastAmountInInventory == -1) return
+        compareInventory()
+        updateGain()
+    }
 
+    private fun compareInventory() {
+        if (lastAmountInInventory == -1) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
         val currentlyInInventory = countCurrentlyInInventory()
         val diff = currentlyInInventory - lastAmountInInventory
         if (diff != 0) {
             if (diff > 0) {
-                itemAmount += diff
-                update()
+                gainItems(diff)
             } else {
                 LorenzUtils.debug("Collection counter! Negative collection change: $diff")
             }
         }
 
         lastAmountInInventory = currentlyInInventory
+    }
+
+    private fun updateGain() {
+        if (recentGain != 0) {
+            if (System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
+                recentGain = 0
+                updateDisplay()
+            }
+        }
+    }
+
+    private fun gainItems(amount: Int) {
+        itemAmount += amount
+
+        if (System.currentTimeMillis() > lastGainTime + RECENT_GAIN_TIME) {
+            recentGain = 0
+        }
+        lastGainTime = System.currentTimeMillis()
+        recentGain += amount
+
+        updateDisplay()
     }
 
     @SubscribeEvent
@@ -140,7 +178,8 @@ class CollectionCounter {
                     LorenzUtils.debug("Collection counter was wrong by $diff items. (Compared against API data)")
                 }
                 itemAmount = value
-                update()
+                recentGain = 0
+                updateDisplay()
             }
         }
     }
@@ -150,6 +189,6 @@ class CollectionCounter {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!LorenzUtils.inSkyblock) return
 
-        SkyHanniMod.feature.misc.collectionCounterPos.renderString(textToRender)
+        SkyHanniMod.feature.misc.collectionCounterPos.renderString(display)
     }
 }
