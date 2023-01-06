@@ -2,6 +2,9 @@
 
 ## Version 0.13.1
 
+### Features
++ Added /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
+
 ### Fixes
 + Dungeon level color fixed wrong colors.
 
