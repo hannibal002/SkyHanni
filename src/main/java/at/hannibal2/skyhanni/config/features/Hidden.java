@@ -14,5 +14,8 @@ public class Hidden {
     public String currentPet = "";
 
     @Expose
-    public Map<String, Long> minions = new HashMap<>();
+    public Map<String, Long> minionLastClick = new HashMap<>();
+
+    @Expose
+    public Map<String, String> minionName = new HashMap<>();
 }
