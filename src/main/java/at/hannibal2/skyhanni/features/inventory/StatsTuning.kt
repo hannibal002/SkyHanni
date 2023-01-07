@@ -19,12 +19,12 @@ class StatsTuning {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        val chestName = InventoryUtils.openInventoryName()
+        val inventoryName = event.inventoryName
 
         val stack = event.stack
 
         if (SkyHanniMod.feature.inventory.statsTuningTemplateStats) {
-            if (chestName == "Stats Tuning") {
+            if (inventoryName == "Stats Tuning") {
                 val name = stack.name ?: return
                 if (name == "§aLoad") {
                     var grab = false
@@ -54,7 +54,7 @@ class StatsTuning {
             }
         }
         if (SkyHanniMod.feature.inventory.statsTuningSelectedStats) {
-            if (chestName == "Accessory Bag Thaumaturgy") {
+            if (inventoryName == "Accessory Bag Thaumaturgy") {
                 val name = stack.name ?: return
                 if (name == "§aStats Tuning") {
                     var grab = false
@@ -84,7 +84,7 @@ class StatsTuning {
             }
         }
         if (SkyHanniMod.feature.inventory.statsTuningPoints) {
-            if (chestName == "Stats Tuning") {
+            if (inventoryName == "Stats Tuning") {
                 for (line in stack.getLore()) {
                     val matcher = patternStatPoints.matcher(line)
                     if (matcher.matches()) {
