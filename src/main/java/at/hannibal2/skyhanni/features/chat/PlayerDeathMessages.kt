@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -10,7 +9,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
@@ -60,11 +58,6 @@ class PlayerDeathMessages {
                 println("wrong death message: '$message'")
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        HypixelData.skyBlock = false
     }
 
     private fun checkOtherPlayers() {

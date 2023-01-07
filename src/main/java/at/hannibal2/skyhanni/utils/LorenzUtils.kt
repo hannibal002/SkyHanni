@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -15,29 +15,29 @@ import java.text.SimpleDateFormat
 object LorenzUtils {
 
     val isHyPixel: Boolean
-        get() = HypixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
+        get() = HyPixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
 
     val inSkyBlock: Boolean
-        get() = isHyPixel && HypixelData.skyBlock
+        get() = isHyPixel && HyPixelData.skyBlock
 
     val inDungeons: Boolean
         get() = inSkyBlock && DungeonData.inDungeon()
 
     val skyBlockIsland: String
-        get() = HypixelData.skyBlockIsland
+        get() = HyPixelData.skyBlockIsland
 
     //TODO add cache
     val skyBlockArea: String
-        get() = HypixelData.readSkyBlockArea()
+        get() = HyPixelData.readSkyBlockArea()
 
     val inKuudraFight: Boolean
         get() = skyBlockIsland == "Instanced"
 
     val noTradeMode: Boolean
-        get() = HypixelData.noTrade
+        get() = HyPixelData.noTrade
 
     val isBingoProfile: Boolean
-        get() = inSkyBlock && HypixelData.bingo
+        get() = inSkyBlock && HyPixelData.bingo
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")

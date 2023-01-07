@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
-class HypixelData {
+class HyPixelData {
 
     companion object {
         var hypixel = false
@@ -37,7 +37,7 @@ class HypixelData {
         }
     }
 
-    var loggerIslandChange = LorenzLogger("debug/island_change")
+    private var loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {

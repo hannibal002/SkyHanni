@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.event.diana
 
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -44,7 +43,7 @@ class BurrowWarpHelper {
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
-        if (!HypixelData.skyBlock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (event.message == "§cYou haven't unlocked this fast travel destination!") {
             val time = System.currentTimeMillis() - lastWarpTime
