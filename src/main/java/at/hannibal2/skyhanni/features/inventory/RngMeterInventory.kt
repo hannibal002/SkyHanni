@@ -11,9 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -21,11 +18,7 @@ class RngMeterInventory {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        val screen = Minecraft.getMinecraft().currentScreen
-        if (screen !is GuiChest) return
-        val chest = screen.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-
+        val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.stack
         if (SkyHanniMod.feature.inventory.rngMeterFloorName) {
@@ -42,11 +35,7 @@ class RngMeterInventory {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-
+        val chestName = InventoryUtils.openInventoryName()
         if (SkyHanniMod.feature.inventory.rngMeterNoDrop) {
             if (chestName == "Catacombs RNG Meter") {
                 for (slot in InventoryUtils.getItemsInOpenChest()) {

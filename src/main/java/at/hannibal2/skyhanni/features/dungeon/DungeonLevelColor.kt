@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -20,10 +18,7 @@ class DungeonLevelColor {
         if (!SkyHanniMod.feature.dungeon.partyFinderColoredClassLevel) return
 
         if (event.toolTip == null) return
-        val guiChest = Minecraft.getMinecraft().currentScreen
-        if (guiChest !is GuiChest) return
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
+        val chestName = InventoryUtils.openInventoryName()
         if (chestName != "Party Finder") return
 
         val stack = event.itemStack

@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -70,7 +70,7 @@ class HideNotClickableItems {
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
+        val chestName = chest.getInventoryName()
 
         for (slot in chest.inventorySlots) {
             if (slot == null) continue
@@ -92,10 +92,7 @@ class HideNotClickableItems {
     fun onTooltip(event: ItemTooltipEvent) {
         if (isDisabled()) return
         if (event.toolTip == null) return
-        val guiChest = Minecraft.getMinecraft().currentScreen
-        if (guiChest !is GuiChest) return
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
+        val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.itemStack
         if (InventoryUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
@@ -119,9 +116,7 @@ class HideNotClickableItems {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (isDisabled()) return
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
+        val chestName = InventoryUtils.openInventoryName()
 
         val slot = event.slot ?: return
 
