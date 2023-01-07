@@ -78,6 +78,6 @@ class BazaarBestSellMethod {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.bazaar.bestSellMethod
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.bestSellMethod
     }
 }

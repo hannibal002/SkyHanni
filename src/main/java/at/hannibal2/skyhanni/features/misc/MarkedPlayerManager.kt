@@ -76,7 +76,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (tick++ % 20 == 0) {
             findPlayers()
@@ -85,7 +85,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.markedPlayers.highlightInWorld) return
 
         val entity = event.entity
@@ -96,7 +96,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.markedPlayers.highlightInWorld) return
 
         val entity = event.entity

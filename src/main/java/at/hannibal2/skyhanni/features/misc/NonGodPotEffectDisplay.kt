@@ -203,6 +203,6 @@ class NonGodPotEffectDisplay {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.nonGodPotEffectDisplay && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.nonGodPotEffectDisplay && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
     }
 }

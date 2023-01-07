@@ -16,7 +16,7 @@ class CroesusUnopenedChestTracker {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
         if (event.gui !is GuiChest) return

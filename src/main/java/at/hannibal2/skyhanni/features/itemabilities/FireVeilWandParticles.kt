@@ -19,7 +19,7 @@ class FireVeilWandParticles {
 
     @SubscribeEvent
     fun onChatPacket(event: ReceiveParticleEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay == 0) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
@@ -30,7 +30,7 @@ class FireVeilWandParticles {
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickInHandEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (event.clickType != ItemClickInHandEvent.ClickType.RIGHT_CLICK) return
 
         val itemInHand = event.itemInHand ?: return
@@ -43,7 +43,7 @@ class FireVeilWandParticles {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay != 1) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 

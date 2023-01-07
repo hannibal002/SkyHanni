@@ -16,7 +16,7 @@ class DungeonLevelColor {
 
     @SubscribeEvent
     fun onItemTooltip(event: ItemTooltipEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dungeon.partyFinderColoredClassLevel) return
 
         if (event.toolTip == null) return

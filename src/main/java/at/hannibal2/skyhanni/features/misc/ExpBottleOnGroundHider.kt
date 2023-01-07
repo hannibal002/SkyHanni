@@ -10,7 +10,7 @@ class ExpBottleOnGroundHider {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.hideExpBottles) return
 
         if (event.entity is EntityXPOrb) {

@@ -44,7 +44,7 @@ class BurrowWarpHelper {
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
-        if (!HypixelData.skyblock) return
+        if (!HypixelData.skyBlock) return
 
         if (event.message == "§cYou haven't unlocked this fast travel destination!") {
             val time = System.currentTimeMillis() - lastWarpTime

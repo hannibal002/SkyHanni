@@ -16,7 +16,7 @@ class HypixelData {
 
     companion object {
         var hypixel = false
-        var skyblock = false
+        var skyBlock = false
         var skyBlockIsland: String = ""
 
         //Ironman, Stranded and Bingo
@@ -49,13 +49,13 @@ class HypixelData {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        skyblock = false
+        skyBlock = false
     }
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
         hypixel = false
-        skyblock = false
+        skyBlock = false
     }
 
     @SubscribeEvent
@@ -90,8 +90,8 @@ class HypixelData {
             checkSidebar()
         }
 
-        if (inSkyBlock == skyblock) return
-        skyblock = inSkyBlock
+        if (inSkyBlock == skyBlock) return
+        skyBlock = inSkyBlock
     }
 
     private fun checkSidebar() {

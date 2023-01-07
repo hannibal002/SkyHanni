@@ -9,7 +9,7 @@ class SeaCreatureMessageShortener {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.shortenFishingMessage) return
 
         val seaCreature = SeaCreatureManager.getSeaCreature(event.message)

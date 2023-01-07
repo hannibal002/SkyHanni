@@ -18,7 +18,7 @@ class CorruptedMobHighlight {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         if (entity in corruptedMobs) return
@@ -55,7 +55,7 @@ class CorruptedMobHighlight {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.corruptedMobHighlight &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.corruptedMobHighlight &&
                 LorenzUtils.skyBlockIsland != "Private Island"
     }
 }

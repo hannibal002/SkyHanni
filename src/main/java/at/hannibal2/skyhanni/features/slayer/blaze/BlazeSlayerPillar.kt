@@ -147,7 +147,7 @@ class BlazeSlayerPillar {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && DamageIndicatorManager.isBossSpawned(
+        return LorenzUtils.inSkyBlock && DamageIndicatorManager.isBossSpawned(
             BossType.SLAYER_BLAZE_2,
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,

@@ -19,7 +19,7 @@ class BlazeSlayerClearView {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (tick++ % 60 == 0) {
             hideParticles = DamageIndicatorManager.getDistanceTo(
                 BossType.SLAYER_BLAZE_1,
@@ -62,6 +62,6 @@ class BlazeSlayerClearView {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.slayer.blazeClearView && hideParticles
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazeClearView && hideParticles
     }
 }

@@ -112,6 +112,6 @@ class SummoningSoulsName {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.summonings.summoningSoulDisplay
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.summonings.summoningSoulDisplay
     }
 }
