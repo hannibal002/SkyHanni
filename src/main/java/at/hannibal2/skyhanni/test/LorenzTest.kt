@@ -83,25 +83,25 @@ class LorenzTest {
                 emptyList()
             }
 
-            val listeners = SkyHanniMod.listenerClasses
-            for (oldListener in listeners.toMutableList()) {
-                val javaClass = oldListener.javaClass
+            val modules = SkyHanniMod.modules
+            for (original in modules.toMutableList()) {
+                val javaClass = original.javaClass
                 val simpleName = javaClass.simpleName
-                MinecraftForge.EVENT_BUS.unregister(oldListener)
+                MinecraftForge.EVENT_BUS.unregister(original)
                 println("Unregistered listener $simpleName")
 
                 if (simpleName !in blockedFeatures) {
-                    listeners.remove(oldListener)
-                    val newListener = javaClass.newInstance()
-                    listeners.add(newListener)
+                    modules.remove(original)
+                    val module = javaClass.newInstance()
+                    modules.add(module)
 
-                    MinecraftForge.EVENT_BUS.register(newListener)
+                    MinecraftForge.EVENT_BUS.register(module)
                     println("Registered listener $simpleName")
                 } else {
                     println("Skipped registering listener $simpleName")
                 }
             }
-            LorenzUtils.chat("§e[SkyHanni] reloaded ${listeners.size} listener classes.")
+            LorenzUtils.chat("§e[SkyHanni] reloaded ${modules.size} listener classes.")
         }
     }
 
