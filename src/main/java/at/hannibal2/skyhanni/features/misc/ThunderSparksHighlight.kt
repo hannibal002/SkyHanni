@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -62,6 +62,6 @@ class ThunderSparksHighlight {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.fishing.thunderSparkHighlight
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.fishing.thunderSparkHighlight
     }
 }

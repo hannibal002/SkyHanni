@@ -113,6 +113,6 @@ class AshfangBlazes {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
+        return LorenzUtils.inSkyBlock && DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

@@ -40,7 +40,7 @@ class TrophyFishMessages {
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.trophyCounter) return
 
         val message = event.message

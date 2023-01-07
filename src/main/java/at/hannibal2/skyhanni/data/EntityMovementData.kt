@@ -25,7 +25,7 @@ class EntityMovementData {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         for (entity in entityLocation.keys) {
             if (entity.isDead) continue

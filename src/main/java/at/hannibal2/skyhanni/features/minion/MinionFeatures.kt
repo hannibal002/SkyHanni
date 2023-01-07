@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
@@ -27,28 +29,31 @@ import java.awt.Color
 
 class MinionFeatures {
 
-    var lastClickedEntity: LorenzVec? = null
-    var lastMinion: LorenzVec? = null
-    var lastMinionOpened = 0L
-    var minionInventoryOpen = false
+    private var lastClickedEntity: LorenzVec? = null
+    private var lastMinion: LorenzVec? = null
+    private var lastMinionOpened = 0L
+    private var minionInventoryOpen = false
 
-    var lastCoinsRecived = 0L
-    var lastMinionPickedUp = 0L
-    val minions = mutableMapOf<LorenzVec, Long>()
-    var coinsPerDay = ""
+    private var lastCoinsRecived = 0L
+    private var lastMinionPickedUp = 0L
+    private val minions = mutableMapOf<LorenzVec, MinionData>()
+    private var coinsPerDay = ""
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        for (minion in SkyHanniMod.feature.hidden.minions) {
-            val vec = LorenzVec.decodeFromString(minion.key)
-            minions[vec] = minion.value
+        for (minion in SkyHanniMod.feature.hidden.minionLastClick) {
+            val key = minion.key
+            val vec = LorenzVec.decodeFromString(key)
+            val name = SkyHanniMod.feature.hidden.minionName[key] ?: "§cNo name saved!"
+            val data = MinionData(name, minion.value)
+            minions[vec] = data
         }
     }
 
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
-        if (!LorenzUtils.inSkyblock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         if (!Mouse.getEventButtonState()) return
         if (Mouse.getEventButton() != 1) return
@@ -62,8 +67,8 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastClickedMinion(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inSkyblock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (!SkyHanniMod.feature.minions.lastClickedMinionDisplay) return
 
         val special = SkyHanniMod.feature.minions.lastOpenedMinionColor
@@ -87,11 +92,22 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
-        if (InventoryUtils.currentlyOpenInventory().contains("Minion")) {
-            if (lastClickedEntity != null) {
-                lastMinion = lastClickedEntity
+        val openInventory = InventoryUtils.currentlyOpenInventory()
+        if (openInventory.contains("Minion")) {
+            lastClickedEntity?.let {
+                val name = getMinionName(openInventory)
+                if (!minions.contains(it)) {
+                    minions[it] = MinionData(name, 0)
+                    saveConfig()
+                } else {
+                    if (minions[it]!!.name != name) {
+                        minions[it]!!.name = name
+                        saveConfig()
+                    }
+                }
+                lastMinion = it
                 lastClickedEntity = null
                 minionInventoryOpen = true
                 lastMinionOpened = 0
@@ -105,11 +121,11 @@ class MinionFeatures {
                 if (location != null) {
 
                     if (System.currentTimeMillis() - lastCoinsRecived < 2_000) {
-                        minions[location] = System.currentTimeMillis()
+                        minions[location]!!.lastClicked = System.currentTimeMillis()
                         saveConfig()
                     }
                     if (location !in minions) {
-                        minions[location] = 0
+                        minions[location]!!.lastClicked = 0
                     }
 
                     if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
@@ -129,6 +145,15 @@ class MinionFeatures {
         }
     }
 
+    private fun getMinionName(inventoryName: String): String {
+        var list = inventoryName.split(" ").toList()
+        val last = list.last()
+        val number = last.romanToDecimal()
+        list = list.dropLast(1)
+
+        return list.joinToString(" ") + " $number"
+    }
+
     private fun updateCoinsPerDay(): String {
         val loc = lastMinion!!
         val slot = InventoryUtils.getItemsInOpenChest().find { it.slotNumber == 28 } ?: return ""
@@ -138,8 +163,8 @@ class MinionFeatures {
 
         if (coinsPerDay != "") return coinsPerDay
 
-        val lastClicked = minions.getOrDefault(loc, -1)
-        if (lastClicked == -1L) {
+        val lastClicked = minions[loc]!!.lastClicked
+        if (lastClicked == 0L) {
             return "Can't calculate coins/day: No time data available!"
         }
         val duration = System.currentTimeMillis() - lastClicked
@@ -155,13 +180,17 @@ class MinionFeatures {
     }
 
     private fun saveConfig() {
-        val minionConfig = SkyHanniMod.feature.hidden.minions
+        val minionConfig = SkyHanniMod.feature.hidden.minionLastClick
+        val minionName = SkyHanniMod.feature.hidden.minionName
 
         minionConfig.clear()
+        minionName.clear()
         for (minion in minions) {
-            minionConfig[minion.key.encodeToString()] = minion.value
+            val coordinates = minion.key.encodeToString()
+            val data = minion.value
+            minionConfig[coordinates] = data.lastClicked
+            minionName[coordinates] = data.name
         }
-
     }
 
     @SubscribeEvent
@@ -174,8 +203,8 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         if (event.message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
             lastCoinsRecived = System.currentTimeMillis()
@@ -187,22 +216,30 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastEmptied(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inSkyblock) return
-        if (!SkyHanniMod.feature.minions.emptiedTimeDisplay) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val playerLocation = LocationUtils.playerLocation()
         val playerEyeLocation = LocationUtils.playerEyeLocation()
         for (minion in minions) {
-            val location = minion.key
-            if (playerLocation.distance(location) < SkyHanniMod.feature.minions.emptiedTimeDistance) {
-                val lastEmptied = minion.value
-                if (lastEmptied == 0L) continue
-                val duration = System.currentTimeMillis() - lastEmptied
-                val format = StringUtils.formatDuration(duration / 1000) + " ago"
-                if (LocationUtils.canSee(playerEyeLocation, location)) {
-                    val text = "§eHopper Emptied: $format"
-                    event.drawString(location.add(0.0, 2.0, 0.0), text, true)
+            val location = minion.key.add(0.0, 1.0, 0.0)
+            if (LocationUtils.canSee(playerEyeLocation, location)) {
+                val lastEmptied = minion.value.lastClicked
+                if (playerLocation.distance(location) < SkyHanniMod.feature.minions.distance) {
+
+                    if (SkyHanniMod.feature.minions.nameDisplay) {
+                        val name = "§9" + minion.value.name
+                        event.drawString(location.add(0.0, 0.65, 0.0), name, true)
+                    }
+
+                    if (SkyHanniMod.feature.minions.emptiedTimeDisplay) {
+                        if (lastEmptied != 0L) {
+                            val duration = System.currentTimeMillis() - lastEmptied
+                            val format = StringUtils.formatDuration(duration / 1000) + " ago"
+                            val text = "§eHopper Emptied: $format"
+                            event.drawString(location.add(0.0, 1.15, 0.0), text, true)
+                        }
+                    }
                 }
             }
         }
@@ -210,8 +247,8 @@ class MinionFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyblock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (!SkyHanniMod.feature.minions.hideMobsNametagNearby) return
 
         val entity = event.entity

@@ -566,9 +566,9 @@ public class GuiElementTextField {
 					);
 					GlScissorStack.pop(scaledresolution);
 				} else {
-//					String toRender = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(ChromaUtils.INSTANCE.chromaStringByColourCode(
-					String toRender = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(texts[yOffI], searchBarXSize - 10);
-					Minecraft.getMinecraft().fontRendererObj.drawString(toRender, x + 5,
+//					String display = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(ChromaUtils.INSTANCE.chromaStringByColourCode(
+					String display = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(texts[yOffI], searchBarXSize - 10);
+					Minecraft.getMinecraft().fontRendererObj.drawString(display, x + 5,
 						y + (searchBarYSize - 8) / 2 + yOff, customTextColour
 					);
 				}

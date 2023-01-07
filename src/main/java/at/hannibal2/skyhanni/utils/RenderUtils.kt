@@ -424,22 +424,26 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.renderString(string: String, offsetY: Int = 0) {
+    fun Position.renderString(string: String?, offsetY: Int = 0) {
+        val minecraft = Minecraft.getMinecraft()
+        if (minecraft.gameSettings.keyBindPlayerList.isKeyDown) return
+
+        if (string == null) return
         if (string == "") return
-        val textToRender = "§f$string"
+        val display = "§f$string"
 
         GlStateManager.pushMatrix()
-        val resolution = ScaledResolution(Minecraft.getMinecraft())
+        val resolution = ScaledResolution(minecraft)
 
-        val renderer = Minecraft.getMinecraft().renderManager.fontRenderer ?: return
+        val renderer = minecraft.renderManager.fontRenderer ?: return
 
-        val offsetX = (200 - renderer.getStringWidth(textToRender.removeColor())) / 2
+        val offsetX = (200 - renderer.getStringWidth(display.removeColor())) / 2
 
         val x = getAbsX(resolution, 200) + offsetX
         val y = getAbsY(resolution, 16) + offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
-        renderer.drawStringWithShadow(textToRender, 0f, 0f, 0)
+        renderer.drawStringWithShadow(display, 0f, 0f, 0)
 
         GlStateManager.popMatrix()
     }

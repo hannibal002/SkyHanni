@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -13,7 +13,7 @@ class CurrentPetDisplay {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         var blocked = false
 
@@ -37,9 +37,9 @@ class CurrentPetDisplay {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (!SkyHanniMod.feature.misc.petDisplay) return
 

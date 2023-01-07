@@ -26,7 +26,7 @@ class AshfangFreezeCooldown {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
         val duration = System.currentTimeMillis() - lastHit
@@ -41,7 +41,7 @@ class AshfangFreezeCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.freezeCooldown &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.freezeCooldown &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

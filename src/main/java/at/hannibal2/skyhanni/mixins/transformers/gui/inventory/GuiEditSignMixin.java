@@ -44,7 +44,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
         //        this.textInputUtil = new TextInputUtil(this.fontRendererObj, () -> ((IModifiedSign) this.that.tileSign).getText(this.editLine).getUnformattedText(), text -> ((IModifiedSign) this.that.tileSign).setText(this.editLine, new ChatComponentText(text)), 90);
         this.textInputUtil = new TextInputUtil(this.fontRendererObj, () -> ((IModifiedSign) getTileSign(this.that)).getText(this.editLine).getUnformattedText(), text -> ((IModifiedSign) getTileSign(this.that)).setText(this.editLine, new ChatComponentText(text)), 90);
 
-        if (LorenzUtils.INSTANCE.getInSkyblock() && SkyBlockcatiaConfig.enableSignSelectionList) {
+        if (LorenzUtils.INSTANCE.getInSkyBlock() && SkyBlockcatiaConfig.enableSignSelectionList) {
             List<SignSelectionList.Entry> list = null;
             String title = null;
 
@@ -87,7 +87,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
         if (SkyBlockcatiaConfig.enableSignSelectionList) {
             Keyboard.enableRepeatEvents(false);
 
-            if (LorenzUtils.INSTANCE.getInSkyblock()) {
+            if (LorenzUtils.INSTANCE.getInSkyBlock()) {
                 //                String text = this.that.tileSign.signText[0].getUnformattedText();
                 String text = getTileSign(this.that).signText[0].getUnformattedText();
                 //                if (!StringUtils.isNullOrEmpty(text))
@@ -196,7 +196,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
             GlStateManager.popMatrix();
             super.drawScreen(mouseX, mouseY, partialTicks);
 
-            if (LorenzUtils.INSTANCE.getInSkyblock() && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
+            if (LorenzUtils.INSTANCE.getInSkyBlock() && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
                 this.globalSelector.drawScreen(mouseX, mouseY, partialTicks);
             }
             info.cancel();
@@ -205,7 +205,7 @@ public class GuiEditSignMixin extends GuiScreen implements IEditSign {
 
     @Inject(method = "drawScreen(IIF)V", cancellable = true, at = @At("RETURN"))
     private void drawScreenPost(int mouseX, int mouseY, float partialTicks, CallbackInfo info) {
-        if (!SkyBlockcatiaConfig.enableOverwriteSignEditing && LorenzUtils.INSTANCE.getInSkyblock() && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
+        if (!SkyBlockcatiaConfig.enableOverwriteSignEditing && LorenzUtils.INSTANCE.getInSkyBlock() && SkyBlockcatiaConfig.enableSignSelectionList && this.globalSelector != null) {
             this.globalSelector.drawScreen(mouseX, mouseY, partialTicks);
         }
     }

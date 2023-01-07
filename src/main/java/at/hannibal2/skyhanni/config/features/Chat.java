@@ -91,7 +91,7 @@ public class Chat {
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in the dungeon.")
     @ConfigEditorBoolean
-    public boolean dungeonMessages = false;
+    public boolean dungeonMessages = true;
 
     @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from watcher and bosses in the dungeon.")
@@ -103,4 +103,9 @@ public class Chat {
             "except for players who are close to the player, inside dungeon or during a Kuudra fight.")
     @ConfigEditorBoolean
     public boolean hideFarDeathMessages = false;
+
+    @Expose
+    @ConfigOption(name = "Compact Potion Message", desc = "Shorten chat messages about player potion effects.")
+    @ConfigEditorBoolean
+    public boolean compactPotionMessage = true;
 }

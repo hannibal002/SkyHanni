@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigEditor
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
-import at.hannibal2.skyhanni.features.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.misc.CollectionCounter
+import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
@@ -37,6 +38,7 @@ object Commands {
         registerCommand("togglepacketlog") { LorenzTest.togglePacketLog() }
         registerCommand("shreloadlisteners") { LorenzTest.reloadListeners() }
         registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
+        registerCommand("shtrackcollection") { CollectionCounter.command(it) }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

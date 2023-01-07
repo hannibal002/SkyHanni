@@ -6,6 +6,11 @@ import com.google.gson.annotations.Expose;
 
 public class Minions {
 
+    @Expose
+    @ConfigOption(name = "Name Display", desc = "Show the minion name and tier over the minion.")
+    @ConfigEditorBoolean
+    public boolean nameDisplay = true;
+
     @ConfigOption(name = "Last Clicked", desc = "")
     @ConfigEditorAccordion(id = 0)
     public boolean lastClickedMinion = false;
@@ -43,15 +48,15 @@ public class Minions {
     public boolean emptiedTime = false;
 
     @Expose
-    @ConfigOption(name = "Emptied Time Display", desc = "Show the time when the hopper in the minion was last emptied")
+    @ConfigOption(name = "Emptied Time Display", desc = "Show the time when the hopper in the minion was last emptied.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean emptiedTimeDisplay = false;
 
     @Expose
     @ConfigOption(
-            name = "Emptied Time Distance",
-            desc = "At what distance is this display shown"
+            name = "Distance",
+            desc = "At what distance is the minion display shown."
     )
     @ConfigEditorSlider(
             minValue = 3,
@@ -59,7 +64,7 @@ public class Minions {
             minStep = 1
     )
     @ConfigAccordionId(id = 1)
-    public int emptiedTimeDistance = 10;
+    public int distance = 10;
 
     @ConfigOption(name = "Hopper Profit", desc = "")
     @ConfigEditorAccordion(id = 2)
@@ -69,7 +74,7 @@ public class Minions {
     @ConfigOption(name = "Hopper Profit Display", desc = "Using the held coins and the last empty time to calculate the coins a hopper collects in a day")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean hopperProfitDisplay = false;
+    public boolean hopperProfitDisplay = true;
 
     @Expose
     @ConfigOption(name = "Best Sell Method Position", desc = "")

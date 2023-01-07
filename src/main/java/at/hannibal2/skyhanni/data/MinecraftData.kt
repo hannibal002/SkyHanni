@@ -13,7 +13,7 @@ class MinecraftData {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onSoundPacket(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val packet = event.packet
         if (packet !is S29PacketSoundEffect) return
@@ -31,7 +31,7 @@ class MinecraftData {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onParticlePacketReceive(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val packet = event.packet
         if (packet !is S2APacketParticles) return

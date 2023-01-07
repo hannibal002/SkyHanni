@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class IslandChangeEvent(val newIsland: String, val oldIsland: String?) : LorenzEvent()
+import at.hannibal2.skyhanni.data.IslandType
+
+class IslandChangeEvent(val newIsland: IslandType, val oldIsland: IslandType) : LorenzEvent()

@@ -19,6 +19,7 @@
 - Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon or during a Kuudra fight.
 - Scan messages sent by players in all-chat for blacklisted words and greys out the message.
 - Chat peeking (holding key to display chat without opening the chat gui)
+- Compact Potion Effect Messages
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
@@ -85,6 +86,7 @@
 - A marker to the last opened minion for a couple of seconds (seen through walls)
 - Option to hide mob nametags close to minions.
 - Minion hopper coins per day display (Using the held coins in the hopper and the last time the hopper was collected to calculate the coins a hopper collects in a day)
+- Minion name display with minion tier.
 
 ## Bazaar
 - Showing colors in the order inventory for outbid or fully bought/sold items.
@@ -137,9 +139,13 @@
 + Highlight marked player names in chat.
 + Mark the own player name.
 
+## Bingo
++ Shortens chat messages about skill level ups, collection gains, new area discoveries, and bestiarity upgrades while on bingo.
+
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - /shmarkplayer <player> (marking a player with yellow color)
+- /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
 - 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
@@ -155,3 +161,4 @@
 - Display the active non-god potion effects.
 - Option to hide blaze particles.
 - Wishing compass uses amount display.
+- Brewing Stand Overlay.

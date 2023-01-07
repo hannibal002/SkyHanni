@@ -268,7 +268,7 @@ class DamageIndicatorManager {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
             if (entity is EntityLivingBase) {
                 checkEntity(entity)
@@ -752,6 +752,6 @@ class DamageIndicatorManager {
     }
 
     fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.damageIndicator.enabled
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.damageIndicator.enabled
     }
 }

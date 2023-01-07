@@ -40,7 +40,7 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
 
     fun start() {
         fixedRateTimer(name = "skyhanni-bazaar-update", period = 1000L) {
-            if (!LorenzUtils.inSkyblock) {
+            if (!LorenzUtils.inSkyBlock) {
                 return@fixedRateTimer
             }
 

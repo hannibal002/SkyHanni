@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.stream.MalformedJsonException
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
@@ -40,7 +41,13 @@ object APIUtil {
                 val entity = response.entity
                 if (entity != null) {
                     val retSrc = EntityUtils.toString(entity)
-                    return parser.parse(retSrc) as JsonObject
+                    try {
+                        return parser.parse(retSrc) as JsonObject
+                    } catch (e: MalformedJsonException) {
+                        LorenzUtils.error("MalformedJsonException!")
+                        println("MalformedJsonException at '$urlString'")
+                        e.printStackTrace()
+                    }
                 }
             }
         } catch (throwable: Throwable) {
