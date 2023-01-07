@@ -62,6 +62,6 @@ class ThunderSparksHighlight {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.fishing.thunderSparkHighlight
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.fishing.thunderSparkHighlight
     }
 }

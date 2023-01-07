@@ -19,7 +19,7 @@ class ItemStars {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return

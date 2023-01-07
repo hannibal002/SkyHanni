@@ -20,7 +20,7 @@ class ItemTipHelper {
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
-        if (!LorenzUtils.inSkyblock || stack.stackSize != 1) return
+        if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
 
 //        val uuid = stacremovek.getLore().joinToString { ", " }
         val stackTip: String
@@ -51,7 +51,7 @@ class ItemTipHelper {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return

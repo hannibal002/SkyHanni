@@ -20,6 +20,6 @@ class RealTime {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.realTime
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.realTime
     }
 }

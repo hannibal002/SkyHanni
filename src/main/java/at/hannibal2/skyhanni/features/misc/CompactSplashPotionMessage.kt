@@ -17,7 +17,7 @@ class CompactSplashPotionMessage {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock || !SkyHanniMod.feature.chat.compactPotionMessage) return
+        if (!LorenzUtils.inSkyBlock || !SkyHanniMod.feature.chat.compactPotionMessage) return
 
         var matcher = POTION_EFFECT_PATTERN.matcher(event.message)
         if (matcher.matches()) {

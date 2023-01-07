@@ -47,7 +47,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != "Private Island") return
 
         if (!Mouse.getEventButtonState()) return
@@ -62,7 +62,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastClickedMinion(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != "Private Island") return
         if (!SkyHanniMod.feature.minions.lastClickedMinionDisplay) return
 
@@ -174,7 +174,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != "Private Island") return
 
         if (event.message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
@@ -187,7 +187,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastEmptied(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.minions.emptiedTimeDisplay) return
         if (LorenzUtils.skyBlockIsland != "Private Island") return
 
@@ -210,7 +210,7 @@ class MinionFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != "Private Island") return
         if (!SkyHanniMod.feature.minions.hideMobsNametagNearby) return
 

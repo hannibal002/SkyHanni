@@ -46,7 +46,7 @@ class HideMobNames {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.slayer.hideMobNames) return
 
         val entity = event.entity

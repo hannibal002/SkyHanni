@@ -59,7 +59,7 @@ class AshfangBlazingSouls {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.blazingSouls &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.blazingSouls &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

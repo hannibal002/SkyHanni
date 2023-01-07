@@ -41,7 +41,7 @@ class SummoningMobManager {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.isOnHypixel) return
+        if (!LorenzUtils.isHyPixel) return
 
         val message = event.message
         val matcher = spawnPatter.matcher(message)
@@ -139,7 +139,7 @@ class SummoningMobManager {
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.summonings.summoningMobDisplay) return
         if (summoningMobs.isEmpty()) return
 
@@ -162,7 +162,7 @@ class SummoningMobManager {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.summonings.summoningMobHideNametag) return
 
         val entity = event.entity
@@ -200,7 +200,7 @@ class SummoningMobManager {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && (SkyHanniMod.feature.summonings.summoningMobDisplay || SkyHanniMod.feature.summonings.summoningMobHideNametag)
+        return LorenzUtils.inSkyBlock && (SkyHanniMod.feature.summonings.summoningMobDisplay || SkyHanniMod.feature.summonings.summoningMobHideNametag)
     }
 
     class SummoningMob(

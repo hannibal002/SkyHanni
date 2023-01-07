@@ -34,7 +34,7 @@ class PlayerDeathMessages {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
         val matcher = pattern.matcher(message)
@@ -64,7 +64,7 @@ class PlayerDeathMessages {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        HypixelData.skyblock = false
+        HypixelData.skyBlock = false
     }
 
     private fun checkOtherPlayers() {
@@ -77,6 +77,6 @@ class PlayerDeathMessages {
     }
 
     private fun isHideFarDeathsEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.chat.hideFarDeathMessages && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
     }
 }

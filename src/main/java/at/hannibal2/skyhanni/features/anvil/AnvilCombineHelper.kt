@@ -14,7 +14,7 @@ class AnvilCombineHelper {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.inventory.anvilCombineHelper) return
 
         if (event.gui !is GuiChest) return

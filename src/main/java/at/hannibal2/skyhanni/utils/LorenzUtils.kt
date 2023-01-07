@@ -14,14 +14,14 @@ import java.text.SimpleDateFormat
 
 object LorenzUtils {
 
-    val isOnHypixel: Boolean
+    val isHyPixel: Boolean
         get() = HypixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
 
-    val inSkyblock: Boolean
-        get() = isOnHypixel && HypixelData.skyblock
+    val inSkyBlock: Boolean
+        get() = isHyPixel && HypixelData.skyBlock
 
     val inDungeons: Boolean
-        get() = inSkyblock && DungeonData.inDungeon()
+        get() = inSkyBlock && DungeonData.inDungeon()
 
     val skyBlockIsland: String
         get() = HypixelData.skyBlockIsland
@@ -37,7 +37,7 @@ object LorenzUtils {
         get() = HypixelData.noTrade
 
     val isBingoProfile: Boolean
-        get() = inSkyblock && HypixelData.bingo
+        get() = inSkyBlock && HypixelData.bingo
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")

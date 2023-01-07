@@ -158,7 +158,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         }
 
         if (!SkyHanniMod.feature.dev.printUnfilteredDebugs) return Filter.Result.ACCEPT
-        if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyblock) return Filter.Result.ACCEPT
+        if (!SkyHanniMod.feature.dev.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyBlock) return Filter.Result.ACCEPT
         if (formattedMessage == "filtered console: ") return Filter.Result.ACCEPT
 
         debug(" ")

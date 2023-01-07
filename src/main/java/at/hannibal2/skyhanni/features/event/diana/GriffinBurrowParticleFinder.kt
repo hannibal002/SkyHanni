@@ -82,7 +82,7 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         val packet = event.packet
 
         if (packet is S2APacketParticles) {
@@ -171,7 +171,7 @@ class GriffinBurrowParticleFinder {
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         val packet = event.packet
         val pos = when {
             packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {

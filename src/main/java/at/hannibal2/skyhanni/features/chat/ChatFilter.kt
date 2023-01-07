@@ -10,7 +10,7 @@ class ChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.isOnHypixel) return
+        if (!LorenzUtils.isHyPixel) return
 
         val blockReason = block(event.message)
         if (blockReason != "") {

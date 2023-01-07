@@ -12,7 +12,7 @@ class HideDamageSplash {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderDamage(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.hideDamageSplash) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {

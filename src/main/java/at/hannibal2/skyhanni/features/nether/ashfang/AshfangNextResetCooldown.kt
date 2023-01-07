@@ -51,7 +51,7 @@ class AshfangNextResetCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.nextResetCooldown &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.nextResetCooldown &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

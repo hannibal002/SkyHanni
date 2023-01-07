@@ -170,6 +170,6 @@ class SlayerQuestWarning {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.slayer.questWarning
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.questWarning
     }
 }

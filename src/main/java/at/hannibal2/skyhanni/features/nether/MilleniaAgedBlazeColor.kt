@@ -54,5 +54,5 @@ class MilleniaAgedBlazeColor {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyblock && LorenzUtils.skyBlockIsland == "Crimson Isle" && SkyHanniMod.feature.misc.milleniaAgedBlazeColor
+        LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == "Crimson Isle" && SkyHanniMod.feature.misc.milleniaAgedBlazeColor
 }

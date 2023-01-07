@@ -40,7 +40,7 @@ class RngMeterInventory {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (event.gui !is GuiChest) return
         val guiChest = event.gui

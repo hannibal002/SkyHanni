@@ -56,7 +56,7 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onItemClickSend(event: PacketEvent.SendEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val packet = event.packet
         if (packet is C07PacketPlayerDigging) {
@@ -97,7 +97,7 @@ class ItemAbilityCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
     }
 
     private fun click(ability: ItemAbility) {
