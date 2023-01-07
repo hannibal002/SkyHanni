@@ -430,20 +430,20 @@ object RenderUtils {
 
         if (string == null) return
         if (string == "") return
-        val textToRender = "§f$string"
+        val display = "§f$string"
 
         GlStateManager.pushMatrix()
         val resolution = ScaledResolution(minecraft)
 
         val renderer = minecraft.renderManager.fontRenderer ?: return
 
-        val offsetX = (200 - renderer.getStringWidth(textToRender.removeColor())) / 2
+        val offsetX = (200 - renderer.getStringWidth(display.removeColor())) / 2
 
         val x = getAbsX(resolution, 200) + offsetX
         val y = getAbsY(resolution, 16) + offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
-        renderer.drawStringWithShadow(textToRender, 0f, 0f, 0)
+        renderer.drawStringWithShadow(display, 0f, 0f, 0)
 
         GlStateManager.popMatrix()
     }

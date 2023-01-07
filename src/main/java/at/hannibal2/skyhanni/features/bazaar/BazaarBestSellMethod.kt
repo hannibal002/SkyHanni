@@ -15,18 +15,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class BazaarBestSellMethod {
 
     companion object {
-        private var textToRender = ""
+        private var display = ""
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.CloseWindowEvent) {
-        textToRender = ""
+        display = ""
     }
 
     @SubscribeEvent
     fun onGuiDraw(event: GuiScreenEvent.DrawScreenEvent.Post) {
         if (!isEnabled()) return
-        textToRender = getNewText(event)
+        display = getNewText(event)
     }
 
     private fun getNewText(event: GuiScreenEvent.DrawScreenEvent.Post): String {
@@ -74,7 +74,7 @@ class BazaarBestSellMethod {
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.bazaar.bestSellMethodPos.renderString(textToRender)
+        SkyHanniMod.feature.bazaar.bestSellMethodPos.renderString(display)
     }
 
     private fun isEnabled(): Boolean {
