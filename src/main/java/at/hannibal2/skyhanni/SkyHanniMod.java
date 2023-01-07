@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
 import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard;
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
+import at.hannibal2.skyhanni.features.bingo.CompactBingoChat;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages;
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter;
