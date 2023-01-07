@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -23,7 +24,7 @@ object LorenzUtils {
     val inDungeons: Boolean
         get() = inSkyBlock && DungeonData.inDungeon()
 
-    val skyBlockIsland: String
+    val skyBlockIsland: IslandType
         get() = HyPixelData.skyBlockIsland
 
     //TODO add cache
@@ -31,7 +32,7 @@ object LorenzUtils {
         get() = HyPixelData.readSkyBlockArea()
 
     val inKuudraFight: Boolean
-        get() = skyBlockIsland == "Instanced"
+        get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
     val noTradeMode: Boolean
         get() = HyPixelData.noTrade

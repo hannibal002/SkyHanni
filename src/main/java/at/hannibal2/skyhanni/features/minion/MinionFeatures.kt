@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -48,7 +49,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         if (!Mouse.getEventButtonState()) return
         if (Mouse.getEventButton() != 1) return
@@ -63,7 +64,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onRenderLastClickedMinion(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (!SkyHanniMod.feature.minions.lastClickedMinionDisplay) return
 
         val special = SkyHanniMod.feature.minions.lastOpenedMinionColor
@@ -87,7 +88,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         if (InventoryUtils.currentlyOpenInventory().contains("Minion")) {
             if (lastClickedEntity != null) {
@@ -175,7 +176,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         if (event.message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
             lastCoinsRecived = System.currentTimeMillis()
@@ -189,7 +190,7 @@ class MinionFeatures {
     fun onRenderLastEmptied(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.minions.emptiedTimeDisplay) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         val playerLocation = LocationUtils.playerLocation()
         val playerEyeLocation = LocationUtils.playerEyeLocation()
@@ -211,7 +212,7 @@ class MinionFeatures {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != "Private Island") return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (!SkyHanniMod.feature.minions.hideMobsNametagNearby) return
 
         val entity = event.entity

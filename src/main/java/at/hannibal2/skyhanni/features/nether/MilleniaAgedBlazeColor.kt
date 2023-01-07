@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -54,5 +55,5 @@ class MilleniaAgedBlazeColor {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == "Crimson Isle" && SkyHanniMod.feature.misc.milleniaAgedBlazeColor
+        LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE && SkyHanniMod.feature.misc.milleniaAgedBlazeColor
 }
