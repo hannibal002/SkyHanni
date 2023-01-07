@@ -4,10 +4,12 @@
 
 ### Features
 + Added /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
++ Added Compact Bingo Chat Messages
++ Added Compact Potion Effect Chat Messages
 
 ### Changes
 + Don't render overlays when tab list key is pressed.
-+ No longer blocking the sell of bazaar items to NPC when on ironman, stranded or bingo mode.
++ Do no longer prevent the selling of bazaar items to NPC when on ironman, stranded or bingo mode.
 
 ### Fixes
 + Dungeon level color fixed wrong colors.
