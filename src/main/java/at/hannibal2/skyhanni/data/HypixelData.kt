@@ -19,6 +19,13 @@ class HypixelData {
         var skyblock = false
         var skyBlockIsland: String = ""
 
+        //Ironman, Stranded and Bingo
+        var noTrade = false
+
+        var ironman = false
+        var stranded = false
+        var bingo = false
+
         fun readSkyBlockArea(): String {
             for (line in ScoreboardData.sidebarLinesFormatted()) {
                 if (line.startsWith(" §7⏣ ")) {
@@ -28,7 +35,6 @@ class HypixelData {
 
             return "invalid"
         }
-
     }
 
     var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -57,7 +63,6 @@ class HypixelData {
         if (!hypixel) return
 
         val message = event.message.removeColor().lowercase()
-
         if (message.startsWith("your profile was changed to:")) {
             val stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             ProfileJoinEvent(stripped).postAndCatch()
@@ -65,7 +70,6 @@ class HypixelData {
         if (message.startsWith("you are playing on profile:")) {
             val stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
             ProfileJoinEvent(stripped).postAndCatch()
-
         }
     }
 
@@ -80,13 +84,42 @@ class HypixelData {
 
         if (tick % 5 != 0) return
 
-        val newState = checkScoreboard()
-        if (newState) {
+        val inSkyBlock = checkScoreboard()
+        if (inSkyBlock) {
             checkIsland()
+            checkSidebar()
         }
 
-        if (newState == skyblock) return
-        skyblock = newState
+        if (inSkyBlock == skyblock) return
+        skyblock = inSkyBlock
+    }
+
+    private fun checkSidebar() {
+        ironman = false
+        stranded = false
+        bingo = false
+
+        for (line in ScoreboardData.sidebarLinesFormatted()) {
+            when (line) {
+                " §7Ⓑ §7Bingo", // No Rank
+                " §bⒷ §bBingo", // Rank 1
+                " §9Ⓑ §9Bingo", // Rank 2
+                " §5Ⓑ §5Bingo", // Rank 3
+                " §6Ⓑ §6Bingo", // Rank 4
+                -> {
+                    bingo = true
+                }
+
+                // TODO implemennt stranded check
+
+                " §7♲ §7Ironman" -> {
+                    ironman = true
+                }
+
+            }
+        }
+
+        noTrade = ironman || stranded || bingo
     }
 
     private fun checkIsland() {
@@ -115,12 +148,8 @@ class HypixelData {
         val minecraft = Minecraft.getMinecraft()
         val world = minecraft.theWorld ?: return false
 
-        val sidebarObjective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
-
-        val displayName = sidebarObjective.displayName
-
+        val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
+        val displayName = objective.displayName
         return displayName.removeColor().contains("SKYBLOCK")
-
     }
-
 }
