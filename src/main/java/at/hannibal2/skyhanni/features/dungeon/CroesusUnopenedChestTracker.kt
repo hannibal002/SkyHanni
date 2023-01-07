@@ -30,7 +30,7 @@ class CroesusUnopenedChestTracker {
                 val lore = stack.getLore()
                 if (lore.any { it.contains("Click to view") }) {
                     if (!lore.any { it.contains("Chests have been opened!") }) {
-                        slot highlight LorenzColor.GREEN
+                        slot highlight LorenzColor.DARK_PURPLE
                     }
                 }
             }
