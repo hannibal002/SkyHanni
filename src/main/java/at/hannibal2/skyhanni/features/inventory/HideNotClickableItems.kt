@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -92,7 +93,10 @@ class HideNotClickableItems {
     fun onTooltip(event: ItemTooltipEvent) {
         if (isDisabled()) return
         if (event.toolTip == null) return
-        val chestName = InventoryUtils.openInventoryName()
+
+        val guiChest = Minecraft.getMinecraft().currentScreen
+        if (guiChest !is GuiChest) return
+        val chestName = (guiChest.inventorySlots as ContainerChest).getInventoryName()
 
         val stack = event.itemStack
         if (InventoryUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
