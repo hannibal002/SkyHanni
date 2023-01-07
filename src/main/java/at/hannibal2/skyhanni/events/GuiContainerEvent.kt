@@ -2,15 +2,10 @@ package at.hannibal2.skyhanni.events
 
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
-import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : LorenzEvent() {
-    val chestName: String by lazy {
-        if (container !is ContainerChest) error("Container is not a chest")
-        return@lazy (container as ContainerChest).lowerChestInventory.displayName.unformattedText.trim()
-    }
 
     data class BackgroundDrawnEvent(
         override val gui: GuiContainer,
@@ -27,10 +22,18 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     abstract class DrawSlotEvent(gui: GuiContainer, container: Container, open val slot: Slot) :
         GuiContainerEvent(gui, container) {
         @Cancelable
-        data class GuiContainerDrawSlotPre(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
+        data class GuiContainerDrawSlotPre(
+            override val gui: GuiContainer,
+            override val container: Container,
+            override val slot: Slot
+        ) :
             DrawSlotEvent(gui, container, slot)
 
-        data class GuiContainerDrawSlotPost(override val gui: GuiContainer, override val container: Container, override val slot: Slot) :
+        data class GuiContainerDrawSlotPost(
+            override val gui: GuiContainer,
+            override val container: Container,
+            override val slot: Slot
+        ) :
             DrawSlotEvent(gui, container, slot)
     }
 

@@ -11,9 +11,10 @@ object InventoryUtils {
     fun currentlyOpenInventory(): String {
         val screen = Minecraft.getMinecraft().currentScreen
         if (screen !is GuiChest) return ""
-        val chest = screen.inventorySlots as ContainerChest
+        val inventorySlots = screen.inventorySlots
+        val chest = inventorySlots as ContainerChest
 
-        return chest.lowerChestInventory.displayName.unformattedText.trim()
+        return chest.getInventoryName()
     }
 
     fun getItemsInOpenChest(): List<Slot> {
@@ -37,10 +38,14 @@ object InventoryUtils {
         val guiChest = Minecraft.getMinecraft().currentScreen
         val chestName = if (guiChest is GuiChest) {
             val chest = guiChest.inventorySlots as ContainerChest
-            chest.lowerChestInventory.displayName.unformattedText.trim()
+            chest.getInventoryName()
         } else {
             ""
         }
         return chestName
+    }
+    
+    fun ContainerChest.getInventoryName(): String {
+        return this.lowerChestInventory.displayName.unformattedText.trim()
     }
 }
