@@ -18,7 +18,8 @@ class BrewingStandOverlay {
         val stack = event.stack
         val name = stack.name ?: return
 
-        when (event.slot.slotNumber) {
+        val slotNumber = event.slot.slotNumber
+        when (slotNumber) {
             13, // Ingredient input
             21, // Progress
             42, // Output right side
@@ -28,11 +29,15 @@ class BrewingStandOverlay {
             else -> return
         }
 
+        if (slotNumber == 21) {
+            event.offsetX = 55
+        }
+
         // Hide the progress slot when not active
         if (name.contains(" or ")) return
 
         event.stackTip = name
-        event.offsetX = 3
+        event.offsetX = event.offsetX + 3
         event.offsetY = -5
         event.alignLeft = false
     }
