@@ -165,6 +165,10 @@ public class Features extends Config {
     public MarkedPlayers markedPlayers = new MarkedPlayers();
 
     @Expose
+    @Category(name = "Bingo", desc = "Features for the Bingo mode.")
+    public Bingo bingo = new Bingo();
+
+    @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public Misc misc = new Misc();
 

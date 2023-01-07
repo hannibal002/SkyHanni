@@ -19,6 +19,7 @@
 - Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon or during a Kuudra fight.
 - Scan messages sent by players in all-chat for blacklisted words and greys out the message.
 - Chat peeking (holding key to display chat without opening the chat gui)
+- Compact Potion Effect Messages
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
@@ -136,6 +137,9 @@
 + Highlight marked players in the world.
 + Highlight marked player names in chat.
 + Mark the own player name.
+
+## Bingo
++ Shortens chat messages about skill level ups, collection gains, new area discoveries, and bestiarity upgrades while on bingo.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
