@@ -5,6 +5,9 @@
 ### Features
 + Added /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
 
+### Changes
++ Don't render overlays when tab list key is pressed.
+
 ### Fixes
 + Dungeon level color fixed wrong colors.
 

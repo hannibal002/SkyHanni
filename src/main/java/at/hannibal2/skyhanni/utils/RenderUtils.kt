@@ -425,14 +425,17 @@ object RenderUtils {
     }
 
     fun Position.renderString(string: String?, offsetY: Int = 0) {
+        val minecraft = Minecraft.getMinecraft()
+        if (minecraft.gameSettings.keyBindPlayerList.isKeyDown) return
+
         if (string == null) return
         if (string == "") return
         val textToRender = "§f$string"
 
         GlStateManager.pushMatrix()
-        val resolution = ScaledResolution(Minecraft.getMinecraft())
+        val resolution = ScaledResolution(minecraft)
 
-        val renderer = Minecraft.getMinecraft().renderManager.fontRenderer ?: return
+        val renderer = minecraft.renderManager.fontRenderer ?: return
 
         val offsetX = (200 - renderer.getStringWidth(textToRender.removeColor())) / 2
 
