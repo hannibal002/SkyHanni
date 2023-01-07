@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
@@ -56,6 +57,6 @@ class CorruptedMobHighlight {
 
     private fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.corruptedMobHighlight &&
-                LorenzUtils.skyBlockIsland != "Private Island"
+                LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND
     }
 }

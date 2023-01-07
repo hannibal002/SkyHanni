@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
@@ -100,7 +101,7 @@ class EndermanSlayerBeacon {
 
     private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock &&
             SkyHanniMod.feature.slayer.slayerEndermanBeacon &&
-            LorenzUtils.skyBlockIsland == "The End" &&
+            LorenzUtils.skyBlockIsland == IslandType.THE_END &&
             DamageIndicatorManager.isBossSpawned(
                 BossType.SLAYER_ENDERMAN_2,
                 BossType.SLAYER_ENDERMAN_3,

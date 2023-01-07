@@ -17,7 +17,7 @@ class HyPixelData {
     companion object {
         var hypixel = false
         var skyBlock = false
-        var skyBlockIsland: String = ""
+        var skyBlockIsland = IslandType.UNKNOWN
 
         //Ironman, Stranded and Bingo
         var noTrade = false
@@ -133,14 +133,24 @@ class HyPixelData {
                 guesting = true
             }
         }
-        if (guesting) {
-            newIsland = "$newIsland guesting"
+
+        var islandType = IslandType.getBySidebarName(newIsland)
+
+        if (islandType == IslandType.PRIVATE_ISLAND) {
+            if (guesting) {
+                islandType = IslandType.PRIVATE_ISLAND_GUEST
+            }
         }
 
-        if (skyBlockIsland != newIsland) {
-            IslandChangeEvent(newIsland, skyBlockIsland).postAndCatch()
-            loggerIslandChange.log(newIsland)
-            skyBlockIsland = newIsland
+        if (skyBlockIsland != islandType) {
+            IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
+            if (islandType == IslandType.UNKNOWN) {
+                println("Unknown island detected: '$newIsland'")
+                loggerIslandChange.log("Unknown: '$newIsland'")
+            } else {
+                loggerIslandChange.log(islandType.name)
+            }
+            skyBlockIsland = islandType
         }
     }
 
