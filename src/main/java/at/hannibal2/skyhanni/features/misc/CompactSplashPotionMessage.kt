@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -27,9 +28,9 @@ class CompactSplashPotionMessage {
 
         matcher = POTION_EFFECT_OTHERS_PATTERN.matcher(event.message)
         if (matcher.matches()) {
-            val playerName = matcher.group(1)
+            val playerName = matcher.group(1).removeColor()
             val effectName = matcher.group(2)
-            event.chatComponent = ChatComponentText("§a§lPotion Effect! §r$effectName §7(by $playerName§7)")
+            event.chatComponent = ChatComponentText("§a§lPotion Effect! §r$effectName §7(by §b$playerName§7)")
         }
     }
 }
