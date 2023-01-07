@@ -306,6 +306,12 @@ class HideNotClickableItems {
         }
 
         if (!ItemUtils.isRecombobulated(stack)) {
+            if (LorenzUtils.noTradeMode) {
+                if (BazaarApi.isBazaarItem(stack)) {
+                    return false
+                }
+            }
+
             if (hideNpcSellFilter.match(name)) return false
 
             val id = stack.getInternalName()

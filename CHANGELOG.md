@@ -7,6 +7,7 @@
 
 ### Changes
 + Don't render overlays when tab list key is pressed.
++ No longer blocking the sell of bazaar items to NPC when on ironman, stranded or bingo mode.
 
 ### Fixes
 + Dungeon level color fixed wrong colors.
