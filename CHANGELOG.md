@@ -7,6 +7,7 @@
 + Added Compact Bingo Chat Messages.
 + Added Compact Potion Effect Chat Messages.
 + Added Brewing Stand Overlay.
++ Added minion name display with minion tier.
 
 ### Changes
 + Don't render overlays when tab list key is pressed.

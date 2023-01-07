@@ -86,6 +86,7 @@
 - A marker to the last opened minion for a couple of seconds (seen through walls)
 - Option to hide mob nametags close to minions.
 - Minion hopper coins per day display (Using the held coins in the hopper and the last time the hopper was collected to calculate the coins a hopper collects in a day)
+- Minion name display with minion tier.
 
 ## Bazaar
 - Showing colors in the order inventory for outbid or fully bought/sold items.
