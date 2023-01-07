@@ -23,7 +23,7 @@ class NonGodPotEffectDisplay {
 
     private var checkFooter = false
     private val activeEffects = mutableMapOf<String, Long>()
-    private val textToRender = mutableListOf<String>()
+    private val display = mutableListOf<String>()
     private var lastTick = 0L
 
     private var nonGodPotEffects = mapOf(
@@ -58,7 +58,7 @@ class NonGodPotEffectDisplay {
 
     private fun format() {
         val now = System.currentTimeMillis()
-        textToRender.clear()
+        display.clear()
         if (activeEffects.values.removeIf { now > it }) {
             //to fetch the real amount of active pots
             totalEffectsCount = 0
@@ -72,12 +72,12 @@ class NonGodPotEffectDisplay {
 
             val color = colorForTime(seconds)
 
-            textToRender.add("$label $color$format")
+            display.add("$label $color$format")
         }
         val diff = totalEffectsCount - activeEffects.size
         if (diff > 0) {
-            textToRender.add("§eOpen the /effects inventory")
-            textToRender.add("§eto show the missing $diff effects!")
+            display.add("§eOpen the /effects inventory")
+            display.add("§eto show the missing $diff effects!")
             checkFooter = true
         }
     }
@@ -182,7 +182,7 @@ class NonGodPotEffectDisplay {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.misc.nonGodPotEffectPos.renderStrings(textToRender)
+        SkyHanniMod.feature.misc.nonGodPotEffectPos.renderStrings(display)
     }
 
     @SubscribeEvent

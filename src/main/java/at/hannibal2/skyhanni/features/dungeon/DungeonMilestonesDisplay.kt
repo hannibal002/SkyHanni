@@ -15,7 +15,7 @@ class DungeonMilestonesDisplay {
 
 
     companion object {
-        private var textToRender = ""
+        private var display = ""
         var color = ""
         var currentMilestone = 0
         var timeReached = 0L
@@ -40,8 +40,8 @@ class DungeonMilestonesDisplay {
     private fun checkVisibility() {
         if (currentMilestone >= 3) {
             if (System.currentTimeMillis() > timeReached + 3_000)
-                if (textToRender != "") {
-                    textToRender = textToRender.substring(1)
+                if (display != "") {
+                    display = display.substring(1)
                 }
         }
     }
@@ -68,12 +68,12 @@ class DungeonMilestonesDisplay {
             2 -> "§e"
             else -> "§a"
         }
-        textToRender = "Current Milestone: $currentMilestone"
+        display = "Current Milestone: $currentMilestone"
     }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        textToRender = ""
+        display = ""
         currentMilestone = 0
     }
 
@@ -88,7 +88,7 @@ class DungeonMilestonesDisplay {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(color + textToRender)
+        SkyHanniMod.feature.dungeon.showMileStonesDisplayPos.renderString(color + display)
     }
 
     private fun isEnabled(): Boolean {

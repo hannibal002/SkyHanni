@@ -10,11 +10,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class SendTitleHelper {
 
     companion object {
-        private var textToRender = ""
+        private var display = ""
         private var endTime = 0L
 
         fun sendTitle(text: String, duration: Int) {
-            textToRender = text
+            display = text
             endTime = System.currentTimeMillis() + duration
         }
     }
@@ -36,7 +36,7 @@ class SendTitleHelper {
         GlStateManager.pushMatrix()
         GlStateManager.translate((width / 2).toFloat(), (height / 1.8).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(textToRender, renderer, 0f, 0f, false, 75, 0)
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(display, renderer, 0f, 0f, false, 75, 0)
         GlStateManager.popMatrix()
     }
 }
