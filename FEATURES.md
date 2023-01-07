@@ -160,3 +160,4 @@
 - Display the active non-god potion effects.
 - Option to hide blaze particles.
 - Wishing compass uses amount display.
+- Brewing Stand Overlay.

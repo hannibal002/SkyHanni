@@ -4,8 +4,9 @@
 
 ### Features
 + Added /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
-+ Added Compact Bingo Chat Messages
-+ Added Compact Potion Effect Chat Messages
++ Added Compact Bingo Chat Messages.
++ Added Compact Potion Effect Chat Messages.
++ Added Brewing Stand Overlay.
 
 ### Changes
 + Don't render overlays when tab list key is pressed.

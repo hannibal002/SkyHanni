@@ -170,6 +170,7 @@ public class SkyHanniMod {
         loadModule(new CompactSplashPotionMessage());
         loadModule(new CroesusUnopenedChestTracker());
         loadModule(new CompactBingoChat());
+        loadModule(new BrewingStandOverlay());
 
         Commands.INSTANCE.init();
 
