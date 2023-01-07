@@ -38,7 +38,6 @@ object CopyItemCommand {
 
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
-            LorenzUtils.debug("item info printed!")
             LorenzUtils.chat("§e[SkyHanni] item info copied into the clipboard!")
         } catch (_: Throwable) {
             LorenzUtils.chat("§c[SkyHanni] No item in hand!")

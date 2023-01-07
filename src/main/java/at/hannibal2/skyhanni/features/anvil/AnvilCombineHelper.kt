@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.anvil
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,13 +15,12 @@ class AnvilCombineHelper {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.inventory.anvilCombineHelper) return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
+        val chest = event.gui.inventorySlots as ContainerChest
+        val chestName = chest.getInventoryName()
 
         if (chestName != "Anvil") return
 

@@ -12,26 +12,29 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
-class HypixelData {
+class HyPixelData {
 
     companion object {
         var hypixel = false
-        var skyblock = false
-        var skyBlockIsland: String = ""
+        var skyBlock = false
+        var skyBlockIsland = IslandType.UNKNOWN
+
+        //Ironman, Stranded and Bingo
+        var noTrade = false
+
+        var ironman = false
+        var stranded = false
+        var bingo = false
 
         fun readSkyBlockArea(): String {
-            for (line in ScoreboardData.sidebarLinesFormatted()) {
-                if (line.startsWith(" §7⏣ ")) {
-                    return line.substring(5).removeColor()
-                }
-            }
-
-            return "invalid"
+            return ScoreboardData.sidebarLinesFormatted()
+                .firstOrNull { it.startsWith(" §7⏣ ") }
+                ?.substring(5)?.removeColor()
+                ?: "invalid"
         }
-
     }
 
-    var loggerIslandChange = LorenzLogger("debug/island_change")
+    private var loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
@@ -43,13 +46,13 @@ class HypixelData {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        skyblock = false
+        skyBlock = false
     }
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
         hypixel = false
-        skyblock = false
+        skyBlock = false
     }
 
     @SubscribeEvent
@@ -57,7 +60,6 @@ class HypixelData {
         if (!hypixel) return
 
         val message = event.message.removeColor().lowercase()
-
         if (message.startsWith("your profile was changed to:")) {
             val stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             ProfileJoinEvent(stripped).postAndCatch()
@@ -65,7 +67,6 @@ class HypixelData {
         if (message.startsWith("you are playing on profile:")) {
             val stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
             ProfileJoinEvent(stripped).postAndCatch()
-
         }
     }
 
@@ -80,13 +81,42 @@ class HypixelData {
 
         if (tick % 5 != 0) return
 
-        val newState = checkScoreboard()
-        if (newState) {
+        val inSkyBlock = checkScoreboard()
+        if (inSkyBlock) {
             checkIsland()
+            checkSidebar()
         }
 
-        if (newState == skyblock) return
-        skyblock = newState
+        if (inSkyBlock == skyBlock) return
+        skyBlock = inSkyBlock
+    }
+
+    private fun checkSidebar() {
+        ironman = false
+        stranded = false
+        bingo = false
+
+        for (line in ScoreboardData.sidebarLinesFormatted()) {
+            when (line) {
+                " §7Ⓑ §7Bingo", // No Rank
+                " §bⒷ §bBingo", // Rank 1
+                " §9Ⓑ §9Bingo", // Rank 2
+                " §5Ⓑ §5Bingo", // Rank 3
+                " §6Ⓑ §6Bingo", // Rank 4
+                -> {
+                    bingo = true
+                }
+
+                // TODO implemennt stranded check
+
+                " §7♲ §7Ironman" -> {
+                    ironman = true
+                }
+
+            }
+        }
+
+        noTrade = ironman || stranded || bingo
     }
 
     private fun checkIsland() {
@@ -100,14 +130,24 @@ class HypixelData {
                 guesting = true
             }
         }
-        if (guesting) {
-            newIsland = "$newIsland guesting"
+
+        var islandType = IslandType.getBySidebarName(newIsland)
+
+        if (islandType == IslandType.PRIVATE_ISLAND) {
+            if (guesting) {
+                islandType = IslandType.PRIVATE_ISLAND_GUEST
+            }
         }
 
-        if (skyBlockIsland != newIsland) {
-            IslandChangeEvent(newIsland, skyBlockIsland).postAndCatch()
-            loggerIslandChange.log(newIsland)
-            skyBlockIsland = newIsland
+        if (skyBlockIsland != islandType) {
+            IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
+            if (islandType == IslandType.UNKNOWN) {
+                println("Unknown island detected: '$newIsland'")
+                loggerIslandChange.log("Unknown: '$newIsland'")
+            } else {
+                loggerIslandChange.log(islandType.name)
+            }
+            skyBlockIsland = islandType
         }
     }
 
@@ -115,12 +155,8 @@ class HypixelData {
         val minecraft = Minecraft.getMinecraft()
         val world = minecraft.theWorld ?: return false
 
-        val sidebarObjective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
-
-        val displayName = sidebarObjective.displayName
-
+        val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
+        val displayName = objective.displayName
         return displayName.removeColor().contains("SKYBLOCK")
-
     }
-
 }

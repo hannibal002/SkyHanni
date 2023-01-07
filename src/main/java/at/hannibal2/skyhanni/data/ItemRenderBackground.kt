@@ -30,7 +30,7 @@ class ItemRenderBackground {
     @SubscribeEvent
     fun renderOverlayLol(event: RenderRealOverlayEvent) {
         val stack = event.stack
-        if (LorenzUtils.inSkyblock) {
+        if (LorenzUtils.inSkyBlock) {
             if (stack != null) {
                 val color = stack.background
                 if (color != -1) {

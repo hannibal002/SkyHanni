@@ -55,7 +55,7 @@ class AshfangGravityOrbs {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.gravityOrbs &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.gravityOrbs &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

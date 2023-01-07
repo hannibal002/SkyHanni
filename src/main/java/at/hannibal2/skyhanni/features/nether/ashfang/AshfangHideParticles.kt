@@ -19,7 +19,7 @@ class AshfangHideParticles {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (tick++ % 60 == 0) {
             val distance = DamageIndicatorManager.getDistanceTo(BossType.NETHER_ASHFANG)
@@ -51,5 +51,5 @@ class AshfangHideParticles {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.hideParticles && hideParticles
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.hideParticles && hideParticles
 }

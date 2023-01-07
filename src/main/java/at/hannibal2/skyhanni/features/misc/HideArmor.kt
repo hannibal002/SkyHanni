@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -23,7 +23,7 @@ class HideArmor {
 
     @SubscribeEvent
     fun onGuiInventoryToggle(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyblock) return // TODO test this
+        if (!LorenzUtils.inSkyBlock) return // TODO test this
 
         fixOtherArmor()
 
@@ -182,7 +182,7 @@ class HideArmor {
         }
 
         private fun changeArmor(entity: EntityPlayer, new: Array<ItemStack?>?) {
-            if (!LorenzUtils.inSkyblock) return
+            if (!LorenzUtils.inSkyBlock) return
 
             val current = entity.inventory.armorInventory
             if (new != null) {

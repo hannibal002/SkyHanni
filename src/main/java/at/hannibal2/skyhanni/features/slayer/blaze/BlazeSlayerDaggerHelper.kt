@@ -36,7 +36,7 @@ class BlazeSlayerDaggerHelper {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.slayer.blazeHideDaggerWarning) return
 
         val message = event.message
@@ -199,7 +199,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.slayer.blazeDaggers
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazeDaggers
     }
 
     @SubscribeEvent
@@ -245,7 +245,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
         if (textTopLeft.isEmpty()) return

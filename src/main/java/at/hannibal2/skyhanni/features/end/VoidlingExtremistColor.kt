@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.end
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -54,5 +55,5 @@ class VoidlingExtremistColor {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.inSkyblock && LorenzUtils.skyBlockIsland == "The End" && SkyHanniMod.feature.misc.voidlingExtremistColor
+        LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.THE_END && SkyHanniMod.feature.misc.voidlingExtremistColor
 }

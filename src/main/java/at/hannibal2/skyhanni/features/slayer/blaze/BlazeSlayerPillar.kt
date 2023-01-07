@@ -96,7 +96,7 @@ class BlazeSlayerPillar {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
         if (lastPillarSpawnTime == -1L) return
@@ -147,7 +147,7 @@ class BlazeSlayerPillar {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && DamageIndicatorManager.isBossSpawned(
+        return LorenzUtils.inSkyBlock && DamageIndicatorManager.isBossSpawned(
             BossType.SLAYER_BLAZE_2,
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,

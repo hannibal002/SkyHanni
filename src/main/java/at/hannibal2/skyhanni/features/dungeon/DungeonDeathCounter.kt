@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonDeathCounter {
 
-    private var textToRender = ""
+    private var display = ""
     private var deaths = 0
 
     private fun isDeathMessage(message: String): Boolean = when {
@@ -60,7 +60,7 @@ class DungeonDeathCounter {
 
     private fun update() {
         if (deaths == 0) {
-            textToRender = ""
+            display = ""
             return
         }
 
@@ -69,7 +69,7 @@ class DungeonDeathCounter {
             3 -> "§c"
             else -> "§4"
         }
-        textToRender = color + "Deaths: $deaths"
+        display = color + "Deaths: $deaths"
     }
 
     @SubscribeEvent
@@ -85,11 +85,11 @@ class DungeonDeathCounter {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestonesDisplay.color + textToRender)
+        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestonesDisplay.color + display)
     }
 
     private fun isEnabled(): Boolean {

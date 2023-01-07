@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.Category;
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
-import at.hannibal2.skyhanni.features.HideArmor;
-import at.hannibal2.skyhanni.features.MarkedPlayerManager;
+import at.hannibal2.skyhanni.features.misc.HideArmor;
+import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 
@@ -34,6 +34,11 @@ public class Features extends Config {
 
         if (runnableId.equals("petDisplay")) {
             editOverlay(activeConfigCategory, 200, 16, misc.petDisplayPos);
+            return;
+        }
+
+        if (runnableId.equals("collectionCounter")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.collectionCounterPos);
             return;
         }
 
@@ -158,6 +163,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer")
     public MarkedPlayers markedPlayers = new MarkedPlayers();
+
+    @Expose
+    @Category(name = "Bingo", desc = "Features for the Bingo mode.")
+    public Bingo bingo = new Bingo();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")

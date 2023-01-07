@@ -21,7 +21,7 @@ class AshfangHideDamageIndicator {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.hideDamageSplash &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.hideDamageSplash &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

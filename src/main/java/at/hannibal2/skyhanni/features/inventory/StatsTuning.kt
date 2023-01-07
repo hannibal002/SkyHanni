@@ -9,9 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -22,15 +19,12 @@ class StatsTuning {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        val screen = Minecraft.getMinecraft().currentScreen
-        if (screen !is GuiChest) return
-        val chest = screen.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
+        val inventoryName = event.inventoryName
 
         val stack = event.stack
 
         if (SkyHanniMod.feature.inventory.statsTuningTemplateStats) {
-            if (chestName == "Stats Tuning") {
+            if (inventoryName == "Stats Tuning") {
                 val name = stack.name ?: return
                 if (name == "§aLoad") {
                     var grab = false
@@ -60,7 +54,7 @@ class StatsTuning {
             }
         }
         if (SkyHanniMod.feature.inventory.statsTuningSelectedStats) {
-            if (chestName == "Accessory Bag Thaumaturgy") {
+            if (inventoryName == "Accessory Bag Thaumaturgy") {
                 val name = stack.name ?: return
                 if (name == "§aStats Tuning") {
                     var grab = false
@@ -90,7 +84,7 @@ class StatsTuning {
             }
         }
         if (SkyHanniMod.feature.inventory.statsTuningPoints) {
-            if (chestName == "Stats Tuning") {
+            if (inventoryName == "Stats Tuning") {
                 for (line in stack.getLore()) {
                     val matcher = patternStatPoints.matcher(line)
                     if (matcher.matches()) {
@@ -105,13 +99,9 @@ class StatsTuning {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawSelectedTemplate(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
 
-        if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.lowerChestInventory.displayName.unformattedText.trim()
-
+        val chestName = InventoryUtils.openInventoryName()
         if (SkyHanniMod.feature.inventory.statsTuningSelectedTemplate) {
             if (chestName == "Stats Tuning") {
                 for (slot in InventoryUtils.getItemsInOpenChest()) {

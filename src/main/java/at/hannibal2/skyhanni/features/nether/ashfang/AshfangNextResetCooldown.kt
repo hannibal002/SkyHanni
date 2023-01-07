@@ -30,7 +30,7 @@ class AshfangNextResetCooldown {
     }
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
         if (spawnTime == -1L) return
@@ -51,7 +51,7 @@ class AshfangNextResetCooldown {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.ashfang.nextResetCooldown &&
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.nextResetCooldown &&
                 DamageIndicatorManager.isBossSpawned(BossType.NETHER_ASHFANG)
     }
 }

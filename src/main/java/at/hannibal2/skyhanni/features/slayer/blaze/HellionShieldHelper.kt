@@ -16,7 +16,7 @@ class HellionShieldHelper {
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.slayer.blazeColoredMobs) return
 
         val shield = hellionShieldMobs.getOrDefault(event.entity, null) ?: return
@@ -25,7 +25,7 @@ class HellionShieldHelper {
 
     @SubscribeEvent
     fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inSkyblock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.slayer.blazeColoredMobs) return
 
         hellionShieldMobs.getOrDefault(event.entity, null) ?: return

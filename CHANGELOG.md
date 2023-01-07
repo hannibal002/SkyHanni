@@ -1,5 +1,22 @@
 # SkyHanni - Change Log
 
+## Version 0.14
+
+### Features
++ Added /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
++ Added Compact Bingo Chat Messages.
++ Added Compact Potion Effect Chat Messages.
++ Added Brewing Stand Overlay.
++ Added minion name display with minion tier.
+
+### Changes
++ Don't render overlays when tab list key is pressed.
++ Do no longer prevent the selling of bazaar items to NPC when on ironman, stranded or bingo mode.
+
+### Fixes
++ Fixed wrong dungeon level colors. (in Party Finder)
++ Fixed error in Sea Creature Guide inventory.
+
 ## Version 0.13
 
 ### Features

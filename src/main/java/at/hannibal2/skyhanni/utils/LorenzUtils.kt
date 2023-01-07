@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.HyPixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -14,30 +15,42 @@ import java.text.SimpleDateFormat
 
 object LorenzUtils {
 
-    val isOnHypixel: Boolean
-        get() = HypixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
+    val isHyPixel: Boolean
+        get() = HyPixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
 
-    val inSkyblock: Boolean
-        get() = isOnHypixel && HypixelData.skyblock
+    val inSkyBlock: Boolean
+        get() = isHyPixel && HyPixelData.skyBlock
 
     val inDungeons: Boolean
-        get() = inSkyblock && DungeonData.inDungeon()
+        get() = inSkyBlock && DungeonData.inDungeon()
 
-    val skyBlockIsland: String
-        get() = HypixelData.skyBlockIsland
+    val skyBlockIsland: IslandType
+        get() = HyPixelData.skyBlockIsland
 
     //TODO add cache
     val skyBlockArea: String
-        get() = HypixelData.readSkyBlockArea()
+        get() = HyPixelData.readSkyBlockArea()
 
     val inKuudraFight: Boolean
-        get() = skyBlockIsland == "Instanced"
+        get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
-    const val DEBUG_PREFIX = "[Debug] §7"
+    val noTradeMode: Boolean
+        get() = HyPixelData.noTrade
+
+    val isBingoProfile: Boolean
+        get() = inSkyBlock && HyPixelData.bingo
+
+    const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
 
     fun debug(message: String) {
-        internalChat(DEBUG_PREFIX + message)
+        if (SkyHanniMod.feature.dev.debugEnabled) {
+            if (internalChat(DEBUG_PREFIX + message)) {
+                consoleLog("[Debug] $message")
+            }
+        } else {
+            consoleLog("[Debug] $message")
+        }
     }
 
     fun warning(message: String) {
@@ -52,21 +65,22 @@ object LorenzUtils {
         internalChat(message)
     }
 
-    private fun internalChat(message: String) {
+    private fun internalChat(message: String): Boolean {
         log.log(message)
         val minecraft = Minecraft.getMinecraft()
         if (minecraft == null) {
             consoleLog(message.removeColor())
-            return
+            return false
         }
 
         val thePlayer = minecraft.thePlayer
         if (thePlayer == null) {
             consoleLog(message.removeColor())
-            return
+            return false
         }
 
         thePlayer.addChatMessage(ChatComponentText(message))
+        return true
     }
 
     //TODO move into StringUtils

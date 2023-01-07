@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -61,10 +62,13 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(4)) {
-            if (ItemUtils.isPet(name)) {
-                val level = name.between("Lvl ", "] ").toInt()
-                if (level != ItemUtils.maxPetLevel(name)) {
-                    return "$level"
+            val chestName = InventoryUtils.openInventoryName()
+            if (!chestName.endsWith("Sea Creature Guide")) {
+                if (ItemUtils.isPet(name)) {
+                    val level = name.between("Lvl ", "] ").toInt()
+                    if (level != ItemUtils.maxPetLevel(name)) {
+                        return "$level"
+                    }
                 }
             }
         }

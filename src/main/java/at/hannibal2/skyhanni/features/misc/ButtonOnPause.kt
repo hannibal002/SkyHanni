@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigEditor
@@ -14,7 +14,7 @@ class ButtonOnPause {
 
     @SubscribeEvent
     fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
-        if (!LorenzUtils.isOnHypixel) return
+        if (!LorenzUtils.isHyPixel) return
 
         if (SkyHanniMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
             SkyHanniMod.screenToOpen = GuiScreenElementWrapper(
@@ -27,7 +27,7 @@ class ButtonOnPause {
 
     @SubscribeEvent
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
-        if (!LorenzUtils.isOnHypixel) return
+        if (!LorenzUtils.isHyPixel) return
 
         if (SkyHanniMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu) {
             val x = event.gui.width - 105

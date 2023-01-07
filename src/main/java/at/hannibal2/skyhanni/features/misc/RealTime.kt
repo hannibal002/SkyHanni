@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,7 +12,7 @@ class RealTime {
     private val format = SimpleDateFormat("HH:mm:ss")
 
     @SubscribeEvent
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
 
@@ -20,6 +20,6 @@ class RealTime {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyblock && SkyHanniMod.feature.misc.realTime
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.realTime
     }
 }
