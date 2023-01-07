@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.Category;
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
-import at.hannibal2.skyhanni.features.HideArmor;
-import at.hannibal2.skyhanni.features.MarkedPlayerManager;
+import at.hannibal2.skyhanni.features.misc.HideArmor;
+import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 
