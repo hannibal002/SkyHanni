@@ -62,7 +62,7 @@ class CollectionCounter {
 
             val apiName = data.apiName
             if (!apiCollectionData.contains(apiName)) {
-                LorenzUtils.chat("§c[SkyHanni] Item $name not in collection data!")
+                LorenzUtils.chat("§c[SkyHanni] Item $name is not in collection data!")
                 return
             }
 
