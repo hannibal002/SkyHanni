@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
