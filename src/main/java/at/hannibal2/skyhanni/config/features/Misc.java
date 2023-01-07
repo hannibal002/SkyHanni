@@ -139,4 +139,9 @@ public class Misc {
     @ConfigOption(name = "Collection Counter Position", desc = "Tracking the number of items you collect. §cDoes not work with sacks.")
     @ConfigEditorButton(runnableId = "collectionCounter", buttonText = "Edit")
     public Position collectionCounterPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the Item names directly inside the Brewing Stand")
+    @ConfigEditorBoolean
+    public boolean brewingStandOverlay = true;
 }

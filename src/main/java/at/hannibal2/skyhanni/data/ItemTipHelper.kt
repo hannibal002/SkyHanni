@@ -5,10 +5,12 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -55,6 +57,8 @@ class ItemTipHelper {
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return
+        val chest = gui.inventorySlots as ContainerChest
+        var inventoryName = chest.getInventoryName()
 
         val guiLeft = (gui as AccessorGuiContainer).guiLeft
         val guiTop = (gui as AccessorGuiContainer).guiTop
@@ -65,9 +69,8 @@ class ItemTipHelper {
         GlStateManager.disableBlend()
         for (slot in gui.inventorySlots.inventorySlots) {
             val stack = slot.stack ?: continue
-            if (stack.stackSize != 1) continue
 
-            val itemTipEvent = RenderInventoryItemTipEvent(stack)
+            val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
             itemTipEvent.postAndCatch()
             val stackTip = itemTipEvent.stackTip
             if (stackTip.isEmpty()) continue
