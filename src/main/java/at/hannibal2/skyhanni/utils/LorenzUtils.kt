@@ -33,6 +33,12 @@ object LorenzUtils {
     val inKuudraFight: Boolean
         get() = skyBlockIsland == "Instanced"
 
+    val noTradeMode: Boolean
+        get() = HypixelData.noTrade
+
+    val isBingoProfile: Boolean
+        get() = inSkyblock && HypixelData.bingo
+
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
 
