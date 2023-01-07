@@ -86,7 +86,7 @@ public class SkyHanniMod {
         new BazaarApi();
         loadModule(this);
         loadModule(new ChatManager());
-        loadModule(new HypixelData());
+        loadModule(new HyPixelData());
         loadModule(new DungeonData());
         loadModule(new ScoreboardData());
         loadModule(new ApiDataLoader());
