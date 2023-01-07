@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.13.1
+## Version 0.14
 
 ### Features
 + Added /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
