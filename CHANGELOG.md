@@ -12,7 +12,8 @@
 + Do no longer prevent the selling of bazaar items to NPC when on ironman, stranded or bingo mode.
 
 ### Fixes
-+ Dungeon level color fixed wrong colors.
++ Fixed wrong dungeon level colors. (in Party Finder)
++ Fixed error in Sea Creature Guide inventory.
 
 ## Version 0.13
 

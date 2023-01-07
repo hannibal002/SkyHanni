@@ -32,4 +32,15 @@ object InventoryUtils {
         }
         return list
     }
+
+    fun openInventoryName(): String {
+        val guiChest = Minecraft.getMinecraft().currentScreen
+        val chestName = if (guiChest is GuiChest) {
+            val chest = guiChest.inventorySlots as ContainerChest
+            chest.lowerChestInventory.displayName.unformattedText.trim()
+        } else {
+            ""
+        }
+        return chestName
+    }
 }
