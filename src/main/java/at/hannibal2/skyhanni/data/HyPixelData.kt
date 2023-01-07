@@ -27,13 +27,10 @@ class HyPixelData {
         var bingo = false
 
         fun readSkyBlockArea(): String {
-            for (line in ScoreboardData.sidebarLinesFormatted()) {
-                if (line.startsWith(" §7⏣ ")) {
-                    return line.substring(5).removeColor()
-                }
-            }
-
-            return "invalid"
+            return ScoreboardData.sidebarLinesFormatted()
+                .firstOrNull { it.startsWith(" §7⏣ ") }
+                ?.substring(5)?.removeColor()
+                ?: "invalid"
         }
     }
 
