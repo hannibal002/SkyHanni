@@ -103,7 +103,11 @@ class ChatFilter {
 
     private fun uselessDrop(message: String): Boolean {
         when {
+            // TODO check if this is still necessary
             message.matchRegex("§6§lRARE DROP! §r§aEnchanted Ender Pearl (.*)") -> return true
+            message == "§6§lRARE DROP! §r§aEnchanted Ender Pearl" -> return true
+            message == "§6§lRARE DROP! §r§aEnchanted End Stone" -> return true
+            message == "§6§lRARE DROP! §r§5Crystal Fragment" -> return true
 
             message.matchRegex("§6§lRARE DROP! §r§fCarrot (.*)") -> return true
             message.matchRegex("§6§lRARE DROP! §r§fPotato (.*)") -> return true
@@ -175,7 +179,7 @@ class ChatFilter {
 
         //Enderman
         if (message.matchRegex("§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)")) return true
-        if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)")) return true
+        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§fMana Steal I§r§7\\) (.*)")) return true
         if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5Sinful Dice§r§7\\) (.*)")) return true
         if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§9Null Atom§r§7\\) (.*)")) return true
         if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5Transmission Tuner§r§7\\) (.*)")) return true
@@ -183,6 +187,7 @@ class ChatFilter {
         if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ Endersnake Rune I§r§7\\) (.*)")) return true
         if (message.matchRegex("§d§lCRAZY RARE DROP!  §r§7\\(§r§f§r§fPocket Espresso Machine§r§7\\) (.*)")) return true
         if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§5◆ End Rune I§r§7\\) (.*)")) return true
+        if (message.matchRegex("§5§lVERY RARE DROP!  §r§7\\(§r§f§r§6Hazmat Enderman§r§7\\) .*")) return true
 
         //Blaze
         if (message.matchRegex("§9§lVERY RARE DROP!  §r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)")) return true
