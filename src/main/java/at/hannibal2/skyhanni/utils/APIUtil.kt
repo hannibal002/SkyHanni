@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.gson.stream.MalformedJsonException
+import com.google.gson.JsonSyntaxException
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
@@ -43,9 +43,15 @@ object APIUtil {
                     val retSrc = EntityUtils.toString(entity)
                     try {
                         return parser.parse(retSrc) as JsonObject
-                    } catch (e: MalformedJsonException) {
-                        LorenzUtils.error("MalformedJsonException!")
-                        println("MalformedJsonException at '$urlString'")
+                    } catch (e: JsonSyntaxException) {
+                        if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
+                            println("502 Bad Gateway at getJSONResponse '$urlString'")
+                            LorenzUtils.error("[SkyHanni] Hypixel API error: 502 Bad Gateway!")
+                        } else {
+                            println("JsonSyntaxException at getJSONResponse '$urlString'")
+                            LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")
+                            println("result: '$retSrc'")
+                        }
                         e.printStackTrace()
                     }
                 }
