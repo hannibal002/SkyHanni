@@ -117,7 +117,9 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    fun formatInteger(i: Int): String = DecimalFormat("#,##0").format(i.toLong()).replace(',', '.')
+    fun formatInteger(i: Int): String = formatInteger(i.toLong())
+
+    fun formatInteger(l: Long): String = DecimalFormat("#,##0").format(l).replace(',', '.')
 
     fun formatDouble(d: Double, format: String?): String =
         DecimalFormat(format).format(d).replace(',', 'x').replace('.', ',').replace('x', '.')
