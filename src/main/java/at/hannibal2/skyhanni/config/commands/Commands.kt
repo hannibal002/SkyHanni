@@ -37,6 +37,7 @@ object Commands {
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
         registerCommand("togglepacketlog") { LorenzTest.togglePacketLog() }
         registerCommand("shreloadlisteners") { LorenzTest.reloadListeners() }
+        registerCommand("shstoplisteners") { LorenzTest.stopListeners() }
         registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
         registerCommand("shtrackcollection") { CollectionCounter.command(it) }
     }

@@ -103,6 +103,17 @@ class LorenzTest {
             }
             LorenzUtils.chat("§e[SkyHanni] reloaded ${modules.size} listener classes.")
         }
+
+        fun stopListeners() {
+            val modules = SkyHanniMod.modules
+            for (original in modules.toMutableList()) {
+                val javaClass = original.javaClass
+                val simpleName = javaClass.simpleName
+                MinecraftForge.EVENT_BUS.unregister(original)
+                println("Unregistered listener $simpleName")
+            }
+            LorenzUtils.chat("§e[SkyHanni] stopped ${modules.size} listener classes.")
+        }
     }
 
     @SubscribeEvent
