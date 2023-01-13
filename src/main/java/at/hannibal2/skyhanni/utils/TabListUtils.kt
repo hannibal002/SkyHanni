@@ -34,7 +34,7 @@ object TabListUtils {
         val result: MutableList<String> = ArrayList()
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            result.add(name)
+            result.add(LorenzUtils.stripVanillaMessage(name))
         }
         return result
     }
