@@ -1,5 +1,10 @@
 # SkyHanni - Change Log
 
+## Version 0.14.1
+
+### Features
++ Added Bazaar Update Timer - Forrick
+
 ## Version 0.14
 
 ### Features

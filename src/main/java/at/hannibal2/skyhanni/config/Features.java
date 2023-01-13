@@ -106,6 +106,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, misc.nonGodPotEffectPos);
             return;
         }
+
+        if (runnableId.equals("bazzarUpdateTimer")) {
+            editOverlay(activeConfigCategory, 200, 16, bazaar.updateTimerPos);
+            return;
+        }
     }
 
     @Expose
