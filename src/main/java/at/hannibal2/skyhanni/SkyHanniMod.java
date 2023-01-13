@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.nether.MilleniaAgedBlazeColor;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
+import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper;
 import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HideMobNames;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
@@ -170,6 +171,8 @@ public class SkyHanniMod {
         loadModule(new CompactBingoChat());
         loadModule(new BrewingStandOverlay());
         loadModule(new BazaarUpdateTimer());
+
+        loadModule(new CrimsonIsleReputationHelper(this));
 
         Commands.INSTANCE.init();
 
