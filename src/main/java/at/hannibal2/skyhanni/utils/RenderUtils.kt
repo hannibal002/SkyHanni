@@ -424,7 +424,7 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.renderString(string: String?, offsetY: Int = 0) {
+    fun Position.renderString(string: String?, offsetY: Int = 0, center: Boolean = true) {
         val minecraft = Minecraft.getMinecraft()
         if (minecraft.gameSettings.keyBindPlayerList.isKeyDown) return
 
@@ -437,7 +437,11 @@ object RenderUtils {
 
         val renderer = minecraft.renderManager.fontRenderer ?: return
 
-        val offsetX = (200 - renderer.getStringWidth(display.removeColor())) / 2
+        val offsetX = if (center) {
+            (200 - renderer.getStringWidth(display.removeColor())) / 2
+        } else {
+            0
+        }
 
         val x = getAbsX(resolution, 200) + offsetX
         val y = getAbsY(resolution, 16) + offsetY
@@ -448,13 +452,13 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun Position.renderStrings(list: List<String>) {
+    fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, center: Boolean = false) {
         if (list.isEmpty()) return
 
         var offsetY = 0
         for (s in list) {
-            renderString(s, offsetY)
-            offsetY += 14
+            renderString(s, offsetY, center = center)
+            offsetY += 10 + extraSpace
         }
     }
 
