@@ -34,7 +34,7 @@ class BazaarUpdateTimer {
         }
 
         val list = mutableListOf<String>()
-        list.add("next update in")
+        list.add("Next update in:")
         list.add(format)
         SkyHanniMod.feature.bazaar.updateTimerPos.renderStrings(list, center = true)
     }
