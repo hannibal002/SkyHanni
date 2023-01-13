@@ -116,7 +116,6 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
         val message = event.message
-
         if (message == "§aYou completed your Dojo quest! Visit the Town Board to claim the rewards.") {
             val dojoQuest = getQuest<DojoQuest>() ?: return
             dojoQuest.state = QuestState.READY_TO_COLLECT
@@ -124,9 +123,7 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
         }
     }
 
-    private inline fun <reified T : Quest> getQuest(): T? {
-        return quests.filterIsInstance<T>().firstOrNull()
-    }
+    private inline fun <reified T : Quest> getQuest() = quests.filterIsInstance<T>().firstOrNull()
 
     private fun checkInventoryForFetchItem() {
         val fetchQuest = getQuest<FetchQuest>() ?: return
@@ -202,19 +199,15 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
 
         val sacksText = if (quest is FetchQuest && quest.state != QuestState.COLLECTED) {
             val name = quest.itemName.uppercase()
-            val amount = sacksCache.getOrDefault(name, -1)
+            val amount = sacksCache.getOrDefault(name, 0)
             val needAmount = quest.needAmount
+            val amountFormat = LorenzUtils.formatInteger(amount)
             val color = if (amount >= needAmount) {
                 "§a"
             } else {
                 "§c"
             }
-            val format = if (amount == -1L) {
-                "§c?"
-            } else {
-                color + LorenzUtils.formatInteger(amount)
-            }
-            " §f($format §fin sacks)"
+            " §f($color$amountFormat §fin sacks)"
         } else {
             ""
         }
