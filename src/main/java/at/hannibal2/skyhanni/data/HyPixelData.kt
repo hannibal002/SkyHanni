@@ -123,10 +123,10 @@ class HyPixelData {
         var newIsland = ""
         var guesting = false
         for (line in TabListUtils.getTabList()) {
-            if (line.startsWith("§r§b§lArea: ")) {
+            if (line.startsWith("§b§lArea: ")) {
                 newIsland = line.split(": ")[1].removeColor()
             }
-            if (line == "§r Status: §r§9Guest§r") {
+            if (line == " Status: §r§9Guest") {
                 guesting = true
             }
         }
