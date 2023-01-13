@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.bazaar
 
+import at.hannibal2.skyhanni.events.BazaarUpdateEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -97,6 +98,8 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 continue
             }
 
+            val sellMovingWeek = itemData["quick_status"].asJsonObject["sellMovingWeek"].asInt
+            val buyMovingWeek = itemData["quick_status"].asJsonObject["buyMovingWeek"].asInt
             //parse bazaar api format into internal name format
             if (apiName.startsWith("ENCHANTMENT_")) {
                 val split = apiName.split("_")
@@ -106,9 +109,10 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 apiName = text
             }
 
-            val data = BazaarData(apiName, itemName, sellPrice, buyPrice)
+            val data = BazaarData(apiName, itemName, sellPrice, buyPrice, buyMovingWeek, sellMovingWeek)
             bazaarMap[itemName] = data
         }
+        BazaarUpdateEvent(bazaarMap).postAndCatch()
     }
 
     private fun getItemName(apiName: String): String? {

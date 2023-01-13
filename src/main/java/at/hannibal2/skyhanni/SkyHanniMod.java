@@ -6,10 +6,7 @@ import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.data.*;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
-import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
-import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard;
-import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
+import at.hannibal2.skyhanni.features.bazaar.*;
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages;
@@ -172,6 +169,7 @@ public class SkyHanniMod {
         loadModule(new CroesusUnopenedChestTracker());
         loadModule(new CompactBingoChat());
         loadModule(new BrewingStandOverlay());
+        loadModule(new BazaarUpdateTimer());
 
         Commands.INSTANCE.init();
 
