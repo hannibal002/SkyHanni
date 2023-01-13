@@ -142,4 +142,16 @@ object LorenzUtils {
         }
         return null
     }
+
+    fun getPointsForDojoRank(rank: String): Int {
+        return when (rank) {
+            "S" -> 1000
+            "A" -> 800
+            "B" -> 600
+            "C" -> 400
+            "D" -> 200
+            "F" -> 0
+            else -> 0
+        }
+    }
 }
