@@ -150,7 +150,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                 }
             }
             if (SkyHanniMod.feature.dev.filterScoreboardErrors) {
-                if (thrown.toString() == "java.util.concurrent.ExecutionException: java.lang.IllegalArgumentException: A team with the name '") {
+                if (thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
                     filterConsole("IllegalArgumentException because scoreboard team already exists")
                     return Filter.Result.DENY
                 }

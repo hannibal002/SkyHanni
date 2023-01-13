@@ -189,7 +189,7 @@ public class SkyHanniMod {
         repo.loadRepoInformation();
     }
 
-    private void loadModule(Object object) {
+    public void loadModule(Object object) {
         modules.add(object);
         MinecraftForge.EVENT_BUS.register(object);
     }
