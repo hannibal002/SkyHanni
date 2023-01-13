@@ -28,13 +28,16 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
 
     private val sacksCache = mutableMapOf<String, Long>()
 
+    private var latestTrophyFishInInventory = 0
+
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
         tick++
-        if (tick % 3 == 0) {
+        if (tick % 20 == 0) {
             loader.checkInventory()
+            checkInventory()
         }
         if (tick % 60 == 0) {
             checkInventoryForFetchItem()
@@ -48,6 +51,30 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
                 LorenzUtils.chat("§e[SkyHanni] Reset Quests.")
             }
         }
+    }
+
+    private fun checkInventory() {
+        val fishQuest = getQuest<TrophyFishQuest>() ?: return
+        if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
+
+        val fishName = fishQuest.fishName
+        var currentlyInInventory = 0
+        val player = Minecraft.getMinecraft().thePlayer
+        for (stack in player.inventory.mainInventory) {
+            if (stack == null) continue
+            val name = stack.name ?: continue
+            if (name.contains(fishName)) {
+                currentlyInInventory += stack.stackSize
+            }
+        }
+        println("currentlyInInventory: $currentlyInInventory")
+
+        val diff = currentlyInInventory - latestTrophyFishInInventory
+        if (diff < 1) return
+        LorenzUtils.debug("diff: $diff")
+        latestTrophyFishInInventory = currentlyInInventory
+
+        updateProcessQuest(fishQuest, fishQuest.haveAmount + diff)
     }
 
     fun update() {
@@ -121,6 +148,11 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
             dojoQuest.state = QuestState.READY_TO_COLLECT
             update()
         }
+        if (message == "§aYou completed your rescue quest! Visit the Town Board to claim the rewards,") {
+            val rescueMissionQuest = getQuest<RescueMissionQuest>() ?: return
+            rescueMissionQuest.state = QuestState.READY_TO_COLLECT
+            update()
+        }
     }
 
     private inline fun <reified T : Quest> getQuest() = quests.filterIsInstance<T>().firstOrNull()
@@ -140,15 +172,22 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
                 count += stack.stackSize
             }
         }
+        updateProcessQuest(fetchQuest, count)
+    }
 
-        val needAmount = fetchQuest.needAmount
+    private fun updateProcessQuest(
+        quest: ProgressQuest,
+        newAmount: Int
+    ) {
+        var count = newAmount
+        val needAmount = quest.needAmount
         if (count > needAmount) {
             count = needAmount
         }
-        if (fetchQuest.haveAmount == count) return
+        if (quest.haveAmount == count) return
 
-        fetchQuest.haveAmount = count
-        fetchQuest.state = if (count == needAmount) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED
+        quest.haveAmount = count
+        quest.state = if (count == needAmount) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED
         update()
     }
 
