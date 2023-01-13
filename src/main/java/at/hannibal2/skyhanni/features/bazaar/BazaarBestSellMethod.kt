@@ -47,8 +47,8 @@ class BazaarBestSellMethod {
             for (slot in chest.inventorySlots) {
                 if (slot == null) continue
                 if (slot.slotNumber == slot.slotIndex) continue
-                if (slot.stack == null) continue
-                val stack = slot.stack
+                val stack = slot.stack ?: continue
+
                 var displayName = stack.displayName
                 if (displayName.endsWith("Enchanted Book")) {
                     displayName = stack.getLore()[0]

@@ -74,7 +74,7 @@ enum class ItemAbility(
         } else {
             duration /= 1000
             duration++
-            LorenzUtils.formatInteger(duration.toInt())
+            LorenzUtils.formatInteger(duration)
         }
     }
 
