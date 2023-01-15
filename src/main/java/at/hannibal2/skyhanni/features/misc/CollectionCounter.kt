@@ -62,7 +62,11 @@ class CollectionCounter {
 
             val apiName = data.apiName
             if (!apiCollectionData.contains(apiName)) {
-                LorenzUtils.chat("§c[SkyHanni] Item $name is not in collection data!")
+                if (apiCollectionData.isEmpty()) {
+                    LorenzUtils.chat("§c[SkyHanni] Collection data not loaded! (API down?)")
+                } else {
+                    LorenzUtils.chat("§c[SkyHanni] Item $name is not in collection data!")
+                }
                 return
             }
 
@@ -133,8 +137,8 @@ class CollectionCounter {
         if (diff != 0) {
             if (diff > 0) {
                 gainItems(diff)
-            } else {
-                LorenzUtils.debug("Collection counter! Negative collection change: $diff")
+//            } else {
+//                LorenzUtils.debug("Collection counter! Negative collection change: $diff")
             }
         }
 
