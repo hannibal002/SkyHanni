@@ -55,7 +55,7 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
                 if (oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
                     oldQuest.state = QuestState.READY_TO_COLLECT
                     dailyQuestHelper.update()
-                    LorenzUtils.debug("Tablist updated ${oldQuest.internalName} (This should not happen)")
+                    LorenzUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
                 }
             }
             return
@@ -71,33 +71,33 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
         state: QuestState,
         needAmount: Int
     ): Quest {
-
-        //TODO add repo
-
-        //Trophy Fish
-        if (name == "Lavahorse") return TrophyFishQuest(name, state, needAmount)
-        if (name == "Gusher") return TrophyFishQuest(name, state, needAmount)
-        if (name == "Volcanic Stonefish") return TrophyFishQuest(name, state, needAmount)
-
-        //Rescue Mission
-        if (name == "Rescue Mission") return RescueMissionQuest(state)
-
-        for (miniBoss in dailyQuestHelper.reputationHelper.miniBosses) {
+        for (miniBoss in dailyQuestHelper.reputationHelper.miniBossHelper.miniBosses) {
             if (name == miniBoss.displayName) {
                 return MiniBossQuest(miniBoss, state, needAmount)
             }
         }
 
-        //Fetch
-        if (name == "Magmag") return FetchQuest(name, state, needAmount)
-        if (name == "Spectre Dust") return FetchQuest(name, state, needAmount)
-        if (name == "Tentacle Meat") return FetchQuest(name, state, needAmount)
+        for (entry in dailyQuestHelper.reputationHelper.repoData.entrySet()) {
+            val category = entry.key
 
-        if (name.startsWith("Mastery Rank ") || name.startsWith("Tenacity Rank ") || name.startsWith("Stamina Rank ")) {
-            val split = name.split(" Rank ")
-            val dojoName = split[0]
-            val dojoRankGoal = split[1]
-            return DojoQuest(dojoName, dojoRankGoal, state)
+            for (element in entry.value.asJsonArray) {
+                val entryName = element.asString
+
+                if (name.startsWith("$entryName Rank ")) {
+                    val split = name.split(" Rank ")
+                    val dojoName = split[0]
+                    val dojoRankGoal = split[1]
+                    return DojoQuest(dojoName, dojoRankGoal, state)
+                }
+
+                if (name == entryName) {
+                    when (category) {
+                        "FISHING" -> return TrophyFishQuest(name, state, needAmount)
+                        "RESCUE" -> return RescueMissionQuest(state)
+                        "FETCH" -> return FetchQuest(name, state, needAmount)
+                    }
+                }
+            }
         }
 
         println("Unknown quest: '$name'")
