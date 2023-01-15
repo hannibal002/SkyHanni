@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -17,7 +18,6 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         for (miniBoss in reputationHelper.miniBosses) {
             miniBossesDoneToday[miniBoss] = false
             val patterns = " *§r§6§l${miniBoss.displayName.uppercase()} DOWN!"
-            println("patterns: '$patterns'")
             miniBossesPatterns[miniBoss] = Pattern.compile(patterns)
         }
     }
@@ -33,10 +33,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
             if (pattern.matcher(message).matches()) {
                 finished(entry.key)
             }
-            //§r§6§BLADESOUL DOWN!
         }
-        //                           §r§6§lMAGMA BOSS DOWN!
-        //                           §r§6§lMAGE OUTLAW DOWN!
     }
 
     private fun finished(miniBoss: CrimsonMiniBoss) {
@@ -64,4 +61,28 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         val displayName = miniBoss.displayName
         return "$displayName: $color"
     }
+
+    fun reset() {
+        for (miniBoss in miniBossesDoneToday.keys) {
+            miniBossesDoneToday[miniBoss] = false
+        }
+    }
+
+    fun saveConfig() {
+        SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.clear()
+
+        for (entry in miniBossesDoneToday) {
+            if (entry.value) {
+                SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.add(entry.key.displayName)
+            }
+        }
+    }
+
+    fun loadConfig() {
+        for (name in SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday) {
+            miniBossesDoneToday[getByDisplayName(name)!!] = true
+        }
+    }
+
+    private fun getByDisplayName(name: String) = miniBossesDoneToday.keys.firstOrNull { it.displayName == name }
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -12,10 +13,6 @@ import net.minecraft.inventory.ContainerChest
 class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
 
     fun loadFromTabList() {
-//        println(" ")
-//        println("#####")
-//        println(" ")
-
         var i = -1
         for (line in TabListUtils.getTabList()) {
             if (line.contains("Faction Quests:")) {
@@ -49,15 +46,9 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
         }
 
         checkQuest(name, green, amount)
-
-//        println("line: '$line'")
-//        println("green: '$green'")
-//        println("name: '$name'")
-//        println("amount: '$amount'")
-//        println(" ")
     }
 
-    private fun checkQuest(name: String, green: Boolean, amount: Int) {
+    private fun checkQuest(name: String, green: Boolean, needAmount: Int) {
         val oldQuest = getQuestByName(name)
         if (oldQuest != null) {
             if (green) {
@@ -72,35 +63,35 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
 
         val state = if (green) QuestState.READY_TO_COLLECT else QuestState.NOT_ACCEPTED
         dailyQuestHelper.update()
-        dailyQuestHelper.quests.add(addQuest(name, state, amount))
+        dailyQuestHelper.quests.add(addQuest(name, state, needAmount))
     }
 
     private fun addQuest(
         name: String,
         state: QuestState,
-        amount: Int
+        needAmount: Int
     ): Quest {
 
         //TODO add repo
 
         //Trophy Fish
-        if (name == "Lavahorse") return TrophyFishQuest(name, state, amount)
-        if (name == "Gusher") return TrophyFishQuest(name, state, amount)
-        if (name == "Volcanic Stonefish") return TrophyFishQuest(name, state, amount)
+        if (name == "Lavahorse") return TrophyFishQuest(name, state, needAmount)
+        if (name == "Gusher") return TrophyFishQuest(name, state, needAmount)
+        if (name == "Volcanic Stonefish") return TrophyFishQuest(name, state, needAmount)
 
         //Rescue Mission
         if (name == "Rescue Mission") return RescueMissionQuest(state)
 
         for (miniBoss in dailyQuestHelper.reputationHelper.miniBosses) {
             if (name == miniBoss.displayName) {
-                return MiniBossQuest(miniBoss, state, amount)
+                return MiniBossQuest(miniBoss, state, needAmount)
             }
         }
 
         //Fetch
-        if (name == "Magmag") return FetchQuest(name, state, amount)
-        if (name == "Spectre Dust") return FetchQuest(name, state, amount)
-        if (name == "Tentacle Meat") return FetchQuest(name, state, amount)
+        if (name == "Magmag") return FetchQuest(name, state, needAmount)
+        if (name == "Spectre Dust") return FetchQuest(name, state, needAmount)
+        if (name == "Tentacle Meat") return FetchQuest(name, state, needAmount)
 
         if (name.startsWith("Mastery Rank ") || name.startsWith("Tenacity Rank ") || name.startsWith("Stamina Rank ")) {
             val split = name.split(" Rank ")
@@ -154,6 +145,21 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
                     }
                 }
             }
+        }
+    }
+
+    fun loadConfig() {
+        for (text in SkyHanniMod.feature.hidden.crimsonIsleQuests) {
+            val split = text.split(":")
+            val name = split[0]
+            val state = QuestState.valueOf(split[1])
+            val needAmount = split[2].toInt()
+            val quest = addQuest(name, state, needAmount)
+            if (quest is ProgressQuest) {
+                val haveAmount = split[3].toInt()
+                quest.haveAmount = haveAmount
+            }
+            dailyQuestHelper.quests.add(quest)
         }
     }
 }

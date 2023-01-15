@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -22,13 +23,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
-    val quests = mutableListOf<Quest>()
     private var tick = 0
-
     private val loader = QuestLoader(this)
 
+    val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
-
     private var latestTrophyFishInInventory = 0
 
     @SubscribeEvent
@@ -40,16 +39,13 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             loader.checkInventory()
             checkInventory()
         }
+
         if (tick % 60 == 0) {
             checkInventoryForFetchItem()
-        }
-
-        if (tick % 60 == 0) {
             loader.loadFromTabList()
 
-            if (quests.size != 5) {
-                quests.clear()
-                LorenzUtils.chat("§e[SkyHanni] Reset Quests.")
+            if (quests.size > 5) {
+                reputationHelper.reset()
             }
         }
     }
@@ -268,5 +264,41 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
                 updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
             }
         }
+    }
+
+    fun reset() {
+        quests.clear()
+        latestTrophyFishInInventory = 0
+    }
+
+    fun loadConfig() {
+        loader.loadConfig()
+    }
+
+    fun saveConfig() {
+        SkyHanniMod.feature.hidden.crimsonIsleQuests.clear()
+        for (quest in quests) {
+            val builder = StringBuilder()
+            val internalName = quest.internalName
+            builder.append(internalName)
+            builder.append(":")
+            val state = quest.state
+            builder.append(state)
+
+            if (quest is ProgressQuest) {
+                val need = quest.needAmount
+                val have = quest.haveAmount
+
+                builder.append(":")
+                builder.append(need)
+                builder.append(":")
+                builder.append(have)
+            } else {
+                builder.append(":0")
+            }
+            SkyHanniMod.feature.hidden.crimsonIsleQuests.add(builder.toString())
+        }
+
+        SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory = latestTrophyFishInInventory
     }
 }
