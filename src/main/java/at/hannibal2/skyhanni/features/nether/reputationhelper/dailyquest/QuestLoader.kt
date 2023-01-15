@@ -80,19 +80,28 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
         state: QuestState,
         amount: Int
     ): Quest {
+
+        //TODO add repo
+
         //Trophy Fish
         if (name == "Lavahorse") return TrophyFishQuest(name, state, amount)
+        if (name == "Gusher") return TrophyFishQuest(name, state, amount)
+        if (name == "Volcanic Stonefish") return TrophyFishQuest(name, state, amount)
 
         //Rescue Mission
         if (name == "Rescue Mission") return RescueMissionQuest(state)
 
         //Boss
         if (name == "Magma Boss") return BossQuest(name, state, amount)
+        if (name == "Mage Outlaw") return BossQuest(name, state, amount)
+        if (name == "Barbarian Duke X") return BossQuest(name, state, amount)
 
         //Fetch
         if (name == "Magmag") return FetchQuest(name, state, amount)
+        if (name == "Spectre Dust") return FetchQuest(name, state, amount)
+        if (name == "Tentacle Meat") return FetchQuest(name, state, amount)
 
-        if (name.startsWith("Mastery Rank ")) {
+        if (name.startsWith("Mastery Rank ") || name.startsWith("Tenacity Rank ") || name.startsWith("Stamina Rank ")) {
             val split = name.split(" Rank ")
             val dojoName = split[0]
             val dojoRankGoal = split[1]
@@ -121,10 +130,13 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
                 for (slot in chest.inventorySlots) {
                     if (slot == null) continue
                     if (slot.slotNumber != slot.slotIndex) continue
+
+                    // Only checking the middle slot
+                    if (slot.slotNumber != 22) continue
+
                     val stack = slot.stack ?: continue
 
                     val completed = stack.getLore().any { it.contains("Completed!") }
-                    println("completed: $completed")
                     if (completed) {
                         if (quest.state != QuestState.COLLECTED) {
                             quest.state = QuestState.COLLECTED
@@ -132,7 +144,7 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
                         }
                     }
 
-                    val accepted = !stack.getLore().any { it.contains("not accepted") }
+                    val accepted = !stack.getLore().any { it.contains("Click to start!") }
                     if (accepted) {
                         if (quest.state == QuestState.NOT_ACCEPTED) {
                             quest.state = QuestState.ACCEPTED
