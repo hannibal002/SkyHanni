@@ -34,6 +34,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
         tick++
         if (tick % 20 == 0) {
             loader.checkInventory()
@@ -80,6 +81,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+
         if (event.gui !is GuiChest) return
         val chest = event.gui.inventorySlots as ContainerChest
         val chestName = chest.getInventoryName()
@@ -136,6 +139,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onChat(event: LorenzChatEvent) {
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 
         val message = event.message
         if (message == "§aYou completed your Dojo quest! Visit the Town Board to claim the rewards.") {

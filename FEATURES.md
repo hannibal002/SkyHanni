@@ -163,3 +163,4 @@
 - Option to hide blaze particles.
 - Wishing compass uses amount display.
 - Brewing Stand Overlay.
+- Crimson Isle Reputation Helper.

@@ -3,7 +3,8 @@
 ## Version 0.14.1
 
 ### Features
-+ Added Bazaar Update Timer - Forrick
++ Added Bazaar Update Timer - Forrick.
++ Added Crimson Isle Reputation Helper.
 
 ## Version 0.14
 

@@ -30,6 +30,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun onChat(event: LorenzChatEvent) {
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 
         val message = event.message
         for (miniBoss in miniBosses) {

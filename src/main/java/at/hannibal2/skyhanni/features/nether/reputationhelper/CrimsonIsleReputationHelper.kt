@@ -47,6 +47,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
         if (dirty) {
             dirty = false
             updateRender()
@@ -64,11 +65,12 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        SkyHanniMod.feature.dev.debugPos.renderStrings(display)
+        SkyHanniMod.feature.misc.crimsonIsleReputationHelperPos.renderStrings(display)
     }
 
     fun update() {
