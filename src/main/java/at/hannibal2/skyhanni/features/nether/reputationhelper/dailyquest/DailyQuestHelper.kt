@@ -67,8 +67,6 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
                 currentlyInInventory += stack.stackSize
             }
         }
-        println("currentlyInInventory: $currentlyInInventory")
-
         val diff = currentlyInInventory - latestTrophyFishInInventory
         if (diff < 1) return
         LorenzUtils.debug("diff: $diff")
