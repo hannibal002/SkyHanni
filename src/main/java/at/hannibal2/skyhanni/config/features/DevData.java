@@ -125,6 +125,12 @@ public class DevData {
     public boolean filterBiomeIdBounds = false;
 
     @Expose
+    @ConfigOption(name = "Http Texture", desc = "Filter message 'Couldn't download http texture'.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean couldNotDownloadHttpTexture = false;
+
+    @Expose
     @ConfigOption(name = "Print Event Timings", desc = "Prints every 10 seconds the timings of all SkyHanni events in the chat.")
     @ConfigEditorBoolean
     public boolean printEventTimings = false;
