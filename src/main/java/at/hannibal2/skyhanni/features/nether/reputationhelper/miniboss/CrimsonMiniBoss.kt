@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
-class CrimsonMiniBoss(val displayName: String)
+import java.util.regex.Pattern
+
+class CrimsonMiniBoss(val displayName: String, val pattern: Pattern, var doneToday: Boolean = false, )

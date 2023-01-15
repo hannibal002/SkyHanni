@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.FirstConfigLoadedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import com.google.gson.JsonObject
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,25 +17,30 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     val questHelper = DailyQuestHelper(this)
-    private val miniBossHelper = DailyMiniBossHelper(this)
+    val miniBossHelper = DailyMiniBossHelper(this)
 
-    val miniBosses = mutableListOf<CrimsonMiniBoss>()
+    var repoData: JsonObject = JsonObject()
 
     private val display = mutableListOf<String>()
     private var dirty = true
+    private var loaded = false
 
     init {
         skyHanniMod.loadModule(questHelper)
         skyHanniMod.loadModule(miniBossHelper)
+    }
 
-        miniBosses.add(CrimsonMiniBoss("Magma Boss"))
-        miniBosses.add(CrimsonMiniBoss("Mage Outlaw"))
-        miniBosses.add(CrimsonMiniBoss("Barbarian Duke X"))
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        repoData = event.getConstant("CrimsonIsleReputation")!!
+        if (!loaded) {
+            loaded = true
 
-        miniBosses.add(CrimsonMiniBoss("Bladesoul"))
-        miniBosses.add(CrimsonMiniBoss("Ashfang"))
+            miniBossHelper.init()
 
-        miniBossHelper.init()
+            questHelper.loadConfig()
+            miniBossHelper.loadConfig()
+        }
     }
 
     @SubscribeEvent
@@ -46,12 +51,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             dirty = false
             updateRender()
         }
-    }
-
-    @SubscribeEvent
-    fun onFirstConfigLoaded(event: FirstConfigLoadedEvent) {
-        questHelper.loadConfig()
-        miniBossHelper.loadConfig()
     }
 
     private fun updateRender() {

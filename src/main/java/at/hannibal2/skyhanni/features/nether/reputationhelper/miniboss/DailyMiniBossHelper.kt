@@ -11,14 +11,18 @@ import java.util.regex.Pattern
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
-    private val miniBossesDoneToday = mutableMapOf<CrimsonMiniBoss, Boolean>()
-    private val miniBossesPatterns = mutableMapOf<CrimsonMiniBoss, Pattern>()
+    val miniBosses = mutableListOf<CrimsonMiniBoss>()
 
     fun init() {
-        for (miniBoss in reputationHelper.miniBosses) {
-            miniBossesDoneToday[miniBoss] = false
-            val patterns = " *§r§6§l${miniBoss.displayName.uppercase()} DOWN!"
-            miniBossesPatterns[miniBoss] = Pattern.compile(patterns)
+        if (miniBosses.isNotEmpty()) return
+
+        val repoData = reputationHelper.repoData
+        val jsonElement = repoData["MINIBOSS"]
+        val asJsonArray = jsonElement.asJsonArray
+        for (entry in asJsonArray) {
+            val displayName = entry.asString
+            val patterns = " *§r§6§l${displayName.uppercase()} DOWN!"
+            miniBosses.add(CrimsonMiniBoss(displayName, Pattern.compile(patterns)))
         }
     }
 
@@ -28,10 +32,9 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
         val message = event.message
-        for (entry in miniBossesPatterns) {
-            val pattern = entry.value
-            if (pattern.matcher(message).matches()) {
-                finished(entry.key)
+        for (miniBoss in miniBosses) {
+            if (miniBoss.pattern.matcher(message).matches()) {
+                finished(miniBoss)
             }
         }
     }
@@ -39,50 +42,50 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     private fun finished(miniBoss: CrimsonMiniBoss) {
         LorenzUtils.debug("Detected mini boss death: ${miniBoss.displayName}")
         reputationHelper.questHelper.finishMiniBoss(miniBoss)
-        miniBossesDoneToday[miniBoss] = true
+        miniBoss.doneToday = true
         reputationHelper.update()
     }
 
     fun render(display: MutableList<String>) {
-        val done = miniBossesDoneToday.count { it.value }
+        val done = miniBosses.count { it.doneToday }
 //        val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
 //        if (done != 5 || sneaking) {
         if (done != 5) {
             display.add("")
             display.add("Daily Bosses ($done/5 killed)")
-            for (entry in miniBossesDoneToday) {
-                display.add(renderQuest(entry.key, entry.value))
+            for (miniBoss in miniBosses) {
+                display.add(renderQuest(miniBoss))
             }
         }
     }
 
-    private fun renderQuest(miniBoss: CrimsonMiniBoss, doneToday: Boolean): String {
-        val color = if (doneToday) "§7Done" else "§bTodo"
+    private fun renderQuest(miniBoss: CrimsonMiniBoss): String {
+        val color = if (miniBoss.doneToday) "§7Done" else "§bTodo"
         val displayName = miniBoss.displayName
         return "$displayName: $color"
     }
 
     fun reset() {
-        for (miniBoss in miniBossesDoneToday.keys) {
-            miniBossesDoneToday[miniBoss] = false
+        for (miniBoss in miniBosses) {
+            miniBoss.doneToday = false
         }
     }
 
     fun saveConfig() {
         SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.clear()
 
-        for (entry in miniBossesDoneToday) {
-            if (entry.value) {
-                SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.add(entry.key.displayName)
+        for (miniBoss in miniBosses) {
+            if (miniBoss.doneToday) {
+                SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.add(miniBoss.displayName)
             }
         }
     }
 
     fun loadConfig() {
         for (name in SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday) {
-            miniBossesDoneToday[getByDisplayName(name)!!] = true
+            getByDisplayName(name)!!.doneToday = true
         }
     }
 
-    private fun getByDisplayName(name: String) = miniBossesDoneToday.keys.firstOrNull { it.displayName == name }
+    private fun getByDisplayName(name: String) = miniBosses.firstOrNull { it.displayName == name }
 }
