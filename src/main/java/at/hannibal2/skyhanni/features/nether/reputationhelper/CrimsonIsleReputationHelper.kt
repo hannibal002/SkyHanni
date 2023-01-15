@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.FirstConfigLoadedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
@@ -20,6 +21,9 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     val miniBosses = mutableListOf<CrimsonMiniBoss>()
 
+    private val display = mutableListOf<String>()
+    private var dirty = true
+
     init {
         skyHanniMod.loadModule(questHelper)
         skyHanniMod.loadModule(miniBossHelper)
@@ -34,9 +38,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         miniBossHelper.init()
     }
 
-    private val display = mutableListOf<String>()
-    private var dirty = true
-
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!HyPixelData.skyBlock) return
@@ -45,6 +46,12 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             dirty = false
             updateRender()
         }
+    }
+
+    @SubscribeEvent
+    fun onFirstConfigLoaded(event: FirstConfigLoadedEvent) {
+        questHelper.loadConfig()
+        miniBossHelper.loadConfig()
     }
 
     private fun updateRender() {
@@ -67,5 +74,16 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     fun update() {
         dirty = true
+
+        questHelper.saveConfig()
+        miniBossHelper.saveConfig()
+    }
+
+    fun reset() {
+        LorenzUtils.chat("§e[SkyHanni] Reset Reputation Helper.")
+
+        questHelper.reset()
+        miniBossHelper.reset()
+        update()
     }
 }
