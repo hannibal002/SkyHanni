@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.miniboss.CrimsonMiniBoss
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.miniboss.DailyMiniBossHelper
+import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
+import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.client.event.RenderGameOverlayEvent

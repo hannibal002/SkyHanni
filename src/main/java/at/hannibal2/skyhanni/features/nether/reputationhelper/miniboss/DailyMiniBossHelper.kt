@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.miniboss
+package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType

@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
+import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
