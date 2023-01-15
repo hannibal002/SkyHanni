@@ -111,6 +111,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, bazaar.updateTimerPos);
             return;
         }
+
+        if (runnableId.equals("crimsonIsleReputationHelper")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.crimsonIsleReputationHelperPos);
+            return;
+        }
     }
 
     @Expose
