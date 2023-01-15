@@ -19,7 +19,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
+class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     val quests = mutableListOf<Quest>()
     private var tick = 0
@@ -203,11 +203,12 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
         update()
     }
 
-    fun renderAllQuests(display: MutableList<String>) {
+    fun render(display: MutableList<String>) {
         val done = quests.count { it.state == QuestState.COLLECTED }
 //        val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
 //        if (done != 5 || sneaking) {
         if (done != 5) {
+            display.add("")
             display.add("Daily Quests ($done/5 collected)")
             for (quest in quests) {
 //                if (!sneaking) {
@@ -248,6 +249,23 @@ class DailyQuestHelper(private val reputationHelper: CrimsonIsleReputationHelper
         } else {
             ""
         }
-        return "$stateColor[$state] §f$type: §f$displayName$multipleText$sacksText"
+
+        val stateText = if (quest !is UnknownQuest) {
+            "$stateColor[$state] §f"
+        } else {
+            ""
+        }
+
+        return "$stateText$type: §f$displayName$multipleText$sacksText"
+    }
+
+    fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {
+        val miniBossQuest = getQuest<MiniBossQuest>() ?: return
+        if (miniBossQuest.miniBoss == miniBoss) {
+            if (miniBossQuest.state == QuestState.READY_TO_COLLECT) {
+                miniBossQuest.state = QuestState.COLLECTED
+                updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
+            }
+        }
     }
 }

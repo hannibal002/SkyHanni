@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.CrimsonMiniBoss
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyMiniBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -13,10 +15,23 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
-    private val questHelper = DailyQuestHelper(this)
+    val questHelper = DailyQuestHelper(this)
+    private val miniBossHelper = DailyMiniBossHelper(this)
+
+    val miniBosses = mutableListOf<CrimsonMiniBoss>()
 
     init {
         skyHanniMod.loadModule(questHelper)
+        skyHanniMod.loadModule(miniBossHelper)
+
+        miniBosses.add(CrimsonMiniBoss("Magma Boss"))
+        miniBosses.add(CrimsonMiniBoss("Mage Outlaw"))
+        miniBosses.add(CrimsonMiniBoss("Barbarian Duke X"))
+
+        miniBosses.add(CrimsonMiniBoss("Bladesoul"))
+        miniBosses.add(CrimsonMiniBoss("Ashfang"))
+
+        miniBossHelper.init()
     }
 
     private val display = mutableListOf<String>()
@@ -36,8 +51,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         display.clear()
 
         display.add("Reputation Helper:")
-        display.add("")
-        questHelper.renderAllQuests(display)
+        questHelper.render(display)
+        miniBossHelper.render(display)
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
