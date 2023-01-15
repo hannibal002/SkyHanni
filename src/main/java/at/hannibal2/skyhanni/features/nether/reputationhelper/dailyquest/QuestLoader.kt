@@ -91,10 +91,11 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
         //Rescue Mission
         if (name == "Rescue Mission") return RescueMissionQuest(state)
 
-        //Boss
-        if (name == "Magma Boss") return BossQuest(name, state, amount)
-        if (name == "Mage Outlaw") return BossQuest(name, state, amount)
-        if (name == "Barbarian Duke X") return BossQuest(name, state, amount)
+        for (miniBoss in dailyQuestHelper.reputationHelper.miniBosses) {
+            if (name == miniBoss.displayName) {
+                return MiniBossQuest(miniBoss, state, amount)
+            }
+        }
 
         //Fetch
         if (name == "Magmag") return FetchQuest(name, state, amount)
