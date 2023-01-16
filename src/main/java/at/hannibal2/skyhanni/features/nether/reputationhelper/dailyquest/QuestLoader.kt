@@ -66,11 +66,7 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
         dailyQuestHelper.quests.add(addQuest(name, state, needAmount))
     }
 
-    private fun addQuest(
-        name: String,
-        state: QuestState,
-        needAmount: Int
-    ): Quest {
+    private fun addQuest(name: String, state: QuestState, needAmount: Int): Quest {
         for (miniBoss in dailyQuestHelper.reputationHelper.miniBossHelper.miniBosses) {
             if (name == miniBoss.displayName) {
                 return MiniBossQuest(miniBoss, state, needAmount)
@@ -79,7 +75,6 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
 
         for (entry in dailyQuestHelper.reputationHelper.repoData.entrySet()) {
             val category = entry.key
-
             for (element in entry.value.asJsonArray) {
                 val entryName = element.asString
 
@@ -118,30 +113,30 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
 
         for (quest in dailyQuestHelper.quests) {
             val categoryName = quest.category.name
-            if (categoryName.equals(name, ignoreCase = true)) {
-                for (slot in chest.inventorySlots) {
-                    if (slot == null) continue
-                    if (slot.slotNumber != slot.slotIndex) continue
+            if (!categoryName.equals(name, ignoreCase = true)) continue
 
-                    // Only checking the middle slot
-                    if (slot.slotNumber != 22) continue
+            for (slot in chest.inventorySlots) {
+                if (slot == null) continue
+                if (slot.slotNumber != slot.slotIndex) continue
 
-                    val stack = slot.stack ?: continue
+                // Only checking the middle slot
+                if (slot.slotNumber != 22) continue
 
-                    val completed = stack.getLore().any { it.contains("Completed!") }
-                    if (completed) {
-                        if (quest.state != QuestState.COLLECTED) {
-                            quest.state = QuestState.COLLECTED
-                            dailyQuestHelper.update()
-                        }
+                val stack = slot.stack ?: continue
+
+                val completed = stack.getLore().any { it.contains("Completed!") }
+                if (completed) {
+                    if (quest.state != QuestState.COLLECTED) {
+                        quest.state = QuestState.COLLECTED
+                        dailyQuestHelper.update()
                     }
+                }
 
-                    val accepted = !stack.getLore().any { it.contains("Click to start!") }
-                    if (accepted) {
-                        if (quest.state == QuestState.NOT_ACCEPTED) {
-                            quest.state = QuestState.ACCEPTED
-                            dailyQuestHelper.update()
-                        }
+                val accepted = !stack.getLore().any { it.contains("Click to start!") }
+                if (accepted) {
+                    if (quest.state == QuestState.NOT_ACCEPTED) {
+                        quest.state = QuestState.ACCEPTED
+                        dailyQuestHelper.update()
                     }
                 }
             }
