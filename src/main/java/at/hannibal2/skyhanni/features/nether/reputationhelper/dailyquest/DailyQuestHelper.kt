@@ -38,7 +38,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         tick++
         if (tick % 20 == 0) {
             loader.checkInventory()
-            checkInventory()
+            checkInventoryForTrophyFish()
         }
 
         if (tick % 60 == 0) {
@@ -51,7 +51,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private fun checkInventory() {
+    private fun checkInventoryForTrophyFish() {
         val fishQuest = getQuest<TrophyFishQuest>() ?: return
         if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
 
@@ -67,9 +67,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
         val diff = currentlyInInventory - latestTrophyFishInInventory
         if (diff < 1) return
-        LorenzUtils.debug("diff: $diff")
         latestTrophyFishInInventory = currentlyInInventory
-
         updateProcessQuest(fishQuest, fishQuest.haveAmount + diff)
     }
 
@@ -174,16 +172,14 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         updateProcessQuest(fetchQuest, count)
     }
 
-    private fun updateProcessQuest(
-        quest: ProgressQuest,
-        newAmount: Int
-    ) {
+    private fun updateProcessQuest(quest: ProgressQuest, newAmount: Int) {
         var count = newAmount
         val needAmount = quest.needAmount
         if (count > needAmount) {
             count = needAmount
         }
         if (quest.haveAmount == count) return
+        LorenzUtils.chat("§e[SkyHanni] ${quest.displayName} progress: $count/$needAmount")
 
         quest.haveAmount = count
         quest.state = if (count == needAmount) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED
@@ -276,6 +272,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun loadConfig() {
         loader.loadConfig()
+        latestTrophyFishInInventory = SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory
     }
 
     fun saveConfig() {
