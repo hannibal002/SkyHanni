@@ -55,12 +55,12 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
             display.add("")
             display.add("Daily Bosses ($done/5 killed)")
             for (miniBoss in miniBosses) {
-                display.add(renderQuest(miniBoss))
+                display.add("  " + renderBoss(miniBoss))
             }
         }
     }
 
-    private fun renderQuest(miniBoss: CrimsonMiniBoss): String {
+    private fun renderBoss(miniBoss: CrimsonMiniBoss): String {
         val color = if (miniBoss.doneToday) "§7Done" else "§bTodo"
         val displayName = miniBoss.displayName
         return "$displayName: $color"

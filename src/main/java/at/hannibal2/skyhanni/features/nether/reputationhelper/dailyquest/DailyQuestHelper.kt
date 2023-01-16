@@ -204,16 +204,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         val done = quests.count { it.state == QuestState.COLLECTED }
 //        val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
 //        if (done != 5 || sneaking) {
+        display.add("")
+        display.add("Daily Quests ($done/5 collected)")
         if (done != 5) {
-            display.add("")
-            display.add("Daily Quests ($done/5 collected)")
             for (quest in quests) {
 //                if (!sneaking) {
 //                    if (quest.state == QuestState.COLLECTED) {
 //                        continue
 //                    }
 //                }
-                display.add(renderQuest(quest))
+                display.add("  " + renderQuest(quest))
             }
         }
     }
