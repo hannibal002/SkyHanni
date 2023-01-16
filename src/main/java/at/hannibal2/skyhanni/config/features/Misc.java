@@ -146,7 +146,7 @@ public class Misc {
     public boolean crimsonIsleReputationHelper = true;
 
     @Expose
-    @ConfigOption(name = "Collection Counter Position", desc = "Tracking the number of items you collect. §cDoes not work with sacks.")
+    @ConfigOption(name = "Reputation Position", desc = "")
     @ConfigEditorButton(runnableId = "crimsonIsleReputationHelper", buttonText = "Edit")
     public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
 
