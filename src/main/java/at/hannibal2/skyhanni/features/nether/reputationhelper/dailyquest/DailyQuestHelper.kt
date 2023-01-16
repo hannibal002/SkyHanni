@@ -264,7 +264,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         val miniBossQuest = getQuest<MiniBossQuest>() ?: return
         if (miniBossQuest.miniBoss == miniBoss) {
             if (miniBossQuest.state == QuestState.READY_TO_COLLECT) {
-                miniBossQuest.state = QuestState.COLLECTED
                 updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
             }
         }
