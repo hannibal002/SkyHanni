@@ -104,7 +104,9 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun checkInventory() {
-        if (LorenzUtils.skyBlockArea != "Community Center") return
+        val inMageRegion = LorenzUtils.skyBlockArea == "Community Center"
+        val inBarbarianRegion = LorenzUtils.skyBlockArea == "Dragontail"
+        if (!inMageRegion && !inBarbarianRegion) return
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return
