@@ -6,9 +6,13 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.audio.ISound
+import net.minecraft.client.audio.PositionedSound
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -19,8 +23,17 @@ class BarnFishingTimer {
 
     private var tick = 0
     private var rightLocation = false
-    private var mobsCount = 0
+    private var currentCount = 0
     private var startTime = 0L
+
+    private var sound = object : PositionedSound(ResourceLocation("random.orb")) {
+        init {
+            volume = 50f
+            repeat = false
+            repeatDelay = 0
+            attenuationType = ISound.AttenuationType.NONE
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -31,42 +44,42 @@ class BarnFishingTimer {
 
         tick++
 
-        if (tick % 60 == 0) {
-            checkIsland()
-        }
-//        if (tick % 20 == 0) {
-        if (tick % 5 == 0) {
-            checkMobs()
+        if (tick % 60 == 0) checkIsland()
+
+        if (!rightLocation) return
+
+        if (tick % 5 == 0) checkMobs()
+        if (tick % 7 == 0) tryPlaySound()
+    }
+
+    private fun tryPlaySound() {
+        if (currentCount == 0) return
+
+        val duration = System.currentTimeMillis() - startTime
+        val barnTimerAlertTime = SkyHanniMod.feature.fishing.barnTimerAlertTime * 1_000
+        if (duration > barnTimerAlertTime && duration < barnTimerAlertTime + 3_000) {
+            sound.playSound()
         }
     }
 
     private fun checkMobs() {
-        val newCounter = countMobs()
-
-        if (mobsCount == 0) {
-            if (newCounter > 0) {
-                startTimer()
+        val newCount = countMobs()
+        if (currentCount == 0) {
+            if (newCount > 0) {
+                startTime = System.currentTimeMillis()
             }
         }
-        mobsCount = newCounter
 
-        if (newCounter == 0) {
+        currentCount = newCount
+        if (newCount == 0) {
             startTime = 0
         }
     }
 
-    private fun countMobs(): Int {
-        val counter = Minecraft.getMinecraft().theWorld.loadedEntityList
-            .filterIsInstance<EntityArmorStand>()
-            .map { it.name }
-            //            .count { it.startsWith("§8[§7Lv") && it.endsWith("§c❤") }
-            .count { it.endsWith("§c❤") }
-        return counter
-    }
-
-    private fun startTimer() {
-        startTime = System.currentTimeMillis()
-    }
+    private fun countMobs() = Minecraft.getMinecraft().theWorld.loadedEntityList
+        .filterIsInstance<EntityArmorStand>()
+        .map { it.name }
+        .count { it.endsWith("§c❤") }
 
     private fun checkIsland() {
         if (LorenzUtils.skyBlockIsland == IslandType.THE_FARMING_ISLANDS) {
@@ -84,11 +97,14 @@ class BarnFishingTimer {
         if (!SkyHanniMod.feature.fishing.barnTimer) return
         if (!rightLocation) return
 
-        if (mobsCount == 0) return
+        if (currentCount == 0) return
 
         val duration = System.currentTimeMillis() - startTime
+
+        val barnTimerAlertTime = SkyHanniMod.feature.fishing.barnTimerAlertTime * 1_000
+        val color = if (duration > barnTimerAlertTime) "§c" else "§e"
         val format = StringUtils.formatDuration(duration / 1000, decimalFormat = true)
-        val text = "§e$format §8(§e$mobsCount §bsea creatures§8)"
+        val text = "$color$format §8(§e$currentCount §bsea creatures§8)"
 
         SkyHanniMod.feature.fishing.barnTimerPos.renderString(text)
     }
