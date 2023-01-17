@@ -98,7 +98,8 @@
 - Trophy Counter (After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total)
 - Hide Bronze Duplicates (Hiding chat message when picking up a duplicate bronze trophy fish)
 - Shorten Fishing Message (Replacing the green chat message when fishing a sea creature with a more clean format)
-- Highlight Thunder Sparks after killing a Thunder
+- Highlight Thunder Sparks that spawn after killing a Thunder
+- Barn Timer - Shows the time and amount of sea creatures while fishing on the barn via hub.
 
 ## Damage Indicator
 - Show the remaining health of selected bosses in the game in a bigger GUI.
