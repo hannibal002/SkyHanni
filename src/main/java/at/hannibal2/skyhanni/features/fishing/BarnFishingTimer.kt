@@ -96,7 +96,6 @@ class BarnFishingTimer {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.barnTimer) return
         if (!rightLocation) return
-
         if (currentCount == 0) return
 
         val duration = System.currentTimeMillis() - startTime

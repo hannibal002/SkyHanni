@@ -107,6 +107,7 @@ object LorenzUtils {
         return kotlin.math.round(this * multiplier) / multiplier
     }
 
+    // TODO replace all calls with regex
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
     val EntityLivingBase.baseMaxHealth: Double

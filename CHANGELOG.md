@@ -7,6 +7,9 @@
 + Added Crimson Isle Reputation Helper.
 + Added Barn Timer - Shows the time and amount of sea creatures while fishing on the barn via hub.
 
+### Fixes
++ Fixed steaming hot flounder in custom trophy fish counter.
+
 ## Version 0.14
 
 ### Features
