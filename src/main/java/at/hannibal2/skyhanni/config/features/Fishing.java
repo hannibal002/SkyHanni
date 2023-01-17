@@ -58,4 +58,13 @@ public class Fishing {
     @ConfigOption(name = "Fishing Timer Location", desc = "")
     @ConfigEditorButton(runnableId = "barnTimer", buttonText = "Edit")
     public Position barnTimerPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Fishing Timer Alert", desc = "Change the amount of time in seconds until the timer dings.")
+    @ConfigEditorSlider(
+            minValue = 240,
+            maxValue = 360,
+            minStep = 10
+    )
+    public int barnTimerAlertTime = 330;
 }
