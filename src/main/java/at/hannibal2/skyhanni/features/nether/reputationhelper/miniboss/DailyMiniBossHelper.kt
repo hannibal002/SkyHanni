@@ -51,9 +51,9 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         val done = miniBosses.count { it.doneToday }
 //        val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
 //        if (done != 5 || sneaking) {
+        display.add("")
+        display.add("Daily Bosses ($done/5 killed)")
         if (done != 5) {
-            display.add("")
-            display.add("Daily Bosses ($done/5 killed)")
             for (miniBoss in miniBosses) {
                 display.add("  " + renderBoss(miniBoss))
             }
