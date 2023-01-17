@@ -116,6 +116,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, misc.crimsonIsleReputationHelperPos);
             return;
         }
+
+        if (runnableId.equals("barnTimer")) {
+            editOverlay(activeConfigCategory, 200, 16, fishing.barnTimerPos);
+            return;
+        }
     }
 
     @Expose

@@ -35,7 +35,7 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun formatDuration(seconds: Long): String {
+    fun formatDuration(seconds: Long, decimalFormat: Boolean = false): String {
         var sec: Long = seconds
 
         var minutes: Long = sec / 60
@@ -51,6 +51,10 @@ object StringUtils {
         val formatHours = durationFormat.format(hours)
         val formatMinutes = durationFormat.format(minutes)
         val formatSeconds = durationFormat.format(sec)
+
+        if (decimalFormat) {
+            return "$formatMinutes:$formatSeconds"
+        }
 
         if (days > 0) {
             return "${days}d $formatHours:$formatMinutes:$formatSeconds"

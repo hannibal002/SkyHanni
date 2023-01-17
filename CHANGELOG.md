@@ -5,6 +5,7 @@
 ### Features
 + Added Bazaar Update Timer - Forrick.
 + Added Crimson Isle Reputation Helper.
++ Added Barn Timer - Shows the time and amount of sea creatures while fishing on the barn via hub.
 
 ## Version 0.14
 

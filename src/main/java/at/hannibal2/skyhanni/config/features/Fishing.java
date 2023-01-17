@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
@@ -10,7 +11,10 @@ public class Fishing {
     public boolean trophyFishing = false;
 
     @Expose
-    @ConfigOption(name = "Trophy Counter", desc = "Counts every single Trohy message from chat and tells you how many you got already.")
+    @ConfigOption(
+            name = "Trophy Counter",
+            desc = "Counts every single Trohy message from chat and tells you how many you got already."
+    )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean trophyCounter = false;
@@ -37,11 +41,21 @@ public class Fishing {
     public boolean thunderSparkHighlight = false;
 
     @Expose
-    @ConfigOption(
-            name = "Thunder Spark Color",
-            desc = "Color of the Thunder Sparks"
-    )
+    @ConfigOption(name = "Thunder Spark Color", desc = "Color of the Thunder Sparks")
     @ConfigEditorColour
     @ConfigAccordionId(id = 1)
     public String thunderSparkColor = "0:255:255:255:255";
+
+    @Expose
+    @ConfigOption(
+            name = "Barn Fishing Timer",
+            desc = "Shows the time and amount of sea creatures while fishing on the barn via hub."
+    )
+    @ConfigEditorBoolean
+    public boolean barnTimer = true;
+
+    @Expose
+    @ConfigOption(name = "Fishing Timer Location", desc = "")
+    @ConfigEditorButton(runnableId = "barnTimer", buttonText = "Edit")
+    public Position barnTimerPos = new Position(10, 10, false, true);
 }

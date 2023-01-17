@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
+import at.hannibal2.skyhanni.features.fishing.BarnFishingTimer;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager;
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureMessageShortener;
 import at.hannibal2.skyhanni.features.fishing.TrophyFishMessages;
@@ -172,6 +173,7 @@ public class SkyHanniMod {
         loadModule(new CompactBingoChat());
         loadModule(new BrewingStandOverlay());
         loadModule(new BazaarUpdateTimer());
+        loadModule(new BarnFishingTimer());
 
         loadModule(new CrimsonIsleReputationHelper(this));
 
