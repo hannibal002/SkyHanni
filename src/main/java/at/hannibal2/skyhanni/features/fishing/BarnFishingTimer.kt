@@ -100,11 +100,11 @@ class BarnFishingTimer {
         if (currentCount == 0) return
 
         val duration = System.currentTimeMillis() - startTime
-
         val barnTimerAlertTime = SkyHanniMod.feature.fishing.barnTimerAlertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
-        val format = StringUtils.formatDuration(duration / 1000, decimalFormat = true)
-        val text = "$color$format §8(§e$currentCount §bsea creatures§8)"
+        val timeFormat = StringUtils.formatDuration(duration / 1000, decimalFormat = true)
+        val name = if (currentCount == 1) "sea creature" else "sea creatures"
+        val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
         SkyHanniMod.feature.fishing.barnTimerPos.renderString(text)
     }
