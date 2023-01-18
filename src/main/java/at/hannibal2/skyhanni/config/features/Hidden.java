@@ -29,4 +29,7 @@ public class Hidden {
 
     @Expose
     public List<String> crimsonIsleMiniBossesDoneToday = new ArrayList<>();
+
+    @Expose
+    public List<String> crimsonIsleKuudraTiersDone = new ArrayList<>();
 }

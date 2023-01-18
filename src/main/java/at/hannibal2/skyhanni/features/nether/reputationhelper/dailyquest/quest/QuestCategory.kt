@@ -6,6 +6,7 @@ enum class QuestCategory(val displayName: String) {
     MINIBOSS("Mini Boss"),
     FETCH("Item Fetch"),
     DOJO("Dojo Task"),
+    KUUDRA("Kuudra Kill"),
 
     UNKNOWN("§cUnknown"),
 }
