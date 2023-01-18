@@ -10,6 +10,7 @@
 
 ### Fixes
 + Fixed steaming hot flounder in custom trophy fish counter.
++ Fixed hide powder gain message from chests in crystal hollows. (thanks hypixel)
 
 ## Version 0.14
 
