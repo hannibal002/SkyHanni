@@ -14,8 +14,6 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     val miniBosses = mutableListOf<CrimsonMiniBoss>()
 
     fun init() {
-        if (miniBosses.isNotEmpty()) return
-
         val repoData = reputationHelper.repoData
         val jsonElement = repoData["MINIBOSS"]
         val asJsonArray = jsonElement.asJsonArray
@@ -49,21 +47,15 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     fun render(display: MutableList<String>) {
         val done = miniBosses.count { it.doneToday }
-//        val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
-//        if (done != 5 || sneaking) {
         display.add("")
         display.add("Daily Bosses ($done/5 killed)")
         if (done != 5) {
             for (miniBoss in miniBosses) {
-                display.add("  " + renderBoss(miniBoss))
+                val result = if (miniBoss.doneToday) "§7Done" else "§bTodo"
+                val displayName = miniBoss.displayName
+                display.add("  $displayName: $result")
             }
         }
-    }
-
-    private fun renderBoss(miniBoss: CrimsonMiniBoss): String {
-        val color = if (miniBoss.doneToday) "§7Done" else "§bTodo"
-        val displayName = miniBoss.displayName
-        return "$displayName: $color"
     }
 
     fun reset() {
@@ -75,11 +67,8 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun saveConfig() {
         SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.clear()
 
-        for (miniBoss in miniBosses) {
-            if (miniBoss.doneToday) {
-                SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.add(miniBoss.displayName)
-            }
-        }
+        miniBosses.filter { it.doneToday }
+            .forEach { SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.add(it.displayName) }
     }
 
     fun loadConfig() {

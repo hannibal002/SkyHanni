@@ -72,6 +72,12 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
                 return MiniBossQuest(miniBoss, state, needAmount)
             }
         }
+        for (kuudraTier in dailyQuestHelper.reputationHelper.kuudraBossHelper.kuudraTiers) {
+            val kuudraName = kuudraTier.name
+            if (name == "Kill Kuudra $kuudraName Tier") {
+                return KuudraQuest(kuudraTier, state)
+            }
+        }
 
         for (entry in dailyQuestHelper.reputationHelper.repoData.entrySet()) {
             val category = entry.key

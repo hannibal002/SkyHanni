@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
@@ -202,19 +203,10 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun render(display: MutableList<String>) {
         val done = quests.count { it.state == QuestState.COLLECTED }
-//        val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
-//        if (done != 5 || sneaking) {
         display.add("")
         display.add("Daily Quests ($done/5 collected)")
         if (done != 5) {
-            for (quest in quests) {
-//                if (!sneaking) {
-//                    if (quest.state == QuestState.COLLECTED) {
-//                        continue
-//                    }
-//                }
-                display.add("  " + renderQuest(quest))
-            }
+            quests.mapTo(display) { "  " + renderQuest(it) }
         }
     }
 
@@ -261,6 +253,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         if (miniBossQuest.miniBoss == miniBoss) {
             if (miniBossQuest.state == QuestState.ACCEPTED) {
                 updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
+            }
+        }
+    }
+
+    fun finishKuudra(kuudraTier: KuudraTier) {
+        val kuudraQuest = getQuest<KuudraQuest>() ?: return
+        if (kuudraQuest.kuudraTier == kuudraTier) {
+            //TODO make inline method for this two lines
+            if (kuudraQuest.state == QuestState.ACCEPTED) {
+                kuudraQuest.state = QuestState.READY_TO_COLLECT
             }
         }
     }
