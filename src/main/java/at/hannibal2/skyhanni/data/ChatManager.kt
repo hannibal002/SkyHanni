@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.network.play.server.S02PacketChat
@@ -62,5 +64,13 @@ class ChatManager {
             loggerModified.log("[original] " + original.formattedText)
             loggerModified.log("[modified] " + modified.formattedText)
         }
+    }
+
+    @SubscribeEvent
+    fun onChatMessage(chatEvent: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+
+        val seaCreature = SeaCreatureManager.getSeaCreature(chatEvent.message) ?: return
+        SeaCreatureFishEvent(seaCreature, chatEvent).postAndCatch()
     }
 }

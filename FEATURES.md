@@ -100,6 +100,7 @@
 - Shorten Fishing Message (Replacing the green chat message when fishing a sea creature with a more clean format)
 - Highlight Thunder Sparks that spawn after killing a Thunder
 - Barn Timer - Shows the time and amount of sea creatures while fishing on the barn via hub.
+- Shark Fish Counter - Counts how many sharks have been caught.
 
 ## Damage Indicator
 - Show the remaining health of selected bosses in the game in a bigger GUI.

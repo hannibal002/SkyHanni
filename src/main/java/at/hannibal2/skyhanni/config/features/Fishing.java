@@ -67,4 +67,17 @@ public class Fishing {
             minStep = 10
     )
     public int barnTimerAlertTime = 330;
+
+    @Expose
+    @ConfigOption(
+            name = "Shark Fish Counter",
+            desc = "Counts how many sharks have been caught."
+    )
+    @ConfigEditorBoolean
+    public boolean sharkFishCounter = false;
+
+    @Expose
+    @ConfigOption(name = "Shark Location", desc = "")
+    @ConfigEditorButton(runnableId = "sharkFishCounter", buttonText = "Edit")
+    public Position sharkFishCounterPos = new Position(10, 10, false, true);
 }
