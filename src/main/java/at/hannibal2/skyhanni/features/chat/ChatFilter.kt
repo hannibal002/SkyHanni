@@ -87,7 +87,7 @@ class ChatFilter {
         }
     }
 
-    private fun uselessWarning(message: String): Boolean = when {
+    private fun uselessWarning(message: String) = when {
         message == "§cYou are sending commands too fast! Please slow down." -> true//TODO prevent in the future
         message == "§cYou can't use this while in combat!" -> true
         message == "§cYou can not modify your equipped armor set!" -> true
@@ -120,7 +120,7 @@ class ChatFilter {
         return false
     }
 
-    private fun winterIsland(message: String): Boolean = when {
+    private fun winterIsland(message: String) = when {
         message.matchRegex(" §r§f☃ §r§7§r(.*) §r§7mounted a §r§fSnow Cannon§r§7!") -> true
 
         else -> false
@@ -218,7 +218,7 @@ class ChatFilter {
         return false
     }
 
-    private fun watchdogAnnouncement(message: String): Boolean = when {
+    private fun watchdogAnnouncement(message: String) = when {
         message == "§4[WATCHDOG ANNOUNCEMENT]" -> true
         message.matchRegex("§fWatchdog has banned §r§c§l(.*)§r§f players in the last 7 days.") -> true
         message.matchRegex("§fStaff have banned an additional §r§c§l(.*)§r§f in the last 7 days.") -> true
@@ -226,7 +226,7 @@ class ChatFilter {
         else -> false
     }
 
-    private fun bazaarAndAHMiniMessages(message: String): Boolean = when (message) {
+    private fun bazaarAndAHMiniMessages(message: String) = when (message) {
         "§7Putting item in escrow...",
         "§7Putting coins in escrow...",
 
@@ -263,7 +263,7 @@ class ChatFilter {
         }
     }
 
-    private fun lobby(message: String): Boolean = when {
+    private fun lobby(message: String) = when {
         //player join
         message.matchRegex(".* §6joined the lobby!") -> true
         message.matchRegex(" §b>§c>§a>§r §r.*§f §6slid into the lobby!§r §a<§c<§b<") -> true
@@ -294,7 +294,7 @@ class ChatFilter {
 
     private fun welcome(message: String): Boolean = message == "§eWelcome to §r§aHypixel SkyBlock§r§e!"
 
-    private fun warping(message: String): Boolean = when {
+    private fun warping(message: String) = when {
         message.matchRegex("§7Sending to server (.*)\\.\\.\\.") -> true
         message.matchRegex("§7Request join for Hub (.*)\\.\\.\\.") -> true
         message.matchRegex("§7Request join for Dungeon Hub #(.*)\\.\\.\\.") -> true
@@ -311,7 +311,7 @@ class ChatFilter {
         else -> false
     }
 
-    private fun empty(message: String): Boolean = when (message) {
+    private fun empty(message: String) = when (message) {
         "§8 §r§8 §r§1 §r§3 §r§3 §r§7 §r§8 ",
 
         "§f §r§f §r§1 §r§0 §r§2 §r§4§r§f §r§f §r§2 §r§0 §r§4 §r§8§r§0§r§1§r§0§r§1§r§2§r§f§r§f§r§0§r§1§r§3§r§4§r§f§r§f§r§0§r§1§r§5§r§f§r§f§r§0§r§1§r§6§r§f§r§f§r§0§r§1§r§8§r§9§r§a§r§b§r§f§r§f§r§0§r§1§r§7§r§f§r§f§r§3 §r§9 §r§2 §r§0 §r§0 §r§1§r§3 §r§9 §r§2 §r§0 §r§0 §r§2§r§3 §r§9 §r§2 §r§0 §r§0 §r§3§r§0§r§0§r§1§r§f§r§e§r§0§r§0§r§2§r§f§r§e§r§0§r§0§r§3§r§4§r§5§r§6§r§7§r§8§r§f§r§e§r§3 §r§6 §r§3 §r§6 §r§3 §r§6 §r§e§r§3 §r§6 §r§3 §r§6 §r§3 §r§6 §r§d",
@@ -326,7 +326,7 @@ class ChatFilter {
         else -> false
     }
 
-    private fun isWinterGift(message: String): Boolean = when {
+    private fun isWinterGift(message: String) = when {
         //winter gifts useless
         message.matchRegex("§f§lCOMMON! §r§3.* XP §r§egift with §r.*§r§e!") -> true
         message.matchRegex("(§f§lCOMMON|§9§lRARE)! §r.* XP Boost .* Potion §r.*§r§e!") -> true
