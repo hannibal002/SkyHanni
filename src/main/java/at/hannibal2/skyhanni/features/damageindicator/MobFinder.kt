@@ -426,7 +426,7 @@ class MobFinder {
                     floor3GuardianShield = false
                 }
 
-                "§c[BOSS] The Professor§r§f: Oh? You found my Guardians one weakness?" -> {
+                "§c[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?" -> {
                     floor3Professor = true
                     floor3ProfessorSpawnTime = System.currentTimeMillis() + 10_300
                 }
