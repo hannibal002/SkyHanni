@@ -6,6 +6,7 @@
 + Added Bazaar Update Timer - Forrick.
 + Added Crimson Isle Reputation Helper.
 + Added Barn Timer - Shows the time and amount of sea creatures while fishing on the barn via hub.
++ Added Shark Fish Counter - Counts how many sharks have been caught.
 
 ### Fixes
 + Fixed steaming hot flounder in custom trophy fish counter.

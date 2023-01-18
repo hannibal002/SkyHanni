@@ -121,6 +121,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, fishing.barnTimerPos);
             return;
         }
+
+        if (runnableId.equals("sharkFishCounter")) {
+            editOverlay(activeConfigCategory, 200, 16, fishing.sharkFishCounterPos);
+            return;
+        }
     }
 
     @Expose
