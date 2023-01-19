@@ -129,11 +129,11 @@ public class Features extends Config {
     }
 
     @Expose
-    @Category(name = "Chat", desc = "Chat related features.")
+    @Category(name = "Chat", desc = "Change how the chat looks.")
     public Chat chat = new Chat();
 
     @Expose
-    @Category(name = "Dungeon", desc = "Features that change the catacombs dungeon experience.")
+    @Category(name = "Dungeon", desc = "Features that change the dungeon experience in catacombs.")
     public Dungeon dungeon = new Dungeon();
 
     @Expose
@@ -141,19 +141,19 @@ public class Features extends Config {
     public Inventory inventory = new Inventory();
 
     @Expose
-    @Category(name = "Item Abilities", desc = "Stuff about item abilities")
+    @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
     public ItemAbilities itemAbilities = new ItemAbilities();
 
     @Expose
-    @Category(name = "Summonings", desc = "Ashfang fight in Crimson Isle")
+    @Category(name = "Summonings", desc = "Mobs you revive.")
     public Summonings summonings = new Summonings();
 
     @Expose
-    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle")
+    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle.")
     public Ashfang ashfang = new Ashfang();
 
     @Expose
-    @Category(name = "Minion", desc = "Stuff about minions")
+    @Category(name = "Minion", desc = "The minions at your private island.")
     public Minions minions = new Minions();
 
     @Expose
@@ -169,7 +169,7 @@ public class Features extends Config {
     public DamageIndicator damageIndicator = new DamageIndicator();
 
     @Expose
-    @Category(name = "Slayer", desc = "Slayer Features.")
+    @Category(name = "Slayer", desc = "Slayer features.")
     public Slayer slayer = new Slayer();
 
     @Expose
@@ -177,11 +177,11 @@ public class Features extends Config {
     public Diana diana = new Diana();
 
     @Expose
-    @Category(name = "Commands", desc = "Enable or disable mod commands")
+    @Category(name = "Commands", desc = "Enable or disable commands.")
     public CommandsFeatures commands = new CommandsFeatures();
 
     @Expose
-    @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer")
+    @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer.")
     public MarkedPlayers markedPlayers = new MarkedPlayers();
 
     @Expose
@@ -193,7 +193,7 @@ public class Features extends Config {
     public Misc misc = new Misc();
 
     @Expose
-    @Category(name = "Dev", desc = "Debug and test stuff.")
+    @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     public DevData dev = new DevData();
 
     @Expose
