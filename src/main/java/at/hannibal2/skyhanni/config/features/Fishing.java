@@ -26,6 +26,12 @@ public class Fishing {
     public boolean trophyFishBronzeHider = false;
 
     @Expose
+    @ConfigOption(name = "Hide Silver Duplicates", desc = "Hide duplicate messages for silver trophy fishes from chat.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean trophyFishSilverHider = false;
+
+    @Expose
     @ConfigOption(name = "Shorten Fishing Message", desc = "Shorten the message what type of sea creature you have fished.")
     @ConfigEditorBoolean
     public boolean shortenFishingMessage = false;

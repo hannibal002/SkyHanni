@@ -5,11 +5,12 @@
 ### Features
 + Added Bazaar Update Timer - Forrick.
 + Added Crimson Isle Reputation Helper.
-+ Added Barn Timer - Shows the time and amount of sea creatures while fishing on the barn via hub.
-+ Added Shark Fish Counter - Counts how many sharks have been caught.
++ Added **Barn Timer** - Shows the time and amount of sea creatures while fishing on the barn via hub.
++ Added **Shark Fish Counter** - Counts how many sharks have been caught.
++ Added **Hide Silver Duplicates** - Hiding chat message when catching a duplicate silver trophy fish.
 
 ### Fixes
-+ Fixed steaming hot flounder in custom trophy fish counter.
++ Fixed **Steaming Hot Flounder** in custom trophy fish counter.
 + Fixed hide powder gain message from chests in crystal hollows. (thanks hypixel)
 + Fixed damage indicator for M3 Professor bug. (Thanks hypixel)
 

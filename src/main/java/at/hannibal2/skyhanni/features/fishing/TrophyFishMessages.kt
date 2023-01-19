@@ -45,29 +45,33 @@ class TrophyFishMessages {
 
         val message = event.message
         //TODO replace logic with regex
-        if (message.startsWith("§6§lTROPHY FISH! §r§bYou caught a")) {
-            var displayName =
-                if (message.contains(" a §r")) message.between(" a §r", "§r §r") else message.between(" an §r", "§r §r")
-            if (displayName.contains("§k")) {
-                displayName = displayName.replace("§k", "")
-                displayName = displayName.replace("Obfuscated", "Obfuscated Fish")
-            }
-            val rarity = message.between("§r §r", "§b.").lowercase().replace("§l", "")
+        if (!message.startsWith("§6§lTROPHY FISH! §r§bYou caught a")) return
 
-            val name = (rarity + "_" + displayName).removeColor().lowercase().replace(" ", "").replace("-", "")
-            val amount = map.getOrDefault(name, 0) + 1
-            map[name] = amount
-            event.blockedReason = "trophy_fish"
-
-            if (amount == 1) {
-                LorenzUtils.chat("§6TROPHY FISH! §c§lFIRST §r$rarity $displayName")
-            } else {
-                if (rarity.contains("bronze")) {
-                    if (SkyHanniMod.feature.fishing.trophyFishBronzeHider) return
-                }
-                LorenzUtils.chat("§6TROPHY FISH! §7$amount. §r$rarity $displayName")
-            }
-//            LorenzDebug.log("new trophy: $name = $amount")
+        var displayName =
+            if (message.contains(" a §r")) message.between(" a §r", "§r §r") else message.between(" an §r", "§r §r")
+        if (displayName.contains("§k")) {
+            displayName = displayName.replace("§k", "")
+            displayName = displayName.replace("Obfuscated", "Obfuscated Fish")
         }
+        val rarity = message.between("§r §r", "§b.").lowercase().replace("§l", "")
+
+        val name = (rarity + "_" + displayName).removeColor().lowercase().replace(" ", "").replace("-", "")
+        val amount = map.getOrDefault(name, 0) + 1
+        map[name] = amount
+        event.blockedReason = "trophy_fish"
+
+        if (amount == 1) {
+            LorenzUtils.chat("§6TROPHY FISH! §c§lFIRST §r$rarity $displayName")
+            return
+        }
+
+        if (rarity.contains("bronze")) {
+            if (SkyHanniMod.feature.fishing.trophyFishBronzeHider) return
+        }
+        if (rarity.contains("silver")) {
+            if (SkyHanniMod.feature.fishing.trophyFishSilverHider) return
+        }
+
+        LorenzUtils.chat("§6TROPHY FISH! §7$amount. §r$rarity $displayName")
     }
 }
