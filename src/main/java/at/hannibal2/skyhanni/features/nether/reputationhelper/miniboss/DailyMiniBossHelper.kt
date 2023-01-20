@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 import java.util.regex.Pattern
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -16,9 +18,11 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun init() {
         val repoData = reputationHelper.repoData
         val jsonElement = repoData["MINIBOSS"]
-        for ((displayName, value) in jsonElement.asJsonObject.entrySet()) {
+        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
+            val data = extraData.asJsonObject
+            val displayItem = data["item"]?.asString
             val patterns = " *§r§6§l${displayName.uppercase()} DOWN!"
-            miniBosses.add(CrimsonMiniBoss(displayName, Pattern.compile(patterns)))
+            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, Pattern.compile(patterns)))
         }
     }
 
@@ -43,15 +47,24 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         reputationHelper.update()
     }
 
-    fun render(display: MutableList<String>) {
+    fun render(display: MutableList<List<Any>>) {
         val done = miniBosses.count { it.doneToday }
-        display.add("")
-        display.add("Daily Bosses ($done/5 killed)")
+        display.add(Collections.singletonList(""))
+        display.add(Collections.singletonList("Daily Bosses ($done/5 killed)"))
         if (done != 5) {
             for (miniBoss in miniBosses) {
                 val result = if (miniBoss.doneToday) "§7Done" else "§bTodo"
                 val displayName = miniBoss.displayName
-                display.add("  $displayName: $result")
+                val displayItem = miniBoss.displayItem
+                if (displayItem == null) {
+                    display.add(Collections.singletonList("  $displayName: $result"))
+                } else {
+                    val lineList = mutableListOf<Any>()
+                    lineList.add(" ")
+                    lineList.add(NEUItems.readItemFromRepo(displayItem))
+                    lineList.add("$displayName: $result")
+                    display.add(lineList)
+                }
             }
         }
     }

@@ -1,3 +1,4 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
-class RescueMissionQuest(state: QuestState): Quest(QuestCategory.RESCUE, "Rescue Mission", state, "Rescue the NPC")
+class RescueMissionQuest(displayItem: String?, state: QuestState) :
+    Quest(displayItem, QuestCategory.RESCUE, "Rescue Mission", state, "Rescue the NPC")

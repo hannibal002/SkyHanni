@@ -11,6 +11,6 @@
     "credits": "Alea1337 & Eisengolem",
     "logoFile": "",
     "screenshots": [],
-    "dependencies": []
+    "dependencies": ["NotEnoughUpdates"]
   }
 ]

@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 import java.util.regex.Pattern
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -18,8 +20,10 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         val repoData = reputationHelper.repoData
         val jsonElement = repoData["KUUDRA"]
         var tier = 1
-        for ((displayName, value) in jsonElement.asJsonObject.entrySet()) {
-            kuudraTiers.add(KuudraTier(displayName, tier))
+        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
+            val data = extraData.asJsonObject
+            val displayItem = data["item"]?.asString
+            kuudraTiers.add(KuudraTier(displayName, displayItem, tier))
             tier++
         }
     }
@@ -51,15 +55,24 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         reputationHelper.update()
     }
 
-    fun render(display: MutableList<String>) {
+    fun render(display: MutableList<List<Any>>) {
         val done = kuudraTiers.count { it.doneToday }
-        display.add("")
-        display.add("Daily Kuudra ($done/2 killed)")
+        display.add(Collections.singletonList(""))
+        display.add(Collections.singletonList("Daily Kuudra ($done/2 killed)"))
         if (done != 2) {
             for (tier in kuudraTiers) {
                 val result = if (tier.doneToday) "§7Done" else "§bTodo"
                 val displayName = tier.getDisplayName()
-                display.add("  $displayName: $result")
+                val displayItem = tier.displayItem
+                if (displayItem == null) {
+                    display.add(Collections.singletonList("  $displayName: $result"))
+                } else {
+                    val lineList = mutableListOf<Any>()
+                    lineList.add(" ")
+                    lineList.add(NEUItems.readItemFromRepo(displayItem))
+                    lineList.add("$displayName: $result")
+                    display.add(lineList)
+                }
             }
         }
     }
