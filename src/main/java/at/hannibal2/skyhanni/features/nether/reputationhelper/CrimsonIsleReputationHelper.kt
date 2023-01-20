@@ -9,12 +9,13 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQu
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import com.google.gson.JsonObject
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.*
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
@@ -24,7 +25,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     var repoData: JsonObject = JsonObject()
 
-    private val display = mutableListOf<String>()
+    private val display = mutableListOf<List<Any>>()
     private var dirty = true
     private var loaded = false
 
@@ -64,7 +65,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     private fun updateRender() {
         display.clear()
 
-        display.add("Reputation Helper:")
+        display.add(Collections.singletonList("Reputation Helper:"))
         questHelper.render(display)
         miniBossHelper.render(display)
         //TODO check if mage
@@ -79,7 +80,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (!HyPixelData.skyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        SkyHanniMod.feature.misc.crimsonIsleReputationHelperPos.renderStrings(display)
+        SkyHanniMod.feature.misc.crimsonIsleReputationHelperPos.renderStringsAndItems(display)
     }
 
     fun update() {

@@ -82,19 +82,22 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
         for (entry in dailyQuestHelper.reputationHelper.repoData.entrySet()) {
             val categoryName = entry.key
             val category = entry.value.asJsonObject
-            for ((entryName, value) in category.entrySet()) {
+            for ((entryName, extraData) in category.entrySet()) {
+                val data = extraData.asJsonObject
+                val displayItem = data["item"]?.asString
+
                 if (name.startsWith("$entryName Rank ")) {
                     val split = name.split(" Rank ")
                     val dojoName = split[0]
                     val dojoRankGoal = split[1]
-                    return DojoQuest(dojoName, dojoRankGoal, state)
+                    return DojoQuest(dojoName,displayItem, dojoRankGoal, state)
                 }
 
                 if (name == entryName) {
                     when (categoryName) {
-                        "FISHING" -> return TrophyFishQuest(name, state, needAmount)
-                        "RESCUE" -> return RescueMissionQuest(state)
-                        "FETCH" -> return FetchQuest(name, state, needAmount)
+                        "FISHING" -> return TrophyFishQuest(name, displayItem, state, needAmount)
+                        "RESCUE" -> return RescueMissionQuest(displayItem, state)
+                        "FETCH" -> return FetchQuest(name, displayItem, state, needAmount)
                     }
                 }
             }
@@ -158,8 +161,13 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
             if (quest is ProgressQuest) {
-                val haveAmount = split[3].toInt()
-                quest.haveAmount = haveAmount
+                try {
+                    val haveAmount = split[3].toInt()
+                    quest.haveAmount = haveAmount
+                } catch (e: IndexOutOfBoundsException) {
+                    println("text: '$text'")
+                    e.printStackTrace()
+                }
             }
             dailyQuestHelper.quests.add(quest)
         }

@@ -15,12 +15,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.*
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -201,16 +203,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         update()
     }
 
-    fun render(display: MutableList<String>) {
+    fun render(display: MutableList<List<Any>>) {
         val done = quests.count { it.state == QuestState.COLLECTED }
-        display.add("")
-        display.add("Daily Quests ($done/5 collected)")
+        display.add(Collections.singletonList(""))
+        display.add(Collections.singletonList("Daily Quests ($done/5 collected)"))
         if (done != 5) {
-            quests.mapTo(display) { "  " + renderQuest(it) }
+            quests.mapTo(display) { renderQuest(it) }
         }
     }
 
-    private fun renderQuest(quest: Quest): String {
+    private fun renderQuest(quest: Quest): List<Any> {
         val type = quest.category.displayName
         val state = quest.state.displayName
         val stateColor = quest.state.color
@@ -245,7 +247,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             ""
         }
 
-        return "$stateText$type: §f$displayName$multipleText$sacksText"
+        val result = mutableListOf<Any>()
+        val item = quest.displayItem
+        if (item == null) {
+            result.add("  $stateText$type: §f$displayName$multipleText$sacksText")
+        } else {
+            result.add("  $stateText$type: ")
+            result.add(NEUItems.readItemFromRepo(item))
+            result.add("§f$displayName$multipleText$sacksText")
+        }
+        return result
     }
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {

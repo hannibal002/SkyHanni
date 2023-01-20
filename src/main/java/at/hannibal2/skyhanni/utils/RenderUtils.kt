@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils.drawStringScaled
+import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -12,6 +13,7 @@ import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
@@ -424,7 +426,7 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.renderString(string: String?, offsetY: Int = 0, center: Boolean = true) {
+    fun Position.renderString(string: String?, extraOffsetX: Int = 0, offsetY: Int = 0, center: Boolean = true) {
         val minecraft = Minecraft.getMinecraft()
         if (minecraft.gameSettings.keyBindPlayerList.isKeyDown) return
 
@@ -441,7 +443,7 @@ object RenderUtils {
             (200 - renderer.getStringWidth(display.removeColor())) / 2
         } else {
             0
-        }
+        } + extraOffsetX
 
         val x = getAbsX(resolution, 200) + offsetX
         val y = getAbsY(resolution, 16) + offsetY
@@ -459,6 +461,40 @@ object RenderUtils {
         for (s in list) {
             renderString(s, offsetY, center = center)
             offsetY += 10 + extraSpace
+        }
+    }
+
+    /**
+     * Accepts a list of lines to print.
+     * Each line is a list of things to print. Can print String or ItemStack objects.
+     */
+    fun Position.renderStringsAndItems(list: List<List<Any>>, extraSpace: Int = 0) {
+        if (list.isEmpty()) return
+
+        var offsetY = 0
+        for (line in list) {
+            renderLine(line, offsetY)
+            offsetY += 10 + extraSpace + 2
+        }
+    }
+
+    private fun Position.renderLine(line: List<Any>, offsetY: Int) {
+        val renderer = Minecraft.getMinecraft().fontRendererObj
+        val resolution = ScaledResolution(Minecraft.getMinecraft())
+        var offsetX = 0
+        for (any in line) {
+            if (any is String) {
+                renderString(any, offsetX, offsetY, center = false)
+                val width = renderer.getStringWidth(any.removeColor())
+                offsetX += width
+            }
+            if (any is ItemStack) {
+                val isX = getAbsX(resolution, 0) + offsetX
+                val isY = getAbsY(resolution, 0) + offsetY
+
+                any.renderOnScreen(isX.toFloat(), isY.toFloat())
+                offsetX += 12
+            }
         }
     }
 
