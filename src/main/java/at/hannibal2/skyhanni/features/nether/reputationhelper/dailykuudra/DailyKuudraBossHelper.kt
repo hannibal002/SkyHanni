@@ -17,10 +17,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun init() {
         val repoData = reputationHelper.repoData
         val jsonElement = repoData["KUUDRA"]
-        val asJsonArray = jsonElement.asJsonArray
         var tier = 1
-        for (entry in asJsonArray) {
-            val displayName = entry.asString
+        for ((displayName, value) in jsonElement.asJsonObject.entrySet()) {
             kuudraTiers.add(KuudraTier(displayName, tier))
             tier++
         }

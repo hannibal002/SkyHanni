@@ -16,9 +16,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun init() {
         val repoData = reputationHelper.repoData
         val jsonElement = repoData["MINIBOSS"]
-        val asJsonArray = jsonElement.asJsonArray
-        for (entry in asJsonArray) {
-            val displayName = entry.asString
+        for ((displayName, value) in jsonElement.asJsonObject.entrySet()) {
             val patterns = " *§r§6§l${displayName.uppercase()} DOWN!"
             miniBosses.add(CrimsonMiniBoss(displayName, Pattern.compile(patterns)))
         }
