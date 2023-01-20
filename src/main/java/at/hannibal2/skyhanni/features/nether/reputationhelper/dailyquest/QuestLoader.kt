@@ -80,10 +80,9 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
         }
 
         for (entry in dailyQuestHelper.reputationHelper.repoData.entrySet()) {
-            val category = entry.key
-            for (element in entry.value.asJsonArray) {
-                val entryName = element.asString
-
+            val categoryName = entry.key
+            val category = entry.value.asJsonObject
+            for ((entryName, value) in category.entrySet()) {
                 if (name.startsWith("$entryName Rank ")) {
                     val split = name.split(" Rank ")
                     val dojoName = split[0]
@@ -92,7 +91,7 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
                 }
 
                 if (name == entryName) {
-                    when (category) {
+                    when (categoryName) {
                         "FISHING" -> return TrophyFishQuest(name, state, needAmount)
                         "RESCUE" -> return RescueMissionQuest(state)
                         "FETCH" -> return FetchQuest(name, state, needAmount)
