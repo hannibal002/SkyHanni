@@ -396,6 +396,7 @@ object RenderUtils {
         }
 
         val f1 = 0.0266666688
+
         val width = minecraft.fontRendererObj.getStringWidth(finalText) / 2
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, z)
@@ -623,5 +624,98 @@ object RenderUtils {
         var factor = len / strLen.toFloat()
         factor = Math.min(1f, factor)
         drawStringScaled(str, fr, x, y, shadow, colour, factor)
+    }
+
+    fun RenderWorldLastEvent.drawDynamicText(
+        location: LorenzVec,
+        text: String,
+        scaleMultiplier: Double,
+        yOff: Float = 0f,
+        hideTooCloseAt: Double = 4.5
+    ) {
+        val thePlayer = Minecraft.getMinecraft().thePlayer
+        val x = location.x
+        val y = location.y
+        val z = location.z
+
+        val render = Minecraft.getMinecraft().renderViewEntity
+        val renderOffsetX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
+        val renderOffsetY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
+        val renderOffsetZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val eyeHeight = thePlayer.eyeHeight
+
+        val distToPlayerSq =
+            (x - renderOffsetX) * (x - renderOffsetX) + (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight)) + (z - renderOffsetZ) * (z - renderOffsetZ)
+        var distToPlayer = sqrt(distToPlayerSq)
+        //TODO this is optional maybe?
+        distToPlayer = distToPlayer.coerceAtLeast(8.0)
+
+        if (distToPlayer < hideTooCloseAt) return
+
+        val distRender = distToPlayer.coerceAtMost(50.0)
+
+        val resultX = renderOffsetX + (x + 0.5 - renderOffsetX) / (distToPlayer / distRender)
+        val resultY =
+            (renderOffsetY + eyeHeight) + (y + 20 * distToPlayer / 300 - (renderOffsetY + eyeHeight)) / (distToPlayer / distRender)
+        val resultZ = renderOffsetZ + (z + 0.5 - renderOffsetZ) / (distToPlayer / distRender)
+
+        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+        var scale = distRender / 12
+        scale *= scaleMultiplier
+        render(renderLocation, "§f$text", scale, false, true, yOff)
+    }
+
+    private fun render(
+        location: LorenzVec,
+        text: String,
+        scale: Double,
+        depthTest: Boolean,
+        shadow: Boolean,
+        yOff: Float
+    ) {
+        if (!depthTest) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST)
+            GL11.glDepthMask(false)
+        }
+        GlStateManager.pushMatrix()
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+
+        val minecraft = Minecraft.getMinecraft()
+        val fontRenderer = minecraft.fontRendererObj
+        val renderManager = minecraft.renderManager
+
+        GlStateManager.translate(
+            location.x - renderManager.viewerPosX,
+            location.y - renderManager.viewerPosY,
+            location.z - renderManager.viewerPosZ
+        )
+        GlStateManager.color(1f, 1f, 1f, 0.5f)
+        GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GlStateManager.rotate(renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
+        val stringWidth = fontRenderer.getStringWidth(text.removeColor())
+        if (shadow) {
+            fontRenderer.drawStringWithShadow(
+                text,
+                (-stringWidth / 2).toFloat(),
+                yOff,
+                0
+            )
+        } else {
+            fontRenderer.drawString(
+                text,
+                -stringWidth / 2,
+                0,
+                0
+            )
+        }
+        GlStateManager.color(1f, 1f, 1f)
+        GlStateManager.disableBlend()
+        GlStateManager.popMatrix()
+        if (!depthTest) {
+            GL11.glEnable(GL11.GL_DEPTH_TEST)
+            GL11.glDepthMask(true)
+        }
     }
 }

@@ -5,8 +5,13 @@ import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import java.util.regex.Pattern
@@ -22,7 +27,18 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
             val data = extraData.asJsonObject
             val displayItem = data["item"]?.asString
             val patterns = " *§r§6§l${displayName.uppercase()} DOWN!"
-            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, Pattern.compile(patterns)))
+
+            val locationData = data["location"]?.asJsonArray
+            val location: LorenzVec? = if (locationData == null || locationData.size() == 0) {
+                null
+            } else {
+                val x = locationData[0].asDouble
+                val y = locationData[1].asDouble
+                val z = locationData[2].asDouble
+                LorenzVec(x, y, z)
+            }
+
+            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, Pattern.compile(patterns)))
         }
     }
 
@@ -36,6 +52,22 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         for (miniBoss in miniBosses) {
             if (miniBoss.pattern.matcher(message).matches()) {
                 finished(miniBoss)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+
+        for (miniBoss in miniBosses) {
+            if (!miniBoss.doneToday) {
+                val location = miniBoss.location ?: continue
+                event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+                event.drawDynamicText(location, miniBoss.displayName, 1.5)
             }
         }
     }

@@ -1,4 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
-class FetchQuest(val itemName: String, displayItem: String?, state: QuestState, needAmount: Int) :
-    ProgressQuest(displayItem, QuestCategory.FETCH, itemName, state, needAmount)
+import at.hannibal2.skyhanni.utils.LorenzVec
+
+class FetchQuest(val itemName: String, location: LorenzVec?, displayItem: String?, state: QuestState, needAmount: Int) :
+    ProgressQuest(displayItem, location, QuestCategory.FETCH, itemName, state, needAmount)

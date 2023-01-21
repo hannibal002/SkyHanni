@@ -121,6 +121,29 @@ public class Misc {
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
 
     @Expose
+    @ConfigOption(name = "Crimson Reputation Helper", desc = "")
+    @ConfigEditorAccordion(id = 6)
+    public boolean reputationHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Crimson Isle Reputation", desc = "Enable features around Reputation features in the Crimson Isle.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean crimsonIsleReputationHelper = true;
+
+    @Expose
+    @ConfigOption(name = "Reputation Position", desc = "")
+    @ConfigEditorButton(runnableId = "crimsonIsleReputationHelper", buttonText = "Edit")
+    @ConfigAccordionId(id = 6)
+    public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Reputation Locations", desc = "Show locations to the points where to do stuff in the Crimson Isle to get reputation.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean crimsonIsleReputationLocation = true;
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
     @ConfigEditorBoolean
     public boolean hideExpBottles = false;
@@ -139,16 +162,6 @@ public class Misc {
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the Item names directly inside the Brewing Stand")
     @ConfigEditorBoolean
     public boolean brewingStandOverlay = true;
-
-    @Expose
-    @ConfigOption(name = "Crimson Isle Reputation", desc = "Enable features around Reputation features in the Crimson Isle")
-    @ConfigEditorBoolean
-    public boolean crimsonIsleReputationHelper = true;
-
-    @Expose
-    @ConfigOption(name = "Reputation Position", desc = "")
-    @ConfigEditorButton(runnableId = "crimsonIsleReputationHelper", buttonText = "Edit")
-    public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
