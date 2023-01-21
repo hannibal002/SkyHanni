@@ -6,8 +6,13 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import java.util.regex.Pattern
@@ -16,6 +21,9 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     val kuudraTiers = mutableListOf<KuudraTier>()
     private val pattern = Pattern.compile("  Kuudra's Hollow \\(T(.*)\\)")
 
+    private var kuudraLocation: LorenzVec? = null
+    private var allKuudraDone = true
+
     fun init() {
         val repoData = reputationHelper.repoData
         val jsonElement = repoData["KUUDRA"]
@@ -23,8 +31,36 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
             val data = extraData.asJsonObject
             val displayItem = data["item"]?.asString
-            kuudraTiers.add(KuudraTier(displayName, displayItem, tier))
+
+            val locationData = data["location"]?.asJsonArray
+            val location: LorenzVec? = if (locationData == null || locationData.size() == 0) {
+                null
+            } else {
+                val x = locationData[0].asDouble
+                val y = locationData[1].asDouble
+                val z = locationData[2].asDouble
+                LorenzVec(x, y, z)
+            }
+            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
+            if (location != null) {
+                kuudraLocation = location
+            }
+
             tier++
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+        if (allKuudraDone) return
+
+        kuudraLocation?.let {
+            event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
+            event.drawDynamicText(it, "Kuudra", 1.5)
         }
     }
 
@@ -52,6 +88,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         LorenzUtils.debug("Detected kuudra tier done: $kuudraTier")
         reputationHelper.questHelper.finishKuudra(kuudraTier)
         kuudraTier.doneToday = true
+        updateAllKuudraDone()
         reputationHelper.update()
     }
 
@@ -81,6 +118,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         for (miniBoss in kuudraTiers) {
             miniBoss.doneToday = false
         }
+        updateAllKuudraDone()
     }
 
     fun saveConfig() {
@@ -91,9 +129,16 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     }
 
     fun loadConfig() {
+        println("loadConfig")
         for (name in SkyHanniMod.feature.hidden.crimsonIsleKuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true
         }
+        updateAllKuudraDone()
+    }
+
+    private fun updateAllKuudraDone() {
+        allKuudraDone = !kuudraTiers.any { !it.doneToday }
+        println("allKuudraDone: $allKuudraDone")
     }
 
     private fun getByDisplayName(name: String) = kuudraTiers.firstOrNull { it.name == name }

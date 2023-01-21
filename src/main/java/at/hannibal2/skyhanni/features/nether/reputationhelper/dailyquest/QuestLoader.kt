@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.TabListUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -85,19 +86,28 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
             for ((entryName, extraData) in category.entrySet()) {
                 val data = extraData.asJsonObject
                 val displayItem = data["item"]?.asString
+                val locationData = data["location"]?.asJsonArray
+                val location: LorenzVec? = if (locationData == null || locationData.size() == 0) {
+                    null
+                } else {
+                    val x = locationData[0].asDouble
+                    val y = locationData[1].asDouble
+                    val z = locationData[2].asDouble
+                    LorenzVec(x, y, z)
+                }
 
                 if (name.startsWith("$entryName Rank ")) {
                     val split = name.split(" Rank ")
                     val dojoName = split[0]
                     val dojoRankGoal = split[1]
-                    return DojoQuest(dojoName,displayItem, dojoRankGoal, state)
+                    return DojoQuest(dojoName, location, displayItem, dojoRankGoal, state)
                 }
 
                 if (name == entryName) {
                     when (categoryName) {
-                        "FISHING" -> return TrophyFishQuest(name, displayItem, state, needAmount)
-                        "RESCUE" -> return RescueMissionQuest(displayItem, state)
-                        "FETCH" -> return FetchQuest(name, displayItem, state, needAmount)
+                        "FISHING" -> return TrophyFishQuest(name, location, displayItem, state, needAmount)
+                        "RESCUE" -> return RescueMissionQuest(displayItem, location, state)
+                        "FETCH" -> return FetchQuest(name, location, displayItem, state, needAmount)
                     }
                 }
             }
@@ -161,12 +171,14 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
             if (quest is ProgressQuest) {
-                try {
-                    val haveAmount = split[3].toInt()
-                    quest.haveAmount = haveAmount
-                } catch (e: IndexOutOfBoundsException) {
-                    println("text: '$text'")
-                    e.printStackTrace()
+                if (split.size == 4) {
+                    try {
+                        val haveAmount = split[3].toInt()
+                        quest.haveAmount = haveAmount
+                    } catch (e: IndexOutOfBoundsException) {
+                        println("text: '$text'")
+                        e.printStackTrace()
+                    }
                 }
             }
             dailyQuestHelper.quests.add(quest)
