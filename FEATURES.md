@@ -101,6 +101,7 @@
 - Highlight Thunder Sparks that spawn after killing a Thunder.
 - **Barn Timer** - Shows the time and amount of sea creatures while fishing on the barn via hub.
 - **Shark Fish Counter** - Counts how many sharks have been caught.
+- **Added Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 
 ## Damage Indicator
 - Show the remaining health of selected bosses in the game in a bigger GUI.

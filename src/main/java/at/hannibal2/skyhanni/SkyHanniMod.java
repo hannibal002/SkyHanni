@@ -173,6 +173,7 @@ public class SkyHanniMod {
         loadModule(new BarnFishingTimer());
         loadModule(new CrimsonIsleReputationHelper(this));
         loadModule(new SharkFishCounter());
+        loadModule(new OdgerWaypoint());
 
         Commands.INSTANCE.init();
 
