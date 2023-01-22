@@ -24,32 +24,6 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
 
-    fun init() {
-        val repoData = reputationHelper.repoData
-        val jsonElement = repoData["KUUDRA"]
-        var tier = 1
-        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
-            val data = extraData.asJsonObject
-            val displayItem = data["item"]?.asString
-
-            val locationData = data["location"]?.asJsonArray
-            val location: LorenzVec? = if (locationData == null || locationData.size() == 0) {
-                null
-            } else {
-                val x = locationData[0].asDouble
-                val y = locationData[1].asDouble
-                val z = locationData[2].asDouble
-                LorenzVec(x, y, z)
-            }
-            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
-            if (location != null) {
-                kuudraLocation = location
-            }
-
-            tier++
-        }
-    }
-
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -128,8 +102,26 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
             .forEach { SkyHanniMod.feature.hidden.crimsonIsleKuudraTiersDone.add(it.name) }
     }
 
-    fun loadConfig() {
-        println("loadConfig")
+    fun load() {
+        kuudraTiers.clear()
+
+        //Repo
+        val repoData = reputationHelper.repoData
+        val jsonElement = repoData["KUUDRA"]
+        var tier = 1
+        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
+            val data = extraData.asJsonObject
+            val displayItem = data["item"]?.asString
+            val location = reputationHelper.readLocationData(data)
+            kuudraTiers.add(KuudraTier(displayName, displayItem, location, tier))
+            if (location != null) {
+                kuudraLocation = location
+            }
+
+            tier++
+        }
+
+        //Config
         for (name in SkyHanniMod.feature.hidden.crimsonIsleKuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true
         }

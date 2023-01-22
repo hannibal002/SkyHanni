@@ -5,13 +5,12 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.TabListUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 
-class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
+class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     fun loadFromTabList() {
         var i = -1
@@ -86,16 +85,7 @@ class QuestLoader(val dailyQuestHelper: DailyQuestHelper) {
             for ((entryName, extraData) in category.entrySet()) {
                 val data = extraData.asJsonObject
                 val displayItem = data["item"]?.asString
-                val locationData = data["location"]?.asJsonArray
-                val location: LorenzVec? = if (locationData == null || locationData.size() == 0) {
-                    null
-                } else {
-                    val x = locationData[0].asDouble
-                    val y = locationData[1].asDouble
-                    val z = locationData[2].asDouble
-                    LorenzVec(x, y, z)
-                }
-
+                val location = dailyQuestHelper.reputationHelper.readLocationData(data)
                 if (name.startsWith("$entryName Rank ")) {
                     val split = name.split(" Rank ")
                     val dojoName = split[0]

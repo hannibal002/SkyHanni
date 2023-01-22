@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputat
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -19,28 +18,6 @@ import java.util.regex.Pattern
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
     val miniBosses = mutableListOf<CrimsonMiniBoss>()
-
-    fun init() {
-        val repoData = reputationHelper.repoData
-        val jsonElement = repoData["MINIBOSS"]
-        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
-            val data = extraData.asJsonObject
-            val displayItem = data["item"]?.asString
-            val patterns = " *§r§6§l${displayName.uppercase()} DOWN!"
-
-            val locationData = data["location"]?.asJsonArray
-            val location: LorenzVec? = if (locationData == null || locationData.size() == 0) {
-                null
-            } else {
-                val x = locationData[0].asDouble
-                val y = locationData[1].asDouble
-                val z = locationData[2].asDouble
-                LorenzVec(x, y, z)
-            }
-
-            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, Pattern.compile(patterns)))
-        }
-    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -113,7 +90,21 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
             .forEach { SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.add(it.displayName) }
     }
 
-    fun loadConfig() {
+    fun load() {
+        miniBosses.clear()
+
+        //Repo
+        val repoData = reputationHelper.repoData
+        val jsonElement = repoData["MINIBOSS"]
+        for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
+            val data = extraData.asJsonObject
+            val displayItem = data["item"]?.asString
+            val patterns = " *§r§6§l${displayName.uppercase()} DOWN!"
+            val location = reputationHelper.readLocationData(data)
+            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, Pattern.compile(patterns)))
+        }
+
+        //Config
         for (name in SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday) {
             getByDisplayName(name)!!.doneToday = true
         }
