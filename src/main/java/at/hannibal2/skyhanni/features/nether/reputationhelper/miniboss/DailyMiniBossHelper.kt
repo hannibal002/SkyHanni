@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -40,9 +42,12 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
 
+        val playerLocation = LocationUtils.playerLocation()
         for (miniBoss in miniBosses) {
             if (!miniBoss.doneToday) {
                 val location = miniBoss.location ?: continue
+                if (DamageIndicatorManager.getNearestDistanceTo(location) < 40 && playerLocation.distance(location) < 40) continue
+
                 event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
                 event.drawDynamicText(location, miniBoss.displayName, 1.5)
             }

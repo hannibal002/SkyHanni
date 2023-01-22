@@ -78,6 +78,12 @@ class DamageIndicatorManager {
                 list.minOf { it }
             }
         }
+
+        fun getNearestDistanceTo(location: LorenzVec): Double {
+            return data.values
+                .map { it.entity.getLorenzVec() }
+                .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
+        }
     }
 
     @SubscribeEvent
