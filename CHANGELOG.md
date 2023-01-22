@@ -9,6 +9,10 @@
 + Added **Shark Fish Counter** - Counts how many sharks have been caught.
 + Added **Hide Silver Duplicates** - Hiding chat message when catching a duplicate silver trophy fish.
 
+### Changes
++ **Damage Indicator** text size scale now changes dynamically.
++ Enderman slayer beacon now renders behind the damage indicator text, for better readability.
+
 ### Fixes
 + Fixed **Steaming Hot Flounder** in custom trophy fish counter.
 + Fixed hide powder gain message from chests in crystal hollows. (thanks hypixel)
