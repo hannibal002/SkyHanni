@@ -141,7 +141,7 @@ public class Misc {
     @ConfigOption(name = "Reputation Locations", desc = "Show locations to the points where to do stuff in the Crimson Isle to get reputation.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
-    public boolean crimsonIsleReputationLocation = true;
+    public boolean crimsonIsleReputationLocation = false;
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")

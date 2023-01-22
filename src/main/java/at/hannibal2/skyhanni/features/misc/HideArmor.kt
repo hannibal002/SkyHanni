@@ -80,7 +80,8 @@ class HideArmor {
                 if (slot !in 5..8) continue
 
                 val armorSlot = (slot - 5) * -1 + 3
-                val armor = getCachedArmor(Minecraft.getMinecraft().thePlayer.entityId)
+                val entityId = Minecraft.getMinecraft()?.thePlayer?.entityId ?: return
+                val armor = getCachedArmor(entityId)
                 armor[armorSlot] = itemStack
 
                 val currentScreen = Minecraft.getMinecraft().currentScreen

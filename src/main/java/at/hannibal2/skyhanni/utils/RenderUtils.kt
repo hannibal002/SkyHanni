@@ -631,7 +631,8 @@ object RenderUtils {
         text: String,
         scaleMultiplier: Double,
         yOff: Float = 0f,
-        hideTooCloseAt: Double = 4.5
+        hideTooCloseAt: Double = 4.5,
+        smallestDistanceVew: Double = 5.0
     ) {
         val thePlayer = Minecraft.getMinecraft().thePlayer
         val x = location.x
@@ -648,7 +649,7 @@ object RenderUtils {
             (x - renderOffsetX) * (x - renderOffsetX) + (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight)) + (z - renderOffsetZ) * (z - renderOffsetZ)
         var distToPlayer = sqrt(distToPlayerSq)
         //TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(8.0)
+        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
 
