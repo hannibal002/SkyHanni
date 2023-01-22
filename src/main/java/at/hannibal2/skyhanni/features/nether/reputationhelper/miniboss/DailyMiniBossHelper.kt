@@ -73,7 +73,6 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     }
 
     private fun finished(miniBoss: CrimsonMiniBoss) {
-        LorenzUtils.debug("Detected mini boss death: ${miniBoss.displayName}")
         reputationHelper.questHelper.finishMiniBoss(miniBoss)
         miniBoss.doneToday = true
         reputationHelper.update()
