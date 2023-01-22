@@ -63,7 +63,7 @@ class EndermanSlayerBeacon {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
 
