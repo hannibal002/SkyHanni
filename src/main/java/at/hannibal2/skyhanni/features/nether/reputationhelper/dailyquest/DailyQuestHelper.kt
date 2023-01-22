@@ -302,7 +302,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         latestTrophyFishInInventory = 0
     }
 
-    fun loadConfig() {
+    fun load() {
+        reset()
+
         loader.loadConfig()
         latestTrophyFishInInventory = SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory
     }

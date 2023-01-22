@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import com.google.gson.JsonObject
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -27,7 +27,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     private val display = mutableListOf<List<Any>>()
     private var dirty = true
-    private var loaded = false
 
     init {
         skyHanniMod.loadModule(questHelper)
@@ -37,18 +36,12 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        questHelper.quests.removeIf { it is UnknownQuest}
         repoData = event.getConstant("CrimsonIsleReputation")!!
-        if (!loaded) {
-            loaded = true
 
-            miniBossHelper.init()
-            kuudraBossHelper.init()
+        miniBossHelper.load()
+        kuudraBossHelper.load()
 
-            questHelper.loadConfig()
-            miniBossHelper.loadConfig()
-            kuudraBossHelper.loadConfig()
-        }
+        questHelper.load()
     }
 
     @SubscribeEvent
@@ -98,5 +91,15 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         miniBossHelper.reset()
         kuudraBossHelper.reset()
         update()
+    }
+
+    fun readLocationData(data: JsonObject): LorenzVec? {
+        val locationData = data["location"]?.asJsonArray ?: return null
+        if (locationData.size() == 0) return null
+
+        val x = locationData[0].asDouble - 1
+        val y = locationData[1].asDouble
+        val z = locationData[2].asDouble - 1
+        return LorenzVec(x, y, z)
     }
 }

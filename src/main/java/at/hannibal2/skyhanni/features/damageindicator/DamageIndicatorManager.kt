@@ -166,7 +166,7 @@ class DamageIndicatorManager {
                 )
                 if (data.dead) data.deathLocation = loc
                 loc
-            }
+            }.add(-0.5, 0.0, -0.5)
 
 
             event.drawDynamicText(location, healthText, sizeHealth, smallestDistanceVew = smallestDistanceVew)
