@@ -1,6 +1,11 @@
 # SkyHanni - Change Log
 
-## Version 0.15
+## Version 0.16.UNRELEASED (UNRELEASED)
+
+## Features
++ Adding green line around items that are clickable. (Inside the **Not Clickable Items Feature**)
+
+## Version 0.15 (2023-01-22)
 
 ### Features
 + Added Bazaar Update Timer - Forrick.

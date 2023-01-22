@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
+import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.data.VanillaItemManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -24,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HideNotClickableItems {
 
     private var hideReason = ""
+    private var reverseColor = false
 
     private var lastClickTime = 0L
     private var bypassUntil = 0L
@@ -80,11 +82,12 @@ class HideNotClickableItems {
             if (slot.stack == null) continue
 
             if (hide(chestName, slot.stack)) {
-//                val color = LorenzColor.DARK_GRAY.addOpacity(160)
-//                val color = LorenzColor.DARK_GRAY.addOpacity(LorenzTest.a.toInt())
                 val opacity = SkyHanniMod.feature.inventory.hideNotClickableOpacity
                 val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
                 slot.stack.background = color.rgb
+            } else if (reverseColor && SkyHanniMod.feature.inventory.hideNotClickableItemsGreenLine) {
+                val color = LorenzColor.GREEN.addOpacity(200)
+                slot.stack.borderLine = color.rgb
             }
         }
     }
@@ -147,6 +150,8 @@ class HideNotClickableItems {
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
         hideReason = ""
+        reverseColor = false
+
         return when {
             hideNpcSell(chestName, stack) -> true
             hideInStorage(chestName, stack) -> true
@@ -160,7 +165,9 @@ class HideNotClickableItems {
             hidePrivateIslandChest(chestName, stack) -> true
             hideAttributeFusion(chestName, stack) -> true
             hideYourEquipment(chestName, stack) -> true
-            else -> false
+            else -> {
+                false
+            }
         }
     }
 
@@ -181,6 +188,7 @@ class HideNotClickableItems {
         )
         for (type in list) {
             if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {//todo use item api
+                reverseColor = true
                 return false
             }
         }
@@ -197,6 +205,8 @@ class HideNotClickableItems {
     private fun hideAttributeFusion(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("Attribute Fusion")) return false
 
+        reverseColor = true
+
         if (ItemUtils.hasAttributes(stack)) return false
 
         hideReason = "This item has no attributes!"
@@ -205,6 +215,7 @@ class HideNotClickableItems {
 
     private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {
         if (chestName != "Chest" && chestName != "Large Chest") return false
+
         //TODO make check if player is on private island
 
         if (!ItemUtils.isSoulBound(stack)) return false
@@ -221,6 +232,7 @@ class HideNotClickableItems {
             return true
         }
 
+        reverseColor = true
         if (stack.cleanName().endsWith(" Potion")) return false
 
         hideReason = "This item is not a potion!"
@@ -235,6 +247,7 @@ class HideNotClickableItems {
             return true
         }
 
+        reverseColor = true
         if (stack.getLore().any { it.removeColor() == "Fishing Bait" }) {
             return false
         }
@@ -244,20 +257,23 @@ class HideNotClickableItems {
 
     private fun hideSackOfSacks(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("Sack of Sacks")) return false
+        if (isSkyBlockMenuItem(stack)) return false
 
         val name = stack.cleanName()
+        reverseColor = true
         if (ItemUtils.isSack(name)) return false
-        if (isSkyBlockMenuItem(stack)) return false
+
 
         hideReason = "This item is not a sack!"
         return true
     }
 
     private fun hideAccessoryBag(chestName: String, stack: ItemStack): Boolean {
-        if (!chestName.startsWith("Accessory Bag")) return false
-
-        if (stack.getLore().any { it.contains("ACCESSORY") }) return false
+        if (!chestName.startsWith("Accessory Bag") && !chestName.startsWith("Accessory Bag (")) return false
         if (isSkyBlockMenuItem(stack)) return false
+
+        reverseColor = true
+        if (stack.getLore().any { it.contains("ACCESSORY") }) return false
 
         hideReason = "This item is not an accessory!"
         return true
@@ -291,6 +307,7 @@ class HideNotClickableItems {
 
     private fun hideNpcSell(chestName: String, stack: ItemStack): Boolean {
         if (!tradeNpcFilter.match(chestName)) return false
+        reverseColor = true
 
         var name = stack.cleanName()
         val size = stack.stackSize
@@ -346,6 +363,7 @@ class HideNotClickableItems {
 
     private fun hideSalvage(chestName: String, stack: ItemStack): Boolean {
         if (chestName != "Salvage Item") return false
+        reverseColor = true
 
         if (ItemUtils.isRecombobulated(stack)) {
             hideReason = "This item should not be salvaged! (Recombobulated)"
@@ -380,8 +398,7 @@ class HideNotClickableItems {
         val auctionHouseInventory =
             chestName == "Co-op Auction House" || chestName == "Auction House" || chestName == "Create BIN Auction" || chestName == "Create Auction"
         if (!bazaarInventory && !auctionHouseInventory) return false
-
-
+        reverseColor = true
 
         if (isSkyBlockMenuItem(stack)) {
             if (bazaarInventory) hideReason = "The SkyBlock Menu is not a Bazaar Product!"

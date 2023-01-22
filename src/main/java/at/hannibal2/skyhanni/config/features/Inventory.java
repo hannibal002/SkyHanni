@@ -32,6 +32,12 @@ public class Inventory {
     @ConfigAccordionId(id = 0)
     public int hideNotClickableOpacity = 180;
 
+    @Expose
+    @ConfigOption(name = "Green line", desc = "Adds green line around items that are clickable.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean hideNotClickableItemsGreenLine = true;
+
     @ConfigOption(name = "RNG Meter", desc = "")
     @ConfigEditorAccordion(id = 1)
     public boolean rngMeter = false;
