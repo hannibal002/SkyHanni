@@ -12,7 +12,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class SharkFishCounter {
-
     private var counter = 0
     private var display = "$counter sharks caught"
     private var tick = 0
