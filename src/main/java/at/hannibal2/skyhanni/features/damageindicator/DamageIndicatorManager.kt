@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -107,7 +108,30 @@ class DamageIndicatorManager {
             data.remove(uuid)
         }
 
-        var playerLocation = LocationUtils.playerLocation()
+        val sizeHealth: Double
+        val sizeNameAbove: Double
+        val sizeBossName: Double
+        val sizeFinalResults: Double
+        val smallestDistanceVew: Double
+        val thirdPersonView = Minecraft.getMinecraft().gameSettings.thirdPersonView
+        // 0 == normal
+        // 1 == f3 behind
+        // 2 == selfie
+        if (thirdPersonView == 1) {
+            sizeHealth = 2.8
+            sizeNameAbove = 2.2
+            sizeBossName = 2.4
+            sizeFinalResults = 1.8
+
+            smallestDistanceVew = 10.0
+        } else {
+            sizeHealth = 1.9
+            sizeNameAbove = 1.8
+            sizeBossName = 2.1
+            sizeFinalResults = 1.4
+
+            smallestDistanceVew = 6.0
+        }
 
         for (data in data.values) {
 
@@ -132,7 +156,6 @@ class DamageIndicatorManager {
             }
 
             val partialTicks = event.partialTicks
-            var tooClose = false
             val location = if (data.dead && data.deathLocation != null) {
                 data.deathLocation!!
             } else {
@@ -142,25 +165,15 @@ class DamageIndicatorManager {
                     RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
                 )
                 if (data.dead) data.deathLocation = loc
-                val distance = loc.distance(playerLocation)
-                Minecraft.getMinecraft().renderManager
-                tooClose = distance < 5 && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
-                if (tooClose) {
-                    loc.add(0.0, -1.0, 0.0)
-                } else {
-                    loc
-                }
+                loc
             }
 
-            RenderUtils.drawLabel(location, healthText, partialTicks, true, 6f)
+
+            event.drawDynamicText(location, healthText, sizeHealth, smallestDistanceVew = smallestDistanceVew)
 
             if (data.nameAbove.isNotEmpty()) {
-                RenderUtils.drawLabel(
-                    location, data.nameAbove, partialTicks, true, 3.9f, if (tooClose) -9.0f else -18.0f
-                )
+                event.drawDynamicText(location, data.nameAbove, sizeNameAbove, -18f, smallestDistanceVew = smallestDistanceVew)
             }
-
-            if (tooClose) continue
 
             var bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
                 0 -> ""
@@ -175,11 +188,7 @@ class DamageIndicatorManager {
             if (data.nameSuffix.isNotEmpty()) {
                 bossName += data.nameSuffix
             }
-            //TODO fix scaling problem
-
-//            val debug = Minecraft.getMinecraft().thePlayer.isSneaking
-//            RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f, debug = debug)
-            RenderUtils.drawLabel(location, bossName, partialTicks, true, 3.9f, -9.0f)
+            event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
             if (SkyHanniMod.feature.damageIndicator.showDamageOverTime) {
                 var diff = 13f
@@ -195,7 +204,7 @@ class DamageIndicatorManager {
                     } else {
                         "$formatDamage §7/ $formatHealing"
                     }
-                    RenderUtils.drawLabel(location, finalResult, partialTicks, true, 3.9f, diff)
+                    event.drawDynamicText(location, finalResult, sizeFinalResults, diff, smallestDistanceVew = smallestDistanceVew)
                     diff += 9f
                 }
                 for (damage in data.damageCounter.oldDamages) {
@@ -208,7 +217,7 @@ class DamageIndicatorManager {
                     } else {
                         "$formatDamage §7/ $formatHealing"
                     }
-                    RenderUtils.drawLabel(location, finalResult, partialTicks, true, 3.9f, diff)
+                    event.drawDynamicText(location, finalResult, sizeFinalResults, diff, smallestDistanceVew = smallestDistanceVew)
                     diff += 9f
                 }
             }
