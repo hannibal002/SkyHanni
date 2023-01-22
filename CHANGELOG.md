@@ -6,6 +6,9 @@
 + Adding green line around items that are clickable. (Inside the **Not Clickable Items Feature**)
 + Added **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 
+## Changes
++ Hide reputation boss waypoint when damage indicator is present.
+
 ## Version 0.15 (2023-01-22)
 
 ### Features
