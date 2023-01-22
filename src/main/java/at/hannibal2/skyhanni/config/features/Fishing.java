@@ -31,6 +31,12 @@ public class Fishing {
     @ConfigAccordionId(id = 0)
     public boolean trophyFishSilverHider = false;
 
+    @Expose
+    @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean odgerLocation = true;
+
     @ConfigOption(name = "Thunder Spark", desc = "")
     @ConfigEditorAccordion(id = 1)
     public boolean thunderSpark = false;
