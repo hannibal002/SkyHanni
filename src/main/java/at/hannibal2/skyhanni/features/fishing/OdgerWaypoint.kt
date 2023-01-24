@@ -36,7 +36,7 @@ class OdgerWaypoint {
             trophyFishInInv = Minecraft.getMinecraft().thePlayer.inventoryContainer.inventorySlots
                 .mapNotNull { it?.stack }
                 .map { it.getLore() }
-                .any { it.last().endsWith("TROPHY FISH") }
+                .any { it.isNotEmpty() && it.last().endsWith("TROPHY FISH") }
         }
     }
 
