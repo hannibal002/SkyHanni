@@ -158,7 +158,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private inline fun <reified T : Quest> getQuest() = quests.filterIsInstance<T>().firstOrNull()
+    inline fun <reified T : Quest> getQuest() = quests.filterIsInstance<T>().firstOrNull()
 
     private fun checkInventoryForFetchItem() {
         val fetchQuest = getQuest<FetchQuest>() ?: return
@@ -214,11 +214,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
 
         for (quest in quests) {
-            if (quest.state == QuestState.ACCEPTED) {
-                val location = quest.location ?: continue
-                event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
-                event.drawDynamicText(location, quest.displayName, 1.5)
-            }
+            if (quest is MiniBossQuest) continue
+            if (quest.state != QuestState.ACCEPTED) continue
+            val location = quest.location ?: continue
+
+            event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+            event.drawDynamicText(location, quest.displayName, 1.5)
         }
     }
 
