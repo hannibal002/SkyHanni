@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMini
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.TabListUtils
 import com.google.gson.JsonObject
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -24,9 +25,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
     var repoData: JsonObject = JsonObject()
+    var factionType = FactionType.NONE
 
     private val display = mutableListOf<List<Any>>()
     private var dirty = true
+    private var tick = 0
 
     init {
         skyHanniMod.loadModule(questHelper)
@@ -53,16 +56,35 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             dirty = false
             updateRender()
         }
+
+        tick++
+        if (tick % 60 == 0) {
+            TabListUtils.getTabList()
+                .filter { it.contains("Reputation:") }
+                .forEach {
+                    factionType = if (it.contains("Mage")) {
+                        FactionType.MAGE
+                    } else if (it.contains("Barbarian")) {
+                        FactionType.BARBARIAN
+                    } else {
+                        FactionType.NONE
+                    }
+                }
+        }
     }
 
     private fun updateRender() {
         display.clear()
 
+        //TODO test
+        if (factionType == FactionType.NONE) return
+
         display.add(Collections.singletonList("Reputation Helper:"))
         questHelper.render(display)
         miniBossHelper.render(display)
-        //TODO check if mage
-        kuudraBossHelper.render(display)
+        if (factionType == FactionType.MAGE) {
+            kuudraBossHelper.render(display)
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -29,9 +31,11 @@ import java.util.*
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
+    private val townBoardMage = LorenzVec(-138, 92, -754)
+    private val townBoardBarbarian = LorenzVec(-572, 100, -687)
+
     private var tick = 0
     private val loader = QuestLoader(this)
-
     val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
     private var latestTrophyFishInInventory = 0
@@ -220,6 +224,21 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
             event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
             event.drawDynamicText(location, quest.displayName, 1.5)
+        }
+
+        renderTownBoard(event)
+    }
+
+    private fun renderTownBoard(event: RenderWorldLastEvent) {
+        if (quests.any { it.state == QuestState.READY_TO_COLLECT || it.state == QuestState.NOT_ACCEPTED }) {
+            val location = when (reputationHelper.factionType) {
+                FactionType.BARBARIAN -> townBoardBarbarian
+                FactionType.MAGE -> townBoardMage
+
+                FactionType.NONE -> return
+            }
+            event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+            event.drawDynamicText(location, "Town Board", 1.5)
         }
     }
 
