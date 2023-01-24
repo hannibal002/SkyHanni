@@ -53,10 +53,6 @@ class PlayerDeathMessages {
                     event.blockedReason = "far_away_player_death"
                 }
             }
-        } else {
-            if (message.contains("☠") && !message.startsWith("§c ☠ §r§7You ")) {
-                println("wrong death message: '$message'")
-            }
         }
     }
 
