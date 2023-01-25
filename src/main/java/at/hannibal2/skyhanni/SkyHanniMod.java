@@ -27,6 +27,8 @@ import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
+import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
+import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
 import at.hannibal2.skyhanni.features.nether.MilleniaAgedBlazeColor;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper;
@@ -174,6 +176,8 @@ public class SkyHanniMod {
         loadModule(new CrimsonIsleReputationHelper(this));
         loadModule(new SharkFishCounter());
         loadModule(new OdgerWaypoint());
+        loadModule(new TiaRelayHelper());
+        loadModule(new TiaRelayWaypoints());
 
         Commands.INSTANCE.init();
 

@@ -144,6 +144,35 @@ public class Misc {
     public boolean crimsonIsleReputationLocation = false;
 
     @Expose
+    @ConfigOption(name = "Tia Relay", desc = "")
+    @ConfigEditorAccordion(id = 7)
+    public boolean tiaRelay = false;
+
+    @Expose
+    @ConfigOption(name = "Tia Relay Waypoint", desc = "Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network needs to be done.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean tiaRelayNextWaypoint = true;
+
+    @Expose
+    @ConfigOption(name = "Tia Relay All", desc = "Show all relay waypoints at once.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean tiaRelayAllWaypoints = false;
+
+    @Expose
+    @ConfigOption(name = "Tia Relay Helper", desc = "Helps with solving the sound puzzle.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean tiaRelayHelper = true;
+
+    @Expose
+    @ConfigOption(name = "Tia Relay Mute", desc = "Mutes the sound when close to the Relay.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean tiaRelayMute = true;
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
     @ConfigEditorBoolean
     public boolean hideExpBottles = false;
