@@ -6,6 +6,8 @@ enum class IslandType(val displayName: String) {
     THE_END("The End"),
     KUUDRA_ARENA("Instanced"),
     CRIMSON_ISLE("Crimson Isle"),
+    DWARVEN_MINES("Dwarven Mines"),
+    DUNGEON_HUB("Dungeon Hub"),
 
     HUB("Hub"),
     THE_FARMING_ISLANDS("The Farming Islands"),
