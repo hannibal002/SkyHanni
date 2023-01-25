@@ -167,4 +167,9 @@ public class Misc {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
+
+    @Expose
+    @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers at the right side of the screen.")
+    @ConfigEditorBoolean
+    public boolean hideScoreboardNumbers = false;
 }
