@@ -167,3 +167,4 @@
 - Wishing compass uses amount display.
 - Brewing Stand Overlay.
 - Crimson Isle Reputation Helper.
+- Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
