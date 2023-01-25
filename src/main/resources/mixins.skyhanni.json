@@ -17,6 +17,7 @@
     "tileentity.TileEntitySignMixin"
   ],
   "client": [
+    "MixinGuiIngame",
     "gui.MixinGuiNewChat"
   ]
 }
