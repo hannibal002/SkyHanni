@@ -161,15 +161,16 @@ class DamageIndicatorManager {
                 }
             }
 
-            val partialTicks = event.partialTicks
+//            val partialTicks = event.partialTicks
             val location = if (data.dead && data.deathLocation != null) {
                 data.deathLocation!!
             } else {
-                val loc = LorenzVec(
-                    RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
-                    RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
-                    RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
-                )
+                val loc = entity.getLorenzVec()
+//                val loc = LorenzVec(
+//                    RenderUtils.interpolate(entity.posX, entity.lastTickPosX, partialTicks),
+//                    RenderUtils.interpolate(entity.posY, entity.lastTickPosY, partialTicks) + 0.5f,
+//                    RenderUtils.interpolate(entity.posZ, entity.lastTickPosZ, partialTicks)
+//                )
                 if (data.dead) data.deathLocation = loc
                 loc
             }.add(-0.5, 0.0, -0.5)
@@ -178,7 +179,13 @@ class DamageIndicatorManager {
             event.drawDynamicText(location, healthText, sizeHealth, smallestDistanceVew = smallestDistanceVew)
 
             if (data.nameAbove.isNotEmpty()) {
-                event.drawDynamicText(location, data.nameAbove, sizeNameAbove, -18f, smallestDistanceVew = smallestDistanceVew)
+                event.drawDynamicText(
+                    location,
+                    data.nameAbove,
+                    sizeNameAbove,
+                    -18f,
+                    smallestDistanceVew = smallestDistanceVew
+                )
             }
 
             var bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
@@ -210,7 +217,13 @@ class DamageIndicatorManager {
                     } else {
                         "$formatDamage §7/ $formatHealing"
                     }
-                    event.drawDynamicText(location, finalResult, sizeFinalResults, diff, smallestDistanceVew = smallestDistanceVew)
+                    event.drawDynamicText(
+                        location,
+                        finalResult,
+                        sizeFinalResults,
+                        diff,
+                        smallestDistanceVew = smallestDistanceVew
+                    )
                     diff += 9f
                 }
                 for (damage in data.damageCounter.oldDamages) {
@@ -223,7 +236,13 @@ class DamageIndicatorManager {
                     } else {
                         "$formatDamage §7/ $formatHealing"
                     }
-                    event.drawDynamicText(location, finalResult, sizeFinalResults, diff, smallestDistanceVew = smallestDistanceVew)
+                    event.drawDynamicText(
+                        location,
+                        finalResult,
+                        sizeFinalResults,
+                        diff,
+                        smallestDistanceVew = smallestDistanceVew
+                    )
                     diff += 9f
                 }
             }
