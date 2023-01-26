@@ -126,21 +126,6 @@ object LorenzUtils {
         SkyHanniMod.consoleLog(text)
     }
 
-    // Taken and modified from https://stackoverflow.com/a/11306854/5507634
-    fun getCallerClass(vararg skip: String): String? {
-        val stElements = Thread.currentThread().stackTrace
-        for (i in 1 until stElements.size) {
-            val ste = stElements[i]
-            val className = ste.className
-            if (className != LorenzUtils::class.java.name && className.indexOf("java.lang.Thread") != 0) {
-                if (className !in skip) {
-                    return className
-                }
-            }
-        }
-        return null
-    }
-
     fun getPointsForDojoRank(rank: String): Int {
         return when (rank) {
             "S" -> 1000
