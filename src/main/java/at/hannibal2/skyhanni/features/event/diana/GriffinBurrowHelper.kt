@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
-import at.hannibal2.skyhanni.test.GriffinUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.client.Minecraft
@@ -198,7 +198,7 @@ class GriffinBurrowHelper {
 
         var vector = target.subtract(animation)
 
-        event.draw3DLine(animation.add(0.5, 0.5, 0.5), target.add(0.5, 0.5, 0.5), LorenzColor.WHITE, 2, true)
+        event.draw3DLine(animation.add(0.5, 0.5, 0.5), target.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 2, true)
 
         vector = vector.multiply(1 / vector.length())
         vector = vector.multiply(0.18)

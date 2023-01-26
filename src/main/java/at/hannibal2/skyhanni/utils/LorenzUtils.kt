@@ -86,7 +86,6 @@ object LorenzUtils {
     //TODO move into StringUtils
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
-
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
     fun stripVanillaMessage(originalMessage: String): String {
@@ -156,5 +155,17 @@ object LorenzUtils {
             "F" -> 0
             else -> 0
         }
+    }
+
+    fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {
+        return sortedBy { (_, value) -> value }
+    }
+
+    fun <K, V : Comparable<V>> Map<K, V>.sorted(): Map<K, V> {
+        return toList().sorted().toMap()
+    }
+
+    fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
+        return toList().sorted().reversed().toMap()
     }
 }

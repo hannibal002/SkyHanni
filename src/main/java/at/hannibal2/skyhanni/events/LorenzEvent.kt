@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.GriffinJavaUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 
@@ -30,7 +30,7 @@ abstract class LorenzEvent : Event() {
                 lastPrint = System.currentTimeMillis()
                 println(" ")
                 println("Event Timings!")
-                for (entry in GriffinJavaUtils.sortByValue(map)) {
+                for (entry in map.sorted()) {
                     println(entry.key + ": " + entry.value + " ms")
                 }
                 println(" ")

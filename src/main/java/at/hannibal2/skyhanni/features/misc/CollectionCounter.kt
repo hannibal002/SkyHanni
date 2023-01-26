@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
-import at.hannibal2.skyhanni.test.GriffinJavaUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -95,11 +94,11 @@ class CollectionCounter {
         }
 
         private fun updateDisplay() {
-            val format = GriffinJavaUtils.formatInteger(itemAmount)
+            val format = LorenzUtils.formatInteger(itemAmount)
 
             var gainText = ""
             if (recentGain != 0) {
-                gainText = "§a+" + GriffinJavaUtils.formatInteger(recentGain)
+                gainText = "§a+" + LorenzUtils.formatInteger(recentGain)
             }
 
             display = "$itemName collection: §e$format $gainText"

@@ -64,7 +64,7 @@ class NonGodPotEffectDisplay {
             totalEffectsCount = 0
             checkFooter = true
         }
-        for (effect in GriffinJavaUtils.sortByValue(activeEffects)) {
+        for (effect in activeEffects.sorted()) {
             val label = effect.key
             val until = effect.value
             val seconds = (until - now) / 1000

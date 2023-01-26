@@ -461,7 +461,7 @@ object RenderUtils {
 
         var offsetY = 0
         for (s in list) {
-            renderString(s, offsetY, center = center)
+            renderString(s, offsetY = offsetY, center = center)
             offsetY += 10 + extraSpace
         }
     }
@@ -720,5 +720,44 @@ object RenderUtils {
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDepthMask(true)
         }
+    }
+
+    fun RenderWorldLastEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        GlStateManager.disableDepth()
+        GlStateManager.disableCull()
+
+        val render = Minecraft.getMinecraft().renderViewEntity
+        val worldRenderer = Tessellator.getInstance().worldRenderer
+        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
+        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
+        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(-realX, -realY, -realZ)
+        GlStateManager.disableTexture2D()
+        GlStateManager.enableBlend()
+        GlStateManager.disableAlpha()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GL11.glLineWidth(lineWidth.toFloat())
+        if (!depth) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST)
+            GlStateManager.depthMask(false)
+        }
+        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
+        worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
+        worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
+        Tessellator.getInstance().draw()
+        GlStateManager.translate(realX, realY, realZ)
+        if (!depth) {
+            GL11.glEnable(GL11.GL_DEPTH_TEST)
+            GlStateManager.depthMask(true)
+        }
+        GlStateManager.disableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.popMatrix()
+        GlStateManager.disableLighting()
+        GlStateManager.enableDepth()
     }
 }
