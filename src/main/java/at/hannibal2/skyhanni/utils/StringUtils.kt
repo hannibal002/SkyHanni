@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import org.intellij.lang.annotations.Language
 import java.text.DecimalFormat
 import java.util.*
 
 object StringUtils {
-
     private val durationFormat = DecimalFormat("00")
 
     fun String.firstLetterUppercase(): String {
@@ -92,6 +92,7 @@ object StringUtils {
         return toString().replace("-", "")
     }
 
-}
+    fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
-private fun String.removeAtBeginning(text: String): String = if (this.startsWith(text)) substring(text.length) else this
+    private fun String.removeAtBeginning(text: String): String = if (this.startsWith(text)) substring(text.length) else this
+}

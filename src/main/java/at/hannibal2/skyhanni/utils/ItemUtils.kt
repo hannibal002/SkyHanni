@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -14,7 +14,8 @@ object ItemUtils {
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
-    fun isSack(name: String): Boolean = name.endsWith(" Sack")//TODO use item id or api or something? or dont, its working fine now
+    fun isSack(name: String): Boolean =
+        name.endsWith(" Sack")//TODO use item id or api or something? or dont, its working fine now
 
     fun ItemStack.getLore(): List<String> {
         val tagCompound = this.tagCompound ?: return emptyList()

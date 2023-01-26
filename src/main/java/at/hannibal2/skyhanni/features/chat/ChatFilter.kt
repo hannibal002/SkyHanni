@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChatFilter {
@@ -288,7 +288,7 @@ class ChatFilter {
     }
 
     private fun isGuildExp(message: String) =
-        // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
+    // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
         // §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
         message.matchRegex("§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!")
 

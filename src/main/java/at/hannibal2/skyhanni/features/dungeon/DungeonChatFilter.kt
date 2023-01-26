@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonChatFilter {
@@ -81,6 +81,7 @@ class DungeonChatFilter {
         message.matchRegex(
             "§eYou were healed for §r§a(.*)§r§e health by §r(.*)§r§e's §r§9Healing Bow§r§e and " + "gained §r§c\\+(.*) Strength§r§e for 10 seconds."
         ) -> true
+
         message.matchRegex("(.*)§r§a granted you §r§c(.*) §r§astrength for §r§e20 §r§aseconds!") -> true
 
         message.matchRegex("§eYour fairy healed §r§ayourself §r§efor §r§a(.*) §r§ehealth!") -> true
@@ -188,9 +189,11 @@ class DungeonChatFilter {
         message.matchRegex(
             "§c(.*) §r§eYou picked up a Ability Damage Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +§r§c(.*)% §r§eAbility Damage for §r§b10 §r§eseconds."
         ) -> true
+
         message.matchRegex(
             "§c(.*) §r§eYou picked up a Damage Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +§r§c(.*)% §r§eDamage for §r§b10 §r§eseconds."
         ) -> true
+
         message.matchRegex("(.*) §r§ehas obtained §r§a§r§9Premium Flesh§r§e!") -> true
         message.matchRegex("§6§lRARE DROP! §r§9Beating Heart §r§b(.*)") -> true
         else -> false

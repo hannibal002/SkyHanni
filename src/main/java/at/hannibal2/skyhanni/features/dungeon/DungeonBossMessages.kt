@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonBossMessages {
@@ -26,6 +26,7 @@ class DungeonBossMessages {
                 when {
                     message.contains(" The Watcher§r§f: ") ->
                         message != "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass."
+
                     message.contains(" Bonzo§r§f: ") -> return true
                     message.contains(" Scarf§r§f:") -> return true
                     message.contains("Professor§r§f") -> return true
