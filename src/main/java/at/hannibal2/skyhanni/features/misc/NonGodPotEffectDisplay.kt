@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
-import at.hannibal2.skyhanni.test.GriffinJavaUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraft.network.play.server.S30PacketWindowItems
@@ -30,6 +30,16 @@ class NonGodPotEffectDisplay {
         "smoldering_polarization" to "§aSmoldering Polarization I",
         "mushed_glowy_tonic" to "§2Mushed Glowy Tonic I",
         "wisp_ice" to "§bWisp's Ice-Flavored Water I",
+
+        "invisibility" to "§8Invisibility I", // when wearing sorrow armor
+
+        // Bartender Mixins
+        "ZOMBIE_BRAIN" to "§9Zombie Brain Mixin",
+        "SPIDER_EGG" to "§9Spider Egg Mixin",
+        "WOLF_FUR" to "§9Wolf Fur Mixin",
+        "END_PORTAL_FUMES" to "§9End Portal Fumes",
+        //TODO fix typo
+        "GABAGOEY" to "§9Gabagoey Mixin",
     )
 
     private var patternEffectsCount = Pattern.compile("§7You have §e(\\d+) §7non-god effects\\.")
@@ -66,6 +76,10 @@ class NonGodPotEffectDisplay {
         }
         for (effect in activeEffects.sorted()) {
             val label = effect.key
+            if (label.contains("Invisibility")) continue
+            if (label.contains("Mixin")) continue
+            if (label.contains("Fumes")) continue
+
             val until = effect.value
             val seconds = (until - now) / 1000
             val format = StringUtils.formatDuration(seconds)
@@ -182,7 +196,7 @@ class NonGodPotEffectDisplay {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.misc.nonGodPotEffectPos.renderStrings(display)
+        SkyHanniMod.feature.misc.nonGodPotEffectPos.renderStrings(display, extraSpace = 3)
     }
 
     @SubscribeEvent
@@ -196,9 +210,11 @@ class NonGodPotEffectDisplay {
 
             val time = effect["ticks_remaining"].asLong / 20
             val newValue = System.currentTimeMillis() + time * 1000
-            val old = activeEffects.getOrDefault(label, 0)
-            val diff = newValue - old
+            if (label.contains("Invisibility")) {
+                activeEffects[label] = System.currentTimeMillis() + 1000 * 60 * 60 * 24
+            } else {
             activeEffects[label] = newValue
+        }
         }
     }
 
