@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.util.ChatComponentText
-import org.intellij.lang.annotations.Language
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
@@ -82,9 +81,6 @@ object LorenzUtils {
         thePlayer.addChatMessage(ChatComponentText(message))
         return true
     }
-
-    //TODO move into StringUtils
-    fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
