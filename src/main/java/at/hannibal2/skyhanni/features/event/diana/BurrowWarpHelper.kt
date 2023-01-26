@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils.isActive
 import net.minecraft.client.Minecraft
@@ -85,7 +86,7 @@ class BurrowWarpHelper {
 
         private fun getNearestWarpPoint(location: LorenzVec): WarpPoint {
             val map = WarpPoint.values().filter { it.enabled }.map { it to it.distance(location) }
-            return map.toList().sortedBy { (_, value) -> value }.first().first
+            return map.sorted().first().first
         }
 
         fun resetDisabledWarps() {

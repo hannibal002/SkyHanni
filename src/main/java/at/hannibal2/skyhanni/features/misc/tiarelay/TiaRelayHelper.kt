@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -91,7 +92,7 @@ class TiaRelayHelper {
         resultDisplay.clear()
 
         var i = 1
-        for (entry in pitchMap.toList().sortedBy { (_, value) -> value }.toMap()) {
+        for (entry in pitchMap.sorted()) {
             resultDisplay[entry.key] = i
             i++
         }

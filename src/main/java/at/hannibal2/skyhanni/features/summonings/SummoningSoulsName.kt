@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.GriffinJavaUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -57,20 +57,9 @@ class SummoningSoulsName {
                         map[mob] = distance
                     }
 
-                    val nearestMob = GriffinJavaUtils.sortByValueAsc(map).firstNotNullOfOrNull { it.key }
+                    val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
                     if (nearestMob != null) {
-//                        val mobDistance = nearestMob.getLorenzVec().add(0.0, -1.4375, 0.0)
-//                        val distance = mobDistance.distance(soulLocation)
-//                        val diff = mobDistance.add(soulLocation.multiply(-1))
-
-//                        println(" ")
-//                        println("mobDistance: $mobDistance")
-//                        println("soulLocation: $soulLocation")
-//                        println("diff: $diff")
-//                        LorenzUtils.chat("distance: $distance")
-                        val name = mobsName[nearestMob]!!
-//                        LorenzUtils.chat("maybe its $name")
-                        souls[entity] = name
+                        souls[entity] = mobsName[nearestMob]!!
                     }
 
                 }
