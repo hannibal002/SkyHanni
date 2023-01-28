@@ -35,7 +35,7 @@ object MobFactories {
         Mob(baseEntity = baseEntity, mobType = Mob.Type.Basic, name = name)
 
     fun summon(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, extraEntityList: List<EntityLivingBase>): Mob? =
-        MobFilter.summonnRegex.find(armorStand.cleanName())?.let {
+        MobFilter.summonRegex.find(armorStand.cleanName())?.let {
             Mob(baseEntity = baseEntity, mobType = Mob.Type.Summon, armorStand = armorStand, name = it.groupValues[2], additionalEntities = extraEntityList, ownerName = it.groupValues[1])
         }
 

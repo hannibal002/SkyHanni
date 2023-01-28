@@ -123,8 +123,11 @@ object EntityUtils {
     fun EntityPlayer.getSkinTexture(): String? {
         val gameProfile = gameProfile ?: return null
 
-        return gameProfile.properties.entries().filter { it.key == "textures" }.map { it.value }
-            .firstOrNull { it.name == "textures" }?.value
+        return gameProfile.properties.entries()
+            .filter { it.key == "textures" }
+            .map { it.value }
+            .firstOrNull { it.name == "textures" }
+            ?.value
     }
 
     inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =

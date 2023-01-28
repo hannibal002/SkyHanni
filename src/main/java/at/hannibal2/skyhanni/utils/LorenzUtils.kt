@@ -31,7 +31,6 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.Timer
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -327,7 +326,7 @@ object LorenzUtils {
         hover: List<String>,
         command: String? = null,
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
@@ -384,9 +383,11 @@ object LorenzUtils {
         whenChanged { _, new -> observer(new) }
     }
 
-    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
+    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
+        toMutableMap().also { function(it) }.toMap()
 
-    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
+    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
+        toMutableList().also { function(it) }.toList()
 
     fun colorCodeToRarity(colorCode: Char): String {
         return when (colorCode) {
@@ -472,20 +473,21 @@ object LorenzUtils {
 //        }
 //    }
 
-    fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) = object : ReadWriteProperty<Any?, T?> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-            val rootObj = root.get() ?: return null
-            return child.get(rootObj)
+    fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) =
+        object : ReadWriteProperty<Any?, T?> {
+            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
+                val rootObj = root.get() ?: return null
+                return child.get(rootObj)
+            }
+
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
+                if (value == null) return
+                val rootObj = root.get() ?: return
+                child.set(rootObj, value)
+            }
         }
 
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
-            if (value == null) return
-            val rootObj = root.get() ?: return
-            child.set(rootObj, value)
-        }
-    }
-
-    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after}, skip)
+    fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
     fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
         var missing = -1
@@ -508,7 +510,9 @@ object LorenzUtils {
         if (this !is AccessorGuiEditSign) return false
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
-        return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^" && tileSign.signText[2].unformattedText.removeColor() == "Set your" && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+        return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun IslandType.isInIsland() = inSkyBlock && (skyBlockIsland == this || this == IslandType.CATACOMBS && inDungeons)
@@ -616,10 +620,9 @@ object LorenzUtils {
         return enums.firstOrNull { it.name == name }
     }
 
-    inline fun <reified T : Enum<T>> enumValueOf(name: String) = enumValueOfOrNull<T>(name)
-        ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
-
-    operator fun MatchResult?.get(index: Int) = this?.groupValues?.get(index)
+    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
+        enumValueOfOrNull<T>(name)
+            ?: kotlin.error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
         with(iterator()) {
