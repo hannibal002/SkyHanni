@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickInHandEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -31,7 +32,7 @@ class FireVeilWandParticles {
     @SubscribeEvent
     fun onItemClick(event: ItemClickInHandEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.clickType != ItemClickInHandEvent.ClickType.RIGHT_CLICK) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
 
         val itemInHand = event.itemInHand ?: return
 

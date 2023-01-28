@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickInHandEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -206,7 +207,7 @@ class BlazeSlayerDaggerHelper {
     fun onItemClick(event: ItemClickInHandEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return
-        if (event.clickType != ItemClickInHandEvent.ClickType.RIGHT_CLICK) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
 
         val itemInHand = event.itemInHand ?: return
         val dagger = getDaggerFromStack(itemInHand)
