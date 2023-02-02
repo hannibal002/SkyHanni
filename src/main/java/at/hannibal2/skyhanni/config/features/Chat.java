@@ -103,6 +103,7 @@ public class Chat {
             "except for players who are close to the player, inside dungeon or during a Kuudra fight.")
     @ConfigEditorBoolean
     public boolean hideFarDeathMessages = false;
+    //TODO jawbus + x
 
     @Expose
     @ConfigOption(name = "Compact Potion Message", desc = "Shorten chat messages about player potion effects.")
