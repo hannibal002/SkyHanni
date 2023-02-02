@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -62,9 +63,9 @@ class CollectionCounter {
             val apiName = data.apiName
             if (!apiCollectionData.contains(apiName)) {
                 if (apiCollectionData.isEmpty()) {
-                    LorenzUtils.chat("§c[SkyHanni] Collection data not loaded! (API down?)")
+                    LorenzUtils.chat("§c[SkyHanni] No Collection Data! API down?")
                 } else {
-                    LorenzUtils.chat("§c[SkyHanni] Item $name is not in collection data!")
+                    LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data!")
                 }
                 return
             }
@@ -104,18 +105,8 @@ class CollectionCounter {
             display = "$itemName collection: §e$format $gainText"
         }
 
-        private fun countCurrentlyInInventory(): Int {
-            var currentlyInInventory = 0
-            val player = Minecraft.getMinecraft().thePlayer
-            for (stack in player.inventory.mainInventory) {
-                if (stack == null) continue
-                val internalName = stack.getInternalName()
-                if (internalName == itemApiName) {
-                    currentlyInInventory += stack.stackSize
-                }
-            }
-            return currentlyInInventory
-        }
+        private fun countCurrentlyInInventory() =
+            InventoryUtils.countItemsInLowerInventory { it.getInternalName() == itemApiName }
     }
 
     @SubscribeEvent
@@ -168,7 +159,9 @@ class CollectionCounter {
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
-        val collection = profileData["collection"].asJsonObject
+
+        //new profiles don't have any collections
+        val collection = profileData["collection"]?.asJsonObject ?: return
 
         apiCollectionData.clear()
         for (entry in collection.entrySet()) {

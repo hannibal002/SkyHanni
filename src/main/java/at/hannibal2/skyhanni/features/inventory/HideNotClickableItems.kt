@@ -193,7 +193,7 @@ class HideNotClickableItems {
             }
         }
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the potion bag!"
             return true
         }
@@ -227,7 +227,7 @@ class HideNotClickableItems {
     private fun hidePotionBag(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("Potion Bag")) return false
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the potion bag!"
             return true
         }
@@ -242,7 +242,7 @@ class HideNotClickableItems {
     private fun hideFishingBag(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("Fishing Bag")) return false
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the fishing bag!"
             return true
         }
@@ -257,7 +257,7 @@ class HideNotClickableItems {
 
     private fun hideSackOfSacks(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("Sack of Sacks")) return false
-        if (isSkyBlockMenuItem(stack)) return false
+        if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
         val name = stack.cleanName()
         reverseColor = true
@@ -270,7 +270,7 @@ class HideNotClickableItems {
 
     private fun hideAccessoryBag(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("Accessory Bag") && !chestName.startsWith("Accessory Bag (")) return false
-        if (isSkyBlockMenuItem(stack)) return false
+        if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
         reverseColor = true
         if (stack.getLore().any { it.contains("ACCESSORY") }) return false
@@ -287,7 +287,7 @@ class HideNotClickableItems {
             return true
         }
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be traded!"
             return true
         }
@@ -316,7 +316,7 @@ class HideNotClickableItems {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be sold at the NPC!"
             return true
         }
@@ -343,7 +343,7 @@ class HideNotClickableItems {
     private fun hideInStorage(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.contains("Ender Chest") && !chestName.contains("Backpack") && chestName != "Storage") return false
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the storage!"
             return true
         }
@@ -376,7 +376,7 @@ class HideNotClickableItems {
             }
         }
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be salvaged!"
             return true
         }
@@ -400,7 +400,7 @@ class HideNotClickableItems {
         if (!bazaarInventory && !auctionHouseInventory) return false
         reverseColor = true
 
-        if (isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) {
             if (bazaarInventory) hideReason = "The SkyBlock Menu is not a Bazaar Product!"
             if (auctionHouseInventory) hideReason = "The SkyBlock Menu cannot be auctioned!"
             return true
@@ -435,6 +435,4 @@ class HideNotClickableItems {
         if (result) hideReason = "This item cannot be auctioned!"
         return result
     }
-
-    private fun isSkyBlockMenuItem(stack: ItemStack): Boolean = stack.getInternalName() == "SKYBLOCK_MENU"
 }
