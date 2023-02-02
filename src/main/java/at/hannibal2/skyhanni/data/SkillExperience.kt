@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -16,6 +17,7 @@ import java.util.regex.Pattern
 class SkillExperience {
 
     private val actionBarPattern = Pattern.compile("(?:.*)§3\\+(?:.*) (.*) \\((.*)\\/(.*)\\)(?:.*)")
+    private val inventoryPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
@@ -27,6 +29,11 @@ class SkillExperience {
                 skillExp[label] = exp
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        skillExp.clear()
     }
 
     @SubscribeEvent
@@ -76,8 +83,7 @@ class SkillExperience {
                     val skillName = split[0].lowercase()
                     val level = split[1].romanToDecimal()
                     val baseExp = getExpForLevel(level)
-                    val pattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
-                    val matcher = pattern.matcher(line)
+                    val matcher = inventoryPattern.matcher(line)
                     if (matcher.matches()) {
                         val rawNumber = matcher.group(1)
                         val overflow = rawNumber.formatNumber()

@@ -52,7 +52,7 @@ class ApiDataLoader {
     }
 
     @SubscribeEvent
-    fun onStatusBar(event: ProfileJoinEvent) {
+    fun onProfileJoin(event: ProfileJoinEvent) {
         currentProfileName = event.name
         updateApiData()
     }

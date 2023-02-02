@@ -2,6 +2,9 @@
 
 ## Version 0.16.UNRELEASED (UNRELEASED)
 
+## Features
++ Added highlight for stuff that is missing in the skyblock level guide inventory.
+
 ## Version 0.15.1 (2023-01-25)
 
 ## Features

@@ -128,4 +128,10 @@ public class Inventory {
             desc = "Highlights used Bonzo's Masks with a background")
     @ConfigEditorBoolean
     public boolean highlightDepletedBonzosMasks = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Missing SkyBlock Level Guide",
+            desc = "Highlight stuff that is missing in the skyblock level guide inventory.")
+    @ConfigEditorBoolean
+    public boolean highlightMissingSkyBlockLevelGuide = true;
 }
