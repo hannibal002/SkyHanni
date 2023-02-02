@@ -78,18 +78,19 @@ object EntityUtils {
 
     fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false): Boolean {
-        if (this.baseMaxHealth == health.toDouble()) return true
+    //TODO remove baseMaxHealth
+    fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
+        if (maxHealth == health) return true
 
         //Derpy
-        if (this.baseMaxHealth == health.toDouble() * 2) return true
+        if (maxHealth == health * 2) return true
 
         if (!boss) {
             //Corrupted
-            if (this.baseMaxHealth == health.toDouble() * 3) return true
+            if (maxHealth == health * 3) return true
 
             //Derpy + Corrupted
-            if (this.baseMaxHealth == health.toDouble() * 2 * 3) return true
+            if (maxHealth == health * 2 * 3) return true
         }
 
         return false

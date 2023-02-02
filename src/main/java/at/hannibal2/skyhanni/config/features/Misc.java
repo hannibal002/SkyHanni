@@ -46,16 +46,10 @@ public class Misc {
     public boolean highlightColor = false;
 
     @Expose
-    @ConfigOption(name = "Voidling Extremist Color", desc = "Highlight the voidling extremist in pink color")
+    @ConfigOption(name = "Area Mini Bosses", desc = "Highlight voidling extremists, millenia aged blazes.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean voidlingExtremistColor = false;
-
-    @Expose
-    @ConfigOption(name = "Millenia Aged Blaze Color", desc = "Highlight the millenia aged blaze in red color")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    public boolean milleniaAgedBlazeColor = false;
+    public boolean highlightAreaMinisBoss= false;
 
     @Expose
     @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")

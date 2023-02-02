@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
-import at.hannibal2.skyhanni.features.end.VoidlingExtremistColor;
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
@@ -29,16 +28,16 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
-import at.hannibal2.skyhanni.features.nether.MilleniaAgedBlazeColor;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper;
 import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HideMobNames;
-import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniboss;
+import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniBoss;
 import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning;
 import at.hannibal2.skyhanni.features.slayer.blaze.*;
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager;
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName;
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
 import kotlin.coroutines.EmptyCoroutineContext;
@@ -98,6 +97,7 @@ public class SkyHanniMod {
         loadModule(new MinecraftData());
         loadModule(new SendTitleHelper());
         loadModule(new ItemTipHelper());
+        loadModule(new RenderLivingEntityHelper());
 
         //features
         loadModule(new BazaarOrderHelper());
@@ -135,11 +135,10 @@ public class SkyHanniMod {
         loadModule(new RngMeterInventory());
         loadModule(new WikiCommand());
         loadModule(new SummoningMobManager());
-        loadModule(new VoidlingExtremistColor());
-        loadModule(new MilleniaAgedBlazeColor());
+        loadModule(new HighlightAreaMiniBoss());
         loadModule(new CorruptedMobHighlight());
         loadModule(new MarkedPlayerManager());
-        loadModule(new HighlightSlayerMiniboss());
+        loadModule(new HighlightSlayerMiniBoss());
         loadModule(new PlayerDeathMessages());
         loadModule(new HighlightDungeonDeathmite());
         loadModule(new DungeonHideItems());

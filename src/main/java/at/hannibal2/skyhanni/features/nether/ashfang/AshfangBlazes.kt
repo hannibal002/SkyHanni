@@ -64,7 +64,7 @@ class AshfangBlazes {
         val entityId = event.entity.entityId
         if (entityId !in blazeArmorStand.keys.map { it.entityId }) return
 
-        if (event.health % 10_000_000 != 0F) {
+        if (event.health % 10_000_000 != 0) {
             blazeArmorStand.keys.removeIf { it.entityId == entityId }
         }
     }

@@ -24,7 +24,7 @@ class CorruptedMobHighlight {
         val entity = event.entity
         if (entity in corruptedMobs) return
 
-        val baseMaxHealth = entity.baseMaxHealth.toFloat()
+        val baseMaxHealth = entity.baseMaxHealth
         if (event.health == baseMaxHealth * 3) {
             corruptedMobs.add(entity)
         }
