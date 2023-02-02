@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//TODO make guava caches working
 @Mixin(RendererLivingEntity.class)
 public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> extends Render<T> {
 
@@ -28,6 +27,5 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
     @Redirect(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
     private int changeHurtTime(EntityLivingBase entity) {
         return RenderLivingEntityHelper.Companion.changeHurtTime(entity);
-
     }
 }
