@@ -45,8 +45,7 @@ object APIUtil {
                         return parser.parse(retSrc) as JsonObject
                     } catch (e: JsonSyntaxException) {
                         if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
-                            println("502 Bad Gateway at getJSONResponse '$urlString'")
-                            LorenzUtils.error("[SkyHanni] Hypixel API error: 502 Bad Gateway!")
+                            LorenzUtils.error("[SkyHanni] HyPixel API is down :(")
                         } else {
                             println("JsonSyntaxException at getJSONResponse '$urlString'")
                             LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")

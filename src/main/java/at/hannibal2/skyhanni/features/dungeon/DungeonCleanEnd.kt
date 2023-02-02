@@ -63,7 +63,7 @@ class DungeonCleanEnd {
         if (lastBossId == -1) return
         if (event.entity.entityId != lastBossId) return
 
-        if (event.health < 1) {
+        if (event.health <= 0) {
             val dungeonFloor = DungeonData.dungeonFloor
             LorenzUtils.chat("§eFloor $dungeonFloor done!")
             bossDone = true
