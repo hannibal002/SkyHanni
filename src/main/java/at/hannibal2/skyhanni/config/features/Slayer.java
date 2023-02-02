@@ -101,7 +101,7 @@ public class Slayer {
     public boolean blazeClearView = false;
 
     @Expose
-    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color")
+    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color.")
     @ConfigEditorBoolean
     public boolean slayerMinibossHighlight = false;
 

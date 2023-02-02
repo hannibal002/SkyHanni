@@ -134,4 +134,6 @@ object ItemUtils {
         set(value) {
             setStackDisplayName(value)
         }
+
+    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
 }

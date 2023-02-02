@@ -105,8 +105,9 @@ object LorenzUtils {
     // TODO replace all calls with regex
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
-    val EntityLivingBase.baseMaxHealth: Double
-        get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue
+    //TODO change to Int
+    val EntityLivingBase.baseMaxHealth: Int
+        get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 

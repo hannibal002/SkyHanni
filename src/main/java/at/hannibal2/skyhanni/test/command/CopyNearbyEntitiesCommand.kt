@@ -61,7 +61,7 @@ object CopyNearbyEntitiesCommand {
 
                 if (entity is EntityLivingBase) {
                     resultList.add("EntityLivingBase:")
-                    val baseMaxHealth = entity.baseMaxHealth.toInt()
+                    val baseMaxHealth = entity.baseMaxHealth
                     val health = entity.health.toInt()
                     resultList.add("-  baseMaxHealth: $baseMaxHealth")
                     resultList.add("-  health: $health")
