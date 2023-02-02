@@ -1,16 +1,20 @@
 package at.hannibal2.skyhanni.data
 
-enum class IslandType(val displayName: String) {
+enum class IslandType(val displayName: String, val apiName: String = "null") {
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
     THE_END("The End"),
     KUUDRA_ARENA("Instanced"),
     CRIMSON_ISLE("Crimson Isle"),
     DWARVEN_MINES("Dwarven Mines"),
-    DUNGEON_HUB("Dungeon Hub"),
+    DUNGEON_HUB("Dungeon Hub", "dungeon_hub"),
 
-    HUB("Hub"),
+    HUB("Hub", "village"),
     THE_FARMING_ISLANDS("The Farming Islands"),
+    CRYSTAL_HOLLOWS("Crystal Hollows"),
+    THE_PARK("The Park", "floating_islands_1"),
+    DEEP_CAVERNS("Deep Caverns", "deep_caverns"),
+    GOLD_MINES("Gold Mine", "gold_mine"),//TODO confirm
 
     NONE(""),
     UNKNOWN("???"),

@@ -12,16 +12,12 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.Kuudra
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -66,15 +62,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
 
         val fishName = fishQuest.fishName
-        var currentlyInInventory = 0
-        val player = Minecraft.getMinecraft().thePlayer
-        for (stack in player.inventory.mainInventory) {
-            if (stack == null) continue
-            val name = stack.name ?: continue
-            if (name.contains(fishName)) {
-                currentlyInInventory += stack.stackSize
-            }
-        }
+        val currentlyInInventory = InventoryUtils.countItemsInLowerInventory { it.name?.contains(fishName) ?: false }
         val diff = currentlyInInventory - latestTrophyFishInInventory
         if (diff < 1) return
         latestTrophyFishInInventory = currentlyInInventory
@@ -170,15 +158,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val itemName = fetchQuest.itemName
 
-        val player = Minecraft.getMinecraft().thePlayer
-        var count = 0
-        for (stack in player.inventory.mainInventory) {
-            if (stack == null) continue
-            val name = stack.name ?: continue
-            if (name.contains(itemName)) {
-                count += stack.stackSize
-            }
-        }
+        val count = InventoryUtils.countItemsInLowerInventory { it.name?.contains(itemName) ?: false }
         updateProcessQuest(fetchQuest, count)
     }
 

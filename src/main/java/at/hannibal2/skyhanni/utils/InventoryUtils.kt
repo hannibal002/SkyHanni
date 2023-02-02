@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 
 object InventoryUtils {
 
@@ -48,4 +49,9 @@ object InventoryUtils {
     fun ContainerChest.getInventoryName(): String {
         return this.lowerChestInventory.displayName.unformattedText.trim()
     }
+
+    fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
+        Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+            .filter { it != null && predicate(it) }
+            .sumOf { it.stackSize }
 }

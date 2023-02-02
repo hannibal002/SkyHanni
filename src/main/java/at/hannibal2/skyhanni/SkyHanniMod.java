@@ -98,6 +98,7 @@ public class SkyHanniMod {
         loadModule(new SendTitleHelper());
         loadModule(new ItemTipHelper());
         loadModule(new RenderLivingEntityHelper());
+        loadModule(new SkillExperience());
 
         //features
         loadModule(new BazaarOrderHelper());
