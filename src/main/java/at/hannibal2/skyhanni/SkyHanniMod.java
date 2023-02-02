@@ -175,6 +175,7 @@ public class SkyHanniMod {
         loadModule(new BarnFishingTimer());
         loadModule(new CrimsonIsleReputationHelper(this));
         loadModule(new SharkFishCounter());
+        loadModule(new SkyBLockLevelGuideHelper());
         loadModule(new OdgerWaypoint());
         loadModule(new TiaRelayHelper());
         loadModule(new TiaRelayWaypoints());

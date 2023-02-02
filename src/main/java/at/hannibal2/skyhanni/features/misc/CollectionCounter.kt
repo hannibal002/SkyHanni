@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -154,6 +155,11 @@ class CollectionCounter {
         recentGain += amount
 
         updateDisplay()
+    }
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        apiCollectionData.clear()
     }
 
     @SubscribeEvent
