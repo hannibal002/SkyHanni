@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigEditor
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
+import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
+import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -40,6 +42,8 @@ object Commands {
         registerCommand("shstoplisteners") { LorenzTest.stopListeners() }
         registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
         registerCommand("shtrackcollection") { CollectionCounter.command(it) }
+        registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
+        registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

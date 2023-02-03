@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.events.FirstConfigLoadedEvent;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.features.bazaar.*;
+import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay;
+import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper;
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages;
@@ -179,6 +181,8 @@ public class SkyHanniMod {
         loadModule(new OdgerWaypoint());
         loadModule(new TiaRelayHelper());
         loadModule(new TiaRelayWaypoints());
+        loadModule(new BingoCardDisplay());
+        loadModule(new BingoNextStepHelper());
 
         Commands.INSTANCE.init();
 

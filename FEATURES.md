@@ -146,6 +146,7 @@
 
 ## Bingo
 + Shortens chat messages about skill level ups, collection gains, new area discoveries, and bestiarity upgrades while on bingo.
++ Bingo Card
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
