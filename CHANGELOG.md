@@ -5,6 +5,7 @@
 ## Features
 + Added highlight for stuff that is missing in the skyblock level guide inventory.
 + Added Bingo Card display.
++ **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful for bingo.
 
 ## Version 0.15.1 (2023-01-25)
 

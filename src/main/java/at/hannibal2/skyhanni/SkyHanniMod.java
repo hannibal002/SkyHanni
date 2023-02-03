@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.features.fishing.*;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
+import at.hannibal2.skyhanni.features.minion.MinionCraftHelper;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
@@ -183,6 +184,7 @@ public class SkyHanniMod {
         loadModule(new TiaRelayWaypoints());
         loadModule(new BingoCardDisplay());
         loadModule(new BingoNextStepHelper());
+        loadModule(new MinionCraftHelper());
 
         Commands.INSTANCE.init();
 

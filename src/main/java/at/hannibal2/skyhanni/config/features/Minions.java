@@ -82,6 +82,22 @@ public class Minions {
     @ConfigAccordionId(id = 2)
     public Position hopperProfitPos = new Position(10, 10, false, true);
 
+    @ConfigOption(name = "Minion Craft Helper", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    public boolean minionCraftHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Minion Craft Helper", desc = "Show how many more items you need to upgrade the minion in your inventory. Especially useful for bingo.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean minionCraftHelperEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Minion Craft Helper Position", desc = "")
+    @ConfigEditorButton(runnableId = "minionCraftHelper", buttonText = "Edit")
+    @ConfigAccordionId(id = 3)
+    public Position minionCraftHelperPos = new Position(10, 10, false, true);
+
     @Expose
     @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions")
     @ConfigEditorBoolean

@@ -126,6 +126,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, fishing.sharkFishCounterPos);
             return;
         }
+
+        if (runnableId.equals("minionCraftHelper")) {
+            editOverlay(activeConfigCategory, 200, 16, minions.minionCraftHelperPos);
+            return;
+        }
     }
 
     @Expose
