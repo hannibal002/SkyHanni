@@ -64,7 +64,7 @@ class CollectionCounter {
             val apiName = data.apiName
             if (!apiCollectionData.contains(apiName)) {
                 if (apiCollectionData.isEmpty()) {
-                    LorenzUtils.chat("§c[SkyHanni] No Collection Data! API down?")
+                    LorenzUtils.chat("§c[SkyHanni] No Collection Data! Is the collection API disabled? Is the API down?")
                 } else {
                     LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data!")
                 }
@@ -166,7 +166,7 @@ class CollectionCounter {
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
 
-        //new profiles don't have any collections
+        //new profiles don't have any collections or collection api is disabled
         val collection = profileData["collection"]?.asJsonObject ?: return
 
         apiCollectionData.clear()
