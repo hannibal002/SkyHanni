@@ -18,9 +18,9 @@ import java.util.regex.Pattern
 class MinionCraftHelper {
 
     private var minionNamePattern = Pattern.compile("(.*) Minion (.*)")
-
-    var tick = 0
-    var display = mutableListOf<String>()
+    private var tick = 0
+    private var display = mutableListOf<String>()
+    private var hasMinionInInventory = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -29,7 +29,18 @@ class MinionCraftHelper {
         if (!SkyHanniMod.feature.minions.minionCraftHelperEnabled) return
 
         tick++
+
+        if (tick % 60 == 0) {
+            val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
+            hasMinionInInventory = mainInventory
+                .mapNotNull { it?.name?.removeColor() }
+                .any { it.contains(" Minion ") }
+        }
+
+        if (!hasMinionInInventory) return
+
         if (tick % 5 != 0) return
+//        if (tick % 60 != 0) return
 
         val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
 
@@ -38,15 +49,15 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
+            val rawId = NotEnoughUpdates.INSTANCE.manager.createItemResolutionQuery()
+                .withItemStack(item)
+                .resolveInternalName() ?: continue
             if (name.contains(" Minion ")) {
-                val minionId = NotEnoughUpdates.INSTANCE.manager.createItemResolutionQuery()
-                    .withItemStack(item)
-                    .resolveInternalName() ?: continue
-                minions[name] = minionId
+                minions[name] = rawId
             } else {
-                val (itemName, multiplier) = getMultiplier(name)
-                val old = otherItems.getOrDefault(itemName, 0)
-                otherItems[itemName] = old + item.stackSize * multiplier
+                val (itemId, multiplier) = getMultiplier(rawId)
+                val old = otherItems.getOrDefault(itemId, 0)
+                otherItems[itemId] = old + item.stackSize * multiplier
             }
         }
 
@@ -58,12 +69,6 @@ class MinionCraftHelper {
             val number = matcher.group(2).romanToDecimal()
             addMinion(cleanName, number, minionId, otherItems)
         }
-    }
-
-    private fun getMultiplier(name: String) = if (name.startsWith("Enchanted")) {
-        Pair(name.substring(10), 160)
-    } else {
-        Pair(name, 1)
     }
 
     private fun addMinion(
@@ -84,21 +89,24 @@ class MinionCraftHelper {
             for (input in recipe.inputs) {
                 val itemId = input.internalItemId
                 if (minionId != itemId) {
-                    val itemName = input.itemStack.name?.removeColor()!!
                     val count = input.count.toInt()
-                    val old = map.getOrDefault(itemName, 0)
-                    map[itemName] = old + count
+                    val old = map.getOrDefault(itemId, 0)
+                    map[itemId] = old + count
                 }
             }
-            for ((name, need) in map) {
-                val (itemName, multiplier) = getMultiplier(name)
+            for ((rawId, need) in map) {
+//                println("need rawId: $rawId")
+                val (itemId, multiplier) = getMultiplier(rawId)
                 val needAmount = need * multiplier
-                val have = otherItems.getOrDefault(itemName, 0)
+                val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
+                val itemName = NotEnoughUpdates.INSTANCE.manager.createItemResolutionQuery()
+                    .withKnownInternalName(rawId)
+                    .resolveToItemStack()?.name ?: "§cName??§f"
                 if (percentage >= 1) {
                     display.add("  $itemName§8: §aDONE")
                     display.add(" ")
-                    otherItems[itemName] = have - needAmount
+                    otherItems[itemId] = have - needAmount
                     addMinion(minionName, minionNumber + 1, minionId.addOneToId(), otherItems)
                 } else {
                     val format = LorenzUtils.formatPercentage(percentage)
@@ -127,4 +135,30 @@ private fun String.addOneToId(): String {
     val next = lastText.toInt() + 1
     val result = replace(lastText, "" + next)
     return result
+}
+
+private fun getMultiplier(rawId: String): Pair<String, Int> {
+    if (rawId == "MELON_BLOCK") {
+        return Pair("MELON", 9)
+    }
+    if (rawId == "HAY_BLOCK") {
+        return Pair("WHEAT", 9)
+    }
+    if (rawId == "ENCHANTED_HAY_BLOCK") {
+        return Pair("WHEAT", 9 * 16 * 9)
+    }
+    if (rawId == "PACKED_ICE") {
+        return Pair("ICE", 9)
+    }
+    if (rawId == "ENCHANTED_MITHRIL") {
+        return Pair("MITHRIL_ORE", 160)
+    }
+    if (rawId == "ENCHANTED_GOLD") {
+        return Pair("GOLD_INGOT", 160)
+    }
+    return if (rawId.startsWith("ENCHANTED_")) {
+        Pair(rawId.substring(10), 160)
+    } else {
+        Pair(rawId, 1)
+    }
 }
