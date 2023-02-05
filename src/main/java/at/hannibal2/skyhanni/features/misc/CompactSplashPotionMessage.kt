@@ -30,7 +30,7 @@ class CompactSplashPotionMessage {
         if (matcher.matches()) {
             val playerName = matcher.group(1).removeColor()
             val effectName = matcher.group(2)
-            event.chatComponent = ChatComponentText("§a§lPotion Effect! §r$effectName §7(by §b$playerName§7)")
+            event.chatComponent = ChatComponentText("§a§lPotion Effect! §r$effectName by §b$playerName")
         }
     }
 }
