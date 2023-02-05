@@ -130,11 +130,9 @@ class MinionCraftHelper {
 }
 
 private fun String.addOneToId(): String {
-    val split = split("_")
-    val lastText = split.last()
+    val lastText = split("_").last()
     val next = lastText.toInt() + 1
-    val result = replace(lastText, "" + next)
-    return result
+    return replace(lastText, "" + next)
 }
 
 private fun getMultiplier(rawId: String): Pair<String, Int> {
