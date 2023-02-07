@@ -30,7 +30,7 @@ class BazaarOrderHelper {
         val inventoryName = chest.getInventoryName()
         if (!isBazaarOrderInventory(inventoryName)) return
 
-        out@ for (slot in chest.inventorySlots) {
+        for (slot in chest.inventorySlots) {
             if (slot == null) continue
             if (slot.slotNumber != slot.slotIndex) continue
             if (slot.stack == null) continue
@@ -44,14 +44,18 @@ class BazaarOrderHelper {
 
             val rawName = itemName.split(if (isBuying) "BUY " else "SELL ")[1]
             val bazaarName = BazaarApi.getCleanBazaarName(rawName)
-            val data = BazaarApi.getBazaarDataForName(bazaarName) ?: return
+            val data = BazaarApi.getBazaarDataForName(bazaarName)
+            if (data == null) {
+                println("Bazaar data is null for '$rawName'/'$bazaarName'")
+                continue
+            }
 
             val itemLore = stack.getLore()
             for (line in itemLore) {
                 if (line.startsWith("§7Filled:")) {
                     if (line.endsWith(" §a§l100%!")) {
                         slot highlight LorenzColor.GREEN
-                        continue@out
+                        break
                     }
                 }
                 if (line.startsWith("§7Price per unit:")) {
@@ -61,7 +65,7 @@ class BazaarOrderHelper {
                     val price = text.toDouble()
                     if (isSelling && price > data.buyPrice || isBuying && price < data.sellPrice) {
                         slot highlight LorenzColor.GOLD
-                        continue@out
+                        break
                     }
                 }
             }
