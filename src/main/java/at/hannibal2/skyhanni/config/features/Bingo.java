@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigAccordionId;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorButton;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
@@ -18,12 +17,10 @@ public class Bingo {
     @Expose
     @ConfigOption(name = "Bingo Card", desc = "Show the bingo card.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
     public boolean bingoCard = false;
 
     @Expose
     @ConfigOption(name = "Bingo Card Position", desc = "")
     @ConfigEditorButton(runnableId = "bingoCardPos", buttonText = "Edit")
-    @ConfigAccordionId(id = 0)
     public Position bingoCardPos = new Position(10, 10, false, true);
 }
