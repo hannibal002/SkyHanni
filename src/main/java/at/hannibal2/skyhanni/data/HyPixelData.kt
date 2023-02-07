@@ -113,6 +113,9 @@ class HyPixelData {
                     ironman = true
                 }
 
+                " §a☀ §aStranded" -> {
+                    stranded = true
+                }
             }
         }
 
