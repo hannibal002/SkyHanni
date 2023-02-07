@@ -127,7 +127,7 @@ class BingoCardDisplay {
     }
 
     private var lastSneak = false
-    private var showHelp = false
+    private var displayMode = 0
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
@@ -141,16 +141,19 @@ class BingoCardDisplay {
             if (lastSneak != sneaking) {
                 lastSneak = sneaking
                 if (sneaking) {
-                    showHelp = !showHelp
+                    displayMode++
+                    if (displayMode == 3) {
+                        displayMode = 0
+                    }
                 }
             }
         }
-        if (showHelp) {
-            SkyHanniMod.feature.bingo.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp)
-        } else {
+        if (displayMode == 0) {
             if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
-                SkyHanniMod.feature.dev.debugPos.renderStrings(display)
+                SkyHanniMod.feature.bingo.bingoCardPos.renderStrings(display)
             }
+        } else if (displayMode == 1) {
+            SkyHanniMod.feature.bingo.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp)
         }
     }
 
@@ -170,8 +173,7 @@ class BingoCardDisplay {
             for (goal in personalGoals) {
                 println("goal: '" + goal.displayName + "'")
             }
-            personalGoals
-                .filter { it.displayName == name }
+            personalGoals.filter { it.displayName == name }
                 .forEach {
                     it.done = true
                     update()
