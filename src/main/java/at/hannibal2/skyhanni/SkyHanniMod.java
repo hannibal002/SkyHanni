@@ -37,7 +37,10 @@ import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
 import at.hannibal2.skyhanni.features.slayer.HideMobNames;
 import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniBoss;
 import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning;
-import at.hannibal2.skyhanni.features.slayer.blaze.*;
+import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView;
+import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper;
+import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning;
+import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper;
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager;
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
@@ -185,6 +188,7 @@ public class SkyHanniMod {
         loadModule(new BingoCardDisplay());
         loadModule(new BingoNextStepHelper());
         loadModule(new MinionCraftHelper());
+        loadModule(new HideDeadEntities());
 
         Commands.INSTANCE.init();
 
