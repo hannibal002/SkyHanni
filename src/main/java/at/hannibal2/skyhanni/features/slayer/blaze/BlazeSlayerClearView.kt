@@ -34,7 +34,7 @@ class BlazeSlayerClearView {
                 BossType.SLAYER_BLAZE_QUAZII_2,
                 BossType.SLAYER_BLAZE_QUAZII_3,
                 BossType.SLAYER_BLAZE_QUAZII_4,
-            ) < 10
+            ) < 20
         }
     }
 

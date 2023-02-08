@@ -172,9 +172,19 @@ public class Misc {
     public boolean hideExpBottles = false;
 
     @Expose
-    @ConfigOption(name = "Blaze Particles", desc = "Hide Blaze Particles")
+    @ConfigOption(name = "Blaze Particles", desc = "Hide blaze particles")
     @ConfigEditorBoolean
     public boolean hideBlazeParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles")
+    @ConfigEditorBoolean
+    public boolean hideFireballParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Fire Particles", desc = "Hide particles from the fire block.")
+    @ConfigEditorBoolean
+    public boolean hideFireBlockParticles = false;
 
     @Expose
     @ConfigOption(name = "Collection Counter Position", desc = "Tracking the number of items you collect. §cDoes not work with sacks.")

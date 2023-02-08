@@ -6,6 +6,9 @@
 + Added highlight for stuff that is missing in the skyblock level guide inventory.
 + Added Bingo Card display.
 + **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful for bingo.
++ Hide dead entities - Similar to Skytil's feature for inside dungeon, but for everywhere.
++ Hide Fireball particles and hide Fire Block particles.
++ Made **blaze slayer clear view** work with more particles.
 
 ## Version 0.15.1 (2023-01-25)
 
