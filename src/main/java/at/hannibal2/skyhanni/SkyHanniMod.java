@@ -155,7 +155,6 @@ public class SkyHanniMod {
         loadModule(new HideMobNames());
         loadModule(new HideDamageSplash());
         loadModule(new ThunderSparksHighlight());
-        loadModule(new BlazeSlayerPillar());
         loadModule(new BlazeSlayerDaggerHelper());
         loadModule(new HellionShieldHelper());
         loadModule(new BlazeSlayerFirePitsWarning());

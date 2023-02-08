@@ -10,6 +10,9 @@
 + Hide Fireball particles and hide Fire Block particles.
 + Made **blaze slayer clear view** work with more particles.
 
+## Removals
+- Removed Blaze slayer Pillar warning + timer (The Feature caused lags and Soopy's approach is better)
+
 ## Version 0.15.1 (2023-01-25)
 
 ## Features
