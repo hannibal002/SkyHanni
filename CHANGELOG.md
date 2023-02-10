@@ -9,6 +9,7 @@
 + Hide dead entities - Similar to Skytil's feature for inside dungeon, but for everywhere.
 + Hide Fireball particles and hide Fire Block particles.
 + Made **blaze slayer clear view** work with more particles.
++ Added colors for the missing slayer area bosses (Golden Ghoul, Old Wolf and Spider Keeper)
 
 ## Removals
 - Removed Blaze slayer Pillar warning + timer (The Feature caused lags and Soopy's approach is better)
