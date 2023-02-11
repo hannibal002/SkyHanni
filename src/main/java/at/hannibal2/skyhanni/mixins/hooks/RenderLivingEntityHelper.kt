@@ -11,53 +11,55 @@ class RenderLivingEntityHelper {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         entityColorMap.clear()
+        entityColorCondition.clear()
+
         entityNoHurTime.clear()
+        entityNoHurTimeCondition.clear()
     }
 
     companion object {
         private val entityColorMap = mutableMapOf<EntityLivingBase, Int>()
+        private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+
         private val entityNoHurTime = mutableListOf<EntityLivingBase>()
+        private val entityNoHurTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
-        fun <T : EntityLivingBase> setEntityColor(entity: T, color: Int) {
+        fun <T : EntityLivingBase> setEntityColor(entity: T, color: Int, condition: () -> Boolean) {
             entityColorMap[entity] = color
+            entityColorCondition[entity] = condition
         }
 
-        fun <T : EntityLivingBase> setNoHurtTime(entity: T) {
+        fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
             entityNoHurTime.add(entity)
+            entityNoHurTimeCondition[entity] = condition
         }
 
-        fun <T : EntityLivingBase> setColorMultiplier(entity: T, ): Int {
+        fun <T : EntityLivingBase> setColorMultiplier(entity: T): Int {
             if (entityColorMap.containsKey(entity)) {
-                return entityColorMap[entity]!!
+                val condition = entityColorCondition[entity]!!
+                if (condition.invoke()) {
+                    return entityColorMap[entity]!!
+                }
             }
 
             //TODO remove event
             val event = RenderMobColoredEvent(entity, 0)
             event.postAndCatch()
-            val color = event.color
-            if (color != 0) {
-                //TODO remove?
-                entityColorMap[entity] = color
-            }
-
-            return color
+            return event.color
         }
 
         fun <T : EntityLivingBase> changeHurtTime(entity: T): Int {
             if (entityNoHurTime.contains(entity)) {
-                return 0
+                val condition = entityNoHurTimeCondition[entity]!!
+                if (condition.invoke()) {
+                    return 0
+                }
             }
 
             //TODO remove event
             val event = ResetEntityHurtEvent(entity, false)
             event.postAndCatch()
-            val shouldReset = event.shouldReset
-
-            if (shouldReset) {
-                //TODO remove?
-                entityNoHurTime.add(entity)
-            }
-            return if (shouldReset) 0 else entity.hurtTime
+            return if (event.shouldReset) 0 else entity.hurtTime
         }
     }
 }

@@ -149,6 +149,11 @@
 + Shortens chat messages about skill level ups, collection gains, new area discoveries, and bestiarity upgrades while on bingo.
 + Bingo Card
 
+## Mobs
++ Arachne keeper highlighter.
++ Area mini boss highlighter.
++ Area mini boss spawn timer.
+
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - /shmarkplayer <player> (marking a player with yellow color)

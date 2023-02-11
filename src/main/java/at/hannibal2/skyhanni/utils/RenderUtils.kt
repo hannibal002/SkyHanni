@@ -634,7 +634,8 @@ object RenderUtils {
         scaleMultiplier: Double,
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0
+        smallestDistanceVew: Double = 5.0,
+        ignoreBlocks: Boolean = true,
     ) {
         val thePlayer = Minecraft.getMinecraft().thePlayer
         val x = location.x
@@ -665,7 +666,7 @@ object RenderUtils {
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
         var scale = distRender / 12
         scale *= scaleMultiplier
-        render(renderLocation, "§f$text", scale, false, true, yOff)
+        render(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
     }
 
     private fun render(
@@ -674,7 +675,7 @@ object RenderUtils {
         scale: Double,
         depthTest: Boolean,
         shadow: Boolean,
-        yOff: Float
+        yOff: Float,
     ) {
         if (!depthTest) {
             GL11.glDisable(GL11.GL_DEPTH_TEST)

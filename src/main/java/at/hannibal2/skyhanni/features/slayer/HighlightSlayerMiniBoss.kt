@@ -23,26 +23,26 @@ class HighlightSlayerMiniBoss {
         if (!isEnabled()) return
 
         val entity = event.entity
-
         if (DamageIndicatorManager.isBoss(entity)) return
 
         val maxHealth = event.maxHealth
-
-        for (bossType in AreaMiniBossType.values()) {
+        for (bossType in SlayerMiniBossType.values()) {
             if (!bossType.clazz.isInstance(entity)) continue
 
             if (bossType.health.any { entity.hasMaxHealth(it, false, maxHealth) }) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127))
-                RenderLivingEntityHelper.setNoHurtTime(entity)
+                { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
             }
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.slayerMinibossHighlight && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
-    }
+    private fun isEnabled() = LorenzUtils.inSkyBlock &&
+            SkyHanniMod.feature.slayer.slayerMinibossHighlight &&
+            !LorenzUtils.inDungeons &&
+            !LorenzUtils.inKuudraFight
 
-    enum class AreaMiniBossType(val clazz: Class<out EntityCreature>, vararg val health: Int) {
+    enum class SlayerMiniBossType(val clazz: Class<out EntityCreature>, vararg val health: Int) {
         REVENANT(EntityZombie::class.java, 24_000, 90_000, 360_000, 600_000, 2_400_000),
         TARANTULA(EntitySpider::class.java, 54_000, 144_000, 576_000),
         SVEN(EntityWolf::class.java, 45_000, 120_000, 450_000),

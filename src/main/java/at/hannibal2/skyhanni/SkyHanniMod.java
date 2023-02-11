@@ -142,8 +142,8 @@ public class SkyHanniMod {
         loadModule(new RngMeterInventory());
         loadModule(new WikiCommand());
         loadModule(new SummoningMobManager());
-        loadModule(new HighlightAreaMiniBoss());
-        loadModule(new CorruptedMobHighlight());
+        loadModule(new AreaMiniBossFeatures());
+        loadModule(new MobHighlight());
         loadModule(new MarkedPlayerManager());
         loadModule(new HighlightSlayerMiniBoss());
         loadModule(new PlayerDeathMessages());
