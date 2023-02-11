@@ -38,4 +38,9 @@ public class Mobs {
     @ConfigOption(name = "Arachne Keeper Highlight", desc = "Highlight corrupted mobs in purple color")
     @ConfigEditorBoolean
     public boolean arachneKeeperHighlight = true;
+
+    @Expose
+    @ConfigOption(name = "Corleone Highlighter", desc = "Highlight Boss Corleone in the Crystal Hollows")
+    @ConfigEditorBoolean
+    public boolean corleoneHighlighter = true;
 }

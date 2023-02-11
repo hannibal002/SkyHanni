@@ -153,6 +153,7 @@
 + Arachne keeper highlighter.
 + Area mini boss highlighter.
 + Area mini boss spawn timer.
++ Corleone highlighter.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

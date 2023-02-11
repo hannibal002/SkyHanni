@@ -12,6 +12,7 @@
 + Added colors for the missing slayer area bosses (Golden Ghoul, Old Wolf and Spider Keeper)
 + Added Arachne keeper highlighter.
 + Added area mini bosses spawn timer.
++ Added Corleone highlighter.
 
 ## Removals
 - Removed Blaze slayer Pillar warning + timer (The Feature caused lags and Soopy's approach is better)
