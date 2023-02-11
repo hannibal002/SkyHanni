@@ -10,6 +10,8 @@
 + Hide Fireball particles and hide Fire Block particles.
 + Made **blaze slayer clear view** work with more particles.
 + Added colors for the missing slayer area bosses (Golden Ghoul, Old Wolf and Spider Keeper)
++ Added Arachne keeper highlighter.
++ Added area mini bosses spawn timer.
 
 ## Removals
 - Removed Blaze slayer Pillar warning + timer (The Feature caused lags and Soopy's approach is better)

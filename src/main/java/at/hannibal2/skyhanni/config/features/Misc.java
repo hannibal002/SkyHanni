@@ -41,23 +41,6 @@ public class Misc {
     public Position realTimePos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Highlight Mobs", desc = "")
-    @ConfigEditorAccordion(id = 2)
-    public boolean highlightColor = false;
-
-    @Expose
-    @ConfigOption(name = "Area Mini Bosses", desc = "Highlight voidling extremists, millenia aged blazes.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    public boolean highlightAreaMinisBoss= false;
-
-    @Expose
-    @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
-    public boolean corruptedMobHighlight = false;
-
-    @Expose
     @ConfigOption(name = "Hide Armor", desc = "")
     @ConfigEditorAccordion(id = 3)
     public boolean hideArmor = false;
