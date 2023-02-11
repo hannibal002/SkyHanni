@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -35,12 +36,18 @@ class MobHighlight {
         val entity = event.entity
         val maxHealth = event.maxHealth
         if (SkyHanniMod.feature.mobs.arachneKeeperHighlight) {
-            if (entity is EntitySpider) {
-                if (maxHealth == 3_000) {
-                    RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_BLUE.toColor().withAlpha(127))
-                    { SkyHanniMod.feature.mobs.arachneKeeperHighlight }
-                    RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.arachneKeeperHighlight }
-                }
+            if (maxHealth == 3_000 && entity is EntitySpider) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_BLUE.toColor().withAlpha(127))
+                { SkyHanniMod.feature.mobs.arachneKeeperHighlight }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.arachneKeeperHighlight }
+            }
+        }
+
+        if (SkyHanniMod.feature.mobs.corleoneHighlighter) {
+            if (maxHealth == 1_000_000 && entity is EntityOtherPlayerMP && entity.name == "Team Treasurite") {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_PURPLE.toColor().withAlpha(127))
+                { SkyHanniMod.feature.mobs.corleoneHighlighter }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.corleoneHighlighter }
             }
         }
     }
