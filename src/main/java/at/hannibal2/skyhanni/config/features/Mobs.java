@@ -10,24 +10,23 @@ public class Mobs {
 
     @Expose
     @ConfigOption(
-            name = "Area Mini Bosses",
-            desc = "Special mobs in slayer regions that have way more hp than normal mobs:" +
-                    "\nGolden Ghoul, Old Wolf, Voidling Extremist and Millenia-Aged Blaze"
+            name = "Area Boss",
+            desc = "Golden Ghoul, Old Wolf, Voidling Extremist and Millenia-Aged Blaze"
     )
     @ConfigEditorAccordion(id = 0)
-    public boolean areaMiniBosses = false;
+    public boolean areaBosses = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Mini Bosses", desc = "Highlight area mini bosses")
+    @ConfigOption(name = "Highlight Area Boss", desc = "Highlight area boss.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean areaMiniBossesHighlight = true;
+    public boolean areaBossHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Mini Bosses Respawn Timer", desc = "Show a timer when area mini bosses spawn.")
+    @ConfigOption(name = "Area Bosses Respawn Timer", desc = "Show a timer when the area boss spawns.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean areaMinisBossesRespawnTimer = false;
+    public boolean areaBossRespawnTimer = false;
 
     @Expose
     @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color.")

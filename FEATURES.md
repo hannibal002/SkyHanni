@@ -151,8 +151,8 @@
 
 ## Mobs
 + Arachne keeper highlighter.
-+ Area mini boss highlighter.
-+ Area mini boss spawn timer.
++ Area boss highlighter.
++ Area boss spawn timer.
 + Corleone highlighter.
 + Zealots, Bruisers and Special Zealot highlighter.
 - Highlight corrupted mobs.

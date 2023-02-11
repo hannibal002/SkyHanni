@@ -11,7 +11,8 @@
 + Made **blaze slayer clear view** work with more particles.
 + Added colors for the missing slayer area bosses (Golden Ghoul, Old Wolf and Spider Keeper)
 + Added Arachne keeper highlighter.
-+ Added area mini bosses spawn timer.
++ Added area boss highlighter.
++ Added area boss spawn timer.
 + Added Corleone highlighter.
 + Added **Tps Display** - Show the Tps of the current server.
 + Added Kuudra Key Number overlay.

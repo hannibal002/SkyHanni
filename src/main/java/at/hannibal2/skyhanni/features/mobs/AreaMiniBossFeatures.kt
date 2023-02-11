@@ -43,11 +43,11 @@ class AreaMiniBossFeatures {
             }
             lastTime = time
 
-            if (SkyHanniMod.feature.mobs.areaMiniBossesHighlight) {
+            if (SkyHanniMod.feature.mobs.areaBossHighlight) {
                 val color = bossType.color.toColor().withAlpha(bossType.colorOpacity)
                 RenderLivingEntityHelper.setEntityColor(entity, color)
-                { SkyHanniMod.feature.mobs.areaMiniBossesHighlight }
-                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.areaMiniBossesHighlight }
+                { SkyHanniMod.feature.mobs.areaBossHighlight }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.areaBossHighlight }
             }
 
             // TODO add sound
@@ -57,7 +57,7 @@ class AreaMiniBossFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.mobs.areaMinisBossesRespawnTimer) return
+        if (!SkyHanniMod.feature.mobs.areaBossRespawnTimer) return
 
         miniBossType?.apply {
             val time = getTime()
