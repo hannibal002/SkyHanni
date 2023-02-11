@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzDebug
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
@@ -113,6 +112,14 @@ class LorenzTest {
                 println("Unregistered listener $simpleName")
             }
             LorenzUtils.chat("§e[SkyHanni] stopped ${modules.size} listener classes.")
+        }
+
+        fun copyLocation() {
+            val location = LocationUtils.playerLocation()
+            val x = LorenzUtils.formatDouble(location.x.round(1), "0.0")
+            val y = LorenzUtils.formatDouble(location.y.round(1), "0.0")
+            val z = LorenzUtils.formatDouble(location.z.round(1), "0.0")
+            OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
         }
     }
 
