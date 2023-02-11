@@ -33,6 +33,7 @@ object Commands {
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
         registerCommand("testhanni") { LorenzTest.testCommand(it) }
+        registerCommand("copylocation") { LorenzTest.copyLocation() }
         registerCommand("copyentities") { CopyNearbyEntitiesCommand.command(it) }
         registerCommand("copyitem") { CopyItemCommand.command(it) }
         registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig() }
