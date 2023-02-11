@@ -64,25 +64,6 @@ public class Slayer {
     public boolean blazeHideDaggerWarning = false;
 
     @Expose
-    @ConfigOption(name = "Fire Pillars", desc = "")
-    @ConfigEditorAccordion(id = 3)
-    @ConfigAccordionId(id = 1)
-    public boolean blazePillars = false;
-
-    @Expose
-    @ConfigOption(name = "Pillar Display", desc = "Cooldown when the Fire Pillar from the Blaze Slayer will kill you.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean firePillarDisplay = false;
-
-    @Expose
-    @ConfigOption(name = "Pillar Sound", desc = "Custom countdown sound for the Fire Pillar timer and hide pillar build sound for the Blaze Slayer.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
-    public boolean firePillarSound = false;
-
-
-    @Expose
     @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
