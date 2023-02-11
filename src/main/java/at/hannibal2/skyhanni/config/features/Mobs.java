@@ -30,17 +30,27 @@ public class Mobs {
     public boolean areaMinisBossesRespawnTimer = false;
 
     @Expose
-    @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color")
+    @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color.")
     @ConfigEditorBoolean
     public boolean corruptedMobHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Arachne Keeper Highlight", desc = "Highlight corrupted mobs in purple color")
+    @ConfigOption(name = "Arachne Keeper Highlight", desc = "Highlight corrupted mobs in purple color.")
     @ConfigEditorBoolean
     public boolean arachneKeeperHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Corleone Highlighter", desc = "Highlight Boss Corleone in the Crystal Hollows")
+    @ConfigOption(name = "Corleone Highlighter", desc = "Highlight Boss Corleone in the Crystal Hollows.")
     @ConfigEditorBoolean
     public boolean corleoneHighlighter = true;
+
+    @Expose
+    @ConfigOption(name = "Zealots Highlighter", desc = "Highlight Zealots and Bruisers in The End.")
+    @ConfigEditorBoolean
+    public boolean zealotBruiserHighlighter = false;
+
+    @Expose
+    @ConfigOption(name = "Special Zealots Highlighter", desc = "Highlight Special Zealots in The End. (The one that drops Summoning Eyes)")
+    @ConfigEditorBoolean
+    public boolean specialZealotHighlighter = true;
 }

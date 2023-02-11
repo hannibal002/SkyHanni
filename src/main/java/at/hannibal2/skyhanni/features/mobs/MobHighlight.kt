@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -48,6 +49,22 @@ class MobHighlight {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_PURPLE.toColor().withAlpha(127))
                 { SkyHanniMod.feature.mobs.corleoneHighlighter }
                 RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.corleoneHighlighter }
+            }
+        }
+
+        if (SkyHanniMod.feature.mobs.zealotBruiserHighlighter) {
+            if ((maxHealth == 65_000 || maxHealth == 13_000) && entity is EntityEnderman) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_AQUA.toColor().withAlpha(127))
+                { SkyHanniMod.feature.mobs.zealotBruiserHighlighter }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.zealotBruiserHighlighter }
+            }
+        }
+
+        if (SkyHanniMod.feature.mobs.specialZealotHighlighter) {
+            if (maxHealth == 2_000 && entity is EntityEnderman) {
+                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_RED.toColor().withAlpha(50))
+                { SkyHanniMod.feature.mobs.specialZealotHighlighter }
+                RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.mobs.specialZealotHighlighter }
             }
         }
     }
