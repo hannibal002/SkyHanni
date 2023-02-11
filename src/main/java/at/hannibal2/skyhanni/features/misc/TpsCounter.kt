@@ -35,7 +35,7 @@ class TpsCounter {
             if (ignoreFirstTicks > 0) {
                 ignoreFirstTicks--
                 val current = ignoreFirstTicks + minDataAmount
-                display = "§eSkyHanni Tps: §fCalculating.. (${current}s)"
+                display = "§eTps: §fCalculating.. (${current}s)"
                 packetsFromLastSecond = 0
                 return@fixedRateTimer
             }
@@ -48,13 +48,13 @@ class TpsCounter {
 
             display = if (tpsList.size < minDataAmount) {
                 val current = minDataAmount - tpsList.size
-                "§eSkyHanni Tps: §fCalculating.. (${current}s)"
+                "§eTps: §fCalculating.. (${current}s)"
             } else {
                 val sum = tpsList.sum().toDouble()
                 var tps = (sum / tpsList.size).round(1)
                 if (tps > 20) tps = 20.0
                 val color = getColor(tps)
-                "§eSkyHanni Tps: $color$tps"
+                "§eTps: $color$tps"
             }
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
