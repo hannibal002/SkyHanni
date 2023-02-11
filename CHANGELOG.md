@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.16.UNRELEASED (UNRELEASED)
+## Version 0.16 (2023-02-11)
 
 ## Features
 + Added highlight for stuff that is missing in the skyblock level guide inventory.
