@@ -173,7 +173,6 @@
 - Option to hide all damage splashes, from anywhere in Skyblock.
 - Hide armor or just helmet of other player or yourself
 - Display the active non-god potion effects.
-- Option to hide blaze particles.
 - Wishing compass uses amount display.
 - Brewing Stand Overlay.
 - Crimson Isle Reputation Helper.
@@ -181,5 +180,5 @@
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network needs to be done.
 + **Tia Relay Helper** - Helps with solving the sound puzzle.
 + **Hide dead entities** - Similar to Skytil's feature for inside dungeon, but for everywhere.
-+ Hide Fireball particles and hide Fire Block particles.
 + **Tps Display** - Show the Tps of the current server.
++ **Particle Hider** - Hide blaze particles, fire block particles, fireball particles, near redstone particles, far particles or smoke particles.

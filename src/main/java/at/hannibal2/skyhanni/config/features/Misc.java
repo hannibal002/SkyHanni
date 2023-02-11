@@ -167,24 +167,50 @@ public class Misc {
     public Position tpsDisplayPosition = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
-    @ConfigEditorBoolean
-    public boolean hideExpBottles = false;
+    @ConfigOption(name = "Particle Hider", desc = "")
+    @ConfigEditorAccordion(id = 9)
+    public boolean particleHider = false;
 
     @Expose
     @ConfigOption(name = "Blaze Particles", desc = "Hide blaze particles")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
     public boolean hideBlazeParticles = false;
 
     @Expose
     @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles")
     @ConfigEditorBoolean
-    public boolean hideFireballParticles = false;
+    @ConfigAccordionId(id = 9)
+    public boolean hideFireballParticles = true;
 
     @Expose
     @ConfigOption(name = "Fire Particles", desc = "Hide particles from the fire block.")
     @ConfigEditorBoolean
-    public boolean hideFireBlockParticles = false;
+    @ConfigAccordionId(id = 9)
+    public boolean hideFireBlockParticles = true;
+
+    @Expose
+    @ConfigOption(name = "Smoke Particle", desc = "Hide smoke particles.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean hideSmokeParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Far Particles", desc = "Hide particles that are more than 40 blocks away.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean hideFarParticles = true;
+
+    @Expose
+    @ConfigOption(name = "Close Redstone Particles", desc = "Hide redstone particles around the player. (They spawn when having some potion effects active)")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean hideCloseRedstoneparticles = true;
+
+    @Expose
+    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
+    @ConfigEditorBoolean
+    public boolean hideExpBottles = false;
 
     @Expose
     @ConfigOption(name = "Collection Counter Position", desc = "Tracking the number of items you collect. §cDoes not work with sacks.")
