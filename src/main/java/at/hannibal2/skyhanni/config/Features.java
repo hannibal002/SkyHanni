@@ -131,6 +131,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, minions.minionCraftHelperPos);
             return;
         }
+
+        if (runnableId.equals("tpsDisplay")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.tpsDisplayPosition);
+            return;
+        }
     }
 
     @Expose
