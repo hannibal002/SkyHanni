@@ -31,6 +31,8 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
+import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures;
+import at.hannibal2.skyhanni.features.mobs.MobHighlight;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper;
 import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon;
