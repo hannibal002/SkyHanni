@@ -181,3 +181,4 @@
 + **Tia Relay Helper** - Helps with solving the sound puzzle.
 + **Hide dead entities** - Similar to Skytil's feature for inside dungeon, but for everywhere.
 + Hide Fireball particles and hide Fire Block particles.
++ **Tps Display** - Show the Tps of the current server.

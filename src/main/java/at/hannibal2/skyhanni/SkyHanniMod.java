@@ -190,6 +190,7 @@ public class SkyHanniMod {
         loadModule(new BingoNextStepHelper());
         loadModule(new MinionCraftHelper());
         loadModule(new HideDeadEntities());
+        loadModule(new TpsCounter());
 
         Commands.INSTANCE.init();
 

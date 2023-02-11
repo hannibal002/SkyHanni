@@ -150,6 +150,23 @@ public class Misc {
     public boolean tiaRelayMute = true;
 
     @Expose
+    @ConfigOption(name = "Tps Display", desc = "")
+    @ConfigEditorAccordion(id = 8)
+    public boolean tpsDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Tps Display", desc = "Show the Tps of the current server.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 8)
+    public boolean tpsDisplayEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Tps Display Position", desc = "")
+    @ConfigEditorButton(runnableId = "tpsDisplay", buttonText = "Edit")
+    @ConfigAccordionId(id = 8)
+    public Position tpsDisplayPosition = new Position(10, 10, false, true);
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
     @ConfigEditorBoolean
     public boolean hideExpBottles = false;
@@ -180,12 +197,12 @@ public class Misc {
     public boolean brewingStandOverlay = true;
 
     @Expose
-    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
-    @ConfigEditorBoolean
-    public boolean configButtonOnPause = true;
-
-    @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers at the right side of the screen.")
     @ConfigEditorBoolean
     public boolean hideScoreboardNumbers = false;
+
+    @Expose
+    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
+    @ConfigEditorBoolean
+    public boolean configButtonOnPause = true;
 }

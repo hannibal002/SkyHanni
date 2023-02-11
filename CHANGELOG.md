@@ -13,6 +13,7 @@
 + Added Arachne keeper highlighter.
 + Added area mini bosses spawn timer.
 + Added Corleone highlighter.
++ Added **Tps Display** - Show the Tps of the current server.
 
 ## Removals
 - Removed Blaze slayer Pillar warning + timer (The Feature caused lags and Soopy's approach is better)
