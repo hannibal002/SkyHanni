@@ -104,6 +104,18 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(7)) {
+            if (name.contains("Kuudra Key")) {
+                return when (name) {
+                    "Kuudra Key" -> "§a1"
+                    "Hot Kuudra Key" -> "§22"
+                    "Burning Kuudra Key" -> "§e3"
+                    "Fiery Kuudra Key" -> "§64"
+                    "Infernal Kuudra Key" -> "§c5"
+                    else -> "§4?"
+                }
+            }
+        }
         return ""
     }
 

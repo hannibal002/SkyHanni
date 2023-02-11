@@ -102,7 +102,8 @@ public class Inventory {
                     "§bPet Level",
                     "§bMinion Tier",
                     "§bCrimson Armor",
-                    "§bWishing Compass"
+                    "§bWishing Compass",
+                    "§bKuudra Key"
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Collections.singletonList(3));

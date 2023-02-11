@@ -46,7 +46,7 @@
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement. (in NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
 - Option to change the gray-out opacity for 'Not Clickable Items'.
-- Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number and the tier of master skull and master star)
+- Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys)
 - Sack name (show short name of sacks)
 - Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same enchantment are highlighted in the inventory)
 - Added compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
@@ -154,6 +154,8 @@
 + Area mini boss highlighter.
 + Area mini boss spawn timer.
 + Corleone highlighter.
++ Zealots, Bruisers and Special Zealot highlighter.
+- Highlight corrupted mobs.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
@@ -167,7 +169,6 @@
 - Fixing Skytils custom Damage Splash.
 - Gui element showing the real time.
 - Highlight the voidling extremist in pink color.
-- Highlight corrupted mobs in purple color.
 - Highlight millenia aged blaze color in red
 - Option to hide all damage splashes, from anywhere in Skyblock.
 - Hide armor or just helmet of other player or yourself
