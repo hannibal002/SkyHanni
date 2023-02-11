@@ -9,47 +9,54 @@ import com.google.gson.annotations.Expose;
 public class Mobs {
 
     @Expose
-    @ConfigOption(
-            name = "Area Boss",
-            desc = "Golden Ghoul, Old Wolf, Voidling Extremist and Millenia-Aged Blaze"
-    )
+    @ConfigOption(name = "Highlighters", desc = "")
     @ConfigEditorAccordion(id = 0)
-    public boolean areaBosses = false;
+    public boolean highlighters = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Area Boss", desc = "Highlight area boss.")
+    @ConfigOption(name = "Area Boss", desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist and Millenia-Aged Blaze.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean areaBossHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Area Bosses Respawn Timer", desc = "Show a timer when the area boss spawns.")
+    @ConfigOption(name = "Arachne Keeper", desc = "Highlight corrupted mobs in purple color.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean areaBossRespawnTimer = false;
-
-    @Expose
-    @ConfigOption(name = "Corrupted Mob Highlight", desc = "Highlight corrupted mobs in purple color.")
-    @ConfigEditorBoolean
-    public boolean corruptedMobHighlight = false;
-
-    @Expose
-    @ConfigOption(name = "Arachne Keeper Highlight", desc = "Highlight corrupted mobs in purple color.")
-    @ConfigEditorBoolean
     public boolean arachneKeeperHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Corleone Highlighter", desc = "Highlight Boss Corleone in the Crystal Hollows.")
+    @ConfigOption(name = "Corleone", desc = "Highlight Boss Corleone in the Crystal Hollows.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
     public boolean corleoneHighlighter = true;
 
     @Expose
-    @ConfigOption(name = "Zealots Highlighter", desc = "Highlight Zealots and Bruisers in The End.")
+    @ConfigOption(name = "Zealot", desc = "Highlight Zealots and Bruisers in The End.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
     public boolean zealotBruiserHighlighter = false;
 
     @Expose
-    @ConfigOption(name = "Special Zealots Highlighter", desc = "Highlight Special Zealots in The End. (The one that drops Summoning Eyes)")
+    @ConfigOption(name = "Special Zealots", desc = "Highlight Special Zealots in The End. (The one that drops Summoning Eyes)")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
     public boolean specialZealotHighlighter = true;
+
+    @Expose
+    @ConfigOption(name = "Corrupted Mob", desc = "Highlight corrupted mobs in purple color.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean corruptedMobHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Respawn Timers", desc = "")
+    @ConfigEditorAccordion(id = 1)
+    public boolean timers = false;
+
+    @Expose
+    @ConfigOption(name = "Area Boss", desc = "Show a timer when Golden Ghoul, Old Wolf, Voidling Extremist or Millenia-Aged Blaze respawns.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean areaBossRespawnTimer = false;
 }
