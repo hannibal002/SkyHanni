@@ -17,6 +17,7 @@
 + Added **Tps Display** - Show the Tps of the current server.
 + Added Kuudra Key Number overlay.
 + Added colored highlight support for zealots, bruisers and special zealots.
++ Added more particle hiders. (Far particles, near redstone particles and smoke particles)
 
 ## Removals
 - Removed Blaze slayer Pillar warning + timer (The Feature caused lags and Soopy's approach is better)

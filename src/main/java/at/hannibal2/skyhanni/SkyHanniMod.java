@@ -191,6 +191,7 @@ public class SkyHanniMod {
         loadModule(new MinionCraftHelper());
         loadModule(new HideDeadEntities());
         loadModule(new TpsCounter());
+        loadModule(new ParticleHider());
 
         Commands.INSTANCE.init();
 
