@@ -13,13 +13,13 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class BlazeSlayerClearView {
 
     private var tick = 0
-    private var hideParticles = false
+    private var nearBlaze = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (tick++ % 60 == 0) {
-            hideParticles = DamageIndicatorManager.getDistanceTo(
+            nearBlaze = DamageIndicatorManager.getDistanceTo(
                 BossType.SLAYER_BLAZE_1,
                 BossType.SLAYER_BLAZE_2,
                 BossType.SLAYER_BLAZE_3,
@@ -32,7 +32,7 @@ class BlazeSlayerClearView {
                 BossType.SLAYER_BLAZE_QUAZII_2,
                 BossType.SLAYER_BLAZE_QUAZII_3,
                 BossType.SLAYER_BLAZE_QUAZII_4,
-            ) < 20
+            ) < 10
         }
     }
 
@@ -54,6 +54,6 @@ class BlazeSlayerClearView {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazeClearView && hideParticles
+        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazeClearView && nearBlaze
     }
 }
