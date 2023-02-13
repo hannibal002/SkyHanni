@@ -4,12 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.monster.EntityBlaze
@@ -70,8 +66,8 @@ class AreaMiniBossFeatures {
     private fun AreaMiniBossType.getTime(): String {
         val duration = System.currentTimeMillis() - lastTime
         val estimatedTime = respawnCooldown - duration % respawnCooldown
-        val double = (estimatedTime.toDouble() / 1000).round(1)
-        return color.getChatColor() + "" + LorenzUtils.formatDouble(double, "0.0") + "s"
+        val format = TimeUtils.formatDuration(estimatedTime, showMilliSeconds = true)
+        return color.getChatColor() + format
     }
 
     @SubscribeEvent

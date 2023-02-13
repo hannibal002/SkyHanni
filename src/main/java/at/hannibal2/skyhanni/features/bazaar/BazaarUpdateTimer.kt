@@ -5,10 +5,11 @@ import at.hannibal2.skyhanni.events.BazaarUpdateEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.text.DecimalFormat
 
 class BazaarUpdateTimer {
     private var lastBazaarUpdateTime = 0L
@@ -24,13 +25,11 @@ class BazaarUpdateTimer {
         if (!isEnabled()) return
         if (!BazaarApi.isBazaarInventory(InventoryUtils.openInventoryName())) return
 
-        val duration = System.currentTimeMillis() - lastBazaarUpdateTime
-        val durationSeconds = duration.toDouble() / 1000
-        val nextUpdateIn = 10 - durationSeconds
-        val format = if (nextUpdateIn < 0) {
+        val duration = 10_000 - (System.currentTimeMillis() - lastBazaarUpdateTime)
+        val format = if (duration < 0) {
             "Updating"
         } else {
-            DecimalFormat("0.0").format(nextUpdateIn)
+            TimeUtils.formatDuration(duration, TimeUnit.SECOND, showMilliSeconds = true)
         }
 
         val list = mutableListOf<String>()

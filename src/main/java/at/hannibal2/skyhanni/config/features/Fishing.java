@@ -60,7 +60,7 @@ public class Fishing {
     @Expose
     @ConfigOption(
             name = "Barn Fishing Timer",
-            desc = "Shows the time and amount of sea creatures while fishing on the barn via hub."
+            desc = "Show the time and amount of sea creatures while fishing on the barn via hub."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)

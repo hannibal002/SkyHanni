@@ -2,6 +2,9 @@
 
 ## Version 0.17.UNRELEASED
 
+### Features
++ Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
+
 ### Changed
 + Barbarian Duke Damage Indicator only starts showing after getting close (< 30 blocks)
 
@@ -44,7 +47,7 @@
 ### Features
 + Added Bazaar Update Timer - Forrick.
 + Added Crimson Isle Reputation Helper.
-+ Added **Barn Timer** - Shows the time and amount of sea creatures while fishing on the barn via hub.
++ Added **Barn Timer** - Show the time and amount of sea creatures while fishing on the barn via hub.
 + Added **Shark Fish Counter** - Counts how many sharks have been caught.
 + Added **Hide Silver Duplicates** - Hiding chat message when catching a duplicate silver trophy fish.
 
@@ -82,7 +85,7 @@
 + Add catacombs class level color to party finder.
 + Add wishing compass uses amount display.
 + Saves missing items from cancelled buy orders to clipboard for faster re-entry.
-+ Adds a visual highlight to the Croesus inventory that shows what chests have not yet been opened.
++ Adds a visual highlight to the Croesus inventory that show what chests have not yet been opened.
 
 ### Removals
 - Removed additional settings for the chat design, like channel prefix and skyblock level
@@ -273,11 +276,11 @@
 ## Version 0.5 - Minions and RNG Meter
 
 ### New Features
-- Added a display that shows the last time the hopper inside a minion has been emptied
+- Added a display that show the last time the hopper inside a minion has been emptied
 - Added a marker to the last opened minion for a couple of seconds (Seen through walls)
 - Added option to hide mob nametags close to minions
 - Added showing stars on all items (Not only dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
-- Added a display timer that shows the real time
+- Added a display timer that show the real time
 - Added overlay features to the RNG meter inventory (Highlight selected drop and floors without a drop and show floor)
 - Added minion hopper coins per day display (Using the held coins in the hopper and the last time the hopper was collected to calculate the coins a hopper collects in a day)
 

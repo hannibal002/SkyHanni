@@ -81,4 +81,9 @@ public class DamageIndicator {
     @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of damage indicator bosses.")
     @ConfigEditorBoolean
     public boolean hideVanillaNametag = false;
+
+    @Expose
+    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the Slayer boss.")
+    @ConfigEditorBoolean
+    public boolean timeToKillSlayer = true;
 }

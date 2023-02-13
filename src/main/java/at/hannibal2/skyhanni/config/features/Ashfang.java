@@ -20,7 +20,7 @@ public class Ashfang {
     public Position freezeCooldownPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Reset Time", desc = "Shows the cooldown until ashfang pulls his underlings back.")
+    @ConfigOption(name = "Reset Time", desc = "Show the cooldown until ashfang pulls his underlings back.")
     @ConfigEditorBoolean
     public boolean nextResetCooldown = false;
 

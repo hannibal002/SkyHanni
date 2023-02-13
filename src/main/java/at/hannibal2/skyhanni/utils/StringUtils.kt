@@ -1,12 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import org.intellij.lang.annotations.Language
-import java.text.DecimalFormat
 import java.util.*
 
 object StringUtils {
-    private val durationFormat = DecimalFormat("00")
-
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
 
@@ -33,43 +30,6 @@ object StringUtils {
         }
 
         return builder.toString()
-    }
-
-    fun formatDuration(seconds: Long, decimalFormat: Boolean = false): String {
-        var sec: Long = seconds
-
-        var minutes: Long = sec / 60
-        sec %= 60
-
-        var hours = minutes / 60
-        minutes %= 60
-
-        val days = hours / 24
-        hours %= 24
-
-
-        val formatHours = durationFormat.format(hours)
-        val formatMinutes = durationFormat.format(minutes)
-        val formatSeconds = durationFormat.format(sec)
-
-        if (decimalFormat) {
-            return "$formatMinutes:$formatSeconds"
-        }
-
-        if (days > 0) {
-            return "${days}d $formatHours:$formatMinutes:$formatSeconds"
-        }
-        if (hours > 0) {
-            return "$formatHours:$formatMinutes:$formatSeconds".removeAtBeginning("0")
-        }
-        if (minutes > 0) {
-            return "$formatMinutes:$formatSeconds".removeAtBeginning("0")
-        }
-        if (sec > 0) {
-            return "${sec}s"
-        }
-
-        return "Now"
     }
 
     /**
