@@ -192,6 +192,7 @@ public class SkyHanniMod {
         loadModule(new HideDeadEntities());
         loadModule(new TpsCounter());
         loadModule(new ParticleHider());
+        loadModule(new MiscFeatures());
 
         Commands.INSTANCE.init();
 
