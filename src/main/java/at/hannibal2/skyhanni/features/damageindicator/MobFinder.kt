@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
@@ -206,7 +207,9 @@ class MobFinder {
                     return EntityResult(bossType = BossType.NETHER_MAGE_OUTLAW)
                 }
                 if (entity.name == "DukeBarb ") {
-                    return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
+                    if (entity.getLorenzVec().distance(LocationUtils.playerLocation()) < 30) {
+                        return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
+                    }
                 }
             }
             if (entity is EntityWither) {
