@@ -1,5 +1,10 @@
 # SkyHanni - Change Log
 
+## Version 0.17.UNRELEASED
+
+### Changed
++ Barbarian Duke Damage Indicator only starts showing after getting close (< 30 blocks)
+
 ## Version 0.16 (2023-02-11)
 
 ## Features
