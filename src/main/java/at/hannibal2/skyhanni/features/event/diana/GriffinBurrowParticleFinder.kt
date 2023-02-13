@@ -2,20 +2,14 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.BurrowDugEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C07PacketPlayerDigging
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -176,20 +170,14 @@ class GriffinBurrowParticleFinder {
     }
 
     @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onBlockClick(event: BlockClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
         if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
-        val packet = event.packet
-        val pos = when {
-            packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
-                packet.position
-            }
 
-            packet is C08PacketPlayerBlockPlacement && packet.stack != null -> packet.position
-            else -> return
-        }.toLorenzVec()
-        if (Minecraft.getMinecraft().thePlayer.heldItem?.isSpade != true || pos.getBlockAt() !== Blocks.grass) return
+        val pos = event.position
+        if (event.itemInHand?.isSpade != true || pos.getBlockAt() !== Blocks.grass) return
+
         if (burrows.containsKey(pos)) {
             lastDugParticleBurrow = pos
         }

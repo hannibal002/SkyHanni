@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C07PacketPlayerDigging
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -27,51 +25,40 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
-            if (event.soundName == "mob.zombie.remedy") {
-                if (event.pitch == 0.6984127f && event.volume == 1f) {
-                    ItemAbility.HYPERION.sound()
-                }
+        if (event.soundName == "mob.zombie.remedy") {
+            if (event.pitch == 0.6984127f && event.volume == 1f) {
+                ItemAbility.HYPERION.sound()
             }
-            if (event.soundName == "mob.enderdragon.growl") {
-                if (event.pitch == 1f && event.volume == 1f) {
-                    ItemAbility.ICE_SPRAY_WAND.sound()
-                }
+        }
+        if (event.soundName == "mob.enderdragon.growl") {
+            if (event.pitch == 1f && event.volume == 1f) {
+                ItemAbility.ICE_SPRAY_WAND.sound()
             }
-            if (event.soundName == "mob.endermen.portal") {
-                if (event.pitch == 0.61904764f && event.volume == 1f) {
-                    ItemAbility.GYROKINETIC_WAND.sound()
-                }
+        }
+        if (event.soundName == "mob.endermen.portal") {
+            if (event.pitch == 0.61904764f && event.volume == 1f) {
+                ItemAbility.GYROKINETIC_WAND.sound()
             }
-            if (event.soundName == "random.anvil_land") {
-                if (event.pitch == 0.4920635f && event.volume == 1f) {
-                    ItemAbility.GIANTS_SWORD.sound()
-                }
+        }
+        if (event.soundName == "random.anvil_land") {
+            if (event.pitch == 0.4920635f && event.volume == 1f) {
+                ItemAbility.GIANTS_SWORD.sound()
             }
-            if (event.soundName == "mob.ghast.affectionate_scream") {
-                if (event.pitch == 0.4920635f && event.volume == 0.15f) {
-                    ItemAbility.ATOMSPLIT_KATANA.sound()
-                }
+        }
+        if (event.soundName == "mob.ghast.affectionate_scream") {
+            if (event.pitch == 0.4920635f && event.volume == 0.15f) {
+                ItemAbility.ATOMSPLIT_KATANA.sound()
             }
+        }
     }
 
     @SubscribeEvent
-    fun onItemClickSend(event: PacketEvent.SendEvent) {
+    fun onItemClickSend(event: BlockClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        val heldItem = event.itemInHand ?: return
 
-        val packet = event.packet
-        if (packet is C07PacketPlayerDigging) {
-            if (packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
-                val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return
-                val internalName = heldItem.getInternalName()
-                ItemAbility.getByInternalName(internalName)?.newClick()
-//                println("internalName: $internalName")
-            }
-        }
-        if (packet is C08PacketPlayerBlockPlacement) {
-            val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return
-            val internalName = heldItem.getInternalName()
-            ItemAbility.getByInternalName(internalName)?.newClick()
-        }
+        val internalName = heldItem.getInternalName()
+        ItemAbility.getByInternalName(internalName)?.newClick()
     }
 
     @SubscribeEvent

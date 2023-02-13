@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -36,15 +39,13 @@ class DungeonHighlightClickedBlocks {
     }
 
     @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!LorenzUtils.inDungeons) return
         if (DungeonData.inBossRoom) return
-        if (event.packet !is C08PacketPlayerBlockPlacement) return
-        if (event.packet.stack == null) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        val position = event.packet.position.toLorenzVec()
-
+        val position = event.position
         if (blocks.any { it.position == position }) return
 
         val type: ClickedBlockType = when (position.getBlockAt()) {
@@ -64,6 +65,7 @@ class DungeonHighlightClickedBlocks {
             }
         }
 
+        // TODO hide in water room
 //        if (nearWaterRoom() && type == ClickedBlockType.LEVER) return
 
         val color = getNextColor()

@@ -11,8 +11,9 @@
 + Added **Enderman Teleportation Hider** - Stops the enderman teleportation animation (Like in SBA)
 + Added **Fire Overlay Hider** - Hide the fire overlay (Like in Skytils)
 
-### Changed
-+ Barbarian Duke Damage Indicator only starts showing after getting close (< 30 blocks)
+### Fixed
++ Barbarian Duke Damage Indicator now only starts displaying after the player is getting close to him. (30 blocks)
++ Fixed a bug that caused fire veil particle `hider/redline drawer` to not always detect the right click correctly.
 
 ## Version 0.16 (2023-02-11)
 

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.ItemClickInHandEvent
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -204,7 +204,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     @SubscribeEvent
-    fun onItemClick(event: ItemClickInHandEvent) {
+    fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
