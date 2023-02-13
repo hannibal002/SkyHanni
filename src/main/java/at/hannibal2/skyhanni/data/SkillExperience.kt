@@ -93,7 +93,6 @@ class SkillExperience {
                     next = false
                 }
             }
-
         }
         if (skillExp.isNotEmpty()) return
     }

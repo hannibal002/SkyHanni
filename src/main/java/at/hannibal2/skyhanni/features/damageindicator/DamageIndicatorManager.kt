@@ -70,13 +70,11 @@ class DamageIndicatorManager {
 
         fun getDistanceTo(vararg types: BossType): Double {
             val playerLocation = LocationUtils.playerLocation()
-            val list =
-                data.values.filter { it.bossType in types }.map { it.entity.getLorenzVec().distance(playerLocation) }
-            return if (list.isEmpty()) {
-                Double.MAX_VALUE
-            } else {
-                list.minOf { it }
-            }
+            return data.values.filter { it.bossType in types }
+                .map { it.entity.getLorenzVec().distance(playerLocation) }
+                .let { list ->
+                    if (list.isEmpty()) Double.MAX_VALUE else list.minOf { it }
+                }
         }
 
         fun getNearestDistanceTo(location: LorenzVec): Double {

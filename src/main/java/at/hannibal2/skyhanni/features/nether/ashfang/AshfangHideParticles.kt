@@ -15,23 +15,22 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class AshfangHideParticles {
 
     var tick = 0
-    var hideParticles = false
+    private var nearAshfang = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (tick++ % 60 == 0) {
-            val distance = DamageIndicatorManager.getDistanceTo(BossType.NETHER_ASHFANG)
-            hideParticles = distance < 40
+            nearAshfang = DamageIndicatorManager.getDistanceTo(BossType.NETHER_ASHFANG) < 40
         }
     }
 
     @SubscribeEvent
     fun onReceivePacket(event: ReceiveParticleEvent) {
-        if (!isEnabled()) return
-
-        event.isCanceled = true
+        if (isEnabled()) {
+            event.isCanceled = true
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -51,5 +50,5 @@ class AshfangHideParticles {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.hideParticles && hideParticles
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.ashfang.hideParticles && nearAshfang
 }
