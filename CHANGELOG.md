@@ -5,6 +5,12 @@
 ### Features
 + Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
 
+### Features from other Mods
+> *The following features are only there because I want them when testing SkyHanni features without other mods present.*
++ Added Hide explosions.
++ Added **Enderman Teleportation Hider** - Stops the enderman teleportation animation (Like in SBA)
++ Added **Fire Overlay Hider** - Hide the fire overlay (Like in Skytils)
+
 ### Changed
 + Barbarian Duke Damage Indicator only starts showing after getting close (< 30 blocks)
 

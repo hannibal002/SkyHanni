@@ -228,6 +228,16 @@ public class Misc {
     public boolean hideScoreboardNumbers = false;
 
     @Expose
+    @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")
+    @ConfigEditorBoolean
+    public boolean hideExplosions = false;
+
+    @Expose
+    @ConfigOption(name = "Fire Overlay Hider", desc = "Hide the fire overlay (Like in Skytils)")
+    @ConfigEditorBoolean
+    public boolean hideFireOverlay = false;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
