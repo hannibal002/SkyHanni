@@ -32,7 +32,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.text.DecimalFormat
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.max
@@ -40,7 +39,6 @@ import kotlin.math.max
 class DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
-    private val decimalFormat = DecimalFormat("0.0")
     private val maxHealth = mutableMapOf<UUID, Long>()
 
     companion object {
@@ -294,8 +292,8 @@ class DamageIndicatorManager {
 
             else -> LorenzColor.WHITE
         }
-        val d = (delay * 1.0) / 1000
-        return color.getChatColor() + decimalFormat.format(d)
+        val format = TimeUtils.formatDuration(delay, showMilliSeconds = true)
+        return color.getChatColor() + format
     }
 
     @SubscribeEvent
@@ -331,6 +329,9 @@ class DamageIndicatorManager {
             entityData.nameAbove = ""
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
+                if (entityData.bossType.showDeathTime && SkyHanniMod.feature.damageIndicator.timeToKillSlayer) {
+                    entityData.nameAbove = entityData.timeToKill
+                }
                 "§cDead"
             } else {
                 getCustomHealth(entityData, health, entity, maxHealth) ?: return
@@ -714,7 +715,8 @@ class DamageIndicatorManager {
             entityResult.ignoreBlocks,
             entityResult.delayedStart,
             entityResult.finalDungeonBoss,
-            entityResult.bossType
+            entityResult.bossType,
+            foundTime = System.currentTimeMillis()
         )
     }
 

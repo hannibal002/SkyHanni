@@ -5,13 +5,14 @@ import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import java.text.DecimalFormat
 
 class AshfangNextResetCooldown {
 
@@ -37,9 +38,8 @@ class AshfangNextResetCooldown {
 
         val remainingTime = spawnTime + 46_100 - System.currentTimeMillis()
         if (remainingTime > 0) {
-            val remaining = (remainingTime.toFloat() / 1000)
-            val format = DecimalFormat("0.0").format(remaining + 0.1)
-            SkyHanniMod.feature.ashfang.nextResetCooldownPos.renderString("§cAshfang next reset in: §a${format}s")
+            val format = TimeUtils.formatDuration(remainingTime, TimeUnit.SECOND, showMilliSeconds = true)
+            SkyHanniMod.feature.ashfang.nextResetCooldownPos.renderString("§cAshfang next reset in: §a$format")
         } else {
             spawnTime = -1
         }

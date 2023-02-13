@@ -38,7 +38,10 @@ public class Mobs {
     public boolean zealotBruiserHighlighter = false;
 
     @Expose
-    @ConfigOption(name = "Special Zealots", desc = "Highlight Special Zealots in The End. (The one that drops Summoning Eyes)")
+    @ConfigOption(
+            name = "Special Zealots",
+            desc = "Highlight Special Zealots in The End. (The one that drops Summoning Eyes)"
+    )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean specialZealotHighlighter = true;
@@ -55,7 +58,11 @@ public class Mobs {
     public boolean timers = false;
 
     @Expose
-    @ConfigOption(name = "Area Boss", desc = "Show a timer when Golden Ghoul, Old Wolf, Voidling Extremist or Millenia-Aged Blaze respawns.")
+    @ConfigOption(
+            name = "Area Boss",
+            desc = "Show a timer when Golden Ghoul, Old Wolf, Voidling Extremist or Millenia-Aged Blaze respawns. " +
+                    "§cSometimes it takes 20-30 seconds to calibrate correctly."
+    )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean areaBossRespawnTimer = false;

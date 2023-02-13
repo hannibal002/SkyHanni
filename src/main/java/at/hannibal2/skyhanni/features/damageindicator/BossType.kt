@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
-enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName: String = fullName) {
+enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName: String = fullName, val showDeathTime: Boolean = false) {
     GENERIC_DUNGEON_BOSS("Generic Dungeon boss", 0),//TODO split into different bosses
 
     //Nether Mini Bosses
@@ -15,31 +15,31 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     END_ENDSTONE_PROTECTOR("§cEndstone Protector", 3),
     END_ENDER_DRAGON("Ender Dragon", 4),//TODO fix totally
 
-    SLAYER_ZOMBIE_1("§aRevenant Horror 1", 5, "§aRev 1"),
-    SLAYER_ZOMBIE_2("§eRevenant Horror 2", 5, "§eRev 2"),
-    SLAYER_ZOMBIE_3("§cRevenant Horror 3", 5, "§cRev 3"),
-    SLAYER_ZOMBIE_4("§4Revenant Horror 4", 5, "§4Rev 4"),
-    SLAYER_ZOMBIE_5("§5Revenant Horror 5", 5, "§5Rev 5"),
+    SLAYER_ZOMBIE_1("§aRevenant Horror 1", 5, "§aRev 1", showDeathTime = true),
+    SLAYER_ZOMBIE_2("§eRevenant Horror 2", 5, "§eRev 2", showDeathTime = true),
+    SLAYER_ZOMBIE_3("§cRevenant Horror 3", 5, "§cRev 3", showDeathTime = true),
+    SLAYER_ZOMBIE_4("§4Revenant Horror 4", 5, "§4Rev 4", showDeathTime = true),
+    SLAYER_ZOMBIE_5("§5Revenant Horror 5", 5, "§5Rev 5", showDeathTime = true),
 
-    SLAYER_SPIDER_1("§aTarantula Broodfather 1", 6, "§aTara 1"),
-    SLAYER_SPIDER_2("§eTarantula Broodfather 2", 6, "§eTara 2"),
-    SLAYER_SPIDER_3("§cTarantula Broodfather 3", 6, "§cTara 3"),
-    SLAYER_SPIDER_4("§4Tarantula Broodfather 4", 6, "§4Tara 4"),
+    SLAYER_SPIDER_1("§aTarantula Broodfather 1", 6, "§aTara 1", showDeathTime = true),
+    SLAYER_SPIDER_2("§eTarantula Broodfather 2", 6, "§eTara 2", showDeathTime = true),
+    SLAYER_SPIDER_3("§cTarantula Broodfather 3", 6, "§cTara 3", showDeathTime = true),
+    SLAYER_SPIDER_4("§4Tarantula Broodfather 4", 6, "§4Tara 4", showDeathTime = true),
 
-    SLAYER_WOLF_1("§aSven Packmaster 1", 7, "§aSven 1"),
-    SLAYER_WOLF_2("§eSven Packmaster 2", 7, "§eSven 2"),
-    SLAYER_WOLF_3("§cSven Packmaster 3", 7, "§cSven 3"),
-    SLAYER_WOLF_4("§4Sven Packmaster 4", 7, "§4Sven 4"),
+    SLAYER_WOLF_1("§aSven Packmaster 1", 7, "§aSven 1", showDeathTime = true),
+    SLAYER_WOLF_2("§eSven Packmaster 2", 7, "§eSven 2", showDeathTime = true),
+    SLAYER_WOLF_3("§cSven Packmaster 3", 7, "§cSven 3", showDeathTime = true),
+    SLAYER_WOLF_4("§4Sven Packmaster 4", 7, "§4Sven 4", showDeathTime = true),
 
-    SLAYER_ENDERMAN_1("§aVoidgloom Seraph 1", 8, "§aVoid 1"),
-    SLAYER_ENDERMAN_2("§eVoidgloom Seraph 2", 8, "§eVoid 2"),
-    SLAYER_ENDERMAN_3("§cVoidgloom Seraph 3", 8, "§cVoid 3"),
-    SLAYER_ENDERMAN_4("§4Voidgloom Seraph 4", 8, "§4Void 4"),
+    SLAYER_ENDERMAN_1("§aVoidgloom Seraph 1", 8, "§aVoid 1", showDeathTime = true),
+    SLAYER_ENDERMAN_2("§eVoidgloom Seraph 2", 8, "§eVoid 2", showDeathTime = true),
+    SLAYER_ENDERMAN_3("§cVoidgloom Seraph 3", 8, "§cVoid 3", showDeathTime = true),
+    SLAYER_ENDERMAN_4("§4Voidgloom Seraph 4", 8, "§4Void 4", showDeathTime = true),
 
-    SLAYER_BLAZE_1("§aInferno Demonlord 1", 9, "§aInferno 1"),
-    SLAYER_BLAZE_2("§aInferno Demonlord 2", 9, "§aInferno 2"),
-    SLAYER_BLAZE_3("§aInferno Demonlord 3", 9, "§aInferno 3"),
-    SLAYER_BLAZE_4("§aInferno Demonlord 4", 9, "§aInferno 4"),
+    SLAYER_BLAZE_1("§aInferno Demonlord 1", 9, "§aInferno 1", showDeathTime = true),
+    SLAYER_BLAZE_2("§aInferno Demonlord 2", 9, "§aInferno 2", showDeathTime = true),
+    SLAYER_BLAZE_3("§aInferno Demonlord 3", 9, "§aInferno 3", showDeathTime = true),
+    SLAYER_BLAZE_4("§aInferno Demonlord 4", 9, "§aInferno 4", showDeathTime = true),
 
     SLAYER_BLAZE_TYPHOEUS_1("§aInferno Typhoeus 1", 9, "§aTyphoeus 1"),
     SLAYER_BLAZE_TYPHOEUS_2("§eInferno Typhoeus 2", 9, "§eTyphoeus 2"),

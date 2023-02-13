@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -81,8 +82,8 @@ class NonGodPotEffectDisplay {
             if (label.contains("Fumes")) continue
 
             val until = effect.value
-            val seconds = (until - now) / 1000
-            val format = StringUtils.formatDuration(seconds)
+            val seconds = until - now
+            val format = TimeUtils.formatDuration(seconds, TimeUnit.HOUR)
 
             val color = colorForTime(seconds)
 
@@ -213,8 +214,8 @@ class NonGodPotEffectDisplay {
             if (label.contains("Invisibility")) {
                 activeEffects[label] = System.currentTimeMillis() + 1000 * 60 * 60 * 24
             } else {
-            activeEffects[label] = newValue
-        }
+                activeEffects[label] = newValue
+            }
         }
     }
 

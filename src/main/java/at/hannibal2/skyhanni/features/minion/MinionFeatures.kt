@@ -235,7 +235,7 @@ class MinionFeatures {
                     if (SkyHanniMod.feature.minions.emptiedTimeDisplay) {
                         if (lastEmptied != 0L) {
                             val duration = System.currentTimeMillis() - lastEmptied
-                            val format = StringUtils.formatDuration(duration / 1000) + " ago"
+                            val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
                             val text = "§eHopper Emptied: $format"
                             event.drawString(location.add(0.0, 1.15, 0.0), text, true)
                         }

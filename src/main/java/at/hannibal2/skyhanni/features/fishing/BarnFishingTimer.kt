@@ -2,12 +2,9 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.PositionedSound
@@ -101,7 +98,7 @@ class BarnFishingTimer {
         val duration = System.currentTimeMillis() - startTime
         val barnTimerAlertTime = SkyHanniMod.feature.fishing.barnTimerAlertTime * 1_000
         val color = if (duration > barnTimerAlertTime) "§c" else "§e"
-        val timeFormat = StringUtils.formatDuration(duration / 1000, decimalFormat = true)
+        val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
         val name = if (currentCount == 1) "sea creature" else "sea creatures"
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 

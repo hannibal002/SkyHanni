@@ -146,22 +146,22 @@ class LorenzTest {
         SkyHanniMod.feature.dev.debugPos.renderString(text)
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+    @SubscribeEvent
     fun onHypExplosions(event: ReceiveParticleEvent) {
-//        if (!LorenzUtils.inSkyblock) return
-//        when (event.type) {
-//            EnumParticleTypes.EXPLOSION_LARGE,
-//            EnumParticleTypes.EXPLOSION_HUGE,
-//            EnumParticleTypes.EXPLOSION_NORMAL,
-//            -> event.isCanceled = true
-//
-//            else -> {}
-//        }
+        if (!LorenzUtils.inSkyBlock) return
+        when (event.type) {
+            EnumParticleTypes.EXPLOSION_LARGE,
+            EnumParticleTypes.EXPLOSION_HUGE,
+            EnumParticleTypes.EXPLOSION_NORMAL,
+            -> event.isCanceled = true
+            else -> {}
+        }
     }
 
     @SubscribeEvent
     fun onEnderTeleport(event: EnderTeleportEvent) {
-//        event.isCanceled = true
+        if (!LorenzUtils.inSkyBlock) return
+        event.isCanceled = true
     }
 
     @SubscribeEvent

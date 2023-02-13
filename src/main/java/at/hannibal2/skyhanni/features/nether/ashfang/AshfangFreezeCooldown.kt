@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.text.DecimalFormat
 
 class AshfangFreezeCooldown {
 
@@ -34,9 +34,8 @@ class AshfangFreezeCooldown {
 
         val remainingLong = maxDuration - duration
         if (remainingLong > 0) {
-            val remaining = (remainingLong.toFloat() / 1000)
-            val format = DecimalFormat("0.0").format(remaining + 0.1)
-            SkyHanniMod.feature.ashfang.freezeCooldownPos.renderString("§cAshfang Freeze: §a${format}s")
+            var format = TimeUtils.formatDuration(remainingLong, showMilliSeconds = true)
+            SkyHanniMod.feature.ashfang.freezeCooldownPos.renderString("§cAshfang Freeze: §a$format")
         }
     }
 

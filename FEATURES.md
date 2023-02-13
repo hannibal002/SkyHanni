@@ -83,7 +83,7 @@
 
 
 ## Minion
-- A display that shows the last time the hopper inside a minion has been emptied.
+- A display that show the last time the hopper inside a minion has been emptied.
 - A marker to the last opened minion for a couple of seconds (seen through walls)
 - Option to hide mob nametags close to minions.
 - Minion hopper coins per day display (Using the held coins in the hopper and the last time the hopper was collected to calculate the coins a hopper collects in a day)
@@ -101,7 +101,7 @@
 - **Hide Bronze/Silver Duplicates** - Hiding chat message when catching a duplicate bronze/silver trophy fish.
 - **Shorten Fishing Message** (Replacing the green chat message when fishing a sea creature with a more clean format)
 - Highlight Thunder Sparks that spawn after killing a Thunder.
-- **Barn Timer** - Shows the time and amount of sea creatures while fishing on the barn via hub.
+- **Barn Timer** - Show the time and amount of sea creatures while fishing on the barn via hub.
 - **Shark Fish Counter** - Counts how many sharks have been caught.
 - **Added Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 
@@ -117,6 +117,7 @@
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 - Hide the vanilla nametag of damage indicator bosses.
+- **Time to Kill** - Show the time it takes to kill the Slayer boss.
 
 ## Slayer
 + Hide poor slayer drop chat messages.
