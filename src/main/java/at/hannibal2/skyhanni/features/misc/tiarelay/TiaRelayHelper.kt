@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -37,8 +36,7 @@ class TiaRelayHelper {
         if (!SkyHanniMod.feature.misc.tiaRelayHelper) return
         if (!inInventory) return
 
-        val location = event.location
-        val distance = location.distance(LocationUtils.playerLocation())
+        val distance = event.distanceToPlayer
         if (distance >= 2) return
 
         if (lastClickSlot == 0) return

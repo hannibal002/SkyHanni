@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.*
@@ -12,14 +11,12 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 
 class LorenzTest {
 
     companion object {
-        private var shouldLogPackets = false
         var text = ""
 
         var a = 1.0
@@ -66,11 +63,6 @@ class LorenzTest {
 //            for (line in TabListUtils.getTabList()) {
 //                println("tablist: '$line'")
 //            }
-        }
-
-        fun togglePacketLog() {
-            shouldLogPackets = !shouldLogPackets
-            println("shouldLogPackets: $shouldLogPackets")
         }
 
         fun reloadListeners() {
@@ -145,30 +137,12 @@ class LorenzTest {
     }
 
     @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
-        if (!shouldLogPackets) return
-
-        val packet = event.packet
-        val name = packet.javaClass.simpleName
-
-        if (name == "C0FPacketConfirmTransaction") return
-        if (name == "C03PacketPlayer") return
-        if (name == "C05PacketPlayerLook") return
-        if (name == "C00PacketKeepAlive") return
-
-//        println("SendEvent: $name")
-    }
-
-    @SubscribeEvent
     fun onSoundPlay(event: PlaySoundEvent) {
-        if (!shouldLogPackets) return
-
-
-        val location = event.location
-        val distance = location.distance(LocationUtils.playerLocation())
-        val soundName = event.soundName
-        val pitch = event.pitch
-        val volume = event.volume
+//        val location = event.location
+//        val distance = location.distance(LocationUtils.playerLocation())
+//        val soundName = event.soundName
+//        val pitch = event.pitch
+//        val volume = event.volume
 
         //background music
 //        if (soundName == "note.harp") {
@@ -331,8 +305,8 @@ class LorenzTest {
 //        }
 
 
-        if (soundName == "game.player.hurt") return
-        if (soundName.startsWith("step.")) return
+//        if (soundName == "game.player.hurt") return
+//        if (soundName.startsWith("step.")) return
 
 //        if (soundName != "mob.chicken.plop") return
 
@@ -346,8 +320,6 @@ class LorenzTest {
 
     @SubscribeEvent
     fun onParticlePlay(event: ReceiveParticleEvent) {
-        if (!shouldLogPackets) return
-
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).round(2)
 //
@@ -369,67 +341,5 @@ class LorenzTest {
 //        println("particleCount: $particleCount")
 //        println("particleSpeed: $particleSpeed")
 //        println("offset: $offset")
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!shouldLogPackets) return
-
-        val packet = event.packet
-
-        val name = packet.javaClass.simpleName
-
-        if (name == "S2APacketParticles") return
-        if (name == "S3BPacketScoreboardObjective") return
-        if (name == "S18PacketEntityTeleport") return
-        if (name == "S38PacketPlayerListItem") return
-        if (name == "S17PacketEntityLookMove") return
-        if (name == "S00PacketKeepAlive") return
-        if (name == "S23PacketBlockChange") return
-        if (name == "S32PacketConfirmTransaction") return
-        if (name == "S47PacketPlayerListHeaderFooter") return
-        if (name == "S29PacketSoundEffect") return
-        if (name == "S04PacketEntityEquipment") return
-        if (name == "S16PacketEntityLook") return
-
-        if (name == "S15PacketEntityRelMove") return
-        if (name == "S12PacketEntityVelocity") return
-        if (name == "S19PacketEntityHeadLook") return
-        if (name == "S06PacketUpdateHealth") return
-        if (name == "S1FPacketSetExperience") return
-        if (name == "S02PacketChat") return
-        if (name == "S03PacketTimeUpdate") return
-        if (name == "S1DPacketEntityEffect") return
-        if (name == "S1EPacketRemoveEntityEffect") return
-        if (name == "S43PacketCamera") return
-        if (name == "S07PacketRespawn") return
-        if (name == "S01PacketJoinGame") return
-        if (name == "S05PacketSpawnPosition") return
-        if (name == "S08PacketPlayerPosLook") return
-        if (name == "S09PacketHeldItemChange") return
-        if (name == "S37PacketStatistics") return
-        if (name == "S39PacketPlayerAbilities") return
-
-        if (name == "S3EPacketTeams") return
-        if (name == "S3CPacketUpdateScore") return
-
-        //TODO find out what that is
-        if (name == "S0BPacketAnimation") return
-
-        //world
-        if (name == "S34PacketMaps") return
-        if (name == "S21PacketChunkData") return
-        if (name == "S22PacketMultiBlockChange") return
-//        if (name == "S0EPacketSpawnObject") return
-        if (name == "S13PacketDestroyEntities") return
-        if (name == "S33PacketUpdateSign") return
-//        if (name == "S0FPacketSpawnMob") return
-
-        //inventory
-//        if (name == "S2FPacketSetSlot") return
-        if (name == "S2DPacketOpenWindow") return
-//        if (name == "S30PacketWindowItems") return
-        if (name == "S2EPacketCloseWindow") return
-
     }
 }
