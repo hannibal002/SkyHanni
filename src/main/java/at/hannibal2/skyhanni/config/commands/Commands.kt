@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.LorenzTest
+import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import net.minecraft.command.ICommandSender
@@ -38,7 +39,7 @@ object Commands {
         registerCommand("copyitem") { CopyItemCommand.command(it) }
         registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig() }
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
-        registerCommand("togglepacketlog") { LorenzTest.togglePacketLog() }
+        registerCommand("shtestpacket") { PacketTest.toggle() }
         registerCommand("shreloadlisteners") { LorenzTest.reloadListeners() }
         registerCommand("shstoplisteners") { LorenzTest.stopListeners() }
         registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
