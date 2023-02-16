@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InventoryData {
     private var currentInventory: Inventory? = null
+    private var acceptItems = false
 
     @SubscribeEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
@@ -35,9 +36,11 @@ class InventoryData {
             close()
 
             currentInventory = Inventory(windowId, title, slotCount)
+            acceptItems = true
         }
 
         if (packet is S2FPacketSetSlot) {
+            if (!acceptItems) return
             currentInventory?.let {
                 if (it.windowId != packet.func_149175_c()) return
 
@@ -61,6 +64,7 @@ class InventoryData {
 
     private fun done(inventory: Inventory) {
         InventoryOpenEvent(inventory).postAndCatch()
+        acceptItems = false
     }
 
     class Inventory(
