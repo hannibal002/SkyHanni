@@ -78,15 +78,17 @@ class PacketTest {
 
         // Entity
         if (packetName == "S13PacketDestroyEntities") return
+
+        if (packetName == "S18PacketEntityTeleport") return
+        if (packetName == "S15PacketEntityRelMove") return
+        if (packetName == "S04PacketEntityEquipment") return
+
 //        if (packetName == "S0EPacketSpawnObject") return
-//        if (packetName == "S18PacketEntityTeleport") return
 //        if (packetName == "S0BPacketAnimation") return
 //        if (packetName == "S06PacketUpdateHealth") return
 //        if (packetName == "S17PacketEntityLookMove") return
-//        if (packetName == "S15PacketEntityRelMove") return
 //        if (packetName == "S16PacketEntityLook") return
 //        if (packetName == "S19PacketEntityHeadLook") return
-//        if (packetName == "S04PacketEntityEquipment") return
 //        if (packetName == "S1DPacketEntityEffect") return
 //        if (packetName == "S12PacketEntityVelocity") return
 //        if (packetName == "S19PacketEntityStatus") return
@@ -119,7 +121,7 @@ class PacketTest {
             println("entity is null.")
         }
 
-        println("distance: $distance")
+//        println("distance: $distance")
         println("Receive: $packetName")
         println(" ")
     }

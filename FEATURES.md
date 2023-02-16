@@ -156,13 +156,16 @@
 + Area boss spawn timer.
 + Corleone highlighter.
 + Zealots, Bruisers and Special Zealot highlighter.
-- Highlight corrupted mobs.
++ Highlight corrupted mobs.
+
+## Garden Features
++ **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
 - /shmarkplayer <player> (marking a player with yellow color)
 - /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
-- 
+
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
