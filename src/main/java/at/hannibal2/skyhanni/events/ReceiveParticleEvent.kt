@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.Cancelable
@@ -13,4 +14,7 @@ class ReceiveParticleEvent(
     val offset: LorenzVec,
     val longDistance: Boolean,
     val particleArgs: IntArray
-) : LorenzEvent()
+) :
+    LorenzEvent() {
+    val distanceToPlayer by lazy { location.distance(LocationUtils.playerLocation()) }
+}

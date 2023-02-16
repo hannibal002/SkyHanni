@@ -14,9 +14,8 @@
 ### Fixed
 + Barbarian Duke Damage Indicator now only starts displaying after the player is getting close to him. (30 blocks)
 + Fixed a bug that caused fire veil particle `hider/redline drawer` to not always detect the right click correctly.
-
-### Removed
 + Removed `Fixing Skytils custom Damage Splash` (Skytils has already fixed this bug. Additionally, this option enabled and skytils' damage splash disabled caused the hypixel damage splash to not show the tailing commas at all)
++ Fixed bug with particles that blocks NotEnoughUpdates' Fishing features. 
 
 ## Version 0.16 (2023-02-11)
 
