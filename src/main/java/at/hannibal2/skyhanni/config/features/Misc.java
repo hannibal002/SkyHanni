@@ -69,12 +69,6 @@ public class Misc {
     public boolean damageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Skytils Damage Splash", desc = "Fixing the custom damage splash feature from skytils.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    public boolean fixSkytilsDamageSplash = true;
-
-    @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes, from anywhere in Skyblock.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)

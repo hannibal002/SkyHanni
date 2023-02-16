@@ -167,7 +167,6 @@
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
 - Hiding exp Bottles lying on the ground.
-- Fixing Skytils custom Damage Splash.
 - Gui element showing the real time.
 - Highlight the voidling extremist in pink color.
 - Highlight millenia aged blaze color in red
