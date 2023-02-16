@@ -1,7 +1,13 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import net.minecraft.client.Minecraft
+import net.minecraft.entity.Entity
+import net.minecraft.network.Packet
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.server.*
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -20,15 +26,20 @@ class PacketTest {
         if (!enabled) return
 
         val packet = event.packet
-        val name = packet.javaClass.simpleName
+        val packetName = packet.javaClass.simpleName
 
-        if (name == "C00PacketKeepAlive") return
+        if (packetName == "C00PacketKeepAlive") return
 
-        if (name == "C0FPacketConfirmTransaction") return
-        if (name == "C03PacketPlayer") return
-        if (name == "C04PacketPlayerPosition") return
+        if (packetName == "C0FPacketConfirmTransaction") return
+        if (packetName == "C03PacketPlayer") return
+        if (packetName == "C04PacketPlayerPosition") return
 
-        println("Send: $name")
+        if (packetName == "C06PacketPlayerPosLook") return
+        if (packetName == "C0BPacketEntityAction") return
+        if (packetName == "C05PacketPlayerLook") return
+        if (packetName == "C09PacketHeldItemChange") return
+
+        println("Send: $packetName")
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -36,43 +47,143 @@ class PacketTest {
         if (!enabled) return
 
         val packet = event.packet
-        val name = packet.javaClass.simpleName
+        val packetName = packet.javaClass.simpleName
 
-        if (name == "S00PacketKeepAlive") return
-        if (name == "C00PacketKeepAlive") return
+        // Keep alive
+        if (packetName == "S00PacketKeepAlive") return
+        if (packetName == "C00PacketKeepAlive") return
+        if (packetName == "S32PacketConfirmTransaction") return
 
-        if (name == "S32PacketConfirmTransaction") return
-        if (name == "S3BPacketScoreboardObjective") return
-        if (name == "S17PacketEntityLookMove") return
-        if (name == "S15PacketEntityRelMove") return
-        if (name == "S33PacketUpdateSign") return
-        if (name == "S18PacketEntityTeleport") return
-        if (name == "S16PacketEntityLook") return
-        if (name == "S0BPacketAnimation") return
-        if (name == "S1FPacketSetExperience") return
-        if (name == "S06PacketUpdateHealth") return
-        if (name == "S02PacketChat") return
-        if (name == "S03PacketTimeUpdate") return
-        if (name == "S3EPacketTeams") return
-        if (name == "S38PacketPlayerListItem") return
-        if (name == "S04PacketEntityEquipment") return
-        if (name == "S1DPacketEntityEffect") return
+        // Gui
+        if (packetName == "S3BPacketScoreboardObjective") return
+        if (packetName == "S1FPacketSetExperience") return
+        if (packetName == "S3EPacketTeams") return
+        if (packetName == "S38PacketPlayerListItem") return
+        if (packetName == "S3CPacketUpdateScore") return
+        if (packetName == "S06PacketUpdateHealth") return
 
-        if (name == "S19PacketEntityHeadLook") return
-        if (name == "S12PacketEntityVelocity") return
-        if (name == "S29PacketSoundEffect") return
-        if (name == "S22PacketMultiBlockChange") return
-        if (name == "S19PacketEntityStatus") return
-        if (name == "S1CPacketEntityMetadata") return
-        if (name == "S3CPacketUpdateScore") return
-        if (name == "S20PacketEntityProperties") return
+        // Block & World
+        if (packetName == "S33PacketUpdateSign") return
+        if (packetName == "S22PacketMultiBlockChange") return
+        if (packetName == "S03PacketTimeUpdate") return
+        if (packetName == "S21PacketChunkData") return
+        if (packetName == "S23PacketBlockChange") return
 
-        if (name == "S1BPacketEntityAttach") return
-        if (name == "S13PacketDestroyEntities") return
-        if (name == "S0EPacketSpawnObject") return
+        // Chat
+        if (packetName == "S02PacketChat") return
 
-        if (name == "S2APacketParticles") return
+        // Others
+        if (packetName == "S29PacketSoundEffect") return
+//        if (packetName == "S2APacketParticles") return
 
-        println("Receive: $name")
+        // Entity
+        if (packetName == "S13PacketDestroyEntities") return
+//        if (packetName == "S0EPacketSpawnObject") return
+//        if (packetName == "S18PacketEntityTeleport") return
+//        if (packetName == "S0BPacketAnimation") return
+//        if (packetName == "S06PacketUpdateHealth") return
+//        if (packetName == "S17PacketEntityLookMove") return
+//        if (packetName == "S15PacketEntityRelMove") return
+//        if (packetName == "S16PacketEntityLook") return
+//        if (packetName == "S19PacketEntityHeadLook") return
+//        if (packetName == "S04PacketEntityEquipment") return
+//        if (packetName == "S1DPacketEntityEffect") return
+//        if (packetName == "S12PacketEntityVelocity") return
+//        if (packetName == "S19PacketEntityStatus") return
+//        if (packetName == "S1CPacketEntityMetadata") return
+//        if (packetName == "S20PacketEntityProperties") return
+//        if (packetName == "S1BPacketEntityAttach") return
+
+
+        val id = getEntityId(packet)
+        val entity = getEntity(packet, id)
+        val distance = getDistance(getLocation(packet, entity))
+        if (distance > 10) return
+
+        if (entity != null) {
+            if (entity == Minecraft.getMinecraft().thePlayer) {
+//                println("own: $distance $packetName")
+                return
+            } else {
+                println("other: $distance")
+            }
+        } else {
+            if (id != null) {
+                return
+            }
+
+
+//            if (packetName.contains("")) {
+//
+//            }
+            println("entity is null.")
+        }
+
+        println("distance: $distance")
+        println("Receive: $packetName")
+        println(" ")
+    }
+
+    private fun getDistance(location: LorenzVec?): Double {
+        return location?.distance(LocationUtils.playerLocation())?.round(1) ?: 0.0
+    }
+
+    private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {
+        if (packet is S2APacketParticles) {
+            return LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate)
+        }
+        if (packet is S0EPacketSpawnObject) {
+            return LorenzVec(packet.x, packet.y, packet.z)
+        }
+        if (packet is S0CPacketSpawnPlayer) {
+            return LorenzVec(packet.x, packet.y, packet.z)
+        }
+        if (packet is C03PacketPlayer) {
+            return LorenzVec(packet.positionX, packet.positionY, packet.positionZ)
+        }
+
+        if (packet is S0FPacketSpawnMob) {
+            return LorenzVec(packet.x, packet.y, packet.z)
+        }
+        if (packet is S28PacketEffect) {
+            return packet.soundPos.toLorenzVec()
+        }
+
+        if (entity != null) {
+            return entity.getLorenzVec()
+        }
+
+        return null
+    }
+
+    private fun getEntity(packet: Packet<*>, id: Int?): Entity? {
+        val world = Minecraft.getMinecraft().theWorld
+        if (packet is S14PacketEntity) {
+            return packet.getEntity(world)
+        }
+        if (packet is S19PacketEntityHeadLook) {
+            return packet.getEntity(world)
+        }
+        if (packet is S19PacketEntityStatus) {
+            return packet.getEntity(world)
+        }
+        if (id != null) {
+            return world.getEntityByID(id)
+        }
+
+        return null
+    }
+
+    private fun getEntityId(packet: Packet<*>) = when (packet) {
+        is S1CPacketEntityMetadata -> packet.entityId
+        is S20PacketEntityProperties -> packet.entityId
+        is S04PacketEntityEquipment -> packet.entityID
+        is S12PacketEntityVelocity -> packet.entityID
+        is S1BPacketEntityAttach -> packet.entityId
+        is S0BPacketAnimation -> packet.entityID
+        is S18PacketEntityTeleport -> packet.entityId
+        is S1DPacketEntityEffect -> packet.entityId
+
+        else -> null
     }
 }
