@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -19,7 +19,7 @@ class BazaarBestSellMethod {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onBackgroundDrawn(event: InventoryCloseEvent) {
         display = ""
     }
 
