@@ -753,15 +753,11 @@ class DamageIndicatorManager {
         if (isDamageSplash(entity)) {
             val name = entity.customNameTag.removeColor().replace(",", "")
 
-            if (SkyHanniMod.feature.misc.fixSkytilsDamageSplash) {
-                entity.customNameTag = entity.customNameTag.replace(",", "")
-            }
             if (entityData != null) {
                 if (SkyHanniMod.feature.damageIndicator.hideDamageSplash) {
                     event.isCanceled = true
                 }
                 if (entityData.bossType == BossType.DUMMY) {
-
                     val uuid = entity.uniqueID
                     if (dummyDamageCache.contains(uuid)) return
                     dummyDamageCache.add(uuid)
