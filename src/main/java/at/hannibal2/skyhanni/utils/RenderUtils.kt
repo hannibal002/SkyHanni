@@ -460,7 +460,7 @@ object RenderUtils {
         if (list.isEmpty()) return
 
         var offsetY = 0
-        for (s in list) {
+        for (s in list.toMutableList()) {
             renderString(s, offsetY = offsetY, center = center)
             offsetY += 10 + extraSpace
         }

@@ -136,6 +136,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, misc.tpsDisplayPosition);
             return;
         }
+
+        if (runnableId.equals("skyMartCopperPrice")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.skyMartCopperPricePos);
+            return;
+        }
     }
 
     @Expose
@@ -201,6 +206,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Mobs", desc = "Visual Help for Mobs")
     public Mobs mobs = new Mobs();
+
+    @Expose
+    @Category(name = "Garden", desc = "Features on the Garden island.")
+    public Garden garden = new Garden();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")

@@ -5,6 +5,9 @@
 ### Features
 + Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
 
+### Garden Features
++ Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
+
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
 + Added Hide explosions.
