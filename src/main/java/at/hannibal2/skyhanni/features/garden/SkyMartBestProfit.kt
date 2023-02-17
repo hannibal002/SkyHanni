@@ -20,6 +20,7 @@ import java.util.regex.Pattern
 
 class SkyMartBestProfit {
 
+    private val pattern = Pattern.compile("§c(.*) Copper")
     private val display = mutableListOf<String>()
 
     @SubscribeEvent
@@ -29,7 +30,6 @@ class SkyMartBestProfit {
         val inventory = event.inventory
         if (inventory.title != "SkyMart") return
 
-        val pattern = Pattern.compile("§c(.*) Copper")
         val priceMap = mutableMapOf<Pair<String, String>, Double>()
 
         val auctionManager = NotEnoughUpdates.INSTANCE.manager.auctionManager

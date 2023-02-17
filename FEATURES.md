@@ -163,6 +163,8 @@
 + **Visitor Display** - Show all items needed for the visitors.
 + **Highlight Ready** - Highlight the visitor when the required items are in the inventory.
 + **Show Price** - Show the bazaar price of the items required for the visitors.
++ **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
++ **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
