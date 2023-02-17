@@ -58,11 +58,11 @@ class GardenVisitorFeatures {
             if (line.isEmpty()) break
 
             val matcher = pattern.matcher(line)
-            if (matcher.matches()) {
-                val itemName = matcher.group(1).trim()
-                val amount = matcher.group(2).toInt()
-                visitor.items[itemName] = amount
-            }
+            if (!matcher.matches()) continue
+
+            val itemName = matcher.group(1).trim()
+            val amount = matcher.group(2).toInt()
+            visitor.items[itemName] = amount
         }
 
         val visitorName = npcItem.name!!
@@ -141,13 +141,8 @@ class GardenVisitorFeatures {
             !SkyHanniMod.feature.garden.visitorHelperHighlightReady &&
             !SkyHanniMod.feature.garden.visitorHelperShowPrice
         ) return
+        if (tick++ % 60 != 0) return
 
-        if (tick++ % 60 == 0) {
-            check()
-        }
-    }
-
-    private fun check() {
         nearby = LocationUtils.playerLocation().distance(LorenzVec(8.4, 72.0, -14.1)) < 10
 
         if (nearby && SkyHanniMod.feature.garden.visitorHelperHighlightReady) {
@@ -196,13 +191,13 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onSendEvent(event: PacketEvent.SendEvent) {
         val packet = event.packet
-        if (packet is C02PacketUseEntity) {
-            val theWorld = Minecraft.getMinecraft().theWorld
-            val entity = packet.getEntityFromWorld(theWorld)
-            val entityId = entity.entityId
+        if (packet !is C02PacketUseEntity) return
 
-            lastClickedNpc = entityId
-        }
+        val theWorld = Minecraft.getMinecraft().theWorld
+        val entity = packet.getEntityFromWorld(theWorld)
+        val entityId = entity.entityId
+
+        lastClickedNpc = entityId
     }
 
     @SubscribeEvent
