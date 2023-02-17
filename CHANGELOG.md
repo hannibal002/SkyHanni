@@ -7,6 +7,9 @@
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
++ Added **Visitor Display** - Show all items needed for the visitors.
++ Added **Highlight Ready** - Highlight the visitor when the required items are in the inventory.
++ Added **Show Price** - Show the bazaar price of the items required for the visitors.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*

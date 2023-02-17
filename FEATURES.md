@@ -160,6 +160,9 @@
 
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
++ **Visitor Display** - Show all items needed for the visitors.
++ **Highlight Ready** - Highlight the visitor when the required items are in the inventory.
++ **Show Price** - Show the bazaar price of the items required for the visitors.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

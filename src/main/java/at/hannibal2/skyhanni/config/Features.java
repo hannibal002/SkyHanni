@@ -141,6 +141,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.skyMartCopperPricePos);
             return;
         }
+
+        if (runnableId.equals("visitorHelper")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.visitorHelperPos);
+            return;
+        }
     }
 
     @Expose
