@@ -51,4 +51,21 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean visitorHelperShowPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Numbers", desc = "")
+    @ConfigEditorAccordion(id = 2)
+    public boolean numbers = false;
+
+    @Expose
+    @ConfigOption(name = "Crop Milestone", desc = "Show the number of the crop milestone in the inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean cropMilestoneNumber = true;
+
+    @Expose
+    @ConfigOption(name = "Crop Upgrades", desc = "Show the number of upgrades in the crop upgrades inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean cropUpgradesNumber = true;
 }
