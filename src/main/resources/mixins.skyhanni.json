@@ -5,6 +5,7 @@
   "mixins": [
     "AccessorGuiPlayerTabOverlay",
     "MixinBlockFire",
+    "MixinEntity",
     "MixinEntityBlaze",
     "MixinEntityFireball",
     "MixinNetHandlerPlayClient",

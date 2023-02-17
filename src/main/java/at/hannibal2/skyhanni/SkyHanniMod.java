@@ -201,6 +201,7 @@ public class SkyHanniMod {
         loadModule(new SkyMartBestProfit());
         loadModule(new GardenVisitorFeatures());
         loadModule(new GardenInventoryNumbers());
+        loadModule(new YawSnapping());
 
         Commands.INSTANCE.init();
 

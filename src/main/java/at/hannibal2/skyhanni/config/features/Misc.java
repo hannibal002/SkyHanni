@@ -235,4 +235,33 @@ public class Misc {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
+
+    @ConfigOption(name = "Yaw Snapping", desc = "")
+    @ConfigEditorAccordion(id = 6)
+    public boolean yawSnappingAccordion = false;
+
+    @Expose
+    @ConfigOption(name = "Enable Yaw Snapping", desc = "Align your yaw with certain angles")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean yawSnapping = false;
+
+    @Expose
+    @ConfigOption(name = "Release Distance", desc = "How much you have to overshoot an angle to release yaw snapping")
+    @ConfigEditorSlider(minValue = 0, maxValue = 180, minStep = 1)
+    @ConfigAccordionId(id = 6)
+    public float yawTightness = 90;
+
+    @Expose
+    @ConfigOption(name = "Intervals", desc = "In which intervals do you want to enable yaw snapping (45°, 90°, etc.)")
+    @ConfigEditorSlider(minValue = 1, maxValue = 180, minStep = 1)
+    @ConfigAccordionId(id = 6)
+    public float yawIntervals = 45;
+
+
+    @Expose
+    @ConfigOption(name = "Yaw Overlay", desc = "Display your current yaw over your cursor")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean displayYawOverlay = true;
 }
