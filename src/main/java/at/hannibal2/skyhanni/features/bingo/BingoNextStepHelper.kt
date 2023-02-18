@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.bingo
 
-import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -107,7 +106,7 @@ class BingoNextStepHelper {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!HyPixelData.skyBlock) return
+        if (!LorenzUtils.inSkyBlock) return
 
         //TODO add thys message
 //        if (event.message == "thys message") {
