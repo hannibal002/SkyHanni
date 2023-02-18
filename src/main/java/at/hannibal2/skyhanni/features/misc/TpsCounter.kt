@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.events.HypixelTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -28,7 +27,7 @@ class TpsCounter {
 
     init {
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
-            if (!HyPixelData.skyBlock) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
             if (!SkyHanniMod.feature.misc.tpsDisplayEnabled) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
@@ -58,7 +57,7 @@ class TpsCounter {
             }
         }
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
-            if (!HyPixelData.skyBlock) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
             if (!SkyHanniMod.feature.misc.tpsDisplayEnabled) return@fixedRateTimer
 
             if (hasPacketReceived) {

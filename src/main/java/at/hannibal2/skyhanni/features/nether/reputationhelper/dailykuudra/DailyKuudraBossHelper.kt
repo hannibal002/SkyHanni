@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -40,7 +39,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!HyPixelData.skyBlock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.KUUDRA_ARENA) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 
