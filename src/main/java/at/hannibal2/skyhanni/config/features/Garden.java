@@ -29,6 +29,25 @@ public class Garden {
     public boolean visitorHelper = false;
 
     @Expose
+    @ConfigOption(name = "Visitor Timer", desc = "")
+    @ConfigAccordionId(id = 1)
+    @ConfigEditorAccordion(id = 2)
+    public boolean visitorHelperTimer = false;
+
+    @Expose
+    @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear," +
+            "and a number how many visitors are already waiting.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean visitorHelperTimerEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Visitor Timer Position", desc = "")
+    @ConfigEditorButton(runnableId = "visitorHelperTimer", buttonText = "Edit")
+    @ConfigAccordionId(id = 2)
+    public Position visitorHelperTimerPos = new Position(0, 0, false, true);
+
+    @Expose
     @ConfigOption(name = "Visitor Display", desc = "Show all items needed for the visitors.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
@@ -54,18 +73,18 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
-    @ConfigEditorAccordion(id = 2)
+    @ConfigEditorAccordion(id = 3)
     public boolean numbers = false;
 
     @Expose
     @ConfigOption(name = "Crop Milestone", desc = "Show the number of the crop milestone in the inventory.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 3)
     public boolean cropMilestoneNumber = true;
 
     @Expose
     @ConfigOption(name = "Crop Upgrades", desc = "Show the number of upgrades in the crop upgrades inventory.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
+    @ConfigAccordionId(id = 3)
     public boolean cropUpgradesNumber = true;
 }

@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
 import at.hannibal2.skyhanni.features.fishing.*;
 import at.hannibal2.skyhanni.features.garden.GardenInventoryNumbers;
 import at.hannibal2.skyhanni.features.garden.GardenVisitorFeatures;
+import at.hannibal2.skyhanni.features.garden.GardenVisitorTimer;
 import at.hannibal2.skyhanni.features.garden.SkyMartBestProfit;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
@@ -52,6 +53,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.test.PacketTest;
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
+import at.hannibal2.skyhanni.utils.TabListData;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.*;
 import net.minecraft.client.Minecraft;
@@ -112,6 +114,7 @@ public class SkyHanniMod {
         loadModule(new RenderLivingEntityHelper());
         loadModule(new SkillExperience());
         loadModule(new InventoryData());
+        loadModule(new TabListData());
 
         //features
         loadModule(new BazaarOrderHelper());
@@ -201,6 +204,7 @@ public class SkyHanniMod {
         loadModule(new SkyMartBestProfit());
         loadModule(new GardenVisitorFeatures());
         loadModule(new GardenInventoryNumbers());
+        loadModule(new GardenVisitorTimer());
 
         Commands.INSTANCE.init();
 
