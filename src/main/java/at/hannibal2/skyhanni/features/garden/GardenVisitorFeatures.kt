@@ -194,7 +194,7 @@ class GardenVisitorFeatures {
         if (packet !is C02PacketUseEntity) return
 
         val theWorld = Minecraft.getMinecraft().theWorld
-        val entity = packet.getEntityFromWorld(theWorld)
+        val entity = packet.getEntityFromWorld(theWorld) ?: return
         val entityId = entity.entityId
 
         lastClickedNpc = entityId
