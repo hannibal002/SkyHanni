@@ -146,6 +146,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.visitorHelperPos);
             return;
         }
+
+        if (runnableId.equals("visitorHelperTimer")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.visitorHelperTimerPos);
+            return;
+        }
     }
 
     @Expose

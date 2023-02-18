@@ -12,6 +12,7 @@
 + Added **Show Price** - Show the bazaar price of the items required for the visitors.
 + Added **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
 + Added **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
++ Added **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
