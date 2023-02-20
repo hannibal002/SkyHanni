@@ -25,7 +25,6 @@ import java.util.regex.Pattern
 
 class GardenVisitorFeatures {
 
-    private val pattern = Pattern.compile("(.*)§8x(.*)")
     private val visitors = mutableMapOf<String, Visitor>()
     private val display = mutableListOf<String>()
     private var lastClickedNpc = 0
@@ -57,11 +56,8 @@ class GardenVisitorFeatures {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
-            val matcher = pattern.matcher(line)
-            if (!matcher.matches()) continue
-
-            val itemName = matcher.group(1).trim()
-            val amount = matcher.group(2).toInt()
+            val (itemName, amount) = ItemUtils.readItemAmount(line)
+            if (itemName == null) continue
             visitor.items[itemName] = amount
         }
 
@@ -108,18 +104,15 @@ class GardenVisitorFeatures {
             val line = l.substring(4)
             if (line == "") {
                 if (amountDifferentItems > 1) {
-                    val format = NumberUtil.format(totalPrice)
-                    list[1] = list[1] + "$line §f(§6$format§f)"
+                val format = NumberUtil.format(totalPrice)
+                list[1] = list[1] + "$line §f(§6Total §6$format§f)"
                 }
                 break
             }
 
             if (i > 1) {
-                val matcher = pattern.matcher(line)
-                if (matcher.matches()) {
-                    val itemName = matcher.group(1).trim()
-                    val amount = matcher.group(2).toInt()
-
+                val (itemName, amount) = ItemUtils.readItemAmount(line)
+                if (itemName != null) {
                     val internalName = NEUItems.getInternalNameByName(itemName)
                     val auctionManager = NotEnoughUpdates.INSTANCE.manager.auctionManager
                     val lowestBin = auctionManager.getBazaarOrBin(internalName, false)
