@@ -9,6 +9,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.util.Constants
 import java.util.*
+import java.util.regex.Pattern
 
 object ItemUtils {
 
@@ -136,4 +137,18 @@ object ItemUtils {
         }
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
+
+    private val pattern = Pattern.compile("(?<name>(?:[\\w-]+ ?)+)(?:§8x(?<amount>\\d+))?")
+
+    fun readItemAmount(input: String): Pair<String?, Int> {
+        var string = input.trim()
+        val color = string.substring(0, 2)
+        string = string.substring(2)
+        val matcher = pattern.matcher(string)
+        if (!matcher.matches()) return Pair(null, 0)
+
+        val itemName = color + matcher.group("name").trim()
+        val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
+        return Pair(itemName, amount)
+    }
 }
