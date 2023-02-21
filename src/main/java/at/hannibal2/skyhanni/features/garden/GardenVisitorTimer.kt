@@ -23,11 +23,14 @@ class GardenVisitorTimer {
 
         var visitorsAmount = 0
         var millis = 15 * 60_000L
+        var queueFull = false
         for (line in event.tabList) {
             var matcher = patternNextVisitor.matcher(line)
             if (matcher.matches()) {
                 val rawTime = matcher.group(1)
                 millis = TimeUtils.getMillis(rawTime)
+            } else if (line == " Next Visitor: §r§c§lQueue Full!") {
+                queueFull = true
             }
 
             matcher = patternVisitors.matcher(line)
@@ -48,7 +51,8 @@ class GardenVisitorTimer {
 
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
         val formatDuration = TimeUtils.formatDuration(millis)
-        render = "§b$visitorsAmount $visitorLabel §f(Next in §e$formatDuration$extraSpeed§f)"
+        val next = if (queueFull) "§cQueue Full!" else "Next in §e$formatDuration$extraSpeed"
+        render = "§b$visitorsAmount $visitorLabel §f($next§f)"
     }
 
     @SubscribeEvent

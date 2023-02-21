@@ -66,6 +66,8 @@ class GardenVisitorFeatures {
     private fun update() {
         display.clear()
 
+        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay) return
+
         val requiredItems = mutableMapOf<String, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in visitors) {
