@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.*
@@ -190,14 +191,15 @@ class GardenVisitorFeatures {
             }
         }
         if (visitors.keys.removeIf { it !in visitorsInTab }) {
-            println("removed an npc")
             update()
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
                 visitors[name] = Visitor(-1)
-                // todo notification? (check world age first)
-                println("found an npc: '$name'")
+                if (SkyHanniMod.feature.garden.visitorNotification) {
+                    SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
+                    LorenzUtils.chat("§e[SkyHanni] $name §eis visiting your garden!")
+                }
                 update()
             }
         }
