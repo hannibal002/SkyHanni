@@ -54,11 +54,11 @@ class GardenVisitorTimer {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.garden.visitorHelperTimerPos.renderString(render)
+        SkyHanniMod.feature.garden.visitorTimerPos.renderString(render)
     }
 
     private fun isEnabled() =
         LorenzUtils.inSkyBlock &&
-                SkyHanniMod.feature.garden.visitorHelperTimerEnabled &&
+                SkyHanniMod.feature.garden.visitorTimerEnabled &&
                 LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }

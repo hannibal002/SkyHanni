@@ -115,6 +115,7 @@ public class SkyHanniMod {
         loadModule(new SkillExperience());
         loadModule(new InventoryData());
         loadModule(new TabListData());
+        loadModule(new RenderGuiData());
 
         //features
         loadModule(new BazaarOrderHelper());

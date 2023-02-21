@@ -20,7 +20,7 @@ class GardenInventoryNumbers {
         if (!isEnabled()) return
 
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
-            if (!SkyHanniMod.feature.garden.cropMilestoneNumber) return
+            if (!SkyHanniMod.feature.garden.numberCropMilestone) return
 
             event.stack.getLore()
                 .map { patternTierProgress.matcher(it) }
@@ -30,7 +30,7 @@ class GardenInventoryNumbers {
         }
 
         if (InventoryUtils.openInventoryName() == "Crop Upgrades") {
-            if (!SkyHanniMod.feature.garden.cropUpgradesNumber) return
+            if (!SkyHanniMod.feature.garden.numberCropUpgrades) return
 
             event.stack.getLore()
                 .map { patternUpgradeTier.matcher(it) }

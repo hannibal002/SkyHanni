@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -16,12 +17,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.server.S13PacketDestroyEntities
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class GardenVisitorFeatures {
 
@@ -33,8 +32,8 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onChatPacket(event: InventoryOpenEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorHelperDisplay &&
-            !SkyHanniMod.feature.garden.visitorHelperHighlightReady
+        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay &&
+            !SkyHanniMod.feature.garden.visitorHighlightReady
         ) return
 
         val npcItem = event.inventory.items[13] ?: return
@@ -79,7 +78,7 @@ class GardenVisitorFeatures {
         }
         if (requiredItems.isEmpty()) return
 
-        display.add("Visitors need:")
+        display.add("Visitor Items Needed:")
         for ((name, amount) in requiredItems) {
             display.add(" -$name §8x$amount")
         }
@@ -91,7 +90,7 @@ class GardenVisitorFeatures {
     fun onTooltip(event: ItemTooltipEvent) {
         if (!isEnabled()) return
         if (!nearby) return
-        if (!SkyHanniMod.feature.garden.visitorHelperShowPrice) return
+        if (!SkyHanniMod.feature.garden.visitorShowPrice) return
 
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
@@ -104,8 +103,8 @@ class GardenVisitorFeatures {
             val line = l.substring(4)
             if (line == "") {
                 if (amountDifferentItems > 1) {
-                val format = NumberUtil.format(totalPrice)
-                list[1] = list[1] + "$line §f(§6Total §6$format§f)"
+                    val format = NumberUtil.format(totalPrice)
+                    list[1] = list[1] + "$line §f(§6Total §6$format§f)"
                 }
                 break
             }
@@ -130,15 +129,31 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorHelperDisplay &&
-            !SkyHanniMod.feature.garden.visitorHelperHighlightReady &&
-            !SkyHanniMod.feature.garden.visitorHelperShowPrice
+        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay &&
+            !SkyHanniMod.feature.garden.visitorHighlightReady &&
+            !SkyHanniMod.feature.garden.visitorShowPrice
         ) return
         if (tick++ % 60 != 0) return
 
-        nearby = LocationUtils.playerLocation().distance(LorenzVec(8.4, 72.0, -14.1)) < 10
+        val defaultVanillaSkin = LorenzVec(8.4, 72.0, -14.1)
+        val castleSkin = LorenzVec(-5, 75, 18)
+        val bambooSkin = LorenzVec(-12, 72, -25)
+        val hiveSkin = LorenzVec(-17, 71, -19)
+        val cubeSkin = LorenzVec(-17, 71, -19)
 
-        if (nearby && SkyHanniMod.feature.garden.visitorHelperHighlightReady) {
+        // TODO Only check current one, ignore others.
+        val list = mutableListOf<LorenzVec>()
+        list.add(defaultVanillaSkin)
+        list.add(castleSkin)
+        list.add(bambooSkin)
+        list.add(hiveSkin)
+        list.add(cubeSkin)
+
+        val playerLocation = LocationUtils.playerLocation()
+        nearby = list.map { playerLocation.distance(it) < 15 }.any { it }
+
+
+        if (nearby && SkyHanniMod.feature.garden.visitorHighlightReady) {
             checkVisitorsReady()
         }
     }
@@ -160,7 +175,7 @@ class GardenVisitorFeatures {
                 if (entity is EntityLivingBase) {
                     val color = LorenzColor.GREEN.toColor().withAlpha(120)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { SkyHanniMod.feature.garden.visitorHelperHighlightReady }
+                    { SkyHanniMod.feature.garden.visitorHighlightReady }
                 }
             }
         }
@@ -181,6 +196,7 @@ class GardenVisitorFeatures {
         }
     }
 
+    // TODO make event
     @SubscribeEvent
     fun onSendEvent(event: PacketEvent.SendEvent) {
         val packet = event.packet
@@ -194,13 +210,15 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorHelperDisplay) return
-        if (!nearby) return
+        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay) return
 
-        SkyHanniMod.feature.garden.visitorHelperPos.renderStrings(display)
+        if (SkyHanniMod.feature.garden.visitorNeedsOnlyWhenClose) {
+            if (!nearby) return
+        }
+
+        SkyHanniMod.feature.garden.visitorNeedsPos.renderStrings(display)
     }
 
     class Visitor(val entityId: Int, val items: MutableMap<String, Int> = mutableMapOf())
