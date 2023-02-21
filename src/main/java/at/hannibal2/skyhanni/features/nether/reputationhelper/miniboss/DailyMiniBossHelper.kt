@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
@@ -25,7 +24,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!HyPixelData.skyBlock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 

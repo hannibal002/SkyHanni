@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListUtils
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -125,7 +125,7 @@ class HyPixelData {
     private fun checkIsland() {
         var newIsland = ""
         var guesting = false
-        for (line in TabListUtils.getTabList()) {
+        for (line in TabListData.getTabList()) {
             if (line.startsWith("§b§lArea: ")) {
                 newIsland = line.split(": ")[1].removeColor()
             }

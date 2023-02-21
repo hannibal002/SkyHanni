@@ -165,6 +165,7 @@
 + **Show Price** - Show the bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
++ **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

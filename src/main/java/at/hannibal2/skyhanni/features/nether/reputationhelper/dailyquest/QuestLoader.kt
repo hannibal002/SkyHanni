@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.TabListUtils
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -14,7 +14,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
     fun loadFromTabList() {
         var i = -1
-        for (line in TabListUtils.getTabList()) {
+        for (line in TabListData.getTabList()) {
             if (line.contains("Faction Quests:")) {
                 i = 0
                 continue

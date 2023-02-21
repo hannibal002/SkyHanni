@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
@@ -10,7 +9,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMini
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.TabListUtils
+import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -49,7 +48,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!HyPixelData.skyBlock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
         if (dirty) {
@@ -59,7 +58,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
         tick++
         if (tick % 60 == 0) {
-            TabListUtils.getTabList()
+            TabListData.getTabList()
                 .filter { it.contains("Reputation:") }
                 .forEach {
                     factionType = if (it.contains("Mage")) {
@@ -92,7 +91,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 
-        if (!HyPixelData.skyBlock) return
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
         SkyHanniMod.feature.misc.crimsonIsleReputationHelperPos.renderStringsAndItems(display)

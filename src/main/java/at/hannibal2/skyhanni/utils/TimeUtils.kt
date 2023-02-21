@@ -1,6 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
+import java.util.regex.Pattern
+
 object TimeUtils {
+
+    private val pattern =
+        Pattern.compile("(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?")
+
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
@@ -40,6 +46,28 @@ object TimeUtils {
             }
         }
         return builder.toString()
+    }
+
+    fun getMillis(string: String): Long {
+        val matcher = pattern.matcher(string.lowercase().trim())
+        if (!matcher.matches()) {
+            throw RuntimeException("Matcher is null for '$string'")
+        }
+
+        val years = matcher.group("y")?.toLong() ?: 0L
+        val days = matcher.group("d")?.toLong() ?: 0L
+        val hours = matcher.group("h")?.toLong() ?: 0L
+        val minutes = matcher.group("m")?.toLong() ?: 0L
+        val seconds = matcher.group("s")?.toLong() ?: 0L
+
+        var millis = 0L
+        millis += seconds * 1000
+        millis += minutes * 60 * 1000
+        millis += hours * 60 * 60 * 1000
+        millis += days * 24 * 60 * 60 * 1000
+        millis += (years * 365.25 * 24 * 60 * 60 * 1000).toLong()
+
+        return millis
     }
 }
 

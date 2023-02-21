@@ -142,8 +142,13 @@ public class Features extends Config {
             return;
         }
 
-        if (runnableId.equals("visitorHelper")) {
-            editOverlay(activeConfigCategory, 200, 16, garden.visitorHelperPos);
+        if (runnableId.equals("visitorNeeds")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.visitorNeedsPos);
+            return;
+        }
+
+        if (runnableId.equals("visitorTimer")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.visitorTimerPos);
             return;
         }
     }
