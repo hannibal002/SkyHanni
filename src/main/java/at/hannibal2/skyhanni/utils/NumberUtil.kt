@@ -85,6 +85,8 @@ object NumberUtil {
         }
     }
 
+    fun String.romanToDecimalIfNeeded() = toIntOrNull() ?: romanToDecimal()
+
     /**
      * This code was converted to Kotlin and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/9073310
