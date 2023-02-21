@@ -72,6 +72,12 @@ public class Garden {
     public boolean visitorNeedsOnlyWhenClose = false;
 
     @Expose
+    @ConfigOption(name = "Notification", desc = "Show as title and in chat when a new visitor is visiting your island.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorNotification = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Ready", desc = "Highlight the visitor when the required items are in the inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)

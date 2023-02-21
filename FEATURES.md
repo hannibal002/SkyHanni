@@ -166,6 +166,7 @@
 + **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
++ **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
