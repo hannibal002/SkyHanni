@@ -116,6 +116,7 @@ public class SkyHanniMod {
 
         //features
         loadModule(new BazaarOrderHelper());
+        loadModule(new AuctionsHighlighter());
         loadModule(new ChatFilter());
         loadModule(new PlayerChatModifier());
         loadModule(new DungeonChatFilter());
