@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -16,7 +13,6 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -70,17 +66,33 @@ class GardenVisitorFeatures {
         display.clear()
 
         val requiredItems = mutableMapOf<String, Int>()
-        for ((_, visitor) in visitors) {
-            for ((itemName, amount) in visitor.items) {
+        val newVisitors = mutableListOf<String>()
+        for ((visitorName, visitor) in visitors) {
+            val items = visitor.items
+            if (items.isEmpty()) {
+                newVisitors.add(visitorName)
+            }
+            for ((itemName, amount) in items) {
                 val old = requiredItems.getOrDefault(itemName, 0)
                 requiredItems[itemName] = old + amount
             }
         }
-        if (requiredItems.isEmpty()) return
-
-        display.add("Visitor Items Needed:")
-        for ((name, amount) in requiredItems) {
-            display.add(" -$name §8x$amount")
+        if (requiredItems.isNotEmpty()) {
+            display.add("Visitor items needed:")
+            for ((name, amount) in requiredItems) {
+                display.add(" -$name §8x$amount")
+            }
+        }
+        if (newVisitors.isNotEmpty()) {
+            if (requiredItems.isNotEmpty()) {
+                display.add("")
+            }
+            val amount = newVisitors.size
+            val visitorLabel = if (amount == 1) "visitor" else "visitors"
+            display.add("$amount new $visitorLabel:")
+            for (visitor in newVisitors) {
+                display.add(" -$visitor")
+            }
         }
     }
 
@@ -158,6 +170,39 @@ class GardenVisitorFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: TabListUpdateEvent) {
+        if (!isEnabled()) return
+        var found = false
+        val visitorsInTab = mutableListOf<String>()
+        for (line in event.tabList) {
+            if (line.startsWith("§b§lVisitors:")) {
+                found = true
+                continue
+            }
+            if (found) {
+                if (line.isEmpty()) {
+                    found = false
+                    continue
+                }
+                val name = line.substring(3)
+                visitorsInTab.add(name)
+            }
+        }
+        if (visitors.keys.removeIf { it !in visitorsInTab }) {
+            println("removed an npc")
+            update()
+        }
+        for (name in visitorsInTab) {
+            if (!visitors.containsKey(name)) {
+                visitors[name] = Visitor(-1)
+                // todo notification? (check world age first)
+                println("found an npc: '$name'")
+                update()
+            }
+        }
+    }
+
     private fun checkVisitorsReady() {
         for (visitor in visitors.values) {
             var ready = true
@@ -176,21 +221,6 @@ class GardenVisitorFeatures {
                     val color = LorenzColor.GREEN.toColor().withAlpha(120)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
                     { SkyHanniMod.feature.garden.visitorHighlightReady }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onReceiveEvent(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet is S13PacketDestroyEntities) {
-            for (entityID in packet.entityIDs) {
-                for ((name, visitor) in visitors.toMutableMap()) {
-                    if (visitor.entityId == entityID) {
-                        visitors.remove(name)
-                        update()
-                    }
                 }
             }
         }
