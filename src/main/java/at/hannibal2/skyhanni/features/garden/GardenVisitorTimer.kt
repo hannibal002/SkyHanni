@@ -15,6 +15,7 @@ class GardenVisitorTimer {
     private val patternVisitors = Pattern.compile("§b§lVisitors: §r§f\\((\\d)\\)")
     private var render = ""
     private var lastMillis = 0L
+    private var lastVisitors = 0
 
     @SubscribeEvent
     fun onTick(event: TabListUpdateEvent) {
@@ -36,15 +37,16 @@ class GardenVisitorTimer {
         }
 
         val diff = lastMillis - millis
-        if (diff == 0L) return
+        if (diff == 0L && visitorsAmount == lastVisitors) return
         lastMillis = millis
+        lastVisitors = visitorsAmount
 
         val extraSpeed = if (diff in 1001..10_000) {
             val factor = diff / 1000
             "§f/§e" + TimeUtils.formatDuration(millis / factor)
         } else ""
 
-        val visitorLabel = if (visitorsAmount == 1) "Visitor" else "Visitors"
+        val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
         val formatDuration = TimeUtils.formatDuration(millis)
         render = "§b$visitorsAmount $visitorLabel §f(Next in §e$formatDuration$extraSpeed§f)"
     }
