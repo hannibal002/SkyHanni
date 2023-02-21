@@ -49,9 +49,11 @@ class GardenVisitorTimer {
             "§f/§e" + TimeUtils.formatDuration(millis / factor)
         } else ""
 
-        val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
         val formatDuration = TimeUtils.formatDuration(millis)
-        val next = if (queueFull) "§cQueue Full!" else "Next in §e$formatDuration$extraSpeed"
+        val next = if (queueFull) "§cQueue Full!" else {
+            "Next in §e$formatDuration$extraSpeed"
+        }
+        val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
         render = "§b$visitorsAmount $visitorLabel §f($next§f)"
     }
 
