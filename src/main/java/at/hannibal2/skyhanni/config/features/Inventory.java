@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class Inventory {
@@ -103,10 +103,12 @@ public class Inventory {
                     "§bMinion Tier",
                     "§bCrimson Armor",
                     "§bWishing Compass",
-                    "§bKuudra Key"
+                    "§bKuudra Key",
+                    "§bSkill Level",
+                    "§bCollection Level"
             }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Collections.singletonList(3));
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9));
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
