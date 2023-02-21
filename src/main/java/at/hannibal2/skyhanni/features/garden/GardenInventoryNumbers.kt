@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -25,7 +25,8 @@ class GardenInventoryNumbers {
             event.stack.getLore()
                 .map { patternTierProgress.matcher(it) }
                 .filter { it.matches() }
-                .map { it.group(1).romanToDecimal() - 1 }
+
+                .map { it.group(1).romanToDecimalIfNeeded() - 1 }
                 .forEach { event.stackTip = "" + it }
         }
 
