@@ -15,7 +15,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -101,7 +100,7 @@ class GardenVisitorFeatures {
 
     var tick = 0
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!isEnabled()) return
         if (!nearby) return

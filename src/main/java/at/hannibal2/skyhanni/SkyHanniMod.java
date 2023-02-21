@@ -23,10 +23,7 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
 import at.hannibal2.skyhanni.features.fishing.*;
-import at.hannibal2.skyhanni.features.garden.GardenInventoryNumbers;
-import at.hannibal2.skyhanni.features.garden.GardenVisitorFeatures;
-import at.hannibal2.skyhanni.features.garden.GardenVisitorTimer;
-import at.hannibal2.skyhanni.features.garden.SkyMartBestProfit;
+import at.hannibal2.skyhanni.features.garden.*;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
@@ -206,6 +203,7 @@ public class SkyHanniMod {
         loadModule(new GardenVisitorFeatures());
         loadModule(new GardenInventoryNumbers());
         loadModule(new GardenVisitorTimer());
+        loadModule(new GardenNextPlotPrice());
 
         Commands.INSTANCE.init();
 
