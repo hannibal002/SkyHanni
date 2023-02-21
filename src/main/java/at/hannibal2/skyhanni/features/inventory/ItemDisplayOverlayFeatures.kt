@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -104,7 +106,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(7)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(8)) {
             if (name.contains("Kuudra Key")) {
                 return when (name) {
                     "Kuudra Key" -> "§a1"
@@ -113,6 +115,32 @@ class ItemDisplayOverlayFeatures {
                     "Fiery Kuudra Key" -> "§64"
                     "Infernal Kuudra Key" -> "§c5"
                     else -> "§4?"
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9)) {
+            if (InventoryUtils.openInventoryName() == "Your Skills") {
+                if (item.getLore().any { it.contains("Click to view!") }) {
+                    item.name?.let {
+                        if (!it.contains("Dungeon")) {
+                            val text = it.split(" ").last()
+                            return "" + text.romanToDecimalIfNeeded()
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
+            if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
+                if (item.getLore().any { it.contains("Click to view!") }) {
+                    item.name?.let {
+                        if (it.startsWith("§e")) {
+                            val text = it.split(" ").last()
+                            return "" + text.romanToDecimalIfNeeded()
+                        }
+                    }
                 }
             }
         }
