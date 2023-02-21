@@ -137,4 +137,10 @@ public class Inventory {
             desc = "Highlight stuff that is missing in the skyblock level guide inventory.")
     @ConfigEditorBoolean
     public boolean highlightMissingSkyBlockLevelGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Auctions",
+            desc = "Highlight own items that are sold in green.")
+    @ConfigEditorBoolean
+    public boolean highlightAuctions = true;
 }
