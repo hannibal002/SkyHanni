@@ -105,4 +105,9 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean numberCropUpgrades = true;
+
+    @Expose
+    @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
+    @ConfigEditorBoolean
+    public boolean plotPrice = true;
 }

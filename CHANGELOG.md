@@ -15,6 +15,7 @@
 + Added **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + Added **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 + Added **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
++ Added **Plot Price** - Show the price of the plot in coins when inside the Configure Plots inventory.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
