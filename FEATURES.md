@@ -57,7 +57,7 @@
 + Show the type of stats for the tuning point templates.
 + Highlight depleted Bonzo's Masks in your inventory.
 + Highlight stuff that is missing in the skyblock level guide inventory.
-+ **Auction Highlighter** - Highlight own items that are sold in green.
++ **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 
 ## Item Abilities
 - Show the cooldown of items in the inventory.

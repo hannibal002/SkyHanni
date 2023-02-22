@@ -28,8 +28,12 @@ class AuctionsHighlighter {
             if (slot.slotNumber != slot.slotIndex) continue
             val stack = slot.stack ?: continue
 
-            if (stack.getLore().any { it == "§7Status: §aSold!" }) {
+            val lore = stack.getLore()
+            if (lore.any { it == "§7Status: §aSold!" }) {
                 slot highlight LorenzColor.GREEN
+            }
+            if (lore.any { it == "§7Status: §cExpired!" }) {
+                slot highlight LorenzColor.RED
             }
         }
     }

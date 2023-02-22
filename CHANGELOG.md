@@ -5,7 +5,7 @@
 ### Features
 + Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
 + Added skill and collection level as item stack.
-+ Added **Auction Highlighter** - Highlight own items that are sold in green.
++ Added **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
