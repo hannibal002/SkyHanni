@@ -140,7 +140,7 @@ public class Inventory {
 
     @Expose
     @ConfigOption(name = "Highlight Auctions",
-            desc = "Highlight own items that are sold in green.")
+            desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
     public boolean highlightAuctions = true;
 }
