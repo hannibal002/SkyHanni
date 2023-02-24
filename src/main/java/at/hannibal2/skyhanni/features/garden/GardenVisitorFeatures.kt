@@ -24,6 +24,7 @@ class GardenVisitorFeatures {
     private val display = mutableListOf<List<Any>>()
     private var lastClickedNpc = 0
     private var nearby = false
+    private var tick = 0
 
     @SubscribeEvent
     fun onChatPacket(event: InventoryOpenEvent) {
@@ -63,9 +64,14 @@ class GardenVisitorFeatures {
     }
 
     private fun update() {
+        val list = drawDisplay()
         display.clear()
+        display.addAll(list)
+    }
 
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay) return
+    private fun drawDisplay(): List<List<Any>> {
+        val newDisplay = mutableListOf<List<Any>>()
+        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay) return newDisplay
 
         val requiredItems = mutableMapOf<String, Int>()
         val newVisitors = mutableListOf<String>()
@@ -80,27 +86,27 @@ class GardenVisitorFeatures {
             }
         }
         if (requiredItems.isNotEmpty()) {
-            display.add(Collections.singletonList("§7Visitor items needed:"))
+            newDisplay.add(Collections.singletonList("§7Visitor items needed:"))
             for ((name, amount) in requiredItems) {
                 val internalName = NEUItems.getInternalName(name)
                 val itemStack = NEUItems.getItemStack(internalName)
-                display.add(listOf(" §7- ", itemStack, "$name §8x$amount"))
+                newDisplay.add(listOf(" §7- ", itemStack, "$name §8x$amount"))
             }
         }
         if (newVisitors.isNotEmpty()) {
             if (requiredItems.isNotEmpty()) {
-                display.add(Collections.singletonList(""))
+                newDisplay.add(Collections.singletonList(""))
             }
             val amount = newVisitors.size
             val visitorLabel = if (amount == 1) "visitor" else "visitors"
-            display.add(Collections.singletonList("§e$amount §7new $visitorLabel:"))
+            newDisplay.add(Collections.singletonList("§e$amount §7new $visitorLabel:"))
             for (visitor in newVisitors) {
-                display.add(Collections.singletonList(" §7- $visitor"))
+                newDisplay.add(Collections.singletonList(" §7- $visitor"))
             }
         }
-    }
 
-    var tick = 0
+        return newDisplay
+    }
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {

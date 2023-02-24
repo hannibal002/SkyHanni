@@ -475,7 +475,7 @@ object RenderUtils {
         if (list.isEmpty()) return
 
         var offsetY = 0
-        for (line in list) {
+        for (line in list.toMutableList()) {
             renderLine(line, offsetY)
             offsetY += 10 + extraSpace + 2
         }
