@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -8,24 +9,34 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
 object NEUItems {
-
+    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemCache = mutableMapOf<String, ItemStack>()
 
-    fun getInternalNameByName(rawName: String): String? {
-        return ItemResolutionQuery.findInternalNameByDisplayName(rawName, false)
+    fun getInternalName(itemName: String): String {
+        return ItemResolutionQuery.findInternalNameByDisplayName(itemName, false)
     }
 
-    fun readItemFromRepo(internalName: String): ItemStack {
+    fun getInternalName(itemStack: ItemStack): String {
+        return ItemResolutionQuery(manager)
+            .withCurrentGuiContext()
+            .withItemStack(itemStack)
+            .resolveInternalName() ?: ""
+    }
+
+    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double {
+        return manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
+    }
+
+    fun getItemStack(internalName: String): ItemStack {
         if (itemCache.contains(internalName)) {
-            return itemCache[internalName]!!
+            return itemCache[internalName]!!.copy()
         }
-        val itemStack = NotEnoughUpdates.INSTANCE.manager.jsonToStack(
-            NotEnoughUpdates.INSTANCE.manager.itemInformation[internalName]
-        )
-        if (itemStack != null) {
-            itemCache[internalName] = itemStack
-        }
-        return itemStack
+
+        val itemStack = ItemResolutionQuery(manager)
+            .withKnownInternalName(internalName)
+            .resolveToItemStack()!!
+        itemCache[internalName] = itemStack
+        return itemStack.copy()
     }
 
     fun ItemStack.renderOnScreen(x: Float, y: Float) {

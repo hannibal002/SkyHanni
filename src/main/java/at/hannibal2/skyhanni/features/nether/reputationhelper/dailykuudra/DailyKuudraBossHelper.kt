@@ -79,7 +79,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")
-                    lineList.add(NEUItems.readItemFromRepo(displayItem))
+                    lineList.add(NEUItems.getItemStack(displayItem))
                     lineList.add("$displayName: $result")
                     display.add(lineList)
                 }
