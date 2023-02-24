@@ -41,9 +41,14 @@ object NEUItems {
 
     fun ItemStack.renderOnScreen(x: Float, y: Float) {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 0f)
+        val isSkull = item === Items.skull
+        if (isSkull) {
+            GlStateManager.translate(x - 2, y - 2, 0f)
+        } else {
+            GlStateManager.translate(x, y, 0f)
+        }
 
-        val scale = if (item === Items.skull) 0.8f else 0.6f
+        val scale = if (isSkull) 0.8f else 0.6f
         GlStateManager.scale(scale, scale, 1f)
         Utils.drawItemStack(this, 0, 0)
         GlStateManager.popMatrix()
