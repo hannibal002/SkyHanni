@@ -22,6 +22,7 @@ class SkyMartBestProfit {
 
     private val pattern = Pattern.compile("§c(.*) Copper")
     private val display = mutableListOf<String>()
+    private val config get() = SkyHanniMod.feature.garden
 
     @SubscribeEvent
     fun onChatPacket(event: InventoryOpenEvent) {
@@ -53,14 +54,17 @@ class SkyMartBestProfit {
                     name = "§9Sunder I"
                 }
 
-                val pair = Pair("$name§f:", "§6§l$perFormat §f(§6$priceFormat §f/ §c$amountFormat copper§f)")
+                val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
+                    " §f(§6$priceFormat §f/ §c$amountFormat Copper§f)"
+                } else ""
+                val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
                 priceMap[pair] = factor
             }
         }
 
         display.clear()
 
-        display.add("Coins per §ccopper§f:")
+        display.add("Coins per §cCopper§f:")
         display.add(" ")
 
         val keys = priceMap.sortedDesc().keys
@@ -84,12 +88,10 @@ class SkyMartBestProfit {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (isEnabled()) {
-            SkyHanniMod.feature.garden.skyMartCopperPricePos.renderStrings(display)
+            config.skyMartCopperPricePos.renderStrings(display)
         }
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock &&
-                SkyHanniMod.feature.garden.skyMartCopperPrice &&
-                LorenzUtils.skyBlockIsland == IslandType.GARDEN
+        LorenzUtils.inSkyBlock && config.skyMartCopperPrice && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }
