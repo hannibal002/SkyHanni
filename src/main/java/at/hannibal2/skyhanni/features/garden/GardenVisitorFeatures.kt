@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
@@ -16,11 +16,12 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.*
 
 class GardenVisitorFeatures {
 
     private val visitors = mutableMapOf<String, Visitor>()
-    private val display = mutableListOf<String>()
+    private val display = mutableListOf<List<Any>>()
     private var lastClickedNpc = 0
     private var nearby = false
 
@@ -79,20 +80,22 @@ class GardenVisitorFeatures {
             }
         }
         if (requiredItems.isNotEmpty()) {
-            display.add("Visitor items needed:")
+            display.add(Collections.singletonList("§7Visitor items needed:"))
             for ((name, amount) in requiredItems) {
-                display.add(" -$name §8x$amount")
+                val internalName = NEUItems.getInternalName(name)
+                val itemStack = NEUItems.getItemStack(internalName)
+                display.add(listOf(" §7- ", itemStack, "$name §8x$amount"))
             }
         }
         if (newVisitors.isNotEmpty()) {
             if (requiredItems.isNotEmpty()) {
-                display.add("")
+                display.add(Collections.singletonList(""))
             }
             val amount = newVisitors.size
             val visitorLabel = if (amount == 1) "visitor" else "visitors"
-            display.add("$amount new $visitorLabel:")
+            display.add(Collections.singletonList("§e$amount §7new $visitorLabel:"))
             for (visitor in newVisitors) {
-                display.add(" -$visitor")
+                display.add(Collections.singletonList(" §7- $visitor"))
             }
         }
     }
@@ -248,7 +251,7 @@ class GardenVisitorFeatures {
             if (!nearby) return
         }
 
-        SkyHanniMod.feature.garden.visitorNeedsPos.renderStrings(display)
+        SkyHanniMod.feature.garden.visitorNeedsPos.renderStringsAndItems(display)
     }
 
     class Visitor(val entityId: Int, val items: MutableMap<String, Int> = mutableMapOf())
