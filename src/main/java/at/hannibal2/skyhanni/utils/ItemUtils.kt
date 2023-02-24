@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -114,7 +116,7 @@ object ItemUtils {
     }
 
     fun ItemStack.getInternalName(): String {
-        return ItemResolutionQuery()
+        return ItemResolutionQuery(NotEnoughUpdates.INSTANCE.manager)
             .withCurrentGuiContext()
             .withItemStack(this)
             .resolveInternalName() ?: ""

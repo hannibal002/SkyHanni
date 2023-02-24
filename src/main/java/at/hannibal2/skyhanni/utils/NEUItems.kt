@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
@@ -10,25 +10,9 @@ import net.minecraft.item.ItemStack
 object NEUItems {
 
     private val itemCache = mutableMapOf<String, ItemStack>()
-    private val itemNameCache = mutableMapOf<String, String>() // display name -> internal name
 
     fun getInternalNameByName(rawName: String): String? {
-        val itemName = rawName.removeColor()
-        if (itemNameCache.containsKey(itemName)) {
-            return itemNameCache[itemName]
-        }
-        val manager = NotEnoughUpdates.INSTANCE.manager
-        for ((internalId, b) in manager.itemInformation) {
-            if (b.has("displayname")) {
-                val name = b.get("displayname").asString
-                if (name.contains(itemName)) {
-                    itemNameCache[itemName] = internalId
-                    return internalId
-                }
-            }
-        }
-
-        return null
+        return ItemResolutionQuery.findInternalNameByDisplayName(rawName, false)
     }
 
     fun readItemFromRepo(internalName: String): ItemStack {
