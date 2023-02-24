@@ -11,17 +11,19 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
+import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 import java.util.regex.Pattern
 
 class SkyMartBestProfit {
 
     private val pattern = Pattern.compile("§c(.*) Copper")
-    private val display = mutableListOf<String>()
+    private val display = mutableListOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
 
     @SubscribeEvent
@@ -32,6 +34,7 @@ class SkyMartBestProfit {
         if (inventory.title != "SkyMart") return
 
         val priceMap = mutableMapOf<Pair<String, String>, Double>()
+        val iconMap = mutableMapOf<String, ItemStack>()
 
         for (stack in inventory.items.values) {
             for (line in stack.getLore()) {
@@ -53,29 +56,32 @@ class SkyMartBestProfit {
                     name = "§9Sunder I"
                 }
 
+                iconMap[name] = NEUItems.getItemStack(internalName)
+
                 val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
                     " §f(§6$priceFormat §f/ §c$amountFormat Copper§f)"
                 } else ""
-                val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
+                val pair = Pair(name, "§6§l$perFormat$advancedStats")
                 priceMap[pair] = factor
             }
         }
 
         display.clear()
 
-        display.add("Coins per §cCopper§f:")
-        display.add(" ")
+        display.add(Collections.singletonList("Coins per §cCopper§f:"))
+        display.add(Collections.singletonList(""))
 
         val keys = priceMap.sortedDesc().keys
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
 
-        for ((first, second) in keys) {
-            var name = first
-            while (renderer.getStringWidth(name.removeColor()) < longest) {
-                name += " "
+        for ((name, second) in keys) {
+            val itemStack = iconMap[name]!!
+            var displayName = "$name§f:"
+            while (renderer.getStringWidth(displayName.removeColor()) < longest) {
+                displayName += " "
             }
-            display.add("$name   $second")
+            display.add(listOf(itemStack, "$displayName   $second"))
         }
     }
 
@@ -87,7 +93,7 @@ class SkyMartBestProfit {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (isEnabled()) {
-            config.skyMartCopperPricePos.renderStrings(display)
+            config.skyMartCopperPricePos.renderStringsAndItems(display)
         }
     }
 
