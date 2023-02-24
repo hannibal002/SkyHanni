@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,14 +33,13 @@ class SkyMartBestProfit {
 
         val priceMap = mutableMapOf<Pair<String, String>, Double>()
 
-        val auctionManager = NotEnoughUpdates.INSTANCE.manager.auctionManager
         for (stack in inventory.items.values) {
             for (line in stack.getLore()) {
                 val matcher = pattern.matcher(line)
                 if (!matcher.matches()) continue
 
                 val internalName = stack.getInternalName()
-                val lowestBin = auctionManager.getBazaarOrBin(internalName, false)
+                val lowestBin = NEUItems.getPrice(internalName)
                 if (lowestBin == -1.0) continue
 
                 val amount = matcher.group(1).replace(",", "").toInt()

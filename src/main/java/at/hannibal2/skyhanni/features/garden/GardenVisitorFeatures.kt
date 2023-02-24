@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.play.client.C02PacketUseEntity
@@ -126,9 +125,7 @@ class GardenVisitorFeatures {
             if (i > 1) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    val internalName = NEUItems.getInternalNameByName(itemName)
-                    val auctionManager = NotEnoughUpdates.INSTANCE.manager.auctionManager
-                    val lowestBin = auctionManager.getBazaarOrBin(internalName, false)
+                    val lowestBin = NEUItems.getPrice(NEUItems.getInternalName(itemName))
                     val price = lowestBin * amount
                     totalPrice += price
                     val format = NumberUtil.format(price)

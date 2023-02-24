@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import net.minecraft.client.Minecraft
@@ -49,9 +50,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = NotEnoughUpdates.INSTANCE.manager.createItemResolutionQuery()
-                .withItemStack(item)
-                .resolveInternalName() ?: continue
+            val rawId = item.getInternalName()
             if (name.contains(" Minion ")) {
                 minions[name] = rawId
             } else {
@@ -79,7 +78,7 @@ class MinionCraftHelper {
     ) {
         val nextNumber = minionNumber + 1
         display.add("$minionName Minion $minionNumber -> $nextNumber")
-        val recipes: List<NeuRecipe> = NotEnoughUpdates.INSTANCE.manager.getAvailableUsagesFor(minionId)
+        val recipes: List<NeuRecipe> = NEUItems.manager.getAvailableUsagesFor(minionId)
         for (recipe in recipes) {
             if (recipe !is CraftingRecipe) continue
             val output = recipe.output
@@ -100,9 +99,7 @@ class MinionCraftHelper {
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
-                val itemName = NotEnoughUpdates.INSTANCE.manager.createItemResolutionQuery()
-                    .withKnownInternalName(rawId)
-                    .resolveToItemStack()?.name ?: "§cName??§f"
+                val itemName = NEUItems.getItemStack(rawId).name ?: "§cName??§f"
                 if (percentage >= 1) {
                     display.add("  $itemName§8: §aDONE")
                     display.add(" ")

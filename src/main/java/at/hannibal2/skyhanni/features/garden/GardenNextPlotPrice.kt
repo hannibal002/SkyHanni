@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -34,9 +33,7 @@ class GardenNextPlotPrice {
             if (next) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    val internalName = NEUItems.getInternalNameByName(itemName)
-                    val auctionManager = NotEnoughUpdates.INSTANCE.manager.auctionManager
-                    val lowestBin = auctionManager.getBazaarOrBin(internalName, false)
+                    val lowestBin = NEUItems.getPrice(NEUItems.getInternalName(itemName))
                     val price = lowestBin * amount
                     val format = NumberUtil.format(price)
                     list[i] = list[i] + " §f(§6$format§f)"
