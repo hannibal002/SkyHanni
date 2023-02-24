@@ -18,6 +18,12 @@ public class Garden {
     public boolean skyMartCopperPrice = true;
 
     @Expose
+    @ConfigOption(name = "Advanced stats", desc = "Show additionally the bin price and copper price for every item.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean skyMartCopperPriceAdvancedStats = false;
+
+    @Expose
     @ConfigOption(name = "Copper Price Position", desc = "")
     @ConfigEditorButton(runnableId = "skyMartCopperPrice", buttonText = "Edit")
     @ConfigAccordionId(id = 0)
