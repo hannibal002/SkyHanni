@@ -129,7 +129,7 @@ class GardenVisitorFeatures {
                     val price = lowestBin * amount
                     totalPrice += price
                     val format = NumberUtil.format(price)
-                    list[i] = "$line §f(§6$format§f)"
+                    list[i] = "$line §7(§6$format§7)"
                     amountDifferentItems++
                 }
             }

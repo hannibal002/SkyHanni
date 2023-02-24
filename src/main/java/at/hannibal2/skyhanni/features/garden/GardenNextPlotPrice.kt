@@ -36,7 +36,7 @@ class GardenNextPlotPrice {
                     val lowestBin = NEUItems.getPrice(NEUItems.getInternalName(itemName))
                     val price = lowestBin * amount
                     val format = NumberUtil.format(price)
-                    list[i] = list[i] + " §f(§6$format§f)"
+                    list[i] = list[i] + " §7(§6$format§7)"
                 }
                 break
             }
