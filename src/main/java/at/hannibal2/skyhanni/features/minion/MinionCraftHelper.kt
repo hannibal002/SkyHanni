@@ -94,7 +94,6 @@ class MinionCraftHelper {
                 }
             }
             for ((rawId, need) in map) {
-//                println("need rawId: $rawId")
                 val (itemId, multiplier) = getMultiplier(rawId)
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
@@ -131,28 +130,35 @@ private fun String.addOneToId(): String {
     return replace(lastText, "" + next)
 }
 
-private fun getMultiplier(rawId: String): Pair<String, Int> {
-    if (rawId == "MELON_BLOCK") {
-        return Pair("MELON", 9)
+var multiplierCache = mutableMapOf<String, Pair<String, Int>>()
+
+ fun getMultiplier(rawId: String): Pair<String, Int> {
+     if (multiplierCache.contains(rawId)) {
+         return multiplierCache[rawId]!!
+     }
+    for (recipe in NEUItems.manager.getAvailableRecipesFor(rawId)) {
+        if (recipe is CraftingRecipe) {
+            val map = mutableMapOf<String, Int>()
+            for (ingredient in recipe.ingredients) {
+                val count = ingredient.count.toInt()
+                val internalItemId = ingredient.internalItemId
+                val old = map.getOrDefault(internalItemId, 0)
+                map[internalItemId] = old + count
+            }
+            if (map.size == 1) {
+                val pair = map.iterator().next().toPair()
+                val id = pair.first
+                val amount = pair.second
+
+                val multiplier = getMultiplier(id)
+                val result = Pair(multiplier.first, multiplier.second * amount)
+                multiplierCache[rawId] = result
+                return result
+            }
+        }
     }
-    if (rawId == "HAY_BLOCK") {
-        return Pair("WHEAT", 9)
-    }
-    if (rawId == "ENCHANTED_HAY_BLOCK") {
-        return Pair("WHEAT", 9 * 16 * 9)
-    }
-    if (rawId == "PACKED_ICE") {
-        return Pair("ICE", 9)
-    }
-    if (rawId == "ENCHANTED_MITHRIL") {
-        return Pair("MITHRIL_ORE", 160)
-    }
-    if (rawId == "ENCHANTED_GOLD") {
-        return Pair("GOLD_INGOT", 160)
-    }
-    return if (rawId.startsWith("ENCHANTED_")) {
-        Pair(rawId.substring(10), 160)
-    } else {
-        Pair(rawId, 1)
-    }
+
+     val result = Pair(rawId, 1)
+     multiplierCache[rawId] = result
+     return result
 }
