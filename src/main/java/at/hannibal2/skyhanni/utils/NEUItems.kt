@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
@@ -38,6 +39,8 @@ object NEUItems {
         itemCache[internalName] = itemStack
         return itemStack.copy()
     }
+
+    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 
     fun ItemStack.renderOnScreen(x: Float, y: Float) {
         GlStateManager.pushMatrix()

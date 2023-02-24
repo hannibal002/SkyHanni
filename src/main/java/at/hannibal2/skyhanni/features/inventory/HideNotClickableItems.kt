@@ -3,15 +3,15 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
-import at.hannibal2.skyhanni.data.VanillaItemManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -330,8 +330,7 @@ class HideNotClickableItems {
 
             if (hideNpcSellFilter.match(name)) return false
 
-            val id = stack.getInternalName()
-            if (VanillaItemManager.isVanillaItem(id) && !stack.isItemEnchanted) {
+            if (stack.isVanilla() && !stack.isEnchanted()) {
                 return false
             }
         }

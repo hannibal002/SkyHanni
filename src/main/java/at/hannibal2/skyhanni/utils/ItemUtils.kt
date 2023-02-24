@@ -115,6 +115,10 @@ object ItemUtils {
 
     fun ItemStack.getInternalName() = NEUItems.getInternalName(this)
 
+    fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
+
+    fun ItemStack.isEnchanted() = isItemEnchanted
+
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
         if (tagCompound == null) return null

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -117,7 +118,7 @@ object CopyNearbyEntitiesCommand {
                         val stackName = stack.name
                         val stackDisplayName = stack.displayName
                         val cleanName = stack.cleanName()
-                        val itemEnchanted = stack.isItemEnchanted
+                        val itemEnchanted = stack.isEnchanted()
                         val itemDamage = stack.itemDamage
                         val stackSize = stack.stackSize
                         val maxStackSize = stack.maxStackSize
