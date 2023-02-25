@@ -137,7 +137,7 @@ object ItemUtils {
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
 
-    private val pattern = Pattern.compile("(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>\\d+))?")
+    private val pattern = Pattern.compile("(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?")
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
