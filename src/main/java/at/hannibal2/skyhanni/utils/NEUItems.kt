@@ -38,8 +38,14 @@ object NEUItems {
     fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double {
         val result = manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
         // TODO remove workaround
-        if (internalName == "JACK_O_LANTERN" && result == -1.0) {
-            return getPrice("PUMPKIN") + 1
+        if (result == -1.0) {
+            if (internalName == "JACK_O_LANTERN") {
+                return getPrice("PUMPKIN") + 1
+            }
+            if (internalName == "GOLDEN_CARROT") {
+                // 6.8 for some players
+                return 7.0 // NPC price
+            }
         }
         return result
     }
