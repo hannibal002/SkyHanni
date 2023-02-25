@@ -108,7 +108,8 @@ class HideArmor {
             if (slot !in 5..8) return
 
             val armorSlot = (slot - 5) * -1 + 3
-            val armor = getCachedArmor(Minecraft.getMinecraft().thePlayer.entityId)
+            val ownEntityId = Minecraft.getMinecraft()?.thePlayer?.entityId ?: return
+            val armor = getCachedArmor(ownEntityId)
             // set item in cache
             armor[armorSlot] = packet.func_149174_e()
 
