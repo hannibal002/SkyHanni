@@ -35,7 +35,12 @@ object NEUItems {
 
         val itemStack = ItemResolutionQuery(manager)
             .withKnownInternalName(internalName)
-            .resolveToItemStack()!!
+            .resolveToItemStack()
+        if (itemStack == null) {
+            val error = "ItemResolutionQuery returns null for internalName $internalName"
+            LorenzUtils.error(error)
+            throw RuntimeException(error)
+        }
         itemCache[internalName] = itemStack
         return itemStack.copy()
     }
