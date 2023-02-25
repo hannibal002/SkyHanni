@@ -19,6 +19,7 @@ object NEUItems {
             return itemNameCache[itemName]!!
         }
         // We love hypixel naming moments
+        // TODO remove workaround
         val name = if (itemName.contains("Jack o' Lantern")) {
             itemName.replace("Jack o' Lantern", "Jack o'Lantern")
         } else itemName
@@ -35,7 +36,12 @@ object NEUItems {
     }
 
     fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double {
-        return manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
+        val result = manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
+        // TODO remove workaround
+        if (internalName == "JACK_O_LANTERN" && result == -1.0) {
+            return getPrice("PUMPKIN") + 1
+        }
+        return result
     }
 
     fun getItemStack(internalName: String): ItemStack {
