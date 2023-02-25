@@ -12,9 +12,19 @@ import net.minecraft.item.ItemStack
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemCache = mutableMapOf<String, ItemStack>()
+    private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
 
     fun getInternalName(itemName: String): String {
-        return ItemResolutionQuery.findInternalNameByDisplayName(itemName, false)
+        if (itemNameCache.containsKey(itemName)) {
+            return itemNameCache[itemName]!!
+        }
+        // We love hypixel naming moments
+        val name = if (itemName.contains("Jack o' Lantern")) {
+            itemName.replace("Jack o' Lantern", "Jack o'Lantern")
+        } else itemName
+        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(name, false)
+        itemNameCache[itemName] = internalName
+        return internalName
     }
 
     fun getInternalName(itemStack: ItemStack): String {
