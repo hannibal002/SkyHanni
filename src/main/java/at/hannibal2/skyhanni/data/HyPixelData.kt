@@ -56,7 +56,7 @@ class HyPixelData {
     }
 
     @SubscribeEvent
-    fun onStatusBar(event: LorenzChatEvent) {
+    fun onChatMessage(event: LorenzChatEvent) {
         if (!hypixel) return
 
         val message = event.message.removeColor().lowercase()
