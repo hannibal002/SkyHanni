@@ -27,7 +27,7 @@ class SkyMartBestProfit {
     private val config get() = SkyHanniMod.feature.garden
 
     @SubscribeEvent
-    fun onChatPacket(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
         val inventory = event.inventory

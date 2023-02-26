@@ -31,7 +31,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onChatPacket(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         inVisitorInventory = false
 
         if (!isEnabled()) return
