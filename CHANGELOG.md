@@ -30,6 +30,7 @@
 + Removed `Fixing Skytils custom Damage Splash` (Skytils has already fixed this bug. Additionally, this option enabled and skytils' damage splash disabled caused the hypixel damage splash to not show the tailing commas at all)
 + Fixed bug with particles that blocks NotEnoughUpdates' Fishing features.
 + Hopefully fixed incompatibility with skytils' hide cheap coins feature.
++ Fixed dungeon milestone messages getting wrongfully formatted.
 
 ## Version 0.16 (2023-02-11)
 
