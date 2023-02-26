@@ -4,15 +4,21 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import net.minecraft.network.play.server.S38PacketPlayerListItem
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 
 class TabListData {
-
     private val uuidMap = mutableMapOf<UUID, TabListPlayer>()
     private val tabListMap = mutableMapOf<TabListPlayer, String>()
 
     class TabListPlayer(var displayName: String, var internalName: String)
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        uuidMap.clear()
+        tabListMap.clear()
+    }
 
     @SubscribeEvent
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
