@@ -2,16 +2,15 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.BurrowDugEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -84,6 +83,13 @@ class GriffinBurrowHelper {
             if (event.entity == Minecraft.getMinecraft().thePlayer) {
                 teleportedLocation = event.newLocation
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
+            particleBurrows.keys.removeIf { particleBurrows[it] == BurrowType.MOB }
         }
     }
 
