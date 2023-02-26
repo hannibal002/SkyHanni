@@ -26,13 +26,15 @@ class GardenVisitorFeatures {
     private var nearby = false
     private var tick = 0
 
+    companion object {
+        var inVisitorInventory = false
+    }
+
     @SubscribeEvent
     fun onChatPacket(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay &&
-            !SkyHanniMod.feature.garden.visitorHighlightReady
-        ) return
+        inVisitorInventory = false
 
+        if (!isEnabled()) return
         val npcItem = event.inventory.items[13] ?: return
         val lore = npcItem.getLore()
         var isVisitor = false
@@ -46,6 +48,9 @@ class GardenVisitorFeatures {
 
         val offerItem = event.inventory.items[29] ?: return
         if (offerItem.name != "§aAccept Offer") return
+        inVisitorInventory = true
+
+        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay && !SkyHanniMod.feature.garden.visitorHighlightReady) return
 
         val visitor = Visitor(lastClickedNpc)
         for (line in offerItem.getLore()) {
@@ -114,6 +119,7 @@ class GardenVisitorFeatures {
         if (!nearby) return
         if (!SkyHanniMod.feature.garden.visitorShowPrice) return
 
+        if (!inVisitorInventory) return
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
 
