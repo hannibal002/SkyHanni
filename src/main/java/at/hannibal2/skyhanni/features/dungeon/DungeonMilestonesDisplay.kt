@@ -13,7 +13,6 @@ import kotlin.concurrent.fixedRateTimer
 
 class DungeonMilestonesDisplay {
 
-
     companion object {
         private var display = ""
         var color = ""
