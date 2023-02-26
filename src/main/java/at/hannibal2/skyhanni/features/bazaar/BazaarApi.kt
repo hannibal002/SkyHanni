@@ -21,7 +21,7 @@ class BazaarApi {
             if (name.endsWith(" Gemstone")) {
                 return name.substring(6)
             }
-            return name.removeColor()
+            return name.replace("-", " ").removeColor()
         }
 
         fun getBazaarDataForName(name: String): BazaarData? {
