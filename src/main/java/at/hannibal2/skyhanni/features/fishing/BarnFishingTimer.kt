@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -10,7 +11,6 @@ import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.PositionedSound
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -88,8 +88,7 @@ class BarnFishingTimer {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.barnTimer) return
         if (!rightLocation) return
