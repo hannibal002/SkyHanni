@@ -271,7 +271,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             result.add("  $stateText$type: §f$displayName$multipleText$sacksText")
         } else {
             result.add("  $stateText$type: ")
-            result.add(NEUItems.getItemStack(item))
+            try {
+                result.add(NEUItems.getItemStack(item))
+            } catch (e: RuntimeException) {
+                e.printStackTrace()
+            }
             result.add("§f$displayName$multipleText$sacksText")
         }
         return result
