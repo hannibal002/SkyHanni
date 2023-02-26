@@ -58,7 +58,7 @@ class GriffinBurrowHelper {
     private fun checkRemoveGuess(animation: Boolean) {
         guessLocation?.let { guessRaw ->
             val guess = findBlock(guessRaw)
-            if (particleBurrows.any { guess.distance(it.key) < 20 }) {
+            if (particleBurrows.any { guess.distance(it.key) < 40 }) {
                 if (animation) {
                     animationLocation = guess
                 }
@@ -126,30 +126,33 @@ class GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        val playerLocation = LocationUtils.playerLocation()
-        if (SkyHanniMod.feature.diana.burrowsSoopyGuess) {
-            guessLocation?.let {
-                val guessLocation = findBlock(it)
-                val distance = guessLocation.distance(playerLocation)
-                event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
-                event.drawDynamicText(guessLocation, "Guess", 1.5)
-                if (distance > 5) {
-                    val formattedDistance = LorenzUtils.formatDouble(distance)
-                    event.drawDynamicText(guessLocation, "§e${formattedDistance}m", 1.3, yOff = 12f)
-                }
-            }
-        }
-
         sendTip(event)
 
+        val playerLocation = LocationUtils.playerLocation()
         if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
             for (burrow in particleBurrows) {
                 val location = burrow.key
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
-                event.drawColor(location, burrowType.color, distance > 10)
-                if (distance < 10) {
-                    event.drawString(location.add(0.5, 1.5, 0.5), burrowType.text, true)
+//                if (distance < 30) {
+                    event.drawColor(location, burrowType.color, distance > 10)
+//                }
+                event.drawDynamicText(location.add(0, 1, 0), burrowType.text, 1.5)
+//                if (distance < 10) {
+//                    event.drawString(location.add(0.5, 1.5, 0.5), burrowType.text, true)
+//                }
+            }
+        }
+
+        if (SkyHanniMod.feature.diana.burrowsSoopyGuess) {
+            guessLocation?.let {
+                val guessLocation = findBlock(it)
+                val distance = guessLocation.distance(playerLocation)
+                event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
+                event.drawDynamicText(guessLocation.add(0, 1, 0), "Guess", 1.5)
+                if (distance > 5) {
+                    val formattedDistance = LorenzUtils.formatDouble(distance)
+                    event.drawDynamicText(guessLocation.add(0, 1, 0), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
         }
