@@ -31,6 +31,7 @@
 + Fixed bug with particles that blocks NotEnoughUpdates' Fishing features.
 + Hopefully fixed incompatibility with skytils' hide cheap coins feature.
 + Fixed dungeon milestone messages getting wrongfully formatted.
++ Fixed bazaar features not working for items with an - (turbo farming books and triple strike)
 
 ## Version 0.16 (2023-02-11)
 
