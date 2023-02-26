@@ -196,7 +196,6 @@ public class SkyHanniMod {
         loadModule(new BingoCardDisplay());
         loadModule(new BingoNextStepHelper());
         loadModule(new MinionCraftHelper());
-        loadModule(new HideDeadEntities());
         loadModule(new TpsCounter());
         loadModule(new ParticleHider());
         loadModule(new MiscFeatures());
