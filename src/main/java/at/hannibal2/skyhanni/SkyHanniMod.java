@@ -93,8 +93,8 @@ public class SkyHanniMod {
         logger = LogManager.getLogger("SkyHanni");
 
         //API and utils
-        new BazaarApi();
         loadModule(this);
+        loadModule(new BazaarApi());
         loadModule(new ChatManager());
         loadModule(new HyPixelData());
         loadModule(new DungeonData());
