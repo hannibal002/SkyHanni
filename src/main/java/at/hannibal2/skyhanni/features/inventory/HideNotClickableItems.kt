@@ -394,7 +394,7 @@ class HideNotClickableItems {
     }
 
     private fun hideBazaarOrAH(chestName: String, stack: ItemStack): Boolean {
-        val bazaarInventory = BazaarApi.isBazaarInventory(chestName)
+        val bazaarInventory = BazaarApi.inBazaarInventory
 
         val auctionHouseInventory =
             chestName == "Co-op Auction House" || chestName == "Auction House" || chestName == "Create BIN Auction" || chestName == "Create Auction"
