@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
@@ -117,8 +117,7 @@ class MinionCraftHelper {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.minions.minionCraftHelperEnabled) return
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.bingo.card.CommunityGoal
 import at.hannibal2.skyhanni.features.bingo.card.PersonalGoal
@@ -15,7 +16,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
@@ -130,8 +130,7 @@ class BingoCardDisplay {
     private var displayMode = 0
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!SkyHanniMod.feature.bingo.bingoCard) return
 

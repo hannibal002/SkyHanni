@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -31,8 +31,7 @@ class AshfangNextResetCooldown {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
         if (spawnTime == -1L) return
 

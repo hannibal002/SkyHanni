@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
@@ -37,8 +37,7 @@ class CurrentPetDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (!SkyHanniMod.feature.misc.petDisplay) return

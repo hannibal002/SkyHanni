@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -8,7 +9,6 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -128,8 +128,7 @@ class LorenzTest {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dev.debugEnabled) return
 
