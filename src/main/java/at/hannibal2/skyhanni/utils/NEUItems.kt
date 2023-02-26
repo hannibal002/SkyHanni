@@ -5,7 +5,9 @@ import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
@@ -79,8 +81,21 @@ object NEUItems {
         }
 
         val scale = if (isSkull) 0.8f else 0.6f
-        GlStateManager.scale(scale, scale, 1f)
-        Utils.drawItemStack(this, 0, 0)
+        GlStateManager.scale(scale, scale, 0f)
+        drawItemStack(this)
         GlStateManager.popMatrix()
+    }
+
+    private fun drawItemStack(stack: ItemStack) {
+        val itemRender = Minecraft.getMinecraft().renderItem
+
+        Utils.disableCustomDungColours = true
+        RenderHelper.enableGUIStandardItemLighting()
+        Utils.hasEffectOverride = true
+        itemRender.renderItemAndEffectIntoGUI(stack, 0, 0)
+        itemRender.renderItemOverlayIntoGUI(Minecraft.getMinecraft().fontRendererObj, stack, 0, 0, null)
+        Utils.hasEffectOverride = false
+        RenderHelper.disableStandardItemLighting()
+        Utils.disableCustomDungColours = false
     }
 }
