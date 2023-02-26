@@ -19,7 +19,7 @@ class BazaarBestSellMethod {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         display = ""
     }
 
