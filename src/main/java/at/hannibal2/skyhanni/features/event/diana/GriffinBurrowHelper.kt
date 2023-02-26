@@ -26,6 +26,7 @@ class GriffinBurrowHelper {
     private var lastDug: LorenzVec? = null
     private var teleportedLocation: LorenzVec? = null
     private var lastGuessTime = 0L
+    private var lastAnimationTime = 0L
 
     @SubscribeEvent
     fun onSoopyGuessBurrow(event: SoopyGuessBurrowEvent) {
@@ -135,7 +136,7 @@ class GriffinBurrowHelper {
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
 //                if (distance < 30) {
-                    event.drawColor(location, burrowType.color, distance > 10)
+                event.drawColor(location, burrowType.color, distance > 10)
 //                }
                 event.drawDynamicText(location.add(0, 1, 0), burrowType.text, 1.5)
 //                if (distance < 10) {
@@ -151,7 +152,7 @@ class GriffinBurrowHelper {
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
                 event.drawDynamicText(guessLocation.add(0, 1, 0), "Guess", 1.5)
                 if (distance > 5) {
-                    val formattedDistance = LorenzUtils.formatDouble(distance)
+                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
                     event.drawDynamicText(guessLocation.add(0, 1, 0), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
@@ -211,8 +212,13 @@ class GriffinBurrowHelper {
 
         event.draw3DLine(animation.add(0.5, 0.5, 0.5), target.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 2, true)
 
-        vector = vector.multiply(1 / vector.length())
-        vector = vector.multiply(0.18)
-        return animation.add(vector)
+        return if (System.currentTimeMillis() > lastAnimationTime + 25) {
+            lastAnimationTime = System.currentTimeMillis()
+            vector = vector.multiply(1 / vector.length())
+            vector = vector.multiply(0.18)
+            animation.add(vector)
+        } else {
+            animation
+        }
     }
 }
