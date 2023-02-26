@@ -14,6 +14,8 @@ public class MixinRenderManager {
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void shouldRender(Entity entity, ICamera camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(!new CheckRenderEntityEvent<>(entity, camera, camX, camY, camZ).postAndCatch());
+        if (new CheckRenderEntityEvent<>(entity, camera, camX, camY, camZ).postAndCatch()) {
+            cir.setReturnValue(false);
+        }
     }
 }
