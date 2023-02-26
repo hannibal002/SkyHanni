@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import java.util.regex.Pattern
@@ -91,7 +91,7 @@ class SkyMartBestProfit {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (isEnabled()) {
             config.skyMartCopperPricePos.renderStringsAndItems(display)
         }

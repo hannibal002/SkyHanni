@@ -39,6 +39,7 @@ object RenderUtils {
         GlStateManager.color(1f, 1f, 1f, 1f)
 
         GlStateManager.pushMatrix()
+        // TODO don't use z
         GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
         Gui.drawRect(
             this.xDisplayPosition,
