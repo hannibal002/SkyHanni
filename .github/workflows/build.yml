@@ -18,12 +18,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 17
-      - uses: actions/cache@v2
+          distribution: temurin
+          cache: gradle
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -33,7 +35,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
         run: ./gradlew build
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: build/libs/*.jar
       - name: Stop gradle daemons
