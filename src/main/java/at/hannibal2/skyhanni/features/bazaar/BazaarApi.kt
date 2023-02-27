@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.bazaar
 
-import at.hannibal2.skyhanni.data.InventoryData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -44,12 +43,12 @@ class BazaarApi {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inBazaarInventory = checkIfInBazaar(event.inventory)
+        inBazaarInventory = checkIfInBazaar(event)
     }
 
-    private fun checkIfInBazaar(inventory: InventoryData.Inventory): Boolean {
-        val returnItem = inventory.slotCount - 5
-        for ((slot, item) in inventory.items) {
+    private fun checkIfInBazaar(event: InventoryOpenEvent): Boolean {
+        val returnItem = event.inventorySize - 5
+        for ((slot, item) in event.inventoryItems) {
             if (slot == returnItem) {
                 if (item.name?.removeColor().let { it == "Go Back" }) {
                     val lore = item.getLore()
@@ -60,9 +59,8 @@ class BazaarApi {
             }
         }
 
-        val title = inventory.title
-        if (title.startsWith("Bazaar ➜ ")) return true
-        return when (title) {
+        if (event.inventoryName.startsWith("Bazaar ➜ ")) return true
+        return when (event.inventoryName) {
             "How many do you want?" -> true
             "How much do you want to pay?" -> true
             "Confirm Buy Order" -> true
