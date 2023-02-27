@@ -113,6 +113,8 @@ public class SkyHanniMod {
         loadModule(new InventoryData());
         loadModule(new TabListData());
         loadModule(new RenderGuiData());
+        loadModule(new GardenCropMilestones());
+        loadModule(new OwnInventoryData());
 
         //features
         loadModule(new BazaarOrderHelper());
@@ -204,6 +206,7 @@ public class SkyHanniMod {
         loadModule(new GardenInventoryNumbers());
         loadModule(new GardenVisitorTimer());
         loadModule(new GardenNextPlotPrice());
+        loadModule(new GardenCropMilestoneDisplay());
 
         Commands.INSTANCE.init();
 

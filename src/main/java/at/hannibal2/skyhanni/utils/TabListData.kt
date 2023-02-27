@@ -84,12 +84,14 @@ class TabListData {
 
             if (action == S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME) {
 //                println("UPDATE_DISPLAY_NAME")
-                val listPlayer = uuidMap[id]!!
+                val listPlayer = uuidMap[id]
+                listPlayer?.let {
+                    it.displayName = formattedName
+                    update()
+                }
 //                println("old: '" + listPlayer.displayName + "'")
 //                println("new: '$formattedName'")
 
-                listPlayer.displayName = formattedName
-                update()
                 return
             }
         }

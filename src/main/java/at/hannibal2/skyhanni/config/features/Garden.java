@@ -113,6 +113,27 @@ public class Garden {
     public boolean numberCropUpgrades = true;
 
     @Expose
+    @ConfigOption(name = "Crop Milestone", desc = "")
+    @ConfigEditorAccordion(id = 5)
+    public boolean cropMilestone = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Display",
+            desc = "Show how much more crops are needed to reach the next crop milestone. " +
+                    "§cRequires an tool with either an counter or cultivating enchantment in the hand."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean cropMilestoneDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Display Position", desc = "")
+    @ConfigEditorButton(runnableId = "cropMilestone", buttonText = "Edit")
+    @ConfigAccordionId(id = 5)
+    public Position cropMilestoneDisplayPos = new Position(0, 0, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
