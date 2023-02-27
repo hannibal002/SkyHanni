@@ -84,10 +84,10 @@ public class Garden {
     public boolean visitorNotification = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Ready", desc = "Highlight the visitor when the required items are in the inventory.")
+    @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean visitorHighlightReady = true;
+    public boolean visitorHighlight = true;
 
     @Expose
     @ConfigOption(name = "Show Price", desc = "Show the bazaar price of the items required for the visitors.")

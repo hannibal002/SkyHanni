@@ -162,7 +162,7 @@
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 + **Visitor Display** - Show all items needed for the visitors.
-+ **Highlight Ready** - Highlight the visitor when the required items are in the inventory.
++ **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.
 + **Show Price** - Show the bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
