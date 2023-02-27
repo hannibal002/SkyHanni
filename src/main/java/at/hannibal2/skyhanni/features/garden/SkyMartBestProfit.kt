@@ -30,13 +30,12 @@ class SkyMartBestProfit {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
-        val inventory = event.inventory
-        if (inventory.title != "SkyMart") return
+        if (event.inventoryName != "SkyMart") return
 
         val priceMap = mutableMapOf<Pair<String, String>, Double>()
         val iconMap = mutableMapOf<String, ItemStack>()
 
-        for (stack in inventory.items.values) {
+        for (stack in event.inventoryItems.values) {
             for (line in stack.getLore()) {
                 val matcher = pattern.matcher(line)
                 if (!matcher.matches()) continue

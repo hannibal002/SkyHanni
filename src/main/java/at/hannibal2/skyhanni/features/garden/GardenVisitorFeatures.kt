@@ -36,7 +36,7 @@ class GardenVisitorFeatures {
         inVisitorInventory = false
 
         if (!isEnabled()) return
-        val npcItem = event.inventory.items[13] ?: return
+        val npcItem = event.inventoryItems[13] ?: return
         val lore = npcItem.getLore()
         var isVisitor = false
         if (lore.size == 4) {
@@ -47,7 +47,7 @@ class GardenVisitorFeatures {
         }
         if (!isVisitor) return
 
-        val offerItem = event.inventory.items[29] ?: return
+        val offerItem = event.inventoryItems[29] ?: return
         if (offerItem.name != "§aAccept Offer") return
         inVisitorInventory = true
 

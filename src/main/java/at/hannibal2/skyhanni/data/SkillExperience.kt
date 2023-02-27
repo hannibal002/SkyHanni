@@ -1,17 +1,15 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
 
 class SkillExperience {
@@ -46,28 +44,18 @@ class SkillExperience {
         val skill = matcher.group(1).lowercase()
         val overflow = matcher.group(2).formatNumber()
         val neededForNextLevel = matcher.group(3).formatNumber()
-        val nextLevel = getLevelForExp(neededForNextLevel)
+        val nextLevel = getLevelForExpExactly(neededForNextLevel)
         val baseExp = getExpForLevel(nextLevel - 1)
         skillExp[skill] = baseExp + overflow
     }
 
-    private var tick = 0
-    private var dirty = true
-
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: InventoryOpenEvent) {
+        if (event.inventoryName != "Your Skills") return
 
-        tick++
-        if (tick % 20 != 0) return
-        if (InventoryUtils.openInventoryName() != "Your Skills") return
-
-        if (!dirty) return
-        dirty = false
-
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val stack = slot.stack
+        for ((_, stack) in event.inventoryItems) {
             val name = stack.name?.removeColor() ?: continue
+            if (!name.contains(" ")) continue
 
             val lore = stack.getLore()
 
@@ -78,7 +66,6 @@ class SkillExperience {
                     continue
                 }
                 if (next) {
-                    if (!name.contains(" ")) continue
                     val split = name.split(" ")
                     val skillName = split[0].lowercase()
                     val level = split[1].romanToDecimal()
@@ -89,6 +76,7 @@ class SkillExperience {
                         val overflow = rawNumber.formatNumber()
                         val experience = baseExp + overflow
                         skillExp[skillName] = experience
+                        println("skill exp: $skillName -> $experience")
                     }
                     next = false
                 }
@@ -97,15 +85,10 @@ class SkillExperience {
         if (skillExp.isNotEmpty()) return
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        dirty = true
-    }
-
     companion object {
         private val skillExp = mutableMapOf<String, Long>()
 
-        private fun getLevelForExp(experience: Long): Int {
+        private fun getLevelForExpExactly(experience: Long): Int {
             var level = 1
             for (levelXp in levelingExp) {
                 if (levelXp.toLong() == experience) {
@@ -207,9 +190,7 @@ private fun String.formatNumber(): Long {
     } else if (text.endsWith("m")) {
         text = text.substring(0, text.length - 1)
         1_000_000
-    } else {
-        1
-    }
+    } else 1
     val d = text.toDouble()
     return (d * multiplier).toLong()
 }
