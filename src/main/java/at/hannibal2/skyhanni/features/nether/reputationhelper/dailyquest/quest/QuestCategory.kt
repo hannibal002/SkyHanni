@@ -8,5 +8,5 @@ enum class QuestCategory(val displayName: String) {
     DOJO("Dojo Task"),
     KUUDRA("Kuudra Kill"),
 
-    UNKNOWN("§cUnknown"),
+    UNKNOWN("§4Unknown"),
 }

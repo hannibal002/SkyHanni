@@ -44,6 +44,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         kuudraBossHelper.load()
 
         questHelper.load()
+        update()
     }
 
     @SubscribeEvent
@@ -97,11 +98,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun update() {
-        dirty = true
-
         questHelper.saveConfig()
         miniBossHelper.saveConfig()
         kuudraBossHelper.saveConfig()
+
+        dirty = true
     }
 
     fun reset() {

@@ -68,7 +68,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun render(display: MutableList<List<Any>>) {
         val done = kuudraTiers.count { it.doneToday }
         display.add(Collections.singletonList(""))
-        display.add(Collections.singletonList("Daily Kuudra ($done/2 killed)"))
+        display.add(Collections.singletonList("§7Daily Kuudra (§e$done§8/§e3 killed§7)"))
         if (done != 2) {
             for (tier in kuudraTiers) {
                 val result = if (tier.doneToday) "§7Done" else "§bTodo"
@@ -129,7 +129,6 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     private fun updateAllKuudraDone() {
         allKuudraDone = !kuudraTiers.any { !it.doneToday }
-        println("allKuudraDone: $allKuudraDone")
     }
 
     private fun getByDisplayName(name: String) = kuudraTiers.firstOrNull { it.name == name }
