@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -50,9 +51,10 @@ class GardenVisitorFeatures {
         if (offerItem.name != "§aAccept Offer") return
         inVisitorInventory = true
 
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay && !SkyHanniMod.feature.garden.visitorHighlightReady) return
+        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay && !SkyHanniMod.feature.garden.visitorHighlight) return
 
-        val visitor = Visitor(lastClickedNpc)
+        val visitor = visitors[npcItem.name!!]!!
+        visitor.entityId = lastClickedNpc
         for (line in offerItem.getLore()) {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
@@ -61,14 +63,12 @@ class GardenVisitorFeatures {
             if (itemName == null) continue
             visitor.items[itemName] = amount
         }
+        checkVisitorsReady()
 
-        val visitorName = npcItem.name!!
-        visitors[visitorName] = visitor
-
-        update()
+        updateDisplay()
     }
 
-    private fun update() {
+    private fun updateDisplay() {
         val list = drawDisplay()
         display.clear()
         display.addAll(list)
@@ -156,7 +156,7 @@ class GardenVisitorFeatures {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
         if (!SkyHanniMod.feature.garden.visitorNeedsDisplay &&
-            !SkyHanniMod.feature.garden.visitorHighlightReady &&
+            !SkyHanniMod.feature.garden.visitorHighlight &&
             !SkyHanniMod.feature.garden.visitorShowPrice
         ) return
         if (tick++ % 60 != 0) return
@@ -178,8 +178,7 @@ class GardenVisitorFeatures {
         val playerLocation = LocationUtils.playerLocation()
         nearby = list.map { playerLocation.distance(it) < 15 }.any { it }
 
-
-        if (nearby && SkyHanniMod.feature.garden.visitorHighlightReady) {
+        if (nearby && SkyHanniMod.feature.garden.visitorHighlight) {
             checkVisitorsReady()
         }
     }
@@ -204,7 +203,7 @@ class GardenVisitorFeatures {
             }
         }
         if (visitors.keys.removeIf { it !in visitorsInTab }) {
-            update()
+            updateDisplay()
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
@@ -213,32 +212,55 @@ class GardenVisitorFeatures {
                     SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
                     LorenzUtils.chat("§e[SkyHanni] $name §eis visiting your garden!")
                 }
-                update()
+                updateDisplay()
             }
         }
     }
 
     private fun checkVisitorsReady() {
-        for (visitor in visitors.values) {
-            var ready = true
-            for ((name, need) in visitor.items) {
-                val cleanName = name.removeColor()
-                val having = InventoryUtils.countItemsInLowerInventory { it.name?.contains(cleanName) ?: false }
-                if (having < need) {
-                    ready = false
-                }
+        for ((visitorName, visitor) in visitors) {
+            val entity = Minecraft.getMinecraft().theWorld.getEntityByID(visitor.entityId)
+            if (entity == null) {
+                findEntityByNametag(visitorName, visitor)
             }
 
-            if (ready) {
-                val world = Minecraft.getMinecraft().theWorld
-                val entity = world.getEntityByID(visitor.entityId)
-                if (entity is EntityLivingBase) {
+            if (entity is EntityLivingBase) {
+                if (visitor.items.isEmpty()) {
+                    val color = LorenzColor.DARK_AQUA.toColor().withAlpha(120)
+                    RenderLivingEntityHelper.setEntityColor(entity, color)
+                    { SkyHanniMod.feature.garden.visitorHighlight }
+                } else if (isReady(visitor)) {
                     val color = LorenzColor.GREEN.toColor().withAlpha(120)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { SkyHanniMod.feature.garden.visitorHighlightReady }
+                    { SkyHanniMod.feature.garden.visitorHighlight }
+                } else {
+                    RenderLivingEntityHelper.removeEntityColor(entity)
                 }
             }
         }
+    }
+
+    private fun findEntityByNametag(visitorName: String, visitor: Visitor) {
+        Minecraft.getMinecraft().theWorld.loadedEntityList
+            .filter { it is EntityArmorStand && it.name == visitorName }
+            .forEach { entity ->
+                Minecraft.getMinecraft().theWorld.loadedEntityList
+                    .filter { it !is EntityArmorStand }
+                    .filter { entity.getLorenzVec().distanceIgnoreY(it.getLorenzVec()) == 0.0 }
+                    .forEach { visitor.entityId = it?.entityId ?: 0 }
+            }
+    }
+
+    private fun isReady(visitor: Visitor): Boolean {
+        var ready = true
+        for ((name, need) in visitor.items) {
+            val cleanName = name.removeColor()
+            val having = InventoryUtils.countItemsInLowerInventory { it.name?.contains(cleanName) ?: false }
+            if (having < need) {
+                ready = false
+            }
+        }
+        return ready
     }
 
     // TODO make event
@@ -266,7 +288,7 @@ class GardenVisitorFeatures {
         SkyHanniMod.feature.garden.visitorNeedsPos.renderStringsAndItems(display)
     }
 
-    class Visitor(val entityId: Int, val items: MutableMap<String, Int> = mutableMapOf())
+    class Visitor(var entityId: Int, val items: MutableMap<String, Int> = mutableMapOf())
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }
