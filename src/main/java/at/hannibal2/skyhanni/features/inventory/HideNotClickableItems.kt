@@ -274,7 +274,7 @@ class HideNotClickableItems {
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
         reverseColor = true
-        if (stack.getLore().any { it.contains("ACCESSORY") }) return false
+        if (stack.getLore().any { it.contains("ACCESSORY") || it.contains("HATCCESSORY") }) return false
 
         hideReason = "This item is not an accessory!"
         return true
