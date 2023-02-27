@@ -20,12 +20,7 @@ object NEUItems {
         if (itemNameCache.containsKey(itemName)) {
             return itemNameCache[itemName]!!
         }
-        // We love hypixel naming moments
-        // TODO remove workaround
-        val name = if (itemName.contains("Jack o' Lantern")) {
-            itemName.replace("Jack o' Lantern", "Jack o'Lantern")
-        } else itemName
-        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(name, false)
+        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false)
         itemNameCache[itemName] = internalName
         return internalName
     }

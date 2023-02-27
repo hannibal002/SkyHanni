@@ -93,7 +93,16 @@ class GardenVisitorFeatures {
         if (requiredItems.isNotEmpty()) {
             newDisplay.add(Collections.singletonList("§7Visitor items needed:"))
             for ((name, amount) in requiredItems) {
-                val internalName = NEUItems.getInternalName(name)
+                val internalName: String
+                try {
+                    internalName = NEUItems.getInternalName(name)
+                } catch (e: NullPointerException) {
+                    val message = "internal name is null: '$name'"
+                    println(message)
+                    LorenzUtils.error(message)
+                    e.printStackTrace()
+                    continue
+                }
                 val itemStack = NEUItems.getItemStack(internalName)
                 newDisplay.add(listOf(" §7- ", itemStack, "$name §8x$amount"))
             }
@@ -140,7 +149,16 @@ class GardenVisitorFeatures {
             if (i > 1) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    val lowestBin = NEUItems.getPrice(NEUItems.getInternalName(itemName))
+                    val lowestBin: Double
+                    try {
+                        lowestBin = NEUItems.getPrice(NEUItems.getInternalName(itemName))
+                    } catch (e: NullPointerException) {
+                        val message = "internal name is null: '$itemName'"
+                        println(message)
+                        LorenzUtils.error(message)
+                        e.printStackTrace()
+                        continue
+                    }
                     val price = lowestBin * amount
                     totalPrice += price
                     val format = NumberUtil.format(price)
