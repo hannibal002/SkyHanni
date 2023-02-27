@@ -151,6 +151,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.visitorTimerPos);
             return;
         }
+
+        if (runnableId.equals("cropMilestone")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneDisplayPos);
+            return;
+        }
     }
 
     @Expose

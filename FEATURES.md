@@ -169,6 +169,7 @@
 + **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 + **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
 + **Plot Price** - Show the price of the plot in coins when inside the Configure Plots inventory.
++ **Garden Crop Milestone Display**. (Requires an tool with either an counter or cultivating enchantment)
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
