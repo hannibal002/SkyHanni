@@ -16,5 +16,5 @@ class DojoQuest(
         QuestCategory.DOJO,
         "$dojoName Rank $dojoRankGoal",
         state,
-        "$dojoName (" + LorenzUtils.getPointsForDojoRank(dojoRankGoal) + " points)"
+        "$dojoName §7(§e" + LorenzUtils.getPointsForDojoRank(dojoRankGoal) + " points§7)"
     )
