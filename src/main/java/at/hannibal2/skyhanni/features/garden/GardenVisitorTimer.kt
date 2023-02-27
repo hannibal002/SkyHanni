@@ -64,8 +64,7 @@ class GardenVisitorTimer {
         SkyHanniMod.feature.garden.visitorTimerPos.renderString(render)
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock &&
-                SkyHanniMod.feature.garden.visitorTimerEnabled &&
-                LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    private fun isEnabled() = LorenzUtils.inSkyBlock &&
+            SkyHanniMod.feature.garden.visitorTimerEnabled &&
+            LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }

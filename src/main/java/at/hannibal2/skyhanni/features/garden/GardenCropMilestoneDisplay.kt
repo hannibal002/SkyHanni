@@ -155,8 +155,7 @@ class GardenCropMilestoneDisplay {
         return null
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock &&
-                SkyHanniMod.feature.garden.cropMilestoneDisplay &&
-                LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    private fun isEnabled() = LorenzUtils.inSkyBlock &&
+            SkyHanniMod.feature.garden.cropMilestoneDisplay &&
+            LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }
