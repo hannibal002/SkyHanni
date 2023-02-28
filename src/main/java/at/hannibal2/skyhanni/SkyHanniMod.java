@@ -53,6 +53,10 @@ import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
 import at.hannibal2.skyhanni.utils.TabListData;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.*;
+import moe.nea.libautoupdate.CurrentVersion;
+import moe.nea.libautoupdate.UpdateContext;
+import moe.nea.libautoupdate.UpdateSource;
+import moe.nea.libautoupdate.UpdateTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
@@ -65,8 +69,11 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 @Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION, clientSideOnly = true, useMetadata = true, guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop")
 public class SkyHanniMod {
@@ -81,6 +88,23 @@ public class SkyHanniMod {
     private static Logger logger;
 
     public static List<Object> modules = new ArrayList<>();
+    public static Properties buildProperties = new Properties();
+    public static UpdateContext updateContext;
+
+    static {
+        try (InputStream is = SkyHanniMod.class.getResourceAsStream("/skyhanni.build.properties")) {
+            buildProperties.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        updateContext = new UpdateContext(
+                UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
+                UpdateTarget.deleteAndSaveInTheSameFolder(SkyHanniMod.class),
+                CurrentVersion.ofTag(buildProperties.getProperty("git.tag", "none")),
+                MODID
+        );
+    }
+
     public static Job globalJob = JobKt.Job(null);
     public static CoroutineScope coroutineScope =
             CoroutineScopeKt.CoroutineScope(

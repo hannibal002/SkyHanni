@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.SelfUpdater
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
@@ -46,6 +47,7 @@ object Commands {
         registerCommand("shtrackcollection") { CollectionCounter.command(it) }
         registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
         registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
+        registerCommand("skyhanniupdate") { SelfUpdater.handle(it) }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

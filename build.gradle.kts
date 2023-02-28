@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.ByteArrayOutputStream
+import java.nio.charset.StandardCharsets
 
 plugins {
     idea
@@ -34,6 +36,7 @@ repositories {
             includeGroupByRegex("com\\.github\\..*")
         }
     }
+    maven("https://repo.nea.moe/releases")
 }
 
 val shadowImpl by configurations.creating {
@@ -64,6 +67,8 @@ dependencies {
 
     implementation("com.github.notenoughupdates:notenoughupdates:df945f9:all")
     devenvMod("com.github.notenoughupdates:notenoughupdates:df945f9:all")
+
+    shadowImpl("moe.nea:libautoupdate:1.0.2") { isTransitive = false }
 }
 
 // Minecraft configuration:
@@ -92,6 +97,30 @@ loom {
 }
 
 // Tasks:
+
+fun runCommand(execCommand: String, vararg args: String): String {
+    val baos = ByteArrayOutputStream()
+    exec {
+        executable(execCommand)
+        standardOutput = baos
+        args(*args)
+        isIgnoreExitValue = true
+    }
+    return baos.toByteArray().decodeToString().trim()
+}
+
+val generateBuildProperties by tasks.creating(WriteProperties::class) {
+    encoding = StandardCharsets.UTF_8.name()
+    comment = "Build properties of skyhanni"
+    setOutputFile(layout.buildDirectory.file("skyhanni.build.properties"))
+    property("git.tag", runCommand("git", "describe", "--tags", "HEAD"))
+    property("git.sha", runCommand("git", "rev-parse", "HEAD"))
+    property("git.branch", runCommand("git", "branch", "--show-current"))
+}
+
+tasks.processResources {
+    from(generateBuildProperties)
+}
 
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
@@ -127,7 +156,8 @@ tasks.shadowJar {
     }
 
     // If you want to include other dependencies and shadow them, you can relocate them in here
-//    fun relocate(name: String) = relocate(name, "com.examplemod.deps.$name")
+    fun relocate(name: String) = relocate(name, "at.hannibal2.skyhanni.dep.$name")
+    relocate("moe.nea.libautoupdate")
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

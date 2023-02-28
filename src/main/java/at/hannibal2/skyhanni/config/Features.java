@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
 import at.hannibal2.skyhanni.features.misc.HideArmor;
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager;
+import at.hannibal2.skyhanni.features.misc.SelfUpdater;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 
@@ -156,6 +157,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneDisplayPos);
             return;
         }
+
+        if (runnableId.equals("updateCheck")) {
+            SelfUpdater.INSTANCE.checkForUpdates();
+            return;
+        }
     }
 
     @Expose
@@ -229,6 +235,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public Misc misc = new Misc();
+
+    @Expose
+    @Category(name = "Updater", desc = "Auto Update SkyHanni")
+    public Update update = new Update();
 
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
