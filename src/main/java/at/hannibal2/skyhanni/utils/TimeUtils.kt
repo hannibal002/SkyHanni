@@ -13,7 +13,7 @@ object TimeUtils {
         showMilliSeconds: Boolean = false,
         longName: Boolean = false
     ): String {
-        var milliseconds = millis
+        var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
         for (unit in TimeUnit.values()) {
             if (unit.ordinal >= biggestUnit.ordinal) {

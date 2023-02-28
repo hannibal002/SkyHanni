@@ -21,7 +21,7 @@ public class Misc {
     @ConfigOption(name = "Pet Display Position", desc = "")
     @ConfigEditorButton(runnableId = "petDisplay", buttonText = "Edit")
     @ConfigAccordionId(id = 0)
-    public Position petDisplayPos = new Position(10, 10, false, true);
+    public Position petDisplayPos = new Position(-111, 221, false, true);
 
     @Expose
     @ConfigOption(name = "Time", desc = "")
