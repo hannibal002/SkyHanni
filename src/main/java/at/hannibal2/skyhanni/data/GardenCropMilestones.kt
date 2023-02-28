@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -29,18 +30,18 @@ class GardenCropMilestones {
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        cropCounter.clear()
-
-        cropCounter["Wheat"] = 0
-        cropCounter["Carrot"] = 0
-        cropCounter["Potato"] = 0
-        cropCounter["Pumpkin"] = 0
-        cropCounter["Sugar Cane"] = 0
-        cropCounter["Melon"] = 0
-        cropCounter["Cactus"] = 0
-        cropCounter["Cocoa Beans"] = 0
-        cropCounter["Mushroom"] = 0
-        cropCounter["Nether Wart"] = 0
+        if (cropCounter.isEmpty()) {
+            cropCounter["Wheat"] = 0
+            cropCounter["Carrot"] = 0
+            cropCounter["Potato"] = 0
+            cropCounter["Pumpkin"] = 0
+            cropCounter["Sugar Cane"] = 0
+            cropCounter["Melon"] = 0
+            cropCounter["Cactus"] = 0
+            cropCounter["Cocoa Beans"] = 0
+            cropCounter["Mushroom"] = 0
+            cropCounter["Nether Wart"] = 0
+        }
     }
 
     @SubscribeEvent
@@ -80,7 +81,7 @@ class GardenCropMilestones {
     }
 
     companion object {
-        val cropCounter = mutableMapOf<String, Long>()
+        val cropCounter: MutableMap<String, Long> get() = SkyHanniMod.feature.hidden.gardenCropCounter
 
         fun getTierForCrops(crops: Long): Int {
             var tier = 0

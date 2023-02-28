@@ -27,7 +27,7 @@ public class Garden {
     @ConfigOption(name = "Copper Price Position", desc = "")
     @ConfigEditorButton(runnableId = "skyMartCopperPrice", buttonText = "Edit")
     @ConfigAccordionId(id = 0)
-    public Position skyMartCopperPricePos = new Position(44, -108, false, true);
+    public Position skyMartCopperPricePos = new Position(188, -105, false, true);
 
     @Expose
     @ConfigOption(name = "Visitor", desc = "")
@@ -51,7 +51,7 @@ public class Garden {
     @ConfigOption(name = "Visitor Timer Position", desc = "")
     @ConfigEditorButton(runnableId = "visitorTimer", buttonText = "Edit")
     @ConfigAccordionId(id = 2)
-    public Position visitorTimerPos = new Position(0, 0, false, true);
+    public Position visitorTimerPos = new Position(-373, -203, false, true);
 
     @Expose
     @ConfigOption(name = "Visitor Items Needed", desc = "")
@@ -69,7 +69,7 @@ public class Garden {
     @ConfigOption(name = "Items Needed Position", desc = "")
     @ConfigEditorButton(runnableId = "visitorNeeds", buttonText = "Edit")
     @ConfigAccordionId(id = 3)
-    public Position visitorNeedsPos = new Position(0, 0, false, true);
+    public Position visitorNeedsPos = new Position(155, -57, false, true);
 
     @Expose
     @ConfigOption(name = "Only when Close", desc = "Only show the needed items when close to the visitors.")
@@ -119,19 +119,55 @@ public class Garden {
 
     @Expose
     @ConfigOption(
-            name = "Display",
+            name = "Progress Display",
             desc = "Show how much more crops are needed to reach the next crop milestone. " +
                     "§cRequires an tool with either an counter or cultivating enchantment in the hand."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
-    public boolean cropMilestoneDisplay = true;
+    public boolean cropMilestoneProgress = true;
 
     @Expose
     @ConfigOption(name = "Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "cropMilestone", buttonText = "Edit")
+    @ConfigEditorButton(runnableId = "cropMilestoneProgress", buttonText = "Edit")
     @ConfigAccordionId(id = 5)
-    public Position cropMilestoneDisplayPos = new Position(0, 0, false, true);
+    public Position cropMilestoneProgressDisplayPos = new Position(-363, 12, false, true);
+
+    @Expose
+    @ConfigOption(name = "Best Crop", desc = "")
+    @ConfigAccordionId(id = 5)
+    @ConfigEditorAccordion(id = 6)
+    public boolean cropMilestoneNext = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Best Display",
+            desc = "Show a display with crops sorted by time.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean cropMilestoneBestDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden exp or by skyblock exp.")
+    @ConfigEditorDropdown(values = {"Garden Exp", "SkyBlock Exp"})
+    @ConfigAccordionId(id = 6)
+    public int cropMilestoneBestType = 0;
+
+    @Expose
+    @ConfigOption(name = "Only show top", desc = "Only show the top # crops.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 10,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 6)
+    public int cropMilestoneShowOnlyBest = 10;
+
+    @Expose
+    @ConfigOption(name = "Display Position", desc = "")
+    @ConfigEditorButton(runnableId = "cropMilestoneNext", buttonText = "Edit")
+    @ConfigAccordionId(id = 6)
+    public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.events.OwnInventorItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,21 +20,28 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 
 class GardenCropMilestoneDisplay {
-    private val display = mutableListOf<List<Any>>()
+    private val progressDisplay = mutableListOf<List<Any>>()
+    private val bestCropDisplay = mutableListOf<List<Any>>()
     private var currentCrop: String? = null
+    private var needsInventory = false
     private val cultivatingData = mutableMapOf<String, Int>()
-    private var needsInventory = true
+    private val timeTillNextCrop: MutableMap<String, Long> get() = SkyHanniMod.feature.hidden.gardenTimeTillNextCropMilestone
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.garden.cropMilestoneDisplayPos.renderStringsAndItems(display)
+        SkyHanniMod.feature.garden.cropMilestoneProgressDisplayPos.renderStringsAndItems(progressDisplay)
+        if (SkyHanniMod.feature.garden.cropMilestoneBestDisplay) {
+            SkyHanniMod.feature.garden.cropMilestoneNextDisplayPos.renderStringsAndItems(bestCropDisplay)
+        }
     }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        needsInventory = true
+        if (GardenCropMilestones.cropCounter.values.sum() == 0L) {
+            needsInventory = true
+        }
     }
 
     @SubscribeEvent
@@ -52,10 +61,44 @@ class GardenCropMilestoneDisplay {
             val diff = counter - old
             GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
             if (currentCrop == crop) {
+                calculateSpeed(diff)
                 update()
             }
         }
         cultivatingData[crop] = counter
+    }
+
+    private var lastSecondStart = 0L
+    private var currentSpeed = 0
+    private var averageSpeedPerSecond = 0
+    private var countInLastSecond = 0
+    private val allCounters = mutableListOf<Int>()
+
+    private fun resetSpeed() {
+        lastSecondStart = 0
+        currentSpeed = 0
+        averageSpeedPerSecond = 0
+        countInLastSecond = 0
+        allCounters.clear()
+    }
+
+    private fun calculateSpeed(diff: Int) {
+        if (System.currentTimeMillis() > lastSecondStart + 1_000) {
+            lastSecondStart = System.currentTimeMillis()
+            if (countInLastSecond > 8) {
+//                println("currentSpeed: $currentSpeed")
+                allCounters.add(currentSpeed)
+                while (allCounters.size > 30) {
+                    allCounters.removeFirst()
+                }
+//                println("allCounters: $allCounters")
+                averageSpeedPerSecond = allCounters.average().toInt()
+            }
+            countInLastSecond = 0
+            currentSpeed = 0
+        }
+        currentSpeed += diff
+        countInLastSecond++
     }
 
     private fun readCounter(itemStack: ItemStack): Int {
@@ -87,49 +130,118 @@ class GardenCropMilestoneDisplay {
 
         val cropInHand = getCropInHand()
         if (currentCrop != cropInHand) {
+            resetSpeed()
             currentCrop = cropInHand
             update()
         }
     }
 
     private fun update() {
-        display.clear()
+        progressDisplay.clear()
+        bestCropDisplay.clear()
         currentCrop?.let {
             val crops = GardenCropMilestones.cropCounter[it]
             if (crops == null) {
                 println("cropCounter is null for '$it'")
                 return
             }
-            display.add(Collections.singletonList("§6Crop Milestones"))
 
-            val list = mutableListOf<Any>()
-
-            try {
-                val internalName = NEUItems.getInternalName(if (it == "Mushroom") "Red Mushroom" else it)
-                val itemStack = NEUItems.getItemStack(internalName)
-                list.add(itemStack)
-            } catch (e: NullPointerException) {
-                e.printStackTrace()
+            drawProgressDisplay(it, crops)
+            if (SkyHanniMod.feature.garden.cropMilestoneBestDisplay) {
+                drawBestDisplay(it)
             }
-            list.add(it)
-            display.add(list)
+        }
+    }
 
-            val currentTier = GardenCropMilestones.getTierForCrops(crops)
-
-            val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
-            val nextTier = currentTier + 1
-            val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
-
-            val have = crops - cropsForCurrentTier
-            val need = cropsForNextTier - cropsForCurrentTier
-
-            val haveFormat = LorenzUtils.formatInteger(have)
-            val needFormat = LorenzUtils.formatInteger(need)
-            display.add(Collections.singletonList("§7Progress to Tier $nextTier§8: §e$haveFormat§8/§e$needFormat"))
-
-            if (needsInventory) {
-                display.add(Collections.singletonList("§cOpen §e/cropmilestones §cto update!"))
+    private fun drawBestDisplay(currentCrop: String) {
+        val gardenExp = SkyHanniMod.feature.garden.cropMilestoneBestType == 0
+        val sorted = if (gardenExp) {
+            val helpMap = mutableMapOf<String, Long>()
+            for ((cropName, time) in timeTillNextCrop) {
+                val crops = GardenCropMilestones.cropCounter[cropName]!!
+                val currentTier = GardenCropMilestones.getTierForCrops(crops)
+                val gardenExpForTier = getGardenExpForTier(currentTier + 1)
+                val fakeTime = time / gardenExpForTier
+                helpMap[cropName] = fakeTime
             }
+            helpMap.sorted()
+        } else {
+            timeTillNextCrop.sorted()
+        }
+
+        val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
+        bestCropDisplay.add(Collections.singletonList("§eBest Crop Time §7($title§7)"))
+
+        if (sorted.isEmpty()) {
+            bestCropDisplay.add(Collections.singletonList("§cFarm crops to add them to this list!"))
+        }
+
+        var number = 0
+        for (cropName in sorted.keys) {
+            val millis = timeTillNextCrop[cropName]!!
+            val duration = TimeUtils.formatDuration(millis)
+
+            val isCurrent = currentCrop == cropName
+            val color = if (isCurrent) "§e" else ""
+            number++
+            if (number > SkyHanniMod.feature.garden.cropMilestoneShowOnlyBest && !isCurrent) continue
+            val cropNameDisplay = "$number# $color$cropName"
+            if (gardenExp) {
+                val crops = GardenCropMilestones.cropCounter[cropName]!!
+                val currentTier = GardenCropMilestones.getTierForCrops(crops)
+                val gardenExpForTier = getGardenExpForTier(currentTier + 1)
+                bestCropDisplay.add(Collections.singletonList(" $cropNameDisplay §b$duration §7(§2$gardenExpForTier §7Exp)"))
+            } else {
+                bestCropDisplay.add(Collections.singletonList(" $cropNameDisplay §b$duration"))
+            }
+        }
+    }
+
+    private fun getGardenExpForTier(gardenLevel: Int) = if (gardenLevel > 30) 300 else gardenLevel * 10
+
+    private fun drawProgressDisplay(it: String, crops: Long) {
+        progressDisplay.add(Collections.singletonList("§6Crop Milestones"))
+
+        val list = mutableListOf<Any>()
+
+        try {
+            val internalName = NEUItems.getInternalName(if (it == "Mushroom") "Red Mushroom" else it)
+            val itemStack = NEUItems.getItemStack(internalName)
+            list.add(itemStack)
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        }
+        list.add(it)
+        progressDisplay.add(list)
+
+        val currentTier = GardenCropMilestones.getTierForCrops(crops)
+
+        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
+        val nextTier = currentTier + 1
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
+
+        val have = crops - cropsForCurrentTier
+        val need = cropsForNextTier - cropsForCurrentTier
+
+        val haveFormat = LorenzUtils.formatInteger(have)
+        val needFormat = LorenzUtils.formatInteger(need)
+        progressDisplay.add(Collections.singletonList("§7Progress to Tier $nextTier§8:"))
+        progressDisplay.add(Collections.singletonList("§e$haveFormat§8/§e$needFormat"))
+
+        if (averageSpeedPerSecond != 0) {
+            val missing = need - have
+            val missingTimeSeconds = missing / averageSpeedPerSecond
+            val millis = missingTimeSeconds * 1000
+            timeTillNextCrop[it] = millis
+            val duration = TimeUtils.formatDuration(millis)
+            progressDisplay.add(Collections.singletonList("§7In §b$duration"))
+
+            val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
+            progressDisplay.add(Collections.singletonList("§7Crops/minute§8: §e$format"))
+        }
+
+        if (needsInventory) {
+            progressDisplay.add(Collections.singletonList("§cOpen §e/cropmilestones §cto update!"))
         }
     }
 
@@ -156,6 +268,6 @@ class GardenCropMilestoneDisplay {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock &&
-            SkyHanniMod.feature.garden.cropMilestoneDisplay &&
+            SkyHanniMod.feature.garden.cropMilestoneProgress &&
             LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }

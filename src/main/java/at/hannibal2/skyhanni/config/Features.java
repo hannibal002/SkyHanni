@@ -152,8 +152,13 @@ public class Features extends Config {
             return;
         }
 
-        if (runnableId.equals("cropMilestone")) {
-            editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneDisplayPos);
+        if (runnableId.equals("cropMilestoneProgress")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneProgressDisplayPos);
+            return;
+        }
+
+        if (runnableId.equals("cropMilestoneNext")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneNextDisplayPos);
             return;
         }
     }
