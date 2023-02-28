@@ -17,7 +17,7 @@
 + Added **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 + Added **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
 + Added **Plot Price** - Show the price of the plot in coins when inside the Configure Plots inventory.
-+ Added **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires an tool with either an counter or cultivating enchantment) Shows
++ Added **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
 + Added **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
 
 

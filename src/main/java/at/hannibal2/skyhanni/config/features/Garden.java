@@ -120,8 +120,8 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Progress Display",
-            desc = "Show how much more crops are needed to reach the next crop milestone. " +
-                    "§cRequires an tool with either an counter or cultivating enchantment in the hand."
+            desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
+                    "§cRequires a tool with either a counter or cultivating enchantment."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
@@ -142,7 +142,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Best Display",
-            desc = "Show a display with crops sorted by time.")
+            desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
     public boolean cropMilestoneBestDisplay = true;
