@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
@@ -26,6 +27,7 @@ class GardenVisitorFeatures {
     private var lastClickedNpc = 0
     private var nearby = false
     private var tick = 0
+    private val config: Garden get() = SkyHanniMod.feature.garden
 
     companion object {
         var inVisitorInventory = false
@@ -51,7 +53,7 @@ class GardenVisitorFeatures {
         if (offerItem.name != "§aAccept Offer") return
         inVisitorInventory = true
 
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay && !SkyHanniMod.feature.garden.visitorHighlight) return
+        if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
 
         val visitor = visitors[npcItem.name!!]!!
         visitor.entityId = lastClickedNpc
@@ -76,7 +78,7 @@ class GardenVisitorFeatures {
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay) return newDisplay
+        if (!config.visitorNeedsDisplay) return newDisplay
 
         val requiredItems = mutableMapOf<String, Int>()
         val newVisitors = mutableListOf<String>()
@@ -126,7 +128,7 @@ class GardenVisitorFeatures {
     fun onTooltip(event: ItemTooltipEvent) {
         if (!isEnabled()) return
         if (!nearby) return
-        if (!SkyHanniMod.feature.garden.visitorShowPrice) return
+        if (!config.visitorShowPrice) return
 
         if (!inVisitorInventory) return
         val name = event.itemStack.name ?: return
@@ -173,10 +175,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay &&
-            !SkyHanniMod.feature.garden.visitorHighlight &&
-            !SkyHanniMod.feature.garden.visitorShowPrice
-        ) return
+        if (!config.visitorNeedsDisplay && !config.visitorHighlight && !config.visitorShowPrice) return
         if (tick++ % 60 != 0) return
 
         val defaultVanillaSkin = LorenzVec(8.4, 72.0, -14.1)
@@ -196,7 +195,7 @@ class GardenVisitorFeatures {
         val playerLocation = LocationUtils.playerLocation()
         nearby = list.map { playerLocation.distance(it) < 15 }.any { it }
 
-        if (nearby && SkyHanniMod.feature.garden.visitorHighlight) {
+        if (nearby && config.visitorHighlight) {
             checkVisitorsReady()
         }
     }
@@ -226,8 +225,10 @@ class GardenVisitorFeatures {
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
                 visitors[name] = Visitor(-1)
-                if (SkyHanniMod.feature.garden.visitorNotification) {
+                if (config.visitorNotificationTitle) {
                     SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
+                }
+                if (config.visitorNotificationChat) {
                     LorenzUtils.chat("§e[SkyHanni] $name §eis visiting your garden!")
                 }
                 updateDisplay()
@@ -246,11 +247,11 @@ class GardenVisitorFeatures {
                 if (visitor.items.isEmpty()) {
                     val color = LorenzColor.DARK_AQUA.toColor().withAlpha(120)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { SkyHanniMod.feature.garden.visitorHighlight }
+                    { config.visitorHighlight }
                 } else if (isReady(visitor)) {
                     val color = LorenzColor.GREEN.toColor().withAlpha(120)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { SkyHanniMod.feature.garden.visitorHighlight }
+                    { config.visitorHighlight }
                 } else {
                     RenderLivingEntityHelper.removeEntityColor(entity)
                 }
@@ -297,13 +298,13 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay) return
+        if (!config.visitorNeedsDisplay) return
 
-        if (SkyHanniMod.feature.garden.visitorNeedsOnlyWhenClose) {
+        if (config.visitorNeedsOnlyWhenClose) {
             if (!nearby) return
         }
 
-        SkyHanniMod.feature.garden.visitorNeedsPos.renderStringsAndItems(display)
+        config.visitorNeedsPos.renderStringsAndItems(display)
     }
 
     class Visitor(var entityId: Int, val items: MutableMap<String, Int> = mutableMapOf())

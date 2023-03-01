@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
@@ -26,14 +27,15 @@ class GardenCropMilestoneDisplay {
     private var needsInventory = false
     private val cultivatingData = mutableMapOf<String, Int>()
     private val timeTillNextCrop: MutableMap<String, Long> get() = SkyHanniMod.feature.hidden.gardenTimeTillNextCropMilestone
+    private val config: Garden get() = SkyHanniMod.feature.garden
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.garden.cropMilestoneProgressDisplayPos.renderStringsAndItems(progressDisplay)
-        if (SkyHanniMod.feature.garden.cropMilestoneBestDisplay) {
-            SkyHanniMod.feature.garden.cropMilestoneNextDisplayPos.renderStringsAndItems(bestCropDisplay)
+        config.cropMilestoneProgressDisplayPos.renderStringsAndItems(progressDisplay)
+        if (config.cropMilestoneBestDisplay) {
+            config.cropMilestoneNextDisplayPos.renderStringsAndItems(bestCropDisplay)
         }
     }
 
@@ -147,14 +149,19 @@ class GardenCropMilestoneDisplay {
             }
 
             drawProgressDisplay(it, crops)
-            if (SkyHanniMod.feature.garden.cropMilestoneBestDisplay) {
+            if (config.cropMilestoneBestDisplay) {
                 drawBestDisplay(it)
+            }
+        }
+        if (config.cropMilestoneBestAlwaysOn) {
+            if (currentCrop == null) {
+                drawBestDisplay(null)
             }
         }
     }
 
-    private fun drawBestDisplay(currentCrop: String) {
-        val gardenExp = SkyHanniMod.feature.garden.cropMilestoneBestType == 0
+    private fun drawBestDisplay(currentCrop: String?) {
+        val gardenExp = config.cropMilestoneBestType == 0
         val sorted = if (gardenExp) {
             val helpMap = mutableMapOf<String, Long>()
             for ((cropName, time) in timeTillNextCrop) {
@@ -181,10 +188,10 @@ class GardenCropMilestoneDisplay {
             val millis = timeTillNextCrop[cropName]!!
             val duration = TimeUtils.formatDuration(millis)
 
-            val isCurrent = currentCrop == cropName
+            val isCurrent = cropName == currentCrop
             val color = if (isCurrent) "§e" else ""
             number++
-            if (number > SkyHanniMod.feature.garden.cropMilestoneShowOnlyBest && !isCurrent) continue
+            if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue
             val cropNameDisplay = "$number# $color$cropName"
             if (gardenExp) {
                 val crops = GardenCropMilestones.cropCounter[cropName]!!
@@ -267,7 +274,6 @@ class GardenCropMilestoneDisplay {
         return null
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock &&
-            SkyHanniMod.feature.garden.cropMilestoneProgress &&
-            LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    private fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.cropMilestoneProgress && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }
