@@ -26,6 +26,8 @@ class HyPixelData {
         var stranded = false
         var bingo = false
 
+        var profile = ""
+
         fun readSkyBlockArea(): String {
             return ScoreboardData.sidebarLinesFormatted()
                 .firstOrNull { it.startsWith(" §7⏣ ") }
@@ -61,12 +63,15 @@ class HyPixelData {
 
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
-            val stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
-            ProfileJoinEvent(stripped).postAndCatch()
+            val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
+            profile = newProfile
+            ProfileJoinEvent(newProfile).postAndCatch()
         }
         if (message.startsWith("you are playing on profile:")) {
-            val stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
-            ProfileJoinEvent(stripped).postAndCatch()
+            val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+            if (profile == newProfile) return
+            profile = newProfile
+            ProfileJoinEvent(newProfile).postAndCatch()
         }
     }
 
