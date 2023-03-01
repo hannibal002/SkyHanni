@@ -161,6 +161,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneNextDisplayPos);
             return;
         }
+
+        if (runnableId.equals("bingoCard")) {
+            editOverlay(activeConfigCategory, 200, 16, bingo.bingoCardPos);
+            return;
+        }
     }
 
     @Expose

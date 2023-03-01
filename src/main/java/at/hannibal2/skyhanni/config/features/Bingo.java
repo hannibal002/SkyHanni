@@ -21,6 +21,6 @@ public class Bingo {
 
     @Expose
     @ConfigOption(name = "Bingo Card Position", desc = "")
-    @ConfigEditorButton(runnableId = "bingoCardPos", buttonText = "Edit")
+    @ConfigEditorButton(runnableId = "bingoCard", buttonText = "Edit")
     public Position bingoCardPos = new Position(10, 10, false, true);
 }

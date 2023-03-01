@@ -274,8 +274,8 @@ class BingoNextStepHelper {
         itemRequired["Jacob's Ticket"] = farmingContest
 
 
-        enchantedCharcoal(7)
-        compactor(7)
+//        enchantedCharcoal(7)
+//        compactor(7)
     }
 
     private fun compactor(amount: Long) {
