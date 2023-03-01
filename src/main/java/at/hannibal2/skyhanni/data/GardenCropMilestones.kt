@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -58,7 +58,7 @@ class GardenCropMilestones {
                 if (line.contains("Progress to Tier")) {
                     val matcher = nextTierPattern.matcher(line)
                     if (matcher.matches()) {
-                        val nextTier = matcher.group(1).romanToDecimal()
+                        val nextTier = matcher.group(1).romanToDecimalIfNeeded()
                         val currentTier = nextTier - 1
                         cropForTier = getCropsForTier(currentTier)
                     }
