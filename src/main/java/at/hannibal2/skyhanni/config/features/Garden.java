@@ -78,10 +78,16 @@ public class Garden {
     public boolean visitorNeedsOnlyWhenClose = false;
 
     @Expose
-    @ConfigOption(name = "Notification", desc = "Show as title and in chat when a new visitor is visiting your island.")
+    @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean visitorNotification = true;
+    public boolean visitorNotificationChat = true;
+
+    @Expose
+    @ConfigOption(name = "Notification Title", desc = "Show a title when a new visitor is visiting your island.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorNotificationTitle = true;
 
     @Expose
     @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.")
@@ -162,6 +168,14 @@ public class Garden {
     )
     @ConfigAccordionId(id = 6)
     public int cropMilestoneShowOnlyBest = 10;
+
+    @Expose
+    @ConfigOption(
+            name = "Always On",
+            desc = "Show the Best Display always while on the garden.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean cropMilestoneBestAlwaysOn = false;
 
     @Expose
     @ConfigOption(name = "Display Position", desc = "")
