@@ -14,7 +14,7 @@ class SendTitleHelper {
         private var endTime = 0L
 
         fun sendTitle(text: String, duration: Int) {
-            display = text
+            display = "§f$text"
             endTime = System.currentTimeMillis() + duration
         }
     }
