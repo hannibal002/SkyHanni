@@ -140,7 +140,7 @@ class GardenVisitorFeatures {
         var totalPrice = 0.0
         var amountDifferentItems = 0
         var endReached = false
-        for ((i, l) in list.withIndex()) {
+        for ((i, l) in list.toMutableList().withIndex()) {
             val line = l.substring(4)
             if (line == "") {
                 if (amountDifferentItems > 1) {
@@ -153,9 +153,9 @@ class GardenVisitorFeatures {
             if (i > 1 && !endReached) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    val lowestBin: Double
+                    val internalName: String
                     try {
-                        lowestBin = NEUItems.getPrice(NEUItems.getInternalName(itemName))
+                        internalName = NEUItems.getInternalName(itemName)
                     } catch (e: NullPointerException) {
                         val message = "internal name is null: '$itemName'"
                         println(message)
@@ -163,7 +163,7 @@ class GardenVisitorFeatures {
                         e.printStackTrace()
                         return
                     }
-                    val price = lowestBin * amount
+                    val price = NEUItems.getPrice(internalName) * amount
                     totalPrice += price
                     val format = NumberUtil.format(price)
                     list[i] = "$line §7(§6$format§7)"

@@ -32,13 +32,10 @@ class MinionCraftHelper {
     private val tierOneMinionsDone = mutableListOf<String>()
     private val allIngredients = mutableListOf<String>()
     private val alreadyNotified = mutableListOf<String>()
-    private val recipesCache = mutableMapOf<String, List<NeuRecipe>>()
-    private var multiplierCache = mutableMapOf<String, Pair<String, Int>>()
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         alreadyNotified.clear()
-        recipesCache.clear()
     }
 
     @SubscribeEvent
@@ -101,7 +98,7 @@ class MinionCraftHelper {
                 minions[name] = rawId
             } else {
                 if (!allIngredients.contains(rawId)) continue
-                val (itemId, multiplier) = getMultiplier(rawId)
+                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
                 val old = otherItems.getOrDefault(itemId, 0)
                 otherItems[itemId] = old + item.stackSize * multiplier
             }
@@ -121,7 +118,7 @@ class MinionCraftHelper {
             }
 
             if (internalId.contains("_GENERATOR_")) {
-                for (recipe in getRecipes(internalId)) {
+                for (recipe in NEUItems.getRecipes(internalId)) {
                     if (recipe !is CraftingRecipe) continue
 
                     for (ingredient in recipe.ingredients) {
@@ -148,7 +145,7 @@ class MinionCraftHelper {
         }
         for (minionId in tierOneMinionsFiltered) {
 
-            for (recipe in getRecipes(minionId)) {
+            for (recipe in NEUItems.getRecipes(minionId)) {
                 if (recipe !is CraftingRecipe) continue
                 if (recipe.ingredients.any { help.contains(it.internalItemId) }) {
                     val name = recipe.output.itemStack.name!!.removeColor()
@@ -164,7 +161,7 @@ class MinionCraftHelper {
         val minionName = "§9$name Minion $nextTier"
         display.add(minionName)
         val nextMinionId = minionId.addOneToId()
-        val recipes: List<NeuRecipe> = getRecipes(nextMinionId)
+        val recipes: List<NeuRecipe> = NEUItems.getRecipes(nextMinionId)
         for (recipe in recipes) {
             if (recipe !is CraftingRecipe) continue
             val output = recipe.output
@@ -181,7 +178,7 @@ class MinionCraftHelper {
             }
             var allDone = true
             for ((rawId, need) in map) {
-                val (itemId, multiplier) = getMultiplier(rawId)
+                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
@@ -213,15 +210,6 @@ class MinionCraftHelper {
         SkyHanniMod.feature.bingo.minionCraftHelperPos.renderStrings(display, center = true)
     }
 
-    private fun getRecipes(minionId: String): List<NeuRecipe> {
-        if (recipesCache.contains(minionId)) {
-            return recipesCache[minionId]!!
-        }
-        val recipes = NEUItems.manager.getAvailableRecipesFor(minionId)
-        recipesCache[minionId] = recipes
-        return recipes
-    }
-
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
@@ -233,44 +221,5 @@ class MinionCraftHelper {
         val lastText = split("_").last()
         val next = lastText.toInt() + 1
         return replace(lastText, "" + next)
-    }
-
-
-    private fun getMultiplier(rawId: String, tryCount: Int = 0, parent: String? = null): Pair<String, Int> {
-        if (multiplierCache.contains(rawId)) {
-            return multiplierCache[rawId]!!
-        }
-        if (tryCount == 10) {
-            val message = "Error reading getMultiplier for item '$rawId'"
-            Error(message).printStackTrace()
-            LorenzUtils.error(message)
-            return Pair(rawId, 1)
-        }
-        for (recipe in getRecipes(rawId)) {
-            if (recipe !is CraftingRecipe) continue
-
-            val map = mutableMapOf<String, Int>()
-            for (ingredient in recipe.ingredients) {
-                val count = ingredient.count.toInt()
-                val internalItemId = ingredient.internalItemId
-                val old = map.getOrDefault(internalItemId, 0)
-                map[internalItemId] = old + count
-            }
-            if (map.size != 1) continue
-            val current = map.iterator().next().toPair()
-            val id = current.first
-            return if (id != parent) {
-                val child = getMultiplier(id, tryCount + 1, rawId)
-                val result = Pair(child.first, child.second * current.second)
-                multiplierCache[rawId] = result
-                result
-            } else {
-                Pair(parent, 1)
-            }
-        }
-
-        val result = Pair(rawId, 1)
-        multiplierCache[rawId] = result
-        return result
     }
 }
