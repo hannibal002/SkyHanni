@@ -281,7 +281,7 @@ class BingoNextStepHelper {
         ).apply { createItemIslandRequirement(itemName, this) }
         redstoneForThys requires IslandType.DEEP_CAVERNS.getStep()
         IslandType.DWARVEN_MINES.getStep() requires redstoneForThys
-        IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep("Mining", 12)
+        IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep("Mining", 12).also { it requires IslandType.THE_FARMING_ISLANDS.getStep() }
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
         // TODO add skyblock level requirement
@@ -294,7 +294,7 @@ class BingoNextStepHelper {
 
         IslandType.DWARVEN_MINES.getStep().also { finalSteps.add(it) }
         ChatMessageStep("Get Ender Armor").also { finalSteps.add(it) } requires IslandType.THE_END.getStep()
-        IslandType.THE_END.getStep() requires SkillLevelStep("Combat", 12)
+        IslandType.THE_END.getStep() requires SkillLevelStep("Combat", 12).also { it requires IslandType.DEEP_CAVERNS.getStep() }
 
 //        enchantedCharcoal(7)
 //        compactor(7)
