@@ -98,7 +98,7 @@ object NEUItems {
         Utils.disableCustomDungColours = false
     }
 
-    fun getMultiplier(rawId: String, tryCount: Int = 0, parent: String? = null): Pair<String, Int> {
+    fun getMultiplier(rawId: String, tryCount: Int = 0): Pair<String, Int> {
         if (multiplierCache.contains(rawId)) {
             return multiplierCache[rawId]!!
         }
@@ -121,13 +121,13 @@ object NEUItems {
             if (map.size != 1) continue
             val current = map.iterator().next().toPair()
             val id = current.first
-            return if (id != parent) {
-                val child = getMultiplier(id, tryCount + 1, rawId)
+            return if (current.second > 1) {
+                val child = getMultiplier(id, tryCount + 1)
                 val result = Pair(child.first, child.second * current.second)
                 multiplierCache[rawId] = result
                 result
             } else {
-                Pair(parent, 1)
+                Pair(rawId, 1)
             }
         }
 
