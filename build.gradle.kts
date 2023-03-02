@@ -62,8 +62,8 @@ dependencies {
     // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    implementation("com.github.notenoughupdates:notenoughupdates:df945f9:all")
-    devenvMod("com.github.notenoughupdates:notenoughupdates:df945f9:all")
+    implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 }
 
 // Minecraft configuration:
