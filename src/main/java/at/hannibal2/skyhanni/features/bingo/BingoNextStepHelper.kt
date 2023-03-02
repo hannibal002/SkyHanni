@@ -292,6 +292,10 @@ class BingoNextStepHelper {
         farmingContest requires SkillLevelStep("Farming", 10)
         itemRequired["Jacob's Ticket"] = farmingContest
 
+        IslandType.DWARVEN_MINES.getStep().also { finalSteps.add(it) }
+        ChatMessageStep("Get Ender Armor").also { finalSteps.add(it) } requires IslandType.THE_END.getStep()
+        IslandType.THE_END.getStep() requires SkillLevelStep("Combat", 12)
+
 //        enchantedCharcoal(7)
 //        compactor(7)
     }
