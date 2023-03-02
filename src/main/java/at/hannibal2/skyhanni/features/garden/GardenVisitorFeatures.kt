@@ -19,6 +19,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
+import java.util.regex.Pattern
 
 class GardenVisitorFeatures {
 
@@ -27,6 +28,7 @@ class GardenVisitorFeatures {
     private var lastClickedNpc = 0
     private var nearby = false
     private var tick = 0
+    private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
     private val config: Garden get() = SkyHanniMod.feature.garden
 
     companion object {
@@ -134,21 +136,21 @@ class GardenVisitorFeatures {
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
 
-        var i = 0
         val list = event.toolTip
         var totalPrice = 0.0
         var amountDifferentItems = 0
-        for (l in list) {
+        var endReached = false
+        for ((i, l) in list.withIndex()) {
             val line = l.substring(4)
             if (line == "") {
                 if (amountDifferentItems > 1) {
                     val format = NumberUtil.format(totalPrice)
                     list[1] = list[1] + "$line §f(§6Total §6$format§f)"
                 }
-                break
+                endReached = true
             }
 
-            if (i > 1) {
+            if (i > 1 && !endReached) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
                     val lowestBin: Double
@@ -159,7 +161,7 @@ class GardenVisitorFeatures {
                         println(message)
                         LorenzUtils.error(message)
                         e.printStackTrace()
-                        continue
+                        return
                     }
                     val price = lowestBin * amount
                     totalPrice += price
@@ -168,7 +170,15 @@ class GardenVisitorFeatures {
                     amountDifferentItems++
                 }
             }
-            i++
+
+            if (config.visitorCopperPrice) {
+                val matcher = copperPattern.matcher(line)
+                if (matcher.matches()) {
+                    val coppers = matcher.group(1).replace(",", "").toInt()
+                    val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
+                    list[i] = list[i] + " §f(§7Copper price §6$pricePerCopper§f)"
+                }
+            }
         }
     }
 

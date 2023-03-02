@@ -96,10 +96,16 @@ public class Garden {
     public boolean visitorHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Show Price", desc = "Show the bazaar price of the items required for the visitors.")
+    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean visitorShowPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Copper Price", desc = "Show the price for copper inside the visitor gui.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorCopperPrice = false;
 
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
