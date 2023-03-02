@@ -198,7 +198,7 @@ class GardenVisitorFeatures {
                 if (matcher.matches()) {
                     val coppers = matcher.group(1).replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
-                    list[i] = list[i] + " §f(§7Copper price §6$pricePerCopper§f)"
+                    list[i] = list[i] + " §7(Copper price §6$pricePerCopper§7)"
                 }
             }
         }
