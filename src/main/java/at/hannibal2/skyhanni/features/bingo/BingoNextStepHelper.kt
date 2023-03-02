@@ -42,12 +42,11 @@ class BingoNextStepHelper {
             }
 
             currentHelp.clear()
-            currentHelp.add("Bingo Step Helper:")
+            currentHelp.add("Bingo Step Helper")
 
             if (currentSteps.isEmpty()) {
-                currentHelp.add("§7Open the §e/bingo §7card.")
+                currentHelp.add("§cOpen the §e/bingo §ccard.")
             }
-
             for (currentStep in currentSteps) {
                 val text = getName(currentStep)
                 currentHelp.add("  §7$text")
