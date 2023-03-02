@@ -136,13 +136,13 @@ class GardenVisitorFeatures {
 
         val list = event.toolTip
         var totalPrice = 0.0
-        var amountItems = 0
+        var itemsCounter = 0
         var endReached = false
         for ((i, l) in list.toMutableList().withIndex()) {
             val line = l.substring(4)
             if (line == "") {
                 if (config.visitorShowPrice) {
-                    if (amountItems > 1) {
+                    if (itemsCounter > 1) {
                         val format = NumberUtil.format(totalPrice)
                         list[1] = list[1] + "$line §f(§6Total §6$format§f)"
                     }
@@ -170,7 +170,7 @@ class GardenVisitorFeatures {
                         val format = NumberUtil.format(price)
                         list[i] = "$line §7(§6$format§7)"
                     }
-                    amountItems++
+                    itemsCounter++
 
                     if (config.visitorExactAmountAndTime) {
                         val multiplier = NEUItems.getMultiplier(internalName)
@@ -187,7 +187,7 @@ class GardenVisitorFeatures {
                             } else {
                                 "§cno speed data!"
                             }
-                            list.add(i + amountItems, " §7- $formatName($formatSpeed§7)")
+                            list.add(i + itemsCounter, " §7- $formatName($formatSpeed§7)")
                         }
                     }
                 }
