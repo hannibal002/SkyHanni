@@ -30,6 +30,7 @@
 
 ### Changes
 + Reworked reputation helper design in the crimson isle.
++ Moved the key setting for diana `warp to nearest burrow waypoint` from vanilla mc (esc -> config -> controls -> scroll all the way down to skyhanni category) to simply `/sh diana`
 
 ### Fixed
 + Barbarian Duke Damage Indicator now only starts displaying after the player is getting close to him. (30 blocks)
