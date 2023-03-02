@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
+import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
@@ -15,6 +17,8 @@ object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemCache = mutableMapOf<String, ItemStack>()
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
+    private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
+    private val recipesCache = mutableMapOf<String, List<NeuRecipe>>()
 
     fun getInternalName(itemName: String): String {
         if (itemNameCache.containsKey(itemName)) {
@@ -92,5 +96,52 @@ object NEUItems {
         Utils.hasEffectOverride = false
         RenderHelper.disableStandardItemLighting()
         Utils.disableCustomDungColours = false
+    }
+
+    fun getMultiplier(rawId: String, tryCount: Int = 0, parent: String? = null): Pair<String, Int> {
+        if (multiplierCache.contains(rawId)) {
+            return multiplierCache[rawId]!!
+        }
+        if (tryCount == 10) {
+            val message = "Error reading getMultiplier for item '$rawId'"
+            Error(message).printStackTrace()
+            LorenzUtils.error(message)
+            return Pair(rawId, 1)
+        }
+        for (recipe in getRecipes(rawId)) {
+            if (recipe !is CraftingRecipe) continue
+
+            val map = mutableMapOf<String, Int>()
+            for (ingredient in recipe.ingredients) {
+                val count = ingredient.count.toInt()
+                val internalItemId = ingredient.internalItemId
+                val old = map.getOrDefault(internalItemId, 0)
+                map[internalItemId] = old + count
+            }
+            if (map.size != 1) continue
+            val current = map.iterator().next().toPair()
+            val id = current.first
+            return if (id != parent) {
+                val child = getMultiplier(id, tryCount + 1, rawId)
+                val result = Pair(child.first, child.second * current.second)
+                multiplierCache[rawId] = result
+                result
+            } else {
+                Pair(parent, 1)
+            }
+        }
+
+        val result = Pair(rawId, 1)
+        multiplierCache[rawId] = result
+        return result
+    }
+
+    fun getRecipes(minionId: String): List<NeuRecipe> {
+        if (recipesCache.contains(minionId)) {
+            return recipesCache[minionId]!!
+        }
+        val recipes = manager.getAvailableRecipesFor(minionId)
+        recipesCache[minionId] = recipes
+        return recipes
     }
 }
