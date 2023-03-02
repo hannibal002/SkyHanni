@@ -82,7 +82,7 @@ class SlayerQuestWarning {
         var slayBoss = false
         var slayerTypeName = ""
         var nextIsType = false
-        for (line in ScoreboardData.sidebarLinesFormatted()) {
+        for (line in ScoreboardData.sidebarLinesFormatted) {
             if (nextIsType) {
                 slayerTypeName = line.removeColor()
                 nextIsType = false

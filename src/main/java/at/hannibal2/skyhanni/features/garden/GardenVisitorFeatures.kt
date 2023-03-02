@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ScoreboardData.Companion.sidebarLinesFormatted
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -26,7 +27,7 @@ class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
     private val display = mutableListOf<List<Any>>()
     private var lastClickedNpc = 0
-    private var nearby = false
+    private var onBarnPlot = false
     private var tick = 0
     private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
     private val config: Garden get() = SkyHanniMod.feature.garden
@@ -129,8 +130,6 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!isEnabled()) return
-        if (!nearby) return
-
         if (!inVisitorInventory) return
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
@@ -215,27 +214,12 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
-        if (!config.visitorNeedsDisplay && !config.visitorHighlight && !config.visitorShowPrice) return
-        if (tick++ % 60 != 0) return
+        if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
+        if (tick++ % 30 != 0) return
 
-        val defaultVanillaSkin = LorenzVec(8.4, 72.0, -14.1)
-        val castleSkin = LorenzVec(-5, 75, 18)
-        val bambooSkin = LorenzVec(-12, 72, -25)
-        val hiveSkin = LorenzVec(-17, 71, -19)
-        val cubeSkin = LorenzVec(-17, 71, -19)
+        onBarnPlot = sidebarLinesFormatted.contains(" §7⏣ §aThe Garden")
 
-        // TODO Only check current one, ignore others.
-        val list = mutableListOf<LorenzVec>()
-        list.add(defaultVanillaSkin)
-        list.add(castleSkin)
-        list.add(bambooSkin)
-        list.add(hiveSkin)
-        list.add(cubeSkin)
-
-        val playerLocation = LocationUtils.playerLocation()
-        nearby = list.map { playerLocation.distance(it) < 15 }.any { it }
-
-        if (nearby && config.visitorHighlight) {
+        if (onBarnPlot && config.visitorHighlight) {
             checkVisitorsReady()
         }
     }
@@ -341,7 +325,8 @@ class GardenVisitorFeatures {
         if (!config.visitorNeedsDisplay) return
 
         if (config.visitorNeedsOnlyWhenClose) {
-            if (!nearby) return
+            //TODO check if on barn plot (sidebar)
+            if (!onBarnPlot) return
         }
 
         config.visitorNeedsPos.renderStringsAndItems(display)

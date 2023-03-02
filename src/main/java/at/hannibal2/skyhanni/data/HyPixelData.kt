@@ -29,7 +29,7 @@ class HyPixelData {
         var profile = ""
 
         fun readSkyBlockArea(): String {
-            return ScoreboardData.sidebarLinesFormatted()
+            return ScoreboardData.sidebarLinesFormatted
                 .firstOrNull { it.startsWith(" §7⏣ ") }
                 ?.substring(5)?.removeColor()
                 ?: "invalid"
@@ -101,7 +101,7 @@ class HyPixelData {
         stranded = false
         bingo = false
 
-        for (line in ScoreboardData.sidebarLinesFormatted()) {
+        for (line in ScoreboardData.sidebarLinesFormatted) {
             when (line) {
                 " §7Ⓑ §7Bingo", // No Rank
                 " §bⒷ §bBingo", // Rank 1
