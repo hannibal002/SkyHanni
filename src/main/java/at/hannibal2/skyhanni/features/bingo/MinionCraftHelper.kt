@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.minion
+package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SendTitleHelper
@@ -44,8 +44,8 @@ class MinionCraftHelper {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.minions.minionCraftHelperEnabled) return
+        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
 
         tick++
 
@@ -207,10 +207,10 @@ class MinionCraftHelper {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.minions.minionCraftHelperEnabled) return
+        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
 
-        SkyHanniMod.feature.minions.minionCraftHelperPos.renderStrings(display, center = true)
+        SkyHanniMod.feature.bingo.minionCraftHelperPos.renderStrings(display, center = true)
     }
 
     private fun getRecipes(minionId: String): List<NeuRecipe> {
