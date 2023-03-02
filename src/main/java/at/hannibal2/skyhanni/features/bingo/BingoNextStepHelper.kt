@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -20,6 +21,8 @@ class BingoNextStepHelper {
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
     private val itemRequired = mutableMapOf<String, NextStep>()
     private val islands = mutableMapOf<IslandType, IslandVisitStep>()
+    private val collectionPattern = Pattern.compile("Reach ([0-9]+(?:,\\d+)*) (.*) Collection\\.")
+    private val crystalPattern = Pattern.compile("Obtain a (\\w+) Crystal in the Crystal Hollows\\.")
 
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
@@ -39,7 +42,12 @@ class BingoNextStepHelper {
             }
 
             currentHelp.clear()
-            currentHelp.add("Bingo Helper:")
+            currentHelp.add("Bingo Step Helper:")
+
+            if (currentSteps.isEmpty()) {
+                currentHelp.add("§7Open the §e/bingo §7card.")
+            }
+
             for (currentStep in currentSteps) {
                 val text = getName(currentStep)
                 currentHelp.add("  §7$text")
@@ -92,6 +100,7 @@ class BingoNextStepHelper {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
+        if (!SkyHanniMod.feature.bingo.cardDisplay) return
         if (event.phase != TickEvent.Phase.START) return
 
         tick++
@@ -106,7 +115,8 @@ class BingoNextStepHelper {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyHanniMod.feature.bingo.cardDisplay) return
 
         //TODO add thys message
 //        if (event.message == "thys message") {
@@ -148,7 +158,9 @@ class BingoNextStepHelper {
         done = true
         updateResult()
         if (!silent) {
-            LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
+            if (SkyHanniMod.feature.bingo.stepHelper) {
+                LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
+            }
         }
     }
 
@@ -177,11 +189,10 @@ class BingoNextStepHelper {
         for (goal in personalGoals) {
             val description = goal.description.removeColor()
 
-            val pattern = Pattern.compile("Reach ([0-9]+(?:,\\d+)*) (.*) Collection\\.")
-            val matcher = pattern.matcher(description)
-            if (matcher.matches()) {
-                val amount = matcher.group(1).replace(",", "").toInt()
-                val name = matcher.group(2)
+            val collectionMatcher = collectionPattern.matcher(description)
+            if (collectionMatcher.matches()) {
+                val amount = collectionMatcher.group(1).replace(",", "").toInt()
+                val name = collectionMatcher.group(2)
 
                 val collectionStep = CollectionStep(name, amount).apply { finalSteps.add(this) }
                 createItemIslandRequirement(name, collectionStep)
@@ -201,7 +212,12 @@ class BingoNextStepHelper {
                     "Jacob's Ticket",
                     32,
                     mapOf("Jacob's Ticket" to 1)
-                ).apply { this requires IslandType.HUB.getStep() }.addItemRequirements()
+                ).apply { this requires IslandType.GARDEN.getStep() }.addItemRequirements()
+            }
+            val crystalMatcher = crystalPattern.matcher(description)
+            if (crystalMatcher.matches()) {
+                val crystal = crystalMatcher.group(1)
+                ChatMessageStep("Obtain a $crystal Crystal").apply { finalSteps.add(this) } requires IslandType.CRYSTAL_HOLLOWS.getStep()
             }
 
             println("No help for goal: '$description'")
@@ -269,10 +285,13 @@ class BingoNextStepHelper {
         IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep("Mining", 12)
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
+        // TODO add skyblock level requirement
+//        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
+        IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
+
         val farmingContest = ChatMessageStep("Farming Contest")
         farmingContest requires SkillLevelStep("Farming", 10)
         itemRequired["Jacob's Ticket"] = farmingContest
-
 
 //        enchantedCharcoal(7)
 //        compactor(7)

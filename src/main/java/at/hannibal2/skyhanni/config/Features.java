@@ -128,7 +128,7 @@ public class Features extends Config {
         }
 
         if (runnableId.equals("minionCraftHelper")) {
-            editOverlay(activeConfigCategory, 200, 16, minions.minionCraftHelperPos);
+            editOverlay(activeConfigCategory, 200, 16, bingo.minionCraftHelperPos);
             return;
         }
 
