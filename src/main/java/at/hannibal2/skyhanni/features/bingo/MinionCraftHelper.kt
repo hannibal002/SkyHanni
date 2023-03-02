@@ -184,7 +184,8 @@ class MinionCraftHelper {
                 val percentage = have.toDouble() / needAmount
                 val itemName = NEUItems.getItemStack(rawId).name ?: "§cName??§f"
                 if (percentage >= 1) {
-                    display.add("  $itemName§8: §aDONE")
+                    val color = if (itemId.startsWith("WOOD_")) "§7" else "§a"
+                    display.add("  $itemName§8: ${color}DONE")
                     otherItems[itemId] = have - needAmount
                 } else {
                     val format = LorenzUtils.formatPercentage(percentage)
