@@ -16,5 +16,4 @@ public class MixinGuiNewChat {
         if (SkyHanniMod.feature.chat.peekChat != Keyboard.KEY_NONE && Keyboard.isKeyDown(SkyHanniMod.feature.chat.peekChat))
             cir.setReturnValue(true);
     }
-
 }
