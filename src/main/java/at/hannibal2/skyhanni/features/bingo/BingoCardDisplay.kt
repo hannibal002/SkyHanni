@@ -124,7 +124,7 @@ class BingoCardDisplay {
 
         display.add("Community Goals")
         if (communityGoals.isEmpty()) {
-            display.add("§7Open the §e/bingo §7card.")
+            display.add("§cOpen the §e/bingo §ccard.")
         } else {
             communityGoals.mapTo(display) { "  " + it.description + if (it.done) " §aDONE" else "" }
 
@@ -158,7 +158,7 @@ class BingoCardDisplay {
             }
         }
         if (!config.stepHelper && displayMode == 1) {
-            displayMode = 0
+            displayMode = 2
         }
         if (displayMode == 0) {
             if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
