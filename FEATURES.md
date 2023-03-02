@@ -172,6 +172,7 @@
 + **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
 + **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
 + **Copper Price** - Show the price for copper inside the visitor gui.
++ **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

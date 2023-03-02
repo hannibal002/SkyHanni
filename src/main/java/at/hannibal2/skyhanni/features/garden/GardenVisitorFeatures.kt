@@ -130,55 +130,85 @@ class GardenVisitorFeatures {
     fun onTooltip(event: ItemTooltipEvent) {
         if (!isEnabled()) return
         if (!nearby) return
-        if (!config.visitorShowPrice) return
 
         if (!inVisitorInventory) return
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
 
-        val list = event.toolTip
-        var totalPrice = 0.0
-        var amountDifferentItems = 0
-        var endReached = false
-        for ((i, l) in list.toMutableList().withIndex()) {
-            val line = l.substring(4)
-            if (line == "") {
-                if (amountDifferentItems > 1) {
-                    val format = NumberUtil.format(totalPrice)
-                    list[1] = list[1] + "$line §f(§6Total §6$format§f)"
-                }
-                endReached = true
-            }
-
-            if (i > 1 && !endReached) {
-                val (itemName, amount) = ItemUtils.readItemAmount(line)
-                if (itemName != null) {
-                    val internalName: String
-                    try {
-                        internalName = NEUItems.getInternalName(itemName)
-                    } catch (e: NullPointerException) {
-                        val message = "internal name is null: '$itemName'"
-                        println(message)
-                        LorenzUtils.error(message)
-                        e.printStackTrace()
-                        return
+        // TODO remove
+        try {
+            val list = event.toolTip
+            var totalPrice = 0.0
+            var amountItems = 0
+            var endReached = false
+            for ((i, l) in list.toMutableList().withIndex()) {
+                val line = l.substring(4)
+                if (line == "") {
+                    if (config.visitorShowPrice) {
+                        if (amountItems > 1) {
+                            val format = NumberUtil.format(totalPrice)
+                            list[1] = list[1] + "$line §f(§6Total §6$format§f)"
+                        }
                     }
-                    val price = NEUItems.getPrice(internalName) * amount
-                    totalPrice += price
-                    val format = NumberUtil.format(price)
-                    list[i] = "$line §7(§6$format§7)"
-                    amountDifferentItems++
+                    endReached = true
+                }
+
+                // Items Required
+                if (i > 1 && !endReached) {
+                    val (itemName, amount) = ItemUtils.readItemAmount(line)
+                    if (itemName != null) {
+                        val internalName: String
+                        try {
+                            internalName = NEUItems.getInternalName(itemName)
+                        } catch (e: NullPointerException) {
+                            val message = "internal name is null: '$itemName'"
+                            println(message)
+                            LorenzUtils.error(message)
+                            e.printStackTrace()
+                            return
+                        }
+                        if (config.visitorShowPrice) {
+                            val price = NEUItems.getPrice(internalName) * amount
+                            totalPrice += price
+                            val format = NumberUtil.format(price)
+                            list[i] = "$line §7(§6$format§7)"
+                        }
+                        amountItems++
+
+                        if (config.visitorExactAmountAndTime) {
+                            val multiplier = NEUItems.getMultiplier(internalName)
+                            val rawName = NEUItems.getItemStack(multiplier.first).name ?: continue
+                            val crop = rawName.removeColor()
+                            val cropAmount = multiplier.second.toLong() * amount
+                            GardenCropMilestoneDisplay.cropsPerSecond[crop]?.let {
+                                val formatAmount = LorenzUtils.formatInteger(cropAmount)
+                                val formatName = "§e${formatAmount}§7x $crop "
+                                val formatSpeed = if (it != -1) {
+                                    val missingTimeSeconds = cropAmount / it
+                                    val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
+                                    "in §b$duration"
+                                } else {
+                                    "§cno speed data!"
+                                }
+                                list.add(i + amountItems, " §7- $formatName($formatSpeed§7)")
+                            }
+                        }
+                    }
+                }
+
+                if (config.visitorCopperPrice) {
+                    val matcher = copperPattern.matcher(line)
+                    if (matcher.matches()) {
+                        val coppers = matcher.group(1).replace(",", "").toInt()
+                        val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
+                        list[i] = list[i] + " §f(§7Copper price §6$pricePerCopper§f)"
+                    }
                 }
             }
 
-            if (config.visitorCopperPrice) {
-                val matcher = copperPattern.matcher(line)
-                if (matcher.matches()) {
-                    val coppers = matcher.group(1).replace(",", "").toInt()
-                    val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
-                    list[i] = list[i] + " §f(§7Copper price §6$pricePerCopper§f)"
-                }
-            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            LorenzUtils.debug("crash!")
         }
     }
 

@@ -30,6 +30,10 @@ class GardenCropMilestoneDisplay {
     private val timeTillNextCrop: MutableMap<String, Long> get() = SkyHanniMod.feature.hidden.gardenTimeTillNextCropMilestone
     private val config: Garden get() = SkyHanniMod.feature.garden
 
+    companion object {
+        val cropsPerSecond: MutableMap<String, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
+    }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -44,6 +48,11 @@ class GardenCropMilestoneDisplay {
     fun onProfileJoin(event: ProfileJoinEvent) {
         if (GardenCropMilestones.cropCounter.values.sum() == 0L) {
             needsInventory = true
+        }
+        if (cropsPerSecond.isEmpty()) {
+            for (key in GardenCropMilestones.cropCounter.keys) {
+                cropsPerSecond[key] = -1
+            }
         }
     }
 
@@ -237,12 +246,13 @@ class GardenCropMilestoneDisplay {
         progressDisplay.add(Collections.singletonList("§e$haveFormat§8/§e$needFormat"))
 
         if (averageSpeedPerSecond != 0) {
+            cropsPerSecond[it] = averageSpeedPerSecond
             val missing = need - have
             val missingTimeSeconds = missing / averageSpeedPerSecond
             val millis = missingTimeSeconds * 1000
             timeTillNextCrop[it] = millis
             val duration = TimeUtils.formatDuration(millis)
-            progressDisplay.add(Collections.singletonList("§7In §b$duration"))
+            progressDisplay.add(Collections.singletonList("§7in §b$duration"))
 
             val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
             progressDisplay.add(Collections.singletonList("§7Crops/minute§8: §e$format"))
