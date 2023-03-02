@@ -21,6 +21,7 @@
 + Added **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
 + Added **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
 * Added **Copper Price** - Show the price for copper inside the visitor gui.
+* Added **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 
 
 ### Features from other Mods

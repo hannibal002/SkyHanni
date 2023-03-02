@@ -38,4 +38,7 @@ public class Hidden {
 
     @Expose
     public Map<String, Long> gardenTimeTillNextCropMilestone = new HashMap<>();
+
+    @Expose
+    public Map<String, Integer> gardenCropsPerSecond = new HashMap<>();
 }
