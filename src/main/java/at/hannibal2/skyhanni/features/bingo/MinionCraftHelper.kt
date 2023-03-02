@@ -96,15 +96,45 @@ class MinionCraftHelper {
             val rawId = item.getInternalName()
             if (name.contains(" Minion ")) {
                 minions[name] = rawId
-            } else {
+            }
+        }
+
+        val allMinions = tierOneMinions.toMutableList()
+        minions.values.mapTo(allMinions) { it.addOneToId() }
+
+        for (item in mainInventory) {
+            val name = item?.name?.removeColor() ?: continue
+            val rawId = item.getInternalName()
+            if (!name.contains(" Minion ")) {
                 if (!allIngredients.contains(rawId)) continue
+                if (!isAllowed(allMinions, rawId)) continue
+
                 val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
                 val old = otherItems.getOrDefault(itemId, 0)
                 otherItems[itemId] = old + item.stackSize * multiplier
             }
         }
+
         firstMinionTier(otherItems, minions)
         return Pair(minions, otherItems)
+    }
+
+    private fun isAllowed(allMinions: List<String>, internalName: String): Boolean {
+        val a = NEUItems.getMultiplier(internalName)
+        for (minion in allMinions) {
+            val recipes = NEUItems.getRecipes(minion)
+
+            for (recipe in recipes) {
+                for (ingredient in recipe.ingredients) {
+                    val ingredientInternalName = ingredient.internalItemId
+                    if (ingredientInternalName == internalName) return true
+
+                    val b = NEUItems.getMultiplier(ingredientInternalName)
+                    if (a.first == b.first && a.second < b.second) return true
+                }
+            }
+        }
+        return false
     }
 
     private fun init() {
@@ -114,6 +144,9 @@ class MinionCraftHelper {
 
         for (internalId in NotEnoughUpdates.INSTANCE.manager.itemInformation.keys) {
             if (internalId.endsWith("_GENERATOR_1")) {
+                if (internalId == "REVENANT_GENERATOR_1") continue
+                if (internalId == "TARANTULA_GENERATOR_1") continue
+                if (internalId == "VOIDLING_GENERATOR_1") continue
                 tierOneMinions.add(internalId)
             }
 
@@ -144,7 +177,6 @@ class MinionCraftHelper {
             }
         }
         for (minionId in tierOneMinionsFiltered) {
-
             for (recipe in NEUItems.getRecipes(minionId)) {
                 if (recipe !is CraftingRecipe) continue
                 if (recipe.ingredients.any { help.contains(it.internalItemId) }) {
