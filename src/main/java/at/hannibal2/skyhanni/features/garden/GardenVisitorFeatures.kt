@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -66,7 +67,8 @@ class GardenVisitorFeatures {
 
             val (itemName, amount) = ItemUtils.readItemAmount(line)
             if (itemName == null) continue
-            visitor.items[itemName] = amount
+            val internalName = NEUItems.getInternalName(itemName)
+            visitor.items[internalName] = amount
         }
         checkVisitorsReady()
 
@@ -90,24 +92,15 @@ class GardenVisitorFeatures {
             if (items.isEmpty()) {
                 newVisitors.add(visitorName)
             }
-            for ((itemName, amount) in items) {
-                val old = requiredItems.getOrDefault(itemName, 0)
-                requiredItems[itemName] = old + amount
+            for ((internalName, amount) in items) {
+                val old = requiredItems.getOrDefault(internalName, 0)
+                requiredItems[internalName] = old + amount
             }
         }
         if (requiredItems.isNotEmpty()) {
             newDisplay.add(Collections.singletonList("§7Visitor items needed:"))
-            for ((name, amount) in requiredItems) {
-                val internalName: String
-                try {
-                    internalName = NEUItems.getInternalName(name)
-                } catch (e: NullPointerException) {
-                    val message = "internal name is null: '$name'"
-                    println(message)
-                    LorenzUtils.error(message)
-                    e.printStackTrace()
-                    continue
-                }
+            for ((internalName, amount) in requiredItems) {
+                val name = NEUItems.getItemStack(internalName).name
                 val itemStack = NEUItems.getItemStack(internalName)
                 newDisplay.add(listOf(" §7- ", itemStack, "$name §8x$amount"))
             }
@@ -289,9 +282,8 @@ class GardenVisitorFeatures {
 
     private fun isReady(visitor: Visitor): Boolean {
         var ready = true
-        for ((name, need) in visitor.items) {
-            val cleanName = name.removeColor()
-            val having = InventoryUtils.countItemsInLowerInventory { it.name?.contains(cleanName) ?: false }
+        for ((internalName, need) in visitor.items) {
+            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
             if (having < need) {
                 ready = false
             }
