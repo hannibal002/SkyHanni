@@ -58,7 +58,7 @@ class SkyMartBestProfit {
                 iconMap[name] = NEUItems.getItemStack(internalName)
 
                 val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
-                    " §f(§6$priceFormat §f/ §c$amountFormat Copper§f)"
+                    " §7(§6$priceFormat §f/ §c$amountFormat Copper§7)"
                 } else ""
                 val pair = Pair(name, "§6§l$perFormat$advancedStats")
                 priceMap[pair] = factor
