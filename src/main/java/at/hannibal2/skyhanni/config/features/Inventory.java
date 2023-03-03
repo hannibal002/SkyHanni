@@ -68,25 +68,25 @@ public class Inventory {
     @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningSelectedStats = false;
+    public boolean statsTuningSelectedStats = true;
 
     @Expose
     @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected tuning points in the stats tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningPoints = false;
+    public boolean statsTuningPoints = true;
 
     @Expose
     @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the stats tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningSelectedTemplate = false;
+    public boolean statsTuningSelectedTemplate = true;
 
     @Expose
     @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the tuning point templates.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningTemplateStats = false;
+    public boolean statsTuningTemplateStats = true;
 
     @Expose
     @ConfigOption(
