@@ -48,9 +48,7 @@ class MinionCraftHelper {
 
         if (tick % 10 == 0) {
             val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
-            hasMinionInInventory = mainInventory
-                .mapNotNull { it?.name?.removeColor() }
-                .any { it.contains(" Minion ") && !it.contains(" Minion Skin") }
+            hasMinionInInventory = mainInventory.mapNotNull { it?.name }.any { isMinionName(it) }
         }
 
         if (tick % (60 * 2) == 0) {
@@ -94,7 +92,7 @@ class MinionCraftHelper {
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
             val rawId = item.getInternalName()
-            if (name.contains(" Minion ")) {
+            if (isMinionName(name)) {
                 minions[name] = rawId
             }
         }
@@ -105,7 +103,7 @@ class MinionCraftHelper {
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
             val rawId = item.getInternalName()
-            if (!name.contains(" Minion ")) {
+            if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
                 if (!isAllowed(allMinions, rawId)) continue
 
@@ -255,4 +253,6 @@ class MinionCraftHelper {
         val next = lastText.toInt() + 1
         return replace(lastText, "" + next)
     }
+
+    private fun isMinionName(itemName: String) = itemName.contains(" Minion ") && !itemName.contains(" Minion Skin")
 }
