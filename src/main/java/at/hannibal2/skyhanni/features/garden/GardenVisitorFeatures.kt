@@ -130,17 +130,20 @@ class GardenVisitorFeatures {
         val list = event.toolTip
         var totalPrice = 0.0
         var itemsCounter = 0
+        var itemsWithSpeedCounter = 0
         var endReached = false
         for ((i, l) in list.toMutableList().withIndex()) {
             val line = l.substring(4)
             if (line == "") {
-                if (config.visitorShowPrice) {
-                    if (itemsCounter > 1) {
-                        val format = NumberUtil.format(totalPrice)
-                        list[1] = list[1] + "$line §f(§6Total §6$format§f)"
+                if (!endReached) {
+                    if (config.visitorShowPrice) {
+                        if (itemsCounter > 1) {
+                            val format = NumberUtil.format(totalPrice)
+                            list[1] = list[1] + "$line §7(§6Total §6$format§7)"
+                        }
                     }
+                    endReached = true
                 }
-                endReached = true
             }
 
             // Items Required
@@ -180,7 +183,8 @@ class GardenVisitorFeatures {
                             } else {
                                 "§cno speed data!"
                             }
-                            list.add(i + itemsCounter, " §7- $formatName($formatSpeed§7)")
+                            itemsWithSpeedCounter++
+                            list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
                         }
                     }
                 }
@@ -191,7 +195,7 @@ class GardenVisitorFeatures {
                 if (matcher.matches()) {
                     val coppers = matcher.group(1).replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
-                    list[i] = list[i] + " §7(Copper price §6$pricePerCopper§7)"
+                    list[i + itemsWithSpeedCounter] = list[i + itemsWithSpeedCounter] + " §7(Copper price §6$pricePerCopper§7)"
                 }
             }
         }
