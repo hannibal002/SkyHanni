@@ -50,7 +50,7 @@ class MinionCraftHelper {
             val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
             hasMinionInInventory = mainInventory
                 .mapNotNull { it?.name?.removeColor() }
-                .any { it.contains(" Minion ") }
+                .any { it.contains(" Minion ") && !it.contains(" Minion Skin") }
         }
 
         if (tick % (60 * 2) == 0) {
