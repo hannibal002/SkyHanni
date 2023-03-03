@@ -471,22 +471,27 @@ object RenderUtils {
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderStringsAndItems(list: List<List<Any>>, extraSpace: Int = 0) {
+    fun Position.renderStringsAndItems(list: List<List<Any?>>, extraSpace: Int = 0) {
         if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isKeyDown) return
         if (list.isEmpty()) return
 
         var offsetY = 0
+        // TODO remove toMutableList
         for (line in list.toMutableList()) {
             renderLine(line, offsetY)
             offsetY += 10 + extraSpace + 2
         }
     }
 
-    private fun Position.renderLine(line: List<Any>, offsetY: Int) {
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int) {
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val resolution = ScaledResolution(Minecraft.getMinecraft())
         var offsetX = 0
         for (any in line) {
+            if (any == null) {
+                offsetX += 12
+                continue
+            }
             if (any is String) {
                 renderString(any, offsetX, offsetY, center = false)
                 val width = renderer.getStringWidth(any.removeColor())
