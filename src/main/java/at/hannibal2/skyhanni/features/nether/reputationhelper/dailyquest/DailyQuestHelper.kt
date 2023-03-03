@@ -253,7 +253,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             } else {
                 "§c"
             }
-            " §f($color$amountFormat §fin sacks)"
+            " §7($color$amountFormat §7in sacks)"
         } else {
             ""
         }

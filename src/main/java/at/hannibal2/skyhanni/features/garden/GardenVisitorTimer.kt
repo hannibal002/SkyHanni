@@ -54,7 +54,7 @@ class GardenVisitorTimer {
             "Next in §e$formatDuration$extraSpeed"
         }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
-        render = "§b$visitorsAmount $visitorLabel §f($next§f)"
+        render = "§b$visitorsAmount $visitorLabel §7($next§7)"
     }
 
     @SubscribeEvent

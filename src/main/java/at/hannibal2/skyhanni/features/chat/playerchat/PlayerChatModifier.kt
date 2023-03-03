@@ -76,6 +76,7 @@ class PlayerChatModifier {
             string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16})'s", "§b$1's")
             string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16}) (§.)", "§b$1 $2")
 
+            // TODO remove workaround
             if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {
                 //all players same color in chat
                 string = string.replace("§r§7: ", "§r§f: ")
