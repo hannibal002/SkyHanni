@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.misc.HideArmor;
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
+import org.lwjgl.input.Keyboard;
 
 
 public class Features extends Config {
@@ -164,6 +165,32 @@ public class Features extends Config {
 
         if (runnableId.equals("bingoCard")) {
             editOverlay(activeConfigCategory, 200, 16, bingo.bingoCardPos);
+            return;
+        }
+
+        if (runnableId.equals("gardenKeyBindPresetDisabled")) {
+            garden.keyBindAttack = Keyboard.KEY_NONE;
+            garden.keyBindLeft = Keyboard.KEY_NONE;
+            garden.keyBindRight = Keyboard.KEY_NONE;
+            garden.keyBindForward = Keyboard.KEY_NONE;
+            garden.keyBindBack = Keyboard.KEY_NONE;
+            garden.keyBindJump = Keyboard.KEY_NONE;
+            garden.keyBindSneak = Keyboard.KEY_NONE;
+
+            Minecraft.getMinecraft().thePlayer.closeScreen();
+            return;
+        }
+
+        if (runnableId.equals("gardenKeyBindPresetDefault")) {
+            garden.keyBindAttack = -100;
+            garden.keyBindLeft = Keyboard.KEY_A;
+            garden.keyBindRight = Keyboard.KEY_D;
+            garden.keyBindForward = Keyboard.KEY_W;
+            garden.keyBindBack = Keyboard.KEY_S;
+            garden.keyBindJump = Keyboard.KEY_SPACE;
+            garden.keyBindSneak = Keyboard.KEY_LSHIFT;
+
+            Minecraft.getMinecraft().thePlayer.closeScreen();
             return;
         }
     }
