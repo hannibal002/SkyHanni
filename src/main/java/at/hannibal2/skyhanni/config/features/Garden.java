@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
+import org.lwjgl.input.Keyboard;
 
 public class Garden {
 
@@ -205,4 +206,67 @@ public class Garden {
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Custom Keybind", desc = "")
+    @ConfigEditorAccordion(id = 8)
+    public boolean keybind = false;
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while having a farming tool in the hand in the garden.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 8)
+    public boolean keyBindEnabled = false;
+
+    @ConfigOption(name = "Disable All", desc = "Disabling all keys.")
+    @ConfigEditorButton(runnableId = "gardenKeyBindPresetDisabled", buttonText = "Disable")
+    @ConfigAccordionId(id = 8)
+    public int keyBindPresetDisable = 0;
+
+    @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
+    @ConfigEditorButton(runnableId = "gardenKeyBindPresetDefault", buttonText = "Default")
+    @ConfigAccordionId(id = 8)
+    public int keyBindPresetDefault = 0;
+
+    @Expose
+    @ConfigOption(name = "Attack", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = -100)
+    public int keyBindAttack = -100;
+
+    @Expose
+    @ConfigOption(name = "Move Left", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_A)
+    public int keyBindLeft = Keyboard.KEY_A;
+
+    @Expose
+    @ConfigOption(name = "Move Right", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_D)
+    public int keyBindRight = Keyboard.KEY_D;
+
+    @Expose
+    @ConfigOption(name = "Move Forward", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_W)
+    public int keyBindForward = Keyboard.KEY_W;
+
+    @Expose
+    @ConfigOption(name = "Move Back", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_S)
+    public int keyBindBack = Keyboard.KEY_S;
+
+    @Expose
+    @ConfigOption(name = "Jump", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_SPACE)
+    public int keyBindJump = Keyboard.KEY_SPACE;
+
+    @Expose
+    @ConfigOption(name = "Sneak", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
+    public int keyBindSneak = Keyboard.KEY_LSHIFT;
 }
