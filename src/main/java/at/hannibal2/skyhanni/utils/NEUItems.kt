@@ -14,7 +14,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
 object NEUItems {
-    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
+    private val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemCache = mutableMapOf<String, ItemStack>()
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
