@@ -28,6 +28,7 @@ class BingoCardDisplay {
     private var tick = 0
     private val display = mutableListOf<String>()
     private val config get() = SkyHanniMod.feature.bingo
+    private val goalCompletePattern = Pattern.compile("§6§lBINGO GOAL COMPLETE! §r§e(.*)")
 
     init {
         update()
@@ -174,18 +175,9 @@ class BingoCardDisplay {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.cardDisplay) return
 
-        val message = event.message
-        //§6§lBINGO GOAL COMPLETE! §r§eRaw Salmon Collector
-        val pattern = Pattern.compile("§6§lBINGO GOAL COMPLETE! §r§e(.*)")
-
-        val matcher = pattern.matcher(message)
-
+        val matcher = goalCompletePattern.matcher(event.message)
         if (matcher.matches()) {
-            val name = matcher.group(0)
-            println("name: '$name'")
-            for (goal in personalGoals) {
-                println("goal: '" + goal.displayName + "'")
-            }
+            val name = matcher.group(1)
             personalGoals.filter { it.displayName == name }
                 .forEach {
                     it.done = true
