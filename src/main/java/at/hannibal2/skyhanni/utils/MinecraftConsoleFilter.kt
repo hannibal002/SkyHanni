@@ -90,12 +90,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
 
-        if (SkyHanniMod.feature.dev.couldNotDownloadHttpTexture) {
-            if (formattedMessage == "Couldn't download http texture: java.net.ConnectException: Connection refused: connect") {
-                filterConsole("Http Texture")
-                return Filter.Result.DENY
-            }
-        }
         //TODO find a way to load the filter earlier to filter these messages too
 //        if (loggerName == "LaunchWrapper") {
 //            //The jar file C:\Users\Lorenz\AppData\Roaming\.minecraft\libraries\org\lwjgl\lwjgl\lwjgl\2.9.4-nightly-20150209\lwjgl-2.9.4-nightly-20150209.jar has a security seal for path org.lwjgl.opengl, but that path is defined and not secure
