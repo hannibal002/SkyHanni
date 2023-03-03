@@ -59,7 +59,8 @@ class GardenVisitorFeatures {
 
         if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
 
-        val visitor = visitors[npcItem.name!!]!!
+        val name = npcItem.name ?: return
+        val visitor = visitors[name]!!
         visitor.entityId = lastClickedNpc
         for (line in offerItem.getLore()) {
             if (line == "§7Items Required:") continue
