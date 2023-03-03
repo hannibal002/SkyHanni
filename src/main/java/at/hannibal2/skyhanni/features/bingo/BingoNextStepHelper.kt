@@ -218,6 +218,13 @@ class BingoNextStepHelper {
                 val crystal = crystalMatcher.group(1)
                 ChatMessageStep("Obtain a $crystal Crystal").apply { finalSteps.add(this) } requires IslandType.CRYSTAL_HOLLOWS.getStep()
             }
+            val pattern = Pattern.compile("Obtain level (.*) in the (.*) Skill.")
+            val matcher = pattern.matcher(description)
+            if (matcher.matches()) {
+                val level = matcher.group(1).toInt()
+                val skillName = matcher.group(2)
+                SkillLevelStep(skillName, level).apply { finalSteps.add(this) }
+            }
 
             println("No help for goal: '$description'")
         }
