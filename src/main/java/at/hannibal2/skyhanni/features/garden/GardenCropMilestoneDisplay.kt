@@ -3,28 +3,19 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.OwnInventorItemUpdateEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 
 class GardenCropMilestoneDisplay {
     private val progressDisplay = mutableListOf<List<Any>>()
     private val bestCropDisplay = mutableListOf<List<Any>>()
-    private var currentCrop: String? = null
     private var needsInventory = false
     private val cultivatingData = mutableMapOf<String, Int>()
     private val timeTillNextCrop: MutableMap<String, Long> get() = SkyHanniMod.feature.hidden.gardenTimeTillNextCropMilestone
@@ -65,14 +56,14 @@ class GardenCropMilestoneDisplay {
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
         val itemStack = event.itemStack
-        val counter = readCounter(itemStack)
+        val counter = GardenAPI.readCounter(itemStack)
         if (counter == -1) return
-        val crop = getCropTypeFromItem(itemStack) ?: return
+        val crop = GardenAPI.getCropTypeFromItem(itemStack) ?: return
         if (cultivatingData.containsKey(crop)) {
             val old = cultivatingData[crop]!!
             val diff = counter - old
             GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
-            if (currentCrop == crop) {
+            if (GardenAPI.cropInHand == crop) {
                 calculateSpeed(diff)
                 update()
             }
@@ -113,45 +104,18 @@ class GardenCropMilestoneDisplay {
         countInLastSecond++
     }
 
-    private fun readCounter(itemStack: ItemStack): Int {
-        if (itemStack.hasTagCompound()) {
-            val tag = itemStack.tagCompound
-            if (tag.hasKey("ExtraAttributes", 10)) {
-                val ea = tag.getCompoundTag("ExtraAttributes")
-                if (ea.hasKey("mined_crops", 99)) {
-                    return ea.getInteger("mined_crops")
-                }
-
-                // only using cultivating when no crops counter is there
-                if (ea.hasKey("farmed_cultivating", 99)) {
-                    return ea.getInteger("farmed_cultivating")
-                }
-            }
-        }
-        return -1
-    }
-
-    var tick = 0
-
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (!isEnabled()) return
 
-        if (tick++ % 5 != 0) return
-
-        val cropInHand = getCropInHand()
-        if (currentCrop != cropInHand) {
-            resetSpeed()
-            currentCrop = cropInHand
-            update()
-        }
+        resetSpeed()
+        update()
     }
 
     private fun update() {
         progressDisplay.clear()
         bestCropDisplay.clear()
-        currentCrop?.let {
+        GardenAPI.cropInHand?.let {
             val crops = GardenCropMilestones.cropCounter[it]
             if (crops == null) {
                 println("cropCounter is null for '$it'")
@@ -164,7 +128,7 @@ class GardenCropMilestoneDisplay {
             }
         }
         if (config.cropMilestoneBestAlwaysOn) {
-            if (currentCrop == null) {
+            if (GardenAPI.cropInHand == null) {
                 drawBestDisplay(null)
             }
         }
@@ -263,28 +227,5 @@ class GardenCropMilestoneDisplay {
         }
     }
 
-    private fun getCropInHand(): String? {
-        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return null
-        if (readCounter(heldItem) == -1) return null
-        return getCropTypeFromItem(heldItem)
-    }
-
-    private fun getCropTypeFromItem(heldItem: ItemStack): String? {
-        val name = heldItem.name ?: return null
-        for ((crop, _) in GardenCropMilestones.cropCounter) {
-            if (name.contains(crop)) {
-                return crop
-            }
-        }
-        if (name.contains("Coco Chopper")) {
-            return "Cocoa Beans"
-        }
-        if (name.contains("Fungi Cutter")) {
-            return "Mushroom"
-        }
-        return null
-    }
-
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.cropMilestoneProgress && LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    private fun isEnabled() = GardenAPI.inGarden() && config.cropMilestoneProgress
 }

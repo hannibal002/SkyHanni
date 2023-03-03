@@ -92,9 +92,8 @@ public class SkyHanniMod {
     public void preInit(FMLPreInitializationEvent event) {
         logger = LogManager.getLogger("SkyHanni");
 
-        //API and utils
+        // utils
         loadModule(this);
-        loadModule(new BazaarApi());
         loadModule(new ChatManager());
         loadModule(new HyPixelData());
         loadModule(new DungeonData());
@@ -116,7 +115,11 @@ public class SkyHanniMod {
         loadModule(new GardenCropMilestones());
         loadModule(new OwnInventoryData());
 
-        //features
+        // APIs
+        loadModule(new BazaarApi());
+        loadModule(new GardenAPI());
+
+        // features
         loadModule(new BazaarOrderHelper());
         loadModule(new AuctionsHighlighter());
         loadModule(new ChatFilter());
