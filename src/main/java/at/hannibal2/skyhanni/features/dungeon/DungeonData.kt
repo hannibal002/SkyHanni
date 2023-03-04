@@ -9,8 +9,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.regex.Pattern
 
 class DungeonData {
+
+    private val pattern = Pattern.compile(" §7⏣ §cThe Catacombs §7\\((.*)\\)")
 
     companion object {
         var dungeonFloor: String? = null
@@ -63,13 +66,12 @@ class DungeonData {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (dungeonFloor == null) {
-            for (line in ScoreboardData.sidebarLines) {
-                //TODO mixins
-                if (line.contains("The Catacombs (")) {
-                    val floor = line.substringAfter("(").substringBefore(")")
+            for (line in ScoreboardData.sidebarLinesFormatted) {
+                val matcher = pattern.matcher(line)
+                if (matcher.matches()) {
+                    val floor = matcher.group(1)
                     dungeonFloor = floor
                     DungeonEnterEvent(floor).postAndCatch()
-                    break
                 }
             }
         }
