@@ -114,7 +114,32 @@ object NEUItems {
             val map = mutableMapOf<String, Int>()
             for (ingredient in recipe.ingredients) {
                 val count = ingredient.count.toInt()
-                val internalItemId = ingredient.internalItemId
+                var internalItemId = ingredient.internalItemId
+                // ignore cactus green
+                if (rawId == "ENCHANTED_CACTUS_GREEN") {
+                    if (internalItemId == "INK_SACK-2") {
+                        internalItemId = "CACTUS"
+                    }
+                }
+
+                // ignore wheat in enchanted cookie
+                if (rawId == "ENCHANTED_COOKIE") {
+                    if (internalItemId == "WHEAT") {
+                        continue
+                    }
+                }
+
+                // ignore golden carrot in enchanted golden carrot
+                if (rawId == "ENCHANTED_GOLDEN_CARROT") {
+                    if (internalItemId == "GOLDEN_CARROT") {
+                        continue
+                    }
+                }
+
+//                println("")
+//                println("rawId: $rawId")
+//                println("internalItemId: $internalItemId")
+
                 val old = map.getOrDefault(internalItemId, 0)
                 map[internalItemId] = old + count
             }
