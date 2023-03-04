@@ -477,9 +477,21 @@ object RenderUtils {
 
         var offsetY = 0
         // TODO remove toMutableList
-        for (line in list.toMutableList()) {
-            renderLine(line, offsetY)
-            offsetY += 10 + extraSpace + 2
+        try {
+            for (line in list.toMutableList()) {
+                renderLine(line, offsetY)
+                offsetY += 10 + extraSpace + 2
+            }
+        } catch (e: NullPointerException) {
+            println(" ")
+            for (innerList in list) {
+                println("new inner list:")
+                for (any in innerList) {
+                    println("any: '$any'")
+                }
+            }
+            e.printStackTrace()
+            LorenzUtils.debug("NPE in renderStringsAndItems!")
         }
     }
 
