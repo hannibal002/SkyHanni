@@ -22,7 +22,14 @@ class GardenCropMilestoneDisplay {
     private val config: Garden get() = SkyHanniMod.feature.garden
 
     companion object {
-        val cropsPerSecond: MutableMap<String, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
+        fun getCropsPerSecond(crop: String): Int? {
+            if (crop.endsWith(" Mushroom")) {
+                return cropsPerSecond["Mushroom"]
+            }
+            return cropsPerSecond[crop]
+        }
+
+       private val cropsPerSecond: MutableMap<String, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
     }
 
     @SubscribeEvent
