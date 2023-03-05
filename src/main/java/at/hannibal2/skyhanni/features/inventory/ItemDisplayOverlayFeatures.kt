@@ -18,6 +18,7 @@ import java.util.regex.Pattern
 class ItemDisplayOverlayFeatures {
 
     private val wishingCompassPattern = Pattern.compile("§7Remaining Uses: §e(.*)§8/§e3")
+    private val collectionTier0Pattern = Pattern.compile("§7Progress to .* I: .*")
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -134,8 +135,10 @@ class ItemDisplayOverlayFeatures {
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
             if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
-                if (item.getLore().any { it.contains("Click to view!") }) {
+                val lore = item.getLore()
+                if (lore.any { it.contains("Click to view!") }) {
                     item.name?.let {
+                        if (isCollectionTier0(lore)) return "0"
                         if (it.startsWith("§e")) {
                             val text = it.split(" ").last()
                             return "" + text.romanToDecimalIfNeeded()
@@ -146,6 +149,8 @@ class ItemDisplayOverlayFeatures {
         }
         return ""
     }
+
+    private fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
