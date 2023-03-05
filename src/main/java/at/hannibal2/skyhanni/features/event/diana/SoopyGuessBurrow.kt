@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.event.diana
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
@@ -51,6 +54,7 @@ class SoopyGuessBurrow {
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
+        if (!isEnabled()) return
         if (event.soundName != "note.harp") return
 
         val pitch = event.pitch
@@ -131,6 +135,7 @@ class SoopyGuessBurrow {
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
+        if (!isEnabled()) return
         val type = event.type
         if (type != EnumParticleTypes.DRIP_LAVA) return
         val currLoc = event.location
@@ -264,5 +269,9 @@ class SoopyGuessBurrow {
                     )
             }
         }
+    }
+
+    private fun isEnabled(): Boolean {
+        return LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && SkyHanniMod.feature.diana.burrowsSoopyGuess
     }
 }
