@@ -31,6 +31,7 @@ class GardenVisitorFeatures {
     private var onBarnPlot = false
     private var tick = 0
     private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
+    private val offerAcceptedPattern = Pattern.compile("§6§lOFFER ACCEPTED §r§8with §r(.*) §r.*")
     private val config: Garden get() = SkyHanniMod.feature.garden
 
     companion object {
@@ -71,8 +72,8 @@ class GardenVisitorFeatures {
             val internalName = NEUItems.getInternalName(itemName)
             visitor.items[internalName] = amount
         }
-        checkVisitorsReady()
 
+        checkVisitorsReady()
         updateDisplay()
     }
 
@@ -89,6 +90,8 @@ class GardenVisitorFeatures {
         val requiredItems = mutableMapOf<String, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in visitors) {
+            if (visitor.done) continue
+
             val items = visitor.items
             if (items.isEmpty()) {
                 newVisitors.add(visitorName)
@@ -251,6 +254,21 @@ class GardenVisitorFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        val matcher = offerAcceptedPattern.matcher(event.message)
+        if (!matcher.matches()) return
+
+        val visitorName = matcher.group(1)
+        for (visitor in visitors) {
+            if (visitor.key == visitorName) {
+                visitor.value.done = true
+                updateDisplay()
+                checkVisitorsReady()
+            }
+        }
+    }
+
     private fun checkVisitorsReady() {
         for ((visitorName, visitor) in visitors) {
             val entity = Minecraft.getMinecraft().theWorld.getEntityByID(visitor.entityId)
@@ -259,7 +277,11 @@ class GardenVisitorFeatures {
             }
 
             if (entity is EntityLivingBase) {
-                if (visitor.items.isEmpty()) {
+                if (visitor.done) {
+                    val color = LorenzColor.WHITE.toColor().withAlpha(120)
+                    RenderLivingEntityHelper.setEntityColor(entity, color)
+                    { config.visitorHighlight }
+                } else if (visitor.items.isEmpty()) {
                     val color = LorenzColor.DARK_AQUA.toColor().withAlpha(120)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
                     { config.visitorHighlight }
@@ -322,7 +344,7 @@ class GardenVisitorFeatures {
         config.visitorNeedsPos.renderStringsAndItems(display)
     }
 
-    class Visitor(var entityId: Int, val items: MutableMap<String, Int> = mutableMapOf())
+    class Visitor(var entityId: Int, var done: Boolean = false, val items: MutableMap<String, Int> = mutableMapOf())
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }
