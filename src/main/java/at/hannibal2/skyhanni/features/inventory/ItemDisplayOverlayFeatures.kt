@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -18,7 +19,6 @@ import java.util.regex.Pattern
 class ItemDisplayOverlayFeatures {
 
     private val wishingCompassPattern = Pattern.compile("§7Remaining Uses: §e(.*)§8/§e3")
-    private val collectionTier0Pattern = Pattern.compile("§7Progress to .* I: .*")
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -138,7 +138,7 @@ class ItemDisplayOverlayFeatures {
                 val lore = item.getLore()
                 if (lore.any { it.contains("Click to view!") }) {
                     item.name?.let {
-                        if (isCollectionTier0(lore)) return "0"
+                        if (CollectionAPI.isCollectionTier0(lore)) return "0"
                         if (it.startsWith("§e")) {
                             val text = it.split(" ").last()
                             return "" + text.romanToDecimalIfNeeded()
@@ -149,8 +149,6 @@ class ItemDisplayOverlayFeatures {
         }
         return ""
     }
-
-    private fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
     private fun grabSackName(name: String): String {
         val split = name.split(" ")
