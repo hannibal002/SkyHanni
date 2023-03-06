@@ -278,7 +278,7 @@ class GardenVisitorFeatures {
 
             if (entity is EntityLivingBase) {
                 if (visitor.done) {
-                    val color = LorenzColor.WHITE.toColor().withAlpha(120)
+                    val color = LorenzColor.DARK_GRAY.toColor().withAlpha(120)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
                     { config.visitorHighlight }
                 } else if (visitor.items.isEmpty()) {
