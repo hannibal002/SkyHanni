@@ -34,6 +34,9 @@ class BazaarApi {
             return null
         }
 
+        fun getBazaarDataForInternalName(internalName: String) =
+            bazaarMap.values.firstOrNull { it.apiName == internalName }
+
         fun isBazaarItem(stack: ItemStack): Boolean {
             val internalName = stack.getInternalName()
             return bazaarMap.any { it.value.apiName == internalName }

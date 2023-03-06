@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni;
 
+import at.hannibal2.skyhanni.api.CollectionAPI;
 import at.hannibal2.skyhanni.config.ConfigManager;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.commands.Commands;
@@ -118,6 +119,7 @@ public class SkyHanniMod {
         // APIs
         loadModule(new BazaarApi());
         loadModule(new GardenAPI());
+        loadModule(new CollectionAPI());
 
         // features
         loadModule(new BazaarOrderHelper());
