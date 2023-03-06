@@ -6,7 +6,8 @@
 + Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
 + Added skill and collection level as item stack.
 + Added **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
-+ Add support for tier 1 minions and title send for the minion craft helper.
++ Added support for tier 1 minions and title send for the minion craft helper.
++ Added Chicken head Timer.
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.

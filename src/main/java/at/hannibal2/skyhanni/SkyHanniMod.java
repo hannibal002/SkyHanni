@@ -213,6 +213,7 @@ public class SkyHanniMod {
         loadModule(new GardenNextPlotPrice());
         loadModule(new GardenCropMilestoneDisplay());
         loadModule(new GardenCustomKeybinds());
+        loadModule(new ChickenHeadTimer());
 
         Commands.INSTANCE.init();
 

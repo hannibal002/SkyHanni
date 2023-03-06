@@ -202,6 +202,23 @@ public class Misc {
     public boolean hideCloseRedstoneparticles = true;
 
     @Expose
+    @ConfigOption(name = "Chicken Head Timer", desc = "")
+    @ConfigEditorAccordion(id = 10)
+    public boolean chickenHeadTimer = false;
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Show the cooldown until the next time you can lay an egg with the chicken head.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 10)
+    public boolean chickenHeadTimerDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Timer Position", desc = "")
+    @ConfigEditorButton(runnableId = "chickenHeadTimer", buttonText = "Edit")
+    @ConfigAccordionId(id = 10)
+    public Position chickenHeadTimerPosition = new Position(-372, 73, false, true);
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
     @ConfigEditorBoolean
     public boolean hideExpBottles = false;
