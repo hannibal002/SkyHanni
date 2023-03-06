@@ -193,6 +193,11 @@ public class Features extends Config {
             Minecraft.getMinecraft().thePlayer.closeScreen();
             return;
         }
+
+        if (runnableId.equals("chickenHeadTimer")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.chickenHeadTimerPosition);
+            return;
+        }
     }
 
     @Expose
