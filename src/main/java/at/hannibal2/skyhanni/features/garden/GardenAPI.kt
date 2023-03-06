@@ -41,15 +41,19 @@ class GardenAPI {
 
         fun getCropTypeFromItem(heldItem: ItemStack): String? {
             val name = heldItem.name ?: return null
+            return getCropTypeFromItem(name)
+        }
+
+        fun getCropTypeFromItem(itemName: String): String? {
             for ((crop, _) in GardenCropMilestones.cropCounter) {
-                if (name.contains(crop)) {
+                if (itemName.contains(crop)) {
                     return crop
                 }
             }
-            if (name.contains("Coco Chopper")) {
+            if (itemName.contains("Coco Chopper")) {
                 return "Cocoa Beans"
             }
-            if (name.contains("Fungi Cutter")) {
+            if (itemName.contains("Fungi Cutter")) {
                 return "Mushroom"
             }
             return null

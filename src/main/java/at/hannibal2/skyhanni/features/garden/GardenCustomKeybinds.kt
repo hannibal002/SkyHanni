@@ -3,12 +3,13 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.KeybindHelper
 import at.hannibal2.skyhanni.config.features.Garden
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class GardenCustomKeybinds {
     private val shConfig: Garden get() = SkyHanniMod.feature.garden
@@ -29,13 +30,41 @@ class GardenCustomKeybinds {
         Runtime.getRuntime().addShutdownHook(Thread { reset() })
     }
 
+    private var tick = 0
+    private var itemInHand = ""
+
     @SubscribeEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
-        if (isEnabled() && GardenAPI.cropInHand != null) {
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        if (!GardenAPI.inGarden()) return
+        if (tick++ % 5 != 0) return
+
+        val crop = loadItemInHand()
+        if (itemInHand != crop) {
+            itemInHand = crop
+            update()
+        }
+    }
+
+    private fun update() {
+        if (isEnabled() && itemInHand != "") {
             applyCustomKeybinds()
         } else {
             reset()
         }
+    }
+
+    private fun loadItemInHand(): String {
+        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return ""
+        val name = heldItem.name ?: return ""
+        if (GardenAPI.readCounter(heldItem) == -1) {
+            if (name.contains("Daedalus Axe")) {
+                return "Daedalus Axe"
+            }
+            return ""
+        }
+
+        return GardenAPI.getCropTypeFromItem(name) ?: ""
     }
 
     @SubscribeEvent

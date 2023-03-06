@@ -218,7 +218,7 @@ public class Garden {
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while having a farming tool in the hand in the garden. §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden. §cOnly updates after scrolling in the hotbar.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean keyBindEnabled = false;
