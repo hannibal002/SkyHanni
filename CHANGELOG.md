@@ -22,7 +22,7 @@
 + Added **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
 + Added **Copper Price** - Show the price for copper inside the visitor gui.
 + Added **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
-+ Added **Custom Keybinds** while having a farming tool in the hand in the garden.
++ Added **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
 
 
 ### Features from other Mods
