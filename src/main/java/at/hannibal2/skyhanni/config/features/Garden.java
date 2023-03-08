@@ -156,7 +156,7 @@ public class Garden {
     @ConfigOption(name = "Display Position", desc = "")
     @ConfigEditorButton(runnableId = "cropMilestoneProgress", buttonText = "Edit")
     @ConfigAccordionId(id = 6)
-    public Position cropMilestoneProgressDisplayPos = new Position(-363, 12, false, true);
+    public Position cropMilestoneProgressDisplayPos = new Position(376, 19, false, true);
 
     @Expose
     @ConfigOption(name = "Best Crop", desc = "")
@@ -205,11 +205,6 @@ public class Garden {
     @ConfigEditorButton(runnableId = "cropMilestoneNext", buttonText = "Edit")
     @ConfigAccordionId(id = 7)
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
-
-    @Expose
-    @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
-    @ConfigEditorBoolean
-    public boolean plotPrice = true;
 
     // TODO moulconfig runnable suppoort
     @Expose
@@ -274,4 +269,32 @@ public class Garden {
     @ConfigAccordionId(id = 8)
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     public int keyBindSneak = Keyboard.KEY_LSHIFT;
+
+    @Expose
+    @ConfigOption(name = "Optimal Speed", desc = "")
+    @ConfigEditorAccordion(id = 9)
+    public boolean optimalSpeed = false;
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean optimalSpeedEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Warn via title when you don't have the optimal speed.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean optimalSpeedWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Speed Warning Position", desc = "")
+    @ConfigEditorButton(runnableId = "optimalSpeed", buttonText = "Edit")
+    @ConfigAccordionId(id = 9)
+    public Position optimalSpeedPos = new Position(188, -105, false, true);
+
+    @Expose
+    @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
+    @ConfigEditorBoolean
+    public boolean plotPrice = true;
 }

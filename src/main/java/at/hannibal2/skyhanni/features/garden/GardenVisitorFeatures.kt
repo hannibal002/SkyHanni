@@ -219,7 +219,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         var found = false
         val visitorsInTab = mutableListOf<String>()
