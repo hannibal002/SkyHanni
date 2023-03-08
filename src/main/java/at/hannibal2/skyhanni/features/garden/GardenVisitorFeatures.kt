@@ -168,7 +168,7 @@ class GardenVisitorFeatures {
                         val price = NEUItems.getPrice(internalName) * amount
                         totalPrice += price
                         val format = NumberUtil.format(price)
-                        list[i] = "$line §7(§6$format§7)"
+                        list[i+ itemsWithSpeedCounter] = "$line §7(§6$format§7)"
                     }
                     itemsCounter++
 
@@ -199,7 +199,7 @@ class GardenVisitorFeatures {
                 if (matcher.matches()) {
                     val coppers = matcher.group(1).replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
-                    list[i + itemsWithSpeedCounter] = list[i + itemsWithSpeedCounter] + " §7(Copper price §6$pricePerCopper§7)"
+                    list[i + itemsWithSpeedCounter] = "$line §7(Copper price §6$pricePerCopper§7)"
                 }
             }
         }
