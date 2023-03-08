@@ -105,10 +105,11 @@ public class Inventory {
                     "§bWishing Compass",
                     "§bKuudra Key",
                     "§bSkill Level",
-                    "§bCollection Level"
+                    "§bCollection Level",
+                    "§bRancher Boot's speed"
             }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9));
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11));
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
