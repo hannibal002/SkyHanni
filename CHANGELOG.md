@@ -8,6 +8,8 @@
 + Added **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 + Added support for tier 1 minions and title send for the minion craft helper.
 + Added Chicken head Timer.
++ Added **rancher boots** speed display.
++ Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.

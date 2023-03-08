@@ -174,6 +174,7 @@
 + **Copper Price** - Show the price for copper inside the visitor gui.
 + **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 + **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
++ **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
@@ -200,3 +201,4 @@
 + **Tps Display** - Show the Tps of the current server.
 + **Particle Hider** - Hide blaze particles, fire block particles, fireball particles, near redstone particles, far particles or smoke particles.
 + Chicken Head Timer.
++ **rancher boots** speed display.

@@ -198,6 +198,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, misc.chickenHeadTimerPosition);
             return;
         }
+
+        if (runnableId.equals("optimalSpeed")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.optimalSpeedPos);
+            return;
+        }
     }
 
     @Expose
