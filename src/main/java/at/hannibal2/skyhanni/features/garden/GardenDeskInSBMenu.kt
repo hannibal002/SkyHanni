@@ -43,6 +43,7 @@ class GardenDeskInSBMenu {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (showItem && event.slotId == 10) {
+            event.isCanceled =  true
             val thePlayer = Minecraft.getMinecraft().thePlayer
             thePlayer.sendChatMessage("/desk")
         }
