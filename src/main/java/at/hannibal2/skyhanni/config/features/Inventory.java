@@ -106,7 +106,7 @@ public class Inventory {
                     "§bKuudra Key",
                     "§bSkill Level",
                     "§bCollection Level",
-                    "§bRancher Boot's speed"
+                    "§bRancher's Boots speed"
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11));
