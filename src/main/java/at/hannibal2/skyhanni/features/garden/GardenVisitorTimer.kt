@@ -46,7 +46,7 @@ class GardenVisitorTimer {
 
         val extraSpeed = if (diff in 1001..10_000) {
             val factor = diff / 1000
-            "§f/§e" + TimeUtils.formatDuration(millis / factor)
+            "§7/§e" + TimeUtils.formatDuration(millis / factor)
         } else ""
 
         val formatDuration = TimeUtils.formatDuration(millis)
