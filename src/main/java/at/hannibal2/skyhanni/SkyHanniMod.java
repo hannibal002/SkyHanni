@@ -215,6 +215,7 @@ public class SkyHanniMod {
         loadModule(new GardenCustomKeybinds());
         loadModule(new ChickenHeadTimer());
         loadModule(new GardenOptimalSpeed());
+        loadModule(new GardenDeskInSBMenu());
 
         Commands.INSTANCE.init();
 

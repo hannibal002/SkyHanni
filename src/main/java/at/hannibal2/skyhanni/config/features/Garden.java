@@ -297,4 +297,9 @@ public class Garden {
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
+    @ConfigEditorBoolean
+    public boolean deskInSkyBlockMenu = true;
 }
