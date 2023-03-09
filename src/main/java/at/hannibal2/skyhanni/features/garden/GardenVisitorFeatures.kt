@@ -137,6 +137,8 @@ class GardenVisitorFeatures {
         var itemsWithSpeedCounter = 0
         var endReached = false
         for ((i, l) in list.toMutableList().withIndex()) {
+            if (l.length < 4) continue
+
             val line = l.substring(4)
             if (line == "") {
                 if (!endReached) {
