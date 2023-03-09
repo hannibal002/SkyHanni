@@ -26,6 +26,7 @@
 + Added **Copper Price** - Show the price for copper inside the visitor gui.
 + Added **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 + Added **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
++ Added Desk shortcut in sb menu.
 
 
 ### Features from other Mods
