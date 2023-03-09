@@ -9,6 +9,7 @@ import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -35,7 +36,7 @@ class GardenDeskInSBMenu {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (showItem && event.slotNumber == 10) {
+        if (event.inventory is ContainerLocalMenu && showItem && event.slotNumber == 10) {
             event.replaceWith(item)
         }
     }
