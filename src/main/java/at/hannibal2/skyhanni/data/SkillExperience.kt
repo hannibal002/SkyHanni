@@ -50,7 +50,7 @@ class SkillExperience {
     }
 
     @SubscribeEvent
-    fun onTick(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
