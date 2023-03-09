@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -26,7 +26,7 @@ class ItemDisplayOverlayFeatures {
     }
 
     private fun getStackTip(item: ItemStack): String {
-        val itemName = item.name ?: return ""
+        val itemName = item.cleanName()
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(0)) {
             when (itemName) {
