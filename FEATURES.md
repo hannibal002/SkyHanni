@@ -175,6 +175,7 @@
 + **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 + **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
 + **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
++ Added Desk shortcut in sb menu.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
