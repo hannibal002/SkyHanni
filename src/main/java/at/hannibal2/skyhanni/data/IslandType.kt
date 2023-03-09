@@ -16,6 +16,7 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
     DEEP_CAVERNS("Deep Caverns", "deep_caverns"),
     GOLD_MINES("Gold Mine", "gold_mine"),//TODO confirm
     GARDEN("Garden"),
+    GARDEN_GUEST("Garden Guest"),
 
     NONE(""),
     UNKNOWN("???"),

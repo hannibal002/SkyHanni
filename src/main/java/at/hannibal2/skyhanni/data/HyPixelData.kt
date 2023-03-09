@@ -112,8 +112,6 @@ class HyPixelData {
                     bingo = true
                 }
 
-                // TODO implemennt stranded check
-
                 " §7♲ §7Ironman" -> {
                     ironman = true
                 }
@@ -144,6 +142,12 @@ class HyPixelData {
         if (islandType == IslandType.PRIVATE_ISLAND) {
             if (guesting) {
                 islandType = IslandType.PRIVATE_ISLAND_GUEST
+            }
+        }
+
+        if (islandType == IslandType.GARDEN) {
+            if (guesting) {
+                islandType = IslandType.GARDEN_GUEST
             }
         }
 
