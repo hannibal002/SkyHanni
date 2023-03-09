@@ -1,19 +1,33 @@
 # SkyHanni - Change Log
 
-## Version 0.17.UNRELEASED
+## Version 0.17.BETA
 
 ### Features
 + Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
++ Added skill and collection level as item stack.
++ Added **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
++ Added support for tier 1 minions and title send for the minion craft helper.
++ Added Chicken head Timer.
++ Added **rancher boots** speed display.
++ Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 + Added **Visitor Display** - Show all items needed for the visitors.
-+ Added **Highlight Ready** - Highlight the visitor when the required items are in the inventory.
++ Added **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.
 + Added **Show Price** - Show the bazaar price of the items required for the visitors.
 + Added **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
 + Added **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + Added **Yaw Snapping** - Make it harder to overshoot certain yaw angles. (contrib nea89)
 + Added **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
++ Added **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
++ Added **Plot Price** - Show the price of the plot in coins when inside the Configure Plots inventory.
++ Added **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
++ Added **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
++ Added **Copper Price** - Show the price for copper inside the visitor gui.
++ Added **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
++ Added **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
+
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
@@ -21,11 +35,19 @@
 + Added **Enderman Teleportation Hider** - Stops the enderman teleportation animation (Like in SBA)
 + Added **Fire Overlay Hider** - Hide the fire overlay (Like in Skytils)
 
+### Changes
++ Reworked reputation helper design in the crimson isle.
++ Moved the key setting for diana `warp to nearest burrow waypoint` from vanilla mc (esc -> config -> controls -> scroll all the way down to skyhanni category) to simply `/sh diana`
+
 ### Fixed
 + Barbarian Duke Damage Indicator now only starts displaying after the player is getting close to him. (30 blocks)
 + Fixed a bug that caused fire veil particle `hider/redline drawer` to not always detect the right click correctly.
 + Removed `Fixing Skytils custom Damage Splash` (Skytils has already fixed this bug. Additionally, this option enabled and skytils' damage splash disabled caused the hypixel damage splash to not show the tailing commas at all)
-+ Fixed bug with particles that blocks NotEnoughUpdates' Fishing features. 
++ Fixed bug with particles that blocks NotEnoughUpdates' Fishing features.
++ Hopefully fixed incompatibility with skytils' hide cheap coins feature.
++ Fixed dungeon milestone messages getting wrongfully formatted.
++ Fixed bazaar features not working for items with an - (turbo farming books and triple strike)
++ Fixed Crab Hat of Celebration not being detected as an accessory correctly.
 
 ## Version 0.16 (2023-02-11)
 

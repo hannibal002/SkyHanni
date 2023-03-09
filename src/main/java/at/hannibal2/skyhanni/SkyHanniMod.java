@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni;
 
+import at.hannibal2.skyhanni.api.CollectionAPI;
 import at.hannibal2.skyhanni.config.ConfigManager;
 import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.commands.Commands;
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.features.bazaar.*;
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay;
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper;
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat;
+import at.hannibal2.skyhanni.features.bingo.MinionCraftHelper;
 import at.hannibal2.skyhanni.features.chat.ChatFilter;
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages;
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter;
@@ -23,14 +25,10 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
 import at.hannibal2.skyhanni.features.fishing.*;
-import at.hannibal2.skyhanni.features.garden.GardenInventoryNumbers;
-import at.hannibal2.skyhanni.features.garden.GardenVisitorFeatures;
-import at.hannibal2.skyhanni.features.garden.GardenVisitorTimer;
-import at.hannibal2.skyhanni.features.garden.SkyMartBestProfit;
+import at.hannibal2.skyhanni.features.garden.*;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
-import at.hannibal2.skyhanni.features.minion.MinionCraftHelper;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
@@ -75,7 +73,7 @@ import java.util.List;
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.17.UNRELEASED";
+    public static final String VERSION = "0.17.Beta.7";
 
     public static Features feature;
 
@@ -95,8 +93,7 @@ public class SkyHanniMod {
     public void preInit(FMLPreInitializationEvent event) {
         logger = LogManager.getLogger("SkyHanni");
 
-        //API and utils
-        new BazaarApi();
+        // utils
         loadModule(this);
         loadModule(new ChatManager());
         loadModule(new HyPixelData());
@@ -116,9 +113,17 @@ public class SkyHanniMod {
         loadModule(new InventoryData());
         loadModule(new TabListData());
         loadModule(new RenderGuiData());
+        loadModule(new GardenCropMilestones());
+        loadModule(new OwnInventoryData());
 
-        //features
+        // APIs
+        loadModule(new BazaarApi());
+        loadModule(new GardenAPI());
+        loadModule(new CollectionAPI());
+
+        // features
         loadModule(new BazaarOrderHelper());
+        loadModule(new AuctionsHighlighter());
         loadModule(new ChatFilter());
         loadModule(new PlayerChatModifier());
         loadModule(new DungeonChatFilter());
@@ -198,7 +203,6 @@ public class SkyHanniMod {
         loadModule(new BingoCardDisplay());
         loadModule(new BingoNextStepHelper());
         loadModule(new MinionCraftHelper());
-        loadModule(new HideDeadEntities());
         loadModule(new TpsCounter());
         loadModule(new ParticleHider());
         loadModule(new MiscFeatures());
@@ -207,6 +211,11 @@ public class SkyHanniMod {
         loadModule(new GardenInventoryNumbers());
         loadModule(new YawSnapping());
         loadModule(new GardenVisitorTimer());
+        loadModule(new GardenNextPlotPrice());
+        loadModule(new GardenCropMilestoneDisplay());
+        loadModule(new GardenCustomKeybinds());
+        loadModule(new ChickenHeadTimer());
+        loadModule(new GardenOptimalSpeed());
 
         Commands.INSTANCE.init();
 

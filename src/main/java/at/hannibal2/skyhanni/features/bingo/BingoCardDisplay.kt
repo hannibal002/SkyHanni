@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.bingo.card.CommunityGoal
 import at.hannibal2.skyhanni.features.bingo.card.PersonalGoal
@@ -15,7 +16,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
@@ -27,6 +27,12 @@ class BingoCardDisplay {
 
     private var tick = 0
     private val display = mutableListOf<String>()
+    private val config get() = SkyHanniMod.feature.bingo
+    private val goalCompletePattern = Pattern.compile("§6§lBINGO GOAL COMPLETE! §r§e(.*)")
+
+    init {
+        update()
+    }
 
     companion object {
         val personalGoals = mutableListOf<PersonalGoal>()
@@ -48,6 +54,7 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
+        if (!config.cardDisplay) return
         if (event.phase != TickEvent.Phase.START) return
 
         tick++
@@ -117,23 +124,26 @@ class BingoCardDisplay {
         display.clear()
 
         display.add("Community Goals")
-        communityGoals.mapTo(display) { "  " + it.description + if (it.done) " §aDONE" else "" }
+        if (communityGoals.isEmpty()) {
+            display.add("§cOpen the §e/bingo §ccard.")
+        } else {
+            communityGoals.mapTo(display) { "  " + it.description + if (it.done) " §aDONE" else "" }
 
-        val todo = personalGoals.filter { !it.done }
-        val done = MAX_PERSONAL_GOALS - todo.size
-        display.add(" ")
-        display.add("Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
-        todo.mapTo(display) { "  " + it.description }
+            val todo = personalGoals.filter { !it.done }
+            val done = MAX_PERSONAL_GOALS - todo.size
+            display.add(" ")
+            display.add("Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
+            todo.mapTo(display) { "  " + it.description }
+        }
     }
 
     private var lastSneak = false
     private var displayMode = 0
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.bingoCard) return
+        if (!config.cardDisplay) return
 
         val stack = Minecraft.getMinecraft().thePlayer.heldItem //TODO into ItemUtils or InventoryUtils
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -148,31 +158,26 @@ class BingoCardDisplay {
                 }
             }
         }
+        if (!config.stepHelper && displayMode == 1) {
+            displayMode = 2
+        }
         if (displayMode == 0) {
             if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
-                SkyHanniMod.feature.bingo.bingoCardPos.renderStrings(display)
+                config.bingoCardPos.renderStrings(display)
             }
         } else if (displayMode == 1) {
-            SkyHanniMod.feature.bingo.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp)
+            config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp)
         }
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.isBingoProfile) return
+        if (!config.cardDisplay) return
 
-        val message = event.message
-        //§6§lBINGO GOAL COMPLETE! §r§eRaw Salmon Collector
-        val pattern = Pattern.compile("§6§lBINGO GOAL COMPLETE! §r§e(.*)")
-
-        val matcher = pattern.matcher(message)
-
+        val matcher = goalCompletePattern.matcher(event.message)
         if (matcher.matches()) {
-            val name = matcher.group(0)
-            println("name: '$name'")
-            for (goal in personalGoals) {
-                println("goal: '" + goal.displayName + "'")
-            }
+            val name = matcher.group(1)
             personalGoals.filter { it.displayName == name }
                 .forEach {
                     it.done = true

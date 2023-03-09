@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SendTitleHelper {
@@ -14,15 +14,13 @@ class SendTitleHelper {
         private var endTime = 0L
 
         fun sendTitle(text: String, duration: Int) {
-            display = text
+            display = "§f$text"
             endTime = System.currentTimeMillis() + duration
         }
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
-
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (System.currentTimeMillis() > endTime) return
 
         val scaledResolution = ScaledResolution(Minecraft.getMinecraft())

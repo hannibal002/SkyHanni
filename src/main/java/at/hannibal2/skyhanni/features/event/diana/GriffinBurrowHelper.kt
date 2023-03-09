@@ -2,16 +2,15 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.BurrowDugEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -27,6 +26,7 @@ class GriffinBurrowHelper {
     private var lastDug: LorenzVec? = null
     private var teleportedLocation: LorenzVec? = null
     private var lastGuessTime = 0L
+    private var lastAnimationTime = 0L
 
     @SubscribeEvent
     fun onSoopyGuessBurrow(event: SoopyGuessBurrowEvent) {
@@ -59,7 +59,7 @@ class GriffinBurrowHelper {
     private fun checkRemoveGuess(animation: Boolean) {
         guessLocation?.let { guessRaw ->
             val guess = findBlock(guessRaw)
-            if (particleBurrows.any { guess.distance(it.key) < 20 }) {
+            if (particleBurrows.any { guess.distance(it.key) < 40 }) {
                 if (animation) {
                     animationLocation = guess
                 }
@@ -84,6 +84,13 @@ class GriffinBurrowHelper {
             if (event.entity == Minecraft.getMinecraft().thePlayer) {
                 teleportedLocation = event.newLocation
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
+            particleBurrows.keys.removeIf { particleBurrows[it] == BurrowType.MOB }
         }
     }
 
@@ -120,28 +127,33 @@ class GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        val playerLocation = LocationUtils.playerLocation()
-        if (SkyHanniMod.feature.diana.burrowsSoopyGuess) {
-            guessLocation?.let {
-                val guessLocation = findBlock(it)
-                val distance = guessLocation.distance(playerLocation)
-                event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
-                if (distance < 10) {
-                    event.drawString(guessLocation.add(0.5, 1.5, 0.5), "§fSoopy Guess", true)
-                }
-            }
-        }
-
         sendTip(event)
 
+        val playerLocation = LocationUtils.playerLocation()
         if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
             for (burrow in particleBurrows) {
                 val location = burrow.key
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
+//                if (distance < 30) {
                 event.drawColor(location, burrowType.color, distance > 10)
-                if (distance < 10) {
-                    event.drawString(location.add(0.5, 1.5, 0.5), burrowType.text, true)
+//                }
+                event.drawDynamicText(location.add(0, 1, 0), burrowType.text, 1.5)
+//                if (distance < 10) {
+//                    event.drawString(location.add(0.5, 1.5, 0.5), burrowType.text, true)
+//                }
+            }
+        }
+
+        if (SkyHanniMod.feature.diana.burrowsSoopyGuess) {
+            guessLocation?.let {
+                val guessLocation = findBlock(it)
+                val distance = guessLocation.distance(playerLocation)
+                event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
+                event.drawDynamicText(guessLocation.add(0, 1, 0), "Guess", 1.5)
+                if (distance > 5) {
+                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
+                    event.drawDynamicText(guessLocation.add(0, 1, 0), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
         }
@@ -200,8 +212,13 @@ class GriffinBurrowHelper {
 
         event.draw3DLine(animation.add(0.5, 0.5, 0.5), target.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 2, true)
 
-        vector = vector.multiply(1 / vector.length())
-        vector = vector.multiply(0.18)
-        return animation.add(vector)
+        return if (System.currentTimeMillis() > lastAnimationTime + 25) {
+            lastAnimationTime = System.currentTimeMillis()
+            vector = vector.multiply(1 / vector.length())
+            vector = vector.multiply(0.18)
+            animation.add(vector)
+        } else {
+            animation
+        }
     }
 }

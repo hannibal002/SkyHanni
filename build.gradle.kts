@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.17.UNRELEASED"
+version = "0.17.Beta.7"
 
 // Toolchains:
 java {
@@ -62,8 +62,8 @@ dependencies {
     // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    implementation("com.github.notenoughupdates:notenoughupdates:e603cf2:all")
-    devenvMod("com.github.notenoughupdates:notenoughupdates:e603cf2:all")
+    implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 }
 
 // Minecraft configuration:

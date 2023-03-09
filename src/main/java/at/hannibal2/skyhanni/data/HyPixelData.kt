@@ -26,8 +26,10 @@ class HyPixelData {
         var stranded = false
         var bingo = false
 
+        var profile = ""
+
         fun readSkyBlockArea(): String {
-            return ScoreboardData.sidebarLinesFormatted()
+            return ScoreboardData.sidebarLinesFormatted
                 .firstOrNull { it.startsWith(" §7⏣ ") }
                 ?.substring(5)?.removeColor()
                 ?: "invalid"
@@ -56,17 +58,20 @@ class HyPixelData {
     }
 
     @SubscribeEvent
-    fun onStatusBar(event: LorenzChatEvent) {
+    fun onChatMessage(event: LorenzChatEvent) {
         if (!hypixel) return
 
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
-            val stripped = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
-            ProfileJoinEvent(stripped).postAndCatch()
+            val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
+            profile = newProfile
+            ProfileJoinEvent(newProfile).postAndCatch()
         }
         if (message.startsWith("you are playing on profile:")) {
-            val stripped = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
-            ProfileJoinEvent(stripped).postAndCatch()
+            val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+            if (profile == newProfile) return
+            profile = newProfile
+            ProfileJoinEvent(newProfile).postAndCatch()
         }
     }
 
@@ -96,7 +101,7 @@ class HyPixelData {
         stranded = false
         bingo = false
 
-        for (line in ScoreboardData.sidebarLinesFormatted()) {
+        for (line in ScoreboardData.sidebarLinesFormatted) {
             when (line) {
                 " §7Ⓑ §7Bingo", // No Rank
                 " §bⒷ §bBingo", // Rank 1

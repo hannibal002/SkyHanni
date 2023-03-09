@@ -113,12 +113,11 @@ object ItemUtils {
         return false
     }
 
-    fun ItemStack.getInternalName(): String {
-        return ItemResolutionQuery()
-            .withCurrentGuiContext()
-            .withItemStack(this)
-            .resolveInternalName() ?: ""
-    }
+    fun ItemStack.getInternalName() = NEUItems.getInternalName(this)
+
+    fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
+
+    fun ItemStack.isEnchanted() = isItemEnchanted
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
@@ -138,9 +137,14 @@ object ItemUtils {
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
 
-    private val pattern = Pattern.compile("(?<name>(?:[\\w-]+ ?)+)(?:§8x(?<amount>\\d+))?")
+    private val pattern = Pattern.compile("(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?")
+
+    private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
     fun readItemAmount(input: String): Pair<String?, Int> {
+        if (itemAmountCache.containsKey(input)) {
+            return itemAmountCache[input]!!
+        }
         var string = input.trim()
         val color = string.substring(0, 2)
         string = string.substring(2)
@@ -149,6 +153,8 @@ object ItemUtils {
 
         val itemName = color + matcher.group("name").trim()
         val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
-        return Pair(itemName, amount)
+        val pair = Pair(itemName, amount)
+        itemAmountCache[input] = pair
+        return pair
     }
 }

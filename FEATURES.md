@@ -46,7 +46,7 @@
 ## Inventory
 - Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement. (in NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
 - Option to change the gray-out opacity for 'Not Clickable Items'.
-- Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys)
+- Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and collection level)
 - Sack name (show short name of sacks)
 - Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same enchantment are highlighted in the inventory)
 - Added compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
@@ -57,6 +57,7 @@
 + Show the type of stats for the tuning point templates.
 + Highlight depleted Bonzo's Masks in your inventory.
 + Highlight stuff that is missing in the skyblock level guide inventory.
++ **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
 
 ## Item Abilities
 - Show the cooldown of items in the inventory.
@@ -161,11 +162,19 @@
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 + **Visitor Display** - Show all items needed for the visitors.
-+ **Highlight Ready** - Highlight the visitor when the required items are in the inventory.
++ **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.
 + **Show Price** - Show the bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
++ **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
++ **Plot Price** - Show the price of the plot in coins when inside the Configure Plots inventory.
++ **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
++ **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
++ **Copper Price** - Show the price for copper inside the visitor gui.
++ **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
++ **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
++ **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
@@ -192,3 +201,5 @@
 + **Tps Display** - Show the Tps of the current server.
 + **Particle Hider** - Hide blaze particles, fire block particles, fireball particles, near redstone particles, far particles or smoke particles.
 + **Yaw Snapping** - Snap your yaw to certain angles
++ Chicken Head Timer.
++ **rancher boots** speed display.

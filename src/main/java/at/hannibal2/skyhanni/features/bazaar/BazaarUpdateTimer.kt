@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BazaarUpdateEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUnit
@@ -23,7 +22,7 @@ class BazaarUpdateTimer {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (!BazaarApi.isBazaarInventory(InventoryUtils.openInventoryName())) return
+        if (!BazaarApi.inBazaarInventory) return
 
         val duration = 10_000 - (System.currentTimeMillis() - lastBazaarUpdateTime)
         val format = if (duration < 0) {

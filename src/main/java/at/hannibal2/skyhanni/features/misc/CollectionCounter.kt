@@ -1,16 +1,14 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.bazaar.BazaarData
+import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -24,14 +22,12 @@ class CollectionCounter {
 
         private var itemName = ""
         private var itemApiName = ""
-        private var itemAmount = -1
+        private var itemAmount = -1L
 
         private var lastAmountInInventory = -1
 
         private var recentGain = 0
         private var lastGainTime = -1L
-
-        private val apiCollectionData = mutableMapOf<String, Int>()
 
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
@@ -40,44 +36,26 @@ class CollectionCounter {
                     return
                 }
                 LorenzUtils.chat("§e[SkyHanni] Stopped collection tracker.")
-                apiCollectionData[itemApiName] = itemAmount
                 resetData()
                 return
             }
 
-            var name = args.joinToString(" ")
-
-            var data: BazaarData? = null
-            for (bazaarData in BazaarApi.bazaarMap.values) {
-                if (bazaarData.itemName.equals(name, ignoreCase = true)) {
-                    data = bazaarData
-                    break
-                }
-            }
-
-            if (data == null) {
-                LorenzUtils.chat("§c[SkyHanni] Item '$name' not found!")
-                return
-            }
-            name = data.itemName
-
-            val apiName = data.apiName
-            if (!apiCollectionData.contains(apiName)) {
-                if (apiCollectionData.isEmpty()) {
-                    LorenzUtils.chat("§c[SkyHanni] No Collection Data! Is the collection API disabled? Is the API down?")
-                } else {
-                    LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data!")
-                }
+            val name = args.joinToString(" ")
+            val pair = CollectionAPI.getCollectionCounter(name)
+            if (pair == null) {
+                LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (API disabled or open the collection inventory)")
                 return
             }
 
-            if (itemAmount != -1) {
-                resetData()
+            itemName = pair.first
+            itemApiName = if (itemName == "Mushroom" || itemName == "Gemstone") {
+                LorenzUtils.chat("§7Mushroom and Gemstone items are not fully supported for the counter!")
+                ""
+            } else {
+                NEUItems.getInternalName(itemName)
             }
 
-            itemName = name
-            itemApiName = apiName
-            itemAmount = apiCollectionData[apiName]!!
+            itemAmount = pair.second
 
             lastAmountInInventory = countCurrentlyInInventory()
             updateDisplay()
@@ -128,8 +106,6 @@ class CollectionCounter {
         if (diff != 0) {
             if (diff > 0) {
                 gainItems(diff)
-//            } else {
-//                LorenzUtils.debug("Collection counter! Negative collection change: $diff")
             }
         }
 
@@ -158,37 +134,7 @@ class CollectionCounter {
     }
 
     @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        apiCollectionData.clear()
-    }
-
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-
-        //new profiles don't have any collections or collection api is disabled
-        val collection = profileData["collection"]?.asJsonObject ?: return
-
-        apiCollectionData.clear()
-        for (entry in collection.entrySet()) {
-            val name = entry.key
-            val value = entry.value.asInt
-            apiCollectionData[name] = value
-            if (name == itemApiName) {
-                val diff = value - itemAmount
-                if (diff != 0) {
-                    LorenzUtils.debug("Collection counter was wrong by $diff items. (Compared against API data)")
-                }
-                itemAmount = value
-                recentGain = 0
-                updateDisplay()
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         SkyHanniMod.feature.misc.collectionCounterPos.renderString(display)

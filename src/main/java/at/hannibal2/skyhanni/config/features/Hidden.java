@@ -32,4 +32,13 @@ public class Hidden {
 
     @Expose
     public List<String> crimsonIsleKuudraTiersDone = new ArrayList<>();
+
+    @Expose
+    public Map<String, Long> gardenCropCounter = new HashMap<>();
+
+    @Expose
+    public Map<String, Long> gardenTimeTillNextCropMilestone = new HashMap<>();
+
+    @Expose
+    public Map<String, Integer> gardenCropsPerSecond = new HashMap<>();
 }

@@ -26,7 +26,7 @@ import java.util.*
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
-    private val townBoardMage = LorenzVec(-138, 92, -754)
+    private val townBoardMage = LorenzVec(-138, 92, -755)
     private val townBoardBarbarian = LorenzVec(-572, 100, -687)
 
     private var tick = 0
@@ -224,19 +224,18 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun render(display: MutableList<List<Any>>) {
         val done = quests.count { it.state == QuestState.COLLECTED }
         display.add(Collections.singletonList(""))
-        display.add(Collections.singletonList("Daily Quests ($done/5 collected)"))
+        display.add(Collections.singletonList("§7Daily Quests (§e$done§8/§e5 collected§7)"))
         if (done != 5) {
             quests.mapTo(display) { renderQuest(it) }
         }
     }
 
     private fun renderQuest(quest: Quest): List<Any> {
-        val type = quest.category.displayName
+        val category = quest.category
         val state = quest.state.displayName
         val stateColor = quest.state.color
-        val displayName = quest.displayName
 
-        val multipleText = if (quest is ProgressQuest && quest.state != QuestState.COLLECTED) {
+        val progressText = if (quest is ProgressQuest && quest.state != QuestState.COLLECTED) {
             val haveAmount = quest.haveAmount
             val needAmount = quest.needAmount
             " §e$haveAmount§8/§e$needAmount"
@@ -254,7 +253,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             } else {
                 "§c"
             }
-            " §f($color$amountFormat §fin sacks)"
+            " §7($color$amountFormat §7in sacks)"
         } else {
             ""
         }
@@ -266,13 +265,31 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val result = mutableListOf<Any>()
-        val item = quest.displayItem
-        if (item == null) {
-            result.add("  $stateText$type: §f$displayName$multipleText$sacksText")
+        val internalItemName = quest.displayItem
+
+        val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
+            if (internalItemName != null) {
+                val name = NEUItems.getItemStack(internalItemName).name
+                if (category == QuestCategory.FISHING) {
+                    name!!.split(" ").dropLast(1).joinToString(" ")
+                } else name
+
+            } else {
+                quest.displayName
+            }
+        } else quest.displayName
+
+        val categoryName = category.displayName
+        if (internalItemName == null) {
+            result.add("  $stateText$categoryName: §f$displayName$progressText$sacksText")
         } else {
-            result.add("  $stateText$type: ")
-            result.add(NEUItems.readItemFromRepo(item))
-            result.add("§f$displayName$multipleText$sacksText")
+            result.add("  $stateText$categoryName: ")
+            try {
+                result.add(NEUItems.getItemStack(internalItemName))
+            } catch (e: RuntimeException) {
+                e.printStackTrace()
+            }
+            result.add("§f$displayName$progressText$sacksText")
         }
         return result
     }

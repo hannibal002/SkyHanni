@@ -1,42 +1,49 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.data.ScoreboardData.Companion.sidebarLinesFormatted
+import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.*
+import java.util.regex.Pattern
 
 class GardenVisitorFeatures {
 
     private val visitors = mutableMapOf<String, Visitor>()
-    private val display = mutableListOf<String>()
+    private val display = mutableListOf<List<Any>>()
     private var lastClickedNpc = 0
-    private var nearby = false
+    private var onBarnPlot = false
+    private var tick = 0
+    private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
+    private val offerAcceptedPattern = Pattern.compile("§6§lOFFER ACCEPTED §r§8with §r(.*) §r.*")
+    private val config: Garden get() = SkyHanniMod.feature.garden
+
+    companion object {
+        var inVisitorInventory = false
+    }
 
     @SubscribeEvent
-    fun onChatPacket(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay &&
-            !SkyHanniMod.feature.garden.visitorHighlightReady
-        ) return
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        inVisitorInventory = false
 
-        val npcItem = event.inventory.items[13] ?: return
+        if (!isEnabled()) return
+        val npcItem = event.inventoryItems[13] ?: return
         val lore = npcItem.getLore()
         var isVisitor = false
         if (lore.size == 4) {
@@ -47,153 +54,268 @@ class GardenVisitorFeatures {
         }
         if (!isVisitor) return
 
-        val offerItem = event.inventory.items[29] ?: return
+        val offerItem = event.inventoryItems[29] ?: return
         if (offerItem.name != "§aAccept Offer") return
+        inVisitorInventory = true
 
-        val visitor = Visitor(lastClickedNpc)
+        if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
+
+        val name = npcItem.name ?: return
+        val visitor = visitors[name]!!
+        visitor.entityId = lastClickedNpc
         for (line in offerItem.getLore()) {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
             val (itemName, amount) = ItemUtils.readItemAmount(line)
             if (itemName == null) continue
-            visitor.items[itemName] = amount
+            val internalName = NEUItems.getInternalName(itemName)
+            visitor.items[internalName] = amount
         }
 
-        val visitorName = npcItem.name!!
-        visitors[visitorName] = visitor
-
-        update()
+        checkVisitorsReady()
+        updateDisplay()
     }
 
-    private fun update() {
+    private fun updateDisplay() {
+        val list = drawDisplay()
         display.clear()
+        display.addAll(list)
+    }
+
+    private fun drawDisplay(): List<List<Any>> {
+        val newDisplay = mutableListOf<List<Any>>()
+        if (!config.visitorNeedsDisplay) return newDisplay
 
         val requiredItems = mutableMapOf<String, Int>()
-        for ((_, visitor) in visitors) {
-            for ((itemName, amount) in visitor.items) {
-                val old = requiredItems.getOrDefault(itemName, 0)
-                requiredItems[itemName] = old + amount
+        val newVisitors = mutableListOf<String>()
+        for ((visitorName, visitor) in visitors) {
+            if (visitor.done) continue
+
+            val items = visitor.items
+            if (items.isEmpty()) {
+                newVisitors.add(visitorName)
+            }
+            for ((internalName, amount) in items) {
+                val old = requiredItems.getOrDefault(internalName, 0)
+                requiredItems[internalName] = old + amount
             }
         }
-        if (requiredItems.isEmpty()) return
-
-        display.add("Visitor Items Needed:")
-        for ((name, amount) in requiredItems) {
-            display.add(" -$name §8x$amount")
+        if (requiredItems.isNotEmpty()) {
+            newDisplay.add(Collections.singletonList("§7Visitor items needed:"))
+            for ((internalName, amount) in requiredItems) {
+                val name = NEUItems.getItemStack(internalName).name
+                val itemStack = NEUItems.getItemStack(internalName)
+                newDisplay.add(listOf(" §7- ", itemStack, "$name §8x$amount"))
+            }
         }
+        if (newVisitors.isNotEmpty()) {
+            if (requiredItems.isNotEmpty()) {
+                newDisplay.add(Collections.singletonList(""))
+            }
+            val amount = newVisitors.size
+            val visitorLabel = if (amount == 1) "visitor" else "visitors"
+            newDisplay.add(Collections.singletonList("§e$amount §7new $visitorLabel:"))
+            for (visitor in newVisitors) {
+                newDisplay.add(Collections.singletonList(" §7- $visitor"))
+            }
+        }
+
+        return newDisplay
     }
 
-    var tick = 0
-
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!isEnabled()) return
-        if (!nearby) return
-        if (!SkyHanniMod.feature.garden.visitorShowPrice) return
-
+        if (!inVisitorInventory) return
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
 
-        var i = 0
         val list = event.toolTip
         var totalPrice = 0.0
-        var amountDifferentItems = 0
-        for (l in list) {
+        var itemsCounter = 0
+        var itemsWithSpeedCounter = 0
+        var endReached = false
+        for ((i, l) in list.toMutableList().withIndex()) {
             val line = l.substring(4)
             if (line == "") {
-                if (amountDifferentItems > 1) {
-                    val format = NumberUtil.format(totalPrice)
-                    list[1] = list[1] + "$line §f(§6Total §6$format§f)"
+                if (!endReached) {
+                    if (config.visitorShowPrice) {
+                        if (itemsCounter > 1) {
+                            val format = NumberUtil.format(totalPrice)
+                            list[1] = list[1] + "$line §7(§6Total §6$format§7)"
+                        }
+                    }
+                    endReached = true
                 }
-                break
             }
 
-            if (i > 1) {
+            // Items Required
+            if (i > 1 && !endReached) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    val internalName = NEUItems.getInternalNameByName(itemName)
-                    val auctionManager = NotEnoughUpdates.INSTANCE.manager.auctionManager
-                    val lowestBin = auctionManager.getBazaarOrBin(internalName, false)
-                    val price = lowestBin * amount
-                    totalPrice += price
-                    val format = NumberUtil.format(price)
-                    list[i] = "$line §f(§6$format§f)"
-                    amountDifferentItems++
+                    val internalName: String
+                    try {
+                        internalName = NEUItems.getInternalName(itemName)
+                    } catch (e: NullPointerException) {
+                        val message = "internal name is null: '$itemName'"
+                        println(message)
+                        LorenzUtils.error(message)
+                        e.printStackTrace()
+                        return
+                    }
+                    if (config.visitorShowPrice) {
+                        val price = NEUItems.getPrice(internalName) * amount
+                        totalPrice += price
+                        val format = NumberUtil.format(price)
+                        list[i+ itemsWithSpeedCounter] = "$line §7(§6$format§7)"
+                    }
+                    itemsCounter++
+
+                    if (config.visitorExactAmountAndTime) {
+                        val multiplier = NEUItems.getMultiplier(internalName)
+                        val rawName = NEUItems.getItemStack(multiplier.first).name ?: continue
+                        val crop = rawName.removeColor()
+                        val cropAmount = multiplier.second.toLong() * amount
+                        GardenCropMilestoneDisplay.getCropsPerSecond(crop)?.let {
+                            val formatAmount = LorenzUtils.formatInteger(cropAmount)
+                            val formatName = "§e${formatAmount}§7x $crop "
+                            val formatSpeed = if (it != -1) {
+                                val missingTimeSeconds = cropAmount / it
+                                val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
+                                "in §b$duration"
+                            } else {
+                                "§cno speed data!"
+                            }
+                            itemsWithSpeedCounter++
+                            list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
+                        }
+                    }
                 }
             }
-            i++
+
+            if (config.visitorCopperPrice) {
+                val matcher = copperPattern.matcher(line)
+                if (matcher.matches()) {
+                    val coppers = matcher.group(1).replace(",", "").toInt()
+                    val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
+                    list[i + itemsWithSpeedCounter] = "$line §7(Copper price §6$pricePerCopper§7)"
+                }
+            }
         }
     }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay &&
-            !SkyHanniMod.feature.garden.visitorHighlightReady &&
-            !SkyHanniMod.feature.garden.visitorShowPrice
-        ) return
-        if (tick++ % 60 != 0) return
+        if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
+        if (tick++ % 30 != 0) return
 
-        val defaultVanillaSkin = LorenzVec(8.4, 72.0, -14.1)
-        val castleSkin = LorenzVec(-5, 75, 18)
-        val bambooSkin = LorenzVec(-12, 72, -25)
-        val hiveSkin = LorenzVec(-17, 71, -19)
-        val cubeSkin = LorenzVec(-17, 71, -19)
+        onBarnPlot = sidebarLinesFormatted.contains(" §7⏣ §aThe Garden")
 
-        // TODO Only check current one, ignore others.
-        val list = mutableListOf<LorenzVec>()
-        list.add(defaultVanillaSkin)
-        list.add(castleSkin)
-        list.add(bambooSkin)
-        list.add(hiveSkin)
-        list.add(cubeSkin)
-
-        val playerLocation = LocationUtils.playerLocation()
-        nearby = list.map { playerLocation.distance(it) < 15 }.any { it }
-
-
-        if (nearby && SkyHanniMod.feature.garden.visitorHighlightReady) {
+        if (onBarnPlot && config.visitorHighlight) {
             checkVisitorsReady()
         }
     }
 
-    private fun checkVisitorsReady() {
-        for (visitor in visitors.values) {
-            var ready = true
-            for ((name, need) in visitor.items) {
-                val cleanName = name.removeColor()
-                val having = InventoryUtils.countItemsInLowerInventory { it.name?.contains(cleanName) ?: false }
-                if (having < need) {
-                    ready = false
-                }
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (!isEnabled()) return
+        var found = false
+        val visitorsInTab = mutableListOf<String>()
+        for (line in event.tabList) {
+            if (line.startsWith("§b§lVisitors:")) {
+                found = true
+                continue
             }
-
-            if (ready) {
-                val world = Minecraft.getMinecraft().theWorld
-                val entity = world.getEntityByID(visitor.entityId)
-                if (entity is EntityLivingBase) {
-                    val color = LorenzColor.GREEN.toColor().withAlpha(120)
-                    RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { SkyHanniMod.feature.garden.visitorHighlightReady }
+            if (found) {
+                if (line.isEmpty()) {
+                    found = false
+                    continue
                 }
+                val name = line.substring(3)
+                visitorsInTab.add(name)
+            }
+        }
+        if (visitors.keys.removeIf { it !in visitorsInTab }) {
+            updateDisplay()
+        }
+        for (name in visitorsInTab) {
+            if (!visitors.containsKey(name)) {
+                visitors[name] = Visitor(-1)
+                if (config.visitorNotificationTitle) {
+                    SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
+                }
+                if (config.visitorNotificationChat) {
+                    LorenzUtils.chat("§e[SkyHanni] $name §eis visiting your garden!")
+                }
+                updateDisplay()
             }
         }
     }
 
     @SubscribeEvent
-    fun onReceiveEvent(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet is S13PacketDestroyEntities) {
-            for (entityID in packet.entityIDs) {
-                for ((name, visitor) in visitors.toMutableMap()) {
-                    if (visitor.entityId == entityID) {
-                        visitors.remove(name)
-                        update()
-                    }
+    fun onChatMessage(event: LorenzChatEvent) {
+        val matcher = offerAcceptedPattern.matcher(event.message)
+        if (!matcher.matches()) return
+
+        val visitorName = matcher.group(1)
+        for (visitor in visitors) {
+            if (visitor.key == visitorName) {
+                visitor.value.done = true
+                updateDisplay()
+                checkVisitorsReady()
+            }
+        }
+    }
+
+    private fun checkVisitorsReady() {
+        for ((visitorName, visitor) in visitors) {
+            val entity = Minecraft.getMinecraft().theWorld.getEntityByID(visitor.entityId)
+            if (entity == null) {
+                findEntityByNametag(visitorName, visitor)
+            }
+
+            if (entity is EntityLivingBase) {
+                if (visitor.done) {
+                    val color = LorenzColor.DARK_GRAY.toColor().withAlpha(120)
+                    RenderLivingEntityHelper.setEntityColor(entity, color)
+                    { config.visitorHighlight }
+                } else if (visitor.items.isEmpty()) {
+                    val color = LorenzColor.DARK_AQUA.toColor().withAlpha(120)
+                    RenderLivingEntityHelper.setEntityColor(entity, color)
+                    { config.visitorHighlight }
+                } else if (isReady(visitor)) {
+                    val color = LorenzColor.GREEN.toColor().withAlpha(120)
+                    RenderLivingEntityHelper.setEntityColor(entity, color)
+                    { config.visitorHighlight }
+                } else {
+                    RenderLivingEntityHelper.removeEntityColor(entity)
                 }
             }
         }
+    }
+
+    private fun findEntityByNametag(visitorName: String, visitor: Visitor) {
+        Minecraft.getMinecraft().theWorld.loadedEntityList
+            .filter { it is EntityArmorStand && it.name == visitorName }
+            .forEach { entity ->
+                Minecraft.getMinecraft().theWorld.loadedEntityList
+                    .filter { it !is EntityArmorStand }
+                    .filter { entity.getLorenzVec().distanceIgnoreY(it.getLorenzVec()) == 0.0 }
+                    .forEach { visitor.entityId = it?.entityId ?: 0 }
+            }
+    }
+
+    private fun isReady(visitor: Visitor): Boolean {
+        var ready = true
+        for ((internalName, need) in visitor.items) {
+            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+            if (having < need) {
+                ready = false
+            }
+        }
+        return ready
     }
 
     // TODO make event
@@ -212,16 +334,17 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.garden.visitorNeedsDisplay) return
+        if (!config.visitorNeedsDisplay) return
 
-        if (SkyHanniMod.feature.garden.visitorNeedsOnlyWhenClose) {
-            if (!nearby) return
+        if (config.visitorNeedsOnlyWhenClose) {
+            //TODO check if on barn plot (sidebar)
+            if (!onBarnPlot) return
         }
 
-        SkyHanniMod.feature.garden.visitorNeedsPos.renderStrings(display)
+        config.visitorNeedsPos.renderStringsAndItems(display)
     }
 
-    class Visitor(val entityId: Int, val items: MutableMap<String, Int> = mutableMapOf())
+    class Visitor(var entityId: Int, var done: Boolean = false, val items: MutableMap<String, Int> = mutableMapOf())
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }

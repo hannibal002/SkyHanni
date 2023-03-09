@@ -20,6 +20,8 @@ data class LorenzVec(
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
 
+    fun distanceIgnoreY(other: LorenzVec): Double = distanceIgnoreYSq(other).pow(0.5)
+
     fun distance(other: LorenzVec): Double = distanceSq(other).pow(0.5)
 
     fun distanceSq(x: Double, y: Double, z: Double): Double = distanceSq(LorenzVec(x, y, z))
@@ -31,6 +33,12 @@ data class LorenzVec(
         val dy = (other.y - y)
         val dz = (other.z - z)
         return (dx * dx + dy * dy + dz * dz)
+    }
+
+    fun distanceIgnoreYSq(other: LorenzVec): Double {
+        val dx = (other.x - x)
+        val dz = (other.z - z)
+        return (dx * dx + dz * dz)
     }
 
     fun add(x: Double, y: Double, z: Double): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)

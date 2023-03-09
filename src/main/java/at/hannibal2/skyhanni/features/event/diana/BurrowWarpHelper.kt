@@ -1,42 +1,37 @@
 package at.hannibal2.skyhanni.features.event.diana
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils.isActive
 import net.minecraft.client.Minecraft
-import net.minecraft.client.settings.KeyBinding
-import net.minecraftforge.fml.client.registry.ClientRegistry
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
 import org.lwjgl.input.Keyboard
 
 class BurrowWarpHelper {
 
-    private val keyBinding = KeyBinding(
-        "Nearest Burrow Warp",
-        Keyboard.KEY_X,
-        "SkyHanni"
-    )
-
     private var lastWarpTime = 0L
     private var lastWarp: WarpPoint? = null
 
-    init {
-        ClientRegistry.registerKeyBinding(keyBinding)
-    }
-
     @SubscribeEvent
-    fun onClientTick(event: TickEvent.ClientTickEvent) {
-        if (keyBinding.isActive()) {
+    fun onKeyBindPressed(event: KeyInputEvent?) {
+        if (!LorenzUtils.inSkyBlock) return
+        if(LorenzUtils.skyBlockIsland != IslandType.HUB) return
+        if (!SkyHanniMod.feature.diana.burrowNearestWarp) return
+
+        if (!Keyboard.getEventKeyState()) return
+        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
+        if (SkyHanniMod.feature.diana.keyBindWarp == key) {
             currentWarp?.let {
                 if (System.currentTimeMillis() > lastWarpTime + 5_000) {
+                    lastWarpTime = System.currentTimeMillis()
                     val thePlayer = Minecraft.getMinecraft().thePlayer
                     thePlayer.sendChatMessage("/warp " + currentWarp?.name)
                     lastWarp = currentWarp
-                    lastWarpTime = System.currentTimeMillis()
                 }
             }
         }

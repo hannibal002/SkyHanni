@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.misc.HideArmor;
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager;
 import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
+import org.lwjgl.input.Keyboard;
 
 
 public class Features extends Config {
@@ -128,7 +129,7 @@ public class Features extends Config {
         }
 
         if (runnableId.equals("minionCraftHelper")) {
-            editOverlay(activeConfigCategory, 200, 16, minions.minionCraftHelperPos);
+            editOverlay(activeConfigCategory, 200, 16, bingo.minionCraftHelperPos);
             return;
         }
 
@@ -149,6 +150,57 @@ public class Features extends Config {
 
         if (runnableId.equals("visitorTimer")) {
             editOverlay(activeConfigCategory, 200, 16, garden.visitorTimerPos);
+            return;
+        }
+
+        if (runnableId.equals("cropMilestoneProgress")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneProgressDisplayPos);
+            return;
+        }
+
+        if (runnableId.equals("cropMilestoneNext")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneNextDisplayPos);
+            return;
+        }
+
+        if (runnableId.equals("bingoCard")) {
+            editOverlay(activeConfigCategory, 200, 16, bingo.bingoCardPos);
+            return;
+        }
+
+        if (runnableId.equals("gardenKeyBindPresetDisabled")) {
+            garden.keyBindAttack = Keyboard.KEY_NONE;
+            garden.keyBindLeft = Keyboard.KEY_NONE;
+            garden.keyBindRight = Keyboard.KEY_NONE;
+            garden.keyBindForward = Keyboard.KEY_NONE;
+            garden.keyBindBack = Keyboard.KEY_NONE;
+            garden.keyBindJump = Keyboard.KEY_NONE;
+            garden.keyBindSneak = Keyboard.KEY_NONE;
+
+            Minecraft.getMinecraft().thePlayer.closeScreen();
+            return;
+        }
+
+        if (runnableId.equals("gardenKeyBindPresetDefault")) {
+            garden.keyBindAttack = -100;
+            garden.keyBindLeft = Keyboard.KEY_A;
+            garden.keyBindRight = Keyboard.KEY_D;
+            garden.keyBindForward = Keyboard.KEY_W;
+            garden.keyBindBack = Keyboard.KEY_S;
+            garden.keyBindJump = Keyboard.KEY_SPACE;
+            garden.keyBindSneak = Keyboard.KEY_LSHIFT;
+
+            Minecraft.getMinecraft().thePlayer.closeScreen();
+            return;
+        }
+
+        if (runnableId.equals("chickenHeadTimer")) {
+            editOverlay(activeConfigCategory, 200, 16, misc.chickenHeadTimerPosition);
+            return;
+        }
+
+        if (runnableId.equals("optimalSpeed")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.optimalSpeedPos);
             return;
         }
     }

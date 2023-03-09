@@ -76,10 +76,10 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     fun render(display: MutableList<List<Any>>) {
         val done = miniBosses.count { it.doneToday }
         display.add(Collections.singletonList(""))
-        display.add(Collections.singletonList("Daily Bosses ($done/5 killed)"))
+        display.add(Collections.singletonList("§7Daily Bosses (§e$done§8/§e5 killed§7)"))
         if (done != 5) {
             for (miniBoss in miniBosses) {
-                val result = if (miniBoss.doneToday) "§7Done" else "§bTodo"
+                val result = if (miniBoss.doneToday) "§aDone" else "§bTodo"
                 val displayName = miniBoss.displayName
                 val displayItem = miniBoss.displayItem
                 if (displayItem == null) {
@@ -87,8 +87,8 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")
-                    lineList.add(NEUItems.readItemFromRepo(displayItem))
-                    lineList.add("$displayName: $result")
+                    lineList.add(NEUItems.getItemStack(displayItem))
+                    lineList.add("§5$displayName§7: $result")
                     display.add(lineList)
                 }
             }

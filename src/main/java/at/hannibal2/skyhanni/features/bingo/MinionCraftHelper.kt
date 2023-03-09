@@ -1,0 +1,258 @@
+package at.hannibal2.skyhanni.features.bingo
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
+import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
+import net.minecraft.client.Minecraft
+import net.minecraft.item.ItemStack
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.regex.Pattern
+
+class MinionCraftHelper {
+
+    private var minionNamePattern = Pattern.compile("(.*) Minion (.*)")
+    private var tick = 0
+    private var display = mutableListOf<String>()
+    private var hasMinionInInventory = false
+    private var hasItemsForMinion = false
+    private val tierOneMinions = mutableListOf<String>()
+    private val tierOneMinionsDone = mutableListOf<String>()
+    private val allIngredients = mutableListOf<String>()
+    private val alreadyNotified = mutableListOf<String>()
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        alreadyNotified.clear()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
+
+        tick++
+
+        if (tick % 10 == 0) {
+            val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
+            hasMinionInInventory = mainInventory.mapNotNull { it?.name }.any { isMinionName(it) }
+        }
+
+        if (tick % (60 * 2) == 0) {
+            val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
+            hasItemsForMinion = loadFromInventory(mainInventory).first.isNotEmpty()
+        }
+
+        if (!hasMinionInInventory && !hasItemsForMinion) {
+            display.clear()
+            return
+        }
+
+        if (tick % 3 != 0) return
+//        if (tick % 60 != 0) return
+
+        val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
+
+        val (minions, otherItems) = loadFromInventory(mainInventory)
+
+        display.clear()
+        for ((minionName, minionId) in minions) {
+            val matcher = minionNamePattern.matcher(minionName)
+            if (!matcher.matches()) return
+            val cleanName = matcher.group(1).removeColor()
+            val number = matcher.group(2).romanToDecimalIfNeeded()
+            addMinion(cleanName, number, minionId, otherItems)
+        }
+    }
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        tierOneMinionsDone.clear()
+    }
+
+    private fun loadFromInventory(mainInventory: Array<ItemStack>): Pair<MutableMap<String, String>, MutableMap<String, Int>> {
+        init()
+
+        val minions = mutableMapOf<String, String>()
+        val otherItems = mutableMapOf<String, Int>()
+
+        for (item in mainInventory) {
+            val name = item?.name?.removeColor() ?: continue
+            val rawId = item.getInternalName()
+            if (isMinionName(name)) {
+                minions[name] = rawId
+            }
+        }
+
+        val allMinions = tierOneMinions.toMutableList()
+        minions.values.mapTo(allMinions) { it.addOneToId() }
+
+        for (item in mainInventory) {
+            val name = item?.name?.removeColor() ?: continue
+            val rawId = item.getInternalName()
+            if (!isMinionName(name)) {
+                if (!allIngredients.contains(rawId)) continue
+                if (!isAllowed(allMinions, rawId)) continue
+
+                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
+                val old = otherItems.getOrDefault(itemId, 0)
+                otherItems[itemId] = old + item.stackSize * multiplier
+            }
+        }
+
+        firstMinionTier(otherItems, minions)
+        return Pair(minions, otherItems)
+    }
+
+    private fun isAllowed(allMinions: List<String>, internalName: String): Boolean {
+        val a = NEUItems.getMultiplier(internalName)
+        for (minion in allMinions) {
+            val recipes = NEUItems.getRecipes(minion)
+
+            for (recipe in recipes) {
+                for (ingredient in recipe.ingredients) {
+                    val ingredientInternalName = ingredient.internalItemId
+                    if (ingredientInternalName == internalName) return true
+
+                    val b = NEUItems.getMultiplier(ingredientInternalName)
+                    if (a.first == b.first && a.second < b.second) return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun init() {
+        if (tierOneMinions.isNotEmpty()) return
+
+        allIngredients.clear()
+
+        for (internalId in NotEnoughUpdates.INSTANCE.manager.itemInformation.keys) {
+            if (internalId.endsWith("_GENERATOR_1")) {
+                if (internalId == "REVENANT_GENERATOR_1") continue
+                if (internalId == "TARANTULA_GENERATOR_1") continue
+                if (internalId == "VOIDLING_GENERATOR_1") continue
+                tierOneMinions.add(internalId)
+            }
+
+            if (internalId.contains("_GENERATOR_")) {
+                for (recipe in NEUItems.getRecipes(internalId)) {
+                    if (recipe !is CraftingRecipe) continue
+
+                    for (ingredient in recipe.ingredients) {
+                        val id = ingredient.internalItemId
+                        if (!id.contains("_GENERATOR_")) {
+                            if (!allIngredients.contains(id)) {
+                                allIngredients.add(id)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun firstMinionTier(otherItems: Map<String, Int>, minions: MutableMap<String, String>) {
+        val help = otherItems.filter { !it.key.startsWith("WOOD_") }
+        val tierOneMinionsFiltered = tierOneMinions.filter { it !in tierOneMinionsDone }
+        for (minionId in tierOneMinionsFiltered) {
+            val prefix = minionId.dropLast(1)
+            if (minions.any { it.value.startsWith(prefix) }) {
+                tierOneMinionsDone.add(minionId)
+            }
+        }
+        for (minionId in tierOneMinionsFiltered) {
+            for (recipe in NEUItems.getRecipes(minionId)) {
+                if (recipe !is CraftingRecipe) continue
+                if (recipe.ingredients.any { help.contains(it.internalItemId) }) {
+                    val name = recipe.output.itemStack.name!!.removeColor()
+                    val abc = name.replace(" I", " 0")
+                    minions[abc] = minionId.replace("_1", "_0")
+                }
+            }
+        }
+    }
+
+    private fun addMinion(name: String, minionTier: Int, minionId: String, otherItems: MutableMap<String, Int>) {
+        val nextTier = minionTier + 1
+        val minionName = "§9$name Minion $nextTier"
+        display.add(minionName)
+        val nextMinionId = minionId.addOneToId()
+        val recipes: List<NeuRecipe> = NEUItems.getRecipes(nextMinionId)
+        for (recipe in recipes) {
+            if (recipe !is CraftingRecipe) continue
+            val output = recipe.output
+            val internalItemId = output.internalItemId
+            if (!internalItemId.contains("_GENERATOR_")) continue
+            val map = mutableMapOf<String, Int>()
+            for (input in recipe.inputs) {
+                val itemId = input.internalItemId
+                if (minionId != itemId) {
+                    val count = input.count.toInt()
+                    val old = map.getOrDefault(itemId, 0)
+                    map[itemId] = old + count
+                }
+            }
+            var allDone = true
+            for ((rawId, need) in map) {
+                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
+                val needAmount = need * multiplier
+                val have = otherItems.getOrDefault(itemId, 0)
+                val percentage = have.toDouble() / needAmount
+                val itemName = NEUItems.getItemStack(rawId).name ?: "§cName??§f"
+                if (percentage >= 1) {
+                    val color = if (itemId.startsWith("WOOD_")) "§7" else "§a"
+                    display.add("  $itemName§8: ${color}DONE")
+                    otherItems[itemId] = have - needAmount
+                } else {
+                    val format = LorenzUtils.formatPercentage(percentage)
+                    val haveFormat = LorenzUtils.formatInteger(have)
+                    val needFormat = LorenzUtils.formatInteger(needAmount)
+                    display.add("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
+                    allDone = false
+                }
+            }
+            display.add(" ")
+            if (allDone) {
+                addMinion(name, nextTier, nextMinionId, otherItems)
+                notify(minionName)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
+
+        SkyHanniMod.feature.bingo.minionCraftHelperPos.renderStrings(display, center = true)
+    }
+
+    private fun notify(minionName: String) {
+        if (alreadyNotified.contains(minionName)) return
+
+        SendTitleHelper.sendTitle("Can craft $minionName", 3_000)
+        alreadyNotified.add(minionName)
+    }
+
+    private fun String.addOneToId(): String {
+        val lastText = split("_").last()
+        val next = lastText.toInt() + 1
+        return replace(lastText, "" + next)
+    }
+
+    private fun isMinionName(itemName: String) = itemName.contains(" Minion ") && !itemName.contains(" Minion Skin")
+}

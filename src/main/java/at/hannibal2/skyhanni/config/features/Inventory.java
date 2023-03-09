@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class Inventory {
@@ -68,25 +68,25 @@ public class Inventory {
     @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningSelectedStats = false;
+    public boolean statsTuningSelectedStats = true;
 
     @Expose
     @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected tuning points in the stats tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningPoints = false;
+    public boolean statsTuningPoints = true;
 
     @Expose
     @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the stats tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningSelectedTemplate = false;
+    public boolean statsTuningSelectedTemplate = true;
 
     @Expose
     @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the tuning point templates.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean statsTuningTemplateStats = false;
+    public boolean statsTuningTemplateStats = true;
 
     @Expose
     @ConfigOption(
@@ -103,10 +103,13 @@ public class Inventory {
                     "§bMinion Tier",
                     "§bCrimson Armor",
                     "§bWishing Compass",
-                    "§bKuudra Key"
+                    "§bKuudra Key",
+                    "§bSkill Level",
+                    "§bCollection Level",
+                    "§bRancher Boot's speed"
             }
     )
-    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Collections.singletonList(3));
+    public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11));
 
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
@@ -135,4 +138,10 @@ public class Inventory {
             desc = "Highlight stuff that is missing in the skyblock level guide inventory.")
     @ConfigEditorBoolean
     public boolean highlightMissingSkyBlockLevelGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Auctions",
+            desc = "Highlight own items that are sold in green and that are expired in red.")
+    @ConfigEditorBoolean
+    public boolean highlightAuctions = true;
 }

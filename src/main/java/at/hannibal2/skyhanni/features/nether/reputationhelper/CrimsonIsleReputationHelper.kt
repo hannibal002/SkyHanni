@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -44,6 +44,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         kuudraBossHelper.load()
 
         questHelper.load()
+        update()
     }
 
     @SubscribeEvent
@@ -87,8 +88,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
+    fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 
         if (!LorenzUtils.inSkyBlock) return
@@ -98,11 +98,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun update() {
-        dirty = true
-
         questHelper.saveConfig()
         miniBossHelper.saveConfig()
         kuudraBossHelper.saveConfig()
+
+        dirty = true
     }
 
     fun reset() {

@@ -24,6 +24,11 @@ class RenderLivingEntityHelper {
         private val entityNoHurTime = mutableListOf<EntityLivingBase>()
         private val entityNoHurTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
+        fun <T : EntityLivingBase> removeEntityColor(entity: T) {
+            entityColorMap.remove(entity)
+            entityColorCondition.remove(entity)
+        }
+
         fun <T : EntityLivingBase> setEntityColor(entity: T, color: Int, condition: () -> Boolean) {
             entityColorMap[entity] = color
             entityColorCondition[entity] = condition

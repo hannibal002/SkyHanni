@@ -14,12 +14,11 @@
     "MixinRenderManager",
     "gui.AccessorGuiContainer",
     "gui.MixinGuiContainer",
-    "gui.inventory.GuiEditSignMixin",
     "renderer.MixinBlockRendererDispatcher",
-    "renderer.MixinRendererLivingEntity",
-    "tileentity.TileEntitySignMixin"
+    "renderer.MixinRendererLivingEntity"
   ],
   "client": [
+    "AccessorKeyBinding",
     "MixinGuiIngame",
     "gui.MixinGuiNewChat"
   ]

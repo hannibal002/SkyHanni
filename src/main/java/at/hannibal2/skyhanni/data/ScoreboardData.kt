@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
@@ -28,9 +27,9 @@ class ScoreboardData {
             "\uD83C\uDF82",
         )
 
-        fun sidebarLinesFormatted(): List<String> {
+        fun formatLines(rawList: List<String>): List<String> {
             val list = mutableListOf<String>()
-            for (line in sidebarLinesRaw) {
+            for (line in rawList) {
                 val seperator = splitIcons.find { line.contains(it) } ?: continue
                 val split = line.split(seperator)
                 val start = split[0]
@@ -46,6 +45,9 @@ class ScoreboardData {
             return list
         }
 
+        var sidebarLinesFormatted: List<String> = emptyList()
+
+        // TODO remove these two
         var sidebarLines: List<String> = emptyList()
         var sidebarLinesRaw: List<String> = emptyList()
     }
@@ -54,13 +56,14 @@ class ScoreboardData {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
 
-        val list = fetchScoreboardLines()
-        sidebarLines = list.map { cleanSB(it) }.reversed()
-        sidebarLinesRaw = list.reversed()
+        val list = fetchScoreboardLines().reversed()
+        sidebarLines = list.map { cleanSB(it) }
+        sidebarLinesRaw = list
+        sidebarLinesFormatted = formatLines(list)
     }
 
     private fun cleanSB(scoreboard: String): String {
-        return scoreboard.removeColor().toCharArray().filter { it.code in 21..126 }.joinToString(separator = "")
+        return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 }.joinToString(separator = "")
     }
 
     fun fetchScoreboardLines(): List<String> {
