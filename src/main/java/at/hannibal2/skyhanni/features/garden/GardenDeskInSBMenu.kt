@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -15,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenDeskInSBMenu {
 
-    private val config: Garden get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden
     private var showItem = false
 
     private val item by lazy {

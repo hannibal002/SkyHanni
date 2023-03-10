@@ -32,7 +32,7 @@ class GardenVisitorFeatures {
     private var tick = 0
     private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
     private val offerAcceptedPattern = Pattern.compile("§6§lOFFER ACCEPTED §r§8with §r(.*) §r.*")
-    private val config: Garden get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden
 
     companion object {
         var inVisitorInventory = false

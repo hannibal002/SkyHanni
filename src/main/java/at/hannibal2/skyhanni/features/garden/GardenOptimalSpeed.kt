@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class GardenOptimalSpeed {
-    private val config: Garden get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden
     private var currentSpeed = 100
     private var optimalSpeed = -1
     private val currentSpeedPattern = Pattern.compile(" Speed: §r§f✦(.*)")
