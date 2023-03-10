@@ -282,7 +282,7 @@ public class Garden {
     public boolean optimalSpeedEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Warn via title when you don't have the optimal speed.")
+    @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean optimalSpeedWarning = false;
@@ -292,6 +292,23 @@ public class Garden {
     @ConfigEditorButton(runnableId = "optimalSpeed", buttonText = "Edit")
     @ConfigAccordionId(id = 9)
     public Position optimalSpeedPos = new Position(188, -105, false, true);
+
+    @Expose
+    @ConfigOption(name = "Garden Level", desc = "")
+    @ConfigEditorAccordion(id = 10)
+    public boolean gardenLevel = false;
+
+    @Expose
+    @ConfigOption(name = "Display", desc = "Show the current garden level and progress to the next level.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 10)
+    public boolean gardenLevelDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Garden Level Position", desc = "")
+    @ConfigEditorButton(runnableId = "gardenLevel", buttonText = "Edit")
+    @ConfigAccordionId(id = 10)
+    public Position gardenLevelPos = new Position(-375, -215, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

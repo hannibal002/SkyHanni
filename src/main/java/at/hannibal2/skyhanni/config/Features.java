@@ -203,6 +203,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.optimalSpeedPos);
             return;
         }
+
+        if (runnableId.equals("gardenLevel")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.gardenLevelPos);
+            return;
+        }
     }
 
     @Expose
