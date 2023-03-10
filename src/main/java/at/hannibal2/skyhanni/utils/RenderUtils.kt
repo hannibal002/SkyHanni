@@ -430,7 +430,6 @@ object RenderUtils {
 
     fun Position.renderString(string: String?, extraOffsetX: Int = 0, offsetY: Int = 0, center: Boolean = true) {
         val minecraft = Minecraft.getMinecraft()
-        if (minecraft.gameSettings.keyBindPlayerList.isKeyDown) return
 
         if (string == null) return
         if (string == "") return
@@ -457,7 +456,6 @@ object RenderUtils {
     }
 
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, center: Boolean = false) {
-        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isKeyDown) return
         if (list.isEmpty()) return
 
         var offsetY = 0
@@ -472,7 +470,6 @@ object RenderUtils {
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
     fun Position.renderStringsAndItems(list: List<List<Any?>>, extraSpace: Int = 0) {
-        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isKeyDown) return
         if (list.isEmpty()) return
 
         var offsetY = 0
