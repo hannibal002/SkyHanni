@@ -64,6 +64,12 @@ public class Chat {
     @ConfigAccordionId(id = 0)
     public boolean powderMining = true;
 
+    @Expose
+    @ConfigOption(name = "Kill Combo", desc = "Hide messages about the current kill combo from the Grandma Wolf Pet.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean killCombo = false;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")

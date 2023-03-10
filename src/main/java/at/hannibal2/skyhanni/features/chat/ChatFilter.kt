@@ -26,8 +26,8 @@ class ChatFilter {
         welcome(message) && SkyHanniMod.feature.chat.welcome -> "welcome"
         isGuildExp(message) && SkyHanniMod.feature.chat.guildExp -> "guild_exp"
         friendJoin(message) && SkyHanniMod.feature.chat.friendJoinLeft -> "friend_join"
+        killCombo(message) && SkyHanniMod.feature.chat.killCombo -> "kill_combo"
 
-        killCombo(message) && SkyHanniMod.feature.chat.others -> "kill_combo"
         bazaarAndAHMiniMessages(message) && SkyHanniMod.feature.chat.others -> "bz_ah_minis"
         watchdogAnnouncement(message) && SkyHanniMod.feature.chat.others -> "watchdog"
         slayer(message) && SkyHanniMod.feature.chat.others -> "slayer"
