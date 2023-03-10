@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,7 +18,7 @@ class GardenCropMilestoneDisplay {
     private var needsInventory = false
     private val cultivatingData = mutableMapOf<String, Int>()
     private val timeTillNextCrop = mutableMapOf<String, Long>()
-    private val config: Garden get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden
 
     companion object {
         fun getCropsPerSecond(crop: String): Int? {

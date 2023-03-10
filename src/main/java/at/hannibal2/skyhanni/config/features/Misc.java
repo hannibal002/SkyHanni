@@ -219,7 +219,7 @@ public class Misc {
     public Position chickenHeadTimerPosition = new Position(-372, 73, false, true);
 
     @Expose
-    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience bottles lying on the ground.")
+    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     public boolean hideExpBottles = false;
 
