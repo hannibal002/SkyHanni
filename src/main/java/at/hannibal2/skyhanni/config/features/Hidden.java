@@ -38,4 +38,7 @@ public class Hidden {
 
     @Expose
     public Map<String, Integer> gardenCropsPerSecond = new HashMap<>();
+
+    @Expose
+    public int gardenExp = -1;
 }
