@@ -21,7 +21,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import org.lwjgl.input.Keyboard
 
 class BlazeSlayerDaggerHelper {
 
@@ -251,7 +250,6 @@ class BlazeSlayerDaggerHelper {
         if (textTopLeft.isEmpty()) return
 
         if (Minecraft.getMinecraft().currentScreen != null) return
-        if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindPlayerList.keyCode)) return
 
         val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
         val width = scaledResolution.scaledWidth
