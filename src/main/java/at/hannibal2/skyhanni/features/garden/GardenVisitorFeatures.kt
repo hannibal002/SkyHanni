@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData.Companion.sidebarLinesFormatted
 import at.hannibal2.skyhanni.data.SendTitleHelper
@@ -280,7 +279,7 @@ class GardenVisitorFeatures {
 
             if (entity is EntityLivingBase) {
                 if (visitor.done) {
-                    val color = LorenzColor.DARK_GRAY.toColor().withAlpha(120)
+                    val color = LorenzColor.DARK_GRAY.toColor().withAlpha(60)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
                     { config.visitorHighlight }
                 } else if (visitor.items.isEmpty()) {
