@@ -70,6 +70,12 @@ public class Chat {
     @ConfigAccordionId(id = 0)
     public boolean killCombo = false;
 
+    @Expose
+    @ConfigOption(name = "Watchdog", desc = "Hide the message where hypixel is flexing how many players they have banned over the last week.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean watchDog = true;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
