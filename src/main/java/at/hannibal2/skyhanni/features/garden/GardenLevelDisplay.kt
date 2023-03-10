@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
+import kotlin.math.roundToInt
 
 class GardenLevelDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -57,7 +58,7 @@ class GardenLevelDisplay {
         for (line in item.getLore()) {
             val matcher = overflowPattern.matcher(line)
             if (matcher.matches()) {
-                overflow = matcher.group(1).replace(",", "").toInt()
+                overflow = matcher.group(1).replace(",", "").toDouble().roundToInt()
                 break
             }
         }
