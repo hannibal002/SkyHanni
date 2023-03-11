@@ -17,7 +17,9 @@ class CollectionAPI {
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
-        for ((rawName, rawCounter) in profileData["collection"].asJsonObject.entrySet()) {
+        val jsonElement = profileData["collection"]?: return
+        val asJsonObject = jsonElement.asJsonObject ?: return
+        for ((rawName, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
             var itemName = BazaarApi.getBazaarDataForInternalName(rawName)?.itemName
             if (rawName == "MUSHROOM_COLLECTION") {
