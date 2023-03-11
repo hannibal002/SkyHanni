@@ -38,8 +38,12 @@ abstract class LorenzEvent : Event() {
             }
             result
         }.onFailure {
-            it.printStackTrace()
-            LorenzUtils.chat("§cSkyHanni caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}.")
+            if (it is NoSuchMethodError) {
+                LorenzUtils.chat("§c[SkyHanni] You need to use a newer version of NotEnoughUpdates (alpha-11 or newer)! If you need help downloading it, go to the skyhanni discord.")
+            } else {
+                it.printStackTrace()
+                LorenzUtils.chat("§cSkyHanni caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}.")
+            }
         }.getOrDefault(isCanceled)
     }
 }
