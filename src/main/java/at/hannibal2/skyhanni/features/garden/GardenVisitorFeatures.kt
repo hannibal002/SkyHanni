@@ -178,7 +178,7 @@ class GardenVisitorFeatures {
                         val rawName = NEUItems.getItemStack(multiplier.first).name ?: continue
                         val crop = rawName.removeColor()
                         val cropAmount = multiplier.second.toLong() * amount
-                        GardenCropMilestoneDisplay.getCropsPerSecond(crop)?.let {
+                        GardenAPI.getCropsPerSecond(crop)?.let {
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
                             val formatName = "§e${formatAmount}§7x $crop "
                             val formatSpeed = if (it != -1) {

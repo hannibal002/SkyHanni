@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -27,6 +30,16 @@ class GardenAPI {
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        if (cropsPerSecond.isEmpty()) {
+            // TODO use enum
+            for (key in GardenCropMilestones.cropCounter.keys) {
+                cropsPerSecond[key] = -1
+            }
+        }
+    }
+
     private fun loadCropInHand(): String? {
         val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return null
         if (readCounter(heldItem) == -1) return null
@@ -38,6 +51,7 @@ class GardenAPI {
         fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
         var cropInHand: String? = null
+        val cropsPerSecond: MutableMap<String, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
 
         fun getCropTypeFromItem(heldItem: ItemStack): String? {
             val name = heldItem.name ?: return null
@@ -76,5 +90,13 @@ class GardenAPI {
             }
             return -1
         }
+
+        fun getCropsPerSecond(itemName: String): Int? {
+            if (itemName.endsWith(" Mushroom")) {
+                return cropsPerSecond["Mushroom"]
+            }
+            return cropsPerSecond[itemName]
+        }
+
     }
 }
