@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -17,7 +15,7 @@ class GardenInventoryNumbers {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
 
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
             if (!SkyHanniMod.feature.garden.numberCropMilestone) return
@@ -40,6 +38,4 @@ class GardenInventoryNumbers {
                 .forEach { event.stackTip = "" + it }
         }
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }

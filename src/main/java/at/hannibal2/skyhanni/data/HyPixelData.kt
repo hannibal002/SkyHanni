@@ -137,20 +137,7 @@ class HyPixelData {
             }
         }
 
-        var islandType = IslandType.getBySidebarName(newIsland)
-
-        if (islandType == IslandType.PRIVATE_ISLAND) {
-            if (guesting) {
-                islandType = IslandType.PRIVATE_ISLAND_GUEST
-            }
-        }
-
-        if (islandType == IslandType.GARDEN) {
-            if (guesting) {
-                islandType = IslandType.GARDEN_GUEST
-            }
-        }
-
+        val islandType = getIslandType(newIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
@@ -161,6 +148,15 @@ class HyPixelData {
             }
             skyBlockIsland = islandType
         }
+    }
+
+    private fun getIslandType(newIsland: String, guesting: Boolean): IslandType {
+        val islandType = IslandType.getBySidebarName(newIsland)
+        if (guesting) {
+            if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
+            if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST
+        }
+        return islandType
     }
 
     private fun checkScoreboard(): Boolean {

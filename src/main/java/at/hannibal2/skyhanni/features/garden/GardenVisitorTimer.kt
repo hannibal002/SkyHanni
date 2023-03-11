@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -64,7 +62,5 @@ class GardenVisitorTimer {
         SkyHanniMod.feature.garden.visitorTimerPos.renderString(render)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock &&
-            SkyHanniMod.feature.garden.visitorTimerEnabled &&
-            LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    private fun isEnabled() = GardenAPI.inGarden() && SkyHanniMod.feature.garden.visitorTimerEnabled
 }

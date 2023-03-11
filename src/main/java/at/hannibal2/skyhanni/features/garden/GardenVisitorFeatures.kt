@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData.Companion.sidebarLinesFormatted
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
@@ -41,7 +40,7 @@ class GardenVisitorFeatures {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inVisitorInventory = false
 
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[13] ?: return
         val lore = npcItem.getLore()
         var isVisitor = false
@@ -125,7 +124,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (!inVisitorInventory) return
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
@@ -208,7 +207,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
         if (tick++ % 30 != 0) return
 
@@ -221,7 +220,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         var found = false
         val visitorsInTab = mutableListOf<String>()
         for (line in event.tabList) {
@@ -334,7 +333,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay) return
 
         if (config.visitorNeedsOnlyWhenClose) {
@@ -346,6 +345,4 @@ class GardenVisitorFeatures {
     }
 
     class Visitor(var entityId: Int, var done: Boolean = false, val items: MutableMap<String, Int> = mutableMapOf())
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }

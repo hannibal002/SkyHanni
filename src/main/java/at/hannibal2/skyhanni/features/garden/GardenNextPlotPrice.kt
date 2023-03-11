@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -11,7 +13,7 @@ class GardenNextPlotPrice {
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (!SkyHanniMod.feature.garden.plotPrice) return
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
@@ -42,6 +44,4 @@ class GardenNextPlotPrice {
             }
         }
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }
