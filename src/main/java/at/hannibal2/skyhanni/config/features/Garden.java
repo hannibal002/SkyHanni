@@ -85,10 +85,10 @@ public class Garden {
     public boolean visitorInventory = false;
 
     @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors.")
+    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors. (Like in NEU)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
-    public boolean visitorShowPrice = true;
+    public boolean visitorShowPrice = false;
 
     @Expose
     @ConfigOption(name = "Amount and Time", desc = "Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.")
