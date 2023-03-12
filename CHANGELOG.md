@@ -50,6 +50,7 @@
 + Fixed dungeon milestone messages getting wrongfully formatted.
 + Fixed bazaar features not working for items with an - (turbo farming books and triple strike)
 + Fixed Crab Hat of Celebration not being detected as an accessory correctly.
++ Added support for soopy's \[hand] feature
 
 ## Version 0.16 (2023-02-11)
 
