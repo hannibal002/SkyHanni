@@ -149,7 +149,7 @@ public class Misc {
     public boolean tpsDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Tps Display", desc = "Show the Tps of the current server.")
+    @ConfigOption(name = "Tps Display", desc = "Show the Tps of the current server. (Like in Soopy)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean tpsDisplayEnabled = false;
