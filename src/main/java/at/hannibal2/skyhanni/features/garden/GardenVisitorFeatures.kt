@@ -16,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
@@ -122,7 +123,7 @@ class GardenVisitorFeatures {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.inGarden()) return
         if (!inVisitorInventory) return
@@ -164,9 +165,9 @@ class GardenVisitorFeatures {
                         e.printStackTrace()
                         return
                     }
+                    val price = NEUItems.getPrice(internalName) * amount
+                    totalPrice += price
                     if (config.visitorShowPrice) {
-                        val price = NEUItems.getPrice(internalName) * amount
-                        totalPrice += price
                         val format = NumberUtil.format(price)
                         list[i+ itemsWithSpeedCounter] = "$line §7(§6$format§7)"
                     }
