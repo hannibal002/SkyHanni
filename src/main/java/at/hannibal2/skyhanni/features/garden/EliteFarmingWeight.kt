@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import com.google.gson.JsonObject
@@ -13,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.DecimalFormat
 
@@ -20,48 +22,73 @@ class EliteFarmingWeight {
 
     @SubscribeEvent
     fun onCollectionUpdate(event: CollectionUpdateEvent) {
-        if (!config.eliteFarmingWeightDisplay) return
-        update()
+        if (isEnabled()) {
+            breakBlocksToTryAgain = false
+            update()
+        }
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!isEnabled()) return
-
-        config.eliteFarmingWeightPos.renderString(display)
+        if (isEnabled()) {
+            config.eliteFarmingWeightPos.renderString(display)
+        }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        if (apiError) {
+            apiError = false
+            breakBlocksToTryAgain = true
+            if (config.eliteFarmingWeightDisplay) {
+                update()
+            }
+        }
+    }
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
         private val extraCollection = mutableMapOf<String, Long>()
-        private var display = ""
+        private var display = "§6Farming Weight§7: §eLoading.."
+
+        private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
 
         fun addCrop(crop: String, diff: Int) {
-            if (!config.eliteFarmingWeightDisplay) return
             val old = extraCollection[crop] ?: 0L
             extraCollection[crop] = old + diff
-            update()
+            breakBlocksToTryAgain = false
+            if (isEnabled()) {
+                update()
+            }
         }
 
         private fun update() = SkyHanniMod.coroutineScope.launch {
-            val collectionWeight = calculateCollectionWeight()
-            val cropWeight = collectionWeight.values.sum()
+            display = "§6Farming Weight§7: " + if (apiError) {
+                "§cAPI error!"
+            } else if (breakBlocksToTryAgain) {
+                "§cBreak blocks to try again!"
+            } else {
+                val collectionWeight = calculateCollectionWeight()
+                val cropWeight = collectionWeight.values.sum()
 
-            val bonusWeight = if (apiError) 0 else getBonusWeight()
-
-            val totalWeight = cropWeight + bonusWeight
-            val s = DecimalFormat("#,##0.00").format(totalWeight)
-            display = "§6Farming Weight§7: §e$s"
+                try {
+                    val totalWeight = cropWeight + getBonusWeight()
+                    val format = DecimalFormat("#,##0.00").format(totalWeight)
+                    "§e$format"
+                } catch (e: Exception) {
+                    apiError = true
+                    LorenzUtils.error("[SkyHanni] Failed to load farming weight data from elitebot.dev! please report this on discord!")
+                    e.printStackTrace()
+                    "§cAPI error!"
+                }
+            }
         }
 
         private suspend fun getBonusWeight(): Int {
             for (profileEntry in getApiResult()["profiles"].asJsonObject.entrySet()) {
                 val profile = profileEntry.value.asJsonObject
-                val profileName = profile["cute_name"].asString
-                val profile1 = HyPixelData.profile
-                if (profileName.lowercase() == profile1) {
+                val profileName = profile["cute_name"].asString.lowercase()
+                if (profileName == HyPixelData.profile) {
                     return profile["farming"].asJsonObject["bonus"].asInt
                 }
             }
@@ -70,19 +97,14 @@ class EliteFarmingWeight {
 
         private var apiCache: JsonObject? = null
         private var apiError = false
+        private var breakBlocksToTryAgain = false
 
         private suspend fun getApiResult(): JsonObject {
             apiCache?.let { return it }
-            val result: JsonObject?
-            try {
-                val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
-                val url = "https://elitebot.dev/api/weight/$uuid"
-                result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
-            } catch (e: Error) {
-                apiError = true
-                e.printStackTrace()
-                throw Error(e)
-            }
+
+            val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
+            val url = "https://elitebot.dev/api/weight/$uuid"
+            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
             apiCache = result
             return result
         }
