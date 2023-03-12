@@ -53,6 +53,7 @@ class GardenCropMilestoneDisplay {
             val old = cultivatingData[crop]!!
             val diff = counter - old
             GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
+            EliteFarmingWeight.addCrop(crop, diff)
             if (GardenAPI.cropInHand == crop) {
                 calculateSpeed(diff)
                 update()
