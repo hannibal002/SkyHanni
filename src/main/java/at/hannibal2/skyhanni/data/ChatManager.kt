@@ -43,7 +43,9 @@ class ChatManager {
         if (message.startsWith("§f{\"server\":\"")) return
 
         val chatEvent = LorenzChatEvent(message, original)
-        chatEvent.postAndCatch()
+        if (!event.message.toString().contains("(held item preview from soopy using [hand])")) {
+            chatEvent.postAndCatch()
+        }
 
         val blockReason = chatEvent.blockedReason.uppercase()
         if (blockReason != "") {
