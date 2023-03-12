@@ -173,7 +173,7 @@ class GardenCropMilestoneDisplay {
             progressDisplay.add(Collections.singletonList("§7in §b$duration"))
 
             val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
-            progressDisplay.add(Collections.singletonList("§7Drops/minute§8: §e$format"))
+            progressDisplay.add(Collections.singletonList("§7Crops/minute§8: §e$format"))
         }
 
         if (needsInventory) {
