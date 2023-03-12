@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
+import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -17,14 +19,29 @@ class GardenAPI {
     var tick = 0
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        if (!inGarden()) return
-        if (tick++ % 5 != 0) return
+    fun onSendPacket(event: PacketEvent.SendEvent) {
+        val packet = event.packet
+        if (packet !is C09PacketHeldItemChange) return
 
         val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
         val crop = loadCropInHand(heldItem)
         if (cropInHand != crop) {
+            cropInHand = crop
+            GardenToolChangeEvent(crop, heldItem).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        if (!inGarden()) return
+        if (tick++ % 10 != 0) return
+
+        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
+        val crop = loadCropInHand(heldItem)
+        if (cropInHand != crop) {
+            // We ignore random hypixel moments
+            Minecraft.getMinecraft().currentScreen ?: return
             cropInHand = crop
             GardenToolChangeEvent(crop, heldItem).postAndCatch()
         }
@@ -42,7 +59,7 @@ class GardenAPI {
 
     private fun loadCropInHand(heldItem: ItemStack?): String? {
         if (heldItem == null) return null
-        return getCropTypeFromItem(heldItem)
+        return getCropTypeFromItem(heldItem, true)
     }
 
     companion object {
@@ -96,6 +113,5 @@ class GardenAPI {
             }
             return cropsPerSecond[itemName]
         }
-
     }
 }

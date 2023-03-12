@@ -14,11 +14,11 @@ import java.util.*
 
 class GardenCropMilestoneDisplay {
     private val progressDisplay = mutableListOf<List<Any>>()
-    private var needsInventory = false
     private val cultivatingData = mutableMapOf<String, Int>()
     private val config get() = SkyHanniMod.feature.garden
-
     private val bestCropTime = GardenBestCropTime()
+
+    private var needsInventory = false
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -55,7 +55,7 @@ class GardenCropMilestoneDisplay {
             val diff = counter - old
             GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
             EliteFarmingWeight.addCrop(crop, diff)
-            if (GardenAPI.cropInHand == crop) {
+            if (currentCrop == crop) {
                 calculateSpeed(diff)
                 update()
             }
@@ -68,7 +68,8 @@ class GardenCropMilestoneDisplay {
     private var averageSpeedPerSecond = 0
     private var countInLastSecond = 0
     private val allCounters = mutableListOf<Int>()
-    var lastItemInHand: ItemStack? = null
+    private var lastItemInHand: ItemStack? = null
+    private var currentCrop: String? = null
 
     private fun resetSpeed() {
         lastSecondStart = 0
@@ -97,7 +98,8 @@ class GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        lastItemInHand = event.heldItem
+        lastItemInHand = if (event.isRealCrop) event.heldItem else null
+        currentCrop = if (event.isRealCrop) event.crop else null
 
         if (isEnabled()) {
             resetSpeed()
@@ -108,7 +110,7 @@ class GardenCropMilestoneDisplay {
     private fun update() {
         progressDisplay.clear()
         bestCropTime.display.clear()
-        GardenAPI.cropInHand?.let {
+        currentCrop?.let {
             val crops = GardenCropMilestones.cropCounter[it]
             if (crops == null) {
                 println("cropCounter is null for '$it'")
@@ -121,7 +123,7 @@ class GardenCropMilestoneDisplay {
             }
         }
         if (config.cropMilestoneBestAlwaysOn) {
-            if (GardenAPI.cropInHand == null) {
+            if (currentCrop == null) {
                 bestCropTime.drawBestDisplay(null)
             }
         }
