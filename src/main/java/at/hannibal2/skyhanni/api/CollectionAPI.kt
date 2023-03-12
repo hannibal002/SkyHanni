@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -41,6 +42,8 @@ class CollectionAPI {
             }
             collectionValue[itemName] = counter
         }
+
+        CollectionUpdateEvent().postAndCatch()
     }
 
     @SubscribeEvent
@@ -61,6 +64,7 @@ class CollectionAPI {
                     collectionValue[name] = counter
                 }
             }
+            CollectionUpdateEvent().postAndCatch()
         }
 
         if (inventoryName.endsWith(" Collections")) {
@@ -85,6 +89,7 @@ class CollectionAPI {
                     }
                 }
             }
+            CollectionUpdateEvent().postAndCatch()
         }
     }
 

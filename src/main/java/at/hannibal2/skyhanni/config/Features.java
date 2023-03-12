@@ -208,6 +208,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.gardenLevelPos);
             return;
         }
+
+        if (runnableId.equals("eliteFarmingWeight")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.eliteFarmingWeightPos);
+            return;
+        }
     }
 
     @Expose

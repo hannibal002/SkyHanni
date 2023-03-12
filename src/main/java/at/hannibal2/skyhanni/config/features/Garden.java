@@ -311,6 +311,25 @@ public class Garden {
     public Position gardenLevelPos = new Position(-375, -215, false, true);
 
     @Expose
+    @ConfigOption(name = "Elite Farming Weight", desc = "")
+    @ConfigEditorAccordion(id = 10)
+    public boolean eliteFarmingWeight = false;
+
+    @Expose
+    @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
+            "The calculation and api is provided by The Elite SkyBlock Farmers. " +
+            "See §ehttps://elitebot.dev/info §7for more info.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 10)
+    public boolean eliteFarmingWeightDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Farming Weight Position", desc = "")
+    @ConfigEditorButton(runnableId = "eliteFarmingWeight", buttonText = "Edit")
+    @ConfigAccordionId(id = 10)
+    public Position eliteFarmingWeightPos = new Position(-370, -167, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
