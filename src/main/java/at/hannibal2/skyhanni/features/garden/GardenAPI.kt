@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -47,30 +47,33 @@ class GardenAPI {
     }
 
     companion object {
-        // TODO use everywhere instead of IslandType.GARDEN
         fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
         var cropInHand: String? = null
         val cropsPerSecond: MutableMap<String, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
 
-        fun getCropTypeFromItem(heldItem: ItemStack): String? {
-            val name = heldItem.name ?: return null
-            return getCropTypeFromItem(name)
-        }
+        fun getCropTypeFromItem(item: ItemStack, withDaedalus: Boolean = false): String? {
+            val internalName = item.getInternalName()
 
-        fun getCropTypeFromItem(itemName: String): String? {
-            for ((crop, _) in GardenCropMilestones.cropCounter) {
-                if (itemName.contains(crop)) {
-                    return crop
-                }
+            return when {
+                internalName.startsWith("THEORETICAL_HOE_WHEAT") -> "Wheat"
+                internalName.startsWith("THEORETICAL_HOE_CARROT") -> "Carrot"
+                internalName.startsWith("THEORETICAL_HOE_POTATO") -> "Potato"
+                internalName.startsWith("PUMPKIN_DICER") -> "Pumpkin"
+                internalName.startsWith("THEORETICAL_HOE_CANE") -> "Sugar Cane"
+                internalName.startsWith("MELON_DICER") -> "Melon"
+                internalName == "CACTUS_KNIFE" -> "Cactus"
+                internalName == "COCO_CHOPPER" -> "Cocoa Beans"
+                internalName == "FUNGI_CUTTER" -> "Mushroom"
+                internalName.startsWith("ENCHANTED_NETHER_STALK") -> "Nether Wart"
+                internalName.startsWith("THEORETICAL_HOE_WHEAT") -> "Wheat"
+                internalName.startsWith("THEORETICAL_HOE_CARROT") -> "Carrot"
+                internalName.startsWith("PUMPKIN_DICER") -> "Pumpkin"
+
+                internalName.startsWith("DAEDALUS_AXE") && withDaedalus -> "Daedalus Axe"
+
+                else -> null
             }
-            if (itemName.contains("Coco Chopper")) {
-                return "Cocoa Beans"
-            }
-            if (itemName.contains("Fungi Cutter")) {
-                return "Mushroom"
-            }
-            return null
         }
 
         fun readCounter(itemStack: ItemStack): Int {
