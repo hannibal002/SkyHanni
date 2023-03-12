@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class GardenAPI {
-
     var tick = 0
 
     @SubscribeEvent
@@ -23,10 +22,11 @@ class GardenAPI {
         if (!inGarden()) return
         if (tick++ % 5 != 0) return
 
-        val crop = loadCropInHand()
+        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
+        val crop = loadCropInHand(heldItem)
         if (cropInHand != crop) {
             cropInHand = crop
-            GardenToolChangeEvent().postAndCatch()
+            GardenToolChangeEvent(crop, heldItem).postAndCatch()
         }
     }
 
@@ -40,9 +40,8 @@ class GardenAPI {
         }
     }
 
-    private fun loadCropInHand(): String? {
-        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return null
-        if (readCounter(heldItem) == -1) return null
+    private fun loadCropInHand(heldItem: ItemStack?): String? {
+        if (heldItem == null) return null
         return getCropTypeFromItem(heldItem)
     }
 
