@@ -130,8 +130,8 @@ class EliteFarmingWeight {
                 }
             }
 
-            val totalWeight = (cropWeight + bonusWeight).round(2)
-            return "§e" + LorenzUtils.formatDouble(totalWeight)
+            val totalWeight = (cropWeight + bonusWeight)
+            return "§e" + LorenzUtils.formatDouble(totalWeight, 2)
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay

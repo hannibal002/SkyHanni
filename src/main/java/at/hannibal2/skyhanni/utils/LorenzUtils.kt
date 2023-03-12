@@ -121,10 +121,8 @@ object LorenzUtils {
 
     fun formatInteger(l: Long): String = NumberFormat.getIntegerInstance().format(l)
 
-    fun formatDouble(d: Double, format: String?): String =
-        NumberFormat.getNumberInstance().format(d)
-
-    fun formatDouble(d: Double): String = formatDouble(d, "#,##0.0")
+    fun formatDouble(d: Double, round: Int = 1): String =
+        NumberFormat.getNumberInstance().format(d.round(round))
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

@@ -649,7 +649,7 @@ class DamageIndicatorManager {
                 else -> {
                     LorenzUtils.error(
                         "Unexpected health of thorn in f4! (${
-                            LorenzUtils.formatDouble(realHealth.toDouble())
+                            LorenzUtils.formatInteger(realHealth)
                         })"
                     )
                     return null
