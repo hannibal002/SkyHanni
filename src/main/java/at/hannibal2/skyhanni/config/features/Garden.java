@@ -330,6 +330,13 @@ public class Garden {
     public Position eliteFarmingWeightPos = new Position(-370, -167, false, true);
 
     @Expose
+    @ConfigOption(name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +
+            "Only if your farming weight is high enough! Updates every 10 minutes.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 10)
+    public boolean eliteFarmingWeightLeaderboard = false;
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;

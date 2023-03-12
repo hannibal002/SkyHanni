@@ -177,7 +177,7 @@
 + **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
 + Desk shortcut in SkyBlock Menu.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
-+ **Farming Weight**, provided by the elite skyblock farmers.
++ **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
