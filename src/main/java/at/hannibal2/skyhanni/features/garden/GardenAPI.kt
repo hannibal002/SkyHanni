@@ -64,10 +64,7 @@ class GardenAPI {
                 internalName == "CACTUS_KNIFE" -> "Cactus"
                 internalName == "COCO_CHOPPER" -> "Cocoa Beans"
                 internalName == "FUNGI_CUTTER" -> "Mushroom"
-                internalName.startsWith("ENCHANTED_NETHER_STALK") -> "Nether Wart"
-                internalName.startsWith("THEORETICAL_HOE_WHEAT") -> "Wheat"
-                internalName.startsWith("THEORETICAL_HOE_CARROT") -> "Carrot"
-                internalName.startsWith("PUMPKIN_DICER") -> "Pumpkin"
+                internalName.startsWith("THEORETICAL_HOE_WARTS") -> "Nether Wart"
 
                 internalName.startsWith("DAEDALUS_AXE") && withDaedalus -> "Daedalus Axe"
 
