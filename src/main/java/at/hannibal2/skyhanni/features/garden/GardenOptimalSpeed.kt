@@ -17,6 +17,7 @@ class GardenOptimalSpeed {
     private var optimalSpeed = -1
     private val currentSpeedPattern = Pattern.compile(" Speed: §r§f✦(.*)")
     private var lastWarnTime = 0L
+    private var cropInHand: String? = null
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -30,8 +31,9 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
+        cropInHand = if (event.isRealCrop) event.crop else null
         if (isEnabled()) {
-            optimalSpeed = GardenAPI.cropInHand.let { if (it != null) speedForCrop(it) else -1 }
+            optimalSpeed = cropInHand.let { if (it != null) speedForCrop(it) else -1 }
         }
     }
 
@@ -64,7 +66,7 @@ class GardenOptimalSpeed {
                 if (System.currentTimeMillis() > lastWarnTime + 20_000) {
                     lastWarnTime = System.currentTimeMillis()
                     SendTitleHelper.sendTitle("§cWrong speed!", 3_000)
-                    GardenAPI.cropInHand?.let {
+                    cropInHand?.let {
                         LorenzUtils.chat("§e[SkyHanni] Wrong speed for $it: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
                     }
                 }
