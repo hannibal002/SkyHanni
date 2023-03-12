@@ -57,7 +57,9 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.4-SNAPSHOT")
 
     implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") {
+        exclude(group = "org.jetbrains.kotlin")
+    }
 
     // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
