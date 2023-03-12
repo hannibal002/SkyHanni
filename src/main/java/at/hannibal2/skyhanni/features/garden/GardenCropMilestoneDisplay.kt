@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TimeUtils
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
@@ -67,6 +68,7 @@ class GardenCropMilestoneDisplay {
     private var averageSpeedPerSecond = 0
     private var countInLastSecond = 0
     private val allCounters = mutableListOf<Int>()
+    var lastItemInHand: ItemStack? = null
 
     private fun resetSpeed() {
         lastSecondStart = 0
@@ -95,10 +97,12 @@ class GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        if (!isEnabled()) return
+        lastItemInHand = event.heldItem
 
-        resetSpeed()
-        update()
+        if (isEnabled()) {
+            resetSpeed()
+            update()
+        }
     }
 
     private fun update() {
@@ -152,6 +156,13 @@ class GardenCropMilestoneDisplay {
         progressDisplay.add(Collections.singletonList("§7Progress to Tier $nextTier§8:"))
         progressDisplay.add(Collections.singletonList("§e$haveFormat§8/§e$needFormat"))
 
+        lastItemInHand?.let {
+            if (GardenAPI.readCounter(it) == -1) {
+                progressDisplay.add(Collections.singletonList("§cWarning: You need Cultivating!"))
+                return
+            }
+        }
+
         if (averageSpeedPerSecond != 0) {
             GardenAPI.cropsPerSecond[it] = averageSpeedPerSecond
             val missing = need - have
@@ -162,7 +173,7 @@ class GardenCropMilestoneDisplay {
             progressDisplay.add(Collections.singletonList("§7in §b$duration"))
 
             val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
-            progressDisplay.add(Collections.singletonList("§7Crops/minute§8: §e$format"))
+            progressDisplay.add(Collections.singletonList("§7Drops/minute§8: §e$format"))
         }
 
         if (needsInventory) {
