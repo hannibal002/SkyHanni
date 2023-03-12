@@ -52,12 +52,13 @@ object LorenzUtils {
         }
     }
 
+    // TODO remove ig?
     fun warning(message: String) {
         internalChat("§cWarning! $message")
     }
 
     fun error(message: String) {
-        internalChat("§4$message")
+        internalChat("§c$message")
     }
 
     fun chat(message: String) {
