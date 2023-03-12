@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
@@ -106,9 +105,9 @@ class LorenzTest {
 
         fun copyLocation() {
             val location = LocationUtils.playerLocation()
-            val x = LorenzUtils.formatDouble(location.x.round(1), "0.0")
-            val y = LorenzUtils.formatDouble(location.y.round(1), "0.0")
-            val z = LorenzUtils.formatDouble(location.z.round(1), "0.0")
+            val x = LorenzUtils.formatDouble(location.x)
+            val y = LorenzUtils.formatDouble(location.y)
+            val z = LorenzUtils.formatDouble(location.z)
             OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
         }
     }
