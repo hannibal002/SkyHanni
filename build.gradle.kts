@@ -3,10 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     idea
     java
-    id("gg.essential.loom") version "0.10.0.+"
-    id("dev.architectury.architectury-pack200") version "0.1.3"
+    id("xyz.wagyourtail.unimined") version "0.4.1"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.7.20-Beta"
+    kotlin("jvm") version "1.8.20-RC"
 }
 
 group = "at.hannibal2.skyhanni"
@@ -17,22 +16,36 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
 
-
 sourceSets.main {
     output.setResourcesDir(file("$buildDir/classes/java/main"))
 }
 
 // Dependencies:
-
 repositories {
     mavenCentral()
     maven("https://repo.spongepowered.org/maven/")
+    maven("https://repo.nea.moe/releases")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://jitpack.io") {
         content {
             includeGroupByRegex("com\\.github\\..*")
         }
+    }
+}
+
+
+minecraft {
+    forge {
+        it.mcpChannel = "stable"
+        it.mcpVersion = "22-1.8.9"
+        it.setDevFallbackNamespace("intermediary")
+        it.setDevNamespace("yarn")
+        it.mixinConfig = listOf("mixins.skyhanni.json")
+    }
+    mcRemapper.tinyRemapperConf = {
+        it.ignoreFieldDesc(true)
+        it.ignoreConflicts(true)
     }
 }
 
@@ -46,55 +59,52 @@ val devenvMod by configurations.creating {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.8.9")
-    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
-    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
+    minecraft("net.minecraft:minecraft:1.8.9")
+    mappings("moe.nea.mcp:mcp-yarn:1.8.9")
+    "forge"("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
-    // If you don't want mixins, remove these lines
+    // Mixin
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
-    annotationProcessor("org.spongepowered:mixin:0.8.4-SNAPSHOT")
 
+    // Kotlin
     implementation(kotlin("stdlib-jdk8"))
     shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    // If you don't want to log in with your real minecraft account, remove this line
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    // NEU
+    compileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") { isTransitive = false }
+    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:deobf")
 
-    implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
-    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    // Dev Auth
+    runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    devenvMod("me.djtheredstoner:DevAuth-forge-legacy:1.1.0") { isTransitive = false }
 }
 
-// Minecraft configuration:
-loom {
-    launchConfigs {
-        "client" {
-            // If you don't want mixins, remove these lines
-            property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--mixin", "mixins.skyhanni.json")
-            val modFiles = devenvMod
-                .incoming.artifacts.resolvedArtifacts.get()
-            arg("--mods", modFiles.joinToString(",") { it.file.relativeTo(file("run")).path })
+
+minecraft {
+    launches.apply {
+        setConfig("client") {
+            this.args.add(0, "--tweakClass")
+            this.args.add(1, "net.minecraftforge.fml.common.launcher.FMLTweaker")
+            this.args.addAll(listOf(
+                "--tweakClass",
+                "org.spongepowered.asm.launch.MixinTweaker",
+                "--mods",
+                devenvMod.resolve().joinToString(",") { it.relativeTo(this.workingDir).path },
+            ))
+            this.args.replaceAll { if (it == "-mixin.config") "--mixin" else it }
+            this.jvmArgs.addAll(listOf(
+                "-Dmixin.debug=true",
+                "-Dmixin.env.remapRefMap=true",
+            ))
         }
-    }
-    forge {
-        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
-        mixinConfig("mixins.skyhanni.json")
-    }
-    // If you don't want mixins, remove these lines
-    mixin {
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
 }
 
 // Tasks:
-
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
@@ -112,27 +122,28 @@ tasks.withType(Jar::class) {
     }
 }
 
-
-val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    archiveClassifier.set("all")
-    from(tasks.shadowJar)
-    input.set(tasks.shadowJar.get().archiveFile)
+project.afterEvaluate {
+    tasks.named("runClient", JavaExec::class) {
+        this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    }
 }
 
 tasks.shadowJar {
-    archiveClassifier.set("all-dev")
+    archiveClassifier.set("all")
     configurations = listOf(shadowImpl)
     doLast {
         configurations.forEach {
-            println("Config: ${it.files}")
+            println("${(it as? Configuration)?.name ?: "Unknown"}: ${it.files}")
         }
     }
-
+    from(tasks["remapJar"])
     // If you want to include other dependencies and shadow them, you can relocate them in here
-//    fun relocate(name: String) = relocate(name, "com.examplemod.deps.$name")
+    // fun relocate(name: String) = relocate(name, "com.examplemod.deps.$name")
 }
 
-tasks.assemble.get().dependsOn(tasks.remapJar)
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
+}
 
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
