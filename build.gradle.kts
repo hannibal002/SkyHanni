@@ -12,6 +12,15 @@ group = "at.hannibal2.skyhanni"
 version = "0.17.Beta.13.1"
 
 // Toolchains:
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = "2.0"
+        }
+    }
+}
+
+
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
