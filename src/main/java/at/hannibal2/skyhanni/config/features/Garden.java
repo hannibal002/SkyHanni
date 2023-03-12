@@ -334,7 +334,7 @@ public class Garden {
             "Only if your farming weight is high enough! Updates every 10 minutes.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 10)
-    public boolean eliteFarmingWeightLeaderboard = false;
+    public boolean eliteFarmingWeightLeaderboard = true;
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
