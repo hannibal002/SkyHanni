@@ -29,6 +29,7 @@
 + Added Desk shortcut in SkyBlock Menu.
 + Added **Garden Level Display** - Show the current garden level and progress to the next level.
 + Added **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
++ Added **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 
 
 ### Features from other Mods
