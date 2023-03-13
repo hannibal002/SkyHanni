@@ -41,4 +41,7 @@ public class Hidden {
 
     @Expose
     public int gardenExp = -1;
+
+    @Expose
+    public Map<String, Integer> gardenDicerRngDrops = new HashMap<>();
 }

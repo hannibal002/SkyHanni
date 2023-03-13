@@ -213,6 +213,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.eliteFarmingWeightPos);
             return;
         }
+
+        if (runnableId.equals("dicerCounter")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.dicerCounterPos);
+            return;
+        }
     }
 
     @Expose

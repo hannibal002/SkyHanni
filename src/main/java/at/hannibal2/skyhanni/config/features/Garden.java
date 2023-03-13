@@ -312,7 +312,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Elite Farming Weight", desc = "")
-    @ConfigEditorAccordion(id = 10)
+    @ConfigEditorAccordion(id = 11)
     public boolean eliteFarmingWeight = false;
 
     @Expose
@@ -320,21 +320,38 @@ public class Garden {
             "The calculation and api is provided by The Elite SkyBlock Farmers. " +
             "See §ehttps://elitebot.dev/info §7for more info.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 10)
+    @ConfigAccordionId(id = 11)
     public boolean eliteFarmingWeightDisplay = true;
 
     @Expose
     @ConfigOption(name = "Farming Weight Position", desc = "")
     @ConfigEditorButton(runnableId = "eliteFarmingWeight", buttonText = "Edit")
-    @ConfigAccordionId(id = 10)
+    @ConfigAccordionId(id = 11)
     public Position eliteFarmingWeightPos = new Position(-370, -167, false, true);
 
     @Expose
     @ConfigOption(name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +
             "Only if your farming weight is high enough! Updates every 10 minutes.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 10)
+    @ConfigAccordionId(id = 11)
     public boolean eliteFarmingWeightLeaderboard = true;
+
+    @Expose
+    @ConfigOption(name = "Dicer Counter", desc = "")
+    @ConfigEditorAccordion(id = 12)
+    public boolean dicerCounter = false;
+
+    @Expose
+    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean dicerCounterDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Dicer Counter Position", desc = "")
+    @ConfigEditorButton(runnableId = "dicerCounter", buttonText = "Edit")
+    @ConfigAccordionId(id = 12)
+    public Position dicerCounterPos = new Position(-375, -215, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

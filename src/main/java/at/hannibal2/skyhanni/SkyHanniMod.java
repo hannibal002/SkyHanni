@@ -218,6 +218,7 @@ public class SkyHanniMod {
         loadModule(new GardenDeskInSBMenu());
         loadModule(new GardenLevelDisplay());
         loadModule(new EliteFarmingWeight());
+        loadModule(new DicerRngDropCounter());
 
         Commands.INSTANCE.init();
 
