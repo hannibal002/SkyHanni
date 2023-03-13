@@ -351,7 +351,7 @@ public class Garden {
     @ConfigOption(name = "Dicer Counter Position", desc = "")
     @ConfigEditorButton(runnableId = "dicerCounter", buttonText = "Edit")
     @ConfigAccordionId(id = 12)
-    public Position dicerCounterPos = new Position(-375, -215, false, true);
+    public Position dicerCounterPos = new Position(16, -232, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
