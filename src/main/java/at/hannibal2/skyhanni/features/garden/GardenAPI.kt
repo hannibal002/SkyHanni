@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -20,15 +21,15 @@ class GardenAPI {
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
-        val packet = event.packet
-        if (packet !is C09PacketHeldItemChange) return
+        if (!inGarden()) return
+        if (event.packet !is C09PacketHeldItemChange) return
+        checkItemInHand()
+    }
 
-        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
-        val crop = loadCropInHand(heldItem)
-        if (cropInHand != crop) {
-            cropInHand = crop
-            GardenToolChangeEvent(crop, heldItem).postAndCatch()
-        }
+    @SubscribeEvent
+    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+        if (!inGarden()) return
+        checkItemInHand()
     }
 
     @SubscribeEvent
@@ -37,11 +38,15 @@ class GardenAPI {
         if (!inGarden()) return
         if (tick++ % 10 != 0) return
 
+        // We ignore random hypixel moments
+        Minecraft.getMinecraft().currentScreen ?: return
+        checkItemInHand()
+    }
+
+    private fun checkItemInHand() {
         val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
         val crop = loadCropInHand(heldItem)
         if (cropInHand != crop) {
-            // We ignore random hypixel moments
-            Minecraft.getMinecraft().currentScreen ?: return
             cropInHand = crop
             GardenToolChangeEvent(crop, heldItem).postAndCatch()
         }
