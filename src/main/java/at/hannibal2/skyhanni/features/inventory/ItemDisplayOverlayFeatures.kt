@@ -131,6 +131,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
+        // TODO this is broken, fix it!
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
             if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
                 val lore = item.getLore()
