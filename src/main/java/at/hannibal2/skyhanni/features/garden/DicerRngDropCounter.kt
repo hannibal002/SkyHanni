@@ -90,9 +90,9 @@ class DicerRngDropCounter {
     }
 
     private fun addDrop(item: String, rarity: DropRarity) {
-        val melon = drops[item]!!
-        val old = melon[rarity] ?: 0
-        melon[rarity] = old + 1
+        val map = drops[item]!!
+        val old = map[rarity] ?: 0
+        map[rarity] = old + 1
     }
 
     @SubscribeEvent
