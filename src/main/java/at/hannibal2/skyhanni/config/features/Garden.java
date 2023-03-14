@@ -153,6 +153,16 @@ public class Garden {
     public boolean cropMilestoneProgress = true;
 
     @Expose
+    @ConfigOption(
+            name = "Warn When Close",
+            desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
+                    "(Useful for switching to a different pet for leveling)")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean cropMilestoneWarnClose = true;
+
+
+    @Expose
     @ConfigOption(name = "Display Position", desc = "")
     @ConfigEditorButton(runnableId = "cropMilestoneProgress", buttonText = "Edit")
     @ConfigAccordionId(id = 6)
