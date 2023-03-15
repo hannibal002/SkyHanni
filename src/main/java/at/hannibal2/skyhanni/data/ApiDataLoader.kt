@@ -107,7 +107,7 @@ class ApiDataLoader {
     }
 
     private fun findApiCandidatesFromOtherMods(): Map<String, String> {
-        LorenzUtils.consoleLog("Trying to find the API Key from the config of other mods..")
+        LorenzUtils.consoleLog("Trying to find the api key from the config of other mods..")
         val candidates = mutableMapOf<String, String>()
         for (mod in OtherMod.values()) {
             val modName = mod.modName
@@ -116,6 +116,10 @@ class ApiDataLoader {
                 val reader = APIUtil.readFile(file)
                 try {
                     val key = mod.readKey(reader).replace("\n", "").replace(" ", "")
+                    if (key == "") {
+                        LorenzUtils.consoleLog("- $modName: no api key set!")
+                        continue
+                    }
                     UUID.fromString(key)
                     candidates[modName] = key
                 } catch (e: Throwable) {
@@ -123,7 +127,7 @@ class ApiDataLoader {
                     continue
                 }
             } else {
-                LorenzUtils.consoleLog("- $modName: no config found!")
+                LorenzUtils.consoleLog("- $modName: no mod/config found!")
             }
         }
         return candidates
