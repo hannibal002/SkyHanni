@@ -83,7 +83,7 @@ class EliteFarmingWeight {
                 return
             }
 
-                if (bonusWeight == -1) {
+            if (bonusWeight == -1) {
                 if (!isLoadingWeight) {
                     isLoadingWeight = true
                     SkyHanniMod.coroutineScope.launch {
