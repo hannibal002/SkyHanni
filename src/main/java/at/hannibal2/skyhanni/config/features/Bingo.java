@@ -8,7 +8,7 @@ public class Bingo {
 
     @Expose
     @ConfigOption(name = "Compact Chat Messages", desc = "Shortens chat messages about skill level ups, collection gains, " +
-            "new area discoveries, and bestiarity upgrades while on bingo.")
+            "new area discoveries, and bestiary upgrades while on bingo.")
     @ConfigEditorBoolean
     public boolean compactChatMessages = true;
 
