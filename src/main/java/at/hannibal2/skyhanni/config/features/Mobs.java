@@ -40,7 +40,7 @@ public class Mobs {
     @Expose
     @ConfigOption(
             name = "Special Zealots",
-            desc = "Highlight Special Zealots in The End. (The one that drops Summoning Eyes)"
+            desc = "Highlight Special Zealots (the ones that drop summoning eyes) in the End."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -68,7 +68,7 @@ public class Mobs {
     public boolean areaBossRespawnTimer = false;
 
     @Expose
-    @ConfigOption(name = "Enderman Teleportation Hider", desc = "Stops the Enderman Teleportation animation (Like in SBA)")
+    @ConfigOption(name = "Enderman Teleportation Hider", desc = "Stops the Enderman Teleportation animation, like in SBA.")
     @ConfigEditorBoolean
     public boolean endermanTeleportationHider = false;
 }
