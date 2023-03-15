@@ -281,7 +281,7 @@ public class Features extends Config {
     public Bingo bingo = new Bingo();
 
     @Expose
-    @Category(name = "Mobs", desc = "Visual Help for Mobs")
+    @Category(name = "Mobs", desc = "Visual help for Mobs")
     public Mobs mobs = new Mobs();
 
     @Expose
