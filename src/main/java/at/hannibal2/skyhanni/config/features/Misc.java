@@ -29,7 +29,7 @@ public class Misc {
     public boolean time = false;
 
     @Expose
-    @ConfigOption(name = "Real Time", desc = "Show the real time. Useful while playing in full screen mode")
+    @ConfigOption(name = "Real Time", desc = "Show IRL time. Useful while playing in full screen mode.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean realTime = false;
@@ -46,19 +46,19 @@ public class Misc {
     public boolean hideArmor = false;
 
     @Expose
-    @ConfigOption(name = "Hide Armor", desc = "Hide the armor of players.")
+    @ConfigOption(name = "Hide Armor", desc = "Hide other players' armor.")
     @ConfigEditorBoolean(runnableId = "hideArmor")
     @ConfigAccordionId(id = 3)
     public boolean hideArmorEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Own Armor", desc = "Hide the armor of yourself.")
+    @ConfigOption(name = "Own Armor", desc = "Hide your own armor.")
     @ConfigEditorBoolean(runnableId = "hideArmor")
     @ConfigAccordionId(id = 3)
     public boolean hideArmorOwn = true;
 
     @Expose
-    @ConfigOption(name = "Only Helmet", desc = "Hide only the helmet.")
+    @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
     @ConfigEditorBoolean(runnableId = "hideArmor")
     @ConfigAccordionId(id = 3)
     public boolean hideArmorOnlyHelmet = false;
@@ -69,7 +69,7 @@ public class Misc {
     public boolean damageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes, from anywhere in Skyblock.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in Skyblock.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean hideDamageSplash = false;
@@ -109,7 +109,7 @@ public class Misc {
     public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Reputation Locations", desc = "Show locations to the points where to do stuff in the Crimson Isle to get reputation.")
+    @ConfigOption(name = "Reputation Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
     public boolean crimsonIsleReputationLocation = false;
@@ -120,7 +120,7 @@ public class Misc {
     public boolean tiaRelay = false;
 
     @Expose
-    @ConfigOption(name = "Tia Relay Waypoint", desc = "Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network needs to be done.")
+    @ConfigOption(name = "Tia Relay Waypoint", desc = "Show the next relay waypoint for Tia the Fairy, where maintenance for the abiphone network needs to be done.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean tiaRelayNextWaypoint = true;
@@ -138,7 +138,7 @@ public class Misc {
     public boolean tiaRelayHelper = true;
 
     @Expose
-    @ConfigOption(name = "Tia Relay Mute", desc = "Mutes the sound when close to the Relay.")
+    @ConfigOption(name = "Tia Relay Mute", desc = "Mutes the sound when close to the relay.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean tiaRelayMute = true;
@@ -149,7 +149,7 @@ public class Misc {
     public boolean tpsDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Tps Display", desc = "Show the Tps of the current server. (Like in Soopy)")
+    @ConfigOption(name = "Tps Display", desc = "Show the TPS of the current server, like in Soopy.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean tpsDisplayEnabled = false;
@@ -166,13 +166,13 @@ public class Misc {
     public boolean particleHider = false;
 
     @Expose
-    @ConfigOption(name = "Blaze Particles", desc = "Hide blaze particles")
+    @ConfigOption(name = "Blaze Particles", desc = "Hide blaze particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean hideBlazeParticles = false;
 
     @Expose
-    @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles")
+    @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean hideFireballParticles = true;
@@ -196,7 +196,7 @@ public class Misc {
     public boolean hideFarParticles = true;
 
     @Expose
-    @ConfigOption(name = "Close Redstone Particles", desc = "Hide redstone particles around the player. (They spawn when having some potion effects active)")
+    @ConfigOption(name = "Close Redstone Particles", desc = "Hide redstone particles around the player (appear for some potion effects).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean hideCloseRedstoneparticles = true;
