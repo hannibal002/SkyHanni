@@ -112,11 +112,15 @@ class GardenAPI {
             return -1
         }
 
-        fun getCropsPerSecond(itemName: String): Int? {
-            if (itemName.endsWith(" Mushroom")) {
-                return cropsPerSecond["Mushroom"]
+        fun getCropsPerSecond(itemName: String): Int {
+            return cropsPerSecond[itemNameToCropName(itemName)]!!
+        }
+
+        fun itemNameToCropName(itemName: String): String {
+            if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") {
+                return "Mushroom"
             }
-            return cropsPerSecond[itemName]
+            return itemName
         }
     }
 }

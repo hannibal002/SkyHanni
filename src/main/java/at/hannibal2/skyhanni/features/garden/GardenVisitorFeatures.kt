@@ -155,9 +155,14 @@ class GardenVisitorFeatures {
             if (i > 1 && !endReached) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    val internalName: String
+                    var internalName: String
                     try {
                         internalName = NEUItems.getInternalName(itemName)
+                        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
+                        // TODO remove workaround when this is fixed in neu
+                        if (internalName == "HAY_BALE") {
+                            internalName = "HAY_BLOCK"
+                        }
                     } catch (e: NullPointerException) {
                         val message = "internal name is null: '$itemName'"
                         println(message)
@@ -169,7 +174,7 @@ class GardenVisitorFeatures {
                     totalPrice += price
                     if (config.visitorShowPrice) {
                         val format = NumberUtil.format(price)
-                        list[i+ itemsWithSpeedCounter] = "$line §7(§6$format§7)"
+                        list[i + itemsWithSpeedCounter] = "$line §7(§6$format§7)"
                     }
                     itemsCounter++
 
@@ -178,19 +183,18 @@ class GardenVisitorFeatures {
                         val rawName = NEUItems.getItemStack(multiplier.first).name ?: continue
                         val crop = rawName.removeColor()
                         val cropAmount = multiplier.second.toLong() * amount
-                        GardenAPI.getCropsPerSecond(crop)?.let {
-                            val formatAmount = LorenzUtils.formatInteger(cropAmount)
-                            val formatName = "§e${formatAmount}§7x $crop "
-                            val formatSpeed = if (it != -1) {
-                                val missingTimeSeconds = cropAmount / it
-                                val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
-                                "in §b$duration"
-                            } else {
-                                "§cno speed data!"
-                            }
-                            itemsWithSpeedCounter++
-                            list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
+                        val speed = GardenAPI.getCropsPerSecond(crop)
+                        val formatAmount = LorenzUtils.formatInteger(cropAmount)
+                        val formatName = "§e${formatAmount}§7x $crop "
+                        val formatSpeed = if (speed != -1) {
+                            val missingTimeSeconds = cropAmount / speed
+                            val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
+                            "in §b$duration"
+                        } else {
+                            "§cno speed data!"
                         }
+                        itemsWithSpeedCounter++
+                        list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
                     }
                 }
             }
