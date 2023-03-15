@@ -16,7 +16,7 @@ public class Dungeon {
     public boolean showMilestone = false;
 
     @Expose
-    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in dungeon.")
+    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showMilestonesDisplay = false;
@@ -32,7 +32,7 @@ public class Dungeon {
     public boolean deathCounter = false;
 
     @Expose
-    @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeon.")
+    @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean deathCounterDisplay = false;
@@ -62,7 +62,7 @@ public class Dungeon {
     public boolean cleanEndF3IgnoreGuardians = false;
 
     @Expose
-    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room. (fixing Skytils feature).")
+    @ConfigOption(name = "Boss Damage Splash", desc = "Hides damage splashes while inside the boss room (fixes a Skytils feature).")
     @ConfigEditorBoolean
     public boolean damageSplashBoss = false;
 
@@ -71,42 +71,42 @@ public class Dungeon {
     @ConfigEditorBoolean
     public boolean highlightDeathmites = true;
 
-    @ConfigOption(name = "Object Hider", desc = "Hide various things in dungeon.")
+    @ConfigOption(name = "Object Hider", desc = "Hide various things in dungeons.")
     @ConfigEditorAccordion(id = 3)
     public boolean objectHider = false;
 
     @Expose
-    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeon.")
+    @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideSuperboomTNT = false;
 
     @Expose
-    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeon.")
+    @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideBlessing = false;
 
     @Expose
-    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeon.")
+    @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideReviveStone = false;
 
     @Expose
-    @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeon.")
+    @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hidePremiumFlesh = false;
 
     @Expose
-    @ConfigOption(name = "Hide Journal Entry", desc = "Hide Journal Entry pages laying around in dungeon.")
+    @ConfigOption(name = "Hide Journal Entry", desc = "Hide Journal Entry pages laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideJournalEntry = false;
 
     @Expose
-    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeon.")
+    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideSkeletonSkull = true;
@@ -138,7 +138,7 @@ public class Dungeon {
     public boolean dungeonCopilot = false;
 
     @Expose
-    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeon.")
+    @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     public boolean copilotEnabled = false;
@@ -154,14 +154,14 @@ public class Dungeon {
     public boolean partyFinder = false;
 
     @Expose
-    @ConfigOption(name = "Colored Class Level", desc = "Show the class levels in party finder in colors.")
+    @ConfigOption(name = "Colored Class Level", desc = "Color class levels in party finder.")
     @ConfigAccordionId(id = 6)
     @ConfigEditorBoolean
     public boolean partyFinderColoredClassLevel = true;
 
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
-            "orange Skeletor (not useful combined with feature Hide Skeleton Skull).")
+            "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
     @ConfigEditorBoolean
     public boolean highlightSkeletonSkull = true;
 
