@@ -29,6 +29,9 @@ class GardenVisitorTimer {
                 millis = TimeUtils.getMillis(rawTime)
             } else if (line == " Next Visitor: §r§c§lQueue Full!") {
                 queueFull = true
+            } else if (line == " Next Visitor: §r§cNot Unlocked!") {
+                render = ""
+                return
             }
 
             matcher = patternVisitors.matcher(line)
