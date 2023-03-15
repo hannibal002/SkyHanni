@@ -21,7 +21,7 @@ public class ItemAbilities {
     public boolean fireVeilWand = false;
 
     @Expose
-    @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability")
+    @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability.")
     @ConfigEditorDropdown(values = {"Particles", "Line", "Off"})
     @ConfigAccordionId(id = 1)
     public int fireVeilWandDisplay = 0;
@@ -29,7 +29,7 @@ public class ItemAbilities {
     @Expose
     @ConfigOption(
             name = "Line Color",
-            desc = "Changes the color of the Fire Veil Wand line"
+            desc = "Changes the color of the Fire Veil Wand line."
     )
     @ConfigEditorColour
     @ConfigAccordionId(id = 1)
