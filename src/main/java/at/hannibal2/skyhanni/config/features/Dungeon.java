@@ -7,7 +7,7 @@ import com.google.gson.annotations.Expose;
 public class Dungeon {
 
     @Expose
-    @ConfigOption(name = "Clicked Blocks", desc = "Highlight the following blocks when clicked in dungeon: Lever, Chest, Wither Essence.")
+    @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and wither essence when clicked in dungeons.")
     @ConfigEditorBoolean
     public boolean highlightClickedBlocks = false;
 
@@ -62,7 +62,7 @@ public class Dungeon {
     public boolean cleanEndF3IgnoreGuardians = false;
 
     @Expose
-    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room. (fixing Skytils feature)")
+    @ConfigOption(name = "Boss Damage Splash", desc = "Hiding damage splashes while inside the boss room. (fixing Skytils feature).")
     @ConfigEditorBoolean
     public boolean damageSplashBoss = false;
 
@@ -106,7 +106,7 @@ public class Dungeon {
     public boolean hideJournalEntry = false;
 
     @Expose
-    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide skeleton skulls laying around in dungeon.")
+    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeon.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideSkeletonSkull = true;
@@ -160,14 +160,14 @@ public class Dungeon {
     public boolean partyFinderColoredClassLevel = true;
 
     @Expose
-    @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into a " +
-            "Skeletor in orange color (not useful combined with feature Hide Skeleton Skull)")
+    @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
+            "orange Skeletor (not useful combined with feature Hide Skeleton Skull).")
     @ConfigEditorBoolean
     public boolean highlightSkeletonSkull = true;
 
     @Expose
     @ConfigOption(name = "Croesus Unopened Chest Tracker", desc = "Adds a visual highlight to the Croesus inventory that " +
-            "shows what chests have not yet been opened.")
+            "shows unopened chests.")
     @ConfigEditorBoolean
     public boolean croesusUnopenedChestTracker = true;
 }
