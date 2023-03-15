@@ -43,19 +43,19 @@ public class Inventory {
     public boolean rngMeter = false;
 
     @Expose
-    @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory")
+    @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterFloorName = false;
 
     @Expose
-    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory")
+    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterNoDrop = false;
 
     @Expose
-    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs or slayer rng meter inventory")
+    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs or slayer rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterSelectedDrop = false;
@@ -91,7 +91,7 @@ public class Inventory {
     @Expose
     @ConfigOption(
             name = "Item number",
-            desc = "Showing the item number as a stack size for these items"
+            desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList(
             exampleText = {
@@ -129,7 +129,7 @@ public class Inventory {
 
     @Expose
     @ConfigOption(name = "Highlight Depleted Bonzo's Masks",
-            desc = "Highlights used Bonzo's Masks with a background")
+            desc = "Highlights used Bonzo's Masks with a background.")
     @ConfigEditorBoolean
     public boolean highlightDepletedBonzosMasks = false;
 
