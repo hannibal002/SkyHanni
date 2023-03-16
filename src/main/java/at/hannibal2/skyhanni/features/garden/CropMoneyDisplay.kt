@@ -99,7 +99,7 @@ class CropMoneyDisplay {
         for ((internalName, amount) in multipliers) {
             val price = NEUItems.getPrice(internalName)
             val cropName = cropNames[internalName]!!
-            val speed = GardenAPI.getCropsPerSecond(cropName)
+            val speed = GardenAPI.getCropsPerSecond(cropName)!!
 
             // No speed data for item in hand
             if (speed == -1) continue

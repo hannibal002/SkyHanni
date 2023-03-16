@@ -183,18 +183,19 @@ class GardenVisitorFeatures {
                         val rawName = NEUItems.getItemStack(multiplier.first).name ?: continue
                         val crop = rawName.removeColor()
                         val cropAmount = multiplier.second.toLong() * amount
-                        val speed = GardenAPI.getCropsPerSecond(crop)
-                        val formatAmount = LorenzUtils.formatInteger(cropAmount)
-                        val formatName = "§e${formatAmount}§7x $crop "
-                        val formatSpeed = if (speed != -1) {
-                            val missingTimeSeconds = cropAmount / speed
-                            val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
-                            "in §b$duration"
-                        } else {
-                            "§cno speed data!"
+                        GardenAPI.getCropsPerSecond(crop)?.let {
+                            val formatAmount = LorenzUtils.formatInteger(cropAmount)
+                            val formatName = "§e${formatAmount}§7x $crop "
+                            val formatSpeed = if (it != -1) {
+                                val missingTimeSeconds = cropAmount / it
+                                val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
+                                "in §b$duration"
+                            } else {
+                                "§cno speed data!"
+                            }
+                            itemsWithSpeedCounter++
+                            list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
                         }
-                        itemsWithSpeedCounter++
-                        list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
                     }
                 }
             }
