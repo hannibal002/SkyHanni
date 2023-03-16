@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -37,10 +38,11 @@ class BazaarApi {
         fun getBazaarDataForInternalName(internalName: String) =
             bazaarMap.values.firstOrNull { it.apiName == internalName }
 
-        fun isBazaarItem(stack: ItemStack): Boolean {
-            val internalName = stack.getInternalName()
-            return bazaarMap.any { it.value.apiName == internalName }
+        fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
 
+        fun isBazaarItem(internalName: String): Boolean {
+            val bazaarInfo = NotEnoughUpdates.INSTANCE.manager.auctionManager.getBazaarInfo(internalName)
+            return bazaarInfo != null
         }
     }
 
