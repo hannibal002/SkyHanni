@@ -13,10 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarBestSellMethod {
-
-    companion object {
-        private var display = ""
-    }
+    private var display = ""
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
