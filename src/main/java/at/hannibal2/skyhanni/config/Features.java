@@ -218,6 +218,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.dicerCounterPos);
             return;
         }
+
+        if (runnableId.equals("moneyPerHour")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.moneyPerHourPos);
+            return;
+        }
     }
 
     @Expose

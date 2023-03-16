@@ -113,7 +113,13 @@ class GardenAPI {
         }
 
         fun getCropsPerSecond(itemName: String): Int {
-            return cropsPerSecond[itemNameToCropName(itemName)]!!
+            val name = itemNameToCropName(itemName)
+            val result = cropsPerSecond[name]
+            if (result == null) {
+                println("getCropsPerSecond is null for '$name'")
+                return -1
+            }
+            return result
         }
 
         fun itemNameToCropName(itemName: String): String {
