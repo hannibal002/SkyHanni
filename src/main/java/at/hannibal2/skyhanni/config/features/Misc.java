@@ -80,13 +80,13 @@ public class Misc {
     public boolean potionEffects = false;
 
     @Expose
-    @ConfigOption(name = "Non-God Pot Effects", desc = "Display the active non-god potion effects.")
+    @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the god pot.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Real Time Position", desc = "")
+    @ConfigOption(name = "Pot Effects Position", desc = "")
     @ConfigEditorButton(runnableId = "nonGodPotEffect", buttonText = "Edit")
     @ConfigAccordionId(id = 5)
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
