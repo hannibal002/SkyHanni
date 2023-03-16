@@ -10,7 +10,7 @@ import com.google.gson.annotations.Expose;
 public class Ashfang {
 
     @Expose
-    @ConfigOption(name = "Freeze", desc = "Show the cooldown fpr how long Ashfang blocks your abilities.")
+    @ConfigOption(name = "Freeze", desc = "Show the cooldown for how long Ashfang blocks your abilities.")
     @ConfigEditorBoolean
     public boolean freezeCooldown = false;
 
