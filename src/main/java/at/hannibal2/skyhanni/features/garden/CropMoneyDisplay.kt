@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
@@ -132,66 +133,11 @@ class CropMoneyDisplay {
                 "Nether Wart",
             )
 
-            val ignoreCheapCraftedItems = listOf(
-                "BREAD",
-                "BUILDER_BROWN_MUSHROOM",
-                "BUILDER_CACTUS",
-                "BUILDER_MELON",
-                "CACTUS_BOOTS",
-                "CACTUS_CHESTPLATE",
-                "CACTUS_HELMET",
-                "CACTUS_LEGGINGS",
-                "FARM_SUIT_BOOTS",
-                "FARM_SUIT_CHESTPLATE",
-                "FARM_SUIT_HELMET",
-                "FARM_SUIT_LEGGINGS",
-                "MUSHROOM_BOOTS",
-                "MUSHROOM_CHESTPLATE",
-                "MUSHROOM_HELMET",
-                "MUSHROOM_LEGGINGS",
-                "PAPER",
-                "POTION_AFFINITY_TALISMAN",
-                "PUMPKIN_BOOTS",
-                "PUMPKIN_CHESTPLATE",
-                "PUMPKIN_HELMET",
-                "PUMPKIN_LEGGINGS",
-                "SIMPLE_CARROT_CANDY",
-                "SPEED_TALISMAN",
-            )
-
-            val ignoreCheapItems = listOf(
-                "BROWN_MUSHROOM",
-                "CACTUS",
-                "CARROT_ITEM",
-                "ENCHANTED_BREAD",
-                "HAY_BLOCK",
-                "HUGE_MUSHROOM_1",
-                "HUGE_MUSHROOM_2",
-                "INK_SACK-3",
-                "MELON",
-                "MELON_BLOCK",
-                "NETHER_STALK",
-                "POTATO_ITEM",
-                "PUMPKIN",
-                "RED_MUSHROOM",
-                "SUGAR_CANE",
-                "WHEAT",
-            )
-
             for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
-                if (ignoreCheapCraftedItems.contains(internalName)) continue
-                if (ignoreCheapItems.contains(internalName)) continue
-                // filter craftable items
-                if (internalName.endsWith("_BOOTS") ||
-                    internalName.endsWith("_HELMET") ||
-                    internalName.endsWith("_LEGGINGS") ||
-                    internalName.endsWith("_CHESTPLATE") ||
-                    internalName == "ENCHANTED_PAPER"
-                ) {
-                    continue
-                }
+                if (!BazaarApi.isBazaarItem(internalName)) continue
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
+                if (amount < 10) continue
                 val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
                 val cropName = GardenAPI.itemNameToCropName(itemName)
                 if (crops.contains(cropName)) {
