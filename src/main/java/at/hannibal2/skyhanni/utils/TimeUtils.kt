@@ -11,7 +11,7 @@ object TimeUtils {
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
-        longName: Boolean = false
+        longName: Boolean = false,
     ): String {
         var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
@@ -50,9 +50,7 @@ object TimeUtils {
 
     fun getMillis(string: String): Long {
         val matcher = pattern.matcher(string.lowercase().trim())
-        if (!matcher.matches()) {
-            throw RuntimeException("Matcher is null for '$string'")
-        }
+        if (!matcher.matches()) return tryAlternativeFormat(string)
 
         val years = matcher.group("y")?.toLong() ?: 0L
         val days = matcher.group("d")?.toLong() ?: 0L
@@ -68,6 +66,32 @@ object TimeUtils {
         millis += (years * 365.25 * 24 * 60 * 60 * 1000).toLong()
 
         return millis
+    }
+
+    private fun tryAlternativeFormat(string: String): Long {
+        val split = string.split(":")
+        return when (split.size) {
+            3 -> {
+                val hours = split[0].toInt() * 1000 * 60 * 60
+                val minutes = split[1].toInt() * 1000 * 60
+                val seconds = split[2].toInt() * 1000
+                seconds + minutes + hours
+            }
+
+            2 -> {
+                val minutes = split[0].toInt() * 1000 * 60
+                val seconds = split[1].toInt() * 1000
+                seconds + minutes
+            }
+
+            1 -> {
+                split[0].toInt() * 1000
+            }
+
+            else -> {
+                throw RuntimeException("Invalid format: '$string'")
+            }
+        }.toLong()
     }
 }
 

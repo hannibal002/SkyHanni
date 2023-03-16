@@ -132,7 +132,7 @@ class NonGodPotEffectDisplay {
                 if (name in nonGodPotEffects.values) {
                     for (line in stack.getLore()) {
                         if (line.contains("Remaining")) {
-                            val duration = readDuration(line.split("§f")[1])
+                            val duration = TimeUtils.getMillis(line.split("§f")[1])
                             activeEffects[name] = System.currentTimeMillis() + duration
                             format()
                         }
@@ -152,7 +152,7 @@ class NonGodPotEffectDisplay {
             var effectsCount = 0
             for (line in lines) {
                 if (line.startsWith("§2Mushed Glowy Tonic I")) {
-                    val duration = readDuration(line.split("§f")[1])
+                    val duration = TimeUtils.getMillis(line.split("§f")[1])
                     activeEffects["§2Mushed Glowy Tonic I"] = System.currentTimeMillis() + duration
                     format()
                 }
@@ -163,32 +163,6 @@ class NonGodPotEffectDisplay {
                 }
             }
             totalEffectsCount = effectsCount
-        }
-    }
-
-    private fun readDuration(text: String): Int {
-        val split = text.split(":")
-        return when (split.size) {
-            3 -> {
-                val hours = split[0].toInt() * 1000 * 60 * 60
-                val minutes = split[1].toInt() * 1000 * 60
-                val seconds = split[2].toInt() * 1000
-                seconds + minutes + hours
-            }
-
-            2 -> {
-                val minutes = split[0].toInt() * 1000 * 60
-                val seconds = split[1].toInt() * 1000
-                seconds + minutes
-            }
-
-            1 -> {
-                split[0].toInt() * 1000
-            }
-
-            else -> {
-                throw RuntimeException("Invalid format: '$text'")
-            }
         }
     }
 
