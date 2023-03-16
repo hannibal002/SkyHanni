@@ -115,6 +115,7 @@ public class SkyHanniMod {
         loadModule(new RenderGuiData());
         loadModule(new GardenCropMilestones());
         loadModule(new OwnInventoryData());
+        loadModule(new ToolTipData());
 
         // APIs
         loadModule(new BazaarApi());
@@ -220,6 +221,7 @@ public class SkyHanniMod {
         loadModule(new EliteFarmingWeight());
         loadModule(new DicerRngDropCounter());
         loadModule(new CropMoneyDisplay());
+        loadModule(new JacobFarmingContestsInventory());
 
         Commands.INSTANCE.init();
 

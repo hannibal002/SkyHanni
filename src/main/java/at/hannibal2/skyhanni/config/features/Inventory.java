@@ -89,6 +89,29 @@ public class Inventory {
     public boolean statsTuningTemplateStats = true;
 
     @Expose
+    @ConfigOption(name = "Jacob Farming Contest", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    public boolean jacobFarmingContest = false;
+
+    @Expose
+    @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the jacob inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestHighlightRewards = true;
+
+    @Expose
+    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestHideDuplicates = true;
+
+    @Expose
+    @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the contest description.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestRealTime = true;
+
+    @Expose
     @ConfigOption(
             name = "Item number",
             desc = "Showing the item number as a stack size for these items."
