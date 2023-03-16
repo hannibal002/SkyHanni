@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
+import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,6 +17,9 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Unique
     private final GuiContainerHook hook = new GuiContainerHook(this);
+
+    @Shadow
+    private Slot theSlot;
 
     @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE), cancellable = true)
     private void closeWindowPressed(CallbackInfo ci) {
@@ -55,5 +60,6 @@ public abstract class MixinGuiContainer extends GuiScreen {
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         hook.onDrawScreenAfter(mouseX, mouseY, ci);
+        ToolTipData.Companion.setLastSlot(theSlot);
     }
 }

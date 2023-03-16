@@ -9,6 +9,9 @@
 + Added support for tier 1 minions and title send for the minion craft helper.
 + Added Chicken head Timer.
 + Added **rancher boots** speed display.
++ Added **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
++ Added **Duplicate Hider** - Hides duplicate farming contests in the inventory.
++ Added **Contest Time** - Adds the real time format to the farming contest description.
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
@@ -32,6 +35,7 @@
 + Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
 + Added **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
 + Added **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
+
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
