@@ -57,6 +57,12 @@ class CropMoneyDisplay {
             val newDisplay = drawNewDisplay()
             display.clear()
             display.addAll(newDisplay)
+        } else {
+            val newDisplay = mutableListOf<List<Any>>()
+            newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
+            newDisplay.add(Collections.singletonList("§eLoading..."))
+            display.clear()
+            display.addAll(newDisplay)
         }
     }
 
@@ -68,27 +74,32 @@ class CropMoneyDisplay {
         newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
 
         var number = 0
-        for ((internalName, moneyPerHour) in calculateMoneyPerHour().sortedDesc()) {
-            number++
-            val cropName = cropNames[internalName]
-            val isCurrent = cropName == GardenAPI.cropInHand
-            if (number > config.moneyPerHourShowOnlyBest && !isCurrent) continue
+        val map = calculateMoneyPerHour()
+        if (map.isEmpty()) {
+            newDisplay.add(Collections.singletonList("§cFarm crops to add them to this list!"))
+        } else {
+            for ((internalName, moneyPerHour) in map.sortedDesc()) {
+                number++
+                val cropName = cropNames[internalName]
+                val isCurrent = cropName == GardenAPI.cropInHand
+                if (number > config.moneyPerHourShowOnlyBest && !isCurrent) continue
 
-            val list = mutableListOf<Any>()
-            list.add("§7$number# ")
+                val list = mutableListOf<Any>()
+                list.add("§7$number# ")
 
-            try {
-                val itemStack = NEUItems.getItemStack(internalName)
-                list.add(itemStack)
-            } catch (e: NullPointerException) {
-                e.printStackTrace()
+                try {
+                    val itemStack = NEUItems.getItemStack(internalName)
+                    list.add(itemStack)
+                } catch (e: NullPointerException) {
+                    e.printStackTrace()
+                }
+                val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
+                val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
+                val color = if (isCurrent) "§e" else "§7"
+                list.add("$color$itemName§7: §6$format")
+
+                newDisplay.add(list)
             }
-            val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
-            val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
-            val color = if (isCurrent) "§e" else "§7"
-            list.add("$color$itemName§7: §6$format")
-
-            newDisplay.add(list)
         }
 
         return newDisplay
@@ -117,6 +128,12 @@ class CropMoneyDisplay {
 
     private fun init() {
         if (loaded) return
+
+        if (BazaarApi.bazaarMap.isEmpty()) {
+            LorenzUtils.debug("bz not ready for money/time!")
+            return
+        }
+
         loaded = true
 
         SkyHanniMod.coroutineScope.launch {
