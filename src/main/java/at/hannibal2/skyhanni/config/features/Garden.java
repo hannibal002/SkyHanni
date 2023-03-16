@@ -364,6 +364,43 @@ public class Garden {
     public Position dicerCounterPos = new Position(16, -232, false, true);
 
     @Expose
+    @ConfigOption(name = "Money per Hour", desc = "")
+    @ConfigEditorAccordion(id = 13)
+    public boolean moneyPerHour = false;
+
+    @Expose
+    @ConfigOption(name = "Show money per Hour", desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourDisplay = true;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(name = "Only show top", desc = "Only show the best # items.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 25,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 13)
+    public int moneyPerHourShowOnlyBest = 5;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(
+            name = "Always On",
+            desc = "Show the money/hour Display always while on the garden.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourAlwaysOn = false;
+
+    @Expose
+    @ConfigOption(name = "Dicer Counter Position", desc = "")
+    @ConfigEditorButton(runnableId = "moneyPerHour", buttonText = "Edit")
+    @ConfigAccordionId(id = 13)
+    public Position moneyPerHourPos = new Position(16, -232, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
