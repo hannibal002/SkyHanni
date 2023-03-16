@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.event.world.WorldEvent
@@ -74,8 +73,7 @@ class NonGodPotEffectDisplay {
         }
 
 
-        val name = Minecraft.getMinecraft().thePlayer.displayName
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rWell done, $name§r!") {
+        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
             checkFooter = true
             activeEffects["§2King's Scent I"] = System.currentTimeMillis() + 1000 * 60 * 20
             update()
