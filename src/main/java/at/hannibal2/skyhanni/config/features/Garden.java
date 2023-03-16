@@ -43,7 +43,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear, " +
-            "and a number how many visitors are already waiting.")
+            "and a number for how many visitors are already waiting.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean visitorTimerEnabled = true;
@@ -85,7 +85,7 @@ public class Garden {
     public boolean visitorInventory = false;
 
     @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors. (Like in NEU)")
+    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors, like in NEU.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean visitorShowPrice = false;
@@ -115,7 +115,7 @@ public class Garden {
     public boolean visitorNotificationTitle = true;
 
     @Expose
-    @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.")
+    @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and required items need to be checked.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean visitorHighlight = true;
@@ -156,7 +156,7 @@ public class Garden {
     @ConfigOption(
             name = "Warn When Close",
             desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
-                    "(Useful for switching to a different pet for leveling)")
+                    "Useful for switching to a different pet for leveling.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
     public boolean cropMilestoneWarnClose = true;
@@ -223,12 +223,12 @@ public class Garden {
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden. §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the garden. §cOnly updates after scrolling in the hotbar.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean keyBindEnabled = false;
 
-    @ConfigOption(name = "Disable All", desc = "Disabling all keys.")
+    @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(runnableId = "gardenKeyBindPresetDisabled", buttonText = "Disable")
     @ConfigAccordionId(id = 8)
     public int keyBindPresetDisable = 0;
@@ -286,7 +286,7 @@ public class Garden {
     public boolean optimalSpeed = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)")
+    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean optimalSpeedEnabled = true;
@@ -352,7 +352,7 @@ public class Garden {
     public boolean dicerCounter = false;
 
     @Expose
-    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer")
+    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     public boolean dicerCounterDisplay = true;

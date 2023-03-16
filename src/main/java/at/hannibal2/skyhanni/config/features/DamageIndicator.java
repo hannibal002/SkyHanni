@@ -13,12 +13,12 @@ import java.util.List;
 public class DamageIndicator {
 
     @Expose
-    @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the missing health of a boss.")
+    @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the boss' remaining health.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Healing Chat Message", desc = "Sends a chat message when a boss heals himself.")
+    @ConfigOption(name = "Healing Chat Message", desc = "Sends a chat message when a boss heals themself.")
     @ConfigEditorBoolean
     public boolean healingMessage = false;
 
@@ -83,7 +83,7 @@ public class DamageIndicator {
     public boolean hideVanillaNametag = false;
 
     @Expose
-    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the Slayer boss.")
+    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.")
     @ConfigEditorBoolean
     public boolean timeToKillSlayer = true;
 }

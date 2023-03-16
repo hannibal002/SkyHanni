@@ -16,7 +16,7 @@ public class Minions {
     public boolean lastClickedMinion = false;
 
     @Expose
-    @ConfigOption(name = "Last Minion Display", desc = "Marks the location of the last clicked minion (even through walls)")
+    @ConfigOption(name = "Last Minion Display", desc = "Marks the location of the last clicked minion, even through walls.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean lastClickedMinionDisplay = false;
@@ -24,7 +24,7 @@ public class Minions {
     @Expose
     @ConfigOption(
             name = "Last Minion Color",
-            desc = "The colour in which the last minion should be displayed"
+            desc = "The color in which the last minion should be displayed."
     )
     @ConfigEditorColour
     @ConfigAccordionId(id = 0)
@@ -33,7 +33,7 @@ public class Minions {
     @Expose
     @ConfigOption(
             name = "Last Minion Time",
-            desc = "Time in seconds how long the last minion should be displayed"
+            desc = "Time in seconds how long the last minion should be displayed."
     )
     @ConfigEditorSlider(
             minValue = 3,
@@ -56,7 +56,7 @@ public class Minions {
     @Expose
     @ConfigOption(
             name = "Distance",
-            desc = "At what distance is the minion display shown."
+            desc = "Maximum distance to display minion data."
     )
     @ConfigEditorSlider(
             minValue = 3,
@@ -71,7 +71,7 @@ public class Minions {
     public boolean hopperProfit = false;
 
     @Expose
-    @ConfigOption(name = "Hopper Profit Display", desc = "Using the held coins and the last empty time to calculate the coins a hopper collects in a day")
+    @ConfigOption(name = "Hopper Profit Display", desc = "Use the hopper's held coins and the last empty time to calculate the coins per day.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean hopperProfitDisplay = true;
@@ -83,7 +83,7 @@ public class Minions {
     public Position hopperProfitPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions")
+    @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions.")
     @ConfigEditorBoolean
     public boolean hideMobsNametagNearby = false;
 }

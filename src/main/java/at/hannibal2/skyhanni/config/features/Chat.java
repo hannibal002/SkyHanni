@@ -7,7 +7,7 @@ import org.lwjgl.input.Keyboard;
 public class Chat {
 
     @Expose
-    @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open")
+    @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
     public int peekChat = Keyboard.KEY_Z;
 
@@ -29,7 +29,7 @@ public class Chat {
     public boolean empty = true;
 
     @Expose
-    @ConfigOption(name = "Warping", desc = "Block 'sending request to join ..' and 'warping ..' messages.")
+    @ConfigOption(name = "Warping", desc = "Block 'sending request to join...' and 'warping...' messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean warping = true;
@@ -41,7 +41,7 @@ public class Chat {
     public boolean welcome = true;
 
     @Expose
-    @ConfigOption(name = "Guild Exp", desc = "Hide Guild Exp messages.")
+    @ConfigOption(name = "Guild Exp", desc = "Hide guild exp messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean guildExp = true;
@@ -101,7 +101,7 @@ public class Chat {
     public boolean chatFilter = false;
 
     @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in the dungeon.")
+    @ConfigOption(name = "Dungeon Filter", desc = "Hide annoying messages in dungeons.")
     @ConfigEditorBoolean
     public boolean dungeonMessages = true;
 
@@ -111,8 +111,8 @@ public class Chat {
     public boolean dungeonBossMessages = false;
 
     @Expose
-    @ConfigOption(name = "Hide Far Deaths", desc = "Hide the death messages of other players, " +
-            "except for players who are close to the player, inside dungeon or during a Kuudra fight.")
+    @ConfigOption(name = "Hide Far Deaths", desc = "Hide other players' death messages, " +
+            "except for players who are nearby or during dungeons/a Kuudra fight.")
     @ConfigEditorBoolean
     public boolean hideFarDeathMessages = false;
     //TODO jawbus + x
