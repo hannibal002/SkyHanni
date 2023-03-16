@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.event.world.WorldEvent
@@ -31,6 +32,7 @@ class NonGodPotEffectDisplay {
         "smoldering_polarization" to "§aSmoldering Polarization I",
         "mushed_glowy_tonic" to "§2Mushed Glowy Tonic I",
         "wisp_ice" to "§bWisp's Ice-Flavored Water I",
+        "goblin_king_scent" to "§2King's Scent I",
 
         "invisibility" to "§8Invisibility I", // when wearing sorrow armor
 
@@ -48,26 +50,39 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (event.message == "§aYou cleared all of your active effects!") {
+            activeEffects.clear()
+            update()
+        }
+
         if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
             checkFooter = true
             activeEffects["§aSmoldering Polarization I"] = System.currentTimeMillis() + 1000 * 60 * 60
-            format()
+            update()
         }
 
         if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
             checkFooter = true
             activeEffects["§2Mushed Glowy Tonic I"] = System.currentTimeMillis() + 1000 * 60 * 60
-            format()
+            update()
         }
 
         if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
             checkFooter = true
             activeEffects["§bWisp's Ice-Flavored Water I"] = System.currentTimeMillis() + 1000 * 60 * 5
-            format()
+            update()
+        }
+
+
+        val name = Minecraft.getMinecraft().thePlayer.displayName
+        if (event.message == "§e[NPC] §6King Yolkar§f: §rWell done, $name§r!") {
+            checkFooter = true
+            activeEffects["§2King's Scent I"] = System.currentTimeMillis() + 1000 * 60 * 20
+            update()
         }
     }
 
-    private fun format() {
+    private fun update() {
         val now = System.currentTimeMillis()
         display.clear()
         if (activeEffects.values.removeIf { now > it }) {
@@ -115,7 +130,7 @@ class NonGodPotEffectDisplay {
         if (lastTick + 1_000 > System.currentTimeMillis()) return
         lastTick = System.currentTimeMillis()
 
-        format()
+        update()
     }
 
     @SubscribeEvent
@@ -134,7 +149,7 @@ class NonGodPotEffectDisplay {
                         if (line.contains("Remaining")) {
                             val duration = TimeUtils.getMillis(line.split("§f")[1])
                             activeEffects[name] = System.currentTimeMillis() + duration
-                            format()
+                            update()
                         }
                     }
                 }
@@ -154,7 +169,7 @@ class NonGodPotEffectDisplay {
                 if (line.startsWith("§2Mushed Glowy Tonic I")) {
                     val duration = TimeUtils.getMillis(line.split("§f")[1])
                     activeEffects["§2Mushed Glowy Tonic I"] = System.currentTimeMillis() + duration
-                    format()
+                    update()
                 }
                 val matcher = patternEffectsCount.matcher(line)
                 if (matcher.matches()) {
