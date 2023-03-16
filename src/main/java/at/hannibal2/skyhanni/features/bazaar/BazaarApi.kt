@@ -18,10 +18,17 @@ class BazaarApi {
         var inBazaarInventory = false
 
         fun getCleanBazaarName(name: String): String {
-            if (name.endsWith(" Gemstone")) {
-                return name.substring(6)
+            var newName = name
+            if (newName.endsWith(" Gemstone")) {
+                return newName.substring(6)
             }
-            return name.replace("-", " ").removeColor()
+            if (newName.contains("Turbo-Cocoa ")) {
+                newName = newName.replace("Cocoa", "Coco")
+            }
+            if (newName.contains("Turbo-Cacti ")) {
+                newName = newName.replace("Cacti", "Cactus")
+            }
+            return newName.replace("-", " ").removeColor()
         }
 
         fun getBazaarDataForName(name: String): BazaarData? {
