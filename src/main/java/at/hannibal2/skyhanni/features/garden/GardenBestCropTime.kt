@@ -47,14 +47,14 @@ class GardenBestCropTime {
             val color = if (isCurrent) "§e" else ""
             number++
             if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue
-            val cropNameDisplay = "$number# $color$cropName"
+            val cropNameDisplay = "§7$number# $color$cropName"
             if (gardenExp) {
                 val crops = GardenCropMilestones.cropCounter[cropName]!!
                 val currentTier = GardenCropMilestones.getTierForCrops(crops)
                 val gardenExpForTier = getGardenExpForTier(currentTier + 1)
-                display.add(Collections.singletonList(" $cropNameDisplay §b$duration §7(§2$gardenExpForTier §7Exp)"))
+                display.add(Collections.singletonList("$cropNameDisplay §b$duration §7(§2$gardenExpForTier §7Exp)"))
             } else {
-                display.add(Collections.singletonList(" $cropNameDisplay §b$duration"))
+                display.add(Collections.singletonList("$cropNameDisplay §b$duration"))
             }
         }
     }
