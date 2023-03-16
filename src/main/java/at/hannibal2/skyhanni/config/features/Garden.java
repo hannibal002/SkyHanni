@@ -395,7 +395,7 @@ public class Garden {
     public boolean moneyPerHourAlwaysOn = false;
 
     @Expose
-    @ConfigOption(name = "Dicer Counter Position", desc = "")
+    @ConfigOption(name = "Money per hour Position", desc = "")
     @ConfigEditorButton(runnableId = "moneyPerHour", buttonText = "Edit")
     @ConfigAccordionId(id = 13)
     public Position moneyPerHourPos = new Position(16, -232, false, true);
