@@ -782,7 +782,5 @@ class DamageIndicatorManager {
         }
     }
 
-    fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.enabled
-    }
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
