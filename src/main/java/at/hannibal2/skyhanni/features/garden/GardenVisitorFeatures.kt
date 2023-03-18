@@ -239,7 +239,10 @@ class GardenVisitorFeatures {
                     found = false
                     continue
                 }
-                val name = line.substring(3)
+                var name = line.trim().replace("§r", "")
+                if (!name.contains("§")) {
+                    name = "§f$name"
+                }
                 visitorsInTab.add(name)
             }
         }
