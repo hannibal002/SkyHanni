@@ -1,14 +1,11 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
@@ -63,7 +60,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
         val state = if (green) QuestState.READY_TO_COLLECT else QuestState.NOT_ACCEPTED
         dailyQuestHelper.update()
-        dailyQuestHelper.quests.add(addQuest(name, state, needAmount))
+        addQuest(addQuest(name, state, needAmount))
     }
 
     private fun addQuest(name: String, state: QuestState, needAmount: Int): Quest {
@@ -111,43 +108,30 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         return dailyQuestHelper.quests.firstOrNull { it.internalName == name }
     }
 
-    fun checkInventory() {
+    fun checkInventory(event: InventoryOpenEvent) {
         val inMageRegion = LorenzUtils.skyBlockArea == "Community Center"
         val inBarbarianRegion = LorenzUtils.skyBlockArea == "Dragontail"
         if (!inMageRegion && !inBarbarianRegion) return
 
-        val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiChest) return
-        val chest = gui.inventorySlots as ContainerChest
-        val name = chest.getInventoryName()
-
+        val name = event.inventoryName
         for (quest in dailyQuestHelper.quests) {
             val categoryName = quest.category.name
             if (!categoryName.equals(name, ignoreCase = true)) continue
+            val stack = event.inventoryItems[22] ?: continue
 
-            for (slot in chest.inventorySlots) {
-                if (slot == null) continue
-                if (slot.slotNumber != slot.slotIndex) continue
-
-                // Only checking the middle slot
-                if (slot.slotNumber != 22) continue
-
-                val stack = slot.stack ?: continue
-
-                val completed = stack.getLore().any { it.contains("Completed!") }
-                if (completed) {
-                    if (quest.state != QuestState.COLLECTED) {
-                        quest.state = QuestState.COLLECTED
-                        dailyQuestHelper.update()
-                    }
+            val completed = stack.getLore().any { it.contains("Completed!") }
+            if (completed) {
+                if (quest.state != QuestState.COLLECTED) {
+                    quest.state = QuestState.COLLECTED
+                    dailyQuestHelper.update()
                 }
+            }
 
-                val accepted = !stack.getLore().any { it.contains("Click to start!") }
-                if (accepted) {
-                    if (quest.state == QuestState.NOT_ACCEPTED) {
-                        quest.state = QuestState.ACCEPTED
-                        dailyQuestHelper.update()
-                    }
+            val accepted = !stack.getLore().any { it.contains("Click to start!") }
+            if (accepted) {
+                if (quest.state == QuestState.NOT_ACCEPTED) {
+                    quest.state = QuestState.ACCEPTED
+                    dailyQuestHelper.update()
                 }
             }
         }
@@ -171,7 +155,14 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                     }
                 }
             }
-            dailyQuestHelper.quests.add(quest)
+            addQuest(quest)
+        }
+    }
+
+    private fun addQuest(element: Quest) {
+        dailyQuestHelper.quests.add(element)
+        if (dailyQuestHelper.quests.size > 5) {
+            dailyQuestHelper.reputationHelper.reset()
         }
     }
 }
