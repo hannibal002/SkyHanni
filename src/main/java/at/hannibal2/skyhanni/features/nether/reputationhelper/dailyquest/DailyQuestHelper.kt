@@ -244,7 +244,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val sacksText = if (quest is FetchQuest && quest.state != QuestState.COLLECTED) {
-            val name = quest.itemName.uppercase()
+            val name = quest.itemName.uppercase().replace(" ", "_")
             val amount = sacksCache.getOrDefault(name, 0)
             val needAmount = quest.needAmount
             val amountFormat = LorenzUtils.formatInteger(amount)
