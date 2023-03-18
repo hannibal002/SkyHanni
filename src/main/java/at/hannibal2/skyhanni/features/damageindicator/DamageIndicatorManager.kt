@@ -40,6 +40,7 @@ class DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
     private val maxHealth = mutableMapOf<UUID, Long>()
+    private val config get() = SkyHanniMod.feature.damageIndicator
 
     companion object {
         private var data = mutableMapOf<UUID, EntityData>()
@@ -144,7 +145,7 @@ class DamageIndicatorManager {
             if (!data.ignoreBlocks) {
                 if (!player.canEntityBeSeen(data.entity)) continue
             }
-            if (data.bossType.bossTypeToggle !in SkyHanniMod.feature.damageIndicator.bossesToShow) continue
+            if (data.bossType.bossTypeToggle !in config.bossesToShow) continue
 
             val entity = data.entity
 
@@ -184,7 +185,7 @@ class DamageIndicatorManager {
                 )
             }
 
-            var bossName = when (SkyHanniMod.feature.damageIndicator.bossName) {
+            var bossName = when (config.bossName) {
                 0 -> ""
                 1 -> data.bossType.fullName
                 2 -> data.bossType.shortName
@@ -199,7 +200,7 @@ class DamageIndicatorManager {
             }
             event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
-            if (SkyHanniMod.feature.damageIndicator.showDamageOverTime) {
+            if (config.showDamageOverTime) {
                 var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
@@ -329,7 +330,7 @@ class DamageIndicatorManager {
             entityData.nameAbove = ""
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
-                if (entityData.bossType.showDeathTime && SkyHanniMod.feature.damageIndicator.timeToKillSlayer) {
+                if (entityData.bossType.showDeathTime && config.timeToKillSlayer) {
                     entityData.nameAbove = entityData.timeToKill
                 }
                 "§cDead"
@@ -626,7 +627,7 @@ class DamageIndicatorManager {
             //val remainingTicks = 8 * 20 - ticksAlive
             val remainingTicks = (8.9 * 20).toLong() - ticksAlive
 
-            if (SkyHanniMod.feature.damageIndicator.showHealthDuringLaser) {
+            if (config.showHealthDuringLaser) {
                 entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
             } else {
                 return formatDelay(remainingTicks * 50)
@@ -754,7 +755,7 @@ class DamageIndicatorManager {
             val name = entity.customNameTag.removeColor().replace(",", "")
 
             if (entityData != null) {
-                if (SkyHanniMod.feature.damageIndicator.hideDamageSplash) {
+                if (config.hideDamageSplash) {
                     event.isCanceled = true
                 }
                 if (entityData.bossType == BossType.DUMMY) {
@@ -768,7 +769,7 @@ class DamageIndicatorManager {
         } else {
             if (entityData != null) {
                 if (isEnabled()) {
-                    if (SkyHanniMod.feature.damageIndicator.hideVanillaNametag) {
+                    if (config.hideVanillaNametag) {
                         val name = entity.name
                         if (name.contains("Plaesmaflux")) return
                         if (name.contains("Overflux")) return
@@ -782,6 +783,6 @@ class DamageIndicatorManager {
     }
 
     fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.damageIndicator.enabled
+        return LorenzUtils.inSkyBlock && config.enabled
     }
 }
