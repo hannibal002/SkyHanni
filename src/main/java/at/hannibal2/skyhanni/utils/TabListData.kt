@@ -21,7 +21,6 @@ class TabListData {
         fun getTabList() = cache
     }
 
-
     private val playerOrdering = Ordering.from(PlayerComparator())
 
     @SideOnly(Side.CLIENT)
