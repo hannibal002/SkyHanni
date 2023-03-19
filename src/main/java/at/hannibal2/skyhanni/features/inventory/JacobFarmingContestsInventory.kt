@@ -24,8 +24,8 @@ class JacobFarmingContestsInventory {
     private val duplicateSlots = mutableListOf<Int>()
     private val realTime = mutableMapOf<Int, String>()
 
-    private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
-    private val formatTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+    private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.US)
+    private val formatTime = SimpleDateFormat("HH:mm", Locale.US)
     private val pattern = Pattern.compile("§a(.*) (.*)(?:rd|st|nd|th), Year (.*)")
     private val config get() = SkyHanniMod.feature.inventory
 
