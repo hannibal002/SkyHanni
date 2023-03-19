@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils.drawStringScaled
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -441,7 +440,7 @@ object RenderUtils {
         val renderer = minecraft.renderManager.fontRenderer ?: return
 
         val offsetX = if (center) {
-            (200 - renderer.getStringWidth(display.removeColor())) / 2
+            (200 - renderer.getStringWidth(display)) / 2
         } else {
             0
         } + extraOffsetX
@@ -512,7 +511,7 @@ object RenderUtils {
             }
             if (any is String) {
                 renderString(any, offsetX, offsetY, center = false)
-                val width = renderer.getStringWidth(any.removeColor())
+                val width = renderer.getStringWidth(any)
                 offsetX += width
             } else if (any is ItemStack) {
                 val isX = getAbsX(resolution, 200) + offsetX
@@ -723,7 +722,7 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
-        val stringWidth = fontRenderer.getStringWidth(text.removeColor())
+        val stringWidth = fontRenderer.getStringWidth(text)
         if (shadow) {
             fontRenderer.drawStringWithShadow(
                 text,
