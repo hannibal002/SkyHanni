@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -21,6 +22,9 @@ class GardenNextJacobContest {
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
+    private val patternDay = Pattern.compile("§aDay (.*)")
+    private val patternMonth = Pattern.compile("(.*), Year (.*)")
+    private val patternCrop = Pattern.compile("§e○ §7(.*)")
 
     private val maxContestsPerYear = 124
     private val contestDuration = 1_000 * 60 * 20
@@ -60,10 +64,9 @@ class GardenNextJacobContest {
     private fun readCalendar(event: InventoryOpenEvent) {
         val inventoryName = event.inventoryName
 
-        val patternMonth = Pattern.compile("(.*), Year (.*)")
         val matcher = patternMonth.matcher(inventoryName)
         if (!matcher.matches()) return
-        val rawMonth = matcher.group(1)
+        val month = LorenzUtils.getSBMonthByName(matcher.group(1))
         val year = matcher.group(2).toInt()
 
         if (contests.isNotEmpty()) {
@@ -76,11 +79,6 @@ class GardenNextJacobContest {
             }
         }
 
-
-        val month = LorenzUtils.getSBMonthByName(rawMonth)
-
-        val patternDay = Pattern.compile("§aDay (.*)")
-        val patternCrop = Pattern.compile("§e○ §7(.*)")
         for (item in event.inventoryItems.values) {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
@@ -90,22 +88,34 @@ class GardenNextJacobContest {
             if (!matcherDay.matches()) continue
 
             val day = matcherDay.group(1).toInt()
-
-            val sbTime = SkyBlockTime(year, month, day)
-            val startTime = sbTime.toMillis()
+            val startTime = SkyBlockTime(year, month, day).toMillis()
             val crops = mutableListOf<String>()
             for (line in lore) {
                 val matcherCrop = patternCrop.matcher(line)
                 if (!matcherCrop.matches()) continue
-
-                val crop = matcherCrop.group(1)
-                crops.add(crop)
+                crops.add(matcherCrop.group(1))
             }
             val contest = FarmingContest(startTime + contestDuration, crops)
             contests[startTime] = contest
         }
 
         update()
+        saveConfig()
+    }
+
+    private fun saveConfig() {
+        val map = SkyHanniMod.feature.hidden.gardenJacobFarmingContestTimes
+        map.clear()
+        for (contest in contests.values) {
+            map[contest.endTime] = contest.crops
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        for ((time, crops) in SkyHanniMod.feature.hidden.gardenJacobFarmingContestTimes) {
+            contests[time] = FarmingContest(time, crops)
+        }
     }
 
     class FarmingContest(val endTime: Long, val crops: List<String>)
