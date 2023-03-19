@@ -108,7 +108,12 @@ class CropMoneyDisplay {
         for ((internalName, amount) in multipliers) {
             val price = NEUItems.getPrice(internalName)
             val cropName = cropNames[internalName]!!
-            val speed = GardenAPI.getCropsPerSecond(cropName)!!
+            val speed = GardenAPI.getCropsPerSecond(cropName)
+            if (speed == null) {
+                println("calculateMoneyPerHour: Speed is null for crop name '$cropName' ($internalName)")
+                LorenzUtils.debug("calculateMoneyPerHour: Speed is null!")
+                continue
+            }
 
             // No speed data for item in hand
             if (speed == -1) continue

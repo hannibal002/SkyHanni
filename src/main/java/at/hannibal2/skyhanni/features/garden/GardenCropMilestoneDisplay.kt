@@ -82,7 +82,14 @@ class GardenCropMilestoneDisplay {
         if (cultivatingData.containsKey(crop)) {
             val old = cultivatingData[crop]!!
             val diff = counter - old
-            GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
+            try {
+                GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
+            } catch (e: NullPointerException) {
+                println("crop: '$crop'")
+                println("GardenCropMilestones.cropCounter: '${GardenCropMilestones.cropCounter.keys}'")
+                LorenzUtils.debug("NPE at OwnInventorItemUpdateEvent with GardenCropMilestones.cropCounter")
+                e.printStackTrace()
+            }
             EliteFarmingWeight.addCrop(crop, diff)
             if (currentCrop == crop) {
                 calculateSpeed(diff)
