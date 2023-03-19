@@ -44,4 +44,7 @@ public class Hidden {
 
     @Expose
     public Map<String, Integer> gardenDicerRngDrops = new HashMap<>();
+
+    @Expose
+    public Map<Long, List<String>> gardenJacobFarmingContestTimes = new HashMap<>();
 }
