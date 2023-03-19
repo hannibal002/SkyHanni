@@ -75,14 +75,8 @@ class JacobFarmingContestsInventory {
         val day = matcher.group(2).toInt()
         val year = matcher.group(3).toInt()
 
-        var monthNr = 0
-        for (i in 1..12) {
-            val monthName = SkyBlockTime.monthName(i)
-            if (month == monthName) {
-                monthNr = i
-            }
-        }
-        val time = SkyBlockTime(year, monthNr, day, 0, 0, 0)
+        val monthNr = LorenzUtils.getSBMonthByName(month)
+        val time = SkyBlockTime(year, monthNr, day)
         val toMillis = time.toMillis()
         val dayFormat = formatDay.format(toMillis)
         val startTimeFormat = formatTime.format(toMillis)
