@@ -270,7 +270,8 @@ public class ConfigEditor extends GuiElement {
         GuiRenderUtils.drawFloatingRectDark(x + 5, y + 5, xSize - 10, 20, false);
 
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
-        TextRenderUtils.drawStringCenteredScaledMaxWidth("SkyHanni " + SkyHanniMod.VERSION + " by " + EnumChatFormatting.RED + "hannibal2" + EnumChatFormatting.RESET + ", config by " + EnumChatFormatting.DARK_PURPLE + "Moulberry", fr, x + xSize / 2f, y + 15, false, 200, 0xa0a0a0);
+        String text = "SkyHanni " + SkyHanniMod.VERSION + " by §channibal2§r, config by §5Moulberry";
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(text, fr, x + xSize / 2f, y + 15, false, 400, 0xa0a0a0);
         GuiRenderUtils.drawFloatingRectDark(x + 4, y + 49 - 20,
                 140, ySize - 54 + 20, false
         );
