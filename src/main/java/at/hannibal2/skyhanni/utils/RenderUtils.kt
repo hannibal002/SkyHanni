@@ -514,13 +514,14 @@ object RenderUtils {
                 renderString(any, offsetX, offsetY, center = false)
                 val width = renderer.getStringWidth(any.removeColor())
                 offsetX += width
-            }
-            if (any is ItemStack) {
-                val isX = getAbsX(resolution, 0) + offsetX
-                val isY = getAbsY(resolution, 0) + offsetY
+            } else if (any is ItemStack) {
+                val isX = getAbsX(resolution, 200) + offsetX
+                val isY = getAbsY(resolution, 16) + offsetY
 
                 any.renderOnScreen(isX.toFloat(), isY.toFloat(), itemScale)
                 offsetX += 12
+            } else {
+                println("unknown render object: $any")
             }
         }
     }
