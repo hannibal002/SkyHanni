@@ -85,7 +85,7 @@ class EndermanSlayerBeacon {
         val packet = event.packet
         if (packet is S23PacketBlockChange) {
             val location = packet.blockPosition.toLorenzVec()
-            if (packet.blockState.block == Blocks.beacon) {
+            if (packet.blockState?.block == Blocks.beacon) {
                 val armorStand = flyingBeacons.find { location.distance(it.getLorenzVec()) < 3 }
                 if (armorStand != null) {
                     flyingBeacons.remove(armorStand)
