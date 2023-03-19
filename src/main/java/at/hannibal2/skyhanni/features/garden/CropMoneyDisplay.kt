@@ -77,7 +77,7 @@ class CropMoneyDisplay {
         } else {
             for ((internalName, moneyPerHour) in map.sortedDesc()) {
                 number++
-                val cropName = cropNames[internalName]
+                val cropName = cropNames[internalName]!!
                 val isCurrent = cropName == GardenAPI.cropInHand
                 if (number > config.moneyPerHourShowOnlyBest && !isCurrent) continue
 
@@ -93,7 +93,8 @@ class CropMoneyDisplay {
                 val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
                 val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
                 val color = if (isCurrent) "§e" else "§7"
-                list.add("$color$itemName§7: §6$format")
+                val contestFormat = if (GardenNextJacobContest.isNextCrop(cropName)) "§n" else ""
+                list.add("$color$contestFormat$itemName§7: §6$format")
 
                 newDisplay.add(list)
             }

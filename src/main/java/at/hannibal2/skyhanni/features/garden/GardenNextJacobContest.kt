@@ -17,7 +17,6 @@ import java.time.Instant
 import java.util.regex.Pattern
 
 class GardenNextJacobContest {
-    private val config get() = SkyHanniMod.feature.garden
     private val display = mutableListOf<Any>()
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
@@ -121,6 +120,7 @@ class GardenNextJacobContest {
     class FarmingContest(val endTime: Long, val crops: List<String>)
 
     private fun update() {
+        nextContestCrops.clear()
         val newDisplay = drawDisplay()
         display.clear()
         display.addAll(newDisplay)
@@ -172,6 +172,7 @@ class GardenNextJacobContest {
         for (crop in nextContest.crops) {
             list.add(" ")
             GardenAPI.addGardenCropToList(crop, list)
+            nextContestCrops.add(crop)
         }
         val format = TimeUtils.formatDuration(duration)
         list.add("§7(§b$format§7)")
@@ -196,4 +197,11 @@ class GardenNextJacobContest {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.nextJacobContestDisplay
             && (GardenAPI.inGarden() || config.nextJacobContestEverywhere)
+
+    companion object {
+        private val config get() = SkyHanniMod.feature.garden
+        private val nextContestCrops = mutableListOf<String>()
+
+        fun isNextCrop(cropName: String) = nextContestCrops.contains(cropName) && config.nextJacobContestOtherGuis
+    }
 }
