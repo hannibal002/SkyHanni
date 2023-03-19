@@ -144,7 +144,8 @@ class GardenNextJacobContest {
         }
 
         val nextContest =
-            contests.filter { it.value.endTime > System.currentTimeMillis() }.toSortedMap().firstNotNullOfOrNull { it.value }
+            contests.filter { it.value.endTime > System.currentTimeMillis() }.toSortedMap()
+                .firstNotNullOfOrNull { it.value }
         if (nextContest == null) {
             if (contests.size == maxContestsPerYear) {
                 list.add("§cNew SkyBlock Year! Open calendar again!")
@@ -193,5 +194,6 @@ class GardenNextJacobContest {
         config.nextJacobContestPos.renderSingleLineWithItems(display)
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.nextJacobContestDisplay
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.nextJacobContestDisplay
+            && (GardenAPI.inGarden() || config.nextJacobContestEverywhere)
 }
