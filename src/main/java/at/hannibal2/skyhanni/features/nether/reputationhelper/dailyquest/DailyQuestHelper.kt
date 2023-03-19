@@ -352,6 +352,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory = latestTrophyFishInInventory
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE &&
+    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE &&
             SkyHanniMod.feature.misc.crimsonIsleReputationHelper
 }
