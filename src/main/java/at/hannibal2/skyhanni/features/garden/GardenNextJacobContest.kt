@@ -161,19 +161,19 @@ class GardenNextJacobContest {
         nextContest: FarmingContest,
         list: MutableList<Any>,
     ): MutableList<Any> {
-        for (crop in nextContest.crops) {
-            GardenAPI.addGardenCropToList(crop, list)
-            list.add(" ")
-        }
         var duration = nextContest.endTime - System.currentTimeMillis()
         if (duration < contestDuration) {
-            list.add("§aActive ")
+            list.add("§aActive: ")
         } else {
-            list.add("§eNext ")
+            list.add("§eNext: ")
             duration -= contestDuration
         }
+        for (crop in nextContest.crops) {
+            list.add(" ")
+            GardenAPI.addGardenCropToList(crop, list)
+        }
         val format = TimeUtils.formatDuration(duration)
-        list.add("§b$format ")
+        list.add("§7(§b$format§7)")
 
         return list
     }
@@ -182,7 +182,7 @@ class GardenNextJacobContest {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.nextJacobContestPos.renderSingleLineWithItems(display)
+        config.nextJacobContestPos.renderSingleLineWithItems(display, 1.7)
     }
 
     @SubscribeEvent
