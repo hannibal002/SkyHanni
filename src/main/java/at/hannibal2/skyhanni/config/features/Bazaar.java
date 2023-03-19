@@ -29,7 +29,7 @@ public class Bazaar {
     public boolean cancelledBuyOrderClipboard = true;
 
     @Expose
-    @ConfigOption(name = "Update Timer", desc = "A countdown timer for upcoming Bazzar data update.")
+    @ConfigOption(name = "Update Timer", desc = "A countdown timer for the next Bazaar data update.")
     @ConfigEditorBoolean
     public boolean updateTimer = false;
 

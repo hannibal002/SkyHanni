@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -14,10 +16,19 @@ class CollectionAPI {
     private val counterPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
     private val singleCounterPattern = Pattern.compile("§7Total Collected: §e(.*)")
 
+    private val hypixelApiHasWrongItems = listOf(
+        "WOOL",
+        "CORRUPTED_FRAGMENT",
+        "EGG",
+        "POISONOUS_POTATO",
+    )
+
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
-        for ((rawName, rawCounter) in profileData["collection"].asJsonObject.entrySet()) {
+        val jsonElement = profileData["collection"]?: return
+        val asJsonObject = jsonElement.asJsonObject ?: return
+        for ((rawName, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
             var itemName = BazaarApi.getBazaarDataForInternalName(rawName)?.itemName
             if (rawName == "MUSHROOM_COLLECTION") {
@@ -29,16 +40,19 @@ class CollectionAPI {
             if (rawName == "GEMSTONE_COLLECTION") {
                 itemName = "Gemstone"
             }
+
             // Hypixel moment
-            if (rawName == "WOOL" || rawName == "CORRUPTED_FRAGMENT") {
-                continue
-            }
+            if (hypixelApiHasWrongItems.contains(rawName)) continue
+
             if (itemName == null) {
-                println("collection name is null for '$rawName'")
+                LorenzUtils.debug("collection name is null for '$rawName'")
+                println()
                 continue
             }
             collectionValue[itemName] = counter
         }
+
+        CollectionUpdateEvent().postAndCatch()
     }
 
     @SubscribeEvent
@@ -59,6 +73,7 @@ class CollectionAPI {
                     collectionValue[name] = counter
                 }
             }
+            CollectionUpdateEvent().postAndCatch()
         }
 
         if (inventoryName.endsWith(" Collections")) {
@@ -83,6 +98,7 @@ class CollectionAPI {
                     }
                 }
             }
+            CollectionUpdateEvent().postAndCatch()
         }
     }
 

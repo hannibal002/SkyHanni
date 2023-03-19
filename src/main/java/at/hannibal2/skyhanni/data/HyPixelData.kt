@@ -26,7 +26,7 @@ class HyPixelData {
         var stranded = false
         var bingo = false
 
-        var profile = ""
+        var profileName = ""
 
         fun readSkyBlockArea(): String {
             return ScoreboardData.sidebarLinesFormatted
@@ -64,13 +64,13 @@ class HyPixelData {
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
-            profile = newProfile
+            profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
-            if (profile == newProfile) return
-            profile = newProfile
+            if (profileName == newProfile) return
+            profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
         }
     }
@@ -112,8 +112,6 @@ class HyPixelData {
                     bingo = true
                 }
 
-                // TODO implemennt stranded check
-
                 " §7♲ §7Ironman" -> {
                     ironman = true
                 }
@@ -139,14 +137,7 @@ class HyPixelData {
             }
         }
 
-        var islandType = IslandType.getBySidebarName(newIsland)
-
-        if (islandType == IslandType.PRIVATE_ISLAND) {
-            if (guesting) {
-                islandType = IslandType.PRIVATE_ISLAND_GUEST
-            }
-        }
-
+        val islandType = getIslandType(newIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
@@ -157,6 +148,15 @@ class HyPixelData {
             }
             skyBlockIsland = islandType
         }
+    }
+
+    private fun getIslandType(newIsland: String, guesting: Boolean): IslandType {
+        val islandType = IslandType.getBySidebarName(newIsland)
+        if (guesting) {
+            if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
+            if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST
+        }
+        return islandType
     }
 
     private fun checkScoreboard(): Boolean {

@@ -9,7 +9,9 @@
 + Added support for tier 1 minions and title send for the minion craft helper.
 + Added Chicken head Timer.
 + Added **rancher boots** speed display.
-+ Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
++ Added **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
++ Added **Duplicate Hider** - Hides duplicate farming contests in the inventory.
++ Added **Contest Time** - Adds the real time format to the farming contest description.
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
@@ -27,6 +29,13 @@
 + Added **Copper Price** - Show the price for copper inside the visitor gui.
 + Added **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 + Added **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
++ Added Desk shortcut in SkyBlock Menu.
++ Added **Garden Level Display** - Show the current garden level and progress to the next level.
++ Added **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
++ Added **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
++ Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
++ Added **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
++ Added **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
 
 
 ### Features from other Mods
@@ -48,6 +57,7 @@
 + Fixed dungeon milestone messages getting wrongfully formatted.
 + Fixed bazaar features not working for items with an - (turbo farming books and triple strike)
 + Fixed Crab Hat of Celebration not being detected as an accessory correctly.
++ Added support for soopy's \[hand] feature
 
 ## Version 0.16 (2023-02-11)
 

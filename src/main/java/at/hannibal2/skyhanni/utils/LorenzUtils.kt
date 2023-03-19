@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.util.ChatComponentText
 import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 object LorenzUtils {
@@ -52,12 +53,13 @@ object LorenzUtils {
         }
     }
 
+    // TODO remove ig?
     fun warning(message: String) {
         internalChat("§cWarning! $message")
     }
 
     fun error(message: String) {
-        internalChat("§4$message")
+        internalChat("§c$message")
     }
 
     fun chat(message: String) {
@@ -112,16 +114,15 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
+//        NumberFormat.getPercentInstance().format(percentage)
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
     fun formatInteger(i: Int): String = formatInteger(i.toLong())
 
-    fun formatInteger(l: Long): String = DecimalFormat("#,##0").format(l).replace(',', '.')
+    fun formatInteger(l: Long): String = NumberFormat.getIntegerInstance().format(l)
 
-    fun formatDouble(d: Double, format: String?): String =
-        DecimalFormat(format).format(d).replace(',', 'x').replace('.', ',').replace('x', '.')
-
-    fun formatDouble(d: Double): String = formatDouble(d, "#,##0.0")
+    fun formatDouble(d: Double, round: Int = 1): String =
+        NumberFormat.getNumberInstance().format(d.round(round))
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

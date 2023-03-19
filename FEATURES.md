@@ -58,6 +58,9 @@
 + Highlight depleted Bonzo's Masks in your inventory.
 + Highlight stuff that is missing in the skyblock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
++ **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
++ **Duplicate Hider** - Hides duplicate farming contests in the inventory.
++ **Contest Time** - Adds the real time format to the farming contest description.
 
 ## Item Abilities
 - Show the cooldown of items in the inventory.
@@ -175,6 +178,12 @@
 + **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 + **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
 + **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
++ Desk shortcut in SkyBlock Menu.
++ **Garden Level Display** - Show the current garden level and progress to the next level.
++ **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
++ **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
++ **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
++ **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

@@ -43,7 +43,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear, " +
-            "and a number how many visitors are already waiting.")
+            "and a number for how many visitors are already waiting.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean visitorTimerEnabled = true;
@@ -85,10 +85,10 @@ public class Garden {
     public boolean visitorInventory = false;
 
     @Expose
-    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors.")
+    @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors, like in NEU.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
-    public boolean visitorShowPrice = true;
+    public boolean visitorShowPrice = false;
 
     @Expose
     @ConfigOption(name = "Amount and Time", desc = "Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.")
@@ -115,7 +115,7 @@ public class Garden {
     public boolean visitorNotificationTitle = true;
 
     @Expose
-    @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.")
+    @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and required items need to be checked.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean visitorHighlight = true;
@@ -153,6 +153,16 @@ public class Garden {
     public boolean cropMilestoneProgress = true;
 
     @Expose
+    @ConfigOption(
+            name = "Warn When Close",
+            desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
+                    "Useful for switching to a different pet for leveling.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean cropMilestoneWarnClose = true;
+
+
+    @Expose
     @ConfigOption(name = "Display Position", desc = "")
     @ConfigEditorButton(runnableId = "cropMilestoneProgress", buttonText = "Edit")
     @ConfigAccordionId(id = 6)
@@ -163,7 +173,7 @@ public class Garden {
     @ConfigAccordionId(id = 6)
     @ConfigEditorAccordion(id = 7)
     public boolean cropMilestoneNext = false;
-    // TODO moulconfig runnable suppoort
+    // TODO moulconfig runnable support
 
     @Expose
     @ConfigOption(
@@ -173,14 +183,14 @@ public class Garden {
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestDisplay = true;
 
-    // TODO moulconfig runnable suppoort
+    // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden exp or by skyblock exp.")
     @ConfigEditorDropdown(values = {"Garden Exp", "SkyBlock Exp"})
     @ConfigAccordionId(id = 7)
     public int cropMilestoneBestType = 0;
 
-    // TODO moulconfig runnable suppoort
+    // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Only show top", desc = "Only show the top # crops.")
     @ConfigEditorSlider(
@@ -191,7 +201,7 @@ public class Garden {
     @ConfigAccordionId(id = 7)
     public int cropMilestoneShowOnlyBest = 10;
 
-    // TODO moulconfig runnable suppoort
+    // TODO moulconfig runnable support
     @Expose
     @ConfigOption(
             name = "Always On",
@@ -206,19 +216,19 @@ public class Garden {
     @ConfigAccordionId(id = 7)
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
 
-    // TODO moulconfig runnable suppoort
+    // TODO moulconfig runnable support
     @Expose
     @ConfigOption(name = "Custom Keybind", desc = "")
     @ConfigEditorAccordion(id = 8)
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden. §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the garden. §cOnly updates after scrolling in the hotbar.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean keyBindEnabled = false;
 
-    @ConfigOption(name = "Disable All", desc = "Disabling all keys.")
+    @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(runnableId = "gardenKeyBindPresetDisabled", buttonText = "Disable")
     @ConfigAccordionId(id = 8)
     public int keyBindPresetDisable = 0;
@@ -276,13 +286,13 @@ public class Garden {
     public boolean optimalSpeed = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)")
+    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean optimalSpeedEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Warn via title when you don't have the optimal speed.")
+    @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean optimalSpeedWarning = false;
@@ -294,7 +304,109 @@ public class Garden {
     public Position optimalSpeedPos = new Position(188, -105, false, true);
 
     @Expose
+    @ConfigOption(name = "Garden Level", desc = "")
+    @ConfigEditorAccordion(id = 10)
+    public boolean gardenLevel = false;
+
+    @Expose
+    @ConfigOption(name = "Display", desc = "Show the current garden level and progress to the next level.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 10)
+    public boolean gardenLevelDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Garden Level Position", desc = "")
+    @ConfigEditorButton(runnableId = "gardenLevel", buttonText = "Edit")
+    @ConfigAccordionId(id = 10)
+    public Position gardenLevelPos = new Position(-375, -215, false, true);
+
+    @Expose
+    @ConfigOption(name = "Elite Farming Weight", desc = "")
+    @ConfigEditorAccordion(id = 11)
+    public boolean eliteFarmingWeight = false;
+
+    @Expose
+    @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
+            "The calculation and api is provided by The Elite SkyBlock Farmers. " +
+            "See §ehttps://elitebot.dev/info §7for more info.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Farming Weight Position", desc = "")
+    @ConfigEditorButton(runnableId = "eliteFarmingWeight", buttonText = "Edit")
+    @ConfigAccordionId(id = 11)
+    public Position eliteFarmingWeightPos = new Position(-370, -167, false, true);
+
+    @Expose
+    @ConfigOption(name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +
+            "Only if your farming weight is high enough! Updates every 10 minutes.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightLeaderboard = true;
+
+    @Expose
+    @ConfigOption(name = "Dicer Counter", desc = "")
+    @ConfigEditorAccordion(id = 12)
+    public boolean dicerCounter = false;
+
+    @Expose
+    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean dicerCounterDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Dicer Counter Position", desc = "")
+    @ConfigEditorButton(runnableId = "dicerCounter", buttonText = "Edit")
+    @ConfigAccordionId(id = 12)
+    public Position dicerCounterPos = new Position(16, -232, false, true);
+
+    @Expose
+    @ConfigOption(name = "Money per Hour", desc = "")
+    @ConfigEditorAccordion(id = 13)
+    public boolean moneyPerHour = false;
+
+    @Expose
+    @ConfigOption(name = "Show money per Hour", desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourDisplay = true;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(name = "Only show top", desc = "Only show the best # items.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 25,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 13)
+    public int moneyPerHourShowOnlyBest = 5;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(
+            name = "Always On",
+            desc = "Show the money/hour Display always while on the garden.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourAlwaysOn = false;
+
+    @Expose
+    @ConfigOption(name = "Money per hour Position", desc = "")
+    @ConfigEditorButton(runnableId = "moneyPerHour", buttonText = "Edit")
+    @ConfigAccordionId(id = 13)
+    public Position moneyPerHourPos = new Position(16, -232, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
+    @ConfigEditorBoolean
+    public boolean deskInSkyBlockMenu = true;
 }

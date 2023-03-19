@@ -73,7 +73,7 @@ import java.util.List;
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.17.Beta.7";
+    public static final String VERSION = "0.17.Beta.19";
 
     public static Features feature;
 
@@ -115,6 +115,7 @@ public class SkyHanniMod {
         loadModule(new RenderGuiData());
         loadModule(new GardenCropMilestones());
         loadModule(new OwnInventoryData());
+        loadModule(new ToolTipData());
 
         // APIs
         loadModule(new BazaarApi());
@@ -216,6 +217,12 @@ public class SkyHanniMod {
         loadModule(new GardenCustomKeybinds());
         loadModule(new ChickenHeadTimer());
         loadModule(new GardenOptimalSpeed());
+        loadModule(new GardenDeskInSBMenu());
+        loadModule(new GardenLevelDisplay());
+        loadModule(new EliteFarmingWeight());
+        loadModule(new DicerRngDropCounter());
+        loadModule(new CropMoneyDisplay());
+        loadModule(new JacobFarmingContestsInventory());
 
         Commands.INSTANCE.init();
 

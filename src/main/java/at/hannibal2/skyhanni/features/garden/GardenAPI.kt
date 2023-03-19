@@ -1,62 +1,97 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
+import net.minecraft.network.play.client.C09PacketHeldItemChange
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class GardenAPI {
-
     var tick = 0
+
+    @SubscribeEvent
+    fun onSendPacket(event: PacketEvent.SendEvent) {
+        if (!inGarden()) return
+        if (event.packet !is C09PacketHeldItemChange) return
+        checkItemInHand()
+    }
+
+    @SubscribeEvent
+    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+        if (!inGarden()) return
+        checkItemInHand()
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (!inGarden()) return
-        if (tick++ % 5 != 0) return
+        if (tick++ % 10 != 0) return
 
-        val crop = loadCropInHand()
+        // We ignore random hypixel moments
+        Minecraft.getMinecraft().currentScreen ?: return
+        checkItemInHand()
+    }
+
+    private fun checkItemInHand() {
+        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
+        val crop = loadCropInHand(heldItem)
         if (cropInHand != crop) {
             cropInHand = crop
-            GardenToolChangeEvent().postAndCatch()
+            GardenToolChangeEvent(crop, heldItem).postAndCatch()
         }
     }
 
-    private fun loadCropInHand(): String? {
-        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return null
-        if (readCounter(heldItem) == -1) return null
-        return getCropTypeFromItem(heldItem)
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        if (cropsPerSecond.isEmpty()) {
+            // TODO use enum
+            for (key in GardenCropMilestones.cropCounter.keys) {
+                cropsPerSecond[key] = -1
+            }
+        }
+    }
+
+    private fun loadCropInHand(heldItem: ItemStack?): String? {
+        if (heldItem == null) return null
+        return getCropTypeFromItem(heldItem, true)
     }
 
     companion object {
-        // TODO use everywhere instead of IslandType.GARDEN
         fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
         var cropInHand: String? = null
+        val cropsPerSecond: MutableMap<String, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
 
-        fun getCropTypeFromItem(heldItem: ItemStack): String? {
-            val name = heldItem.name ?: return null
-            return getCropTypeFromItem(name)
-        }
+        fun getCropTypeFromItem(item: ItemStack, withDaedalus: Boolean = false): String? {
+            val internalName = item.getInternalName()
 
-        fun getCropTypeFromItem(itemName: String): String? {
-            for ((crop, _) in GardenCropMilestones.cropCounter) {
-                if (itemName.contains(crop)) {
-                    return crop
-                }
+            return when {
+                internalName.startsWith("THEORETICAL_HOE_WHEAT") -> "Wheat"
+                internalName.startsWith("THEORETICAL_HOE_CARROT") -> "Carrot"
+                internalName.startsWith("THEORETICAL_HOE_POTATO") -> "Potato"
+                internalName.startsWith("PUMPKIN_DICER") -> "Pumpkin"
+                internalName.startsWith("THEORETICAL_HOE_CANE") -> "Sugar Cane"
+                internalName.startsWith("MELON_DICER") -> "Melon"
+                internalName == "CACTUS_KNIFE" -> "Cactus"
+                internalName == "COCO_CHOPPER" -> "Cocoa Beans"
+                internalName == "FUNGI_CUTTER" -> "Mushroom"
+                internalName.startsWith("THEORETICAL_HOE_WARTS") -> "Nether Wart"
+
+                internalName.startsWith("DAEDALUS_AXE") && withDaedalus -> "Daedalus Axe"
+
+                else -> null
             }
-            if (itemName.contains("Coco Chopper")) {
-                return "Cocoa Beans"
-            }
-            if (itemName.contains("Fungi Cutter")) {
-                return "Mushroom"
-            }
-            return null
         }
 
         fun readCounter(itemStack: ItemStack): Int {
@@ -75,6 +110,17 @@ class GardenAPI {
                 }
             }
             return -1
+        }
+
+        fun getCropsPerSecond(itemName: String): Int? {
+            return cropsPerSecond[itemNameToCropName(itemName)]
+        }
+
+        fun itemNameToCropName(itemName: String): String {
+            if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") {
+                return "Mushroom"
+            }
+            return itemName
         }
     }
 }

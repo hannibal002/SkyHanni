@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,6 +29,9 @@ class GardenVisitorTimer {
                 millis = TimeUtils.getMillis(rawTime)
             } else if (line == " Next Visitor: §r§c§lQueue Full!") {
                 queueFull = true
+            } else if (line == " Next Visitor: §r§cNot Unlocked!") {
+                render = ""
+                return
             }
 
             matcher = patternVisitors.matcher(line)
@@ -46,7 +47,7 @@ class GardenVisitorTimer {
 
         val extraSpeed = if (diff in 1001..10_000) {
             val factor = diff / 1000
-            "§f/§e" + TimeUtils.formatDuration(millis / factor)
+            "§7/§e" + TimeUtils.formatDuration(millis / factor)
         } else ""
 
         val formatDuration = TimeUtils.formatDuration(millis)
@@ -64,7 +65,5 @@ class GardenVisitorTimer {
         SkyHanniMod.feature.garden.visitorTimerPos.renderString(render)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock &&
-            SkyHanniMod.feature.garden.visitorTimerEnabled &&
-            LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    private fun isEnabled() = GardenAPI.inGarden() && SkyHanniMod.feature.garden.visitorTimerEnabled
 }

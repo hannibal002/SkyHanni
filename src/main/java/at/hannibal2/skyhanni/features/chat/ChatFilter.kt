@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChatFilter {
+    private val config get() = SkyHanniMod.feature.chat
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -20,28 +21,28 @@ class ChatFilter {
 
     private fun block(message: String): String = when {
         message.startsWith("§aYou are playing on profile: §e") -> "profile"//TODO move into own class
-        lobby(message) && SkyHanniMod.feature.chat.hypixelHub -> "lobby"
-        empty(message) && SkyHanniMod.feature.chat.empty -> "empty"
-        warping(message) && SkyHanniMod.feature.chat.warping -> "warping"
-        welcome(message) && SkyHanniMod.feature.chat.welcome -> "welcome"
-        isGuildExp(message) && SkyHanniMod.feature.chat.guildExp -> "guild_exp"
-        friendJoin(message) && SkyHanniMod.feature.chat.friendJoinLeft -> "friend_join"
+        lobby(message) && config.hypixelHub -> "lobby"
+        empty(message) && config.empty -> "empty"
+        warping(message) && config.warping -> "warping"
+        welcome(message) && config.welcome -> "welcome"
+        isGuildExp(message) && config.guildExp -> "guild_exp"
+        friendJoin(message) && config.friendJoinLeft -> "friend_join"
+        killCombo(message) && config.killCombo -> "kill_combo"
+        watchdogAnnouncement(message) && config.watchDog -> "watchdog"
 
-        killCombo(message) && SkyHanniMod.feature.chat.others -> "kill_combo"
-        bazaarAndAHMiniMessages(message) && SkyHanniMod.feature.chat.others -> "bz_ah_minis"
-        watchdogAnnouncement(message) && SkyHanniMod.feature.chat.others -> "watchdog"
-        slayer(message) && SkyHanniMod.feature.chat.others -> "slayer"
-        slayerDrop(message) && SkyHanniMod.feature.chat.others -> "slayer_drop"
-        uselessDrop(message) && SkyHanniMod.feature.chat.others -> "useless_drop"
-        uselessNotification(message) && SkyHanniMod.feature.chat.others -> "useless_notification"
-        party(message) && SkyHanniMod.feature.chat.others -> "party"
-        money(message) && SkyHanniMod.feature.chat.others -> "money"
-        winterIsland(message) && SkyHanniMod.feature.chat.others -> "winter_island"
-        uselessWarning(message) && SkyHanniMod.feature.chat.others -> "useless_warning"
-        annoyingSpam(message) && SkyHanniMod.feature.chat.others -> "annoying_spam"
+        bazaarAndAHMiniMessages(message) && config.others -> "bz_ah_minis"
+        slayer(message) && config.others -> "slayer"
+        slayerDrop(message) && config.others -> "slayer_drop"
+        uselessDrop(message) && config.others -> "useless_drop"
+        uselessNotification(message) && config.others -> "useless_notification"
+        party(message) && config.others -> "party"
+        money(message) && config.others -> "money"
+        winterIsland(message) && config.others -> "winter_island"
+        uselessWarning(message) && config.others -> "useless_warning"
+        annoyingSpam(message) && config.others -> "annoying_spam"
 
-        isWinterGift(message) && SkyHanniMod.feature.chat.winterGift -> "winter_gift"
-        isPowderMining(message) && SkyHanniMod.feature.chat.powderMining -> "powder_mining"
+        isWinterGift(message) && config.winterGift -> "winter_gift"
+        isPowderMining(message) && config.powderMining -> "powder_mining"
 
 
         else -> ""

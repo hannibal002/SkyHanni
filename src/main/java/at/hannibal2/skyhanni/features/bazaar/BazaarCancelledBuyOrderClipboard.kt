@@ -52,7 +52,5 @@ class BazaarCancelledBuyOrderClipboard {
         }
     }
 
-    fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.cancelledBuyOrderClipboard
-    }
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.cancelledBuyOrderClipboard
 }

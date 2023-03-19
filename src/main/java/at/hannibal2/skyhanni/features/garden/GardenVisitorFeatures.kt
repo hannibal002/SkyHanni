@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.Garden
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData.Companion.sidebarLinesFormatted
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
@@ -18,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
@@ -32,7 +31,7 @@ class GardenVisitorFeatures {
     private var tick = 0
     private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
     private val offerAcceptedPattern = Pattern.compile("§6§lOFFER ACCEPTED §r§8with §r(.*) §r.*")
-    private val config: Garden get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden
 
     companion object {
         var inVisitorInventory = false
@@ -42,7 +41,7 @@ class GardenVisitorFeatures {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inVisitorInventory = false
 
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[13] ?: return
         val lore = npcItem.getLore()
         var isVisitor = false
@@ -60,7 +59,10 @@ class GardenVisitorFeatures {
 
         if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
 
-        val name = npcItem.name ?: return
+        var name = npcItem.name ?: return
+        if (name.length == name.removeColor().length + 4) {
+            name = name.substring(2)
+        }
         val visitor = visitors[name]!!
         visitor.entityId = lastClickedNpc
         for (line in offerItem.getLore()) {
@@ -124,9 +126,9 @@ class GardenVisitorFeatures {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (!inVisitorInventory) return
         val name = event.itemStack.name ?: return
         if (name != "§aAccept Offer") return
@@ -137,6 +139,8 @@ class GardenVisitorFeatures {
         var itemsWithSpeedCounter = 0
         var endReached = false
         for ((i, l) in list.toMutableList().withIndex()) {
+            if (l.length < 4) continue
+
             val line = l.substring(4)
             if (line == "") {
                 if (!endReached) {
@@ -154,9 +158,14 @@ class GardenVisitorFeatures {
             if (i > 1 && !endReached) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    val internalName: String
+                    var internalName: String
                     try {
                         internalName = NEUItems.getInternalName(itemName)
+                        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
+                        // TODO remove workaround when this is fixed in neu
+                        if (internalName == "HAY_BALE") {
+                            internalName = "HAY_BLOCK"
+                        }
                     } catch (e: NullPointerException) {
                         val message = "internal name is null: '$itemName'"
                         println(message)
@@ -164,11 +173,11 @@ class GardenVisitorFeatures {
                         e.printStackTrace()
                         return
                     }
+                    val price = NEUItems.getPrice(internalName) * amount
+                    totalPrice += price
                     if (config.visitorShowPrice) {
-                        val price = NEUItems.getPrice(internalName) * amount
-                        totalPrice += price
                         val format = NumberUtil.format(price)
-                        list[i+ itemsWithSpeedCounter] = "$line §7(§6$format§7)"
+                        list[i + itemsWithSpeedCounter] = "$line §7(§6$format§7)"
                     }
                     itemsCounter++
 
@@ -177,7 +186,7 @@ class GardenVisitorFeatures {
                         val rawName = NEUItems.getItemStack(multiplier.first).name ?: continue
                         val crop = rawName.removeColor()
                         val cropAmount = multiplier.second.toLong() * amount
-                        GardenCropMilestoneDisplay.getCropsPerSecond(crop)?.let {
+                        GardenAPI.getCropsPerSecond(crop)?.let {
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
                             val formatName = "§e${formatAmount}§7x $crop "
                             val formatSpeed = if (it != -1) {
@@ -207,7 +216,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && !config.visitorHighlight) return
         if (tick++ % 30 != 0) return
 
@@ -220,7 +229,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         var found = false
         val visitorsInTab = mutableListOf<String>()
         for (line in event.tabList) {
@@ -233,7 +242,10 @@ class GardenVisitorFeatures {
                     found = false
                     continue
                 }
-                val name = line.substring(3)
+                var name = line.trim().replace("§r", "")
+                if (!name.contains("§")) {
+                    name = "§f$name"
+                }
                 visitorsInTab.add(name)
             }
         }
@@ -278,7 +290,7 @@ class GardenVisitorFeatures {
 
             if (entity is EntityLivingBase) {
                 if (visitor.done) {
-                    val color = LorenzColor.DARK_GRAY.toColor().withAlpha(120)
+                    val color = LorenzColor.DARK_GRAY.toColor().withAlpha(60)
                     RenderLivingEntityHelper.setEntityColor(entity, color)
                     { config.visitorHighlight }
                 } else if (visitor.items.isEmpty()) {
@@ -333,7 +345,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay) return
 
         if (config.visitorNeedsOnlyWhenClose) {
@@ -345,6 +357,4 @@ class GardenVisitorFeatures {
     }
 
     class Visitor(var entityId: Int, var done: Boolean = false, val items: MutableMap<String, Int> = mutableMapOf())
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 }

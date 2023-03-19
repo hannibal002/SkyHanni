@@ -13,7 +13,7 @@ public class Fishing {
     @Expose
     @ConfigOption(
             name = "Trophy Counter",
-            desc = "Counts every single Trohy message from chat and tells you how many you got already."
+            desc = "Counts Trophy messages from chat and tells you how many you have found."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -102,7 +102,7 @@ public class Fishing {
     public Position sharkFishCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Shorten Fishing Message", desc = "Shorten the chat message what type of sea creature you have fished.")
+    @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of sea creature you have fished.")
     @ConfigEditorBoolean
     public boolean shortenFishingMessage = false;
 }

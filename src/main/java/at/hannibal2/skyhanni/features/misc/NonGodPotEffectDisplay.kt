@@ -31,6 +31,7 @@ class NonGodPotEffectDisplay {
         "smoldering_polarization" to "§aSmoldering Polarization I",
         "mushed_glowy_tonic" to "§2Mushed Glowy Tonic I",
         "wisp_ice" to "§bWisp's Ice-Flavored Water I",
+        "goblin_king_scent" to "§2King's Scent I",
 
         "invisibility" to "§8Invisibility I", // when wearing sorrow armor
 
@@ -48,26 +49,38 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (event.message == "§aYou cleared all of your active effects!") {
+            activeEffects.clear()
+            update()
+        }
+
         if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
             checkFooter = true
             activeEffects["§aSmoldering Polarization I"] = System.currentTimeMillis() + 1000 * 60 * 60
-            format()
+            update()
         }
 
         if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
             checkFooter = true
             activeEffects["§2Mushed Glowy Tonic I"] = System.currentTimeMillis() + 1000 * 60 * 60
-            format()
+            update()
         }
 
         if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
             checkFooter = true
             activeEffects["§bWisp's Ice-Flavored Water I"] = System.currentTimeMillis() + 1000 * 60 * 5
-            format()
+            update()
+        }
+
+
+        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
+            checkFooter = true
+            activeEffects["§2King's Scent I"] = System.currentTimeMillis() + 1000 * 60 * 20
+            update()
         }
     }
 
-    private fun format() {
+    private fun update() {
         val now = System.currentTimeMillis()
         display.clear()
         if (activeEffects.values.removeIf { now > it }) {
@@ -115,7 +128,7 @@ class NonGodPotEffectDisplay {
         if (lastTick + 1_000 > System.currentTimeMillis()) return
         lastTick = System.currentTimeMillis()
 
-        format()
+        update()
     }
 
     @SubscribeEvent
@@ -132,9 +145,9 @@ class NonGodPotEffectDisplay {
                 if (name in nonGodPotEffects.values) {
                     for (line in stack.getLore()) {
                         if (line.contains("Remaining")) {
-                            val duration = readDuration(line.split("§f")[1])
+                            val duration = TimeUtils.getMillis(line.split("§f")[1])
                             activeEffects[name] = System.currentTimeMillis() + duration
-                            format()
+                            update()
                         }
                     }
                 }
@@ -152,9 +165,9 @@ class NonGodPotEffectDisplay {
             var effectsCount = 0
             for (line in lines) {
                 if (line.startsWith("§2Mushed Glowy Tonic I")) {
-                    val duration = readDuration(line.split("§f")[1])
+                    val duration = TimeUtils.getMillis(line.split("§f")[1])
                     activeEffects["§2Mushed Glowy Tonic I"] = System.currentTimeMillis() + duration
-                    format()
+                    update()
                 }
                 val matcher = patternEffectsCount.matcher(line)
                 if (matcher.matches()) {
@@ -163,32 +176,6 @@ class NonGodPotEffectDisplay {
                 }
             }
             totalEffectsCount = effectsCount
-        }
-    }
-
-    private fun readDuration(text: String): Int {
-        val split = text.split(":")
-        return when (split.size) {
-            3 -> {
-                val hours = split[0].toInt() * 1000 * 60 * 60
-                val minutes = split[1].toInt() * 1000 * 60
-                val seconds = split[2].toInt() * 1000
-                seconds + minutes + hours
-            }
-
-            2 -> {
-                val minutes = split[0].toInt() * 1000 * 60
-                val seconds = split[1].toInt() * 1000
-                seconds + minutes
-            }
-
-            1 -> {
-                split[0].toInt() * 1000
-            }
-
-            else -> {
-                throw RuntimeException("Invalid format: '$text'")
-            }
         }
     }
 

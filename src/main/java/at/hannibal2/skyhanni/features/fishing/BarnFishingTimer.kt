@@ -23,7 +23,7 @@ class BarnFishingTimer {
     private var currentCount = 0
     private var startTime = 0L
 
-    private var sound = object : PositionedSound(ResourceLocation("random.orb")) {
+    private val sound = object : PositionedSound(ResourceLocation("random.orb")) {
         init {
             volume = 50f
             repeat = false

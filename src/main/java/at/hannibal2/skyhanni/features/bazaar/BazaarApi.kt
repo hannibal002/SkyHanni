@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -17,10 +18,21 @@ class BazaarApi {
         var inBazaarInventory = false
 
         fun getCleanBazaarName(name: String): String {
-            if (name.endsWith(" Gemstone")) {
-                return name.substring(6)
+            var newName = name
+            if (newName.endsWith(" Gemstone")) {
+                return newName.substring(6)
             }
-            return name.replace("-", " ").removeColor()
+            if (newName.contains("Turbo-Cocoa ")) {
+                newName = newName.replace("Cocoa", "Coco")
+            }
+            if (newName.contains("Turbo-Cacti ")) {
+                newName = newName.replace("Cacti", "Cactus")
+            }
+            newName = newName.removeColor()
+            if (!name.contains("Tightly-Tied")) {
+                newName = newName.replace("-", " ")
+            }
+            return newName
         }
 
         fun getBazaarDataForName(name: String): BazaarData? {
@@ -37,10 +49,11 @@ class BazaarApi {
         fun getBazaarDataForInternalName(internalName: String) =
             bazaarMap.values.firstOrNull { it.apiName == internalName }
 
-        fun isBazaarItem(stack: ItemStack): Boolean {
-            val internalName = stack.getInternalName()
-            return bazaarMap.any { it.value.apiName == internalName }
+        fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
 
+        fun isBazaarItem(internalName: String): Boolean {
+            val bazaarInfo = NotEnoughUpdates.INSTANCE.manager.auctionManager.getBazaarInfo(internalName)
+            return bazaarInfo != null
         }
     }
 

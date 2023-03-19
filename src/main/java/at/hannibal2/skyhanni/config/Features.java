@@ -203,6 +203,26 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.optimalSpeedPos);
             return;
         }
+
+        if (runnableId.equals("gardenLevel")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.gardenLevelPos);
+            return;
+        }
+
+        if (runnableId.equals("eliteFarmingWeight")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.eliteFarmingWeightPos);
+            return;
+        }
+
+        if (runnableId.equals("dicerCounter")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.dicerCounterPos);
+            return;
+        }
+
+        if (runnableId.equals("moneyPerHour")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.moneyPerHourPos);
+            return;
+        }
     }
 
     @Expose
@@ -266,7 +286,7 @@ public class Features extends Config {
     public Bingo bingo = new Bingo();
 
     @Expose
-    @Category(name = "Mobs", desc = "Visual Help for Mobs")
+    @Category(name = "Mobs", desc = "Visual help for Mobs")
     public Mobs mobs = new Mobs();
 
     @Expose

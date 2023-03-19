@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -58,7 +56,7 @@ class SkyMartBestProfit {
                 iconMap[name] = NEUItems.getItemStack(internalName)
 
                 val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
-                    " §7(§6$priceFormat §f/ §c$amountFormat Copper§7)"
+                    " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
                 } else ""
                 val pair = Pair(name, "§6§l$perFormat$advancedStats")
                 priceMap[pair] = factor
@@ -96,6 +94,5 @@ class SkyMartBestProfit {
         }
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.skyMartCopperPrice && LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    private fun isEnabled() = GardenAPI.inGarden() && config.skyMartCopperPrice
 }

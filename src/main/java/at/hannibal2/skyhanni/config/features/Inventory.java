@@ -43,19 +43,19 @@ public class Inventory {
     public boolean rngMeter = false;
 
     @Expose
-    @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory")
+    @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterFloorName = false;
 
     @Expose
-    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory")
+    @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterNoDrop = false;
 
     @Expose
-    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs or slayer rng meter inventory")
+    @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs or slayer rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean rngMeterSelectedDrop = false;
@@ -89,9 +89,32 @@ public class Inventory {
     public boolean statsTuningTemplateStats = true;
 
     @Expose
+    @ConfigOption(name = "Jacob Farming Contest", desc = "")
+    @ConfigEditorAccordion(id = 3)
+    public boolean jacobFarmingContest = false;
+
+    @Expose
+    @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the jacob inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestHighlightRewards = true;
+
+    @Expose
+    @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestHideDuplicates = true;
+
+    @Expose
+    @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the contest description.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestRealTime = true;
+
+    @Expose
     @ConfigOption(
             name = "Item number",
-            desc = "Showing the item number as a stack size for these items"
+            desc = "Showing the item number as a stack size for these items."
     )
     @ConfigEditorDraggableList(
             exampleText = {
@@ -106,13 +129,13 @@ public class Inventory {
                     "§bKuudra Key",
                     "§bSkill Level",
                     "§bCollection Level",
-                    "§bRancher Boot's speed"
+                    "§bRancher's Boots speed"
             }
     )
     public List<Integer> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(3, 9, 11));
 
     @Expose
-    @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the Sack name.")
+    @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")
     @ConfigEditorBoolean
     public boolean displaySackName = false;
 
@@ -129,7 +152,7 @@ public class Inventory {
 
     @Expose
     @ConfigOption(name = "Highlight Depleted Bonzo's Masks",
-            desc = "Highlights used Bonzo's Masks with a background")
+            desc = "Highlights used Bonzo's Masks with a background.")
     @ConfigEditorBoolean
     public boolean highlightDepletedBonzosMasks = false;
 
