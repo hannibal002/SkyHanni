@@ -402,25 +402,31 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Next Jacob Contest", desc = "")
-    @ConfigEditorAccordion(id = 12)
+    @ConfigEditorAccordion(id = 14)
     public boolean nextJacobContest = false;
 
     @Expose
     @ConfigOption(name = "Show Jacob Contest", desc = "Show the current or next jacob farming contest time and crops.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 14)
     public boolean nextJacobContestDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Show everywhere", desc = "Show the timer not only in garden but everywhere in skyblock.")
+    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in garden but everywhere in skyblock.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 14)
     public boolean nextJacobContestEverywhere = false;
+
+    @Expose
+    @ConfigOption(name = "In Other Guis", desc = "Mark the current or next farming contest crops in other farming guis as underlined.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestOtherGuis = false;
 
     @Expose
     @ConfigOption(name = "Jacob Contest Position", desc = "")
     @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 14)
     public Position nextJacobContestPos = new Position(16, -232, false, true);
 
     @Expose
