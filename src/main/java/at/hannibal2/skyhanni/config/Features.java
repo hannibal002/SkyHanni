@@ -223,6 +223,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.moneyPerHourPos);
             return;
         }
+
+        if (runnableId.equals("nextJacobContest")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.nextJacobContestPos);
+            return;
+        }
     }
 
     @Expose
