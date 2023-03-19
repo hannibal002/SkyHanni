@@ -427,7 +427,7 @@ public class Garden {
     @ConfigOption(name = "Jacob Contest Position", desc = "")
     @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
     @ConfigAccordionId(id = 14)
-    public Position nextJacobContestPos = new Position(16, -232, false, true);
+    public Position nextJacobContestPos = new Position(-113, -240, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
