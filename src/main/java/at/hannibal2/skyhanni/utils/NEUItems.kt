@@ -70,17 +70,26 @@ object NEUItems {
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float) {
+    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         GlStateManager.pushMatrix()
         val isSkull = item === Items.skull
+
+        val baseScale = (if (isSkull) 0.8f else 0.6f)
+        val finalScale = baseScale * scaleMultiplier
+        val diff = ((finalScale - baseScale) * 10).toFloat()
+
+        val translateX: Float
+        val translateY: Float
         if (isSkull) {
-            GlStateManager.translate(x - 2, y - 2, 0f)
+            translateX = x - 2 - diff
+            translateY = y - 2 - diff
         } else {
-            GlStateManager.translate(x, y, 0f)
+            translateX = x - diff
+            translateY = y - diff
         }
 
-        val scale = if (isSkull) 0.8f else 0.6f
-        GlStateManager.scale(scale, scale, 0f)
+        GlStateManager.translate(translateX, translateY, 0f)
+        GlStateManager.scale(finalScale, finalScale, 0.0)
         drawItemStack(this)
         GlStateManager.popMatrix()
     }

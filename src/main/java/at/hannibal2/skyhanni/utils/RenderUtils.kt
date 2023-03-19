@@ -469,14 +469,14 @@ object RenderUtils {
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderStringsAndItems(list: List<List<Any?>>, extraSpace: Int = 0) {
+    fun Position.renderStringsAndItems(list: List<List<Any?>>, extraSpace: Int = 0, itemScale: Double = 1.0) {
         if (list.isEmpty()) return
 
         var offsetY = 0
         // TODO remove toMutableList
         try {
             for (line in list.toMutableList()) {
-                renderLine(line, offsetY)
+                renderLine(line, offsetY, itemScale)
                 offsetY += 10 + extraSpace + 2
             }
         } catch (e: NullPointerException) {
@@ -496,12 +496,12 @@ object RenderUtils {
      * Accepts a single line to print.
      * This  line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderSingleLineWithItems(list: List<Any?>) {
+    fun Position.renderSingleLineWithItems(list: List<Any?>, itemScale: Double = 1.0) {
         if (list.isEmpty()) return
-        renderLine(list, 0)
+        renderLine(list, 0, itemScale)
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int) {
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0) {
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val resolution = ScaledResolution(Minecraft.getMinecraft())
         var offsetX = 0
@@ -519,7 +519,7 @@ object RenderUtils {
                 val isX = getAbsX(resolution, 0) + offsetX
                 val isY = getAbsY(resolution, 0) + offsetY
 
-                any.renderOnScreen(isX.toFloat(), isY.toFloat())
+                any.renderOnScreen(isX.toFloat(), isY.toFloat(), itemScale)
                 offsetX += 12
             }
         }
