@@ -406,13 +406,19 @@ public class Garden {
     public boolean nextJacobContest = false;
 
     @Expose
-    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+    @ConfigOption(name = "Show Jacob Contest", desc = "Show the current or next jacob farming contest time and crops.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     public boolean nextJacobContestDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Dicer Counter Position", desc = "")
+    @ConfigOption(name = "Show everywhere", desc = "Show the timer not only in garden but everywhere in skyblock.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean nextJacobContestEverywhere = false;
+
+    @Expose
+    @ConfigOption(name = "Jacob Contest Position", desc = "")
     @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
     @ConfigAccordionId(id = 12)
     public Position nextJacobContestPos = new Position(16, -232, false, true);
