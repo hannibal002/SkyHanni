@@ -222,6 +222,7 @@ public class SkyHanniMod {
         loadModule(new DicerRngDropCounter());
         loadModule(new CropMoneyDisplay());
         loadModule(new JacobFarmingContestsInventory());
+        loadModule(new GardenNextJacobContest());
 
         Commands.INSTANCE.init();
 

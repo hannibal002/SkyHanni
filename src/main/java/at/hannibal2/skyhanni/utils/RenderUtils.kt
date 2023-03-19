@@ -492,6 +492,15 @@ object RenderUtils {
         }
     }
 
+    /**
+     * Accepts a single line to print.
+     * This  line is a list of things to print. Can print String or ItemStack objects.
+     */
+    fun Position.renderSingleLineWithItems(list: List<Any?>) {
+        if (list.isEmpty()) return
+        renderLine(list, 0)
+    }
+
     private fun Position.renderLine(line: List<Any?>, offsetY: Int) {
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val resolution = ScaledResolution(Minecraft.getMinecraft())

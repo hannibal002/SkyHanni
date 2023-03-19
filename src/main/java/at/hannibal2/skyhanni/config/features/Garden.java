@@ -401,6 +401,23 @@ public class Garden {
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
+    @ConfigOption(name = "Next Jacob Contest", desc = "")
+    @ConfigEditorAccordion(id = 12)
+    public boolean nextJacobContest = false;
+
+    @Expose
+    @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean nextJacobContestDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Dicer Counter Position", desc = "")
+    @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
+    @ConfigAccordionId(id = 12)
+    public Position nextJacobContestPos = new Position(16, -232, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
