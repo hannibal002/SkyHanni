@@ -69,11 +69,15 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION, clientSideOnly = true, useMetadata = true, guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop")
+@Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION, clientSideOnly = true, useMetadata = true,
+        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
+dependencies = SkyHanniMod.DEPENDENCIES)
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
     public static final String VERSION = "0.17.Beta.20";
+    public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
+
 
     public static Features feature;
 
