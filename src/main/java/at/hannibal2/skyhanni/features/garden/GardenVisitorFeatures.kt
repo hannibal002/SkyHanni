@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -74,9 +75,11 @@ class GardenVisitorFeatures {
             val internalName = NEUItems.getInternalName(itemName)
             visitor.items[internalName] = amount
         }
+        if (visitor.status == VisitorStatus.NEW) {
+            visitor.status = VisitorStatus.WAITING
+        }
 
-        checkVisitorsReady()
-        updateDisplay()
+        update()
     }
 
     private fun updateDisplay() {
@@ -92,7 +95,7 @@ class GardenVisitorFeatures {
         val requiredItems = mutableMapOf<String, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in visitors) {
-            if (visitor.done) continue
+            if (visitor.status != VisitorStatus.WAITING) continue
 
             val items = visitor.items
             if (items.isEmpty()) {
@@ -124,6 +127,17 @@ class GardenVisitorFeatures {
         }
 
         return newDisplay
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onStackClick(event: SlotClickEvent) {
+        if (!inVisitorInventory) return
+        if (event.slotId != 33) return
+
+        visitors.map { it.value }.find { it.entityId == lastClickedNpc }?.let {
+            it.status = VisitorStatus.REFUSED
+            update()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -254,7 +268,7 @@ class GardenVisitorFeatures {
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
-                visitors[name] = Visitor(-1)
+                visitors[name] = Visitor(status = VisitorStatus.NEW)
                 if (config.visitorNotificationTitle) {
                     SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
                 }
@@ -274,11 +288,15 @@ class GardenVisitorFeatures {
         val visitorName = matcher.group(1)
         for (visitor in visitors) {
             if (visitor.key == visitorName) {
-                visitor.value.done = true
-                updateDisplay()
-                checkVisitorsReady()
+                visitor.value.status = VisitorStatus.ACCEPTED
+                update()
             }
         }
+    }
+
+    private fun update() {
+        checkVisitorsReady()
+        updateDisplay()
     }
 
     private fun checkVisitorsReady() {
@@ -288,21 +306,19 @@ class GardenVisitorFeatures {
                 findEntityByNametag(visitorName, visitor)
             }
 
-            if (entity is EntityLivingBase) {
-                if (visitor.done) {
-                    val color = LorenzColor.DARK_GRAY.toColor().withAlpha(60)
-                    RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { config.visitorHighlight }
-                } else if (visitor.items.isEmpty()) {
-                    val color = LorenzColor.DARK_AQUA.toColor().withAlpha(120)
-                    RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { config.visitorHighlight }
-                } else if (isReady(visitor)) {
-                    val color = LorenzColor.GREEN.toColor().withAlpha(120)
-                    RenderLivingEntityHelper.setEntityColor(entity, color)
-                    { config.visitorHighlight }
-                } else {
-                    RenderLivingEntityHelper.removeEntityColor(entity)
+            val status = visitor.status
+            if (status == VisitorStatus.WAITING || status == VisitorStatus.READY) {
+                visitor.status = if (isReady(visitor)) VisitorStatus.READY else VisitorStatus.WAITING
+            }
+
+            if (config.visitorHighlight) {
+                if (entity is EntityLivingBase) {
+                    val color = status.color
+                    if (color != -1) {
+                        RenderLivingEntityHelper.setEntityColor(entity, color) { config.visitorHighlight }
+                    } else {
+                        RenderLivingEntityHelper.removeEntityColor(entity)
+                    }
                 }
             }
         }
@@ -356,5 +372,18 @@ class GardenVisitorFeatures {
         config.visitorNeedsPos.renderStringsAndItems(display)
     }
 
-    class Visitor(var entityId: Int, var done: Boolean = false, val items: MutableMap<String, Int> = mutableMapOf())
+    class Visitor(
+        var entityId: Int = -1,
+        var status: VisitorStatus,
+        val items: MutableMap<String, Int> = mutableMapOf(),
+    )
+
+    enum class VisitorStatus(val color: Int) {
+        NEW(LorenzColor.YELLOW.toColor().withAlpha(120)),
+        WAITING(-1),
+        READY(LorenzColor.GREEN.toColor().withAlpha(60)),
+        ACCEPTED(LorenzColor.DARK_GRAY.toColor().withAlpha(60)),
+        REFUSED(LorenzColor.RED.toColor().withAlpha(60)),
+    }
 }
+
