@@ -169,10 +169,9 @@ class EliteFarmingWeight {
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (etaEnabled()) {
-                val nextPlayerData = result["next"]?.asJsonObject
-                if (nextPlayerData != null) {
-                    nextPlayerName = nextPlayerData["ign"].asString
-                    nextPlayerWeight = nextPlayerData["amount"].asDouble
+                result["next"]?.asJsonObject?.let {
+                    nextPlayerName = it["ign"].asString
+                    nextPlayerWeight = it["amount"].asDouble
                 }
             }
 
