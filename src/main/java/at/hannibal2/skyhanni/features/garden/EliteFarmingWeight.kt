@@ -55,6 +55,8 @@ class EliteFarmingWeight {
         bonusWeight = -1
         dirtyCropWeight = true
         lastLeaderboardUpdate = 0
+        nextPlayerWeight = 0.0
+        nextPlayerIGN = ""
     }
 
     companion object {
@@ -71,6 +73,9 @@ class EliteFarmingWeight {
         private var dirtyCropWeight = false
         private var isLoadingWeight = false
         private var isLoadingLeaderboard = false
+
+        private var nextPlayerIGN = ""
+        private var nextPlayerWeight = 0.0
 
         private fun update() {
             if (!GardenAPI.inGarden()) return
@@ -96,7 +101,8 @@ class EliteFarmingWeight {
 
             val weight = getWeight()
             val leaderboard = getLeaderboard()
-            display = "§6Farming Weight§7: $weight$leaderboard"
+            val eta = if (etaEnabled()) getETA() else ""
+            display = "§6Farming Weight§7: $weight$leaderboard$eta"
         }
 
         private fun getLeaderboard(): String {
@@ -139,7 +145,17 @@ class EliteFarmingWeight {
             return "§e" + LorenzUtils.formatDouble(totalWeight, 2)
         }
 
+        private fun getETA(): String {
+            if (!etaEnabled()) return ""
+
+            var totalWeight = (cropWeight + bonusWeight)
+            var weightUntilOvertake = nextPlayerWeight - totalWeight
+
+            return "\n§e" + LorenzUtils.formatDouble(weightUntilOvertake, 2) + "§7weight left to overtake §b" + nextPlayerIGN
+        }
+
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
+        private fun etaEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightOvertakeETA
 
         fun addCrop(crop: String, diff: Int) {
             val old = extraCollection[crop] ?: 0L
@@ -149,8 +165,16 @@ class EliteFarmingWeight {
 
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
-            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId"
+            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if etaEnabled() "?showNext=true" else "")
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+
+            if (etaEnabled()) {
+                var nextPlayerData = result["next"]?.asJsonObject
+                if (nextPlayerData != null) {
+                    nextPlayerIGN = nextPlayerData["ign"].asString
+                    nextPlayerWeight = nextPlayerData["amount"].asDouble
+                }
+            }
 
             result["rank"].asInt
         } catch (e: Exception) {
