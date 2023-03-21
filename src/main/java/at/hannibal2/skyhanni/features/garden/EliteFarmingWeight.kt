@@ -171,8 +171,8 @@ class EliteFarmingWeight {
 
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
-            val url =
-                "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if (isEtaEnabled()) "?showNext=true" else "")
+            val showNext = if (isEtaEnabled()) "?showNext=true" else ""
+            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId$showNext"
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
