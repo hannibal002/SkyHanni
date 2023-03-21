@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
+import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -296,7 +297,10 @@ class GardenVisitorFeatures {
                 visitorsInTab.add(name)
             }
         }
-        if (visitors.keys.removeIf { it !in visitorsInTab }) {
+        if (visitors.keys.removeIf {
+                val time = System.currentTimeMillis() - SBInfo.getInstance().joinedWorld
+                it !in visitorsInTab && time > 2_000
+            }) {
             updateDisplay()
         }
         for (name in visitorsInTab) {
