@@ -75,7 +75,7 @@ dependencies = SkyHanniMod.DEPENDENCIES)
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.17.Beta.21";
+1    public static final String VERSION = "0.17.Beta.21.1";
     public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
 

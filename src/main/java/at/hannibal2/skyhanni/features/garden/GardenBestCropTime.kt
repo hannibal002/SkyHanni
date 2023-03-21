@@ -50,7 +50,7 @@ class GardenBestCropTime {
             list.add("§7$number# ")
             GardenAPI.addGardenCropToList(cropName, list)
 
-            val color = if (isCurrent) "§e" else ""
+            val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(cropName)) "§n" else ""
             val cropNameDisplay = "$color$contestFormat$cropName§r"
             list.add("$cropNameDisplay §b$duration")
