@@ -101,7 +101,7 @@ class EliteFarmingWeight {
 
             val weight = getWeight()
             val leaderboard = getLeaderboard()
-            val eta = if (etaEnabled()) getETA() else ""
+            val eta = if (isEtaEnabled()) getETA() else ""
             display = "§6Farming Weight§7: $weight$leaderboard$eta"
         }
 
@@ -146,7 +146,7 @@ class EliteFarmingWeight {
         }
 
         private fun getETA(): String {
-            if (!etaEnabled()) return ""
+            if (!isEtaEnabled()) return ""
 
             val totalWeight = (cropWeight + bonusWeight)
             val weightUntilOvertake = nextPlayerWeight - totalWeight
@@ -155,7 +155,7 @@ class EliteFarmingWeight {
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
-        private fun etaEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightOvertakeETA
+        private fun isEtaEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightOvertakeETA
 
         fun addCrop(crop: String, diff: Int) {
             val old = extraCollection[crop] ?: 0L
@@ -165,10 +165,10 @@ class EliteFarmingWeight {
 
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
-            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if (etaEnabled()) "?showNext=true" else "")
+            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if (isEtaEnabled()) "?showNext=true" else "")
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
-            if (etaEnabled()) {
+            if (isEtaEnabled()) {
                 result["next"]?.asJsonObject?.let {
                     nextPlayerName = it["ign"].asString
                     nextPlayerWeight = it["amount"].asDouble
