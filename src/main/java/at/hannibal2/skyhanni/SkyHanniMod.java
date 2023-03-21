@@ -71,11 +71,11 @@ import java.util.List;
 
 @Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION, clientSideOnly = true, useMetadata = true,
         guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-dependencies = SkyHanniMod.DEPENDENCIES)
+        dependencies = SkyHanniMod.DEPENDENCIES)
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-1    public static final String VERSION = "0.17.Beta.21.1";
+    public static final String VERSION = "0.17.Beta.21.1";
     public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
 
