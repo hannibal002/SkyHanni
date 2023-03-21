@@ -150,15 +150,13 @@ class EliteFarmingWeight {
             return "§e" + LorenzUtils.formatDouble(totalWeight, 2)
         }
 
-        private fun getETA(): String {
-            if (!isEtaEnabled()) return ""
-
+        private fun getETA() = if (isEtaEnabled()) {
             val totalWeight = (cropWeight + bonusWeight)
             val weightUntilOvertake = nextPlayerWeight - totalWeight
 
             val format = LorenzUtils.formatDouble(weightUntilOvertake, 2)
-            return "§e$format §7weight left to overtake §b$nextPlayerName"
-        }
+            "§e$format §7weight left to overtake §b$nextPlayerName"
+        } else ""
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
         private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
