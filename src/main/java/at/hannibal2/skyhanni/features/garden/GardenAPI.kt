@@ -125,7 +125,7 @@ class GardenAPI {
         }
 
         private fun getItemStackForCrop(crop: String): ItemStack {
-            val internalName = NEUItems.getInternalName(if (crop == "Mushroom") "Red Mushroom" else crop)
+            val internalName = NEUItems.getInternalName(if (crop == "Mushroom") "Red Mushroom Block" else crop)
             return NEUItems.getItemStack(internalName)
         }
 
