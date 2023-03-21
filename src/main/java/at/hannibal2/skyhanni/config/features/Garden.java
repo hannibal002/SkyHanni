@@ -115,10 +115,10 @@ public class Garden {
     public boolean visitorNotificationTitle = true;
 
     @Expose
-    @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and required items need to be checked.")
-    @ConfigEditorBoolean
+    @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
+    @ConfigEditorDropdown(values = {"Color Only", "Name Only", "Both", "Disabled"})
     @ConfigAccordionId(id = 1)
-    public boolean visitorHighlight = true;
+    public int visitorHighlightStatus = 2;
 
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
