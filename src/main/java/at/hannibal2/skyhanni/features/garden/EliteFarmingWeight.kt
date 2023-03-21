@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.*
 
 class EliteFarmingWeight {
 
@@ -30,7 +31,7 @@ class EliteFarmingWeight {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            config.eliteFarmingWeightPos.renderString(display)
+            config.eliteFarmingWeightPos.renderStrings(display)
         }
     }
 
@@ -63,7 +64,7 @@ class EliteFarmingWeight {
         private val config get() = SkyHanniMod.feature.garden
         private val extraCollection = mutableMapOf<String, Long>()
 
-        private var display = ""
+        private var display = mutableListOf<String>()
         private var profileId = ""
         private var lastLeaderboardUpdate = 0L
         private var apiError = false
@@ -80,11 +81,11 @@ class EliteFarmingWeight {
         private fun update() {
             if (!GardenAPI.inGarden()) return
             if (apiError) {
-                display = "§6Farming Weight§7: §cAPI Error!"
+                display = Collections.singletonList("§6Farming Weight§7: §cAPI Error!")
                 return
             }
             if (bonusWeight == -2) {
-                display = "§6Farming Weight§7: §eLoading.."
+                display = Collections.singletonList("§6Farming Weight§7: §eLoading..")
                 return
             }
 
@@ -101,8 +102,12 @@ class EliteFarmingWeight {
 
             val weight = getWeight()
             val leaderboard = getLeaderboard()
-            val eta = if (isEtaEnabled()) getETA() else ""
-            display = "§6Farming Weight§7: $weight$leaderboard$eta"
+            val list = mutableListOf<String>()
+            list.add("§6Farming Weight§7: $weight$leaderboard")
+            if (isEtaEnabled()) {
+                list.add(getETA())
+            }
+            display = list
         }
 
         private fun getLeaderboard(): String {
@@ -151,7 +156,10 @@ class EliteFarmingWeight {
             val totalWeight = (cropWeight + bonusWeight)
             val weightUntilOvertake = nextPlayerWeight - totalWeight
 
-            return "\n§e" + LorenzUtils.formatDouble(weightUntilOvertake, 2) + "§7weight left to overtake §b" + nextPlayerName
+            return "§e" + LorenzUtils.formatDouble(
+                weightUntilOvertake,
+                2
+            ) + " §7weight left to overtake §b" + nextPlayerName
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
@@ -165,7 +173,8 @@ class EliteFarmingWeight {
 
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
-            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if (isEtaEnabled()) "?showNext=true" else "")
+            val url =
+                "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if (isEtaEnabled()) "?showNext=true" else "")
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
