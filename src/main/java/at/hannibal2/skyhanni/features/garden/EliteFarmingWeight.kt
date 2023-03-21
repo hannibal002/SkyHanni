@@ -150,8 +150,6 @@ class EliteFarmingWeight {
         }
 
         private fun getETA(): String {
-            if (!isEtaEnabled()) return ""
-
             val totalWeight = (cropWeight + bonusWeight)
             val weightUntilOvertake = nextPlayerWeight - totalWeight
 
