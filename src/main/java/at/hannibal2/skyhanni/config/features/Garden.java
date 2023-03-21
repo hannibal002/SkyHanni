@@ -438,4 +438,9 @@ public class Garden {
     @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
     @ConfigEditorBoolean
     public boolean deskInSkyBlockMenu = true;
+
+    @Expose
+    @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
+    @ConfigEditorBoolean
+    public boolean fungiCutterWarn = true;
 }

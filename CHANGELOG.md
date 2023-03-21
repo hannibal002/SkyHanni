@@ -36,6 +36,7 @@
 + Added **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
 + Added **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
 + Added farming contest timer.
++ Added wrong fungi cutter mode warning.
 
 
 ### Features from other Mods
