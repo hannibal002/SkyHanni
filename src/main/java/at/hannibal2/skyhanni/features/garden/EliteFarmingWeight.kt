@@ -156,10 +156,8 @@ class EliteFarmingWeight {
             val totalWeight = (cropWeight + bonusWeight)
             val weightUntilOvertake = nextPlayerWeight - totalWeight
 
-            return "§e" + LorenzUtils.formatDouble(
-                weightUntilOvertake,
-                2
-            ) + " §7weight left to overtake §b" + nextPlayerName
+            val format = LorenzUtils.formatDouble(weightUntilOvertake, 2)
+            return "§e$format §7weight left to overtake §b$nextPlayerName"
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
