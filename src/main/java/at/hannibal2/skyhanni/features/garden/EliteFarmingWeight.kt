@@ -131,9 +131,7 @@ class EliteFarmingWeight {
             } else {
                 if (isLoadingLeaderboard) {
                     " §7[§b#?§7]"
-                } else {
-                    ""
-                }
+                } else ""
             }
         }
 
