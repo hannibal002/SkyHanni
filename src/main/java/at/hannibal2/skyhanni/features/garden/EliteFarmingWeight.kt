@@ -155,7 +155,7 @@ class EliteFarmingWeight {
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
-        private fun isEtaEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightOvertakeETA
+        private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
 
         fun addCrop(crop: String, diff: Int) {
             val old = extraCollection[crop] ?: 0L
