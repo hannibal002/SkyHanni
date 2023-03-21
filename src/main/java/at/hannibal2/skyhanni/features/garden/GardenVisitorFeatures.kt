@@ -34,6 +34,7 @@ class GardenVisitorFeatures {
     private var onBarnPlot = false
     private var tick = 0
     private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
+    private val gardenExperiencePattern = Pattern.compile(" §8\\+§2(.*) §7Garden Experience")
     private val offerAcceptedPattern = Pattern.compile("§6§lOFFER ACCEPTED §r§8with §r(.*) §r.*")
     private val config get() = SkyHanniMod.feature.garden
 
@@ -256,7 +257,15 @@ class GardenVisitorFeatures {
                 if (matcher.matches()) {
                     val coppers = matcher.group(1).replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
-                    list[i + itemsWithSpeedCounter] = "$line §7(Copper price §6$pricePerCopper§7)"
+                    list[i + itemsWithSpeedCounter] = "$line §7(price per §6$pricePerCopper§7)"
+                }
+            }
+            if (config.visitorExperiencePrice) {
+                val matcher = gardenExperiencePattern.matcher(line)
+                if (matcher.matches()) {
+                    val gardenExp = matcher.group(1).replace(",", "").toInt()
+                    val pricePerCopper = NumberUtil.format((totalPrice / gardenExp).toInt())
+                    list[i + itemsWithSpeedCounter] = "$line §7(price per §6$pricePerCopper§7)"
                 }
             }
         }

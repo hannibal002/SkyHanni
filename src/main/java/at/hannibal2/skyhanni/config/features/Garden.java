@@ -97,10 +97,16 @@ public class Garden {
     public boolean visitorExactAmountAndTime = true;
 
     @Expose
-    @ConfigOption(name = "Copper Price", desc = "Show the price for copper inside the visitor gui.")
+    @ConfigOption(name = "Copper Price", desc = "Show the price per copper inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean visitorCopperPrice = false;
+
+    @Expose
+    @ConfigOption(name = "Experience Price", desc = "Show the price per garden experience inside the visitor gui.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 4)
+    public boolean visitorExperiencePrice = false;
 
     @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
