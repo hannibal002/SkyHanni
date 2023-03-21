@@ -14,6 +14,14 @@ object SoundUtils {
         try {
             Minecraft.getMinecraft().soundHandler.playSound(this)
         } catch (e: Exception) {
+            if (e is IllegalArgumentException) {
+                e.message?.let {
+                    if (it.startsWith("value already present:")) {
+                        println("SkyHanni Sound error: $it")
+                        return
+                    }
+                }
+            }
             e.printStackTrace()
         }
         gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)

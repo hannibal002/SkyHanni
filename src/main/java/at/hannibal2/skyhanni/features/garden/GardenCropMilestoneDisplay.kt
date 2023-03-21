@@ -31,6 +31,7 @@ class GardenCropMilestoneDisplay {
             attenuationType = ISound.AttenuationType.NONE
         }
     }
+
     private var lastPlaySoundTime = 0L
 
     private var needsInventory = false
