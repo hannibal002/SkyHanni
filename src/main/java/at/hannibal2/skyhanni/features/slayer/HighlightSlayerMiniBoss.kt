@@ -39,8 +39,7 @@ class HighlightSlayerMiniBoss {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock &&
             SkyHanniMod.feature.slayer.slayerMinibossHighlight &&
-            !LorenzUtils.inDungeons &&
-            !LorenzUtils.inKuudraFight
+            !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
 
     enum class SlayerMiniBossType(val clazz: Class<out EntityCreature>, vararg val health: Int) {
         REVENANT(EntityZombie::class.java, 24_000, 90_000, 360_000, 600_000, 2_400_000),
