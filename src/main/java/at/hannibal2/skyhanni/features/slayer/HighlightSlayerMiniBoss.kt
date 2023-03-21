@@ -45,7 +45,7 @@ class HighlightSlayerMiniBoss {
     enum class SlayerMiniBossType(val clazz: Class<out EntityCreature>, vararg val health: Int) {
         REVENANT(EntityZombie::class.java, 24_000, 90_000, 360_000, 600_000, 2_400_000),
         TARANTULA(EntitySpider::class.java, 54_000, 144_000, 576_000),
-        SVEN(EntityWolf::class.java, 45_000, 120_000, 450_000),
+        SVEN(EntityWolf::class.java, 45_000, 120_000, 480_000),
         VOIDLING(EntityEnderman::class.java, 8_400_000, 17_500_000, 52_500_000),
         INFERNAL(EntityBlaze::class.java, 12_000_000, 25_000_000),
         ;
