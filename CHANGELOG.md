@@ -37,6 +37,7 @@
 + Added **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
 + Added farming contest timer.
 + Added wrong fungi cutter mode warning.
++ Added show the price per garden experience inside the visitor gui.
 
 
 ### Features from other Mods

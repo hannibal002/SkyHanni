@@ -186,6 +186,7 @@
 + **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
 + Farming contest timer.
 + Wrong fungi cutter mode warning.
++ Show the price per garden experience inside the visitor gui.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
