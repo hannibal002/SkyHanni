@@ -87,7 +87,7 @@ class TpsCounter {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.tpsDisplayEnabled) return
 
-        SkyHanniMod.feature.misc.tpsDisplayPosition.renderString(display)
+        SkyHanniMod.feature.misc.tpsDisplayPosition.renderString(display, center = false)
     }
 
     private fun getColor(tps: Double): String {

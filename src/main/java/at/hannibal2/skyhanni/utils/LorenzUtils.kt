@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
@@ -150,5 +151,16 @@ object LorenzUtils {
 
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
         return toList().sorted().reversed().toMap()
+    }
+
+    fun getSBMonthByName(month: String): Int {
+        var monthNr = 0
+        for (i in 1..12) {
+            val monthName = SkyBlockTime.monthName(i)
+            if (month == monthName) {
+                monthNr = i
+            }
+        }
+        return monthNr
     }
 }

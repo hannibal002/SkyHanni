@@ -28,7 +28,11 @@ class BazaarApi {
             if (newName.contains("Turbo-Cacti ")) {
                 newName = newName.replace("Cacti", "Cactus")
             }
-            return newName.replace("-", " ").removeColor()
+            newName = newName.removeColor()
+            if (!name.contains("Tightly-Tied")) {
+                newName = newName.replace("-", " ")
+            }
+            return newName
         }
 
         fun getBazaarDataForName(name: String): BazaarData? {

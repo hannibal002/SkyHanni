@@ -43,31 +43,28 @@ class CropMoneyDisplay {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
-
         if (tick++ % (20 * 5) != 0) return
-
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return
+
         update()
     }
 
     private fun update() {
         init()
 
-        if (ready) {
-            val newDisplay = drawNewDisplay()
-            display.clear()
-            display.addAll(newDisplay)
-        } else {
-            val newDisplay = mutableListOf<List<Any>>()
-            newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
-            newDisplay.add(Collections.singletonList("§eLoading..."))
-            display.clear()
-            display.addAll(newDisplay)
-        }
+        val newDisplay = drawNewDisplay()
+        display.clear()
+        display.addAll(newDisplay)
     }
 
     private fun drawNewDisplay(): MutableList<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
+
+        if (!ready) {
+            newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
+            newDisplay.add(Collections.singletonList("§eLoading..."))
+            return newDisplay
+        }
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
@@ -80,7 +77,7 @@ class CropMoneyDisplay {
         } else {
             for ((internalName, moneyPerHour) in map.sortedDesc()) {
                 number++
-                val cropName = cropNames[internalName]
+                val cropName = cropNames[internalName]!!
                 val isCurrent = cropName == GardenAPI.cropInHand
                 if (number > config.moneyPerHourShowOnlyBest && !isCurrent) continue
 
@@ -96,7 +93,8 @@ class CropMoneyDisplay {
                 val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
                 val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
                 val color = if (isCurrent) "§e" else "§7"
-                list.add("$color$itemName§7: §6$format")
+                val contestFormat = if (GardenNextJacobContest.isNextCrop(cropName)) "§n" else ""
+                list.add("$color$contestFormat$itemName§7: §6$format")
 
                 newDisplay.add(list)
             }
@@ -110,7 +108,12 @@ class CropMoneyDisplay {
         for ((internalName, amount) in multipliers) {
             val price = NEUItems.getPrice(internalName)
             val cropName = cropNames[internalName]!!
-            val speed = GardenAPI.getCropsPerSecond(cropName)!!
+            val speed = GardenAPI.getCropsPerSecond(cropName)
+            if (speed == null) {
+                println("calculateMoneyPerHour: Speed is null for crop name '$cropName' ($internalName)")
+                LorenzUtils.debug("calculateMoneyPerHour: Speed is null!")
+                continue
+            }
 
             // No speed data for item in hand
             if (speed == -1) continue
@@ -152,6 +155,7 @@ class CropMoneyDisplay {
 
             for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
                 if (!BazaarApi.isBazaarItem(internalName)) continue
+                if (internalName == "ENCHANTED_PAPER") continue
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
                 if (amount < 10) continue

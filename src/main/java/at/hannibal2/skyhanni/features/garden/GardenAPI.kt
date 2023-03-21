@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -121,6 +122,19 @@ class GardenAPI {
                 return "Mushroom"
             }
             return itemName
+        }
+
+        private fun getItemStackForCrop(crop: String): ItemStack {
+            val internalName = NEUItems.getInternalName(if (crop == "Mushroom") "Red Mushroom Block" else crop)
+            return NEUItems.getItemStack(internalName)
+        }
+
+        fun addGardenCropToList(crop: String, list: MutableList<Any>) {
+            try {
+                list.add(getItemStackForCrop(crop))
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+            }
         }
     }
 }

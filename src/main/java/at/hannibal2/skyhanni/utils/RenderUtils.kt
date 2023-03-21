@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils.drawStringScaled
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -441,7 +440,7 @@ object RenderUtils {
         val renderer = minecraft.renderManager.fontRenderer ?: return
 
         val offsetX = if (center) {
-            (200 - renderer.getStringWidth(display.removeColor())) / 2
+            (200 - renderer.getStringWidth(display)) / 2
         } else {
             0
         } + extraOffsetX
@@ -469,14 +468,14 @@ object RenderUtils {
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderStringsAndItems(list: List<List<Any?>>, extraSpace: Int = 0) {
+    fun Position.renderStringsAndItems(list: List<List<Any?>>, extraSpace: Int = 0, itemScale: Double = 1.0) {
         if (list.isEmpty()) return
 
         var offsetY = 0
         // TODO remove toMutableList
         try {
             for (line in list.toMutableList()) {
-                renderLine(line, offsetY)
+                renderLine(line, offsetY, itemScale)
                 offsetY += 10 + extraSpace + 2
             }
         } catch (e: NullPointerException) {
@@ -492,7 +491,16 @@ object RenderUtils {
         }
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int) {
+    /**
+     * Accepts a single line to print.
+     * This  line is a list of things to print. Can print String or ItemStack objects.
+     */
+    fun Position.renderSingleLineWithItems(list: List<Any?>, itemScale: Double = 1.0) {
+        if (list.isEmpty()) return
+        renderLine(list, 0, itemScale)
+    }
+
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0) {
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val resolution = ScaledResolution(Minecraft.getMinecraft())
         var offsetX = 0
@@ -503,15 +511,16 @@ object RenderUtils {
             }
             if (any is String) {
                 renderString(any, offsetX, offsetY, center = false)
-                val width = renderer.getStringWidth(any.removeColor())
+                val width = renderer.getStringWidth(any)
                 offsetX += width
-            }
-            if (any is ItemStack) {
-                val isX = getAbsX(resolution, 0) + offsetX
-                val isY = getAbsY(resolution, 0) + offsetY
+            } else if (any is ItemStack) {
+                val isX = getAbsX(resolution, 200) + offsetX
+                val isY = getAbsY(resolution, 16) + offsetY
 
-                any.renderOnScreen(isX.toFloat(), isY.toFloat())
+                any.renderOnScreen(isX.toFloat(), isY.toFloat(), itemScale)
                 offsetX += 12
+            } else {
+                println("unknown render object: $any")
             }
         }
     }
@@ -713,7 +722,7 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
-        val stringWidth = fontRenderer.getStringWidth(text.removeColor())
+        val stringWidth = fontRenderer.getStringWidth(text)
         if (shadow) {
             fontRenderer.drawStringWithShadow(
                 text,

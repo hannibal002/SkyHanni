@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -32,6 +31,7 @@ class GardenCropMilestoneDisplay {
             attenuationType = ISound.AttenuationType.NONE
         }
     }
+
     private var lastPlaySoundTime = 0L
 
     private var needsInventory = false
@@ -83,7 +83,14 @@ class GardenCropMilestoneDisplay {
         if (cultivatingData.containsKey(crop)) {
             val old = cultivatingData[crop]!!
             val diff = counter - old
-            GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
+            try {
+                GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
+            } catch (e: NullPointerException) {
+                println("crop: '$crop'")
+                println("GardenCropMilestones.cropCounter: '${GardenCropMilestones.cropCounter.keys}'")
+                LorenzUtils.debug("NPE at OwnInventorItemUpdateEvent with GardenCropMilestones.cropCounter")
+                e.printStackTrace()
+            }
             EliteFarmingWeight.addCrop(crop, diff)
             if (currentCrop == crop) {
                 calculateSpeed(diff)
@@ -163,14 +170,7 @@ class GardenCropMilestoneDisplay {
         progressDisplay.add(Collections.singletonList("§6Crop Milestones"))
 
         val list = mutableListOf<Any>()
-
-        try {
-            val internalName = NEUItems.getInternalName(if (it == "Mushroom") "Red Mushroom" else it)
-            val itemStack = NEUItems.getItemStack(internalName)
-            list.add(itemStack)
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-        }
+        GardenAPI.addGardenCropToList(it, list)
         list.add(it)
         progressDisplay.add(list)
 

@@ -144,7 +144,9 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
         val builder = StringBuilder()
         for (word in rawName.lowercase().split("_")) {
             if (word.isInt()) {
-                builder.append(word.toInt().toRoman())
+                val number = word.toInt()
+                if (number < 1) continue
+                builder.append(number.toRoman())
             } else {
                 if (word in listOf("of", "the")) {
                     builder.append(word)

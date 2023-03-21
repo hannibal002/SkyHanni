@@ -51,6 +51,11 @@ class BazaarOrderHelper {
             if (data == null) {
                 LorenzUtils.debug("Bazaar data is null!")
                 println("Bazaar data is null for '$rawName'/'$bazaarName'")
+//                for (key in BazaarApi.bazaarMap.keys) {
+//                    if (key.lowercase().contains("hay")) {
+//                        println("key: '$key'")
+//                    }
+//                }
                 continue
             }
 

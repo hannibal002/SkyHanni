@@ -97,10 +97,16 @@ public class Garden {
     public boolean visitorExactAmountAndTime = true;
 
     @Expose
-    @ConfigOption(name = "Copper Price", desc = "Show the price for copper inside the visitor gui.")
+    @ConfigOption(name = "Copper Price", desc = "Show the price per copper inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean visitorCopperPrice = false;
+
+    @Expose
+    @ConfigOption(name = "Experience Price", desc = "Show the price per garden experience inside the visitor gui.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 4)
+    public boolean visitorExperiencePrice = false;
 
     @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
@@ -115,10 +121,10 @@ public class Garden {
     public boolean visitorNotificationTitle = true;
 
     @Expose
-    @ConfigOption(name = "Highlight", desc = "Highlight visitor when the required items are in the inventory or the visitor is new and required items need to be checked.")
-    @ConfigEditorBoolean
+    @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
+    @ConfigEditorDropdown(values = {"Color Only", "Name Only", "Both", "Disabled"})
     @ConfigAccordionId(id = 1)
-    public boolean visitorHighlight = true;
+    public int visitorHighlightStatus = 2;
 
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
@@ -408,6 +414,35 @@ public class Garden {
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
+    @ConfigOption(name = "Next Jacob Contest", desc = "")
+    @ConfigEditorAccordion(id = 14)
+    public boolean nextJacobContest = false;
+
+    @Expose
+    @ConfigOption(name = "Show Jacob Contest", desc = "Show the current or next jacob farming contest time and crops.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in garden but everywhere in skyblock.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestEverywhere = false;
+
+    @Expose
+    @ConfigOption(name = "In Other Guis", desc = "Mark the current or next farming contest crops in other farming guis as underlined.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestOtherGuis = false;
+
+    @Expose
+    @ConfigOption(name = "Jacob Contest Position", desc = "")
+    @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
+    @ConfigAccordionId(id = 14)
+    public Position nextJacobContestPos = new Position(-113, -240, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
@@ -416,4 +451,9 @@ public class Garden {
     @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
     @ConfigEditorBoolean
     public boolean deskInSkyBlockMenu = true;
+
+    @Expose
+    @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
+    @ConfigEditorBoolean
+    public boolean fungiCutterWarn = true;
 }

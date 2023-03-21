@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
@@ -30,29 +28,37 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val townBoardBarbarian = LorenzVec(-572, 100, -687)
 
     private var tick = 0
-    private val loader = QuestLoader(this)
+    private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
     private var latestTrophyFishInInventory = 0
 
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!isEnabled()) return
+
+        questLoader.checkInventory(event)
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (!isEnabled()) return
+
+        questLoader.loadFromTabList()
+    }
+
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!isEnabled()) return
+
         tick++
         if (tick % 20 == 0) {
-            loader.checkInventory()
             checkInventoryForTrophyFish()
         }
 
         if (tick % 60 == 0) {
             checkInventoryForFetchItem()
-            loader.loadFromTabList()
-
-            if (quests.size > 5) {
-                reputationHelper.reset()
-            }
         }
     }
 
@@ -74,9 +80,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!isEnabled()) return
 
         if (event.gui !is GuiChest) return
         val chest = event.gui.inventorySlots as ContainerChest
@@ -132,9 +136,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (message == "§aYou completed your Dojo quest! Visit the Town Board to claim the rewards.") {
@@ -191,9 +193,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!isEnabled()) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
 
         for (quest in quests) {
@@ -244,7 +244,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val sacksText = if (quest is FetchQuest && quest.state != QuestState.COLLECTED) {
-            val name = quest.itemName.uppercase()
+            val name = quest.itemName.uppercase().replace(" ", "_")
             val amount = sacksCache.getOrDefault(name, 0)
             val needAmount = quest.needAmount
             val amountFormat = LorenzUtils.formatInteger(amount)
@@ -321,7 +321,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun load() {
         reset()
 
-        loader.loadConfig()
+        questLoader.loadConfig()
         latestTrophyFishInInventory = SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory
     }
 
@@ -351,4 +351,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory = latestTrophyFishInInventory
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE &&
+            SkyHanniMod.feature.misc.crimsonIsleReputationHelper
 }

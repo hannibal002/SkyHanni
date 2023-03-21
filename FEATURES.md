@@ -184,6 +184,9 @@
 + **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
 + **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
++ Farming contest timer.
++ Wrong fungi cutter mode warning.
++ Show the price per garden experience inside the visitor gui.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

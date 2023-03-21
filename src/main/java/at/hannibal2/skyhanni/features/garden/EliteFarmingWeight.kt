@@ -31,7 +31,7 @@ class EliteFarmingWeight {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            config.eliteFarmingWeightPos.renderStrings(display)
+            config.eliteFarmingWeightPos.renderStrings(display, center = false)
         }
     }
 

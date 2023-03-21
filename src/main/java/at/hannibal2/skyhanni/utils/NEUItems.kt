@@ -6,7 +6,6 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
@@ -70,32 +69,33 @@ object NEUItems {
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float) {
-        GlStateManager.pushMatrix()
+    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val isSkull = item === Items.skull
+
+        val baseScale = (if (isSkull) 0.8f else 0.6f)
+        val finalScale = baseScale * scaleMultiplier
+        val diff = ((finalScale - baseScale) * 10).toFloat()
+
+        val translateX: Float
+        val translateY: Float
         if (isSkull) {
-            GlStateManager.translate(x - 2, y - 2, 0f)
+            translateX = x - 2 - diff
+            translateY = y - 2 - diff
         } else {
-            GlStateManager.translate(x, y, 0f)
+            translateX = x - diff
+            translateY = y - diff
         }
 
-        val scale = if (isSkull) 0.8f else 0.6f
-        GlStateManager.scale(scale, scale, 0f)
-        drawItemStack(this)
-        GlStateManager.popMatrix()
-    }
+        GlStateManager.pushMatrix();
 
-    private fun drawItemStack(stack: ItemStack) {
-        val itemRender = Minecraft.getMinecraft().renderItem
+        GlStateManager.translate(translateX, translateY, 1F)
+        GlStateManager.scale(finalScale, finalScale, 1.0)
 
-        Utils.disableCustomDungColours = true
         RenderHelper.enableGUIStandardItemLighting()
-        Utils.hasEffectOverride = true
-        itemRender.renderItemAndEffectIntoGUI(stack, 0, 0)
-        itemRender.renderItemOverlayIntoGUI(Minecraft.getMinecraft().fontRendererObj, stack, 0, 0, null)
-        Utils.hasEffectOverride = false
+        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(this, 0, 0)
         RenderHelper.disableStandardItemLighting()
-        Utils.disableCustomDungColours = false
+
+        GlStateManager.popMatrix()
     }
 
     fun getMultiplier(rawId: String, tryCount: Int = 0): Pair<String, Int> {
