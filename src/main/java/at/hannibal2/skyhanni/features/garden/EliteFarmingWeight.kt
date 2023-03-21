@@ -56,7 +56,7 @@ class EliteFarmingWeight {
         dirtyCropWeight = true
         lastLeaderboardUpdate = 0
         nextPlayerWeight = 0.0
-        nextPlayerIGN = ""
+        nextPlayerName = ""
     }
 
     companion object {
@@ -74,7 +74,7 @@ class EliteFarmingWeight {
         private var isLoadingWeight = false
         private var isLoadingLeaderboard = false
 
-        private var nextPlayerIGN = ""
+        private var nextPlayerName = ""
         private var nextPlayerWeight = 0.0
 
         private fun update() {
@@ -148,10 +148,10 @@ class EliteFarmingWeight {
         private fun getETA(): String {
             if (!etaEnabled()) return ""
 
-            var totalWeight = (cropWeight + bonusWeight)
-            var weightUntilOvertake = nextPlayerWeight - totalWeight
+            val totalWeight = (cropWeight + bonusWeight)
+            val weightUntilOvertake = nextPlayerWeight - totalWeight
 
-            return "\n§e" + LorenzUtils.formatDouble(weightUntilOvertake, 2) + "§7weight left to overtake §b" + nextPlayerIGN
+            return "\n§e" + LorenzUtils.formatDouble(weightUntilOvertake, 2) + "§7weight left to overtake §b" + nextPlayerName
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
@@ -165,13 +165,13 @@ class EliteFarmingWeight {
 
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
-            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if etaEnabled() "?showNext=true" else "")
+            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId" + (if (etaEnabled()) "?showNext=true" else "")
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (etaEnabled()) {
-                var nextPlayerData = result["next"]?.asJsonObject
+                val nextPlayerData = result["next"]?.asJsonObject
                 if (nextPlayerData != null) {
-                    nextPlayerIGN = nextPlayerData["ign"].asString
+                    nextPlayerName = nextPlayerData["ign"].asString
                     nextPlayerWeight = nextPlayerData["amount"].asDouble
                 }
             }
