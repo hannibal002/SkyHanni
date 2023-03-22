@@ -377,7 +377,7 @@ class GardenVisitorFeatures {
 
     private fun findEntityByNametag(visitorName: String, visitor: Visitor) {
         Minecraft.getMinecraft().theWorld.loadedEntityList
-            .filter { it is EntityArmorStand && it.name == visitorName }
+            .filter { it is EntityArmorStand && it.name.removeColor() == visitorName.removeColor() }
             .forEach { entity ->
                 Minecraft.getMinecraft().theWorld.loadedEntityList
                     .filter { it !is EntityArmorStand }
