@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.17.Beta.21.1"
+version = "0.17.Beta.21.2"
 
 // Toolchains:
 java {
