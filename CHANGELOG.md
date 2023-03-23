@@ -41,6 +41,8 @@
 + Added farming contest timer.
 + Added wrong fungi cutter mode warning.
 + Added show the price per garden experience inside the visitor gui.
++ Added support for mushroom cow pet perk. (Counting and updating mushroom collection when breaking crops with mushroom blocks, added extra gui for time till crop milestones)
++ Added blocks/second display to crop milestone gui and made all crop milestone gui elements customizable/toggleable.
 
 
 ### Features from other Mods
