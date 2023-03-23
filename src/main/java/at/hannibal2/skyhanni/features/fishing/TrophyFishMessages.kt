@@ -17,6 +17,7 @@ class TrophyFishMessages {
     private val fishAmounts = mutableMapOf<String, Int>()
     private val trophyFishPattern =
         Regex("§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+)§r§r§r §r§l§r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.")
+    private val config get() = SkyHanniMod.feature.fishing
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -52,7 +53,7 @@ class TrophyFishMessages {
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock || !SkyHanniMod.feature.fishing.trophyCounter) return
+        if (!LorenzUtils.inSkyBlock || !config.trophyCounter) return
 
         val match = trophyFishPattern.matchEntire(event.message)?.groups ?: return
         val displayName = match["displayName"]!!.value.replace("§k", "")
@@ -67,15 +68,15 @@ class TrophyFishMessages {
         fishAmounts[fish] = amount
         event.blockedReason = "trophy_fish"
 
-        if (SkyHanniMod.feature.fishing.trophyDesign == 0 && amount == 1) {
+        if (config.trophyDesign == 0 && amount == 1) {
             LorenzUtils.chat("§6§lTROPHY FISH! §c§lFIRST §r$displayRarity $displayName")
             return
         }
 
-        if (SkyHanniMod.feature.fishing.trophyFishBronzeHider && rarity == "bronze" && amount != 1) return
-        if (SkyHanniMod.feature.fishing.trophyFishSilverHider && rarity == "silver" && amount != 1) return
+        if (config.trophyFishBronzeHider && rarity == "bronze" && amount != 1) return
+        if (config.trophyFishSilverHider && rarity == "silver" && amount != 1) return
 
-        val trophyMessage = "§6§lTROPHY FISH! " + when (SkyHanniMod.feature.fishing.trophyDesign) {
+        val trophyMessage = "§6§lTROPHY FISH! " + when (config.trophyDesign) {
             0 -> "§7$amount. §r$displayRarity $displayName"
             1 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
             else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
@@ -83,7 +84,7 @@ class TrophyFishMessages {
 
         Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(
             ChatComponentText(trophyMessage),
-            if (SkyHanniMod.feature.fishing.trophyFishDuplicateHider) fish.hashCode() else 0
+            if (config.trophyFishDuplicateHider) fish.hashCode() else 0
         )
     }
 }
