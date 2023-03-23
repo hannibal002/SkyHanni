@@ -479,6 +479,13 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourCompact = false;
+    @Expose
+    @ConfigOption(
+            name = "Compact Price",
+            desc = "Show the price more compact.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourCompactPrice = false;
 
     @Expose
     @ConfigOption(name = "Money per hour Position", desc = "")
