@@ -107,7 +107,8 @@ class EliteFarmingWeight {
 
             val list = mutableListOf<String>()
             list.add("§6Farming Weight§7: $weight$leaderboard")
-            if (isEtaEnabled() && weightPerSecond != -1.0) {
+
+            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.eliteFarmingWeightOvertakeETAAlways)) {
                 list.add(getETA())
             }
             display = list
