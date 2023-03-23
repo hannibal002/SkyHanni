@@ -101,7 +101,16 @@ class GardenAPI {
             return -1
         }
 
-        fun CropType.getSpeed() = cropsPerSecond[this]!!
+        fun CropType.getSpeed(): Int {
+            val speed = cropsPerSecond[this]
+            if (speed != null) return speed
+
+            val message = "Set speed for $this to -1!"
+            println(message)
+            LorenzUtils.debug(message)
+            setSpeed(-1)
+            return -1
+        }
         
         fun CropType.setSpeed(speed: Int) {
             cropsPerSecond[this] = speed
