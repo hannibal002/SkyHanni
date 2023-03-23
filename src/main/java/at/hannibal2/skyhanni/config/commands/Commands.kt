@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigEditor
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
+import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -46,6 +47,7 @@ object Commands {
         registerCommand("shtrackcollection") { CollectionCounter.command(it) }
         registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
         registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
+        registerCommand("shsetapikey") { ApiDataLoader.command(it) }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

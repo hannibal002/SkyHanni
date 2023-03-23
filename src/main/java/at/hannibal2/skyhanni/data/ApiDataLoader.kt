@@ -19,8 +19,6 @@ import java.util.*
 class ApiDataLoader {
 
     private var currentProfileName = ""
-
-    private var nextApiCallTime = -1L
     private var currentProfileId = ""
 
     @SubscribeEvent
@@ -145,6 +143,16 @@ class ApiDataLoader {
                 ProfileApiDataLoadedEvent(profileData).postAndCatch()
                 nextApiCallTime = System.currentTimeMillis() + 60_000 * 3
             }
+        }
+    }
+
+    companion object {
+        private var nextApiCallTime = -1L
+
+        fun command(args: Array<String>) {
+            SkyHanniMod.feature.hidden.apiKey = args[0]
+            LorenzUtils.chat("§e[SkyHanni] Api key set via command!")
+            nextApiCallTime = -1
         }
     }
 }
