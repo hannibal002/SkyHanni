@@ -24,7 +24,7 @@ class NonGodPotEffectDisplay {
 
     private var checkFooter = false
     private val activeEffects = mutableMapOf<String, Long>()
-    private val display = mutableListOf<String>()
+    private var display = listOf<String>()
     private var lastTick = 0L
 
     private var nonGodPotEffects = mapOf(
@@ -82,12 +82,17 @@ class NonGodPotEffectDisplay {
 
     private fun update() {
         val now = System.currentTimeMillis()
-        display.clear()
         if (activeEffects.values.removeIf { now > it }) {
             //to fetch the real amount of active pots
             totalEffectsCount = 0
             checkFooter = true
         }
+
+        display = drawDisplay(now)
+    }
+
+    private fun drawDisplay(now: Long): MutableList<String> {
+        val newDisplay = mutableListOf<String>()
         for (effect in activeEffects.sorted()) {
             val label = effect.key
             if (label.contains("Invisibility")) continue
@@ -100,14 +105,15 @@ class NonGodPotEffectDisplay {
 
             val color = colorForTime(seconds)
 
-            display.add("$label $color$format")
+            newDisplay.add("$label $color$format")
         }
         val diff = totalEffectsCount - activeEffects.size
         if (diff > 0) {
-            display.add("§eOpen the /effects inventory")
-            display.add("§eto show the missing $diff effects!")
+            newDisplay.add("§eOpen the /effects inventory")
+            newDisplay.add("§eto show the missing $diff effects!")
             checkFooter = true
         }
+        return newDisplay
     }
 
     private fun colorForTime(seconds: Long): String {

@@ -26,7 +26,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     var repoData: JsonObject = JsonObject()
     var factionType = FactionType.NONE
 
-    private val display = mutableListOf<List<Any>>()
+    private var display = listOf<List<Any>>()
     private var dirty = true
     private var tick = 0
 
@@ -74,17 +74,19 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     private fun updateRender() {
-        display.clear()
+        val newList = mutableListOf<List<Any>>()
 
         //TODO test
         if (factionType == FactionType.NONE) return
 
-        display.add(Collections.singletonList("Reputation Helper:"))
-        questHelper.render(display)
-        miniBossHelper.render(display)
+        newList.add(Collections.singletonList("Reputation Helper:"))
+        questHelper.render(newList)
+        miniBossHelper.render(newList)
         if (factionType == FactionType.MAGE) {
-            kuudraBossHelper.render(display)
+            kuudraBossHelper.render(newList)
         }
+
+        display = newList
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

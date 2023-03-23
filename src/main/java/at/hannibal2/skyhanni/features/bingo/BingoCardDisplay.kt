@@ -26,7 +26,7 @@ class BingoCardDisplay {
     private val MAX_COMMUNITY_GOALS = 5
 
     private var tick = 0
-    private val display = mutableListOf<String>()
+    private var display = listOf<String>()
     private val config get() = SkyHanniMod.feature.bingo
     private val goalCompletePattern = Pattern.compile("§6§lBINGO GOAL COMPLETE! §r§e(.*)")
 
@@ -121,20 +121,25 @@ class BingoCardDisplay {
     }
 
     private fun update() {
-        display.clear()
+        display = drawDisplay()
+    }
 
-        display.add("Community Goals")
+    private fun drawDisplay(): MutableList<String> {
+        val newList = mutableListOf<String>()
+
+        newList.add("Community Goals")
         if (communityGoals.isEmpty()) {
-            display.add("§cOpen the §e/bingo §ccard.")
+            newList.add("§cOpen the §e/bingo §ccard.")
         } else {
-            communityGoals.mapTo(display) { "  " + it.description + if (it.done) " §aDONE" else "" }
+            communityGoals.mapTo(newList) { "  " + it.description + if (it.done) " §aDONE" else "" }
 
             val todo = personalGoals.filter { !it.done }
             val done = MAX_PERSONAL_GOALS - todo.size
-            display.add(" ")
-            display.add("Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
-            todo.mapTo(display) { "  " + it.description }
+            newList.add(" ")
+            newList.add("Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
+            todo.mapTo(newList) { "  " + it.description }
         }
+        return newList
     }
 
     private var lastSneak = false

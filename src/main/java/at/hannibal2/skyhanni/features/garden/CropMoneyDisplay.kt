@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 
 class CropMoneyDisplay {
-    private val display = mutableListOf<List<Any>>()
+    private var display = mutableListOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
     private var tick = 0
     private var loaded = false
@@ -52,9 +52,7 @@ class CropMoneyDisplay {
     private fun update() {
         init()
 
-        val newDisplay = drawNewDisplay()
-        display.clear()
-        display.addAll(newDisplay)
+        display = drawNewDisplay()
     }
 
     private fun drawNewDisplay(): MutableList<List<Any>> {

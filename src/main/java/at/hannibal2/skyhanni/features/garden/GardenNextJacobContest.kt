@@ -17,7 +17,7 @@ import java.time.Instant
 import java.util.regex.Pattern
 
 class GardenNextJacobContest {
-    private val display = mutableListOf<Any>()
+    private var display = listOf<Any>()
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
@@ -121,9 +121,7 @@ class GardenNextJacobContest {
 
     private fun update() {
         nextContestCrops.clear()
-        val newDisplay = drawDisplay()
-        display.clear()
-        display.addAll(newDisplay)
+        display = drawDisplay()
     }
 
     private fun drawDisplay(): List<Any> {

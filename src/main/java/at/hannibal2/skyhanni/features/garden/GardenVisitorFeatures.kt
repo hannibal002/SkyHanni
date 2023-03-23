@@ -30,7 +30,7 @@ import java.util.regex.Pattern
 class GardenVisitorFeatures {
 
     private val visitors = mutableMapOf<String, Visitor>()
-    private val display = mutableListOf<List<Any>>()
+    private var display = listOf<List<Any>>()
     private var lastClickedNpc = 0
     private var onBarnPlot = false
     private var tick = 0
@@ -88,9 +88,7 @@ class GardenVisitorFeatures {
     }
 
     private fun updateDisplay() {
-        val list = drawDisplay()
-        display.clear()
-        display.addAll(list)
+        display = drawDisplay()
     }
 
     private fun drawDisplay(): List<List<Any>> {

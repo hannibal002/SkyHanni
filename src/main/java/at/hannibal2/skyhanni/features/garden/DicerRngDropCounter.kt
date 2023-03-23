@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DicerRngDropCounter {
-    private val display = mutableListOf<String>()
+    private var display = listOf<String>()
     private val drops = mutableMapOf<CropType, MutableMap<DropRarity, Int>>()
     private val itemDrops = mutableListOf<ItemDrop>()
 
@@ -59,9 +59,7 @@ class DicerRngDropCounter {
     }
 
     private fun update() {
-        val newDisplay = drawDisplay()
-        display.clear()
-        display.addAll(newDisplay)
+        display = drawDisplay()
     }
 
     private fun drawDisplay(): List<String> {

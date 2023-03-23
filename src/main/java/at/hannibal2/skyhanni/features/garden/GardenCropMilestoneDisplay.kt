@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 
 class GardenCropMilestoneDisplay {
-    private val progressDisplay = mutableListOf<List<Any>>()
+    private var progressDisplay = listOf<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Int>()
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
@@ -147,28 +147,29 @@ class GardenCropMilestoneDisplay {
     }
 
     private fun update() {
-        progressDisplay.clear()
-        bestCropTime.display.clear()
+        progressDisplay = emptyList()
+        bestCropTime.display = emptyList()
         currentCrop?.let {
-            drawProgressDisplay(it, it.getCounter())
+            progressDisplay =  drawProgressDisplay(it, it.getCounter())
             if (config.cropMilestoneBestDisplay) {
-                bestCropTime.drawBestDisplay(it)
+                bestCropTime.display =   bestCropTime.drawBestDisplay(it)
             }
         }
         if (config.cropMilestoneBestAlwaysOn) {
             if (currentCrop == null) {
-                bestCropTime.drawBestDisplay(null)
+                bestCropTime.display =  bestCropTime.drawBestDisplay(null)
             }
         }
     }
 
-    private fun drawProgressDisplay(crop: CropType, counter: Long) {
-        progressDisplay.add(Collections.singletonList("§6Crop Milestones"))
+    private fun drawProgressDisplay(crop: CropType, counter: Long): MutableList<List<Any>> {
+        val newList = mutableListOf<List<Any>>()
+        newList.add(Collections.singletonList("§6Crop Milestones"))
 
         val list = mutableListOf<Any>()
         GardenAPI.addGardenCropToList(crop, list)
         list.add(crop.cropName)
-        progressDisplay.add(list)
+        newList.add(list)
 
         val currentTier = GardenCropMilestones.getTierForCrops(counter)
 
@@ -181,13 +182,13 @@ class GardenCropMilestoneDisplay {
 
         val haveFormat = LorenzUtils.formatInteger(have)
         val needFormat = LorenzUtils.formatInteger(need)
-        progressDisplay.add(Collections.singletonList("§7Progress to Tier $nextTier§8:"))
-        progressDisplay.add(Collections.singletonList("§e$haveFormat§8/§e$needFormat"))
+        newList.add(Collections.singletonList("§7Progress to Tier $nextTier§8:"))
+        newList.add(Collections.singletonList("§e$haveFormat§8/§e$needFormat"))
 
         lastItemInHand?.let {
             if (GardenAPI.readCounter(it) == -1) {
-                progressDisplay.add(Collections.singletonList("§cWarning: You need Cultivating!"))
-                return
+                newList.add(Collections.singletonList("§cWarning: You need Cultivating!"))
+                return newList
             }
         }
 
@@ -207,15 +208,17 @@ class GardenCropMilestoneDisplay {
                     SendTitleHelper.sendTitle("§b$crop $nextTier in $duration", 1_500)
                 }
             }
-            progressDisplay.add(Collections.singletonList("§7in §b$duration"))
+            newList.add(Collections.singletonList("§7in §b$duration"))
 
             val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
-            progressDisplay.add(Collections.singletonList("§7Crops/minute§8: §e$format"))
+            newList.add(Collections.singletonList("§7Crops/minute§8: §e$format"))
         }
 
         if (needsInventory) {
-            progressDisplay.add(Collections.singletonList("§cOpen §e/cropmilestones §cto update!"))
+            newList.add(Collections.singletonList("§cOpen §e/cropmilestones §cto update!"))
         }
+
+        return newList
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.cropMilestoneProgress

@@ -28,7 +28,7 @@ class BingoNextStepHelper {
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
         private val currentSteps = mutableListOf<NextStep>()
-        val currentHelp = mutableListOf<String>()
+        var currentHelp = listOf<String>()
 
         fun command() {
             updateResult(true)
@@ -42,18 +42,23 @@ class BingoNextStepHelper {
                 if (print) println()
             }
 
-            currentHelp.clear()
-            currentHelp.add("Bingo Step Helper")
+            currentHelp = drawDisplay(print)
+        }
+
+        private fun drawDisplay(print: Boolean): MutableList<String> {
+            val newCurrentHelp = mutableListOf<String>()
+            newCurrentHelp.add("Bingo Step Helper")
 
             if (currentSteps.isEmpty()) {
-                currentHelp.add("§cOpen the §e/bingo §ccard.")
+                newCurrentHelp.add("§cOpen the §e/bingo §ccard.")
             }
             for (currentStep in currentSteps) {
                 val text = getName(currentStep)
-                currentHelp.add("  §7$text")
+                newCurrentHelp.add("  §7$text")
                 if (print) println(text)
             }
             if (print) println()
+            return newCurrentHelp
         }
 
         private fun printRequirements(step: NextStep, print: Boolean, parentDone: Boolean = false, depth: Int = 0) {

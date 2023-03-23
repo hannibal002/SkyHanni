@@ -24,7 +24,7 @@ class MinionCraftHelper {
 
     private var minionNamePattern = Pattern.compile("(.*) Minion (.*)")
     private var tick = 0
-    private var display = mutableListOf<String>()
+    private var display = listOf<String>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
     private val tierOneMinions = mutableListOf<String>()
@@ -56,7 +56,7 @@ class MinionCraftHelper {
         }
 
         if (!hasMinionInInventory && !hasItemsForMinion) {
-            display.clear()
+            display = emptyList()
             return
         }
 
@@ -67,14 +67,22 @@ class MinionCraftHelper {
 
         val (minions, otherItems) = loadFromInventory(mainInventory)
 
-        display.clear()
+        display = drawDisplay(minions, otherItems)
+    }
+
+    private fun drawDisplay(
+        minions: MutableMap<String, String>,
+        otherItems: MutableMap<String, Int>,
+    ): MutableList<String> {
+        val newDisplay = mutableListOf<String>()
         for ((minionName, minionId) in minions) {
             val matcher = minionNamePattern.matcher(minionName)
-            if (!matcher.matches()) return
+            if (!matcher.matches()) continue
             val cleanName = matcher.group(1).removeColor()
             val number = matcher.group(2).romanToDecimalIfNeeded()
-            addMinion(cleanName, number, minionId, otherItems)
+            addMinion(cleanName, number, minionId, otherItems, newDisplay)
         }
+        return newDisplay
     }
 
     @SubscribeEvent
@@ -185,10 +193,16 @@ class MinionCraftHelper {
         }
     }
 
-    private fun addMinion(name: String, minionTier: Int, minionId: String, otherItems: MutableMap<String, Int>) {
+    private fun addMinion(
+        name: String,
+        minionTier: Int,
+        minionId: String,
+        otherItems: MutableMap<String, Int>,
+        newDisplay: MutableList<String>,
+    ) {
         val nextTier = minionTier + 1
         val minionName = "§9$name Minion $nextTier"
-        display.add(minionName)
+        newDisplay.add(minionName)
         val nextMinionId = minionId.addOneToId()
         for (recipe in NEUItems.getRecipes(nextMinionId)) {
             if (recipe !is CraftingRecipe) continue
@@ -213,19 +227,19 @@ class MinionCraftHelper {
                 val itemName = NEUItems.getItemStack(rawId).name ?: "§cName??§f"
                 if (percentage >= 1) {
                     val color = if (itemId.startsWith("WOOD_")) "§7" else "§a"
-                    display.add("  $itemName§8: ${color}DONE")
+                    newDisplay.add("  $itemName§8: ${color}DONE")
                     otherItems[itemId] = have - needAmount
                 } else {
                     val format = LorenzUtils.formatPercentage(percentage)
                     val haveFormat = LorenzUtils.formatInteger(have)
                     val needFormat = LorenzUtils.formatInteger(needAmount)
-                    display.add("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
+                    newDisplay.add("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
                     allDone = false
                 }
             }
-            display.add(" ")
+            newDisplay.add(" ")
             if (allDone) {
-                addMinion(name, nextTier, nextMinionId, otherItems)
+                addMinion(name, nextTier, nextMinionId, otherItems, newDisplay)
                 notify(minionName)
             }
         }

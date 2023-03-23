@@ -21,7 +21,7 @@ import java.util.regex.Pattern
 class SkyMartBestProfit {
 
     private val pattern = Pattern.compile("§c(.*) Copper")
-    private val display = mutableListOf<List<Any>>()
+    private var display = listOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
 
     @SubscribeEvent
@@ -63,10 +63,17 @@ class SkyMartBestProfit {
             }
         }
 
-        display.clear()
+        display = drawDisplay(priceMap, iconMap)
+    }
 
-        display.add(Collections.singletonList("Coins per §cCopper§f:"))
-        display.add(Collections.singletonList(""))
+    private fun drawDisplay(
+        priceMap: MutableMap<Pair<String, String>, Double>,
+        iconMap: MutableMap<String, ItemStack>,
+    ): MutableList<List<Any>> {
+        val newList = mutableListOf<List<Any>>()
+
+        newList.add(Collections.singletonList("Coins per §cCopper§f:"))
+        newList.add(Collections.singletonList(""))
 
         val keys = priceMap.sortedDesc().keys
         val renderer = Minecraft.getMinecraft().fontRendererObj
@@ -78,13 +85,14 @@ class SkyMartBestProfit {
             while (renderer.getStringWidth(displayName.removeColor()) < longest) {
                 displayName += " "
             }
-            display.add(listOf(itemStack, "$displayName   $second"))
+            newList.add(listOf(itemStack, "$displayName   $second"))
         }
+        return newList
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        display.clear()
+        display = emptyList()
     }
 
     @SubscribeEvent
