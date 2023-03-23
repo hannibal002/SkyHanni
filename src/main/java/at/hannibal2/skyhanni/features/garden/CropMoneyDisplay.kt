@@ -52,56 +52,69 @@ class CropMoneyDisplay {
     private fun update() {
         init()
 
-        display = drawNewDisplay()
+        display = drawDisplay()
     }
 
-    private fun drawNewDisplay(): MutableList<List<Any>> {
+    private fun drawDisplay(): MutableList<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-
+        newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
         if (!ready) {
-            newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
             newDisplay.add(Collections.singletonList("§eLoading..."))
             return newDisplay
         }
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
-        newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
+        val moneyPerHourData = calculateMoneyPerHour()
+        if (moneyPerHourData.isEmpty()) {
+            if (!GardenAPI.isSpeedDataEmpty()) {
+                val message = "money/hr empty but speed data not empty, retry"
+                LorenzUtils.debug(message)
+                println(message)
+                newDisplay.add(Collections.singletonList("§eStill Loading..."))
+                ready = false
+                loaded = false
+                return newDisplay
+            }
+            newDisplay.add(Collections.singletonList("§cFarm crops to add them to this list!"))
+            return newDisplay
+        }
 
         var number = 0
-        val map = calculateMoneyPerHour()
-        if (map.isEmpty()) {
-            newDisplay.add(Collections.singletonList("§cFarm crops to add them to this list!"))
-        } else {
-            for ((internalName, moneyPerHour) in map.sortedDesc()) {
-                number++
-                val cropName = cropNames[internalName]!!
-                val isCurrent = cropName == GardenAPI.cropInHand
-                if (number > config.moneyPerHourShowOnlyBest && !isCurrent) continue
+        for ((internalName, moneyPerHour) in moneyPerHourData.sortedDesc()) {
+            number++
+            val cropName = cropNames[internalName]!!
+            val isCurrent = cropName == GardenAPI.cropInHand
+            if (number > config.moneyPerHourShowOnlyBest && !isCurrent) continue
 
-                val list = mutableListOf<Any>()
+            val list = mutableListOf<Any>()
+            if (!config.moneyPerHourCompact) {
                 list.add("§7$number# ")
-
-                try {
-                    val itemStack = NEUItems.getItemStack(internalName)
-                    list.add(itemStack)
-                } catch (e: NullPointerException) {
-                    e.printStackTrace()
-                }
-                val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
-                val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
-                val color = if (isCurrent) "§e" else "§7"
-                val contestFormat = if (GardenNextJacobContest.isNextCrop(cropName)) "§n" else ""
-                list.add("$color$contestFormat$itemName§7: §6$format")
-
-                newDisplay.add(list)
             }
+
+            try {
+                list.add(NEUItems.getItemStack(internalName))
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+            }
+
+            if (!config.moneyPerHourCompact) {
+                val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
+                val currentColor = if (isCurrent) "§e" else "§7"
+                val contestFormat = if (GardenNextJacobContest.isNextCrop(cropName)) "§n" else ""
+                list.add("$currentColor$contestFormat$itemName§7:")
+            }
+
+            val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
+            list.add(" §6$format")
+
+            newDisplay.add(list)
         }
 
         return newDisplay
     }
 
-    private fun calculateMoneyPerHour(): MutableMap<String, Double> {
+    private fun calculateMoneyPerHour(): Map<String, Double> {
         val moneyPerHours = mutableMapOf<String, Double>()
         for ((internalName, amount) in multipliers) {
             val price = NEUItems.getPrice(internalName)
@@ -132,18 +145,6 @@ class CropMoneyDisplay {
         loaded = true
 
         SkyHanniMod.coroutineScope.launch {
-            val crops = listOf(
-                "Wheat",
-                "Carrot",
-                "Potato",
-                "Pumpkin",
-                "Sugar Cane",
-                "Melon",
-                "Cactus",
-                "Cocoa Beans",
-                "Mushroom",
-                "Nether Wart",
-            )
 
             for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
                 if (!BazaarApi.isBazaarItem(internalName)) continue
