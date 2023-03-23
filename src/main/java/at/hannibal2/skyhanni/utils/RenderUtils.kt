@@ -458,7 +458,7 @@ object RenderUtils {
         if (list.isEmpty()) return
 
         var offsetY = 0
-        for (s in list.toMutableList()) {
+        for (s in list) {
             renderString(s, offsetY = offsetY, center = center)
             offsetY += 10 + extraSpace
         }
@@ -472,9 +472,8 @@ object RenderUtils {
         if (list.isEmpty()) return
 
         var offsetY = 0
-        // TODO remove toMutableList
         try {
-            for (line in list.toMutableList()) {
+            for (line in list) {
                 renderLine(line, offsetY, itemScale)
                 offsetY += 10 + extraSpace + 2
             }

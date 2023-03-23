@@ -61,7 +61,7 @@ class EliteFarmingWeight {
         private val config get() = SkyHanniMod.feature.garden
         private val localCounter = mutableMapOf<CropType, Long>()
 
-        private var display = mutableListOf<String>()
+        private var display = listOf<String>()
         private var profileId = ""
         private var lastLeaderboardUpdate = 0L
         private var apiError = false

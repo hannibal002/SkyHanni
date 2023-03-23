@@ -9,11 +9,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import java.util.*
 
 class GardenBestCropTime {
-    val display = mutableListOf<List<Any>>()
+    var display = listOf<List<Any>>()
     val timeTillNextCrop = mutableMapOf<CropType, Long>()
     private val config get() = SkyHanniMod.feature.garden
 
-    fun drawBestDisplay(currentCrop: CropType?) {
+    fun drawBestDisplay(currentCrop: CropType?): List<List<Any>> {
+        val newList = mutableListOf<List<Any>>()
         if (timeTillNextCrop.size < CropType.values().size) {
             updateTimeTillNextCrop()
         }
@@ -33,10 +34,11 @@ class GardenBestCropTime {
         }
 
         val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
-        display.add(Collections.singletonList("§eBest Crop Time §7($title§7)"))
+        newList.add(Collections.singletonList("§eBest Crop Time §7($title§7)"))
 
         if (sorted.isEmpty()) {
-            display.add(Collections.singletonList("§cFarm crops to add them to this list!"))
+            newList.add(Collections.singletonList("§cFarm crops to add them to this list!"))
+            return newList
         }
 
         var number = 0
@@ -61,8 +63,9 @@ class GardenBestCropTime {
                 val gardenExpForTier = getGardenExpForTier(nextTier)
                 list.add(" §7(§2$gardenExpForTier §7Exp)")
             }
-            display.add(list)
+            newList.add(list)
         }
+        return newList
     }
 
     private fun getGardenExpForTier(gardenLevel: Int) = if (gardenLevel > 30) 300 else gardenLevel * 10
