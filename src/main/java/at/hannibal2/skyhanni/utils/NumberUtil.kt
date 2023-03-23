@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import java.text.NumberFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -74,15 +75,23 @@ object NumberUtil {
         return (this * scale).roundToInt().toFloat() / scale
     }
 
-    fun Number.addSuffix(): String {
+    fun Number.ordinal(): String {
         val long = this.toLong()
-        if (long in 11..13) return "${this}th"
+        if (long % 100 in 11..13) return "th"
         return when (long % 10) {
-            1L -> "${this}st"
-            2L -> "${this}nd"
-            3L -> "${this}rd"
-            else -> "${this}th"
+            1L -> "st"
+            2L -> "nd"
+            3L -> "rd"
+            else -> "th"
         }
+    }
+
+    fun Number.addSuffix(): String {
+        return this.toString() + this.ordinal()
+    }
+
+    fun Number.addSeparators(): String {
+        return NumberFormat.getNumberInstance().format(this)
     }
 
     fun String.romanToDecimalIfNeeded() = toIntOrNull() ?: romanToDecimal()
