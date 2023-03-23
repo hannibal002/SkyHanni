@@ -94,29 +94,39 @@ class GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
-        val item = event.itemStack
-        val counter = GardenAPI.readCounter(item)
-        if (counter == -1) return
-        val crop = GardenAPI.getCropTypeFromItem(item) ?: return
-        if (cultivatingData.containsKey(crop)) {
-            val old = cultivatingData[crop]!!
-            val addedCounter = counter - old
-            // TODO remove try catch
-            try {
+        // TODO remove try catch
+        try {
+            val item = event.itemStack
+            val counter = GardenAPI.readCounter(item)
+            if (counter == -1) return
+            val crop = GardenAPI.getCropTypeFromItem(item) ?: return
+            if (cultivatingData.containsKey(crop)) {
+                val old = cultivatingData[crop]!!
+                val addedCounter = counter - old
+
+                if (GardenCropMilestones.cropCounter.isEmpty()) {
+                    for (innerCrop in CropType.values()) {
+                        innerCrop.setCounter(0)
+                    }
+                }
+                if (GardenAPI.isSpeedDataEmpty()) {
+                    for (cropType in CropType.values()) {
+                        cropType.setSpeed(-1)
+                    }
+                }
+
                 crop.setCounter(crop.getCounter() + addedCounter)
-            } catch (e: NullPointerException) {
-                println("crop: '$crop'")
-                println("GardenCropMilestones.cropCounter: '${GardenCropMilestones.cropCounter.keys}'")
-                LorenzUtils.debug("NPE at OwnInventorItemUpdateEvent with GardenCropMilestones.cropCounter")
-                e.printStackTrace()
+                EliteFarmingWeight.addCrop(crop, addedCounter)
+                if (currentCrop == crop) {
+                    calculateSpeed(addedCounter)
+                    update()
+                }
             }
-            EliteFarmingWeight.addCrop(crop, addedCounter)
-            if (currentCrop == crop) {
-                calculateSpeed(addedCounter)
-                update()
-            }
+            cultivatingData[crop] = counter
+        } catch (e: Throwable) {
+            LorenzUtils.error("[SkyHanni] Error in OwnInventorItemUpdateEvent")
+            e.printStackTrace()
         }
-        cultivatingData[crop] = counter
     }
 
     @SubscribeEvent
