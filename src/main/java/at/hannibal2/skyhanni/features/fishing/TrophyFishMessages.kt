@@ -16,7 +16,7 @@ class TrophyFishMessages {
     private var hasLoadedTrophyFish = false
     private val fishAmounts = mutableMapOf<String, Int>()
     private val trophyFishPattern =
-        Regex("§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w ].+)§r§r§r §r§l§r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.")
+        Regex("§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+)§r§r§r §r§l§r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.")
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
