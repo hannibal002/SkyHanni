@@ -127,5 +127,7 @@ class GardenAPI {
                 e.printStackTrace()
             }
         }
+
+        fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
     }
 }
