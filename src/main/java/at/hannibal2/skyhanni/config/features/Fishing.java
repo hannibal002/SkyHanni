@@ -20,6 +20,23 @@ public class Fishing {
     public boolean trophyCounter = false;
 
     @Expose
+    @ConfigOption(
+            name = "Trophy Counter Design",
+            desc = "§fStyle 1: §72. §6§lGOLD §5Moldfin\n" +
+                    "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
+                    "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
+    )
+    @ConfigEditorDropdown(values = {"Style 1", "Style 2", "Style 3"})
+    @ConfigAccordionId(id = 0)
+    public int trophyDesign = 0;
+
+    @Expose
+    @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same trophy fish from chat.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean trophyFishDuplicateHider = false;
+
+    @Expose
     @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
