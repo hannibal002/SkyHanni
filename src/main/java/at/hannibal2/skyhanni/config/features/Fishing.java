@@ -20,6 +20,18 @@ public class Fishing {
     public boolean trophyCounter = false;
 
     @Expose
+    @ConfigOption(
+            name = "Trophy Counter Design",
+            desc = "Change the way trophy fish are displayed in chat."
+    )
+    @ConfigEditorDropdown(values = {
+            "§72. §6§lGOLD §5Moldfin",
+            "§bYou caught a §5Moldfin §6§lGOLD§6. §7(2)",
+            "§bYou caught your 2nd §5Moldfin §6§lGOLD§6."})
+    @ConfigAccordionId(id = 0)
+    public int trophyDesign = 0;
+
+    @Expose
     @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
