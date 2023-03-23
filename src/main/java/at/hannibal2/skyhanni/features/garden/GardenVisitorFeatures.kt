@@ -114,7 +114,19 @@ class GardenVisitorFeatures {
             for ((internalName, amount) in requiredItems) {
                 val name = NEUItems.getItemStack(internalName).name
                 val itemStack = NEUItems.getItemStack(internalName)
-                newDisplay.add(listOf(" §7- ", itemStack, "$name §8x$amount"))
+
+                val list = mutableListOf<Any>()
+                list.add(" §7- ")
+                list.add(itemStack)
+                list.add("$name §8x$amount")
+
+                if (config.visitorNeedsShowPrice) {
+                    val price = NEUItems.getPrice(internalName) * amount
+                    val format = NumberUtil.format(price)
+                    list.add(" §7(§6$format§7)")
+                }
+
+                newDisplay.add(list)
             }
         }
         if (newVisitors.isNotEmpty()) {
@@ -209,11 +221,6 @@ class GardenVisitorFeatures {
                     var internalName: String
                     try {
                         internalName = NEUItems.getInternalName(itemName)
-                        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-                        // TODO remove workaround when this is fixed in neu
-                        if (internalName == "HAY_BALE") {
-                            internalName = "HAY_BLOCK"
-                        }
                     } catch (e: NullPointerException) {
                         val message = "internal name is null: '$itemName'"
                         println(message)
