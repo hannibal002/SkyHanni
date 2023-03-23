@@ -246,7 +246,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "cropMilestoneNextDisplay", buttonText = "Edit")
+    @ConfigEditorButton(runnableId = "cropMilestoneNext", buttonText = "Edit")
     @ConfigAccordionId(id = 7)
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
 
