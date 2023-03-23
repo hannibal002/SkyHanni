@@ -177,8 +177,7 @@ class EliteFarmingWeight {
             val format = LorenzUtils.formatDouble(weightUntilOvertake, 2)
 
             // TODO Maybe add next player name?
-//            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
-            val nextName = if (leaderboardPosition == -1) "#1000" else "#" + (leaderboardPosition - 1)
+            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
             return "§e$format §7(§b$timeFormat§7) §7behind §b$nextName"
         }
 
