@@ -66,7 +66,7 @@ class GardenAPI {
     fun onProfileJoin(event: ProfileJoinEvent) {
         if (cropsPerSecond.isEmpty()) {
             for (cropType in CropType.values()) {
-                cropsPerSecond[cropType] = -1
+                cropType.setSpeed(-1)
             }
         }
     }
