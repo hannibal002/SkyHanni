@@ -22,12 +22,11 @@ public class Fishing {
     @Expose
     @ConfigOption(
             name = "Trophy Counter Design",
-            desc = "Change the way trophy fish are displayed in chat."
+            desc = "§fStyle 1: §72. §6§lGOLD §5Moldfin\n" +
+                    "§fStyle 2: §bYou caught a §5Moldfin §6§lGOLD§b. §7(2)\n" +
+                    "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
     )
-    @ConfigEditorDropdown(values = {
-            "§72. §6§lGOLD §5Moldfin",
-            "§bYou caught a §5Moldfin §6§lGOLD§6. §7(2)",
-            "§bYou caught your 2nd §5Moldfin §6§lGOLD§6."})
+    @ConfigEditorDropdown(values = {"Style 1", "Style 2", "Style 3"})
     @ConfigAccordionId(id = 0)
     public int trophyDesign = 0;
 
