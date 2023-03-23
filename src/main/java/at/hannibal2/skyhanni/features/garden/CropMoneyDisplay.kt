@@ -102,11 +102,11 @@ class CropMoneyDisplay {
                 val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
                 val currentColor = if (isCurrent) "§e" else "§7"
                 val contestFormat = if (GardenNextJacobContest.isNextCrop(cropName)) "§n" else ""
-                list.add("$currentColor$contestFormat$itemName§7:")
+                list.add("$currentColor$contestFormat$itemName§7: ")
             }
 
             val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
-            list.add(" §6$format")
+            list.add("§6$format")
 
             newDisplay.add(list)
         }
