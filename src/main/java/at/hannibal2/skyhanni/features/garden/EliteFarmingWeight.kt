@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HyPixelData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -194,7 +195,7 @@ class EliteFarmingWeight {
         }
 
         private fun updateWeightPerSecond(crop: CropType, before: Double, after: Double, diff: Int) {
-            val speed = GardenAPI.cropsPerSecond[crop]!!
+            val speed = crop.getSpeed()
             if (speed != -1) {
                 val weightDiff = (after - before) * 1000
                 weightPerSecond = weightDiff / diff * speed / 1000

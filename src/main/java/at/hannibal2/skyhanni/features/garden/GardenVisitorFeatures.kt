@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData.Companion.sidebarLinesFormatted
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -234,7 +235,7 @@ class GardenVisitorFeatures {
                         val multiplier = NEUItems.getMultiplier(internalName)
                         val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
                         CropType.getByName(rawName)?.let {
-                            val speed = GardenAPI.getCropsPerSecond(it)
+                            val speed = it.getSpeed()
                             val cropAmount = multiplier.second.toLong() * amount
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
                             val formatName = "§e$formatAmount§7x ${it.cropName} "
