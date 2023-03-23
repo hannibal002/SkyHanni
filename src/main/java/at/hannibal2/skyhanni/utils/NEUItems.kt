@@ -17,7 +17,7 @@ object NEUItems {
     private val itemCache = mutableMapOf<String, ItemStack>()
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
-    private val recipesCache = mutableMapOf<String, List<NeuRecipe>>()
+    private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
 
     fun getInternalName(itemName: String): String {
         if (itemNameCache.containsKey(itemName)) {
@@ -161,11 +161,11 @@ object NEUItems {
         return result
     }
 
-    fun getRecipes(minionId: String): List<NeuRecipe> {
+    fun getRecipes(minionId: String): Set<NeuRecipe> {
         if (recipesCache.contains(minionId)) {
             return recipesCache[minionId]!!
         }
-        val recipes = manager.getAvailableRecipesFor(minionId)
+        val recipes = manager.getRecipesFor(minionId)
         recipesCache[minionId] = recipes
         return recipes
     }
