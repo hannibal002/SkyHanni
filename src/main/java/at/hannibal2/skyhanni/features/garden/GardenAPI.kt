@@ -101,9 +101,7 @@ class GardenAPI {
             return -1
         }
 
-        fun getCropsPerSecond(crop: CropType): Int {
-            return cropsPerSecond[crop]!!
-        }
+        fun CropType.getSpeed() = cropsPerSecond[this]!!
 
         fun itemNameToCropName(itemName: String): CropType? {
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") {

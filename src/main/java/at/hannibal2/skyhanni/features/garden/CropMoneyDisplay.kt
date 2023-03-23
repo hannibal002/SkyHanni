@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
@@ -107,7 +108,7 @@ class CropMoneyDisplay {
         for ((internalName, amount) in multipliers) {
             val price = NEUItems.getPrice(internalName)
             val cropName = cropNames[internalName]!!
-            val speed = GardenAPI.getCropsPerSecond(cropName)
+            val speed = cropName.getSpeed()
             // No speed data for item in hand
             if (speed == -1) continue
 
