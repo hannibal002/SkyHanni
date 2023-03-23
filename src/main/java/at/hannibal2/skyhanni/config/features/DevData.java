@@ -79,50 +79,50 @@ public class DevData {
     @ConfigOption(name = "Filter Grow Buffer", desc = "Filter 'Needed to grow BufferBuilder buffer:'")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterGrowBuffer = false;
+    public boolean filterGrowBuffer = true;
 
     @Expose
     @ConfigOption(name = "Filter Sound Error", desc = "Filter 'Unable to play unknown soundEvent'.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterUnknownSound = false;
+    public boolean filterUnknownSound = true;
 
     @Expose
     @ConfigOption(name = "Filter Scoreboard Errors", desc = "Filter error messages with Scoreboard: removeTeam, createTeam, " +
             "removeObjective and 'scoreboard team already exists'.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterScoreboardErrors = false;
+    public boolean filterScoreboardErrors = true;
 
     @Expose
     @ConfigOption(name = "Filter Particle", desc = "Filter message 'Could not spawn particle effect VILLAGER_HAPPY'.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterParticleVillagerHappy = false;
+    public boolean filterParticleVillagerHappy = true;
 
     @Expose
     @ConfigOption(name = "Filter OptiFine", desc = "Filter OptiFine messages CustomItems and ConnectedTextures during loading.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterOptiFine = false;
+    public boolean filterOptiFine = true;
 
     @Expose
     @ConfigOption(name = "Filter AsmHelper Transformer", desc = "Filter messages when AsmHelper is Transforming a class during loading.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterAmsHelperTransformer = false;
+    public boolean filterAmsHelperTransformer = true;
 
     @Expose
     @ConfigOption(name = "Filter Applying AsmWriter", desc = "Filter messages when AsmHelper is applying AsmWriter ModifyWriter.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterAsmHelperApplying = false;
+    public boolean filterAsmHelperApplying = true;
 
     @Expose
     @ConfigOption(name = "Filter Biome ID Bounds", desc = "Filter message 'Biome ID is out of bounds'.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    public boolean filterBiomeIdBounds = false;
+    public boolean filterBiomeIdBounds = true;
 
     @Expose
     @ConfigOption(name = "Print Event Timings", desc = "Prints every 10 seconds the timings of all SkyHanni events in the chat.")
