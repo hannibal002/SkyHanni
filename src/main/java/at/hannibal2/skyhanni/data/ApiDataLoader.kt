@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,7 +29,7 @@ class ApiDataLoader {
             nextApiCallTime = System.currentTimeMillis() + 60_000 * 5
             SkyHanniMod.coroutineScope.launch {
                 val apiKey = SkyHanniMod.feature.hidden.apiKey
-                val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
+                val uuid = LorenzUtils.getPlayerUuid()
                 loadProfileData(apiKey, uuid, currentProfileId)
             }
         }
@@ -56,7 +55,7 @@ class ApiDataLoader {
     }
 
     private suspend fun tryUpdateProfileDataAndVerifyKey(apiKey: String): Boolean {
-        val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
+        val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.hypixel.net/player?key=$apiKey&uuid=$uuid"
         val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
 

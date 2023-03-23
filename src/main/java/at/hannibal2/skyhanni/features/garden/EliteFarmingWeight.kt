@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.minecraft.client.Minecraft
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -208,7 +207,7 @@ class EliteFarmingWeight {
         }
 
         private suspend fun loadLeaderboardPosition() = try {
-            val uuid = Minecraft.getMinecraft().thePlayer.uniqueID.toString().replace("-", "")
+            val uuid = LorenzUtils.getPlayerUuid()
             val showNext = if (isEtaEnabled()) "?showNext=true" else ""
             val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId$showNext"
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
@@ -228,15 +227,8 @@ class EliteFarmingWeight {
             -1
         }
 
-        private fun UUID.uuidToString(): String {
-            return "$this"
-        }
-
         private suspend fun loadWeight(localProfile: String) {
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            val uniqueID = thePlayer.uniqueID
-            val abc = uniqueID.uuidToString()
-            val uuid = abc.replace("-", "")
+            val uuid = LorenzUtils.getPlayerUuid()
             val url = "https://elitebot.dev/api/weight/$uuid"
 
             try {
