@@ -46,6 +46,7 @@ class EliteFarmingWeight {
         lastLeaderboardUpdate = 0
         nextPlayerWeight = 0.0
         nextPlayerName = ""
+        hasPassedNext = false
     }
 
     var tick = 0
@@ -74,6 +75,7 @@ class EliteFarmingWeight {
 
         private var nextPlayerName = ""
         private var nextPlayerWeight = 0.0
+        private var hasPassedNext = false
 
         private fun update() {
             if (!GardenAPI.inGarden()) return
@@ -153,11 +155,18 @@ class EliteFarmingWeight {
             if (weight < 0) return ""
 
             val totalWeight = (localWeight + weight)
+            val weightUntilOvertake = nextPlayerWeight - totalWeight
+            if (weightUntilOvertake < 0) {
+                if (!hasPassedNext) {
+                    leaderboardPosition--
+                    nextPlayerWeight = 0.0
+                    hasPassedNext = true
+                }
+            }
+
             if (nextPlayerWeight == 0.0) {
                 return "§cRejoin the garden to show ETA!"
             }
-
-            val weightUntilOvertake = nextPlayerWeight - totalWeight
             val timeTillOvertake = (weightUntilOvertake / weightPerSecond) * 1000
             val timeFormat = TimeUtils.formatDuration(timeTillOvertake.toLong())
 
