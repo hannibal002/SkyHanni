@@ -270,10 +270,10 @@ class EliteFarmingWeight {
         private fun calculateCollectionWeight(round: Boolean = true): MutableMap<CropType, Double> {
             val weightPerCrop = mutableMapOf<CropType, Double>()
             var totalWeight = 0.0
-            for ((cropName, factor) in factorPerCrop) {
-                val collection = getLocalCollection(cropName)
-                val weight = (collection / factor).also { if (round) weight.round(2) else weight }
-                weightPerCrop[cropName] = weight
+            for (crop in CropType.values()) {
+                val collection = getLocalCollection(crop)
+                val weight = (collection / crop.getFactor()).also { if (round) weight.round(2) else weight }
+                weightPerCrop[crop] = weight
                 totalWeight += weight
             }
             if (totalWeight > 0) {
@@ -288,7 +288,7 @@ class EliteFarmingWeight {
             val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight;
             val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight;
 
-            val mushroomFactor = factorPerCrop[CropType.MUSHROOM]!!
+            val mushroomFactor = CropType.MUSHROOM.getFactor()
             val mushroomCollection = getLocalCollection(CropType.MUSHROOM)
             return doubleBreakRatio * (mushroomCollection / (2 * mushroomFactor)) + normalRatio * (mushroomCollection / mushroomFactor)
         }
@@ -296,6 +296,8 @@ class EliteFarmingWeight {
         private fun getLocalCollection(crop: CropType): Long {
             return localCollection[crop] ?: 0L
         }
+
+        private fun CropType.getFactor() = factorPerCrop[this]!!
 
         private val factorPerCrop by lazy {
             mapOf(
