@@ -23,7 +23,12 @@ object NEUItems {
         if (itemNameCache.containsKey(itemName)) {
             return itemNameCache[itemName]!!
         }
-        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false)
+        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false)
+        // This fixes a NEU bug with §9Hay Bale (cosmetic item)
+        // TODO remove workaround when this is fixed in neu
+        if (internalName == "HAY_BALE") {
+            internalName = "HAY_BLOCK"
+        }
         itemNameCache[itemName] = internalName
         return internalName
     }

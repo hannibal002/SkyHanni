@@ -83,6 +83,12 @@ public class Garden {
     public boolean visitorNeedsOnlyWhenClose = false;
 
     @Expose
+    @ConfigOption(name = "Show Price", desc = "Show the coin price in the items needed list.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean visitorNeedsShowPrice = true;
+
+    @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
     @ConfigAccordionId(id = 1)
     @ConfigEditorAccordion(id = 4)
