@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
+    private val config get() = SkyHanniMod.feature.hidden
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -19,15 +20,15 @@ class CurrentPetDisplay {
 
         val message = event.message
         if (message.matchRegex("§aYou summoned your §r(.*)§r§a!")) {
-            SkyHanniMod.feature.hidden.currentPet = message.between("your §r", "§r§a")
+            config.currentPet = message.between("your §r", "§r§a")
             blocked = true
         }
         if (message.matchRegex("§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE")) {
-            SkyHanniMod.feature.hidden.currentPet = message.between("] ", "§e!")
+            config.currentPet = message.between("] ", "§e!")
             blocked = true
         }
         if (message.matchRegex("§aYou despawned your §r(.*)§r§a!")) {
-            SkyHanniMod.feature.hidden.currentPet = ""
+            config.currentPet = ""
             blocked = true
         }
 
@@ -42,6 +43,6 @@ class CurrentPetDisplay {
 
         if (!SkyHanniMod.feature.misc.petDisplay) return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(SkyHanniMod.feature.hidden.currentPet)
+        SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet)
     }
 }
