@@ -72,11 +72,11 @@ class GardenAPI {
     }
 
     companion object {
-        fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
-
         var toolInHand: String? = null
-        val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
+        private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
         var cropInHand: CropType? = null
+
+        fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
         fun getCropTypeFromItem(item: ItemStack?): CropType? {
             val internalName = item?.getInternalName() ?: return null
@@ -102,6 +102,10 @@ class GardenAPI {
         }
 
         fun CropType.getSpeed() = cropsPerSecond[this]!!
+        
+        fun CropType.setSpeed(speed: Int) {
+            cropsPerSecond[this] = speed
+        }
 
         fun itemNameToCropName(itemName: String): CropType? {
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") {

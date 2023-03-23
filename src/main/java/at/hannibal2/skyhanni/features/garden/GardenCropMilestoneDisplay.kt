@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.setSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -191,7 +192,7 @@ class GardenCropMilestoneDisplay {
         }
 
         if (averageSpeedPerSecond != 0) {
-            GardenAPI.cropsPerSecond[crop] = averageSpeedPerSecond
+            crop.setSpeed(averageSpeedPerSecond)
             val missing = need - have
             val missingTimeSeconds = missing / averageSpeedPerSecond
             val millis = missingTimeSeconds * 1000

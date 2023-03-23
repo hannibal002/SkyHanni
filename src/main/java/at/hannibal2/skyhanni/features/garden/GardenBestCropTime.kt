@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.TimeUtils
 import java.util.*
@@ -13,7 +14,7 @@ class GardenBestCropTime {
     private val config get() = SkyHanniMod.feature.garden
 
     fun drawBestDisplay(currentCrop: CropType?) {
-        if (timeTillNextCrop.size < GardenAPI.cropsPerSecond.size) {
+        if (timeTillNextCrop.size < CropType.values().size) {
             updateTimeTillNextCrop()
         }
 
@@ -67,7 +68,8 @@ class GardenBestCropTime {
     private fun getGardenExpForTier(gardenLevel: Int) = if (gardenLevel > 30) 300 else gardenLevel * 10
 
     fun updateTimeTillNextCrop() {
-        for ((crop, speed) in GardenAPI.cropsPerSecond) {
+        for (crop in CropType.values()) {
+            val speed = crop.getSpeed()
             if (speed == -1) continue
 
             val counter = crop.getCounter()
