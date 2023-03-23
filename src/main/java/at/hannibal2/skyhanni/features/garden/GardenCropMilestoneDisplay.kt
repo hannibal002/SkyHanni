@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.setSpeed
@@ -10,16 +12,21 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils
+import net.minecraft.block.properties.PropertyInteger
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.PositionedSound
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
+    private var mushroomCowPerkDisplay = listOf<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Int>()
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
@@ -57,6 +64,11 @@ class GardenCropMilestoneDisplay {
         if (!isEnabled()) return
 
         config.cropMilestoneProgressDisplayPos.renderStringsAndItems(progressDisplay)
+
+        if (config.cropMilestoneMushroomPetPerkEnabled) {
+            config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(mushroomCowPerkDisplay)
+        }
+
         if (config.cropMilestoneBestDisplay) {
             config.cropMilestoneNextDisplayPos.renderStringsAndItems(bestCropTime.display)
         }
@@ -85,8 +97,9 @@ class GardenCropMilestoneDisplay {
         if (cultivatingData.containsKey(crop)) {
             val old = cultivatingData[crop]!!
             val addedCounter = counter - old
+            // TODO remove try catch
             try {
-                GardenCropMilestones.cropCounter[crop] = crop.getCounter() + addedCounter
+                crop.setCounter(crop.getCounter() + addedCounter)
             } catch (e: NullPointerException) {
                 println("crop: '$crop'")
                 println("GardenCropMilestones.cropCounter: '${GardenCropMilestones.cropCounter.keys}'")
@@ -102,35 +115,106 @@ class GardenCropMilestoneDisplay {
         cultivatingData[crop] = counter
     }
 
-    private var lastSecondStart = 0L
+    @SubscribeEvent
+    fun onBlockClick(event: BlockClickEvent) {
+        if (!isEnabled()) return
+
+        if (event.clickType == ClickType.LEFT_CLICK) {
+            val blockState = event.getBlockState
+
+            if (isFarmBlock(blockState)) {
+                for (property in blockState.block.blockState.properties) {
+                    val name = property.name
+                    if (name == "age") {
+                        if (property is PropertyInteger) {
+                            val value = blockState.getValue(property)!!
+                            if (value == 0) return
+                        }
+                    }
+                }
+                blocksBroken++
+            }
+        }
+    }
+
+    private fun isFarmBlock(blockState: IBlockState): Boolean {
+        val block = blockState.block
+        if (block == Blocks.carrots) return true
+        if (block == Blocks.potatoes) return true
+        if (block == Blocks.wheat) {
+            for (property in block.blockState.properties) {
+                val name = property.name
+                if (name != "age") continue
+                if (property !is PropertyInteger) continue
+
+                val age = blockState.getValue(property)
+                if (age == 0) {
+                    return false
+                }
+            }
+            return true
+        }
+        if (block == Blocks.cocoa) return true // Cocoa Beans
+        if (block == Blocks.red_mushroom) return true
+        if (block == Blocks.brown_mushroom) return true
+        if (block == Blocks.cactus) return true
+        if (block == Blocks.reeds) return true // Sugar Cane
+        if (block == Blocks.nether_wart) return true
+        if (block == Blocks.melon_block) return true
+        if (block == Blocks.pumpkin) return true
+
+        if (block == Blocks.dirt) return false
+        if (block == Blocks.farmland) return false
+
+        return false
+    }
+
     private var currentSpeed = 0
     private var averageSpeedPerSecond = 0
     private var countInLastSecond = 0
     private val allCounters = mutableListOf<Int>()
     private var lastItemInHand: ItemStack? = null
     private var currentCrop: CropType? = null
+    private var blocksBroken = 0
+    private var lastBlocksPerSecond = 0
 
     private fun resetSpeed() {
-        lastSecondStart = 0
         currentSpeed = 0
         averageSpeedPerSecond = 0
         countInLastSecond = 0
         allCounters.clear()
     }
 
-    private fun calculateSpeed(addedCounter: Int) {
-        if (System.currentTimeMillis() > lastSecondStart + 1_000) {
-            lastSecondStart = System.currentTimeMillis()
-            if (countInLastSecond > 8) {
-                allCounters.add(currentSpeed)
-                while (allCounters.size > 30) {
-                    allCounters.removeFirst()
-                }
-                averageSpeedPerSecond = allCounters.average().toInt()
+    init {
+        fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
+            if (isEnabled()) {
+                checkSpeed()
             }
-            countInLastSecond = 0
-            currentSpeed = 0
         }
+    }
+
+    private fun checkSpeed() {
+        if (countInLastSecond > 8) {
+            allCounters.add(currentSpeed)
+            while (allCounters.size > 30) {
+                allCounters.removeFirst()
+            }
+            averageSpeedPerSecond = allCounters.average().toInt()
+        }
+        countInLastSecond = 0
+        currentSpeed = 0
+
+        lastBlocksPerSecond = blocksBroken
+        val hasMushroomCow = hasMushroomCow()
+        if (hasMushroomCow) {
+            CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
+        }
+        blocksBroken = 0
+    }
+
+    private fun hasMushroomCow() = SkyHanniMod.feature.hidden.currentPet.contains("Mooshroom Cow")
+
+    private fun calculateSpeed(addedCounter: Int) {
         currentSpeed += addedCounter
         countInLastSecond++
     }
@@ -148,33 +232,34 @@ class GardenCropMilestoneDisplay {
 
     private fun update() {
         progressDisplay = emptyList()
+        mushroomCowPerkDisplay = emptyList()
         bestCropTime.display = emptyList()
         currentCrop?.let {
-            progressDisplay =  drawProgressDisplay(it, it.getCounter())
+            progressDisplay = drawProgressDisplay(it, it.getCounter())
             if (config.cropMilestoneBestDisplay) {
-                bestCropTime.display =   bestCropTime.drawBestDisplay(it)
+                bestCropTime.display = bestCropTime.drawBestDisplay(it)
             }
         }
         if (config.cropMilestoneBestAlwaysOn) {
             if (currentCrop == null) {
-                bestCropTime.display =  bestCropTime.drawBestDisplay(null)
+                bestCropTime.display = bestCropTime.drawBestDisplay(null)
             }
         }
     }
 
     private fun drawProgressDisplay(crop: CropType, counter: Long): MutableList<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
-        newList.add(Collections.singletonList("§6Crop Milestones"))
+        val lineMap = HashMap<Int, List<Any>>()
+        lineMap[0] = Collections.singletonList("§6Crop Milestones")
+
+        val currentTier = GardenCropMilestones.getTierForCrops(counter)
+        val nextTier = currentTier + 1
 
         val list = mutableListOf<Any>()
         GardenAPI.addGardenCropToList(crop, list)
-        list.add(crop.cropName)
-        newList.add(list)
-
-        val currentTier = GardenCropMilestones.getTierForCrops(counter)
+        list.add("§7" + crop.cropName + " Tier $nextTier")
+        lineMap[1] = list
 
         val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
-        val nextTier = currentTier + 1
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
 
         val have = counter - cropsForCurrentTier
@@ -182,13 +267,12 @@ class GardenCropMilestoneDisplay {
 
         val haveFormat = LorenzUtils.formatInteger(have)
         val needFormat = LorenzUtils.formatInteger(need)
-        newList.add(Collections.singletonList("§7Progress to Tier $nextTier§8:"))
-        newList.add(Collections.singletonList("§e$haveFormat§8/§e$needFormat"))
+        lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
 
         lastItemInHand?.let {
             if (GardenAPI.readCounter(it) == -1) {
-                newList.add(Collections.singletonList("§cWarning: You need Cultivating!"))
-                return newList
+                lineMap[3] = Collections.singletonList("§cWarning: You need Cultivating!")
+                return formatDisplay(lineMap)
             }
         }
 
@@ -208,10 +292,27 @@ class GardenCropMilestoneDisplay {
                     SendTitleHelper.sendTitle("§b$crop $nextTier in $duration", 1_500)
                 }
             }
-            newList.add(Collections.singletonList("§7in §b$duration"))
+            lineMap[3] = Collections.singletonList("§7In §b$duration")
 
             val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
-            newList.add(Collections.singletonList("§7Crops/minute§8: §e$format"))
+            lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
+            lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$lastBlocksPerSecond")
+
+
+            if (hasMushroomCow() && crop != CropType.MUSHROOM) {
+                addMushroomCowData()
+            }
+        }
+
+        return formatDisplay(lineMap)
+    }
+
+    private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
+        val newList = mutableListOf<List<Any>>()
+        for (index in config.cropMilestoneText) {
+            lineMap[index]?.let {
+                newList.add(it)
+            }
         }
 
         if (needsInventory) {
@@ -219,6 +320,48 @@ class GardenCropMilestoneDisplay {
         }
 
         return newList
+    }
+
+    private fun addMushroomCowData() {
+        val lineMap = HashMap<Int, List<Any>>()
+        val counter = CropType.MUSHROOM.getCounter()
+
+        val currentTier = GardenCropMilestones.getTierForCrops(counter)
+        val nextTier = currentTier + 1
+
+        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
+
+        val have = counter - cropsForCurrentTier
+        val need = cropsForNextTier - cropsForCurrentTier
+
+        val haveFormat = LorenzUtils.formatInteger(have)
+        val needFormat = LorenzUtils.formatInteger(need)
+
+        val missing = need - have
+
+        // We assume perfect 20 blocks per second speed for this
+        val missingTimeSeconds = missing / 20
+        val millis = missingTimeSeconds * 1000
+        val duration = TimeUtils.formatDuration(millis)
+
+        lineMap[0] = Collections.singletonList("§6Mooshroom Cow Perk")
+
+        val list = mutableListOf<Any>()
+        GardenAPI.addGardenCropToList(CropType.MUSHROOM, list)
+        list.add("§7Mushroom Tier $nextTier")
+        lineMap[1] = list
+
+        lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
+        lineMap[3] = Collections.singletonList("§7In §b$duration")
+
+        val newList = mutableListOf<List<Any>>()
+        for (index in config.cropMilestoneMushroomPetPerkText) {
+            lineMap[index]?.let {
+                newList.add(it)
+            }
+        }
+        mushroomCowPerkDisplay = newList
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.cropMilestoneProgress

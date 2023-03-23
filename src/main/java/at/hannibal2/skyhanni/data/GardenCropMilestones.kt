@@ -33,7 +33,7 @@ class GardenCropMilestones {
     fun onProfileJoin(event: ProfileJoinEvent) {
         if (cropCounter.isEmpty()) {
             for (crop in CropType.values()) {
-                cropCounter[crop] = 0
+                crop.setCounter(0)
             }
         }
     }
@@ -65,7 +65,7 @@ class GardenCropMilestones {
                     if (matcher.matches()) {
                         val rawNumber = matcher.group(1)
                         val overflow = rawNumber.formatNumber()
-                        cropCounter[crop] = cropForTier + overflow
+                        crop.setCounter(cropForTier + overflow)
                     }
                     next = false
                 }
@@ -79,6 +79,8 @@ class GardenCropMilestones {
         val cropCounter: MutableMap<CropType, Long> get() = SkyHanniMod.feature.hidden.gardenCropCounter
 
         fun CropType.getCounter() = cropCounter[this]!!
+
+        fun CropType.setCounter(counter: Long) { cropCounter[this] = counter }
 
         fun getTierForCrops(crops: Long): Int {
             var tier = 0
