@@ -5,6 +5,10 @@ import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Garden {
 
     @Expose
@@ -167,6 +171,24 @@ public class Garden {
     @ConfigAccordionId(id = 6)
     public boolean cropMilestoneWarnClose = true;
 
+    @Expose
+    @ConfigOption(
+            name = "Milestone Text",
+            desc = "Drag text to change the appearance of the overlay.\n" +
+                    "Hold a farming tool to show the overlay."
+    )
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "§6Crop Milestones",
+                    "§7Pumpkin Tier 22",
+                    "§e12,300§8/§e100,000",
+                    "§7In §b12m 34s",
+                    "§7Crops/Minute§8: §e12,345",
+                    "§7Blocks/Second§8: §e20",
+            }
+    )
+    @ConfigAccordionId(id = 6)
+    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
     @Expose
     @ConfigOption(name = "Display Position", desc = "")
@@ -218,9 +240,47 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "cropMilestoneNext", buttonText = "Edit")
+    @ConfigEditorButton(runnableId = "cropMilestoneNextDisplay", buttonText = "Edit")
     @ConfigAccordionId(id = 7)
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
+
+    @Expose
+    @ConfigOption(name = "Mushroom Pet Perk", desc = "")
+    @ConfigAccordionId(id = 6)
+    @ConfigEditorAccordion(id = 15)
+    public boolean cropMilestoneMushroomPetPerk = false;
+
+    // TODO moulconfig runnable support
+    @Expose
+    @ConfigOption(
+            name = "Display Enabled",
+            desc = "Show the progress and ETA for mushroom crops when farming other crops because of the mushroom cow perk.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 15)
+    public boolean cropMilestoneMushroomPetPerkEnabled = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Mushroom Text",
+            desc = "Drag text to change the appearance of the overlay.\n" +
+                    "Hold a farming tool to show the overlay."
+    )
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "§6Mooshroom Cow Perk",
+                    "§7Mushroom Tier 8",
+                    "§e6,700§8/§e15,000",
+                    "§7In §b12m 34s",
+            }
+    )
+    @ConfigAccordionId(id = 15)
+    public List<Integer> cropMilestoneMushroomPetPerkText = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+
+    @Expose
+    @ConfigOption(name = "Display Position", desc = "")
+    @ConfigEditorButton(runnableId = "cropMilestoneMushroomPetPerk", buttonText = "Edit")
+    @ConfigAccordionId(id = 15)
+    public Position cropMilestoneMushroomPetPerkPos = new Position(-112, -143, false, true);
 
     // TODO moulconfig runnable support
     @Expose

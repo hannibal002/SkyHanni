@@ -228,6 +228,11 @@ public class Features extends Config {
             editOverlay(activeConfigCategory, 200, 16, garden.nextJacobContestPos);
             return;
         }
+
+        if (runnableId.equals("cropMilestoneMushroomPetPerk")) {
+            editOverlay(activeConfigCategory, 200, 16, garden.cropMilestoneMushroomPetPerkPos);
+            return;
+        }
     }
 
     @Expose
