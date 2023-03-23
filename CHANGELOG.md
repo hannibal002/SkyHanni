@@ -31,6 +31,7 @@
 + Added Desk shortcut in SkyBlock Menu.
 + Added **Garden Level Display** - Show the current garden level and progress to the next level.
 + Added **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
++ Added farming weight next leaderboard position eta.
 + Added **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
 + Added **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
