@@ -33,11 +33,11 @@ class GardenOptimalSpeed {
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         cropInHand = event.crop
         if (isEnabled()) {
-            optimalSpeed = cropInHand.let { if (it != null) speedForCrop(it) else -1 }
+            optimalSpeed = cropInHand.let { it?.getOptimalSpeed() ?: -1 }
         }
     }
 
-    private fun speedForCrop(crop: CropType) = when (crop) {
+    private fun CropType.getOptimalSpeed() = when (this) {
         CropType.WHEAT -> 93
         CropType.CARROT -> 93
         CropType.POTATO -> 93
