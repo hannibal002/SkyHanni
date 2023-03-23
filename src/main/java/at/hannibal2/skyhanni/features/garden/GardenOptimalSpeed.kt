@@ -17,7 +17,7 @@ class GardenOptimalSpeed {
     private var optimalSpeed = -1
     private val currentSpeedPattern = Pattern.compile(" Speed: §r§f✦(.*)")
     private var lastWarnTime = 0L
-    private var cropInHand: String? = null
+    private var cropInHand: CropType? = null
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -31,25 +31,23 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        cropInHand = if (event.isRealCrop) event.crop else null
+        cropInHand = event.crop
         if (isEnabled()) {
             optimalSpeed = cropInHand.let { if (it != null) speedForCrop(it) else -1 }
         }
     }
 
-    private fun speedForCrop(crop: String) = when (crop) {
-        "Wheat" -> 93
-        "Carrot" -> 93
-        "Potato" -> 93
-        "Pumpkin" -> 155
-        "Sugar Cane" -> 328
-        "Melon" -> 155
-        "Cactus" -> 400 // 500 with racing helmet
-        "Cocoa Beans" -> 155
-        "Mushroom" -> 233
-        "Nether Wart" -> 93
-
-        else -> -1
+    private fun speedForCrop(crop: CropType) = when (crop) {
+        CropType.WHEAT -> 93
+        CropType.CARROT -> 93
+        CropType.POTATO -> 93
+        CropType.PUMPKIN -> 155
+        CropType.SUGAR_CANE -> 328
+        CropType.MELON -> 155
+        CropType.CACTUS -> 400 // 500 with racing helmet
+        CropType.COCOA_BEANS -> 155
+        CropType.MUSHROOM -> 233
+        CropType.NETHER_WART -> 93
     }
 
     @SubscribeEvent

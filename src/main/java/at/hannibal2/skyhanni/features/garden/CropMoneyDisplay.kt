@@ -23,7 +23,7 @@ class CropMoneyDisplay {
     private var loaded = false
     private var ready = false
     private val multipliers = mutableMapOf<String, Int>()
-    private val cropNames = mutableMapOf<String, String>() // internalName -> cropName
+    private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
     private var hasCropInHand = false
 
     @SubscribeEvent
@@ -35,8 +35,7 @@ class CropMoneyDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        val crop = if (event.isRealCrop) event.crop else null
-        hasCropInHand = crop != null
+        hasCropInHand = event.crop != null
         update()
     }
 
@@ -109,12 +108,6 @@ class CropMoneyDisplay {
             val price = NEUItems.getPrice(internalName)
             val cropName = cropNames[internalName]!!
             val speed = GardenAPI.getCropsPerSecond(cropName)
-            if (speed == null) {
-                println("calculateMoneyPerHour: Speed is null for crop name '$cropName' ($internalName)")
-                LorenzUtils.debug("calculateMoneyPerHour: Speed is null!")
-                continue
-            }
-
             // No speed data for item in hand
             if (speed == -1) continue
 
@@ -160,10 +153,10 @@ class CropMoneyDisplay {
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
                 if (amount < 10) continue
                 val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
-                val cropName = GardenAPI.itemNameToCropName(itemName)
-                if (crops.contains(cropName)) {
+                val crop = GardenAPI.itemNameToCropName(itemName)
+                crop?.let {
                     multipliers[internalName] = amount
-                    cropNames[internalName] = cropName
+                    cropNames[internalName] = it
                 }
             }
 

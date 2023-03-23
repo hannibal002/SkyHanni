@@ -232,14 +232,14 @@ class GardenVisitorFeatures {
 
                     if (config.visitorExactAmountAndTime) {
                         val multiplier = NEUItems.getMultiplier(internalName)
-                        val rawName = NEUItems.getItemStack(multiplier.first).name ?: continue
-                        val crop = rawName.removeColor()
-                        val cropAmount = multiplier.second.toLong() * amount
-                        GardenAPI.getCropsPerSecond(crop)?.let {
+                        val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
+                        CropType.getByName(rawName)?.let {
+                            val speed = GardenAPI.getCropsPerSecond(it)
+                            val cropAmount = multiplier.second.toLong() * amount
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
-                            val formatName = "§e${formatAmount}§7x $crop "
-                            val formatSpeed = if (it != -1) {
-                                val missingTimeSeconds = cropAmount / it
+                            val formatName = "§e$formatAmount§7x ${it.cropName} "
+                            val formatSpeed = if (speed != -1) {
+                                val missingTimeSeconds = cropAmount / speed
                                 val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
                                 "in §b$duration"
                             } else {

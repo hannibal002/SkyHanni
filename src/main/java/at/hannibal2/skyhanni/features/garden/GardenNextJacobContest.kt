@@ -88,11 +88,11 @@ class GardenNextJacobContest {
 
             val day = matcherDay.group(1).toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()
-            val crops = mutableListOf<String>()
+            val crops = mutableListOf<CropType>()
             for (line in lore) {
                 val matcherCrop = patternCrop.matcher(line)
                 if (!matcherCrop.matches()) continue
-                crops.add(matcherCrop.group(1))
+                crops.add(CropType.getByNameNoNull(matcherCrop.group(1)))
             }
             val contest = FarmingContest(startTime + contestDuration, crops)
             contests[startTime] = contest
@@ -117,7 +117,7 @@ class GardenNextJacobContest {
         }
     }
 
-    class FarmingContest(val endTime: Long, val crops: List<String>)
+    class FarmingContest(val endTime: Long, val crops: List<CropType>)
 
     private fun update() {
         nextContestCrops.clear()
@@ -200,8 +200,8 @@ class GardenNextJacobContest {
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
-        private val nextContestCrops = mutableListOf<String>()
+        private val nextContestCrops = mutableListOf<CropType>()
 
-        fun isNextCrop(cropName: String) = nextContestCrops.contains(cropName) && config.nextJacobContestOtherGuis
+        fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.nextJacobContestOtherGuis
     }
 }

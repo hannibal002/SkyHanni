@@ -68,9 +68,8 @@ class WrongFungiCutterWarning {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        val crop = event.crop ?: ""
-        if (crop == "Mushroom") {
-            readItem(event.heldItem!!)
+        if (event.crop == CropType.MUSHROOM) {
+            readItem(event.toolItem!!)
         } else {
             mode = FungiMode.UNKNOWN
         }

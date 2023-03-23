@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -31,16 +32,9 @@ class GardenCropMilestones {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         if (cropCounter.isEmpty()) {
-            cropCounter["Wheat"] = 0
-            cropCounter["Carrot"] = 0
-            cropCounter["Potato"] = 0
-            cropCounter["Pumpkin"] = 0
-            cropCounter["Sugar Cane"] = 0
-            cropCounter["Melon"] = 0
-            cropCounter["Cactus"] = 0
-            cropCounter["Cocoa Beans"] = 0
-            cropCounter["Mushroom"] = 0
-            cropCounter["Nether Wart"] = 0
+            for (crop in CropType.values()) {
+                cropCounter[crop] = 0
+            }
         }
     }
 
@@ -50,6 +44,7 @@ class GardenCropMilestones {
 
         for ((_, stack) in event.inventoryItems) {
             val cropName = stack.name?.removeColor() ?: continue
+            val crop = CropType.getByName(cropName) ?: continue
 
             val lore = stack.getLore()
             var cropForTier = 0L
@@ -70,7 +65,7 @@ class GardenCropMilestones {
                     if (matcher.matches()) {
                         val rawNumber = matcher.group(1)
                         val overflow = rawNumber.formatNumber()
-                        cropCounter[cropName] = cropForTier + overflow
+                        cropCounter[crop] = cropForTier + overflow
                     }
                     next = false
                 }
@@ -81,7 +76,7 @@ class GardenCropMilestones {
     }
 
     companion object {
-        val cropCounter: MutableMap<String, Long> get() = SkyHanniMod.feature.hidden.gardenCropCounter
+        val cropCounter: MutableMap<CropType, Long> get() = SkyHanniMod.feature.hidden.gardenCropCounter
 
         fun getTierForCrops(crops: Long): Int {
             var tier = 0

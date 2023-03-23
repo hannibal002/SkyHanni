@@ -8,17 +8,17 @@ import java.util.*
 
 class GardenBestCropTime {
     val display = mutableListOf<List<Any>>()
-    val timeTillNextCrop = mutableMapOf<String, Long>()
+    val timeTillNextCrop = mutableMapOf<CropType, Long>()
     private val config get() = SkyHanniMod.feature.garden
 
-    fun drawBestDisplay(currentCrop: String?) {
+    fun drawBestDisplay(currentCrop: CropType?) {
         if (timeTillNextCrop.size < GardenAPI.cropsPerSecond.size) {
             updateTimeTillNextCrop()
         }
 
         val gardenExp = config.cropMilestoneBestType == 0
         val sorted = if (gardenExp) {
-            val helpMap = mutableMapOf<String, Long>()
+            val helpMap = mutableMapOf<CropType, Long>()
             for ((cropName, time) in timeTillNextCrop) {
                 val crops = GardenCropMilestones.cropCounter[cropName]!!
                 val currentTier = GardenCropMilestones.getTierForCrops(crops)
@@ -39,24 +39,24 @@ class GardenBestCropTime {
         }
 
         var number = 0
-        for (cropName in sorted.keys) {
-            val millis = timeTillNextCrop[cropName]!!
+        for (crop in sorted.keys) {
+            val millis = timeTillNextCrop[crop]!!
             val duration = TimeUtils.formatDuration(millis)
-            val isCurrent = cropName == currentCrop
+            val isCurrent = crop == currentCrop
             number++
             if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue
 
             val list = mutableListOf<Any>()
             list.add("§7$number# ")
-            GardenAPI.addGardenCropToList(cropName, list)
+            GardenAPI.addGardenCropToList(crop, list)
 
             val color = if (isCurrent) "§e" else "§7"
-            val contestFormat = if (GardenNextJacobContest.isNextCrop(cropName)) "§n" else ""
-            val cropNameDisplay = "$color$contestFormat$cropName§r"
+            val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
+            val cropNameDisplay = "$color$contestFormat${crop.cropName}§r"
             list.add("$cropNameDisplay §b$duration")
 
             if (gardenExp) {
-                val crops = GardenCropMilestones.cropCounter[cropName]!!
+                val crops = GardenCropMilestones.cropCounter[crop]!!
                 val currentTier = GardenCropMilestones.getTierForCrops(crops)
                 val gardenExpForTier = getGardenExpForTier(currentTier + 1)
                 list.add(" §7(§2$gardenExpForTier §7Exp)")

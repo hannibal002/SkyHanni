@@ -18,7 +18,7 @@ import java.util.*
 
 class GardenCropMilestoneDisplay {
     private val progressDisplay = mutableListOf<List<Any>>()
-    private val cultivatingData = mutableMapOf<String, Int>()
+    private val cultivatingData = mutableMapOf<CropType, Int>()
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
 //    val cropMilestoneLevelUpPattern = Pattern.compile("  §r§b§lGARDEN MILESTONE §3(.*) §8XXIII➜§3(.*)")
@@ -76,10 +76,10 @@ class GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
-        val itemStack = event.itemStack
-        val counter = GardenAPI.readCounter(itemStack)
+        val item = event.itemStack
+        val counter = GardenAPI.readCounter(item)
         if (counter == -1) return
-        val crop = GardenAPI.getCropTypeFromItem(itemStack) ?: return
+        val crop = GardenAPI.getCropTypeFromItem(item) ?: return
         if (cultivatingData.containsKey(crop)) {
             val old = cultivatingData[crop]!!
             val diff = counter - old
@@ -106,7 +106,7 @@ class GardenCropMilestoneDisplay {
     private var countInLastSecond = 0
     private val allCounters = mutableListOf<Int>()
     private var lastItemInHand: ItemStack? = null
-    private var currentCrop: String? = null
+    private var currentCrop: CropType? = null
 
     private fun resetSpeed() {
         lastSecondStart = 0
@@ -135,8 +135,8 @@ class GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        lastItemInHand = if (event.isRealCrop) event.heldItem else null
-        currentCrop = if (event.isRealCrop) event.crop else null
+        lastItemInHand = event.toolItem
+        currentCrop = event.crop
 
         if (isEnabled()) {
             resetSpeed()
@@ -166,21 +166,21 @@ class GardenCropMilestoneDisplay {
         }
     }
 
-    private fun drawProgressDisplay(it: String, crops: Long) {
+    private fun drawProgressDisplay(crop: CropType, counter: Long) {
         progressDisplay.add(Collections.singletonList("§6Crop Milestones"))
 
         val list = mutableListOf<Any>()
-        GardenAPI.addGardenCropToList(it, list)
-        list.add(it)
+        GardenAPI.addGardenCropToList(crop, list)
+        list.add(crop.cropName)
         progressDisplay.add(list)
 
-        val currentTier = GardenCropMilestones.getTierForCrops(crops)
+        val currentTier = GardenCropMilestones.getTierForCrops(counter)
 
         val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
         val nextTier = currentTier + 1
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
 
-        val have = crops - cropsForCurrentTier
+        val have = counter - cropsForCurrentTier
         val need = cropsForNextTier - cropsForCurrentTier
 
         val haveFormat = LorenzUtils.formatInteger(have)
@@ -196,11 +196,11 @@ class GardenCropMilestoneDisplay {
         }
 
         if (averageSpeedPerSecond != 0) {
-            GardenAPI.cropsPerSecond[it] = averageSpeedPerSecond
+            GardenAPI.cropsPerSecond[crop] = averageSpeedPerSecond
             val missing = need - have
             val missingTimeSeconds = missing / averageSpeedPerSecond
             val millis = missingTimeSeconds * 1000
-            bestCropTime.timeTillNextCrop[it] = millis
+            bestCropTime.timeTillNextCrop[crop] = millis
             val duration = TimeUtils.formatDuration(millis)
             if (config.cropMilestoneWarnClose) {
                 if (millis < 5_900) {
@@ -208,7 +208,7 @@ class GardenCropMilestoneDisplay {
                         lastPlaySoundTime = System.currentTimeMillis()
                         sound.playSound()
                     }
-                    SendTitleHelper.sendTitle("§b$it $nextTier in $duration", 1_500)
+                    SendTitleHelper.sendTitle("§b$crop $nextTier in $duration", 1_500)
                 }
             }
             progressDisplay.add(Collections.singletonList("§7in §b$duration"))
