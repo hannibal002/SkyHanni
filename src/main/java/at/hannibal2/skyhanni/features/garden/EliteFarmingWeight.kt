@@ -59,7 +59,7 @@ class EliteFarmingWeight {
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
-        private val localCollection = mutableMapOf<String, Long>()
+        private val localCollection = mutableMapOf<CropType, Long>()
 
         private var display = mutableListOf<String>()
         private var profileId = ""
@@ -181,7 +181,7 @@ class EliteFarmingWeight {
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
         private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
 
-        fun addCrop(crop: String, diff: Int) {
+        fun addCrop(crop: CropType, diff: Int) {
             val old = localCollection[crop] ?: 0L
 
             val before = calculateExactWeight()
@@ -193,7 +193,7 @@ class EliteFarmingWeight {
             dirtyCropWeight = true
         }
 
-        private fun updateWeightPerSecond(crop: String, before: Double, after: Double, diff: Int) {
+        private fun updateWeightPerSecond(crop: CropType, before: Double, after: Double, diff: Int) {
             val speed = GardenAPI.cropsPerSecond[crop]!!
             if (speed != -1) {
                 val weightDiff = (after - before) * 1000
@@ -266,8 +266,8 @@ class EliteFarmingWeight {
             LorenzUtils.error("[SkyHanni] Failed to load farming weight data from elitebot.dev! please report this on discord!")
         }
 
-        private fun calculateCollectionWeight(round: Boolean = true): MutableMap<String, Double> {
-            val weightPerCrop = mutableMapOf<String, Double>()
+        private fun calculateCollectionWeight(round: Boolean = true): MutableMap<CropType, Double> {
+            val weightPerCrop = mutableMapOf<CropType, Double>()
             var totalWeight = 0.0
             for ((cropName, factor) in factorPerCrop) {
                 val collection = getLocalCollection(cropName)
@@ -276,38 +276,38 @@ class EliteFarmingWeight {
                 totalWeight += weight
             }
             if (totalWeight > 0) {
-                weightPerCrop["Mushroom"] = specialMushroomWeight(weightPerCrop, totalWeight)
+                weightPerCrop[CropType.MUSHROOM] = specialMushroomWeight(weightPerCrop, totalWeight)
             }
             return weightPerCrop
         }
 
-        private fun specialMushroomWeight(weightPerCrop: MutableMap<String, Double>, totalWeight: Double): Double {
-            val cactusWeight = weightPerCrop["Cactus"]!!
-            val sugarCaneWeight = weightPerCrop["Sugar Cane"]!!
+        private fun specialMushroomWeight(weightPerCrop: MutableMap<CropType, Double>, totalWeight: Double): Double {
+            val cactusWeight = weightPerCrop[CropType.CACTUS]!!
+            val sugarCaneWeight = weightPerCrop[CropType.SUGAR_CANE]!!
             val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight;
             val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight;
 
-            val mushroomFactor = factorPerCrop["Mushroom"]!!
-            val mushroomCollection = getLocalCollection("Mushroom")
+            val mushroomFactor = factorPerCrop[CropType.MUSHROOM]!!
+            val mushroomCollection = getLocalCollection(CropType.MUSHROOM)
             return doubleBreakRatio * (mushroomCollection / (2 * mushroomFactor)) + normalRatio * (mushroomCollection / mushroomFactor)
         }
 
-        private fun getLocalCollection(cropName: String): Long {
-            return localCollection[cropName] ?: 0L
+        private fun getLocalCollection(crop: CropType): Long {
+            return localCollection[crop] ?: 0L
         }
 
         private val factorPerCrop by lazy {
             mapOf(
-                "Wheat" to 100_000.0,
-                "Carrot" to 300_000.0,
-                "Potato" to 300_000.0,
-                "Sugar Cane" to 200_000.0,
-                "Nether Wart" to 250_000.0,
-                "Pumpkin" to 87_095.11,
-                "Melon" to 435_466.47,
-                "Mushroom" to 168_925.53,
-                "Cocoa Beans" to 257_214.64,
-                "Cactus" to 169_389.33,
+                CropType.WHEAT to 100_000.0,
+                CropType.CARROT to 300_000.0,
+                CropType.POTATO to 300_000.0,
+                CropType.SUGAR_CANE to 200_000.0,
+                CropType.NETHER_WART to 250_000.0,
+                CropType.PUMPKIN to 87_095.11,
+                CropType.MELON to 435_466.47,
+                CropType.MUSHROOM to 168_925.53,
+                CropType.COCOA_BEANS to 257_214.64,
+                CropType.CACTUS to 169_389.33,
             )
         }
     }

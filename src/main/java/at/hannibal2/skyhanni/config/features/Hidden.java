@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -34,10 +35,10 @@ public class Hidden {
     public List<String> crimsonIsleKuudraTiersDone = new ArrayList<>();
 
     @Expose
-    public Map<String, Long> gardenCropCounter = new HashMap<>();
+    public Map<CropType, Long> gardenCropCounter = new HashMap<>();
 
     @Expose
-    public Map<String, Integer> gardenCropsPerSecond = new HashMap<>();
+    public Map<CropType, Integer> gardenCropsPerSecond = new HashMap<>();
 
     @Expose
     public int gardenExp = -1;
@@ -46,5 +47,5 @@ public class Hidden {
     public Map<String, Integer> gardenDicerRngDrops = new HashMap<>();
 
     @Expose
-    public Map<Long, List<String>> gardenJacobFarmingContestTimes = new HashMap<>();
+    public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 }

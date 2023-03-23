@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
@@ -191,8 +190,7 @@ class MinionCraftHelper {
         val minionName = "§9$name Minion $nextTier"
         display.add(minionName)
         val nextMinionId = minionId.addOneToId()
-        val recipes: List<NeuRecipe> = NEUItems.getRecipes(nextMinionId)
-        for (recipe in recipes) {
+        for (recipe in NEUItems.getRecipes(nextMinionId)) {
             if (recipe !is CraftingRecipe) continue
             val output = recipe.output
             val internalItemId = output.internalItemId

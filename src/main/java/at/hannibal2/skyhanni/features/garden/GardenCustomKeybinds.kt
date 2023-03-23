@@ -29,16 +29,13 @@ class GardenCustomKeybinds {
         Runtime.getRuntime().addShutdownHook(Thread { reset() })
     }
 
-    private var itemInHand = ""
-
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        itemInHand = event.crop ?: ""
         update()
     }
 
     private fun update() {
-        if (isEnabled() && itemInHand != "") {
+        if (isEnabled() && GardenAPI.toolInHand != null) {
             applyCustomKeybinds()
         } else {
             reset()
