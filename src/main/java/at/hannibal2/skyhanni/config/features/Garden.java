@@ -426,6 +426,12 @@ public class Garden {
     public boolean eliteFarmingWeightOvertakeETA = false;
 
     @Expose
+    @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightOvertakeETAAlways = true;
+
+    @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
     @ConfigEditorAccordion(id = 12)
     public boolean dicerCounter = false;
