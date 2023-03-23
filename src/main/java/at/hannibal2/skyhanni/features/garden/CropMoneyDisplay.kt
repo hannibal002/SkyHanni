@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -114,7 +115,12 @@ class CropMoneyDisplay {
                 list.add("$currentColor$contestFormat$itemName§7: ")
             }
 
-            val format = LorenzUtils.formatInteger(moneyPerHour.toLong())
+
+            val format = if (config.moneyPerHourCompactPrice) {
+                NumberUtil.format(moneyPerHour)
+            } else {
+                LorenzUtils.formatInteger(moneyPerHour.toLong())
+            }
             list.add("§6$format")
 
             newDisplay.add(list)
