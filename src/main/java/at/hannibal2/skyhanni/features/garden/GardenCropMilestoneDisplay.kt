@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -84,7 +85,7 @@ class GardenCropMilestoneDisplay {
             val old = cultivatingData[crop]!!
             val diff = counter - old
             try {
-                GardenCropMilestones.cropCounter[crop] = GardenCropMilestones.cropCounter[crop]!! + diff
+                GardenCropMilestones.cropCounter[crop] = crop.getCounter() + diff
             } catch (e: NullPointerException) {
                 println("crop: '$crop'")
                 println("GardenCropMilestones.cropCounter: '${GardenCropMilestones.cropCounter.keys}'")
@@ -148,13 +149,7 @@ class GardenCropMilestoneDisplay {
         progressDisplay.clear()
         bestCropTime.display.clear()
         currentCrop?.let {
-            val crops = GardenCropMilestones.cropCounter[it]
-            if (crops == null) {
-                println("cropCounter is null for '$it'")
-                return
-            }
-
-            drawProgressDisplay(it, crops)
+            drawProgressDisplay(it, it.getCounter())
             if (config.cropMilestoneBestDisplay) {
                 bestCropTime.drawBestDisplay(it)
             }
