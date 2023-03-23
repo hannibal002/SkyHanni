@@ -158,7 +158,11 @@ class EliteFarmingWeight {
             val weightUntilOvertake = nextPlayerWeight - totalWeight
             if (weightUntilOvertake < 0) {
                 if (!hasPassedNext) {
-                    leaderboardPosition--
+                    if (leaderboardPosition == -1) {
+                        leaderboardPosition = 1000
+                    } else {
+                        leaderboardPosition--
+                    }
                     nextPlayerWeight = 0.0
                     hasPassedNext = true
                 }
