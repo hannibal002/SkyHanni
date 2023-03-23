@@ -57,15 +57,22 @@ class CropMoneyDisplay {
 
     private fun drawDisplay(): MutableList<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
+
+        val title = if (config.moneyPerHourCompact) {
+            Collections.singletonList("§7Money per hour:")
+        } else {
+            Collections.singletonList("§7Money per hour when selling:")
+        }
+
         if (!ready) {
-            newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
+            newDisplay.add(title)
             newDisplay.add(Collections.singletonList("§eLoading..."))
             return newDisplay
         }
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
-        newDisplay.add(Collections.singletonList("§7Money per hour when selling:"))
+        newDisplay.add(title)
 
         val moneyPerHourData = calculateMoneyPerHour()
         if (moneyPerHourData.isEmpty()) {
