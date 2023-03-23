@@ -46,7 +46,6 @@ class CollectionAPI {
 
             if (itemName == null) {
                 LorenzUtils.debug("collection name is null for '$rawName'")
-                println()
                 continue
             }
             collectionValue[itemName] = counter
