@@ -520,7 +520,7 @@ object RenderUtils {
                 any.renderOnScreen(isX.toFloat(), isY.toFloat(), itemScale)
                 offsetX += 12
             } else {
-                println("unknown render object: $any")
+                throw RuntimeException("Unknown render object: $any")
             }
         }
     }
