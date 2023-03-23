@@ -353,6 +353,13 @@ public class Garden {
     public boolean eliteFarmingWeightLeaderboard = true;
 
     @Expose
+    @ConfigOption(name = "Overtake ETA", desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
+            "Will show an ETA to rank #1000 if you're not on the leaderboard yet.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightOvertakeETA = false;
+
+    @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
     @ConfigEditorAccordion(id = 12)
     public boolean dicerCounter = false;
