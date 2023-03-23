@@ -12,6 +12,8 @@
 + Added **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
 + Added **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + Added **Contest Time** - Adds the real time format to the farming contest description.
++ Added **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (Thanks appable0)
++ Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (Thanks appable0)
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
