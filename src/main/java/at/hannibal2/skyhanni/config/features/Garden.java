@@ -113,7 +113,7 @@ public class Garden {
     public boolean visitorCopperPrice = false;
 
     @Expose
-    @ConfigOption(name = "Experience Price", desc = "Show the price per garden experience inside the visitor gui.")
+    @ConfigOption(name = "Garden Exp Price", desc = "Show the price per garden experience inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean visitorExperiencePrice = false;
