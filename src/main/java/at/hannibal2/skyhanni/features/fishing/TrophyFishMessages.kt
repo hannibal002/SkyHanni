@@ -3,26 +3,24 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
-import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.client.Minecraft
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class TrophyFishMessages {
 
-    private val map = mutableMapOf<String, Int>()
+    private val fishAmounts = mutableMapOf<String, Int>()
     private val trophyFishPattern = Regex("§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w ].+)§r§r§r §r§l§r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\.")
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
 
-        map.clear()
+        fishAmounts.clear()
         val trophyFishes = profileData["trophy_fish"].asJsonObject
         for ((rawName, value) in trophyFishes.entrySet()) {
             val rarity = when {
@@ -38,7 +36,7 @@ class TrophyFishMessages {
             val amount = value.asInt
 //            LorenzDebug.log("$rarity: $displayName: $amount")
             val name = rarity + "_" + displayName
-            map[name] = amount
+            fishAmounts[name] = amount
 //            LorenzDebug.log("loaded trophy: $name = $amount")
         }
     }
@@ -61,9 +59,9 @@ class TrophyFishMessages {
             .removeColor()
 
         val rarity = displayRarity.lowercase().removeColor()
-
-        val amount = map.getOrDefault("${rarity}_${name}", 0) + 1
-        map[name] = amount
+        val fish = "${rarity}_${name}"
+        val amount = fishAmounts.getOrDefault(fish, 0) + 1
+        fishAmounts[name] = amount
         event.blockedReason = "trophy_fish"
 
         if (SkyHanniMod.feature.fishing.trophyDesign == 0 && amount == 1) {
@@ -78,13 +76,15 @@ class TrophyFishMessages {
             if (SkyHanniMod.feature.fishing.trophyFishSilverHider) return
         }
 
-        val trophyMessage = when (SkyHanniMod.feature.fishing.trophyDesign) {
+        val trophyMessage = ChatComponentText(when (SkyHanniMod.feature.fishing.trophyDesign) {
             0 -> "§7$amount. §r$displayRarity $displayName"
             1 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
             2 -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
             else -> return
-        }
+        })
 
-        LorenzUtils.chat("§6§lTROPHY FISH! $trophyMessage")
+        val chatGui = Minecraft.getMinecraft().ingameGUI.chatGUI
+        val chatLineId = if (SkyHanniMod.feature.fishing.trophyFishDuplicateHider) fish.hashCode() else 0
+        chatGui.printChatMessageWithOptionalDeletion(trophyMessage, chatLineId)
     }
 }

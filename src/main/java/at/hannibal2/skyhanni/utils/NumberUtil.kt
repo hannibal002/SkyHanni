@@ -77,7 +77,7 @@ object NumberUtil {
 
     fun Number.ordinal(): String {
         val long = this.toLong()
-        if (long % 100 in 11..13) return "${this}th"
+        if (long % 100 in 11..13) return "th"
         return when (long % 10) {
             1L -> "st"
             2L -> "nd"

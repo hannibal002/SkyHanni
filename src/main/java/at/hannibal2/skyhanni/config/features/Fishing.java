@@ -32,6 +32,12 @@ public class Fishing {
     public int trophyDesign = 0;
 
     @Expose
+    @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same fish from chat.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean trophyFishDuplicateHider = false;
+
+    @Expose
     @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
