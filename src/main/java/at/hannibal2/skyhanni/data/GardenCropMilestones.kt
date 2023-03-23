@@ -78,6 +78,8 @@ class GardenCropMilestones {
     companion object {
         val cropCounter: MutableMap<CropType, Long> get() = SkyHanniMod.feature.hidden.gardenCropCounter
 
+        fun CropType.getCounter() = cropCounter[this]!!
+
         fun getTierForCrops(crops: Long): Int {
             var tier = 0
             var totalCrops = 0L
