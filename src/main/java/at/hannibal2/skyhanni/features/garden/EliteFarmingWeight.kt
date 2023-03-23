@@ -60,7 +60,7 @@ class EliteFarmingWeight {
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
-        private val localCollection = mutableMapOf<CropType, Long>()
+        private val localCounter = mutableMapOf<CropType, Long>()
 
         private var display = mutableListOf<String>()
         private var profileId = ""
@@ -182,14 +182,12 @@ class EliteFarmingWeight {
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
         private fun isEtaEnabled() = config.eliteFarmingWeightOvertakeETA
 
-        fun addCrop(crop: CropType, diff: Int) {
-            val old = localCollection[crop] ?: 0L
+        fun addCrop(crop: CropType, addedCounter: Int) {
+            val before = getExactWeight()
+            localCounter[crop] = crop.getLocalCounter() + addedCounter
+            val after = getExactWeight()
 
-            val before = calculateExactWeight()
-            localCollection[crop] = old + diff
-            val after = calculateExactWeight()
-
-            updateWeightPerSecond(crop, before, after, diff)
+            updateWeightPerSecond(crop, before, after, addedCounter)
 
             dirtyCropWeight = true
         }
@@ -202,7 +200,7 @@ class EliteFarmingWeight {
             }
         }
 
-        private fun calculateExactWeight(): Double {
+        private fun getExactWeight(): Double {
             val values = calculateCollectionWeight(false).values
             return if (values.isNotEmpty()) {
                 values.sum()
@@ -250,7 +248,7 @@ class EliteFarmingWeight {
                         profileId = profileEntry.key
                         weight = profile["farming"].asJsonObject["total"].asDouble
 
-                        localCollection.clear()
+                        localCounter.clear()
                         dirtyCropWeight = true
 
                         return
@@ -271,10 +269,10 @@ class EliteFarmingWeight {
             val weightPerCrop = mutableMapOf<CropType, Double>()
             var totalWeight = 0.0
             for (crop in CropType.values()) {
-                val collection = getLocalCollection(crop)
-                val weight = (collection / crop.getFactor()).also { if (round) weight.round(2) else weight }
-                weightPerCrop[crop] = weight
-                totalWeight += weight
+                val weight = crop.getLocalCounter() / crop.getFactor()
+                val roundedWeight =  weight.let { if (round) it.round(2) else it }
+                weightPerCrop[crop] = roundedWeight
+                totalWeight += roundedWeight
             }
             if (totalWeight > 0) {
                 weightPerCrop[CropType.MUSHROOM] = specialMushroomWeight(weightPerCrop, totalWeight)
@@ -289,13 +287,11 @@ class EliteFarmingWeight {
             val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight;
 
             val mushroomFactor = CropType.MUSHROOM.getFactor()
-            val mushroomCollection = getLocalCollection(CropType.MUSHROOM)
+            val mushroomCollection = CropType.MUSHROOM.getLocalCounter()
             return doubleBreakRatio * (mushroomCollection / (2 * mushroomFactor)) + normalRatio * (mushroomCollection / mushroomFactor)
         }
 
-        private fun getLocalCollection(crop: CropType): Long {
-            return localCollection[crop] ?: 0L
-        }
+        private fun CropType.getLocalCounter() = localCounter[this] ?: 0L
 
         private fun CropType.getFactor() = factorPerCrop[this]!!
 

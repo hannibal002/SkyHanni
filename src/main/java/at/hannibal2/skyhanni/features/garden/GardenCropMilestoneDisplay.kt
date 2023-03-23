@@ -83,18 +83,18 @@ class GardenCropMilestoneDisplay {
         val crop = GardenAPI.getCropTypeFromItem(item) ?: return
         if (cultivatingData.containsKey(crop)) {
             val old = cultivatingData[crop]!!
-            val diff = counter - old
+            val addedCounter = counter - old
             try {
-                GardenCropMilestones.cropCounter[crop] = crop.getCounter() + diff
+                GardenCropMilestones.cropCounter[crop] = crop.getCounter() + addedCounter
             } catch (e: NullPointerException) {
                 println("crop: '$crop'")
                 println("GardenCropMilestones.cropCounter: '${GardenCropMilestones.cropCounter.keys}'")
                 LorenzUtils.debug("NPE at OwnInventorItemUpdateEvent with GardenCropMilestones.cropCounter")
                 e.printStackTrace()
             }
-            EliteFarmingWeight.addCrop(crop, diff)
+            EliteFarmingWeight.addCrop(crop, addedCounter)
             if (currentCrop == crop) {
-                calculateSpeed(diff)
+                calculateSpeed(addedCounter)
                 update()
             }
         }
@@ -117,7 +117,7 @@ class GardenCropMilestoneDisplay {
         allCounters.clear()
     }
 
-    private fun calculateSpeed(diff: Int) {
+    private fun calculateSpeed(addedCounter: Int) {
         if (System.currentTimeMillis() > lastSecondStart + 1_000) {
             lastSecondStart = System.currentTimeMillis()
             if (countInLastSecond > 8) {
@@ -130,7 +130,7 @@ class GardenCropMilestoneDisplay {
             countInLastSecond = 0
             currentSpeed = 0
         }
-        currentSpeed += diff
+        currentSpeed += addedCounter
         countInLastSecond++
     }
 
