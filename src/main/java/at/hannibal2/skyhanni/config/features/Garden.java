@@ -408,7 +408,7 @@ public class Garden {
     public boolean moneyPerHourAlwaysOn = false;
     @Expose
     @ConfigOption(
-            name = "Compact Display",
+            name = "Compact Mode",
             desc = "Hide the item name and the position number.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
