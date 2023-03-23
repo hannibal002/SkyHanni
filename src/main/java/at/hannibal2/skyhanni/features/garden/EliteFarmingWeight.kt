@@ -153,19 +153,21 @@ class EliteFarmingWeight {
 
         private fun getETA(): String {
             if (weight < 0) return ""
+            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
 
             val totalWeight = (localWeight + weight)
             val weightUntilOvertake = nextPlayerWeight - totalWeight
             if (weightUntilOvertake < 0) {
                 if (!hasPassedNext) {
+                    LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
                     if (leaderboardPosition == -1) {
                         leaderboardPosition = 1000
                     } else {
                         leaderboardPosition--
                     }
-                    nextPlayerWeight = 0.0
                     hasPassedNext = true
                 }
+                return "§cWaiting for leaderboard update..."
             }
 
             if (nextPlayerWeight == 0.0) {
@@ -177,7 +179,6 @@ class EliteFarmingWeight {
             val format = LorenzUtils.formatDouble(weightUntilOvertake, 2)
 
             // TODO Maybe add next player name?
-            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
             return "§e$format §7(§b$timeFormat§7) §7behind §b$nextName"
         }
 
