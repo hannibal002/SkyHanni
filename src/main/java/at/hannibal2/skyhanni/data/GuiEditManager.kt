@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
-import org.lwjgl.util.vector.Vector2f
 import java.util.*
 
 class GuiEditManager {
@@ -89,27 +88,25 @@ class GuiEditManager {
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
 
-        fun Position.getDummySize(random: Boolean = false): Vector2f {
+        fun Position.getDummySize(random: Boolean = false): Vector2i {
             if (random) {
-                return Vector2f(15f, 15f)
+                return Vector2i(15, 15)
             } else {
-                val (x, y) = currentBorderSize[internalName] ?: return Vector2f(1f, 1f)
-                return Vector2f(x.toFloat(), y.toFloat())
+                val (x, y) = currentBorderSize[internalName] ?: return Vector2i(1, 1)
+                return Vector2i(x, y)
             }
         }
 
-        fun Position.getAbsX_(): Int {
+        fun Position.getAbsX(): Int {
             val width = getDummySize(true).x
-            return getAbsX(ScaledResolution(Minecraft.getMinecraft()), width.toInt())
+            return getAbsX0(ScaledResolution(Minecraft.getMinecraft()), width)
         }
 
-        fun Position.getAbsY_(): Int {
+        fun Position.getAbsY(): Int {
             val height = getDummySize(true).y
-            return getAbsY(ScaledResolution(Minecraft.getMinecraft()), height.toInt())
-        }
-
-        fun Position.isCenterX_(): Boolean {
-            return false
+            return getAbsY0(ScaledResolution(Minecraft.getMinecraft()), height)
         }
     }
 }
+
+class Vector2i(val x: Int, val y: Int)
