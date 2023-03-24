@@ -35,8 +35,6 @@ public class Position {
 	private boolean clicked = false;
 	public String internalName = null;
 
-	private static final int EDGE_OFFSET = 0;
-
 	public Position(int x, int y) {
 		this(x, y, false, false);
 	}
@@ -65,10 +63,6 @@ public class Position {
 //		return ;
 //	}
 
-	public boolean isCenterY() {
-		return false;
-	}
-
 	public int getRawX() {
 		return x;
 	}
@@ -84,7 +78,7 @@ public class Position {
 		return clicked;
 	}
 
-	public int getAbsX(ScaledResolution scaledResolution, int objWidth) {
+	public int getAbsX0(ScaledResolution scaledResolution, int objWidth) {
 		int width = scaledResolution.getScaledWidth();
 
 		int ret = x;
@@ -98,7 +92,7 @@ public class Position {
 		return ret;
 	}
 
-	public int getAbsY(ScaledResolution scaledResolution, int objHeight) {
+	public int getAbsY0(ScaledResolution scaledResolution, int objHeight) {
 		int height = scaledResolution.getScaledHeight();
 
 		int ret = y;
@@ -118,22 +112,22 @@ public class Position {
 		this.x += deltaX;
 
 		if (wasPositiveX) {
-			if (this.x < EDGE_OFFSET) {
-				deltaX += EDGE_OFFSET - this.x;
-				this.x = EDGE_OFFSET;
+			if (this.x < 0) {
+				deltaX += -this.x;
+				this.x = 0;
 			}
-			if (this.x > screenWidth - EDGE_OFFSET) {
-				deltaX += screenWidth - EDGE_OFFSET - this.x;
-				this.x = screenWidth - EDGE_OFFSET;
+			if (this.x > screenWidth) {
+				deltaX += screenWidth - this.x;
+				this.x = screenWidth;
 			}
 		} else {
-			if (this.x + 1 > -EDGE_OFFSET) {
-				deltaX += -EDGE_OFFSET - 1 - this.x;
-				this.x = -EDGE_OFFSET - 1;
+			if (this.x + 1 > 0) {
+				deltaX += -1 - this.x;
+				this.x = -1;
 			}
-			if (this.x + screenWidth < EDGE_OFFSET) {
-				deltaX += EDGE_OFFSET - screenWidth - this.x;
-				this.x = EDGE_OFFSET - screenWidth;
+			if (this.x + screenWidth < 0) {
+				deltaX += -screenWidth - this.x;
+				this.x = -screenWidth;
 			}
 		}
 
@@ -152,22 +146,22 @@ public class Position {
 		this.y += deltaY;
 
 		if (wasPositiveY) {
-			if (this.y < EDGE_OFFSET) {
-				deltaY += EDGE_OFFSET - this.y;
-				this.y = EDGE_OFFSET;
+			if (this.y < 0) {
+				deltaY += -this.y;
+				this.y = 0;
 			}
-			if (this.y > screenHeight - EDGE_OFFSET) {
-				deltaY += screenHeight - EDGE_OFFSET - this.y;
-				this.y = screenHeight - EDGE_OFFSET;
+			if (this.y > screenHeight) {
+				deltaY += screenHeight - this.y;
+				this.y = screenHeight;
 			}
 		} else {
-			if (this.y + 1 > -EDGE_OFFSET) {
-				deltaY += -EDGE_OFFSET - 1 - this.y;
-				this.y = -EDGE_OFFSET - 1;
+			if (this.y + 1 > -0) {
+				deltaY += -1 - this.y;
+				this.y = -1;
 			}
-			if (this.y + screenHeight < EDGE_OFFSET) {
-				deltaY += EDGE_OFFSET - screenHeight - this.y;
-				this.y = EDGE_OFFSET - screenHeight;
+			if (this.y + screenHeight < 0) {
+				deltaY += -screenHeight - this.y;
+				this.y = -screenHeight;
 			}
 		}
 

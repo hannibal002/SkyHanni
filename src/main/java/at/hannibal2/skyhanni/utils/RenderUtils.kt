@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils.drawStringScaled
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX_
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY_
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -443,8 +443,8 @@ object RenderUtils {
         val minecraft = Minecraft.getMinecraft()
         val renderer = minecraft.renderManager.fontRenderer
 
-        val x = getAbsX_() + offsetX
-        val y = getAbsY_() + offsetY
+        val x = getAbsX() + offsetX
+        val y = getAbsY() + offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
         renderer.drawStringWithShadow(display, 0f, 0f, 0)
@@ -529,8 +529,8 @@ object RenderUtils {
                 val width = renderer.getStringWidth(any)
                 offsetX += width
             } else if (any is ItemStack) {
-                val isX = getAbsX_() + offsetX
-                val isY = getAbsY_() + offsetY
+                val isX = getAbsX() + offsetX
+                val isY = getAbsY() + offsetY
 
                 any.renderOnScreen(isX.toFloat(), isY.toFloat(), itemScale)
                 offsetX += 12

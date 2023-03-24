@@ -20,10 +20,9 @@ package at.hannibal2.skyhanni.config.core.config.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX_
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY_
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.isCenterX_
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -68,12 +67,10 @@ class GuiPositionEditor(
         var mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
         for (i in positions.indices.reversed()) {
             val position = positions[i]
-            val elementWidth = position.getDummySize().x.toInt()
-            val elementHeight = position.getDummySize().y.toInt()
-            var x = position.getAbsX_()
-            var y = position.getAbsY_()
-            if (position.isCenterX_()) x -= elementWidth / 2
-            if (position.isCenterY) y -= elementHeight / 2
+            val elementWidth = position.getDummySize().x
+            val elementHeight = position.getDummySize().y
+            val x = position.getAbsX()
+            val y = position.getAbsY()
             if (mouseX >= x - border && mouseY >= y - border && mouseX <= x + elementWidth + border * 2 && mouseY <= y + elementHeight + border * 2) {
                 hoveredPos = i
                 break
@@ -93,18 +90,17 @@ class GuiPositionEditor(
         mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
         mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
         for (position in positions) {
-            var elementWidth = position.getDummySize(true).x.toInt()
-            var elementHeight = position.getDummySize(true).y.toInt()
+            var elementWidth = position.getDummySize(true).x
+            var elementHeight = position.getDummySize(true).y
             if (position.clicked) {
                 grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution)
                 grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution)
             }
-            var x = position.getAbsX_()
-            val y = position.getAbsY_()
-            if (position.isCenterX_()) x -= elementWidth / 2
+            val x = position.getAbsX()
+            val y = position.getAbsY()
 
-            elementWidth = position.getDummySize().x.toInt()
-            elementHeight = position.getDummySize().y.toInt()
+            elementWidth = position.getDummySize().x
+            elementHeight = position.getDummySize().y
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
 
@@ -135,11 +131,10 @@ class GuiPositionEditor(
             mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
             for (i in positions.indices.reversed()) {
                 val position = positions[i]
-                val elementWidth = position.getDummySize().x.toInt()
-                val elementHeight = position.getDummySize().y.toInt()
-                var x = position.getAbsX_()
-                val y = position.getAbsY_()
-                if (position.isCenterX_()) x -= elementWidth / 2
+                val elementWidth = position.getDummySize().x
+                val elementHeight = position.getDummySize().y
+                val x = position.getAbsX()
+                val y = position.getAbsY()
                 if (!position.clicked) {
                     if (mouseX >= x && mouseY >= y && mouseX <= x + elementWidth && mouseY <= y + elementHeight) {
                         clickedPos = i
@@ -157,8 +152,8 @@ class GuiPositionEditor(
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         if (clickedPos != -1) {
             val position = positions[clickedPos]
-            val elementWidth = position.getDummySize(true).x.toInt()
-            val elementHeight = position.getDummySize(true).y.toInt()
+            val elementWidth = position.getDummySize(true).x
+            val elementHeight = position.getDummySize(true).y
             if (keyCode == SkyHanniMod.feature.gui.keyBindReset) {
 
                 position.set(originalPositions[positions.indexOf(position)])
@@ -200,8 +195,8 @@ class GuiPositionEditor(
         var mouseX: Int
         var mouseY: Int
         for (position in positions) {
-            val elementWidth = position.getDummySize(true).x.toInt()
-            val elementHeight = position.getDummySize(true).y.toInt()
+            val elementWidth = position.getDummySize(true).x
+            val elementHeight = position.getDummySize(true).y
             if (position.clicked) {
                 val scaledResolution = Utils.pushGuiScale(-1)
                 mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
