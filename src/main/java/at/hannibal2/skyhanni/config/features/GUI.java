@@ -26,12 +26,4 @@ public class GUI {
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindOpen = Keyboard.KEY_NONE;
-
-    @Expose
-    @ConfigOption(
-            name = "Hotkey Reset",
-            desc = "Press this key in the GUI Editor to reset the current element."
-    )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_R)
-    public int keyBindReset = Keyboard.KEY_R;
 }
