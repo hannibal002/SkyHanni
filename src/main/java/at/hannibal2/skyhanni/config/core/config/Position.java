@@ -60,10 +60,6 @@ public class Position {
 		return position;
 	}
 
-//	public boolean isCenterX() {
-//		return ;
-//	}
-
 	public int getRawX() {
 		return x;
 	}
@@ -107,7 +103,7 @@ public class Position {
 		return ret;
 	}
 
-	public int moveX(int deltaX) {
+	public int moveX(int deltaX, int objWidth) {
 		int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
 		boolean wasPositiveX = this.x >= 0;
 		this.x += deltaX;
@@ -132,10 +128,16 @@ public class Position {
 			}
 		}
 
+		if (this.x >= 0 && this.x + objWidth / 2 > screenWidth / 2) {
+			this.x -= screenWidth - objWidth;
+		}
+		if (this.x < 0 && this.x + objWidth / 2 <= -screenWidth / 2) {
+			this.x += screenWidth - objWidth;
+		}
 		return deltaX;
 	}
 
-	public int moveY(int deltaY) {
+	public int moveY(int deltaY, int objHeight) {
 		int screenHeight = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
 		boolean wasPositiveY = this.y >= 0;
 		this.y += deltaY;
@@ -160,6 +162,12 @@ public class Position {
 			}
 		}
 
+		if (this.y >= 0 && this.y - objHeight / 2 > screenHeight / 2) {
+			this.y -= screenHeight - objHeight;
+		}
+		if (this.y < 0 && this.y - objHeight / 2 <= -screenHeight / 2) {
+			this.y += screenHeight - objHeight;
+		}
 		return deltaY;
 	}
 }

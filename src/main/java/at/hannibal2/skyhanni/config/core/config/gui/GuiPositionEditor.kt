@@ -90,15 +90,17 @@ class GuiPositionEditor(
         mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
         mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
         for (position in positions) {
+            var elementWidth = position.getDummySize(true).x
+            var elementHeight = position.getDummySize(true).y
             if (position.clicked) {
-                grabbedX += position.moveX(mouseX - grabbedX)
-                grabbedY += position.moveY(mouseY - grabbedY)
+                grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
+                grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
             }
             val x = position.getAbsX()
             val y = position.getAbsY()
 
-            val elementWidth = position.getDummySize().x
-            val elementHeight = position.getDummySize().y
+            elementWidth = position.getDummySize().x
+            elementHeight = position.getDummySize().y
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
         }
@@ -182,14 +184,16 @@ class GuiPositionEditor(
             } else if (!position.clicked) {
                 val shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
                 val dist = if (shiftHeld) 10 else 1
+                val elementWidth = position.getDummySize(true).x
+                val elementHeight = position.getDummySize(true).y
                 if (keyCode == Keyboard.KEY_DOWN) {
-                    position.moveY(dist)
+                    position.moveY(dist, elementHeight)
                 } else if (keyCode == Keyboard.KEY_UP) {
-                    position.moveY(-dist)
+                    position.moveY(-dist, elementHeight)
                 } else if (keyCode == Keyboard.KEY_LEFT) {
-                    position.moveX(-dist)
+                    position.moveX(-dist, elementWidth,)
                 } else if (keyCode == Keyboard.KEY_RIGHT) {
-                    position.moveX(dist)
+                    position.moveX(dist, elementWidth)
                 }
             }
         }
@@ -212,8 +216,10 @@ class GuiPositionEditor(
             if (position.clicked) {
                 mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
                 mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
-                grabbedX += position.moveX(mouseX - grabbedX)
-                grabbedY += position.moveY(mouseY - grabbedY)
+                val elementWidth = position.getDummySize(true).x
+                val elementHeight = position.getDummySize(true).y
+                grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
+                grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
                 Utils.pushGuiScale(-1)
             }
         }
