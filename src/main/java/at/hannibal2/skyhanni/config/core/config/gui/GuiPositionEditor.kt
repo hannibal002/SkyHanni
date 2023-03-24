@@ -35,11 +35,9 @@ import java.io.IOException
 
 class GuiPositionEditor(
     overlayPositions: LinkedHashMap<Position, Position>,
-    closedCallback: Runnable,
 ) : GuiScreen() {
     private val positions: ArrayList<Position>
     private val originalPositions: ArrayList<Position>
-    private val closedCallback: Runnable
     private var grabbedX = 0
     private var grabbedY = 0
     private var clickedPos = -1
@@ -54,12 +52,10 @@ class GuiPositionEditor(
         }
         positions = pos
         originalPositions = ogPos
-        this.closedCallback = closedCallback
     }
 
     override fun onGuiClosed() {
         super.onGuiClosed()
-        closedCallback.run()
         clickedPos = -1
     }
 
@@ -85,9 +81,8 @@ class GuiPositionEditor(
         }
 
         drawDefaultBackground()
-        val text = "§cSkyHanni Position Editor"
         Utils.drawStringCentered(
-            text, Minecraft.getMinecraft().fontRendererObj,
+            "§cSkyHanni Position Editor", Minecraft.getMinecraft().fontRendererObj,
             (scaledResolution.scaledWidth / 2).toFloat(), 8f, true, 0xffffff
         )
 
@@ -112,17 +107,18 @@ class GuiPositionEditor(
             elementHeight = position.getDummySize().y.toInt()
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
+
+            if (hoveredPos == -1) {
+                hoveredPos = clickedPos
+            }
+
             if (hoveredPos != -1) {
                 val pos = positions[hoveredPos]
-                Utils.drawStringCentered(
-                    "§b" + pos.internalName, Minecraft.getMinecraft().fontRendererObj,
-                    (scaledResolution.scaledWidth / 2).toFloat(), 18f, true, 0xffffff
-                )
+                Utils.drawStringCentered("§b" + pos.internalName, Minecraft.getMinecraft().fontRendererObj,
+                    (scaledResolution.scaledWidth / 2).toFloat(), 18f, true, 0xffffff)
                 val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
-                Utils.drawStringCentered(
-                    location, Minecraft.getMinecraft().fontRendererObj,
-                    (scaledResolution.scaledWidth / 2).toFloat(), 28f, true, 0xffffff
-                )
+                Utils.drawStringCentered(location, Minecraft.getMinecraft().fontRendererObj,
+                    (scaledResolution.scaledWidth / 2).toFloat(), 28f, true, 0xffffff)
             }
         }
         GlStateManager.popMatrix()

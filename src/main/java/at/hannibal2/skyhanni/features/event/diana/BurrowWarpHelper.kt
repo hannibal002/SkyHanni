@@ -18,9 +18,9 @@ class BurrowWarpHelper {
     private var lastWarp: WarpPoint? = null
 
     @SubscribeEvent
-    fun onKeyBindPressed(event: KeyInputEvent?) {
+    fun onKeyBindPressed(event: KeyInputEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if(LorenzUtils.skyBlockIsland != IslandType.HUB) return
+        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
         if (!SkyHanniMod.feature.diana.burrowNearestWarp) return
 
         if (!Keyboard.getEventKeyState()) return
