@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -131,15 +132,16 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        // TODO this is broken, fix it!
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
             if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
                 val lore = item.getLore()
                 if (lore.any { it.contains("Click to view!") }) {
                     if (CollectionAPI.isCollectionTier0(lore)) return "0"
-                    if (itemName.startsWith("§e")) {
-                        val text = itemName.split(" ").last()
-                        return "" + text.romanToDecimalIfNeeded()
+                    item.name?.let {
+                        if (it.startsWith("§e")) {
+                            val text = it.split(" ").last()
+                            return "" + text.romanToDecimalIfNeeded()
+                        }
                     }
                 }
             }
