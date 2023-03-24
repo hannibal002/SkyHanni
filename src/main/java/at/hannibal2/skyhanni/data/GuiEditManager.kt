@@ -61,12 +61,7 @@ class GuiEditManager {
 
         @JvmStatic
         fun openGuiEditor() {
-            val help = LinkedHashMap<Position, Position>()
-            for (position in latestPositions.values) {
-                help[position] = position
-            }
-
-            SkyHanniMod.screenToOpen = GuiPositionEditor(help)
+            SkyHanniMod.screenToOpen = GuiPositionEditor(latestPositions.values.toList(), 2)
         }
 
         @JvmStatic
@@ -89,7 +84,7 @@ class GuiEditManager {
 
         fun Position.getDummySize(random: Boolean = false): Vector2i {
             if (random) {
-                return Vector2i(15, 15)
+                return Vector2i(5, 5)
             } else {
                 val (x, y) = currentBorderSize[internalName] ?: return Vector2i(1, 1)
                 return Vector2i(x, y)

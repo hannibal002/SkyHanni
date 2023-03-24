@@ -18,7 +18,6 @@
  */
 package at.hannibal2.skyhanni.config.core.config.gui
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
@@ -32,27 +31,10 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.io.IOException
 
-class GuiPositionEditor(
-    overlayPositions: LinkedHashMap<Position, Position>,
-) : GuiScreen() {
-    private val positions: ArrayList<Position>
-    private val originalPositions: ArrayList<Position>
+class GuiPositionEditor(private val positions: List<Position>, private val border: Int) : GuiScreen() {
     private var grabbedX = 0
     private var grabbedY = 0
     private var clickedPos = -1
-    private val border = 2
-
-    init {
-        val pos = ArrayList<Position>()
-        val ogPos = ArrayList<Position>()
-        for (i in 0 until overlayPositions.size) {
-            val overlay = ArrayList(overlayPositions.keys)[i]
-            pos.add(overlayPositions[overlay]!!)
-            ogPos.add(pos[i].clone())
-        }
-        positions = pos
-        originalPositions = ogPos
-    }
 
     override fun onGuiClosed() {
         super.onGuiClosed()
@@ -60,36 +42,22 @@ class GuiPositionEditor(
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
-        var hoveredPos = -1
-
-        var mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        var mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
-        for (i in positions.indices.reversed()) {
-            val position = positions[i]
-            val elementWidth = position.getDummySize().x
-            val elementHeight = position.getDummySize().y
-            val x = position.getAbsX()
-            val y = position.getAbsY()
-            if (inXY(mouseX, x, mouseY, y, elementWidth, elementHeight)) {
-                hoveredPos = i
-                break
-            }
-        }
-
+        super.drawScreen(unusedX, unusedY, partialTicks)
         drawDefaultBackground()
-        val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
+
         Utils.drawStringCentered(
-            "§cSkyHanni Position Editor", Minecraft.getMinecraft().fontRendererObj,
-            (scaledResolution.scaledWidth / 2).toFloat(), 8f, true, 0xffffff
+            "§cSkyHanni Position Editor",
+            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 8f, true, 0xffffff
         )
 
-        super.drawScreen(mouseX, mouseY, partialTicks)
+        var hoveredPos = -1
+
         GlStateManager.pushMatrix()
-        width = scaledResolution.scaledWidth
-        height = scaledResolution.scaledHeight
-        mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
-        for (position in positions) {
+        width = getScaledWidth()
+        height = getScaledHeight()
+        val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        for ((index, position) in positions.withIndex()) {
             var elementWidth = position.getDummySize(true).x
             var elementHeight = position.getDummySize(true).y
             if (position.clicked) {
@@ -103,8 +71,10 @@ class GuiPositionEditor(
             elementHeight = position.getDummySize().y
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
+            if (inXY(mouseX, x, mouseY, y, elementWidth, elementHeight)) {
+                hoveredPos = index
+            }
         }
-
         GlStateManager.popMatrix()
 
         var displayPos = -1
@@ -120,20 +90,24 @@ class GuiPositionEditor(
         if (displayPos != -1) {
             val pos = positions[displayPos]
             Utils.drawStringCentered(
-                "§b" + pos.internalName, Minecraft.getMinecraft().fontRendererObj,
-                (scaledResolution.scaledWidth / 2).toFloat(), 18f, true, 0xffffff
+                "§b" + pos.internalName,
+                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 18f, true, 0xffffff
             )
             val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
             Utils.drawStringCentered(
-                location, Minecraft.getMinecraft().fontRendererObj,
-                (scaledResolution.scaledWidth / 2).toFloat(), 28f, true, 0xffffff
+                location,
+                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 28f, true, 0xffffff
             )
         }
     }
 
+    private fun getScaledHeight() = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+    private fun getScaledWidth() = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+
     @Throws(IOException::class)
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
         super.mouseClicked(originalX, priginalY, mouseButton)
+
         if (mouseButton != 0) return
 
         val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
@@ -168,40 +142,30 @@ class GuiPositionEditor(
 
     @Throws(IOException::class)
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        if (clickedPos != -1) {
-            val position = positions[clickedPos]
-            if (keyCode == SkyHanniMod.feature.gui.keyBindReset) {
-
-                position.set(originalPositions[positions.indexOf(position)])
-
-                // TODO option to reset everything
-//                val ii = 0
-//                for (pos in positions) {
-//                    pos.set(originalPositions[ii])
-//                }
-
-
-            } else if (!position.clicked) {
-                val shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
-                val dist = if (shiftHeld) 10 else 1
-                val elementWidth = position.getDummySize(true).x
-                val elementHeight = position.getDummySize(true).y
-                if (keyCode == Keyboard.KEY_DOWN) {
-                    position.moveY(dist, elementHeight)
-                } else if (keyCode == Keyboard.KEY_UP) {
-                    position.moveY(-dist, elementHeight)
-                } else if (keyCode == Keyboard.KEY_LEFT) {
-                    position.moveX(-dist, elementWidth,)
-                } else if (keyCode == Keyboard.KEY_RIGHT) {
-                    position.moveX(dist, elementWidth)
-                }
-            }
-        }
         super.keyTyped(typedChar, keyCode)
+
+        if (clickedPos == -1) return
+        val position = positions[clickedPos]
+        if (position.clicked) return
+
+        val shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
+        val dist = if (shiftHeld) 10 else 1
+        val elementWidth = position.getDummySize(true).x
+        val elementHeight = position.getDummySize(true).y
+        if (keyCode == Keyboard.KEY_DOWN) {
+            position.moveY(dist, elementHeight)
+        } else if (keyCode == Keyboard.KEY_UP) {
+            position.moveY(-dist, elementHeight)
+        } else if (keyCode == Keyboard.KEY_LEFT) {
+            position.moveX(-dist, elementWidth)
+        } else if (keyCode == Keyboard.KEY_RIGHT) {
+            position.moveX(dist, elementWidth)
+        }
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         super.mouseReleased(mouseX, mouseY, state)
+
         for (position in positions) {
             position.clicked = false
         }
@@ -210,18 +174,16 @@ class GuiPositionEditor(
     override fun mouseClickMove(originalX: Int, priginalY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
         super.mouseClickMove(originalX, priginalY, clickedMouseButton, timeSinceLastClick)
 
-        var mouseX: Int
-        var mouseY: Int
         for (position in positions) {
-            if (position.clicked) {
-                mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-                mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
-                val elementWidth = position.getDummySize(true).x
-                val elementHeight = position.getDummySize(true).y
-                grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
-                grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
-                Utils.pushGuiScale(-1)
-            }
+            if (!position.clicked) continue
+
+            val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+            val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+            val elementWidth = position.getDummySize(true).x
+            val elementHeight = position.getDummySize(true).y
+            grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
+            grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
+            Utils.pushGuiScale(-1)
         }
     }
 }

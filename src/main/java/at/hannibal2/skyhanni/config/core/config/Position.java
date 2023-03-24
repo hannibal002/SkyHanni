@@ -54,12 +54,6 @@ public class Position {
 		this.centerY = other.centerY;
 	}
 
-	public Position clone() {
-		Position position = new Position(x, y, centerX, centerY);
-		position.internalName = internalName;
-		return position;
-	}
-
 	public int getRawX() {
 		return x;
 	}
