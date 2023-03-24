@@ -38,7 +38,7 @@ class AshfangNextResetCooldown {
         val remainingTime = spawnTime + 46_100 - System.currentTimeMillis()
         if (remainingTime > 0) {
             val format = TimeUtils.formatDuration(remainingTime, TimeUnit.SECOND, showMilliSeconds = true)
-            SkyHanniMod.feature.ashfang.nextResetCooldownPos.renderString("§cAshfang next reset in: §a$format")
+            SkyHanniMod.feature.ashfang.nextResetCooldownPos.renderString("§cAshfang next reset in: §a$format", posLabel = "Ashfang Reset Cooldown")
         } else {
             spawnTime = -1
         }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorButton;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorColour;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
@@ -15,8 +14,8 @@ public class Ashfang {
     public boolean freezeCooldown = false;
 
     @Expose
-    @ConfigOption(name = "Freeze Position", desc = "")
-    @ConfigEditorButton(runnableId = "ashfangFreezeCooldown", buttonText = "Edit")
+//    @ConfigOption(name = "Freeze Position", desc = "")
+//    @ConfigEditorButton(runnableId = "ashfangFreezeCooldown", buttonText = "Edit")
     public Position freezeCooldownPos = new Position(10, 10, false, true);
 
     @Expose
@@ -25,8 +24,8 @@ public class Ashfang {
     public boolean nextResetCooldown = false;
 
     @Expose
-    @ConfigOption(name = "Reset Position", desc = "")
-    @ConfigEditorButton(runnableId = "ashfangResetCooldown", buttonText = "Edit")
+//    @ConfigOption(name = "Reset Position", desc = "")
+//    @ConfigEditorButton(runnableId = "ashfangResetCooldown", buttonText = "Edit")
     public Position nextResetCooldownPos = new Position(10, 10, false, true);
 
     @Expose

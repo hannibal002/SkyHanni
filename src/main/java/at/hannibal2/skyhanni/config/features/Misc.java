@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigAccordionId;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorAccordion;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
 
 public class Misc {
@@ -18,9 +21,9 @@ public class Misc {
     public boolean petDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Pet Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "petDisplay", buttonText = "Edit")
-    @ConfigAccordionId(id = 0)
+//    @ConfigOption(name = "Pet Display Position", desc = "")
+//    @ConfigEditorButton(runnableId = "petDisplay", buttonText = "Edit")
+//    @ConfigAccordionId(id = 0)
     public Position petDisplayPos = new Position(-111, 221, false, true);
 
     @Expose
@@ -35,9 +38,9 @@ public class Misc {
     public boolean realTime = false;
 
     @Expose
-    @ConfigOption(name = "Real Time Position", desc = "")
-    @ConfigEditorButton(runnableId = "realTime", buttonText = "Edit")
-    @ConfigAccordionId(id = 1)
+//    @ConfigOption(name = "Real Time Position", desc = "")
+//    @ConfigEditorButton(runnableId = "realTime", buttonText = "Edit")
+//    @ConfigAccordionId(id = 1)
     public Position realTimePos = new Position(10, 10, false, true);
 
     @Expose
@@ -86,9 +89,9 @@ public class Misc {
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Pot Effects Position", desc = "")
-    @ConfigEditorButton(runnableId = "nonGodPotEffect", buttonText = "Edit")
-    @ConfigAccordionId(id = 5)
+//    @ConfigOption(name = "Pot Effects Position", desc = "")
+//    @ConfigEditorButton(runnableId = "nonGodPotEffect", buttonText = "Edit")
+//    @ConfigAccordionId(id = 5)
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
 
     @Expose
@@ -103,9 +106,9 @@ public class Misc {
     public boolean crimsonIsleReputationHelper = true;
 
     @Expose
-    @ConfigOption(name = "Reputation Position", desc = "")
-    @ConfigEditorButton(runnableId = "crimsonIsleReputationHelper", buttonText = "Edit")
-    @ConfigAccordionId(id = 6)
+//    @ConfigOption(name = "Reputation Position", desc = "")
+//    @ConfigEditorButton(runnableId = "crimsonIsleReputationHelper", buttonText = "Edit")
+//    @ConfigAccordionId(id = 6)
     public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
 
     @Expose
@@ -155,9 +158,9 @@ public class Misc {
     public boolean tpsDisplayEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Tps Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "tpsDisplay", buttonText = "Edit")
-    @ConfigAccordionId(id = 8)
+//    @ConfigOption(name = "Tps Display Position", desc = "")
+//    @ConfigEditorButton(runnableId = "tpsDisplay", buttonText = "Edit")
+//    @ConfigAccordionId(id = 8)
     public Position tpsDisplayPosition = new Position(10, 10, false, true);
 
     @Expose
@@ -213,9 +216,9 @@ public class Misc {
     public boolean chickenHeadTimerDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Timer Position", desc = "")
-    @ConfigEditorButton(runnableId = "chickenHeadTimer", buttonText = "Edit")
-    @ConfigAccordionId(id = 10)
+//    @ConfigOption(name = "Timer Position", desc = "")
+//    @ConfigEditorButton(runnableId = "chickenHeadTimer", buttonText = "Edit")
+//    @ConfigAccordionId(id = 10)
     public Position chickenHeadTimerPosition = new Position(-372, 73, false, true);
 
     @Expose
@@ -224,8 +227,8 @@ public class Misc {
     public boolean hideExpBottles = false;
 
     @Expose
-    @ConfigOption(name = "Collection Counter Position", desc = "Tracking the number of items you collect. §cDoes not work with sacks.")
-    @ConfigEditorButton(runnableId = "collectionCounter", buttonText = "Edit")
+//    @ConfigOption(name = "Collection Counter Position", desc = "Tracking the number of items you collect. §cDoes not work with sacks.")
+//    @ConfigEditorButton(runnableId = "collectionCounter", buttonText = "Edit")
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose

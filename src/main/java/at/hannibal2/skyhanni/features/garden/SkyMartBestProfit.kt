@@ -98,7 +98,7 @@ class SkyMartBestProfit {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (isEnabled()) {
-            config.skyMartCopperPricePos.renderStringsAndItems(display)
+            config.skyMartCopperPricePos.renderStringsAndItems(display, posLabel = "Sky Mart Copper Price")
         }
     }
 

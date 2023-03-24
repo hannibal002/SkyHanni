@@ -96,7 +96,7 @@ class DicerRngDropCounter {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            SkyHanniMod.feature.garden.dicerCounterPos.renderStrings(display)
+            SkyHanniMod.feature.garden.dicerCounterPos.renderStrings(display, posLabel = "Dicer Counter")
         }
     }
 

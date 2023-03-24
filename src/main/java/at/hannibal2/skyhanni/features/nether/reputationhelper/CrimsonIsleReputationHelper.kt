@@ -96,7 +96,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        SkyHanniMod.feature.misc.crimsonIsleReputationHelperPos.renderStringsAndItems(display)
+        SkyHanniMod.feature.misc.crimsonIsleReputationHelperPos.renderStringsAndItems(display, posLabel = "Crimson Isle Reputation Helper")
     }
 
     fun update() {

@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigAccordionId;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorAccordion;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
 
 public class Bingo {
@@ -24,8 +27,8 @@ public class Bingo {
     public boolean stepHelper = false;
 
     @Expose
-    @ConfigOption(name = "Bingo Card Position", desc = "")
-    @ConfigEditorButton(runnableId = "bingoCard", buttonText = "Edit")
+//    @ConfigOption(name = "Bingo Card Position", desc = "")
+//    @ConfigEditorButton(runnableId = "bingoCard", buttonText = "Edit")
     public Position bingoCardPos = new Position(10, 10, false, true);
 
     @ConfigOption(name = "Minion Craft Helper", desc = "")
@@ -39,8 +42,8 @@ public class Bingo {
     public boolean minionCraftHelperEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Minion Craft Helper Position", desc = "")
-    @ConfigEditorButton(runnableId = "minionCraftHelper", buttonText = "Edit")
-    @ConfigAccordionId(id = 0)
+//    @ConfigOption(name = "Minion Craft Helper Position", desc = "")
+//    @ConfigEditorButton(runnableId = "minionCraftHelper", buttonText = "Edit")
+//    @ConfigAccordionId(id = 0)
     public Position minionCraftHelperPos = new Position(10, 10, false, true);
 }

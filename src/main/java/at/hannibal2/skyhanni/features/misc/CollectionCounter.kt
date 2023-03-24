@@ -137,6 +137,6 @@ class CollectionCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        SkyHanniMod.feature.misc.collectionCounterPos.renderString(display)
+        SkyHanniMod.feature.misc.collectionCounterPos.renderString(display, posLabel = "Collection Counter")
     }
 }

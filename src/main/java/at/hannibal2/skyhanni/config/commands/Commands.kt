@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigEditor
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
 import at.hannibal2.skyhanni.data.ApiDataLoader
+import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -22,8 +23,12 @@ object Commands {
 
     private val openMainMenu: (Array<String>) -> Unit = {
         if (it.isNotEmpty()) {
-            SkyHanniMod.screenToOpen =
-                GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature, StringUtils.join(it, " ")))
+            if (it[0].lowercase() == "gui") {
+                GuiEditManager.openGuiEditor()
+            } else {
+                SkyHanniMod.screenToOpen =
+                    GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature, StringUtils.join(it, " ")))
+            }
         } else {
             SkyHanniMod.screenToOpen = GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature))
         }

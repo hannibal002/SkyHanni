@@ -16,183 +16,204 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with NotEnoughUpdates. If not, see <https://www.gnu.org/licenses/>.
  */
+package at.hannibal2.skyhanni.config.core.config.gui
 
-package at.hannibal2.skyhanni.config.core.config.gui;
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX_
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY_
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.isCenterX_
+import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
+import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
+import java.io.IOException
 
-import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+class GuiPositionEditor(
+    overlayPositions: LinkedHashMap<Position, Position>,
+    closedCallback: Runnable,
+) : GuiScreen() {
+    private val positions: ArrayList<Position>
+    private val originalPositions: ArrayList<Position>
+    private val closedCallback: Runnable
+    private var grabbedX = 0
+    private var grabbedY = 0
+    private var clickedPos = -1
 
-import java.io.IOException;
+    init {
+        val pos = ArrayList<Position>()
+        val ogPos = ArrayList<Position>()
+        for (i in 0 until overlayPositions.size) {
+            val overlay = ArrayList(overlayPositions.keys)[i]
+            pos.add(overlayPositions[overlay]!!)
+            ogPos.add(pos[i].clone())
+        }
+        positions = pos
+        originalPositions = ogPos
+        this.closedCallback = closedCallback
+    }
 
-public class GuiPositionEditor extends GuiScreen {
-	private final Position position;
-	private final Position originalPosition;
-	private final int elementWidth;
-	private final int elementHeight;
-	private final Runnable renderCallback;
-	private final Runnable positionChangedCallback;
-	private final Runnable closedCallback;
-	private boolean clicked = false;
-	private int grabbedX = 0;
-	private int grabbedY = 0;
+    override fun onGuiClosed() {
+        super.onGuiClosed()
+        closedCallback.run()
+        clickedPos = -1
+    }
 
-//	private int guiScaleOverride = -1;
+    override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
+        val border = 2
+        var hoveredPos = -1
 
-	public GuiPositionEditor(
-		Position position, int elementWidth, int elementHeight,
-		Runnable renderCallback,
-		Runnable positionChangedCallback,
-		Runnable closedCallback
-	) {
-		this.position = position;
-		this.originalPosition = position.clone();
-		this.elementWidth = elementWidth;
-		this.elementHeight = elementHeight;
-		this.renderCallback = renderCallback;
-		this.positionChangedCallback = positionChangedCallback;
-		this.closedCallback = closedCallback;
-	}
+        val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
+        var mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+        var mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        for (i in positions.indices.reversed()) {
+            val position = positions[i]
+            val elementWidth = position.getDummySize().x.toInt()
+            val elementHeight = position.getDummySize().y.toInt()
+            var x = position.getAbsX_()
+            var y = position.getAbsY_()
+            if (position.isCenterX_()) x -= elementWidth / 2
+            if (position.isCenterY) y -= elementHeight / 2
+            if (mouseX >= x - border && mouseY >= y - border && mouseX <= x + elementWidth + border * 2 && mouseY <= y + elementHeight + border * 2) {
+                hoveredPos = i
+                break
+            }
+        }
 
-//	public GuiPositionEditor withScale(int scale) {
-//		this.guiScaleOverride = scale;
-//		return this;
-//	}
+        drawDefaultBackground()
+        val text = "§cSkyHanni Position Editor"
+        Utils.drawStringCentered(
+            text, Minecraft.getMinecraft().fontRendererObj,
+            (scaledResolution.scaledWidth / 2).toFloat(), 8f, true, 0xffffff
+        )
 
-	@Override
-	public void onGuiClosed() {
-		super.onGuiClosed();
-		closedCallback.run();
-	}
+        super.drawScreen(mouseX, mouseY, partialTicks)
+        GlStateManager.pushMatrix()
+        width = scaledResolution.scaledWidth
+        height = scaledResolution.scaledHeight
+        mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+        mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        for (position in positions) {
+            var elementWidth = position.getDummySize(true).x.toInt()
+            var elementHeight = position.getDummySize(true).y.toInt()
+            if (position.clicked) {
+                grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution)
+                grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution)
+            }
+            var x = position.getAbsX_()
+            val y = position.getAbsY_()
+            if (position.isCenterX_()) x -= elementWidth / 2
 
-	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawScreen(mouseX, mouseY, partialTicks);
-		ScaledResolution scaledResolution;
-//		if (guiScaleOverride >= 0) {
-//			scaledResolution = GuiRenderUtils.pushGuiScale(guiScaleOverride);
-//		} else {
-			scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-//		}
+            elementWidth = position.getDummySize().x.toInt()
+            elementHeight = position.getDummySize().y.toInt()
+            drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
-		this.width = scaledResolution.getScaledWidth();
-		this.height = scaledResolution.getScaledHeight();
-		mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
-		mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1;
+            if (hoveredPos != -1) {
+                val pos = positions[hoveredPos]
+                Utils.drawStringCentered(
+                    "§b" + pos.internalName, Minecraft.getMinecraft().fontRendererObj,
+                    (scaledResolution.scaledWidth / 2).toFloat(), 18f, true, 0xffffff
+                )
+                val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
+                Utils.drawStringCentered(
+                    location, Minecraft.getMinecraft().fontRendererObj,
+                    (scaledResolution.scaledWidth / 2).toFloat(), 28f, true, 0xffffff
+                )
+            }
+        }
+        GlStateManager.popMatrix()
+    }
 
-		drawDefaultBackground();
+    @Throws(IOException::class)
+    override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
+        super.mouseClicked(originalX, priginalY, mouseButton)
 
-		if (clicked) {
-			grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution);
-			grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution);
-		}
+        val mouseX: Int
+        val mouseY: Int
+        if (mouseButton == 0) {
+            mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+            mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+            for (i in positions.indices.reversed()) {
+                val position = positions[i]
+                val elementWidth = position.getDummySize().x.toInt()
+                val elementHeight = position.getDummySize().y.toInt()
+                var x = position.getAbsX_()
+                val y = position.getAbsY_()
+                if (position.isCenterX_()) x -= elementWidth / 2
+                if (!position.clicked) {
+                    if (mouseX >= x && mouseY >= y && mouseX <= x + elementWidth && mouseY <= y + elementHeight) {
+                        clickedPos = i
+                        position.clicked = true
+                        grabbedX = mouseX
+                        grabbedY = mouseY
+                        break
+                    }
+                }
+            }
+        }
+    }
 
-		renderCallback.run();
+    @Throws(IOException::class)
+    override fun keyTyped(typedChar: Char, keyCode: Int) {
+        if (clickedPos != -1) {
+            val position = positions[clickedPos]
+            val elementWidth = position.getDummySize(true).x.toInt()
+            val elementHeight = position.getDummySize(true).y.toInt()
+            if (keyCode == SkyHanniMod.feature.gui.keyBindReset) {
 
-		int x = position.getAbsX(scaledResolution, elementWidth);
-		int y = position.getAbsY(scaledResolution, elementHeight);
+                position.set(originalPositions[positions.indexOf(position)])
 
-		if (position.isCenterX()) x -= elementWidth / 2;
-		if (position.isCenterY()) y -= elementHeight / 2;
-		Gui.drawRect(x, y, x + elementWidth, y + elementHeight, 0x80404040);
+                // TODO option to reset everything
+//                val ii = 0
+//                for (pos in positions) {
+//                    pos.set(originalPositions[ii])
+//                }
 
-//		if (guiScaleOverride >= 0) {
-//			Utils.pushGuiScale(-1);
-//		}
 
-		scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-		TextRenderUtils.drawStringCentered("Position Editor", Minecraft.getMinecraft().fontRendererObj,
-			scaledResolution.getScaledWidth() / 2, 8, true, 0xffffff
-		);
-		TextRenderUtils.drawStringCentered("R to Reset - Arrow keys/mouse to move", Minecraft.getMinecraft().fontRendererObj,
-			scaledResolution.getScaledWidth() / 2, 18, true, 0xffffff
-		);
-	}
+            } else if (!position.clicked) {
+                val shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
+                val dist = if (shiftHeld) 10 else 1
+                if (keyCode == Keyboard.KEY_DOWN) {
+                    position.moveY(dist, elementHeight, ScaledResolution(Minecraft.getMinecraft()))
+                } else if (keyCode == Keyboard.KEY_UP) {
+                    position.moveY(-dist, elementHeight, ScaledResolution(Minecraft.getMinecraft()))
+                } else if (keyCode == Keyboard.KEY_LEFT) {
+                    position.moveX(-dist, elementWidth, ScaledResolution(Minecraft.getMinecraft()))
+                } else if (keyCode == Keyboard.KEY_RIGHT) {
+                    position.moveX(dist, elementWidth, ScaledResolution(Minecraft.getMinecraft()))
+                }
+            }
+        }
+        super.keyTyped(typedChar, keyCode)
+    }
 
-	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		super.mouseClicked(mouseX, mouseY, mouseButton);
+    override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
+        super.mouseReleased(mouseX, mouseY, state)
+        for (position in positions) {
+            position.clicked = false
+        }
+    }
 
-		if (mouseButton == 0) {
-			ScaledResolution scaledResolution;
-//			if (guiScaleOverride >= 0) {
-//				scaledResolution = Utils.pushGuiScale(guiScaleOverride);
-//			} else {
-				scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-//			}
-			mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
-			mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1;
+    override fun mouseClickMove(originalX: Int, priginalY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
+        super.mouseClickMove(originalX, priginalY, clickedMouseButton, timeSinceLastClick)
 
-			int x = position.getAbsX(scaledResolution, elementWidth);
-			int y = position.getAbsY(scaledResolution, elementHeight);
-			if (position.isCenterX()) x -= elementWidth / 2;
-			if (position.isCenterY()) y -= elementHeight / 2;
-
-			if (mouseX >= x && mouseY >= y &&
-				mouseX <= x + elementWidth && mouseY <= y + elementHeight) {
-				clicked = true;
-				grabbedX = mouseX;
-				grabbedY = mouseY;
-			}
-
-//			if (guiScaleOverride >= 0) {
-//				Utils.pushGuiScale(-1);
-//			}
-		}
-	}
-
-	@Override
-	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		if (keyCode == Keyboard.KEY_R) {
-			position.set(originalPosition);
-		} else if (!clicked) {
-			boolean shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
-			int dist = shiftHeld ? 10 : 1;
-			if (keyCode == Keyboard.KEY_DOWN) {
-				position.moveY(dist, elementHeight, new ScaledResolution(Minecraft.getMinecraft()));
-			} else if (keyCode == Keyboard.KEY_UP) {
-				position.moveY(-dist, elementHeight, new ScaledResolution(Minecraft.getMinecraft()));
-			} else if (keyCode == Keyboard.KEY_LEFT) {
-				position.moveX(-dist, elementWidth, new ScaledResolution(Minecraft.getMinecraft()));
-			} else if (keyCode == Keyboard.KEY_RIGHT) {
-				position.moveX(dist, elementWidth, new ScaledResolution(Minecraft.getMinecraft()));
-			}
-		}
-		super.keyTyped(typedChar, keyCode);
-	}
-
-	@Override
-	protected void mouseReleased(int mouseX, int mouseY, int state) {
-		super.mouseReleased(mouseX, mouseY, state);
-		clicked = false;
-	}
-
-	@Override
-	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-
-		if (clicked) {
-			ScaledResolution scaledResolution;
-//			if (guiScaleOverride >= 0) {
-//				scaledResolution = Utils.pushGuiScale(guiScaleOverride);
-//			} else {
-				scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-//			}
-			mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth;
-			mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1;
-
-			grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution);
-			grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution);
-			positionChangedCallback.run();
-
-//			if (guiScaleOverride >= 0) {
-//				Utils.pushGuiScale(-1);
-//			}
-		}
-	}
+        var mouseX: Int
+        var mouseY: Int
+        for (position in positions) {
+            val elementWidth = position.getDummySize(true).x.toInt()
+            val elementHeight = position.getDummySize(true).y.toInt()
+            if (position.clicked) {
+                val scaledResolution = Utils.pushGuiScale(-1)
+                mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+                mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+                grabbedX += position.moveX(mouseX - grabbedX, elementWidth, scaledResolution)
+                grabbedY += position.moveY(mouseY - grabbedY, elementHeight, scaledResolution)
+                Utils.pushGuiScale(-1)
+            }
+        }
+    }
 }

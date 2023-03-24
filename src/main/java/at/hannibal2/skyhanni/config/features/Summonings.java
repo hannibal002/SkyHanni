@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigAccordionId;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorAccordion;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
 
 public class Summonings {
@@ -24,9 +27,9 @@ public class Summonings {
     public boolean summoningMobDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Summoning Mob Display Position", desc = "")
-    @ConfigEditorButton(runnableId = "summoningMobDisplay", buttonText = "Edit")
-    @ConfigAccordionId(id = 0)
+//    @ConfigOption(name = "Summoning Mob Display Position", desc = "")
+//    @ConfigEditorButton(runnableId = "summoningMobDisplay", buttonText = "Edit")
+//    @ConfigAccordionId(id = 0)
     public Position summoningMobDisplayPos = new Position(10, 10, false, true);
 
     @Expose

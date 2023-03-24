@@ -150,6 +150,10 @@ class ItemDisplayOverlayFeatures {
                 for (line in item.getLore()) {
                     val matcher = rangerBootsSpeedCapPattern.matcher(line)
                     if (matcher.matches()) {
+//                        if (!done) {
+//                            done = true
+//                            Thread.dumpStack()
+//                        }
                         return matcher.group(1)
                     }
                 }
@@ -157,6 +161,8 @@ class ItemDisplayOverlayFeatures {
         }
         return ""
     }
+
+    var done = false
 
     private fun grabSackName(name: String): String {
         val split = name.split(" ")

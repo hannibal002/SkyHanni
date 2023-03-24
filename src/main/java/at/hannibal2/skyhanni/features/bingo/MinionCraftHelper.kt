@@ -250,7 +250,7 @@ class MinionCraftHelper {
         if (!LorenzUtils.isBingoProfile) return
         if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
 
-        SkyHanniMod.feature.bingo.minionCraftHelperPos.renderStrings(display, center = true)
+        SkyHanniMod.feature.bingo.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
     }
 
     private fun notify(minionName: String) {

@@ -71,7 +71,7 @@ class BazaarBestSellMethod {
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.bazaar.bestSellMethodPos.renderString(display)
+        SkyHanniMod.feature.bazaar.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
     }
 
     private fun isEnabled(): Boolean {

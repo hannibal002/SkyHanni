@@ -32,6 +32,9 @@ public class Position {
 	@Expose
 	private boolean centerY;
 
+	private boolean clicked = false;
+	public String internalName = null;
+
 	private static final int EDGE_OFFSET = 0;
 
 	public Position(int x, int y) {
@@ -53,15 +56,17 @@ public class Position {
 	}
 
 	public Position clone() {
-		return new Position(x, y, centerX, centerY);
+		Position position = new Position(x, y, centerX, centerY);
+		position.internalName = internalName;
+		return position;
 	}
 
-	public boolean isCenterX() {
-		return centerX;
-	}
+//	public boolean isCenterX() {
+//		return ;
+//	}
 
 	public boolean isCenterY() {
-		return centerY;
+		return false;
 	}
 
 	public int getRawX() {
@@ -72,12 +77,15 @@ public class Position {
 		return y;
 	}
 
+	public void setClicked(boolean state) {
+		this.clicked = state;
+	}
+	public boolean getClicked() {
+		return clicked;
+	}
+
 	public int getAbsX(ScaledResolution scaledResolution, int objWidth) {
 		int width = scaledResolution.getScaledWidth();
-
-		if (centerX) {
-			return width / 2 + x;
-		}
 
 		int ret = x;
 		if (x < 0) {
@@ -92,10 +100,6 @@ public class Position {
 
 	public int getAbsY(ScaledResolution scaledResolution, int objHeight) {
 		int height = scaledResolution.getScaledHeight();
-
-		if (centerY) {
-			return height / 2 + y;
-		}
 
 		int ret = y;
 		if (y < 0) {
@@ -112,21 +116,6 @@ public class Position {
 		int screenWidth = scaledResolution.getScaledWidth();
 		boolean wasPositiveX = this.x >= 0;
 		this.x += deltaX;
-
-		if (centerX) {
-			if (wasPositiveX) {
-				if (this.x > screenWidth / 2 - objWidth / 2) {
-					deltaX += screenWidth / 2 - objWidth / 2 - this.x;
-					this.x = screenWidth / 2 - objWidth / 2;
-				}
-			} else {
-				if (this.x < -screenWidth / 2 + objWidth / 2) {
-					deltaX += -screenWidth / 2 + objWidth / 2 - this.x;
-					this.x = -screenWidth / 2 + objWidth / 2;
-				}
-			}
-			return deltaX;
-		}
 
 		if (wasPositiveX) {
 			if (this.x < EDGE_OFFSET) {
@@ -161,21 +150,6 @@ public class Position {
 		int screenHeight = scaledResolution.getScaledHeight();
 		boolean wasPositiveY = this.y >= 0;
 		this.y += deltaY;
-
-		if (centerY) {
-			if (wasPositiveY) {
-				if (this.y > screenHeight / 2 - objHeight / 2) {
-					deltaY += screenHeight / 2 - objHeight / 2 - this.y;
-					this.y = screenHeight / 2 - objHeight / 2;
-				}
-			} else {
-				if (this.y < -screenHeight / 2 + objHeight / 2) {
-					deltaY += -screenHeight / 2 + objHeight / 2 - this.y;
-					this.y = -screenHeight / 2 + objHeight / 2;
-				}
-			}
-			return deltaY;
-		}
 
 		if (wasPositiveY) {
 			if (this.y < EDGE_OFFSET) {

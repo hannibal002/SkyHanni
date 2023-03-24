@@ -189,7 +189,7 @@ class NonGodPotEffectDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.misc.nonGodPotEffectPos.renderStrings(display, extraSpace = 3)
+        SkyHanniMod.feature.misc.nonGodPotEffectPos.renderStrings(display, extraSpace = 3, posLabel = "Non God Pot Effects")
     }
 
     @SubscribeEvent

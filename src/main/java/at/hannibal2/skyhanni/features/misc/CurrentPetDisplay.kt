@@ -43,6 +43,6 @@ class CurrentPetDisplay {
 
         if (!SkyHanniMod.feature.misc.petDisplay) return
 
-        SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet)
+        SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
     }
 }

@@ -14,18 +14,23 @@ class RenderGuiData {
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
+        if (GuiEditManager.isInGui()) return
 
         GuiRenderEvent.GameOverlayRenderEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (GuiEditManager.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
-
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
         GlStateManager.pushMatrix()
         GlStateManager.enableDepth()
+
+        if (GuiEditManager.isInGui()) {
+            GuiRenderEvent.GameOverlayRenderEvent().postAndCatch()
+        }
 
         GuiRenderEvent.ChestBackgroundRenderEvent().postAndCatch()
 

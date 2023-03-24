@@ -34,7 +34,7 @@ class BazaarUpdateTimer {
         val list = mutableListOf<String>()
         list.add("Next update in:")
         list.add(format)
-        SkyHanniMod.feature.bazaar.updateTimerPos.renderStrings(list, center = true)
+        SkyHanniMod.feature.bazaar.updateTimerPos.renderStrings(list, posLabel = "Bazaar Update Timer")
     }
 
     private fun isEnabled(): Boolean {

@@ -88,7 +88,7 @@ class DungeonDeathCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestonesDisplay.color + display)
+        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(DungeonMilestonesDisplay.color + display, posLabel = "Dungeon Death Counter")
     }
 
     private fun isEnabled(): Boolean {

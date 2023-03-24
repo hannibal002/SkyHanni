@@ -426,7 +426,7 @@ class GardenVisitorFeatures {
             if (!onBarnPlot) return
         }
 
-        config.visitorNeedsPos.renderStringsAndItems(display)
+        config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
     }
 
     class Visitor(

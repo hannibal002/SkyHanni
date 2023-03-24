@@ -147,7 +147,7 @@ class SummoningMobManager {
             id++
         }
 
-        SkyHanniMod.feature.summonings.summoningMobDisplayPos.renderStrings(list)
+        SkyHanniMod.feature.summonings.summoningMobDisplayPos.renderStrings(list, posLabel = "Summoning Mob Display")
     }
 
     @SubscribeEvent

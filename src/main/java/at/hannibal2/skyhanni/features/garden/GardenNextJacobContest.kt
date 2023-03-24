@@ -182,7 +182,7 @@ class GardenNextJacobContest {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.nextJacobContestPos.renderSingleLineWithItems(display, 1.7)
+        config.nextJacobContestPos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
     }
 
     @SubscribeEvent
@@ -190,7 +190,7 @@ class GardenNextJacobContest {
         if (!config.nextJacobContestDisplay) return
         if (!inCalendar) return
 
-        config.nextJacobContestPos.renderSingleLineWithItems(display)
+        config.nextJacobContestPos.renderSingleLineWithItems(display, posLabel = "Garden Next Jacob Contest")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.nextJacobContestDisplay

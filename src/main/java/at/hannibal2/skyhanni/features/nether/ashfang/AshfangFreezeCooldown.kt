@@ -34,7 +34,7 @@ class AshfangFreezeCooldown {
         val remainingLong = maxDuration - duration
         if (remainingLong > 0) {
             var format = TimeUtils.formatDuration(remainingLong, showMilliSeconds = true)
-            SkyHanniMod.feature.ashfang.freezeCooldownPos.renderString("§cAshfang Freeze: §a$format")
+            SkyHanniMod.feature.ashfang.freezeCooldownPos.renderString("§cAshfang Freeze: §a$format", posLabel = "Ashfang Freeze Cooldown")
         }
     }
 
