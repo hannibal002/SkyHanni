@@ -5,13 +5,14 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.util.vector.Vector2f
 import java.util.*
@@ -20,8 +21,13 @@ class GuiEditManager {
 
     // TODO Make utils method for this
     @SubscribeEvent
-    fun onKeyBindPressed(event: InputEvent.KeyInputEvent) {
+    fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        Minecraft.getMinecraft().currentScreen?.let {
+            if (it !is GuiInventory && it !is GuiChest) return
+        }
+
 
         if (!Keyboard.getEventKeyState()) return
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
@@ -32,7 +38,7 @@ class GuiEditManager {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         latestPositions = currentPositions.toMap()
         currentPositions.clear()
     }
@@ -51,23 +57,18 @@ class GuiEditManager {
             }
             if (!currentPositions.containsKey(name)) {
                 currentPositions[name] = position
-
-
                 currentBorderSize[posLabel] = Pair(x, y)
             }
         }
 
         @JvmStatic
         fun openGuiEditor() {
-            val savedGui = Minecraft.getMinecraft().currentScreen
-
             val help = LinkedHashMap<Position, Position>()
             for (position in latestPositions.values) {
                 help[position] = position
             }
 
-            val guiPositionEditor = GuiPositionEditor(help) { NotEnoughUpdates.INSTANCE.openGui = savedGui }
-            SkyHanniMod.screenToOpen = guiPositionEditor
+            SkyHanniMod.screenToOpen = GuiPositionEditor(help)
         }
 
         @JvmStatic
