@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorButton;
 import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
 
@@ -19,8 +18,8 @@ public class Bazaar {
     public boolean bestSellMethod = false;
 
     @Expose
-    @ConfigOption(name = "Best Sell Method Position", desc = "")
-    @ConfigEditorButton(runnableId = "bestSellMethod", buttonText = "Edit")
+//    @ConfigOption(name = "Best Sell Method Position", desc = "")
+//    @ConfigEditorButton(runnableId = "bestSellMethod", buttonText = "Edit")
     public Position bestSellMethodPos = new Position(10, 10, false, true);
 
     @Expose
@@ -34,7 +33,7 @@ public class Bazaar {
     public boolean updateTimer = false;
 
     @Expose
-    @ConfigOption(name = "Update timer Position", desc = "")
-    @ConfigEditorButton(runnableId = "bazzarUpdateTimer", buttonText = "Edit")
+//    @ConfigOption(name = "Update timer Position", desc = "")
+//    @ConfigEditorButton(runnableId = "bazzarUpdateTimer", buttonText = "Edit")
     public Position updateTimerPos = new Position(10, 10, false, true);
 }

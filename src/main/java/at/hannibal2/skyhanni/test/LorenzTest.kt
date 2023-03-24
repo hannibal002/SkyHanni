@@ -131,7 +131,7 @@ class LorenzTest {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dev.debugEnabled) return
 
-        SkyHanniMod.feature.dev.debugPos.renderString(text)
+        SkyHanniMod.feature.dev.debugPos.renderString(text, posLabel = "Test")
     }
 
     @SubscribeEvent

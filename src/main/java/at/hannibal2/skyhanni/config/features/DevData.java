@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigAccordionId;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorAccordion;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
+import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
 
 public class DevData {
@@ -23,9 +26,9 @@ public class DevData {
     public boolean debugEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Debug Location", desc = "")
-    @ConfigEditorButton(runnableId = "debugPos", buttonText = "Edit")
-    @ConfigAccordionId(id = 0)
+//    @ConfigOption(name = "Debug Location", desc = "")
+//    @ConfigEditorButton(runnableId = "debugPos", buttonText = "Edit")
+//    @ConfigAccordionId(id = 0)
     public Position debugPos = new Position(10, 10, false, true);
 
     @Expose

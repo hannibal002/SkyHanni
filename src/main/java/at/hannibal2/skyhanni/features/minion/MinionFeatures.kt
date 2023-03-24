@@ -267,7 +267,7 @@ class MinionFeatures {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (SkyHanniMod.feature.minions.hopperProfitDisplay) {
-            SkyHanniMod.feature.minions.hopperProfitPos.renderString(coinsPerDay)
+            SkyHanniMod.feature.minions.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
     }
 }

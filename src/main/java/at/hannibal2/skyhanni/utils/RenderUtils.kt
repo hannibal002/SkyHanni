@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils.drawStringScaled
+import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX_
+import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY_
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -427,54 +429,67 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.renderString(string: String?, extraOffsetX: Int = 0, offsetY: Int = 0, center: Boolean = true) {
-        val minecraft = Minecraft.getMinecraft()
-
+    fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string == null) return
         if (string == "") return
+        val x = renderString0(string, offsetX, offsetY)
+        GuiEditManager.add(this, posLabel, x, 10)
+    }
+
+    private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0): Int {
         val display = "§f$string"
-
         GlStateManager.pushMatrix()
-        val resolution = ScaledResolution(minecraft)
 
-        val renderer = minecraft.renderManager.fontRenderer ?: return
+        val minecraft = Minecraft.getMinecraft()
+        val renderer = minecraft.renderManager.fontRenderer
 
-        val offsetX = if (center) {
-            (200 - renderer.getStringWidth(display)) / 2
-        } else {
-            0
-        } + extraOffsetX
-
-        val x = getAbsX(resolution, 200) + offsetX
-        val y = getAbsY(resolution, 16) + offsetY
+        val x = getAbsX_() + offsetX
+        val y = getAbsY_() + offsetY
 
         GlStateManager.translate(x + 1.0, y + 1.0, 0.0)
         renderer.drawStringWithShadow(display, 0f, 0f, 0)
 
+
         GlStateManager.popMatrix()
+
+        return renderer.getStringWidth(display)
     }
 
-    fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, center: Boolean = false) {
+    fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
         var offsetY = 0
+        var longestX = 0
         for (s in list) {
-            renderString(s, offsetY = offsetY, center = center)
+            val x = renderString0(s, offsetY = offsetY)
+            if (x > longestX) {
+                longestX = x
+            }
             offsetY += 10 + extraSpace
         }
+        GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
     /**
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderStringsAndItems(list: List<List<Any?>>, extraSpace: Int = 0, itemScale: Double = 1.0) {
+    fun Position.renderStringsAndItems(
+        list: List<List<Any?>>,
+        extraSpace: Int = 0,
+        itemScale: Double = 1.0,
+        posLabel: String,
+    ) {
         if (list.isEmpty()) return
 
         var offsetY = 0
+        var longestX = 0
         try {
             for (line in list) {
-                renderLine(line, offsetY, itemScale)
+                val x = renderLine(line, offsetY, itemScale)
+                if (x > longestX) {
+                    longestX = x
+                }
                 offsetY += 10 + extraSpace + 2
             }
         } catch (e: NullPointerException) {
@@ -488,20 +503,21 @@ object RenderUtils {
             e.printStackTrace()
             LorenzUtils.debug("NPE in renderStringsAndItems!")
         }
+        GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
     /**
      * Accepts a single line to print.
      * This  line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderSingleLineWithItems(list: List<Any?>, itemScale: Double = 1.0) {
+    fun Position.renderSingleLineWithItems(list: List<Any?>, itemScale: Double = 1.0, posLabel: String) {
         if (list.isEmpty()) return
-        renderLine(list, 0, itemScale)
+        val longestX = renderLine(list, 0, itemScale)
+        GuiEditManager.add(this, posLabel, longestX, 10)
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0) {
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
         val renderer = Minecraft.getMinecraft().fontRendererObj
-        val resolution = ScaledResolution(Minecraft.getMinecraft())
         var offsetX = 0
         for (any in line) {
             if (any == null) {
@@ -509,12 +525,12 @@ object RenderUtils {
                 continue
             }
             if (any is String) {
-                renderString(any, offsetX, offsetY, center = false)
+                renderString0(any, offsetX, offsetY)
                 val width = renderer.getStringWidth(any)
                 offsetX += width
             } else if (any is ItemStack) {
-                val isX = getAbsX(resolution, 200) + offsetX
-                val isY = getAbsY(resolution, 16) + offsetY
+                val isX = getAbsX_() + offsetX
+                val isY = getAbsY_() + offsetY
 
                 any.renderOnScreen(isX.toFloat(), isY.toFloat(), itemScale)
                 offsetX += 12
@@ -522,6 +538,7 @@ object RenderUtils {
                 throw RuntimeException("Unknown render object: $any")
             }
         }
+        return offsetX
     }
 
     // totally not modified Autumn Client's TargetStrafe

@@ -58,7 +58,7 @@ class ChickenHeadTimer {
             "Chicken Head Timer: §b$formatDuration"
         }
 
-        SkyHanniMod.feature.misc.chickenHeadTimerPosition.renderString(displayText)
+        SkyHanniMod.feature.misc.chickenHeadTimerPosition.renderString(displayText, posLabel = "Chicken Head Timer")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.chickenHeadTimerDisplay

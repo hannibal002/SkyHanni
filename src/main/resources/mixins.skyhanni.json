@@ -18,6 +18,7 @@
   ],
   "client": [
     "AccessorKeyBinding",
+    "MixinEntityRenderer",
     "MixinGuiIngame",
     "gui.MixinGuiNewChat"
   ]

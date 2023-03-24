@@ -67,14 +67,14 @@ class GardenCropMilestoneDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.cropMilestoneProgressDisplayPos.renderStringsAndItems(progressDisplay)
+        config.cropMilestoneProgressDisplayPos.renderStringsAndItems(progressDisplay, posLabel = "Crop Milestone Progress")
 
         if (config.cropMilestoneMushroomPetPerkEnabled) {
-            config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(mushroomCowPerkDisplay)
+            config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk")
         }
 
         if (config.cropMilestoneBestDisplay) {
-            config.cropMilestoneNextDisplayPos.renderStringsAndItems(bestCropTime.display)
+            config.cropMilestoneNextDisplayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time")
         }
     }
 

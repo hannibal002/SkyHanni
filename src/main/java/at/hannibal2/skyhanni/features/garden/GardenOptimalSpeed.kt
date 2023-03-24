@@ -59,7 +59,7 @@ class GardenOptimalSpeed {
 
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
-            config.optimalSpeedPos.renderString("§c$text")
+            config.optimalSpeedPos.renderString("§c$text", posLabel = "Garden Optimal Speed")
             if (config.optimalSpeedWarning) {
                 if (System.currentTimeMillis() > lastWarnTime + 20_000) {
                     lastWarnTime = System.currentTimeMillis()
@@ -70,7 +70,7 @@ class GardenOptimalSpeed {
                 }
             }
         } else {
-            config.optimalSpeedPos.renderString("§a$text")
+            config.optimalSpeedPos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }
     }
 

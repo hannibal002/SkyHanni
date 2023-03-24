@@ -168,10 +168,10 @@ class BingoCardDisplay {
         }
         if (displayMode == 0) {
             if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
-                config.bingoCardPos.renderStrings(display)
+                config.bingoCardPos.renderStrings(display, posLabel = "Bingo Card")
             }
         } else if (displayMode == 1) {
-            config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp)
+            config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
         }
     }
 

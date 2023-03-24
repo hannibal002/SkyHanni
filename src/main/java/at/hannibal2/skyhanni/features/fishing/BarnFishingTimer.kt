@@ -101,6 +101,6 @@ class BarnFishingTimer {
         val name = if (currentCount == 1) "sea creature" else "sea creatures"
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
-        SkyHanniMod.feature.fishing.barnTimerPos.renderString(text)
+        SkyHanniMod.feature.fishing.barnTimerPos.renderString(text, posLabel = "BarnTimer")
     }
 }

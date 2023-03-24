@@ -59,6 +59,6 @@ class SharkFishCounter {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return
 
-        SkyHanniMod.feature.fishing.sharkFishCounterPos.renderString(display)
+        SkyHanniMod.feature.fishing.sharkFishCounterPos.renderString(display, posLabel = "Shark Fish Counter")
     }
 }

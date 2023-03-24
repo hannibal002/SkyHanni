@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.config;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.core.GuiElement;
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper;
 import at.hannibal2.skyhanni.config.core.config.Config;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.core.config.annotations.Category;
-import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor;
 import at.hannibal2.skyhanni.config.features.*;
+import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.features.misc.HideArmor;
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager;
 import com.google.gson.annotations.Expose;
@@ -17,9 +16,9 @@ import org.lwjgl.input.Keyboard;
 
 public class Features extends Config {
     private void editOverlay(String activeConfig, int width, int height, Position position) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
-        }, () -> {
-        }, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
+//        Minecraft.getMinecraft().displayGuiScreen(new GuiPositionEditor(position, width, height, () -> {
+//        }, () -> {
+//        }, () -> SkyHanniMod.screenToOpen = new GuiScreenElementWrapper(new ConfigEditor(SkyHanniMod.feature, activeConfig))));
     }
 
     @Override
@@ -31,6 +30,11 @@ public class Features extends Config {
             if (element instanceof ConfigEditor) {
                 activeConfigCategory = ((ConfigEditor) element).getSelectedCategoryName();
             }
+        }
+
+        if (runnableId.equals("editGuiLocations")) {
+            GuiEditManager.openGuiEditor();
+            return;
         }
 
         if (runnableId.equals("petDisplay")) {
@@ -234,6 +238,10 @@ public class Features extends Config {
             return;
         }
     }
+
+    @Expose
+    @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
+    public GUI gui = new GUI();
 
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")

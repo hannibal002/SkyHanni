@@ -23,7 +23,7 @@ class EliteFarmingWeight {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            config.eliteFarmingWeightPos.renderStrings(display, center = false)
+            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Elite Farming Weight")
         }
     }
 

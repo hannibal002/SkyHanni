@@ -120,6 +120,7 @@ public class SkyHanniMod {
         loadModule(new GardenCropMilestones());
         loadModule(new OwnInventoryData());
         loadModule(new ToolTipData());
+        loadModule(new GuiEditManager());
 
         // APIs
         loadModule(new BazaarApi());

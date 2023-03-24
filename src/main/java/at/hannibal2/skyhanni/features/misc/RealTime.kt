@@ -15,7 +15,7 @@ class RealTime {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.misc.realTimePos.renderString(format.format(System.currentTimeMillis()))
+        SkyHanniMod.feature.misc.realTimePos.renderString(format.format(System.currentTimeMillis()), posLabel = "Real Time")
     }
 
     private fun isEnabled(): Boolean {
