@@ -160,7 +160,9 @@ class EliteFarmingWeight {
             val weightUntilOvertake = nextPlayerWeight - totalWeight
             if (weightUntilOvertake < 0) {
                 if (!hasPassedNext) {
-                    LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
+                    if (weightPerSecond != -1.0) {
+                        LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
+                    }
                     if (leaderboardPosition == -1) {
                         leaderboardPosition = 1000
                     } else {
@@ -174,13 +176,14 @@ class EliteFarmingWeight {
             if (nextPlayerWeight == 0.0) {
                 return "§cRejoin the garden to show ETA!"
             }
-            val timeTillOvertake = (weightUntilOvertake / weightPerSecond) * 1000
-            val timeFormat = TimeUtils.formatDuration(timeTillOvertake.toLong())
+            val timeFormat = if (weightPerSecond != -1.0) {
+                val timeTillOvertake = (weightUntilOvertake / weightPerSecond) * 1000
+                val format = TimeUtils.formatDuration(timeTillOvertake.toLong())
+                " §7(§b$format§7)"
+            } else ""
 
-            val format = LorenzUtils.formatDouble(weightUntilOvertake, 2)
-
-            // TODO Maybe add next player name?
-            return "§e$format §7(§b$timeFormat§7) §7behind §b$nextName"
+            val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
+            return "§e$weightFormat$timeFormat §7behind §b$nextName"
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
