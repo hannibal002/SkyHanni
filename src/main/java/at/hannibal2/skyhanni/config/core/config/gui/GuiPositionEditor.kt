@@ -101,20 +101,32 @@ class GuiPositionEditor(
             val elementHeight = position.getDummySize().y
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
-            if (hoveredPos != -1) {
-                val pos = positions[hoveredPos]
-                Utils.drawStringCentered(
-                    "§b" + pos.internalName, Minecraft.getMinecraft().fontRendererObj,
-                    (scaledResolution.scaledWidth / 2).toFloat(), 18f, true, 0xffffff
-                )
-                val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
-                Utils.drawStringCentered(
-                    location, Minecraft.getMinecraft().fontRendererObj,
-                    (scaledResolution.scaledWidth / 2).toFloat(), 28f, true, 0xffffff
-                )
+        }
+
+        GlStateManager.popMatrix()
+
+        var displayPos = -1
+        if (clickedPos != -1) {
+            if (positions[clickedPos].clicked) {
+                displayPos = clickedPos
             }
         }
-        GlStateManager.popMatrix()
+        if (displayPos == -1) {
+            displayPos = hoveredPos
+        }
+
+        if (displayPos != -1) {
+            val pos = positions[displayPos]
+            Utils.drawStringCentered(
+                "§b" + pos.internalName, Minecraft.getMinecraft().fontRendererObj,
+                (scaledResolution.scaledWidth / 2).toFloat(), 18f, true, 0xffffff
+            )
+            val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
+            Utils.drawStringCentered(
+                location, Minecraft.getMinecraft().fontRendererObj,
+                (scaledResolution.scaledWidth / 2).toFloat(), 28f, true, 0xffffff
+            )
+        }
     }
 
     @Throws(IOException::class)
