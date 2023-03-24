@@ -20,6 +20,7 @@
 package at.hannibal2.skyhanni.config.core.config;
 
 import com.google.gson.annotations.Expose;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 
 public class Position {
@@ -78,8 +79,8 @@ public class Position {
 		return clicked;
 	}
 
-	public int getAbsX0(ScaledResolution scaledResolution, int objWidth) {
-		int width = scaledResolution.getScaledWidth();
+	public int getAbsX0(int objWidth) {
+		int width = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
 
 		int ret = x;
 		if (x < 0) {
@@ -92,8 +93,8 @@ public class Position {
 		return ret;
 	}
 
-	public int getAbsY0(ScaledResolution scaledResolution, int objHeight) {
-		int height = scaledResolution.getScaledHeight();
+	public int getAbsY0(int objHeight) {
+		int height = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
 
 		int ret = y;
 		if (y < 0) {
@@ -106,8 +107,8 @@ public class Position {
 		return ret;
 	}
 
-	public int moveX(int deltaX, int objWidth, ScaledResolution scaledResolution) {
-		int screenWidth = scaledResolution.getScaledWidth();
+	public int moveX(int deltaX) {
+		int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
 		boolean wasPositiveX = this.x >= 0;
 		this.x += deltaX;
 
@@ -131,17 +132,11 @@ public class Position {
 			}
 		}
 
-		if (this.x >= 0 && this.x + objWidth / 2 > screenWidth / 2) {
-			this.x -= screenWidth - objWidth;
-		}
-		if (this.x < 0 && this.x + objWidth / 2 <= -screenWidth / 2) {
-			this.x += screenWidth - objWidth;
-		}
 		return deltaX;
 	}
 
-	public int moveY(int deltaY, int objHeight, ScaledResolution scaledResolution) {
-		int screenHeight = scaledResolution.getScaledHeight();
+	public int moveY(int deltaY) {
+		int screenHeight = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
 		boolean wasPositiveY = this.y >= 0;
 		this.y += deltaY;
 
@@ -165,12 +160,6 @@ public class Position {
 			}
 		}
 
-		if (this.y >= 0 && this.y - objHeight / 2 > screenHeight / 2) {
-			this.y -= screenHeight - objHeight;
-		}
-		if (this.y < 0 && this.y - objHeight / 2 <= -screenHeight / 2) {
-			this.y += screenHeight - objHeight;
-		}
 		return deltaY;
 	}
 }

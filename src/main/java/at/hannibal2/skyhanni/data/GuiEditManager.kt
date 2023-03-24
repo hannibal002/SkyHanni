@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
@@ -97,15 +96,9 @@ class GuiEditManager {
             }
         }
 
-        fun Position.getAbsX(): Int {
-            val width = getDummySize(true).x
-            return getAbsX0(ScaledResolution(Minecraft.getMinecraft()), width)
-        }
+        fun Position.getAbsX() = getAbsX0(getDummySize(true).x)
 
-        fun Position.getAbsY(): Int {
-            val height = getDummySize(true).y
-            return getAbsY0(ScaledResolution(Minecraft.getMinecraft()), height)
-        }
+        fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
     }
 }
 
