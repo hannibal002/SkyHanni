@@ -45,13 +45,43 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         super.drawScreen(unusedX, unusedY, partialTicks)
         drawDefaultBackground()
 
+        val hoveredPos = renderRectangles()
+
+        renderLabels(hoveredPos)
+    }
+
+    private fun renderLabels(hoveredPos: Int) {
         Utils.drawStringCentered(
             "§cSkyHanni Position Editor",
             Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 8f, true, 0xffffff
         )
 
-        var hoveredPos = -1
+        var displayPos = -1
+        if (clickedPos != -1) {
+            if (positions[clickedPos].clicked) {
+                displayPos = clickedPos
+            }
+        }
+        if (displayPos == -1) {
+            displayPos = hoveredPos
+        }
 
+        if (displayPos == -1) return
+
+        val pos = positions[displayPos]
+        Utils.drawStringCentered(
+            "§b" + pos.internalName,
+            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 18f, true, 0xffffff
+        )
+        val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
+        Utils.drawStringCentered(
+            location,
+            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 28f, true, 0xffffff
+        )
+    }
+
+    private fun renderRectangles(): Int {
+        var hoveredPos = -1
         GlStateManager.pushMatrix()
         width = getScaledWidth()
         height = getScaledHeight()
@@ -76,29 +106,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             }
         }
         GlStateManager.popMatrix()
-
-        var displayPos = -1
-        if (clickedPos != -1) {
-            if (positions[clickedPos].clicked) {
-                displayPos = clickedPos
-            }
-        }
-        if (displayPos == -1) {
-            displayPos = hoveredPos
-        }
-
-        if (displayPos != -1) {
-            val pos = positions[displayPos]
-            Utils.drawStringCentered(
-                "§b" + pos.internalName,
-                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 18f, true, 0xffffff
-            )
-            val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
-            Utils.drawStringCentered(
-                location,
-                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 28f, true, 0xffffff
-            )
-        }
+        return hoveredPos
     }
 
     private fun getScaledHeight() = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
