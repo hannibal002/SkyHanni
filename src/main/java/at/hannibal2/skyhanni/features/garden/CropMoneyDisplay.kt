@@ -133,8 +133,8 @@ class CropMoneyDisplay {
         val moneyPerHours = mutableMapOf<String, Double>()
         for ((internalName, amount) in multipliers) {
             val price = NEUItems.getPrice(internalName)
-            val cropName = cropNames[internalName]!!
-            val speed = cropName.getSpeed()
+            val crop = cropNames[internalName]!!
+            val speed = crop.getSpeed()
             // No speed data for item in hand
             if (speed == -1) continue
 
