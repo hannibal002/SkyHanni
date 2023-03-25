@@ -192,6 +192,7 @@
 + Show the price per garden experience inside the visitor gui.
 + Support for mushroom cow pet perk. (Counting and updating mushroom collection when breaking crops with mushroom blocks, added extra gui for time till crop milestones)
 + Blocks/Second display in crop milestone gui.
++ Farming armor drops counter
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
