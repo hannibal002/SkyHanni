@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -15,6 +14,7 @@ class DicerRngDropCounter {
     private var display = listOf<String>()
     private val drops = mutableMapOf<CropType, MutableMap<DropRarity, Int>>()
     private val itemDrops = mutableListOf<ItemDrop>()
+    private val config get() = SkyHanniMod.feature.garden
 
     init {
         drops[CropType.MELON] = mutableMapOf()
@@ -48,13 +48,11 @@ class DicerRngDropCounter {
                 addDrop(drop.crop, drop.rarity)
                 saveConfig()
                 update()
+                if (config.dicerCounterHideChat) {
+                    event.blockedReason = "dicer_rng_drop_counter"
+                }
                 return
             }
-        }
-
-        if (message.contains("§r§eDicer dropped")) {
-            LorenzUtils.debug("Unknown dicer drop message!")
-            println("Unknown dicer drop message: '$message'")
         }
     }
 
@@ -96,19 +94,19 @@ class DicerRngDropCounter {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            SkyHanniMod.feature.garden.dicerCounterPos.renderStrings(display, posLabel = "Dicer Counter")
+            config.dicerCounterPos.renderStrings(display, posLabel = "Dicer Counter")
         }
     }
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val message: String)
 
     private fun saveConfig() {
-        val list = SkyHanniMod.feature.hidden.gardenDicerRngDrops
-        list.clear()
+        val map = SkyHanniMod.feature.hidden.gardenDicerRngDrops
+        map.clear()
         for (drop in drops) {
             val crop = drop.key
             for ((rarity, amount) in drop.value) {
-                list[crop.cropName + "." + rarity.name] = amount
+                map[crop.cropName + "." + rarity.name] = amount
             }
         }
     }
@@ -124,5 +122,5 @@ class DicerRngDropCounter {
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && SkyHanniMod.feature.garden.dicerCounterDisplay
+    fun isEnabled() = GardenAPI.inGarden() && config.dicerCounterDisplay
 }

@@ -229,6 +229,7 @@ public class SkyHanniMod {
         loadModule(new JacobFarmingContestsInventory());
         loadModule(new GardenNextJacobContest());
         loadModule(new WrongFungiCutterWarning());
+        loadModule(new FarmingArmorDrops());
 
         Commands.INSTANCE.init();
 
