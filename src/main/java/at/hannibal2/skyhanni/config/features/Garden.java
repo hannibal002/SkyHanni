@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.*;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -251,7 +252,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Always On",
-            desc = "Show the Best Display always while on the garden.")
+            desc = "Show the Best Display always while on the ")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestAlwaysOn = false;
@@ -307,20 +308,39 @@ public class Garden {
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the garden. §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the  §cOnly updates after scrolling in the hotbar.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean keyBindEnabled = false;
 
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
-    @ConfigEditorButton(runnableId = "gardenKeyBindPresetDisabled", buttonText = "Disable")
+    @ConfigEditorButton(buttonText = "Disable")
     @ConfigAccordionId(id = 8)
-    public int keyBindPresetDisable = 0;
+    public Runnable keyBindPresetDisable = () -> {
+        keyBindAttack = Keyboard.KEY_NONE;
+        keyBindLeft = Keyboard.KEY_NONE;
+        keyBindRight = Keyboard.KEY_NONE;
+        keyBindForward = Keyboard.KEY_NONE;
+        keyBindBack = Keyboard.KEY_NONE;
+        keyBindJump = Keyboard.KEY_NONE;
+        keyBindSneak = Keyboard.KEY_NONE;
+
+        Minecraft.getMinecraft().thePlayer.closeScreen();
+    };
 
     @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
-    @ConfigEditorButton(runnableId = "gardenKeyBindPresetDefault", buttonText = "Default")
+    @ConfigEditorButton(buttonText = "Default")
     @ConfigAccordionId(id = 8)
-    public int keyBindPresetDefault = 0;
+    public Runnable keyBindPresetDefault = ()-> {
+        keyBindAttack = -100;
+        keyBindLeft = Keyboard.KEY_A;
+        keyBindRight = Keyboard.KEY_D;
+        keyBindForward = Keyboard.KEY_W;
+        keyBindBack = Keyboard.KEY_S;
+        keyBindJump = Keyboard.KEY_SPACE;
+        keyBindSneak = Keyboard.KEY_LSHIFT;
+        Minecraft.getMinecraft().thePlayer.closeScreen();
+    };
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")
@@ -492,7 +512,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Always On",
-            desc = "Show the money/hour Display always while on the garden.")
+            desc = "Show the money/hour Display always while on the ")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourAlwaysOn = false;

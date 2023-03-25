@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigEditor
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -15,9 +13,10 @@ import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
+import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
-import org.apache.commons.lang3.StringUtils
 
 object Commands {
 
@@ -26,11 +25,12 @@ object Commands {
             if (it[0].lowercase() == "gui") {
                 GuiEditManager.openGuiEditor()
             } else {
-                SkyHanniMod.screenToOpen =
-                    GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature, StringUtils.join(it, " ")))
+                val editor = MoulConfigEditor(SkyHanniMod.configManager.processor)
+                editor.search(it.joinToString(" "))
+                SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
             }
         } else {
-            SkyHanniMod.screenToOpen = GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature))
+            SkyHanniMod.screenToOpen = GuiScreenElementWrapper(MoulConfigEditor(SkyHanniMod.configManager.processor))
         }
     }
 

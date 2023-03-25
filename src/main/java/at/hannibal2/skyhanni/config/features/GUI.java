@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorButton;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorKeybind;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
+import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class GUI {
@@ -14,10 +14,11 @@ public class GUI {
             desc = "Change the position of SkyHanni's overlays"
     )
     @ConfigEditorButton(
-            runnableId = "editGuiLocations",
             buttonText = "Edit"
     )
-    public Position positions = new Position(-1, -1);
+    public Runnable positions = () -> {
+        GuiEditManager.openGuiEditor();
+    };
 
     @Expose
     @ConfigOption(

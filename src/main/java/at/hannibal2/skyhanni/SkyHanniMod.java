@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.test.PacketTest;
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
 import at.hannibal2.skyhanni.utils.TabListData;
+import io.github.moulberry.moulconfig.processor.MoulConfigProcessor;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.*;
 import net.minecraft.client.Minecraft;
