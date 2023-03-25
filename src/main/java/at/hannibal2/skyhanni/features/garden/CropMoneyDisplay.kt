@@ -60,7 +60,7 @@ class CropMoneyDisplay {
         val newDisplay = mutableListOf<List<Any>>()
 
         val title = if (config.moneyPerHourCompact) {
-            Collections.singletonList("§7Money per hour:")
+            Collections.singletonList("§7Money/hour:")
         } else {
             Collections.singletonList("§7Money per hour when selling:")
         }
