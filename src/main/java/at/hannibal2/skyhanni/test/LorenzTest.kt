@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.features.garden.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -16,7 +18,8 @@ import java.io.File
 class LorenzTest {
 
     companion object {
-        var text = ""
+        var displayLine = ""
+        var displayList = listOf<List<Any>>()
 
         var a = 1.0
         var b = 60.0
@@ -62,6 +65,50 @@ class LorenzTest {
 //            for (line in TabListUtils.getTabList()) {
 //                println("tablist: '$line'")
 //            }
+        }
+
+        fun testGardenVisitors() {
+            if (displayList.isNotEmpty()) {
+                displayList = mutableListOf()
+                return
+            }
+
+            val bigList = mutableListOf<List<Any>>()
+            var list = mutableListOf<Any>()
+            var i = 0
+            var errors = 0
+            for (item in GardenVisitorColorNames.visitorItems) {
+                val name = item.key
+                i++
+                if (i == 5) {
+                    i = 0
+                    bigList.add(list)
+                    list = mutableListOf()
+                }
+
+                val coloredName = GardenVisitorColorNames.getColoredName(name)
+                list.add("$coloredName§7 (")
+                for (itemName in item.value) {
+                    try {
+                        val internalName = NEUItems.getInternalName(itemName)
+                        list.add(NEUItems.getItemStack(internalName))
+                    } catch (e: Exception) {
+                        LorenzUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
+                        errors++
+                    }
+                }
+                if (item.value.isEmpty()) {
+                    list.add("Any")
+                }
+                list.add("§7) ")
+            }
+            bigList.add(list)
+            displayList = bigList
+            if (errors == 0) {
+                LorenzUtils.debug("Test garden visitor renderer: no errors")
+            } else {
+                LorenzUtils.debug("Test garden visitor renderer: $errors errors")
+            }
         }
 
         fun reloadListeners() {
@@ -131,7 +178,8 @@ class LorenzTest {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dev.debugEnabled) return
 
-        SkyHanniMod.feature.dev.debugPos.renderString(text, posLabel = "Test")
+        SkyHanniMod.feature.dev.debugPos.renderString(displayLine, posLabel = "Test")
+        SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
     @SubscribeEvent

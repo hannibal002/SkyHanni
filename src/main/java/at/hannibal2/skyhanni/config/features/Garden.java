@@ -89,6 +89,12 @@ public class Garden {
     public boolean visitorNeedsShowPrice = true;
 
     @Expose
+    @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean visitorItemPreview = true;
+
+    @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
     @ConfigAccordionId(id = 1)
     @ConfigEditorAccordion(id = 4)

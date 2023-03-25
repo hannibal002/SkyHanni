@@ -53,6 +53,7 @@ object Commands {
         registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
         registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
         registerCommand("shsetapikey") { ApiDataLoader.command(it) }
+        registerCommand("shtestgardenvisitors") { LorenzTest.testGardenVisitors() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

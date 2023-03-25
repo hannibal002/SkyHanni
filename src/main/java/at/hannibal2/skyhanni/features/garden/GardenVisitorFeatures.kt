@@ -139,7 +139,28 @@ class GardenVisitorFeatures {
             newDisplay.add(Collections.singletonList("§e$amount §7new $visitorLabel:"))
             for (visitor in newVisitors) {
                 val displayName = GardenVisitorColorNames.getColoredName(visitor)
-                newDisplay.add(Collections.singletonList(" §7- $displayName"))
+
+                val list = mutableListOf<Any>()
+                list.add(" §7- $displayName")
+
+                if (config.visitorItemPreview) {
+                    val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]!!
+                    list.add(" ")
+                    if (items.isEmpty()) {
+                        list.add("§7(§fAny§7)")
+                    } else {
+                        for (item in items) {
+                            try {
+                                val internalName = NEUItems.getInternalName(item)
+                                list.add(NEUItems.getItemStack(internalName))
+                            } catch (e: Exception) {
+                                list.add(" '$item' ")
+                            }
+                        }
+                    }
+                }
+
+                newDisplay.add(list)
             }
         }
 
