@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import io.github.moulberry.notenoughupdates.NEUOverlay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -26,10 +27,10 @@ class GuiEditManager {
             if (it !is GuiInventory && it !is GuiChest) return
         }
 
-
         if (!Keyboard.getEventKeyState()) return
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
         if (SkyHanniMod.feature.gui.keyBindOpen == key) {
+            if (NEUOverlay.searchBarHasFocus) return
             if (isInGui()) return
             openGuiEditor()
         }
