@@ -443,6 +443,11 @@ public class Garden {
     public boolean dicerCounterDisplay = true;
 
     @Expose
+    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
+    @ConfigEditorAccordion(id = 12)
+    public boolean dicerCounterHideChat = false;
+
+    @Expose
 //    @ConfigOption(name = "Dicer Counter Position", desc = "")
 //    @ConfigEditorButton(runnableId = "dicerCounter", buttonText = "Edit")
 //    @ConfigAccordionId(id = 12)
@@ -527,6 +532,26 @@ public class Garden {
 //    @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
 //    @ConfigAccordionId(id = 14)
     public Position nextJacobContestPos = new Position(-113, -240, false, true);
+
+    @Expose
+    @ConfigOption(name = "Farming Armor Drops", desc = "")
+    @ConfigEditorAccordion(id = 12)
+    public boolean farmingArmorDrops = false;
+
+    @Expose
+    @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean farmingArmorDropsEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean farmingArmorDropsHideChat = false;
+
+    @Expose
+    public Position farmingArmorDropsPos = new Position(16, -232, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

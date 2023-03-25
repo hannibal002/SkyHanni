@@ -216,6 +216,12 @@ public class Misc {
     public boolean chickenHeadTimerDisplay = false;
 
     @Expose
+    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You lay an egg' chat message'.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 10)
+    public boolean chickenHeadTimerHideChat = true;
+
+    @Expose
 //    @ConfigOption(name = "Timer Position", desc = "")
 //    @ConfigEditorButton(runnableId = "chickenHeadTimer", buttonText = "Edit")
 //    @ConfigAccordionId(id = 10)

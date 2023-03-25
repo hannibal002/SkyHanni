@@ -54,4 +54,7 @@ object InventoryUtils {
         Minecraft.getMinecraft().thePlayer.inventory.mainInventory
             .filter { it != null && predicate(it) }
             .sumOf { it.stackSize }
+
+    fun getArmor(): Array<ItemStack?> =
+        Minecraft.getMinecraft().thePlayer.inventory.armorInventory
 }

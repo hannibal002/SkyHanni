@@ -3,27 +3,27 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.client.Minecraft
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class ChickenHeadTimer {
-
     private var tick = 0
     private var hasChickenHead = false
     private var lastTime = 0L
+    private val config get() = SkyHanniMod.feature.misc
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
         if (tick++ % 5 != 0) return
 
-        val itemStack = Minecraft.getMinecraft().thePlayer.inventory.armorInventory[3]
+        val itemStack = InventoryUtils.getArmor()[3]
         val name = itemStack?.name ?: ""
         hasChickenHead = name.contains("Chicken Head")
     }
@@ -39,6 +39,9 @@ class ChickenHeadTimer {
         if (!hasChickenHead) return
         if (event.message == "§aYou laid an egg!") {
             lastTime = System.currentTimeMillis()
+            if (config.chickenHeadTimerHideChat) {
+                event.blockedReason = "chicken_head_timer"
+            }
         }
     }
 
@@ -58,8 +61,8 @@ class ChickenHeadTimer {
             "Chicken Head Timer: §b$formatDuration"
         }
 
-        SkyHanniMod.feature.misc.chickenHeadTimerPosition.renderString(displayText, posLabel = "Chicken Head Timer")
+        config.chickenHeadTimerPosition.renderString(displayText, posLabel = "Chicken Head Timer")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.chickenHeadTimerDisplay
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.chickenHeadTimerDisplay
 }
