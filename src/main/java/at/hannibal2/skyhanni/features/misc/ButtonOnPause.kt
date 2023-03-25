@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigEditor
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
+import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -18,9 +18,7 @@ class ButtonOnPause {
 
         if (SkyHanniMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
             SkyHanniMod.screenToOpen = GuiScreenElementWrapper(
-                ConfigEditor(
-                    SkyHanniMod.feature
-                )
+                MoulConfigEditor(SkyHanniMod.configManager.processor)
             )
         }
     }

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class CommandsFeatures {
 

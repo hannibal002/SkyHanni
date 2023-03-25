@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorDraggableList;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorDropdown;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
