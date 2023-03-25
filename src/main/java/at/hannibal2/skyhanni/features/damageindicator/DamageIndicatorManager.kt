@@ -668,7 +668,7 @@ class DamageIndicatorManager {
                 270_000 / 2, 270_000 -> 1
                 0 -> 0
                 else -> {
-                    LorenzTest.text = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
+                    LorenzTest.displayLine = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
                     LorenzUtils.error(
                         "Unexpected health of thorn in m4! (${
                             LorenzUtils.formatDouble(

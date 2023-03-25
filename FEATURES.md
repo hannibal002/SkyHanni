@@ -194,6 +194,7 @@
 + Blocks/Second display in crop milestone gui.
 + Farming armor drops counter
 + **Colored Name** - Show the visitor name in the color of the rarity.
++ **Visitor Item Preview** - Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

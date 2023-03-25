@@ -11,13 +11,18 @@ class GardenVisitorColorNames {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
-            val map = mutableMapOf<String, String>()
+            val mapColor = mutableMapOf<String, String>()
+            val mapItems = mutableMapOf<String, List<String>>()
             val garden = event.getConstant("Garden")!!
             for ((name, element) in garden["visitors"].asJsonObject.entrySet()) {
-                val rarity = element.asJsonObject["rarity"].asString
-                map[name] = getColor(rarity)
+                val jsonObject = element.asJsonObject
+                val rarity = jsonObject["rarity"].asString
+                mapColor[name] = getColor(rarity)
+                mapItems[name] = jsonObject["need_items"].asJsonArray.map { it.asString }
+
             }
-            visitorColor = map
+            visitorColor = mapColor
+            visitorItems = mapItems
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -25,8 +30,9 @@ class GardenVisitorColorNames {
         }
     }
 
-    companion object{
+    companion object {
         private var visitorColor = mapOf<String, String>() // name -> color code
+        var visitorItems = mapOf<String, List<String>>()
 
         fun getColoredName(name: String): String {
             if (!SkyHanniMod.feature.garden.visitorColoredName) return name
