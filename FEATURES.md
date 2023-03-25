@@ -220,3 +220,4 @@
 + **Particle Hider** - Hide blaze particles, fire block particles, fireball particles, near redstone particles, far particles or smoke particles.
 + Chicken Head Timer.
 + **rancher boots** speed display.
++ **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.

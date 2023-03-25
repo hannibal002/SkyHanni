@@ -14,6 +14,7 @@
 + Added **Contest Time** - Adds the real time format to the farming contest description.
 + Added **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (Thanks appable0)
 + Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (Thanks appable0)
++ Added **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.

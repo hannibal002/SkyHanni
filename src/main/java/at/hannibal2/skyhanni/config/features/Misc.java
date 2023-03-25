@@ -253,6 +253,11 @@ public class Misc {
     public boolean hideExplosions = false;
 
     @Expose
+    @ConfigOption(name = "CH Join", desc = "Helps buy a Pass for accessing the Crystal Hollows if needed.")
+    @ConfigEditorBoolean
+    public boolean crystalHollowsJoin = true;
+
+    @Expose
     @ConfigOption(name = "Fire Overlay Hider", desc = "Hide the fire overlay (Like in Skytils)")
     @ConfigEditorBoolean
     public boolean hideFireOverlay = false;
