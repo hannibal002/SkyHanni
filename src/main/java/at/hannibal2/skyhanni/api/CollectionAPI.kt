@@ -21,6 +21,7 @@ class CollectionAPI {
         "CORRUPTED_FRAGMENT",
         "EGG",
         "POISONOUS_POTATO",
+        "REDSTONE_BLOCK",
     )
 
     @SubscribeEvent
