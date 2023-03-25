@@ -512,7 +512,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Always On",
-            desc = "Show the money/hour Display always while on the ")
+            desc = "Show the money/hour Display always while on the garden.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourAlwaysOn = false;
