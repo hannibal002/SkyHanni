@@ -444,7 +444,8 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
-    @ConfigEditorAccordion(id = 12)
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
     public boolean dicerCounterHideChat = false;
 
     @Expose
