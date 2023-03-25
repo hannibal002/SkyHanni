@@ -137,6 +137,12 @@ public class Garden {
     public int visitorHighlightStatus = 2;
 
     @Expose
+    @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorColoredName = true;
+
+    @Expose
     @ConfigOption(name = "Numbers", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean numbers = false;

@@ -45,6 +45,7 @@
 + Added support for mushroom cow pet perk. (Counting and updating mushroom collection when breaking crops with mushroom blocks, added extra gui for time till crop milestones)
 + Added blocks/second display to crop milestone gui and made all crop milestone gui elements customizable/toggleable.
 + Added farming armor drops counter.
++ Added **Colored Name** - Show the visitor name in the color of the rarity.
 
 
 ### Features from other Mods

@@ -231,6 +231,7 @@ public class SkyHanniMod {
         loadModule(new WrongFungiCutterWarning());
         loadModule(new FarmingArmorDrops());
         loadModule(new JoinCrystalHollows());
+        loadModule(new GardenVisitorColorNames());
 
         Commands.INSTANCE.init();
 
