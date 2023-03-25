@@ -16,9 +16,7 @@ public class GUI {
     @ConfigEditorButton(
             buttonText = "Edit"
     )
-    public Runnable positions = () -> {
-        GuiEditManager.openGuiEditor();
-    };
+    public Runnable positions = GuiEditManager::openGuiEditor;
 
     @Expose
     @ConfigOption(
