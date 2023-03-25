@@ -193,6 +193,7 @@
 + Support for mushroom cow pet perk. (Counting and updating mushroom collection when breaking crops with mushroom blocks, added extra gui for time till crop milestones)
 + Blocks/Second display in crop milestone gui.
 + Farming armor drops counter
++ **Colored Name** - Show the visitor name in the color of the rarity.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

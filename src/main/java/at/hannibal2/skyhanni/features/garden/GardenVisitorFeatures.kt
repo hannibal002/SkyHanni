@@ -19,6 +19,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -112,7 +113,7 @@ class GardenVisitorFeatures {
         if (requiredItems.isNotEmpty()) {
             newDisplay.add(Collections.singletonList("§7Visitor items needed:"))
             for ((internalName, amount) in requiredItems) {
-                val name = NEUItems.getItemStack(internalName).name
+                val name = NEUItems.getItemStack(internalName).name!!
                 val itemStack = NEUItems.getItemStack(internalName)
 
                 val list = mutableListOf<Any>()
@@ -137,7 +138,8 @@ class GardenVisitorFeatures {
             val visitorLabel = if (amount == 1) "visitor" else "visitors"
             newDisplay.add(Collections.singletonList("§e$amount §7new $visitorLabel:"))
             for (visitor in newVisitors) {
-                newDisplay.add(Collections.singletonList(" §7- $visitor"))
+                val displayName = GardenVisitorColorNames.getColoredName(visitor)
+                newDisplay.add(Collections.singletonList(" §7- $displayName"))
             }
         }
 
@@ -325,7 +327,8 @@ class GardenVisitorFeatures {
                     SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
                 }
                 if (config.visitorNotificationChat) {
-                    LorenzUtils.chat("§e[SkyHanni] $name §eis visiting your garden!")
+                    val displayName = GardenVisitorColorNames.getColoredName(name)
+                    LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
                 }
                 updateDisplay()
             }
@@ -388,7 +391,10 @@ class GardenVisitorFeatures {
                 Minecraft.getMinecraft().theWorld.loadedEntityList
                     .filter { it !is EntityArmorStand }
                     .filter { entity.getLorenzVec().distanceIgnoreY(it.getLorenzVec()) == 0.0 }
-                    .forEach { visitor.entityId = it?.entityId ?: 0 }
+                    .forEach {
+                        visitor.entityId = it?.entityId ?: 0
+                        visitor.nameTagEntityId = entity.entityId
+                    }
             }
     }
 
@@ -429,8 +435,20 @@ class GardenVisitorFeatures {
         config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onRenderLivingB(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+        val entity = event.entity
+        val entityId = entity.entityId
+        for (visitor in visitors.values) {
+            if (visitor.nameTagEntityId == entityId) {
+                entity.customNameTag = GardenVisitorColorNames.getColoredName(entity.name)
+            }
+        }
+    }
+
     class Visitor(
         var entityId: Int = -1,
+        var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
         val items: MutableMap<String, Int> = mutableMapOf(),
     )
