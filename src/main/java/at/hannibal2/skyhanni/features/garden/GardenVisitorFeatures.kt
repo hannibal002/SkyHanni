@@ -379,7 +379,9 @@ class GardenVisitorFeatures {
         for ((visitorName, visitor) in visitors) {
             val entity = visitor.getEntity()
             if (entity == null) {
-                findEntityByNametag(visitorName, visitor)
+                findNametag(visitorName.removeColor())?.let {
+                    findEntity(it, visitor)
+                }
             }
 
             val status = visitor.status
@@ -405,18 +407,45 @@ class GardenVisitorFeatures {
 
     private fun Visitor.getEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
 
-    private fun findEntityByNametag(visitorName: String, visitor: Visitor) {
-        Minecraft.getMinecraft().theWorld.loadedEntityList
-            .filter { it is EntityArmorStand && it.name.removeColor() == visitorName.removeColor() }
-            .forEach { entity ->
-                Minecraft.getMinecraft().theWorld.loadedEntityList
-                    .filter { it !is EntityArmorStand }
-                    .filter { entity.getLorenzVec().distanceIgnoreY(it.getLorenzVec()) == 0.0 }
-                    .forEach {
-                        visitor.entityId = it?.entityId ?: 0
-                        visitor.nameTagEntityId = entity.entityId
-                    }
+    private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
+        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
+            if (entity is EntityArmorStand) continue
+            if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
+
+            visitor.entityId = entity?.entityId ?: 0
+            visitor.nameTagEntityId = nameTag.entityId
+        }
+    }
+
+    private fun findNametag(visitorName: String): EntityArmorStand? {
+        val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
+        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
+            if (entity !is EntityArmorStand) continue
+
+            if (entity.name.removeColor() == visitorName) {
+                foundVisitorNameTags.add(entity)
             }
+        }
+
+        if (visitorName in listOf("Jacob", "Anita")) {
+
+            // Only detect jacob/anita npc if the "wrong" npc got found as well
+            if (foundVisitorNameTags.size != 2) return null
+
+            for (tag in foundVisitorNameTags.toMutableList()) {
+                for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
+                    if (entity !is EntityArmorStand) continue
+                    if (entity in foundVisitorNameTags) continue
+                    val distance = entity.getLorenzVec().distance(tag.getLorenzVec())
+                    if (distance < 1.5 && entity.name == "§bSam") {
+                        foundVisitorNameTags.remove(tag)
+                    }
+                }
+            }
+        }
+
+        if (foundVisitorNameTags.size != 1) return null
+        return foundVisitorNameTags[0]
     }
 
     private fun isReady(visitor: Visitor): Boolean {
