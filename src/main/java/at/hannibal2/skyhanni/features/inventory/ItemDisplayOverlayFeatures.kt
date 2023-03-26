@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -148,14 +149,10 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
-            if (itemName.contains("Rancher's Boots")) {
+            if (item.getInternalName() == "RANCHERS_BOOTS") {
                 for (line in item.getLore()) {
                     val matcher = rangerBootsSpeedCapPattern.matcher(line)
                     if (matcher.matches()) {
-//                        if (!done) {
-//                            done = true
-//                            Thread.dumpStack()
-//                        }
                         return matcher.group(1)
                     }
                 }
