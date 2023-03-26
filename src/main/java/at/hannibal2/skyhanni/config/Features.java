@@ -16,6 +16,12 @@ public class Features extends Config {
     public static final ResourceLocation DISCORD = new ResourceLocation("notenoughupdates:social/discord.png");
     public static final ResourceLocation GITHUB = new ResourceLocation("notenoughupdates:social/github.png");
 
+
+    @Override
+    public boolean shouldAutoFocusSearchbar() {
+        return true;
+    }
+
     @Override
     public List<Social> getSocials() {
         return Arrays.asList(
