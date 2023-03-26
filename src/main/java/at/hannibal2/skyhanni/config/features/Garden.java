@@ -567,6 +567,17 @@ public class Garden {
     public Position farmingArmorDropsPos = new Position(16, -232, false, true);
 
     @Expose
+    @ConfigOption(name = "Teleport Pads", desc = "")
+    @ConfigEditorAccordion(id = 12)
+    public boolean teleportPads = false;
+
+    @Expose
+    @ConfigOption(name = "Compact Name", desc = "Hide the 'Warp to' and 'No Destination' texts over teleport pads.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean teleportPadsCompactName = false;
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;

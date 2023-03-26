@@ -47,6 +47,7 @@
 + Added farming armor drops counter.
 + Added **Colored Name** - Show the visitor name in the color of the rarity.
 + Added **Visitor Item Preview** - Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
++ Added **Teleport Pad Compact Name** - Hide the 'Warp to' and 'No Destination' texts over teleport pads.
 
 
 ### Features from other Mods
