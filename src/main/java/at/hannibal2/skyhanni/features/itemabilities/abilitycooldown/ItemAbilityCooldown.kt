@@ -50,6 +50,31 @@ class ItemAbilityCooldown {
                 ItemAbility.ATOMSPLIT_KATANA.sound()
             }
         }
+        if (event.soundName == "random.click") {
+            if (event.pitch == 2.0f && event.volume == 0.55f) {
+                ItemAbility.RAGNAROCK_AXE.sound()
+            }
+        }
+        if (event.soundName == "liquid.lavapop") {
+            if (event.pitch == 0.7619048f && event.volume == 0.15f) {
+                ItemAbility.WAND_OF_ATONEMENT.sound()
+            }
+        }
+        if (event.soundName == "mob.bat.hurt") {
+            if (event.pitch == 1.6825397f && event.volume == 0.1f) {
+                ItemAbility.STARLIGHT_WAND.sound()
+            }
+        }
+        if (event.soundName == "mob.bat.hurt") {
+            if (event.pitch == 1.6825397f && event.volume == 0.1f) {
+                ItemAbility.STARLIGHT_WAND.sound()
+            }
+        }
+        if (event.soundName == "mob.guardian.curse") {
+            if (event.pitch == 1.8888888f && event.volume == 0.2f) {
+                ItemAbility.VOODOO_DOLL.sound()
+            }
+        }
     }
 
     @SubscribeEvent

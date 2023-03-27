@@ -17,17 +17,12 @@ enum class ItemAbility(
     GIANTS_SWORD(30),
     ICE_SPRAY_WAND(5),
     ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA"),
-
-
+    RAGNAROCK_AXE(20),
+    WAND_OF_ATONEMENT(7, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
+    STARLIGHT_WAND(2),
+    VOODOO_DOLL(5),
     // TODO replace old logic
 
-    HEAL_1("Small Heal", 7, "Wand of Healing"),
-    HEAL_2("Medium Heal", 7, "Wand of Mending"),
-    HEAL_3("Big Heal", 7, "Wand of Restoration"),
-    HEAL_4("Huge Heal", 7, "Wand of Atonement"),
-
-    STAR_FALL("Starfall", 2, "Starlight Wand"),
-    VODOO_DOLL("Acupuncture", 5, "Voodoo Doll"),
     INK_WAND("Ink Bomb", 30, "Ink Wand"),
     GOLEM_SWORD("Iron Punch", 3, "Golem Sword"),
     EMBER_ROD("Fire Blast", 30, "Ember Rod"),
