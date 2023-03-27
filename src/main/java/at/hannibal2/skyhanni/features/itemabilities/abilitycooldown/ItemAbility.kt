@@ -26,13 +26,11 @@ enum class ItemAbility(
     PIGMAN_SWORD(5),
     EMBER_ROD(30),
     STAFF_OF_THE_VOLCANO(30),
-
     STARLIGHT_WAND(2),
     VOODOO_DOLL(5),
     WEIRD_TUBA(20),
     FIRE_FREEZE_STAFF(10),
     SWORD_OF_BAD_HEALTH(5),
-
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 30, "Ender Bow"),
@@ -41,11 +39,7 @@ enum class ItemAbility(
     INK_WAND("Ink Bomb", 30, "Ink Wand"),
 
     // doesn't have a consistent sound
-    ECHO("Echo", 3, "Ancestral Spade"),
-
-    // sound indistinguishable from normal teleport
-    SHADOW_FURY("Shadow Fury", 15, "Shadow Fury");
-
+    ECHO("Echo", 3, "Ancestral Spade");
 
     var newVariant = false
     var internalNames = mutableListOf<String>()

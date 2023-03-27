@@ -29,7 +29,7 @@ class ItemClickData {
             BlockClickEvent(ClickType.LEFT_CLICK, position, itemInHand).postAndCatch()
         }
         if (packet is C0APacketAnimation) {
-            ItemClickEvent(itemInHand)
+            ItemClickEvent(itemInHand).postAndCatch()
         }
     }
 
