@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -13,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import net.minecraft.client.Minecraft
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -61,29 +59,77 @@ class ItemAbilityCooldown {
             }
         }
         if (event.soundName == "mob.bat.hurt") {
-            if (event.pitch == 1.6825397f && event.volume == 0.1f) {
-                ItemAbility.STARLIGHT_WAND.sound()
-            }
-        }
-        if (event.soundName == "mob.bat.hurt") {
-            if (event.pitch == 1.6825397f && event.volume == 0.1f) {
+            if (event.volume == 0.1f) {
                 ItemAbility.STARLIGHT_WAND.sound()
             }
         }
         if (event.soundName == "mob.guardian.curse") {
-            if (event.pitch == 1.8888888f && event.volume == 0.2f) {
+            if (event.volume == 0.2f) {
                 ItemAbility.VOODOO_DOLL.sound()
+            }
+        }
+        if (event.soundName == "random.explode") {
+            if (event.pitch == 4.047619f && event.volume == 0.2f) {
+                ItemAbility.GOLEM_SWORD.sound()
+            }
+        }
+        if (event.soundName == "mob.wolf.howl") {
+            if (event.volume == 0.5f) {
+                ItemAbility.WEIRD_TUBA.sound()
+            }
+        }
+        if (event.soundName == "mob.zombie.unfect") {
+            if (event.pitch == 2.0f && event.volume == 0.3f) {
+                ItemAbility.END_STONE_SWORD.sound()
+            }
+        }
+        if (event.soundName == "mob.wolf.panting") {
+            if (event.pitch == 1.3968254f && event.volume == 0.4f) {
+                ItemAbility.SOUL_ESOWARD.sound()
+            }
+        }
+        if (event.soundName == "mob.zombiepig.zpigangry") {
+            if (event.pitch == 2.0f && event.volume == 0.3f) {
+                ItemAbility.PIGMAN_SWORD.sound()
+            }
+        }
+        if (event.soundName == "mob.ghast.fireball") {
+            if (event.pitch == 1.0f && event.volume == 0.3f) {
+                ItemAbility.EMBER_ROD.sound()
+            }
+        }
+        if (event.soundName == "mob.guardian.elder.idle") {
+            if (event.pitch == 2.0f && event.volume == 0.2f) {
+                ItemAbility.FIRE_FREEZE_STAFF.sound()
+            }
+        }
+        if (event.soundName == "random.explode") {
+            if (event.pitch == 0.4920635f && event.volume == 0.5f) {
+                ItemAbility.STAFF_OF_THE_VOLCANO.sound()
+            }
+        }
+        if (event.soundName == "random.eat") {
+            if (event.pitch == 1.0f && event.volume == 1.0f) {
+                ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
         }
     }
 
     @SubscribeEvent
-    fun onItemClickSend(event: BlockClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        val heldItem = event.itemInHand ?: return
+    fun onBlockClickSend(event: BlockClickEvent) {
+        handleItemClick(event.itemInHand)
+    }
 
-        val internalName = heldItem.getInternalName()
-        ItemAbility.getByInternalName(internalName)?.newClick()
+    @SubscribeEvent
+    fun onItemClick(event: ItemClickEvent) {
+        handleItemClick(event.itemInHand)
+    }
+
+    private fun handleItemClick(itemInHand: ItemStack?) {
+        if (!LorenzUtils.inSkyBlock) return
+        itemInHand?.getInternalName()?.run {
+            ItemAbility.getByInternalName(this)?.newClick()
+        }
     }
 
     @SubscribeEvent

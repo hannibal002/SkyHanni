@@ -19,28 +19,33 @@ enum class ItemAbility(
     ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA"),
     RAGNAROCK_AXE(20),
     WAND_OF_ATONEMENT(7, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
+
+    GOLEM_SWORD(3),
+    END_STONE_SWORD(5),
+    SOUL_ESOWARD(20),
+    PIGMAN_SWORD(5),
+    EMBER_ROD(30),
+    STAFF_OF_THE_VOLCANO(30),
+
     STARLIGHT_WAND(2),
     VOODOO_DOLL(5),
-    // TODO replace old logic
+    WEIRD_TUBA(20),
+    FIRE_FREEZE_STAFF(10),
+    SWORD_OF_BAD_HEALTH(5),
 
-    INK_WAND("Ink Bomb", 30, "Ink Wand"),
-    GOLEM_SWORD("Iron Punch", 3, "Golem Sword"),
-    EMBER_ROD("Fire Blast", 30, "Ember Rod"),
+
+    // doesn't have a sound
     ENDER_BOW("Ender Warp", 30, "Ender Bow"),
-
     LIVID_DAGGER("Throw", 5, "Livid Dagger"),
-    WEIRD_TUBA("Howl", 20, "Weird Tuba"),
+    FIRE_VEIL("Fire Veil", 5, "Fire Veil Wand"),
+    INK_WAND("Ink Bomb", 30, "Ink Wand"),
 
-    ENDSTONE_SWORD("Extreme Focus", 5, "End Stone Sword"),
-    PIGMAN_SWORD("Burning Souls", 5, "Pigman Sword"),
-
-    SOULWARD("Soulward", 20, "Soul Esoward"),
+    // doesn't have a consistent sound
     ECHO("Echo", 3, "Ancestral Spade"),
 
-    FIRE_VEIL("Fire Veil", 5, "Fire Veil Wand"),
-    //TODO add new crimson isle weapons
+    // sound indistinguishable from normal teleport
+    SHADOW_FURY("Shadow Fury", 15, "Shadow Fury");
 
-    ;
 
     var newVariant = false
     var internalNames = mutableListOf<String>()
