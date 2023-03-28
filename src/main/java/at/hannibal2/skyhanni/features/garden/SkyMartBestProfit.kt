@@ -53,7 +53,9 @@ class SkyMartBestProfit {
                     name = "§9Sunder I"
                 }
 
-                iconMap[name] = NEUItems.getItemStack(internalName)
+                NEUItems.getItemStackOrNull(internalName)?.let {
+                    iconMap[name] = it
+                }
 
                 val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
                     " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
@@ -80,12 +82,13 @@ class SkyMartBestProfit {
         val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
 
         for ((name, second) in keys) {
-            val itemStack = iconMap[name]!!
             var displayName = "$name§f:"
             while (renderer.getStringWidth(displayName.removeColor()) < longest) {
                 displayName += " "
             }
-            newList.add(listOf(itemStack, "$displayName   $second"))
+            iconMap[name]?.let {
+                newList.add(listOf(it, "$displayName   $second"))
+            }
         }
         return newList
     }

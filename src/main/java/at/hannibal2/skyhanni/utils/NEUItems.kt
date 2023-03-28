@@ -55,21 +55,26 @@ object NEUItems {
         return result
     }
 
-    fun getItemStack(internalName: String): ItemStack {
+    fun getItemStackOrNull(internalName: String): ItemStack? {
         if (itemCache.contains(internalName)) {
             return itemCache[internalName]!!.copy()
         }
 
         val itemStack = ItemResolutionQuery(manager)
             .withKnownInternalName(internalName)
-            .resolveToItemStack()
-        if (itemStack == null) {
+            .resolveToItemStack() ?: return null
+        itemCache[internalName] = itemStack
+        return itemStack.copy()
+    }
+
+    fun getItemStack(internalName: String): ItemStack {
+        val stack = getItemStackOrNull(internalName)
+        if (stack == null) {
             val error = "ItemResolutionQuery returns null for internalName $internalName"
             LorenzUtils.error(error)
             throw RuntimeException(error)
         }
-        itemCache[internalName] = itemStack
-        return itemStack.copy()
+        return stack
     }
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
