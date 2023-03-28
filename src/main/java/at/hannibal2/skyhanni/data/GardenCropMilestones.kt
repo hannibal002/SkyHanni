@@ -6,15 +6,12 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class GardenCropMilestones {
-    private val overflowPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
-    private val nextTierPattern = Pattern.compile("§7Progress to Tier (.*): §e(?:.*)")
+    private val cropPattern = Pattern.compile("§7Harvest §f(.*) §7on .*")
+    private val totalPattern = Pattern.compile("§7Total: §a(.*)")
 
     // Add when api support is there
 //    @SubscribeEvent
@@ -43,31 +40,20 @@ class GardenCropMilestones {
         if (event.inventoryName != "Crop Milestones") return
 
         for ((_, stack) in event.inventoryItems) {
-            val cropName = stack.name?.removeColor() ?: continue
-            val crop = CropType.getByName(cropName) ?: continue
-
-            val lore = stack.getLore()
-            var cropForTier = 0L
-            var next = false
-            for (line in lore) {
-                if (line.contains("Progress to Tier")) {
-                    val matcher = nextTierPattern.matcher(line)
-                    if (matcher.matches()) {
-                        val nextTier = matcher.group(1).romanToDecimalIfNeeded()
-                        val currentTier = nextTier - 1
-                        cropForTier = getCropsForTier(currentTier)
-                    }
-                    next = true
-                    continue
+            var crop: CropType? = null
+            for (line in stack.getLore()) {
+                var matcher = cropPattern.matcher(line)
+                if (matcher.matches()) {
+                    val name = matcher.group(1)
+                    crop = CropType.getByName(name) ?: continue
                 }
-                if (next) {
-                    val matcher = overflowPattern.matcher(line)
-                    if (matcher.matches()) {
-                        val rawNumber = matcher.group(1)
-                        val overflow = rawNumber.formatNumber()
-                        crop.setCounter(cropForTier + overflow)
+                matcher = totalPattern.matcher(line)
+                if (matcher.matches()) {
+                    val amount = matcher.group(1).replace(",", "").toLong()
+                    crop?.let {
+                        println("set $it to $amount")
+                        it.setCounter(amount)
                     }
-                    next = false
                 }
             }
         }
@@ -80,7 +66,9 @@ class GardenCropMilestones {
 
         fun CropType.getCounter() = cropCounter[this]!!
 
-        fun CropType.setCounter(counter: Long) { cropCounter[this] = counter }
+        fun CropType.setCounter(counter: Long) {
+            cropCounter[this] = counter
+        }
 
         fun getTierForCrops(crops: Long): Int {
             var tier = 0
