@@ -270,7 +270,7 @@ class EliteFarmingWeight {
             var totalWeight = 0.0
             for (crop in CropType.values()) {
                 val weight = crop.getLocalCounter() / crop.getFactor()
-                val roundedWeight =  weight.let { if (round) it.round(2) else it }
+                val roundedWeight = weight.let { if (round) it.round(2) else it }
                 weightPerCrop[crop] = roundedWeight
                 totalWeight += roundedWeight
             }
