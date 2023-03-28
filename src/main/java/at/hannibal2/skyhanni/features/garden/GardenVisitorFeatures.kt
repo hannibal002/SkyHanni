@@ -144,7 +144,12 @@ class GardenVisitorFeatures {
                 list.add(" §7- $displayName")
 
                 if (config.visitorItemPreview) {
-                    val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]!!
+                    val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
+                    if (items == null) {
+                        LorenzUtils.debug("Visitor '$visitor' has no items in repo!")
+                        list.add(" §7(§c?§7)")
+                        continue
+                    }
                     list.add(" ")
                     if (items.isEmpty()) {
                         list.add("§7(§fAny§7)")
