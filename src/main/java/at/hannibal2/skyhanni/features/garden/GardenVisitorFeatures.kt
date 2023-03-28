@@ -82,7 +82,9 @@ class GardenVisitorFeatures {
             visitor.items[internalName] = amount
         }
         if (visitor.status == VisitorStatus.NEW) {
+            oldStatus(visitor)
             visitor.status = VisitorStatus.WAITING
+            statusChange(visitor)
         }
 
         update()
@@ -178,7 +180,9 @@ class GardenVisitorFeatures {
         if (event.slotId != 33) return
 
         getVisitor(lastClickedNpc)?.let {
+            oldStatus(it)
             it.status = VisitorStatus.REFUSED
+            statusChange(it)
             update()
         }
     }
@@ -348,7 +352,8 @@ class GardenVisitorFeatures {
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
-                visitors[name] = Visitor(status = VisitorStatus.NEW)
+                visitors[name] = Visitor(name, status = VisitorStatus.NEW)
+                println("new visitor '$name'")
                 if (config.visitorNotificationTitle) {
                     SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
                 }
@@ -369,7 +374,9 @@ class GardenVisitorFeatures {
         val visitorName = matcher.group(1)
         for (visitor in visitors) {
             if (visitor.key == visitorName) {
+                oldStatus(visitor.value)
                 visitor.value.status = VisitorStatus.ACCEPTED
+                statusChange(visitor.value)
                 update()
             }
         }
@@ -391,7 +398,9 @@ class GardenVisitorFeatures {
 
             val status = visitor.status
             if (status == VisitorStatus.WAITING || status == VisitorStatus.READY) {
+                oldStatus(visitor)
                 visitor.status = if (isReady(visitor)) VisitorStatus.READY else VisitorStatus.WAITING
+                statusChange(visitor)
             }
 
             if (config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2) {
@@ -408,6 +417,20 @@ class GardenVisitorFeatures {
                 }
             }
         }
+    }
+
+    val oldValue = mutableMapOf<Visitor, VisitorStatus>()
+
+    private fun oldStatus(visitor: Visitor) {
+        oldValue[visitor] = visitor.status
+    }
+
+    private fun statusChange(visitor: Visitor) {
+        val old = oldValue[visitor]
+        val new = visitor.status
+        if (old == new) return
+        val name = visitor.visitorName
+        LorenzUtils.debug("Visitor status change for $name: $old -> $new")
     }
 
     private fun Visitor.getEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
@@ -502,6 +525,7 @@ class GardenVisitorFeatures {
     }
 
     class Visitor(
+        val visitorName: String,
         var entityId: Int = -1,
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
