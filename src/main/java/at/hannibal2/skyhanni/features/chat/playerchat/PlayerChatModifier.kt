@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
@@ -69,19 +68,19 @@ class PlayerChatModifier {
             }
         }
 
-        if (SkyHanniMod.feature.chat.playerRankHider) {
-            for (pattern in patterns) {
-                string = string.replace(pattern, "§b$1")
-            }
-            string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16})'s", "§b$1's")
-            string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16}) (§.)", "§b$1 $2")
-
-            // TODO remove workaround
-            if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {
-                //all players same color in chat
-                string = string.replace("§r§7: ", "§r§f: ")
-            }
-        }
+//        if (SkyHanniMod.feature.chat.playerRankHider) {
+//            for (pattern in patterns) {
+//                string = string.replace(pattern, "§b$1")
+//            }
+//            string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16})'s", "§b$1's")
+//            string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16}) (§.)", "§b$1 $2")
+//
+//            // TODO remove workaround
+//            if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {
+//                //all players same color in chat
+//                string = string.replace("§r§7: ", "§r§f: ")
+//            }
+//        }
 
         if (SkyHanniMod.feature.markedPlayers.highlightInChat) {
             for (markedPlayer in MarkedPlayerManager.playerNamesToMark) {
