@@ -50,10 +50,7 @@ class GardenCropMilestones {
                 matcher = totalPattern.matcher(line)
                 if (matcher.matches()) {
                     val amount = matcher.group(1).replace(",", "").toLong()
-                    crop?.let {
-                        println("set $it to $amount")
-                        it.setCounter(amount)
-                    }
+                    crop?.setCounter(amount)
                 }
             }
         }
