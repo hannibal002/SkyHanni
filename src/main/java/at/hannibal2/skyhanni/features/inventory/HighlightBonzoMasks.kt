@@ -5,15 +5,13 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
+import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.*
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
-import kotlin.time.TimeMark
-import kotlin.time.TimeSource
 
 /**
  * @author Linnea Gräf
@@ -21,11 +19,14 @@ import kotlin.time.TimeSource
 @OptIn(ExperimentalTime::class)
 class HighlightBonzoMasks {
 
-    val bonzoMaskTimers = mutableMapOf<String, TimeMark>()
+    val maskTimers = mutableMapOf<String, CooldownTimer>()
 
     // Technically this timer is overestimating since the cooldown is affected by mage level, however I do not care.
     val bonzoMaskCooldown = 360.seconds
-    val bonzoMaskMessage = "Your (.*Bonzo's Mask) saved your life!".toRegex()
+    val bonzoMaskMessage = "^Your (.*Bonzo's Mask) saved your life!$".toRegex()
+
+    val spiritMaskCooldown = 30.seconds
+    val spiritMaskMessage = "^Second Wind Activated! Your Spirit Mask saved your life!$".toRegex()
 
     val greenHue = Color.RGBtoHSB(0, 255, 0, null)[0].toDouble()
     val redHue = Color.RGBtoHSB(255, 0, 0, null)[0].toDouble()
@@ -35,27 +36,47 @@ class HighlightBonzoMasks {
         if (!SkyHanniMod.feature.inventory.highlightDepletedBonzosMasks) return
         for (slot in event.gui.inventorySlots.inventorySlots) {
             val item = slot.stack ?: continue
-            val internalName = item.getInternalName()
-            if (!internalName.endsWith("BONZO_MASK")) continue
-            val timer = bonzoMaskTimers[internalName] ?: continue
-            if (timer.elapsedNow() < bonzoMaskCooldown) {
-                val progress =
-                    timer.elapsedNow().toDouble(DurationUnit.SECONDS) / bonzoMaskCooldown.toDouble(DurationUnit.SECONDS)
-                val hue = interpolate(greenHue, redHue, progress.toFloat())
+            val maskType = maskType(item) ?: continue
+            val timer = maskTimers[maskType] ?: continue
+            if (timer.isActive) {
+                val hue = interpolate(greenHue, redHue, timer.percentComplete.toFloat())
                 slot.highlight(Color(Color.HSBtoRGB(hue.toFloat(), 1F, 1F)))
             }
         }
     }
 
+    private fun maskType(item: ItemStack): String? {
+        return when (item.getInternalName()) {
+            "STARRED_BONZO_MASK" -> "BONZO_MASK"
+            "BONZO_MASK" -> "BONZO_MASK"
+            "SPIRIT_MASK" -> "SPIRIT_MASK"
+            else -> null
+        }
+    }
+
     @SubscribeEvent
     fun onChatReceived(event: ClientChatReceivedEvent) {
-        val match = bonzoMaskMessage.matchEntire(event.message.unformattedText) ?: return
-        val bonzoId = if ("⚚" in match.groupValues[1]) "STARRED_BONZO_MASK" else "BONZO_MASK"
-        bonzoMaskTimers[bonzoId] = TimeSource.Monotonic.markNow()
+        val message = event.message.unformattedText
+        if (bonzoMaskMessage.matches(message)) {
+            maskTimers["BONZO_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), bonzoMaskCooldown)
+        } else if (spiritMaskMessage.matches(message)) {
+            maskTimers["SPIRIT_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), spiritMaskCooldown)
+        }
     }
 
     @SubscribeEvent
     fun onJoinWorld(ignored: WorldEvent.Load) {
-        bonzoMaskTimers.clear()
+        maskTimers.clear()
+    }
+
+    companion object {
+        data class CooldownTimer(val timeMark: TimeMark, val duration: Duration) {
+            val percentComplete: Double get() =
+                timeMark.elapsedNow().toDouble(DurationUnit.SECONDS) / duration.toDouble(DurationUnit.SECONDS)
+
+            val isActive: Boolean get() = timeMark.elapsedNow() < duration
+
+        }
     }
 }
+
