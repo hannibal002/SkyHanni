@@ -23,8 +23,9 @@ object SoundUtils {
                 }
             }
             e.printStackTrace()
+        } finally {
+            gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
         }
-        gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
     }
 
     fun createSound(name: String, pitch: Float): ISound {
