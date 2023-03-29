@@ -7,32 +7,30 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class SkyMartBestProfit {
-
+class SkyMartCopperPrice {
     private val pattern = Pattern.compile("§c(.*) Copper")
     private var display = listOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
 
+    companion object {
+        var inInventory = false
+    }
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
-
         if (event.inventoryName != "SkyMart") return
 
-        val priceMap = mutableMapOf<Pair<String, String>, Double>()
-        val iconMap = mutableMapOf<String, ItemStack>()
-
+        inInventory = true
+        val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
         for (stack in event.inventoryItems.values) {
             for (line in stack.getLore()) {
                 val matcher = pattern.matcher(line)
@@ -53,55 +51,34 @@ class SkyMartBestProfit {
                     name = stack.getLore()[0]
                 }
 
-                NEUItems.getItemStackOrNull(internalName)?.let {
-                    iconMap[name] = it
-                }
-
                 val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
                     " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
                 } else ""
-                val pair = Pair(name, "§6§l$perFormat$advancedStats")
-                priceMap[pair] = factor
+                val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
+                table[pair] = Pair(factor, internalName)
             }
         }
 
-        display = drawDisplay(priceMap, iconMap)
-    }
-
-    private fun drawDisplay(
-        priceMap: MutableMap<Pair<String, String>, Double>,
-        iconMap: MutableMap<String, ItemStack>,
-    ): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
-
-        newList.addAsSingletonList("Coins per §cCopper§f:")
-        newList.addAsSingletonList("")
-
-        val keys = priceMap.sortedDesc().keys
-        val renderer = Minecraft.getMinecraft().fontRendererObj
-        val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
-
-        for ((name, second) in keys) {
-            var displayName = "$name§f:"
-            while (renderer.getStringWidth(displayName.removeColor()) < longest) {
-                displayName += " "
-            }
-            iconMap[name]?.let {
-                newList.add(listOf(it, "$displayName   $second"))
-            }
-        }
-        return newList
+        newList.addAsSingletonList("§eCoins per Copper§f:")
+        LorenzUtils.fillTable(newList, table)
+        display = newList
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        display = emptyList()
+        inInventory = false
     }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
-        if (isEnabled()) {
-            config.skyMartCopperPricePos.renderStringsAndItems(display, posLabel = "Sky Mart Copper Price")
+        if (inInventory) {
+            config.skyMartCopperPricePos.renderStringsAndItems(
+                display,
+                extraSpace = 5,
+                itemScale = 1.7,
+                posLabel = "Sky Mart Copper Price"
+            )
         }
     }
 

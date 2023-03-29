@@ -585,6 +585,26 @@ public class Garden {
     public boolean teleportPadsCompactName = false;
 
     @Expose
+    @ConfigOption(name = "Anita Medal Profit", desc = "")
+    @ConfigEditorAccordion(id = 12)
+    public boolean anitaMedalProfit = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Show Prices",
+            desc = "Helps to identify profitable items to buy at the Anita item shop " +
+                    "and potential profit from selling the item at the auction house."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean anitaMedalProfitEnabled = true;
+
+    @Expose
+    public Position anitaMedalProfitPos = new Position(206, 158, false, true);
+
+
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;

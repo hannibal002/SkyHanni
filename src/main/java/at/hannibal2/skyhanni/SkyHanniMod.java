@@ -212,7 +212,7 @@ public class SkyHanniMod {
         loadModule(new TpsCounter());
         loadModule(new ParticleHider());
         loadModule(new MiscFeatures());
-        loadModule(new SkyMartBestProfit());
+        loadModule(new SkyMartCopperPrice());
         loadModule(new GardenVisitorFeatures());
         loadModule(new GardenInventoryNumbers());
         loadModule(new GardenVisitorTimer());
@@ -233,6 +233,7 @@ public class SkyHanniMod {
         loadModule(new JoinCrystalHollows());
         loadModule(new GardenVisitorColorNames());
         loadModule(new GardenTeleportPadCompactName());
+        loadModule(new AnitaMedalProfit());
 
         Commands.INSTANCE.init();
 

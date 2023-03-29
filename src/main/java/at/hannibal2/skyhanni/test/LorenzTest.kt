@@ -52,8 +52,8 @@ class LorenzTest {
 //            SoundUtils.createSound(name, pitch).playSound()
 
 
-//            a = args[0].toDouble()
-//            b = args[1].toDouble()
+            a = args[0].toDouble()
+            b = args[1].toDouble()
 //            c = args[2].toDouble()
 
 //            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
