@@ -602,7 +602,22 @@ public class Garden {
     @Expose
     public Position anitaMedalProfitPos = new Position(206, 158, false, true);
 
+    @Expose
+    @ConfigOption(name = "Composter", desc = "")
+    @ConfigEditorAccordion(id = 16)
+    public boolean composter = false;
 
+    @Expose
+    @ConfigOption(
+            name = "Compact Display",
+            desc = "Displays the compost data from the tab list in a compact form as gui element."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 16)
+    public boolean composterDisplayEnabled = true;
+
+    @Expose
+    public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
