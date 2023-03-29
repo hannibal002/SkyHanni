@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -44,6 +41,13 @@ class GardenAPI {
         }
     }
 
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (inGarden()) {
+            mushroomCowPet = event.tabList.any { it.startsWith(" Strength: §r§c❁") }
+        }
+    }
+
     private fun checkItemInHand() {
         val toolItem = Minecraft.getMinecraft().thePlayer.heldItem
         val crop = getCropTypeFromItem(toolItem)
@@ -75,6 +79,7 @@ class GardenAPI {
         var toolInHand: String? = null
         private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
         var cropInHand: CropType? = null
+        var mushroomCowPet = false
 
         fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
@@ -111,7 +116,7 @@ class GardenAPI {
             setSpeed(-1)
             return -1
         }
-        
+
         fun CropType.setSpeed(speed: Int) {
             cropsPerSecond[this] = speed
         }
