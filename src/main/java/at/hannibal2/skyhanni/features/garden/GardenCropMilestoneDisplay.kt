@@ -46,6 +46,22 @@ class GardenCropMilestoneDisplay {
 
     private var needsInventory = false
 
+    private var mushroom_cow_nether_warts = true
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        try {
+            val constant = event.getConstant("DisabledFeatures")
+            mushroom_cow_nether_warts = if (constant != null) {
+                if (constant.has("mushroom_cow_nether_warts")) {
+                    constant["mushroom_cow_nether_warts"].asBoolean
+                } else false
+            } else false
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
@@ -68,10 +84,16 @@ class GardenCropMilestoneDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.cropMilestoneProgressDisplayPos.renderStringsAndItems(progressDisplay, posLabel = "Crop Milestone Progress")
+        config.cropMilestoneProgressDisplayPos.renderStringsAndItems(
+            progressDisplay,
+            posLabel = "Crop Milestone Progress"
+        )
 
         if (config.cropMilestoneMushroomPetPerkEnabled) {
-            config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk")
+            config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(
+                mushroomCowPerkDisplay,
+                posLabel = "Mushroom Cow Perk"
+            )
         }
 
         if (config.cropMilestoneBestDisplay) {
@@ -137,7 +159,9 @@ class GardenCropMilestoneDisplay {
         if (event.clickType == ClickType.LEFT_CLICK) {
             val blockState = event.getBlockState
 
-            if (isFarmBlock(blockState)) {
+            val blocks = isFarmBlock(blockState)
+            if (blocks == 0) return
+            if (blocks == 1) {
                 for (property in blockState.block.blockState.properties) {
                     val name = property.name
                     if (name == "age") {
@@ -147,41 +171,29 @@ class GardenCropMilestoneDisplay {
                         }
                     }
                 }
-                blocksBroken++
             }
+            blocksBroken += blocks
         }
     }
 
-    private fun isFarmBlock(blockState: IBlockState): Boolean {
+    private fun isFarmBlock(blockState: IBlockState): Int {
         val block = blockState.block
-        if (block == Blocks.carrots) return true
-        if (block == Blocks.potatoes) return true
-        if (block == Blocks.wheat) {
-            for (property in block.blockState.properties) {
-                val name = property.name
-                if (name != "age") continue
-                if (property !is PropertyInteger) continue
+        if (block == Blocks.carrots) return 1
+        if (block == Blocks.potatoes) return 1
+        if (block == Blocks.wheat) return 1
+        if (block == Blocks.cocoa) return 1 // Cocoa Beans
+        if (block == Blocks.red_mushroom) return 1
+        if (block == Blocks.brown_mushroom) return 1
+        if (block == Blocks.cactus) return 2
+        if (block == Blocks.reeds) return 2 // Sugar Cane
+        if (block == Blocks.nether_wart) return 1
+        if (block == Blocks.melon_block) return 1
+        if (block == Blocks.pumpkin) return 1
 
-                val age = blockState.getValue(property)
-                if (age == 0) {
-                    return false
-                }
-            }
-            return true
-        }
-        if (block == Blocks.cocoa) return true // Cocoa Beans
-        if (block == Blocks.red_mushroom) return true
-        if (block == Blocks.brown_mushroom) return true
-        if (block == Blocks.cactus) return true
-        if (block == Blocks.reeds) return true // Sugar Cane
-        if (block == Blocks.nether_wart) return true
-        if (block == Blocks.melon_block) return true
-        if (block == Blocks.pumpkin) return true
+        if (block == Blocks.dirt) return 0
+        if (block == Blocks.farmland) return 0
 
-        if (block == Blocks.dirt) return false
-        if (block == Blocks.farmland) return false
-
-        return false
+        return 0
     }
 
     private var currentSpeed = 0
@@ -202,6 +214,10 @@ class GardenCropMilestoneDisplay {
 
     init {
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
+            if (GardenAPI.inGarden() && GardenAPI.mushroomCowPet) {
+                CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
+                update()
+            }
             if (isEnabled()) {
                 checkSpeed()
             }
@@ -220,9 +236,6 @@ class GardenCropMilestoneDisplay {
         currentSpeed = 0
 
         lastBlocksPerSecond = blocksBroken
-        if (GardenAPI.mushroomCowPet) {
-            CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
-        }
         blocksBroken = 0
     }
 
@@ -310,8 +323,16 @@ class GardenCropMilestoneDisplay {
             val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$lastBlocksPerSecond")
+        }
 
-            if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
+        if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
+            if (mushroom_cow_nether_warts && crop == CropType.NETHER_WART) {
+                mushroomCowPerkDisplay = listOf(
+                    listOf("§6Mooshroom Cow Perk"),
+                    listOf("§cNether Warts don't give mushrooms."),
+                    listOf("§7(Hypixel please fix this)")
+                )
+            } else {
                 addMushroomCowData()
             }
         }
@@ -352,8 +373,13 @@ class GardenCropMilestoneDisplay {
 
         val missing = need - have
 
-        // We assume perfect 20 blocks per second speed for this
-        val missingTimeSeconds = missing / 20
+        // We assume perfect 20 blocks per seconds
+        val blocksPerSecond = when (currentCrop) {
+            CropType.CACTUS, CropType.SUGAR_CANE -> 40
+
+            else -> 20
+        }
+        val missingTimeSeconds = missing / blocksPerSecond
         val millis = missingTimeSeconds * 1000
         val duration = TimeUtils.formatDuration(millis)
 
