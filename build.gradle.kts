@@ -128,7 +128,7 @@ val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
 
 tasks.shadowJar {
     archiveClassifier.set("all-dev")
-    configurations = listOf(shadowImpl)
+    configurations = listOf(shadowImpl, shadowModImpl)
     doLast {
         configurations.forEach {
             println("Config: ${it.files}")
