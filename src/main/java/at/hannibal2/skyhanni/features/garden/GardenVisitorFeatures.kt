@@ -353,7 +353,7 @@ class GardenVisitorFeatures {
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
                 visitors[name] = Visitor(name, status = VisitorStatus.NEW)
-                println("new visitor '$name'")
+                LorenzUtils.debug("new visitor '$name'")
                 if (config.visitorNotificationTitle) {
                     SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
                 }
@@ -429,7 +429,7 @@ class GardenVisitorFeatures {
         val old = oldValue[visitor]
         val new = visitor.status
         if (old == new) return
-        val name = visitor.visitorName
+        val name = visitor.visitorName.removeColor()
         LorenzUtils.debug("Visitor status change for $name: $old -> $new")
     }
 
