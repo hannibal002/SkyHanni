@@ -117,7 +117,7 @@ public class Garden {
     @ConfigOption(name = "Copper Price", desc = "Show the price per copper inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
-    public boolean visitorCopperPrice = false;
+    public boolean visitorCopperPrice = true;
 
     @Expose
     @ConfigOption(name = "Garden Exp Price", desc = "Show the price per garden experience inside the visitor gui.")
