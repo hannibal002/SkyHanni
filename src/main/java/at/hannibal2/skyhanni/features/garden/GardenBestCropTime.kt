@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.TimeUtils
-import java.util.*
 
 class GardenBestCropTime {
     var display = listOf<List<Any>>()
@@ -34,10 +34,10 @@ class GardenBestCropTime {
         }
 
         val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
-        newList.add(Collections.singletonList("§eBest Crop Time §7($title§7)"))
+        newList.addAsSingletonList("§eBest Crop Time §7($title§7)")
 
         if (sorted.isEmpty()) {
-            newList.add(Collections.singletonList("§cFarm crops to add them to this list!"))
+            newList.addAsSingletonList("§cFarm crops to add them to this list!")
             return newList
         }
 

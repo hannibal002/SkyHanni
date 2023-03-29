@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputat
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
 import java.util.regex.Pattern
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -67,15 +67,15 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     fun render(display: MutableList<List<Any>>) {
         val done = kuudraTiers.count { it.doneToday }
-        display.add(Collections.singletonList(""))
-        display.add(Collections.singletonList("§7Daily Kuudra (§e$done§8/§e3 killed§7)"))
+        display.addAsSingletonList("")
+        display.addAsSingletonList("§7Daily Kuudra (§e$done§8/§e3 killed§7)")
         if (done != 2) {
             for (tier in kuudraTiers) {
                 val result = if (tier.doneToday) "§7Done" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
                 if (displayItem == null) {
-                    display.add(Collections.singletonList("  $displayName: $result"))
+                    display.addAsSingletonList("  $displayName: $result")
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")
