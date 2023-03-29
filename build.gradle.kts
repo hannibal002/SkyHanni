@@ -71,8 +71,8 @@ dependencies {
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("com.github.notenoughupdates:moulconfig:3f469a8")
-    devenvMod("com.github.notenoughupdates:moulconfig:3f469a8:test")
+    shadowModImpl("com.github.notenoughupdates:moulconfig:df01eda")
+    devenvMod("com.github.notenoughupdates:moulconfig:df01eda:test")
 }
 
 // Minecraft configuration:
