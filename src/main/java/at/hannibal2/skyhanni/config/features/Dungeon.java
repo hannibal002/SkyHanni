@@ -14,27 +14,17 @@ public class Dungeon {
     @ConfigEditorBoolean
     public boolean highlightClickedBlocks = false;
 
-    @ConfigOption(name = "Milestones", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean showMilestone = false;
-
     @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in dungeons.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
     public boolean showMilestonesDisplay = false;
 
     @Expose
     public Position showMileStonesDisplayPos = new Position(10, 10, false, true);
 
-    @ConfigOption(name = "Death Counter", desc = "")
-    @ConfigEditorAccordion(id = 1)
-    public boolean deathCounter = false;
-
     @Expose
     @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeons.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
     public boolean deathCounterDisplay = false;
 
     @Expose

@@ -66,14 +66,9 @@ public class Minions {
     @ConfigAccordionId(id = 1)
     public int distance = 10;
 
-    @ConfigOption(name = "Hopper Profit", desc = "")
-    @ConfigEditorAccordion(id = 2)
-    public boolean hopperProfit = false;
-
     @Expose
     @ConfigOption(name = "Hopper Profit Display", desc = "Use the hopper's held coins and the last empty time to calculate the coins per day.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 2)
     public boolean hopperProfitDisplay = true;
 
     @Expose
