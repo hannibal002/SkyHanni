@@ -586,7 +586,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Anita Medal Profit", desc = "")
-    @ConfigEditorAccordion(id = 12)
+    @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
 
     @Expose
@@ -596,7 +596,7 @@ public class Garden {
                     "and potential profit from selling the item at the auction house."
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 16)
     public boolean anitaMedalProfitEnabled = true;
 
     @Expose
