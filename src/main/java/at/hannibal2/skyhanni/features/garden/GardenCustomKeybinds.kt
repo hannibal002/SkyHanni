@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.core.config.KeybindHelper
 import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
+import io.github.moulberry.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.event.world.WorldEvent

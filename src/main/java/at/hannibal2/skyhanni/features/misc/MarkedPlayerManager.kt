@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -59,10 +60,14 @@ class MarkedPlayerManager {
 
         fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
-        fun toggleOwn() {
-            val ownName = SkyHanniMod.feature.markedPlayers.markOwnName
+    }
+
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        SkyHanniMod.feature.markedPlayers.markOwnName.whenChanged { old, new ->
             val name = Minecraft.getMinecraft().thePlayer.name
-            if (ownName) {
+            if (new) {
                 if (!playerNamesToMark.contains(name)) {
                     playerNamesToMark.add(name)
                 }
@@ -110,7 +115,7 @@ class MarkedPlayerManager {
         if (Minecraft.getMinecraft().thePlayer == null) return
 
         markedPlayers.clear()
-        if (SkyHanniMod.feature.markedPlayers.markOwnName) {
+        if (SkyHanniMod.feature.markedPlayers.markOwnName.get()) {
             val name = Minecraft.getMinecraft().thePlayer.name
             if (!playerNamesToMark.contains(name)) {
                 playerNamesToMark.add(name)

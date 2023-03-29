@@ -40,6 +40,10 @@ val shadowImpl by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
+val shadowModImpl by configurations.creating {
+    configurations.modImplementation.get().extendsFrom(this)
+}
+
 val devenvMod by configurations.creating {
     isTransitive = false
     isVisible = false
@@ -66,6 +70,9 @@ dependencies {
 
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
+
+    shadowModImpl("com.github.notenoughupdates:moulconfig:df01eda")
+    devenvMod("com.github.notenoughupdates:moulconfig:df01eda:test")
 }
 
 // Minecraft configuration:
@@ -121,15 +128,14 @@ val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
 
 tasks.shadowJar {
     archiveClassifier.set("all-dev")
-    configurations = listOf(shadowImpl)
+    configurations = listOf(shadowImpl, shadowModImpl)
     doLast {
         configurations.forEach {
             println("Config: ${it.files}")
         }
     }
 
-    // If you want to include other dependencies and shadow them, you can relocate them in here
-//    fun relocate(name: String) = relocate(name, "com.examplemod.deps.$name")
+    relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.*;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.*;
 
 public class Fishing {
 

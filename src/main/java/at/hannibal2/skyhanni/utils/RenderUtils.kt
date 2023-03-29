@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.core.util.render.TextRenderUtils.drawStringScaled
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -665,7 +665,7 @@ object RenderUtils {
         val strLen = fr.getStringWidth(str)
         var factor = len / strLen.toFloat()
         factor = Math.min(1f, factor)
-        drawStringScaled(str, fr, x, y, shadow, colour, factor)
+        TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, colour, factor)
     }
 
     fun RenderWorldLastEvent.drawDynamicText(

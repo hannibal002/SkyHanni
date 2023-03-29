@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigAccordionId;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorAccordion;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class Misc {
 
@@ -50,21 +51,21 @@ public class Misc {
 
     @Expose
     @ConfigOption(name = "Hide Armor", desc = "Hide other players' armor.")
-    @ConfigEditorBoolean(runnableId = "hideArmor")
+    @ConfigEditorBoolean()
     @ConfigAccordionId(id = 3)
-    public boolean hideArmorEnabled = false;
+    public Property<Boolean> hideArmorEnabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Own Armor", desc = "Hide your own armor.")
-    @ConfigEditorBoolean(runnableId = "hideArmor")
+    @ConfigEditorBoolean()
     @ConfigAccordionId(id = 3)
-    public boolean hideArmorOwn = true;
+    public Property<Boolean> hideArmorOwn = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
-    @ConfigEditorBoolean(runnableId = "hideArmor")
+    @ConfigEditorBoolean()
     @ConfigAccordionId(id = 3)
-    public boolean hideArmorOnlyHelmet = false;
+    public Property<Boolean> hideArmorOnlyHelmet = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Damage Splash", desc = "")

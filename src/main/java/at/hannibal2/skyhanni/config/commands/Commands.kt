@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigEditor
+import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bazaar.BazaarDataGrabber
@@ -18,7 +17,6 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
-import org.apache.commons.lang3.StringUtils
 
 object Commands {
 
@@ -27,11 +25,10 @@ object Commands {
             if (it[0].lowercase() == "gui") {
                 GuiEditManager.openGuiEditor()
             } else {
-                SkyHanniMod.screenToOpen =
-                    GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature, StringUtils.join(it, " ")))
+                ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
         } else {
-            SkyHanniMod.screenToOpen = GuiScreenElementWrapper(ConfigEditor(SkyHanniMod.feature))
+            ConfigGuiManager.openConfigGui()
         }
     }
 
