@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
@@ -29,14 +27,9 @@ public class Bingo {
     @Expose
     public Position bingoCardPos = new Position(10, 10, false, true);
 
-    @ConfigOption(name = "Minion Craft Helper", desc = "")
-    @ConfigEditorAccordion(id = 0)
-    public boolean minionCraftHelper = false;
-
     @Expose
     @ConfigOption(name = "Minion Craft Helper", desc = "Show how many more items you need to upgrade the minion in your inventory. Especially useful for bingo.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
     public boolean minionCraftHelperEnabled = true;
 
     @Expose

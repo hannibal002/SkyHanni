@@ -96,17 +96,12 @@ public class Fishing {
     @ConfigAccordionId(id = 2)
     public int barnTimerAlertTime = 330;
 
-    @ConfigOption(name = "Shark Fish", desc = "")
-    @ConfigEditorAccordion(id = 3)
-    public boolean sharkFish = false;
-
     @Expose
     @ConfigOption(
             name = "Shark Fish Counter",
             desc = "Counts how many sharks have been caught."
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 3)
     public boolean sharkFishCounter = false;
 
     @Expose
