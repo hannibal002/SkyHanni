@@ -171,4 +171,23 @@ object LorenzUtils {
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }
+
+    // (key -> value) -> (sorting value -> key item icon)
+    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, String>>) {
+        val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
+        val renderer = Minecraft.getMinecraft().fontRendererObj
+        val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
+
+        for (pair in keys) {
+            val (name, second) = pair
+            var displayName = name
+            while (renderer.getStringWidth(displayName.removeColor()) < longest) {
+                displayName += " "
+            }
+
+            NEUItems.getItemStackOrNull(data[pair]!!.second)?.let {
+                list.add(listOf(it, "$displayName   $second"))
+            }
+        }
+    }
 }

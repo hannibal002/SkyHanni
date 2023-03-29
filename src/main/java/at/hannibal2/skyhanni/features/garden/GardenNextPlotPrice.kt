@@ -1,11 +1,8 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -39,6 +36,8 @@ class GardenNextPlotPrice {
                     val price = lowestBin * amount
                     val format = NumberUtil.format(price)
                     list[i] = list[i] + " §7(§6$format§7)"
+                } else {
+                    LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                 }
                 break
             }

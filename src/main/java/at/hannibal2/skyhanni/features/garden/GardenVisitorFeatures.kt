@@ -77,7 +77,10 @@ class GardenVisitorFeatures {
             if (line.isEmpty()) break
 
             val (itemName, amount) = ItemUtils.readItemAmount(line)
-            if (itemName == null) continue
+            if (itemName == null) {
+                LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
+                continue
+            }
             val internalName = NEUItems.getInternalName(itemName)
             visitor.items[internalName] = amount
         }
@@ -287,6 +290,8 @@ class GardenVisitorFeatures {
                             list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
                         }
                     }
+                } else {
+                    LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                 }
             }
 
