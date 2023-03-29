@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.Features;
 import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.data.*;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
-import at.hannibal2.skyhanni.events.FirstConfigLoadedEvent;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
 import at.hannibal2.skyhanni.features.bazaar.*;
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay;
