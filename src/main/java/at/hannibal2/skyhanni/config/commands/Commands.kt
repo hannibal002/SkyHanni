@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -13,8 +14,6 @@ import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -25,12 +24,10 @@ object Commands {
             if (it[0].lowercase() == "gui") {
                 GuiEditManager.openGuiEditor()
             } else {
-                val editor = MoulConfigEditor(SkyHanniMod.configManager.processor)
-                editor.search(it.joinToString(" "))
-                SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+                ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
         } else {
-            SkyHanniMod.screenToOpen = GuiScreenElementWrapper(MoulConfigEditor(SkyHanniMod.configManager.processor))
+            ConfigGuiManager.openConfigGui()
         }
     }
 
