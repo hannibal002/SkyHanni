@@ -34,7 +34,6 @@ class ComposterDisplay {
         if (!isEnabled()) return
 
         var next = false
-        println(" ")
         val data = mutableMapOf<DataType, String>()
 
         for (line in event.tabList) {
@@ -51,7 +50,6 @@ class ComposterDisplay {
                         data[type] = matcher.group(1)
                     }
                 }
-                println("'$line'")
             }
         }
 

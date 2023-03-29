@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -15,6 +16,7 @@ import java.util.regex.Pattern
 
 class GardenNextJacobContest {
     private var display = listOf<Any>()
+    private var simpleDisplay = listOf<String>()
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
@@ -27,12 +29,10 @@ class GardenNextJacobContest {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!isEnabled()) return
-
         var next = false
         val newList = mutableListOf<String>()
         for (line in event.tabList) {
-            if (line == "§b§lComposter:") {
+            if (line == "§e§lJacob's Contest:") {
                 newList.add(line)
                 next = true
                 continue
@@ -42,8 +42,10 @@ class GardenNextJacobContest {
                 newList.add(line)
             }
         }
+        newList.add("§cOpen calendar for")
+        newList.add("§cmore exact data!")
 
-        display = newList
+        simpleDisplay = newList
     }
 
     @SubscribeEvent
@@ -155,9 +157,7 @@ class GardenNextJacobContest {
         }
 
         if (contests.isEmpty()) {
-
-            list.add("§cOpen calendar to read jacob contest times!")
-            return list
+            return emptyList()
         }
 
         val nextContest =
@@ -201,7 +201,11 @@ class GardenNextJacobContest {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.nextJacobContestPos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
+        if (display.isEmpty()) {
+            config.nextJacobContestPos.renderStrings(simpleDisplay, posLabel = "Garden Next Jacob Contest")
+        } else {
+            config.nextJacobContestPos.renderSingleLineWithItems(display, 1.7, posLabel = "Garden Next Jacob Contest")
+        }
     }
 
     @SubscribeEvent
@@ -209,7 +213,9 @@ class GardenNextJacobContest {
         if (!config.nextJacobContestDisplay) return
         if (!inCalendar) return
 
-        config.nextJacobContestPos.renderSingleLineWithItems(display, posLabel = "Garden Next Jacob Contest")
+        if (!display.isEmpty()) {
+            config.nextJacobContestPos.renderSingleLineWithItems(display, posLabel = "Garden Next Jacob Contest")
+        }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.nextJacobContestDisplay

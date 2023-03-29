@@ -48,7 +48,7 @@ class TabListData {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
             result.add(LorenzUtils.stripVanillaMessage(name))
         }
-        return result
+        return result.dropLast(1)
     }
 
     private var ticks = 0
