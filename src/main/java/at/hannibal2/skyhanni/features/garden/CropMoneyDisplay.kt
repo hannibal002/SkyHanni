@@ -100,14 +100,7 @@ class CropMoneyDisplay {
         }
 
         var number = 0
-
-
-//        val help = moneyPerHourData.map { it.key to it.value.max() }
-        val help = mutableMapOf<String, Double>()
-        for ((name, array) in moneyPerHourData) {
-            help[name] = array.max()
-        }
-
+        val help = moneyPerHourData.mapValues  { (_, value) -> value.max() }
         for (internalName in help.sortedDesc().keys) {
             number++
             val cropName = cropNames[internalName]!!
