@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -20,7 +21,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.*
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -223,8 +223,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun render(display: MutableList<List<Any>>) {
         val done = quests.count { it.state == QuestState.COLLECTED }
-        display.add(Collections.singletonList(""))
-        display.add(Collections.singletonList("§7Daily Quests (§e$done§8/§e5 collected§7)"))
+        display.addAsSingletonList("")
+        display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
             quests.mapTo(display) { renderQuest(it) }
         }

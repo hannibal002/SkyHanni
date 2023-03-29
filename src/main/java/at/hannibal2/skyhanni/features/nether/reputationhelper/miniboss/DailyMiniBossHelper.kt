@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
 import java.util.regex.Pattern
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -75,15 +75,15 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
     fun render(display: MutableList<List<Any>>) {
         val done = miniBosses.count { it.doneToday }
-        display.add(Collections.singletonList(""))
-        display.add(Collections.singletonList("§7Daily Bosses (§e$done§8/§e5 killed§7)"))
+        display.addAsSingletonList("")
+        display.addAsSingletonList("§7Daily Bosses (§e$done§8/§e5 killed§7)")
         if (done != 5) {
             for (miniBoss in miniBosses) {
                 val result = if (miniBoss.doneToday) "§aDone" else "§bTodo"
                 val displayName = miniBoss.displayName
                 val displayItem = miniBoss.displayItem
                 if (displayItem == null) {
-                    display.add(Collections.singletonList("  $displayName: $result"))
+                    display.addAsSingletonList("  $displayName: $result")
                 } else {
                     val lineList = mutableListOf<Any>()
                     lineList.add(" ")

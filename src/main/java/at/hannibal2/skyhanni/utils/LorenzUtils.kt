@@ -14,6 +14,7 @@ import net.minecraft.util.ChatComponentText
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.*
 
 object LorenzUtils {
 
@@ -166,4 +167,8 @@ object LorenzUtils {
     }
 
     fun getPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
+
+    fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
+        add(Collections.singletonList(text))
+    }
 }

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyK
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
@@ -15,7 +16,6 @@ import com.google.gson.JsonObject
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.*
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
@@ -79,7 +79,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         //TODO test
         if (factionType == FactionType.NONE) return
 
-        newList.add(Collections.singletonList("Reputation Helper:"))
+        newList.addAsSingletonList("Reputation Helper:")
         questHelper.render(newList)
         miniBossHelper.render(newList)
         if (factionType == FactionType.MAGE) {

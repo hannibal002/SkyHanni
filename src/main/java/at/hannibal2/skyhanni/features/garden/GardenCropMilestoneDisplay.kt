@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.setSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -330,7 +331,7 @@ class GardenCropMilestoneDisplay {
         }
 
         if (needsInventory) {
-            newList.add(Collections.singletonList("§cOpen §e/cropmilestones §cto update!"))
+            newList.addAsSingletonList("§cOpen §e/cropmilestones §cto update!")
         }
 
         return newList

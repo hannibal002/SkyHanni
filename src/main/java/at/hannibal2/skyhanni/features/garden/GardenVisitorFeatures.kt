@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -25,7 +26,6 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.*
 import java.util.regex.Pattern
 
 class GardenVisitorFeatures {
@@ -113,7 +113,7 @@ class GardenVisitorFeatures {
             }
         }
         if (requiredItems.isNotEmpty()) {
-            newDisplay.add(Collections.singletonList("§7Visitor items needed:"))
+            newDisplay.addAsSingletonList("§7Visitor items needed:")
             for ((internalName, amount) in requiredItems) {
                 val name = NEUItems.getItemStack(internalName).name!!
                 val itemStack = NEUItems.getItemStack(internalName)
@@ -134,11 +134,11 @@ class GardenVisitorFeatures {
         }
         if (newVisitors.isNotEmpty()) {
             if (requiredItems.isNotEmpty()) {
-                newDisplay.add(Collections.singletonList(""))
+                newDisplay.addAsSingletonList("")
             }
             val amount = newVisitors.size
             val visitorLabel = if (amount == 1) "visitor" else "visitors"
-            newDisplay.add(Collections.singletonList("§e$amount §7new $visitorLabel:"))
+            newDisplay.addAsSingletonList("§e$amount §7new $visitorLabel:")
             for (visitor in newVisitors) {
                 val displayName = GardenVisitorColorNames.getColoredName(visitor)
 

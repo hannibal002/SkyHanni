@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -16,7 +17,6 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.*
 
 class CropMoneyDisplay {
     private var display = mutableListOf<List<Any>>()
@@ -66,24 +66,22 @@ class CropMoneyDisplay {
         }
 
         if (!ready) {
-            newDisplay.add(Collections.singletonList(title))
-            newDisplay.add(Collections.singletonList("§eLoading..."))
+            newDisplay.addAsSingletonList(title)
+            newDisplay.addAsSingletonList("§eLoading...")
             return newDisplay
         }
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
 
-        newDisplay.add(
-            Collections.singletonList(
-                if (config.moneyPerHourAdvancedStats) {
-                    "$title §7(§eSell Offer§7/§eInstant Sell§7/§eNpc Price§7)"
-                } else if (LorenzUtils.noTradeMode) {
-                    "$title §7(§eNpc Price§7)"
-                } else {
-                    "$title §7(§eSell Offer§7)"
-                }
-            )
+        newDisplay.addAsSingletonList(
+            if (config.moneyPerHourAdvancedStats) {
+                "$title §7(§eSell Offer§7/§eInstant Sell§7/§eNpc Price§7)"
+            } else if (LorenzUtils.noTradeMode) {
+                "$title §7(§eNpc Price§7)"
+            } else {
+                "$title §7(§eSell Offer§7)"
+            }
         )
 
         val moneyPerHourData = calculateMoneyPerHour()
@@ -92,12 +90,12 @@ class CropMoneyDisplay {
                 val message = "money/hr empty but speed data not empty, retry"
                 LorenzUtils.debug(message)
                 println(message)
-                newDisplay.add(Collections.singletonList("§eStill Loading..."))
+                newDisplay.addAsSingletonList("§eStill Loading...")
                 ready = false
                 loaded = false
                 return newDisplay
             }
-            newDisplay.add(Collections.singletonList("§cFarm crops to add them to this list!"))
+            newDisplay.addAsSingletonList("§cFarm crops to add them to this list!")
             return newDisplay
         }
 
