@@ -49,7 +49,7 @@
 - Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and collection level)
 - Sack name (show short name of sacks)
 - Anvil Combine Helper (When putting an enchanted book into the first slot of the anvil, all items with the same enchantment are highlighted in the inventory)
-- Added compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
+- compact star counter on all items (not only on items with dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
 - RNG meter features (in the catacombs RNG meter inventory show the dungeon floor number and highlight floors without a drop selected and highlighting the selected drop in the RNG meter inventory for slayer or catacombs)
 + Show the tuning stats in the Thaumaturgy inventory.
 + Show the amount of selected tuning points in the stats tuning inventory.
@@ -190,12 +190,13 @@
 + Farming contest timer.
 + Wrong fungi cutter mode warning.
 + Show the price per garden experience inside the visitor gui.
-+ Support for mushroom cow pet perk. (Counting and updating mushroom collection when breaking crops with mushroom blocks, added extra gui for time till crop milestones)
++ Support for mushroom cow pet perk. (Counting and updating mushroom collection when breaking crops with mushroom blocks, extra gui for time till crop milestones)
 + Blocks/Second display in crop milestone gui.
 + Farming armor drops counter
 + **Colored Name** - Show the visitor name in the color of the rarity.
 + **Visitor Item Preview** - Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
-+ Added **Teleport Pad Compact Name** - Hide the 'Warp to' and 'No Destination' texts over teleport pads.
++ **Teleport Pad Compact Name** - Hide the 'Warp to' and 'No Destination' texts over teleport pads.
++ Money per Hour Advanced stats - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

@@ -14,9 +14,15 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
 
     companion object {
         private val itemNames = mutableMapOf<String, String>()
+        private val npcPrices = mutableMapOf<String, Double>()
 
         var lastTime = 0L
         var currentlyUpdating = false
+
+        fun resetItemNames() {
+            LorenzUtils.chat("§e[SkyHanni] Reloading the hypixel item api..")
+            itemNames.clear()
+        }
     }
 
     private fun loadItemNames(): Boolean {
@@ -28,6 +34,17 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 val name = jsonObject["name"].asString
                 val id = jsonObject["id"].asString
                 itemNames[id] = name.removeColor()
+//                if (id.lowercase().contains("redstone")) {
+                    if (jsonObject.has("npc_sell_price")) {
+//                        println(" ")
+//                        println("name: $name")
+//                        println("id: $id")
+                        val npcPrice = jsonObject["npc_sell_price"].asDouble
+//                        println("npcPrice: $npcPrice")
+                        npcPrices[id] = npcPrice
+                    }
+//                    println("jsonObject: $jsonObject")
+//                }
             }
             currentlyUpdating = false
             return true
@@ -94,7 +111,8 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
 
             val itemName = getItemName(apiName)
             if (itemName == null) {
-                LorenzUtils.warning("§c[SkyHanni] bazaar item '$apiName' not found! Try restarting your minecraft to fix this.")
+                LorenzUtils.warning("§c[SkyHanni] bazaar item '$apiName' not found!")
+                resetItemNames()
                 continue
             }
 
@@ -109,7 +127,18 @@ internal class BazaarDataGrabber(private var bazaarMap: MutableMap<String, Bazaa
                 apiName = text
             }
 
-            val data = BazaarData(apiName, itemName, sellPrice, buyPrice, buyMovingWeek, sellMovingWeek)
+            val npcPrice = npcPrices[apiName] ?: -1.0
+//            if (npcPrice == -1.0) {
+//            if (apiName.lowercase().contains("carrot")) {
+//                println(" ")
+//                println("BazaarData")
+//                println("itemName: '$itemName'")
+//                println("apiName: '$apiName'")
+//                println("npc price: $npcPrice")
+//            }
+//            }
+
+            val data = BazaarData(apiName, itemName, sellPrice, buyPrice, npcPrice, buyMovingWeek, sellMovingWeek)
             bazaarMap[itemName] = data
         }
         BazaarUpdateEvent(bazaarMap).postAndCatch()

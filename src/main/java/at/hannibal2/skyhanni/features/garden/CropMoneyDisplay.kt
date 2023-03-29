@@ -60,20 +60,31 @@ class CropMoneyDisplay {
         val newDisplay = mutableListOf<List<Any>>()
 
         val title = if (config.moneyPerHourCompact) {
-            Collections.singletonList("§7Money/hour:")
+            "§7Money/hour:"
         } else {
-            Collections.singletonList("§7Money per hour when selling:")
+            "§7Money per hour when selling:"
         }
 
         if (!ready) {
-            newDisplay.add(title)
+            newDisplay.add(Collections.singletonList(title))
             newDisplay.add(Collections.singletonList("§eLoading..."))
             return newDisplay
         }
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
-        newDisplay.add(title)
+
+        newDisplay.add(
+            Collections.singletonList(
+                if (config.moneyPerHourAdvancedStats) {
+                    "$title §7(§eSell Offer§7/§eInstant Sell§7/§eNpc Price§7)"
+                } else if (LorenzUtils.noTradeMode) {
+                    "$title §7(§eNpc Price§7)"
+                } else {
+                    "$title §7(§eSell Offer§7)"
+                }
+            )
+        )
 
         val moneyPerHourData = calculateMoneyPerHour()
         if (moneyPerHourData.isEmpty()) {
@@ -91,7 +102,15 @@ class CropMoneyDisplay {
         }
 
         var number = 0
-        for ((internalName, moneyPerHour) in moneyPerHourData.sortedDesc()) {
+
+
+//        val help = moneyPerHourData.map { it.key to it.value.max() }
+        val help = mutableMapOf<String, Double>()
+        for ((name, array) in moneyPerHourData) {
+            help[name] = array.max()
+        }
+
+        for (internalName in help.sortedDesc().keys) {
             number++
             val cropName = cropNames[internalName]!!
             val isCurrent = cropName == GardenAPI.cropInHand
@@ -115,13 +134,24 @@ class CropMoneyDisplay {
                 list.add("$currentColor$contestFormat$itemName§7: ")
             }
 
-
-            val format = if (config.moneyPerHourCompactPrice) {
-                NumberUtil.format(moneyPerHour)
+            val coinsColor = if (isCurrent && config.moneyPerHourCompact) "§e" else "§6"
+            val moneyArray = moneyPerHourData[internalName]!!
+            if (config.moneyPerHourAdvancedStats) {
+                for (price in moneyArray) {
+                    val format = format(price)
+                    list.add("$coinsColor$format")
+                    list.add("§7/")
+                }
+                list.removeLast()
+            } else if (LorenzUtils.noTradeMode) {
+                // Show npc price
+                val format = format(moneyArray[2])
+                list.add("$coinsColor$format")
             } else {
-                LorenzUtils.formatInteger(moneyPerHour.toLong())
+                val format = format(moneyArray[0])
+                list.add("$coinsColor$format")
             }
-            list.add("§6$format")
+
 
             newDisplay.add(list)
         }
@@ -129,22 +159,35 @@ class CropMoneyDisplay {
         return newDisplay
     }
 
-    private fun calculateMoneyPerHour(): Map<String, Double> {
-        val moneyPerHours = mutableMapOf<String, Double>()
+    private fun format(moneyPerHour: Double) = if (config.moneyPerHourCompactPrice) {
+        NumberUtil.format(moneyPerHour)
+    } else {
+        LorenzUtils.formatInteger(moneyPerHour.toLong())
+    }
+
+    // sell offer -> instant sell -> npc
+    private fun calculateMoneyPerHour(): Map<String, Array<Double>> {
+        val moneyPerHours = mutableMapOf<String, Array<Double>>()
         for ((internalName, amount) in multipliers) {
-            val price = NEUItems.getPrice(internalName)
             val crop = cropNames[internalName]!!
             val speed = crop.getSpeed()
             // No speed data for item in hand
             if (speed == -1) continue
 
-            // Price not found
-            if (price == -1.0) continue
-
             val speedPerHr = speed.toDouble() * 60 * 60
             val blocksPerHour = speedPerHr / amount.toDouble()
-            val moneyPerHour = price * blocksPerHour
-            moneyPerHours[internalName] = moneyPerHour
+
+            val bazaarData = BazaarApi.getBazaarDataForInternalName(internalName) ?: continue
+
+            val npcPrice = bazaarData.npcPrice * blocksPerHour
+//            if (LorenzUtils.noTradeMode) {
+//                moneyPerHours[internalName] = arrayOf(npcPrice)
+//            } else {
+            val sellOffer = bazaarData.buyPrice * blocksPerHour
+            val instantSell = bazaarData.sellPrice * blocksPerHour
+            moneyPerHours[internalName] = arrayOf(sellOffer, instantSell, npcPrice)
+//            }
+
         }
         return moneyPerHours
     }

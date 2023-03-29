@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -41,6 +42,17 @@ object NEUItems {
     }
 
     fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double {
+        val bazaarData = BazaarApi.getBazaarDataForInternalName(internalName)
+        bazaarData?.let {
+            val buyPrice = it.buyPrice
+            if (buyPrice > 0) return buyPrice
+
+            val sellPrice = it.sellPrice
+            if (sellPrice > 0) return sellPrice
+
+            return it.npcPrice
+        }
+
         val result = manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
         // TODO remove workaround
         if (result == -1.0) {
