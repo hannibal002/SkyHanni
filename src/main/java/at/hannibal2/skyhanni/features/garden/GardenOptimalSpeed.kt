@@ -13,6 +13,7 @@ import java.util.regex.Pattern
 
 class GardenOptimalSpeed {
     private val config get() = SkyHanniMod.feature.garden
+    private val configCustomSpeed get() = config.optimalSpeedCustom
     private var currentSpeed = 100
     private var optimalSpeed = -1
     private val currentSpeedPattern = Pattern.compile(" Speed: §r§f✦(.*)")
@@ -38,16 +39,16 @@ class GardenOptimalSpeed {
     }
 
     private fun CropType.getOptimalSpeed() = when (this) {
-        CropType.WHEAT -> 93
-        CropType.CARROT -> 93
-        CropType.POTATO -> 93
-        CropType.PUMPKIN -> 155
-        CropType.SUGAR_CANE -> 328
-        CropType.MELON -> 155
-        CropType.CACTUS -> 400 // 500 with racing helmet
-        CropType.COCOA_BEANS -> 155
-        CropType.MUSHROOM -> 233
-        CropType.NETHER_WART -> 93
+        CropType.WHEAT -> configCustomSpeed.wheat
+        CropType.CARROT -> configCustomSpeed.carrot
+        CropType.POTATO -> configCustomSpeed.potato
+        CropType.NETHER_WART -> configCustomSpeed.netherWart
+        CropType.PUMPKIN ->  configCustomSpeed.pumpkin
+        CropType.MELON ->  configCustomSpeed.melon
+        CropType.COCOA_BEANS -> configCustomSpeed.cocoaBeans
+        CropType.SUGAR_CANE -> configCustomSpeed.sugarCane
+        CropType.CACTUS -> configCustomSpeed.cactus
+        CropType.MUSHROOM -> configCustomSpeed.mushroom
     }
 
     @SubscribeEvent
