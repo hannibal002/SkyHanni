@@ -32,7 +32,7 @@ public class Garden {
 //    @ConfigOption(name = "Copper Price Position", desc = "")
 //    @ConfigEditorButton(runnableId = "skyMartCopperPrice", buttonText = "Edit")
 //    @ConfigAccordionId(id = 0)
-    public Position skyMartCopperPricePos = new Position(188, -105, false, true);
+    public Position skyMartCopperPricePos = new Position(211, 132, false, true);
 
     @Expose
     @ConfigOption(name = "Visitor", desc = "")
@@ -551,7 +551,7 @@ public class Garden {
 //    @ConfigOption(name = "Jacob Contest Position", desc = "")
 //    @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
 //    @ConfigAccordionId(id = 14)
-    public Position nextJacobContestPos = new Position(-113, -240, false, true);
+    public Position nextJacobContestPos = new Position(-278, 11, false, true);
 
     @Expose
     @ConfigOption(name = "Farming Armor Drops", desc = "")
