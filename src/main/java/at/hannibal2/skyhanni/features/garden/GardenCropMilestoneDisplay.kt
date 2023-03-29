@@ -117,7 +117,8 @@ class GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
-        // TODO remove try catch
+        if (!GardenAPI.inGarden()) return
+
         try {
             val item = event.itemStack
             val counter = GardenAPI.readCounter(item)
