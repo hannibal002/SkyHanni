@@ -27,9 +27,6 @@ public class Summonings {
     public boolean summoningMobDisplay = false;
 
     @Expose
-//    @ConfigOption(name = "Summoning Mob Display Position", desc = "")
-//    @ConfigEditorButton(runnableId = "summoningMobDisplay", buttonText = "Edit")
-//    @ConfigAccordionId(id = 0)
     public Position summoningMobDisplayPos = new Position(10, 10, false, true);
 
     @Expose

@@ -18,8 +18,6 @@ public class Bazaar {
     public boolean bestSellMethod = false;
 
     @Expose
-//    @ConfigOption(name = "Best Sell Method Position", desc = "")
-//    @ConfigEditorButton(runnableId = "bestSellMethod", buttonText = "Edit")
     public Position bestSellMethodPos = new Position(10, 10, false, true);
 
     @Expose
@@ -33,7 +31,5 @@ public class Bazaar {
     public boolean updateTimer = false;
 
     @Expose
-//    @ConfigOption(name = "Update timer Position", desc = "")
-//    @ConfigEditorButton(runnableId = "bazzarUpdateTimer", buttonText = "Edit")
     public Position updateTimerPos = new Position(10, 10, false, true);
 }
