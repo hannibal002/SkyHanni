@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnabl
 import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.features.bazaar.BazaarDataGrabber
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -54,6 +55,7 @@ object Commands {
         registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
         registerCommand("shsetapikey") { ApiDataLoader.command(it) }
         registerCommand("shtestgardenvisitors") { LorenzTest.testGardenVisitors() }
+        registerCommand("shresetitemnames") { BazaarDataGrabber.resetItemNames() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

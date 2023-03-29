@@ -510,6 +510,13 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourCompactPrice = false;
+    @Expose
+    @ConfigOption(
+            name = "Advanced stats",
+            desc = "Show not only Sell Offer price but also Instant Sell price and NPC Sell price.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourAdvancedStats = false;
 
     @Expose
 //    @ConfigOption(name = "Money per hour Position", desc = "")
