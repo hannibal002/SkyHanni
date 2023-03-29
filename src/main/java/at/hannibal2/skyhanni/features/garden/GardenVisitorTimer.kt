@@ -16,7 +16,7 @@ class GardenVisitorTimer {
     private var lastVisitors = 0
 
     @SubscribeEvent
-    fun onTick(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
         var visitorsAmount = 0

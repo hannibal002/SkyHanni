@@ -220,14 +220,12 @@ class GardenCropMilestoneDisplay {
         currentSpeed = 0
 
         lastBlocksPerSecond = blocksBroken
-        val hasMushroomCow = hasMushroomCow()
-        if (hasMushroomCow) {
+        if (GardenAPI.mushroomCowPet) {
             CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
         }
         blocksBroken = 0
     }
 
-    private fun hasMushroomCow() = SkyHanniMod.feature.hidden.currentPet.contains("Mooshroom Cow")
 
     private fun calculateSpeed(addedCounter: Int) {
         currentSpeed += addedCounter
@@ -313,8 +311,7 @@ class GardenCropMilestoneDisplay {
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$lastBlocksPerSecond")
 
-
-            if (hasMushroomCow() && crop != CropType.MUSHROOM) {
+            if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
                 addMushroomCowData()
             }
         }
