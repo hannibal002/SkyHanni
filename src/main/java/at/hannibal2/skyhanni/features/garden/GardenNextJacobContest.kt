@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -27,6 +24,27 @@ class GardenNextJacobContest {
 
     private val maxContestsPerYear = 124
     private val contestDuration = 1_000 * 60 * 20
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (!isEnabled()) return
+
+        var next = false
+        val newList = mutableListOf<String>()
+        for (line in event.tabList) {
+            if (line == "§b§lComposter:") {
+                newList.add(line)
+                next = true
+                continue
+            }
+            if (next) {
+                if (line == "") break
+                newList.add(line)
+            }
+        }
+
+        display = newList
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -137,6 +155,7 @@ class GardenNextJacobContest {
         }
 
         if (contests.isEmpty()) {
+
             list.add("§cOpen calendar to read jacob contest times!")
             return list
         }

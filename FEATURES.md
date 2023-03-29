@@ -196,8 +196,9 @@
 + **Colored Name** - Show the visitor name in the color of the rarity.
 + **Visitor Item Preview** - Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
 + **Teleport Pad Compact Name** - Hide the 'Warp to' and 'No Destination' texts over teleport pads.
-+ Money per Hour Advanced stats - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
-+ Added Anita Medal Profit - Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
++ **Money per Hour Advanced stats** - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
++ **Anita Medal Profit** - Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
++ **Composter Compact Display** - Displays the compost data from the tab list in a compact form as gui element.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
