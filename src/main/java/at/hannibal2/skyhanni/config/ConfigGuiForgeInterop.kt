@@ -22,7 +22,7 @@ class ConfigGuiForgeInterop : IModGuiFactory {
     override fun getHandlerFor(runtimeOptionCategoryElement: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? =
         null
 
-    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(MoulConfigEditor(SkyHanniMod.configManager.processor)) {
+    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.configEditor) {
         @Throws(IOException::class)
         override fun handleKeyboardInput() {
             if (Keyboard.getEventKeyState() && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
