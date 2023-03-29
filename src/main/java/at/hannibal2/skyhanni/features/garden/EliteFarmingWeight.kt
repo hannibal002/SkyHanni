@@ -160,7 +160,8 @@ class EliteFarmingWeight {
             val weightUntilOvertake = nextPlayerWeight - totalWeight
             if (weightUntilOvertake < 0) {
                 if (!hasPassedNext) {
-                    if (weightPerSecond != -1.0) {
+                    if (weightPerSecond > 0) {
+                        LorenzUtils.debug("weightPerSecond: '$weightPerSecond'")
                         LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
                     }
                     if (leaderboardPosition == -1) {
