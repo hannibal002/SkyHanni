@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import io.github.moulberry.moulconfig.observer.Observer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -27,7 +29,7 @@ class HideArmor {
 
         fixOtherArmor()
 
-        if (!SkyHanniMod.feature.misc.hideArmorEnabled) return
+        if (!SkyHanniMod.feature.misc.hideArmorEnabled.get()) return
 
         val currentScreen = Minecraft.getMinecraft().currentScreen
         if (currentScreen == null || currentScreen !is GuiInventory) {
@@ -45,6 +47,15 @@ class HideArmor {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigLoaded(event: ConfigLoadEvent) {
+        val observer = Observer<Boolean> { a, b -> updateArmor() }
+        SkyHanniMod.feature.misc.hideArmorEnabled.whenChanged(observer)
+        SkyHanniMod.feature.misc.hideArmorOwn.whenChanged(observer)
+        SkyHanniMod.feature.misc.hideArmorOnlyHelmet.whenChanged(observer)
+    }
+
+
     // Since S04PacketEntityEquipment gets sent before the entity is fully loaded, I need to remove the armor later
     private fun fixOtherArmor() {
         for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
@@ -54,10 +65,10 @@ class HideArmor {
             if (entityId !in laterCheck) continue
 
             laterCheck.remove(entityId)
-            if (SkyHanniMod.feature.misc.hideArmorEnabled) {
+            if (SkyHanniMod.feature.misc.hideArmorEnabled.get()) {
                 val armorInventory = entity.inventory.armorInventory
                 for ((equipmentSlot, _) in armorInventory.withIndex()) {
-                    if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet || equipmentSlot == 3) {
+                    if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet.get() || equipmentSlot == 3) {
                         armorInventory[equipmentSlot] = null
                     }
                 }
@@ -86,9 +97,9 @@ class HideArmor {
 
                 val currentScreen = Minecraft.getMinecraft().currentScreen
                 if (currentScreen == null || currentScreen !is GuiInventory) {
-                    if (SkyHanniMod.feature.misc.hideArmorEnabled) {
-                        if (SkyHanniMod.feature.misc.hideArmorOwn) {
-                            if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet || armorSlot == 3) {
+                    if (SkyHanniMod.feature.misc.hideArmorEnabled.get()) {
+                        if (SkyHanniMod.feature.misc.hideArmorOwn.get()) {
+                            if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet.get() || armorSlot == 3) {
                                 packet.itemStacks[slot] = null
                             }
                         }
@@ -115,9 +126,9 @@ class HideArmor {
 
             val currentScreen = Minecraft.getMinecraft().currentScreen
             if (currentScreen == null || currentScreen !is GuiInventory) {
-                if (SkyHanniMod.feature.misc.hideArmorEnabled) {
-                    if (SkyHanniMod.feature.misc.hideArmorOwn) {
-                        if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet || armorSlot == 3) {
+                if (SkyHanniMod.feature.misc.hideArmorEnabled.get()) {
+                    if (SkyHanniMod.feature.misc.hideArmorOwn.get()) {
+                        if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet.get() || armorSlot == 3) {
                             event.isCanceled = true
                         }
                     }
@@ -146,8 +157,8 @@ class HideArmor {
             // set item in cache
             armor[equipmentSlot] = packet.itemStack
 
-            if (SkyHanniMod.feature.misc.hideArmorEnabled) {
-                if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet || equipmentSlot == 3) {
+            if (SkyHanniMod.feature.misc.hideArmorEnabled.get()) {
+                if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet.get() || equipmentSlot == 3) {
                     event.isCanceled = true
                 }
             }
@@ -177,7 +188,7 @@ class HideArmor {
                     changeArmor(entity, it)
                 }
 
-                if (SkyHanniMod.feature.misc.hideArmorEnabled) {
+                if (SkyHanniMod.feature.misc.hideArmorEnabled.get()) {
                     changeArmor(entity, null)
                 }
             }
@@ -195,13 +206,13 @@ class HideArmor {
                 return
             }
 
-            if (!SkyHanniMod.feature.misc.hideArmorOwn) {
+            if (!SkyHanniMod.feature.misc.hideArmorOwn.get()) {
                 if (entity is EntityPlayerSP) {
                     return
                 }
             }
 
-            if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet) {
+            if (!SkyHanniMod.feature.misc.hideArmorOnlyHelmet.get()) {
                 current[0] = null
                 current[1] = null
                 current[2] = null

@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigAccordionId;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorAccordion;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigEditorBoolean;
-import at.hannibal2.skyhanni.config.core.config.annotations.ConfigOption;
 import com.google.gson.annotations.Expose;
+import io.github.moulberry.moulconfig.Overlay;
+import io.github.moulberry.moulconfig.annotations.*;
 
 public class Bingo {
 

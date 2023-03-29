@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config
 
-import at.hannibal2.skyhanni.config.core.GuiScreenElementWrapper
+import at.hannibal2.skyhanni.SkyHanniMod
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
+import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.client.IModGuiFactory
@@ -20,7 +22,7 @@ class ConfigGuiForgeInterop : IModGuiFactory {
     override fun getHandlerFor(runtimeOptionCategoryElement: RuntimeOptionCategoryElement): RuntimeOptionGuiHandler? =
         null
 
-    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigEditor.editor) {
+    class WrappedSkyHanniConfig(private val parent: GuiScreen) : GuiScreenElementWrapper(ConfigGuiManager.configEditor) {
         @Throws(IOException::class)
         override fun handleKeyboardInput() {
             if (Keyboard.getEventKeyState() && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
