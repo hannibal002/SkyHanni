@@ -77,9 +77,6 @@ public class Minions {
     public boolean hopperProfitDisplay = true;
 
     @Expose
-//    @ConfigOption(name = "Best Sell Method Position", desc = "")
-//    @ConfigEditorButton(runnableId = "hopperProfitDisplay", buttonText = "Edit")
-//    @ConfigAccordionId(id = 2)
     public Position hopperProfitPos = new Position(10, 10, false, true);
 
     @Expose

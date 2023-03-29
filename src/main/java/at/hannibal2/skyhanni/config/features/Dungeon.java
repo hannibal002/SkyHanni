@@ -25,9 +25,6 @@ public class Dungeon {
     public boolean showMilestonesDisplay = false;
 
     @Expose
-//    @ConfigOption(name = "Milestone Display Position", desc = "")
-//    @ConfigEditorButton(runnableId = "dungeonMilestonesDisplay", buttonText = "Edit")
-//    @ConfigAccordionId(id = 0)
     public Position showMileStonesDisplayPos = new Position(10, 10, false, true);
 
     @ConfigOption(name = "Death Counter", desc = "")
@@ -41,9 +38,6 @@ public class Dungeon {
     public boolean deathCounterDisplay = false;
 
     @Expose
-//    @ConfigOption(name = "Death Counter Position", desc = "")
-//    @ConfigEditorButton(runnableId = "dungeonDeathCounter", buttonText = "Edit")
-//    @ConfigAccordionId(id = 1)
     public Position deathCounterPos = new Position(10, 10, false, true);
 
     @ConfigOption(name = "Clean End", desc = "")
@@ -147,9 +141,6 @@ public class Dungeon {
     public boolean copilotEnabled = false;
 
     @Expose
-//    @ConfigOption(name = "Copilot Pos", desc = "")
-//    @ConfigEditorButton(runnableId = "dungeonCopilot", buttonText = "Edit")
-//    @ConfigAccordionId(id = 5)
     public Position copilotPos = new Position(10, 10, false, true);
 
     @ConfigOption(name = "Party Finder", desc = "")

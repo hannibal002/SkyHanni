@@ -84,9 +84,6 @@ public class Fishing {
     public boolean barnTimer = true;
 
     @Expose
-//    @ConfigOption(name = "Fishing Timer Location", desc = "")
-//    @ConfigEditorButton(runnableId = "barnTimer", buttonText = "Edit")
-//    @ConfigAccordionId(id = 2)
     public Position barnTimerPos = new Position(10, 10, false, true);
 
     @Expose
@@ -113,9 +110,6 @@ public class Fishing {
     public boolean sharkFishCounter = false;
 
     @Expose
-//    @ConfigOption(name = "Shark Location", desc = "")
-//    @ConfigEditorButton(runnableId = "sharkFishCounter", buttonText = "Edit")
-//    @ConfigAccordionId(id = 3)
     public Position sharkFishCounterPos = new Position(10, 10, false, true);
 
     @Expose

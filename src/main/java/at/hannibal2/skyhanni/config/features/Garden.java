@@ -72,9 +72,6 @@ public class Garden {
     public boolean visitorNeedsDisplay = true;
 
     @Expose
-//    @ConfigOption(name = "Items Needed Position", desc = "")
-//    @ConfigEditorButton(runnableId = "visitorNeeds", buttonText = "Edit")
-//    @ConfigAccordionId(id = 3)
     public Position visitorNeedsPos = new Position(155, -57, false, true);
 
     @Expose
@@ -210,9 +207,6 @@ public class Garden {
     public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
     @Expose
-//    @ConfigOption(name = "Display Position", desc = "")
-//    @ConfigEditorButton(runnableId = "cropMilestoneProgress", buttonText = "Edit")
-//    @ConfigAccordionId(id = 6)
     public Position cropMilestoneProgressDisplayPos = new Position(376, 19, false, true);
 
     @Expose
@@ -258,9 +252,6 @@ public class Garden {
     public boolean cropMilestoneBestAlwaysOn = false;
 
     @Expose
-//    @ConfigOption(name = "Display Position", desc = "")
-//    @ConfigEditorButton(runnableId = "cropMilestoneNext", buttonText = "Edit")
-//    @ConfigAccordionId(id = 7)
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
 
     @Expose
@@ -296,9 +287,6 @@ public class Garden {
     public List<Integer> cropMilestoneMushroomPetPerkText = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
 
     @Expose
-//    @ConfigOption(name = "Display Position", desc = "")
-//    @ConfigEditorButton(runnableId = "cropMilestoneMushroomPetPerk", buttonText = "Edit")
-//    @ConfigAccordionId(id = 15)
     public Position cropMilestoneMushroomPetPerkPos = new Position(-112, -143, false, true);
 
     // TODO moulconfig runnable support
@@ -402,9 +390,6 @@ public class Garden {
     public boolean optimalSpeedWarning = false;
 
     @Expose
-//    @ConfigOption(name = "Speed Warning Position", desc = "")
-//    @ConfigEditorButton(runnableId = "optimalSpeed", buttonText = "Edit")
-//    @ConfigAccordionId(id = 9)
     public Position optimalSpeedPos = new Position(188, -105, false, true);
 
     @Expose
@@ -419,9 +404,6 @@ public class Garden {
     public boolean gardenLevelDisplay = true;
 
     @Expose
-//    @ConfigOption(name = "Garden Level Position", desc = "")
-//    @ConfigEditorButton(runnableId = "gardenLevel", buttonText = "Edit")
-//    @ConfigAccordionId(id = 10)
     public Position gardenLevelPos = new Position(-375, -215, false, true);
 
     @Expose
@@ -438,9 +420,6 @@ public class Garden {
     public boolean eliteFarmingWeightDisplay = true;
 
     @Expose
-//    @ConfigOption(name = "Farming Weight Position", desc = "")
-//    @ConfigEditorButton(runnableId = "eliteFarmingWeight", buttonText = "Edit")
-//    @ConfigAccordionId(id = 11)
     public Position eliteFarmingWeightPos = new Position(-370, -167, false, true);
 
     @Expose
@@ -481,9 +460,6 @@ public class Garden {
     public boolean dicerCounterHideChat = false;
 
     @Expose
-//    @ConfigOption(name = "Dicer Counter Position", desc = "")
-//    @ConfigEditorButton(runnableId = "dicerCounter", buttonText = "Edit")
-//    @ConfigAccordionId(id = 12)
     public Position dicerCounterPos = new Position(16, -232, false, true);
 
     @Expose
@@ -539,9 +515,6 @@ public class Garden {
     public boolean moneyPerHourAdvancedStats = false;
 
     @Expose
-//    @ConfigOption(name = "Money per hour Position", desc = "")
-//    @ConfigEditorButton(runnableId = "moneyPerHour", buttonText = "Edit")
-//    @ConfigAccordionId(id = 13)
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
@@ -568,9 +541,6 @@ public class Garden {
     public boolean nextJacobContestOtherGuis = false;
 
     @Expose
-//    @ConfigOption(name = "Jacob Contest Position", desc = "")
-//    @ConfigEditorButton(runnableId = "nextJacobContest", buttonText = "Edit")
-//    @ConfigAccordionId(id = 14)
     public Position nextJacobContestPos = new Position(-278, 11, false, true);
 
     @Expose

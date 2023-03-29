@@ -14,8 +14,6 @@ public class Ashfang {
     public boolean freezeCooldown = false;
 
     @Expose
-//    @ConfigOption(name = "Freeze Position", desc = "")
-//    @ConfigEditorButton(runnableId = "ashfangFreezeCooldown", buttonText = "Edit")
     public Position freezeCooldownPos = new Position(10, 10, false, true);
 
     @Expose
@@ -24,8 +22,6 @@ public class Ashfang {
     public boolean nextResetCooldown = false;
 
     @Expose
-//    @ConfigOption(name = "Reset Position", desc = "")
-//    @ConfigEditorButton(runnableId = "ashfangResetCooldown", buttonText = "Edit")
     public Position nextResetCooldownPos = new Position(10, 10, false, true);
 
     @Expose

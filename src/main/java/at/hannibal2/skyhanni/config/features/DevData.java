@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.Overlay;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class DevData {
 
@@ -24,9 +26,6 @@ public class DevData {
     public boolean debugEnabled = false;
 
     @Expose
-//    @ConfigOption(name = "Debug Location", desc = "")
-//    @ConfigEditorButton(runnableId = "debugPos", buttonText = "Edit")
-//    @ConfigAccordionId(id = 0)
     public Position debugPos = new Position(10, 10, false, true);
 
     @Expose
