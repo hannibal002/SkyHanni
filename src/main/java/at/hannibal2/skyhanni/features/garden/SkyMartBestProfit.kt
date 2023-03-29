@@ -50,7 +50,7 @@ class SkyMartBestProfit {
 
                 var name = stack.name!!
                 if (name == "§fEnchanted Book") {
-                    name = "§9Sunder I"
+                    name = stack.getLore()[0]
                 }
 
                 NEUItems.getItemStackOrNull(internalName)?.let {
