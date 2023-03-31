@@ -303,11 +303,11 @@ class EliteFarmingWeight {
                 CropType.POTATO to 300_000.0,
                 CropType.SUGAR_CANE to 200_000.0,
                 CropType.NETHER_WART to 250_000.0,
-                CropType.PUMPKIN to 87_095.11,
-                CropType.MELON to 435_466.47,
-                CropType.MUSHROOM to 168_925.53,
-                CropType.COCOA_BEANS to 257_214.64,
-                CropType.CACTUS to 169_389.33,
+                CropType.PUMPKIN to 90_066.27,
+                CropType.MELON to 450_324.6,
+                CropType.MUSHROOM to 90_178.06,
+                CropType.COCOA_BEANS to 267_174.04,
+                CropType.CACTUS to 177_254.45,
             )
         }
     }
