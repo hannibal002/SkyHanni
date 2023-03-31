@@ -23,7 +23,7 @@ public class Bazaar {
     @Expose
     @ConfigOption(name = "Cancelled Buy Order Clipboard", desc = "Saves missing items from cancelled buy orders to clipboard for faster re-entry.")
     @ConfigEditorBoolean
-    public boolean cancelledBuyOrderClipboard = true;
+    public boolean cancelledBuyOrderClipboard = false;
 
     @Expose
     @ConfigOption(name = "Update Timer", desc = "A countdown timer for the next Bazaar data update.")
