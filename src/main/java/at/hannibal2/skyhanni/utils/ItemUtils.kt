@@ -150,17 +150,24 @@ object ItemUtils {
         var matcher = patternInFront.matcher(input)
         if (matcher.matches()) {
             val itemName = matcher.group("name")
-            val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
-            val pair = Pair(itemName, amount)
-            itemAmountCache[input] = pair
-            return pair
+            if (!itemName.contains("§8x")) {
+                val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
+                val pair = Pair(itemName, amount)
+                itemAmountCache[input] = pair
+                return pair
+            }
         }
 
         var string = input.trim()
         val color = string.substring(0, 2)
         string = string.substring(2)
         matcher = patternBehind.matcher(string)
-        if (!matcher.matches()) return Pair(null, 0)
+        if (!matcher.matches()) {
+            println("")
+            println("input: '$input'")
+            println("string: '$string'")
+            return Pair(null, 0)
+        }
 
         val itemName = color + matcher.group("name").trim()
         val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
