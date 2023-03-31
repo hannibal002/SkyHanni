@@ -152,7 +152,7 @@ object ItemUtils {
             val itemName = matcher.group("name")
             if (!itemName.contains("§8x")) {
                 val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
-                val pair = Pair(itemName, amount)
+                val pair = Pair(itemName.trim(), amount)
                 itemAmountCache[input] = pair
                 return pair
             }
