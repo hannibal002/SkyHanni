@@ -639,19 +639,20 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Farming Armor Drops", desc = "")
-    @ConfigEditorAccordion(id = 12)
+
+    @ConfigEditorAccordion(id = 18)
     public boolean farmingArmorDrops = false;
 
     @Expose
     @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 18)
     public boolean farmingArmorDropsEnabled = true;
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 18)
     public boolean farmingArmorDropsHideChat = false;
 
     @Expose
@@ -659,13 +660,13 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Teleport Pads", desc = "")
-    @ConfigEditorAccordion(id = 12)
+    @ConfigEditorAccordion(id = 19)
     public boolean teleportPads = false;
 
     @Expose
     @ConfigOption(name = "Compact Name", desc = "Hide the 'Warp to' and 'No Destination' texts over teleport pads.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 19)
     public boolean teleportPadsCompactName = false;
 
     @Expose
