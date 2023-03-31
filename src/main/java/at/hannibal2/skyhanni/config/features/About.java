@@ -68,5 +68,9 @@ public class About {
         @ConfigEditorButton(buttonText = "Git")
         public Runnable libAutoUpdate = () -> Utils.openUrl("https://git.nea.moe/nea/libautoupdate/");
 
+        @ConfigOption(name = "Mixin", desc = "LibAutoUpdate is available under the MIT License")
+        @ConfigEditorButton(buttonText = "GitHub")
+        public Runnable mixin = () -> Utils.openUrl("https://github.com/SpongePowered/Mixin/");
+
     }
 }
