@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import com.google.gson.GsonBuilder
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
@@ -68,6 +69,7 @@ class ConfigManager {
         val features = SkyHanniMod.feature
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
+        UpdateManager.injectConfigProcessor(processor)
         ConfigProcessorDriver.processConfig(
             features.javaClass,
             features,
