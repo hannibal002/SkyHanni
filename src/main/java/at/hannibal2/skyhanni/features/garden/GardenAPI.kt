@@ -128,15 +128,9 @@ class GardenAPI {
             return CropType.getByName(itemName)
         }
 
-        private fun getItemStackForCrop(crop: CropType): ItemStack {
-            val cropName = if (crop == CropType.MUSHROOM) "Red Mushroom Block" else crop.cropName
-            val internalName = NEUItems.getInternalName(cropName)
-            return NEUItems.getItemStack(internalName)
-        }
-
         fun addGardenCropToList(crop: CropType, list: MutableList<Any>) {
             try {
-                list.add(getItemStackForCrop(crop))
+                list.add(crop.icon)
             } catch (e: NullPointerException) {
                 e.printStackTrace()
             }
