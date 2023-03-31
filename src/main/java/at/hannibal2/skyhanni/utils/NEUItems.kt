@@ -30,6 +30,9 @@ object NEUItems {
         if (internalName == "HAY_BALE") {
             internalName = "HAY_BLOCK"
         }
+        if (internalName == null) {
+            throw Error("getInternalName is null for '$itemName'")
+        }
         itemNameCache[itemName] = internalName
         return internalName
     }
