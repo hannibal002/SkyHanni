@@ -165,6 +165,8 @@ class HyPixelData {
 
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
         val displayName = objective.displayName
-        return displayName.removeColor().contains("SKYBLOCK")
+        val scoreboardTitle = displayName.removeColor()
+        return scoreboardTitle.contains("SKYBLOCK") ||
+                scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
     }
 }
