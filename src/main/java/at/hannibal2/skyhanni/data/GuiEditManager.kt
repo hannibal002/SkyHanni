@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -24,7 +25,7 @@ class GuiEditManager {
         if (!LorenzUtils.inSkyBlock) return
 
         Minecraft.getMinecraft().currentScreen?.let {
-            if (it !is GuiInventory && it !is GuiChest) return
+            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
         }
 
         if (!Keyboard.getEventKeyState()) return

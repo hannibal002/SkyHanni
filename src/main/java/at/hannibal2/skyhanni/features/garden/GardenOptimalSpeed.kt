@@ -7,7 +7,15 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.util.ChatComponentText
+import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -19,6 +27,7 @@ class GardenOptimalSpeed {
     private val currentSpeedPattern = Pattern.compile(" Speed: §r§f✦(.*)")
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
+    private var rancherOverlayList: List<List<Any?>> = emptyList()
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -28,6 +37,35 @@ class GardenOptimalSpeed {
                 currentSpeed = matcher.group(1).toInt()
             }
         }
+    }
+
+
+    @SubscribeEvent
+    fun onGuiOpen(event: GuiOpenEvent) {
+        rancherOverlayList = CropType.values().map { crop ->
+            listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
+                val gui = Minecraft.getMinecraft().currentScreen
+                if (gui !is GuiEditSign) return@link
+                gui as AccessorGuiEditSign
+                gui.tileSign.signText[0] = ChatComponentText("${crop.getOptimalSpeed()}")
+            })
+        }
+    }
+
+    @SubscribeEvent
+    fun onGuiRender(event: DrawScreenEvent.Post) {
+        if (!isRancherOverlayEnabled()) return
+        val gui = event.gui
+        if (gui !is GuiEditSign) return
+        gui as AccessorGuiEditSign
+        if (gui.tileSign.signText[1].unformattedText.removeColor() != "^^^^^^"
+            || gui.tileSign.signText[2].unformattedText.removeColor() != "Set your"
+            || gui.tileSign.signText[3].unformattedText.removeColor() != "speed cap!"
+        ) return
+        config.optimalSpeedSignPosition.renderStringsAndItems(
+            rancherOverlayList,
+            posLabel = "Optimal Speed Rancher Overlay"
+        )
     }
 
     @SubscribeEvent
@@ -75,5 +113,6 @@ class GardenOptimalSpeed {
         }
     }
 
+    private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.optimalSpeedSignEnabled
     private fun isEnabled() = GardenAPI.inGarden() && config.optimalSpeedEnabled
 }

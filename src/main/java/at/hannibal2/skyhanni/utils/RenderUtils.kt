@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
-import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
@@ -517,27 +516,17 @@ object RenderUtils {
     }
 
     private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
-        val renderer = Minecraft.getMinecraft().fontRendererObj
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(getAbsX().toFloat(), (getAbsY() + offsetY).toFloat(), 0F)
         var offsetX = 0
         for (any in line) {
-            if (any == null) {
-                offsetX += 12
-                continue
-            }
-            if (any is String) {
-                renderString0(any, offsetX, offsetY)
-                val width = renderer.getStringWidth(any)
-                offsetX += width
-            } else if (any is ItemStack) {
-                val isX = getAbsX() + offsetX
-                val isY = getAbsY() + offsetY
+            val renderable = Renderable.fromAny(any, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: ${any}")
 
-                any.renderOnScreen(isX.toFloat(), isY.toFloat(), itemScale)
-                offsetX += 12
-            } else {
-                throw RuntimeException("Unknown render object: $any")
-            }
+            renderable.render(getAbsX() + offsetX, getAbsY() + offsetY)
+            offsetX += renderable.width
+            GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
         }
+        GlStateManager.popMatrix()
         return offsetX
     }
 
