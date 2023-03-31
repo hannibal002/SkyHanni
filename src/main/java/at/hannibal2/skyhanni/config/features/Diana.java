@@ -25,6 +25,7 @@ public class Diana {
 
     @Expose
     @ConfigOption(name = "Griffin Burrows", desc = "")
+    @ConfigEditorBoolean
     public boolean griffinBurrows = false;
 
     @Expose
