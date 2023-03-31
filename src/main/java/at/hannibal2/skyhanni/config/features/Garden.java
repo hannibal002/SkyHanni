@@ -164,6 +164,12 @@ public class Garden {
     public boolean numberCropUpgrades = true;
 
     @Expose
+    @ConfigOption(name = "Composter Upgrades", desc = "Show the number of upgrades in the composter upgrades inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean numberComposterUpgrades = true;
+
+    @Expose
     @ConfigOption(name = "Crop Milestones", desc = "")
     @ConfigEditorAccordion(id = 6)
     public boolean cropMilestones = false;
@@ -684,6 +690,24 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
     public boolean composterDisplayEnabled = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Upgrade Price",
+            desc = "Show the price for the composter upgrade in the lore."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterUpgradePrice = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Highlight Upgrade",
+            desc = "Highlight Upgrades that can be bought right now."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterHighLightUpgrade = true;
 
     @Expose
     public Position composterDisplayPos = new Position(-363, 13, false, true);
