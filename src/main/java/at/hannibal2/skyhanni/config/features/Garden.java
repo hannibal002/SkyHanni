@@ -390,7 +390,7 @@ public class Garden {
     public boolean optimalSpeedWarning = false;
 
     @Expose
-    @ConfigOption(name = "Show optimal speed in Rancher Boot Sign", desc = "Allows you to set the optimal speed in the rancher overlay by clicking on a link")
+    @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the rancher boots overlay by clicking on the presets.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean optimalSpeedSignEnabled = true;
