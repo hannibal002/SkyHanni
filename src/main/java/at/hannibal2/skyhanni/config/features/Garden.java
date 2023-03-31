@@ -246,7 +246,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Always On",
-            desc = "Show the Best Display always while on the ")
+            desc = "Show the Best Display always while on the garden.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestAlwaysOn = false;
@@ -682,7 +682,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Composter", desc = "")
-    @ConfigEditorAccordion(id = 16)
+    @ConfigEditorAccordion(id = 17)
     public boolean composter = false;
 
     @Expose
@@ -691,7 +691,7 @@ public class Garden {
             desc = "Displays the compost data from the tab list in a compact form as gui element."
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 16)
+    @ConfigAccordionId(id = 17)
     public boolean composterDisplayEnabled = true;
 
     @Expose

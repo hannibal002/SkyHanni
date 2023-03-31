@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
@@ -18,6 +17,7 @@ public class MarkedPlayers {
     @ConfigEditorBoolean
     public boolean highlightInChat = true;
 
+    @Expose
     @ConfigOption(name = "Mark Own Name", desc = "Mark own player name.")
     @ConfigEditorBoolean()
     public Property<Boolean> markOwnName = Property.of(false);
