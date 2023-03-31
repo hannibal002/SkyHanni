@@ -246,7 +246,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Always On",
-            desc = "Show the Best Display always while on the ")
+            desc = "Show the Best Display always while on the garden.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestAlwaysOn = false;
