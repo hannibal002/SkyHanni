@@ -104,7 +104,7 @@ class GardenOptimalSpeed {
                     lastWarnTime = System.currentTimeMillis()
                     SendTitleHelper.sendTitle("§cWrong speed!", 3_000)
                     cropInHand?.let {
-                        LorenzUtils.chat("§e[SkyHanni] Wrong speed for $it: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
+                        LorenzUtils.chat("§e[SkyHanni] Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
                     }
                 }
             }
