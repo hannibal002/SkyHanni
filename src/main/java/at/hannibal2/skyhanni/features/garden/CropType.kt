@@ -19,9 +19,6 @@ enum class CropType(val cropName: String, val toolName: String, iconSupplier: ()
     ;
 
     val icon by lazy { iconSupplier() }
-    override fun toString(): String {
-        return cropName
-    }
 
     companion object {
         fun getByName(name: String) = values().firstOrNull { it.cropName == name }
