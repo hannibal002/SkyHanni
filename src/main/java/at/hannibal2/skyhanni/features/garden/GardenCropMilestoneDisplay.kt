@@ -316,7 +316,7 @@ class GardenCropMilestoneDisplay {
                         lastPlaySoundTime = System.currentTimeMillis()
                         sound.playSound()
                     }
-                    SendTitleHelper.sendTitle("§b$crop $nextTier in $duration", 1_500)
+                    SendTitleHelper.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
                 }
             }
             lineMap[3] = Collections.singletonList("§7In §b$duration")

@@ -21,15 +21,21 @@ object NEUItems {
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
 
     fun getInternalName(itemName: String): String {
+        return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
+    }
+
+    fun getInternalNameOrNull(itemName: String): String? {
         if (itemNameCache.containsKey(itemName)) {
             return itemNameCache[itemName]!!
         }
-        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false)
+        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
         if (internalName == "HAY_BALE") {
             internalName = "HAY_BLOCK"
         }
+
         itemNameCache[itemName] = internalName
         return internalName
     }

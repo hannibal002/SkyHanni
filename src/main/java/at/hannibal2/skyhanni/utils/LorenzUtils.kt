@@ -62,6 +62,7 @@ object LorenzUtils {
     }
 
     fun error(message: String) {
+        println("error: '$message'")
         internalChat("§c$message")
     }
 

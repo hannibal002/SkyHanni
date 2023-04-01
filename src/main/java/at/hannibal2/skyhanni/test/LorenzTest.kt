@@ -92,7 +92,7 @@ class LorenzTest {
                     try {
                         val internalName = NEUItems.getInternalName(itemName)
                         list.add(NEUItems.getItemStack(internalName))
-                    } catch (e: Exception) {
+                    } catch (e: Error) {
                         LorenzUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                         errors++
                     }

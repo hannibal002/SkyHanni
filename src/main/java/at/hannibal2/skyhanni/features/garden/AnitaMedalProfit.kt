@@ -42,12 +42,18 @@ class AnitaMedalProfit {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!config.anitaMedalProfitEnabled) return
         if (event.inventoryName != "Anita") return
+        if (GardenVisitorFeatures.inVisitorInventory) return
 
         inInventory = true
 
         val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
         for ((_, item) in event.inventoryItems) {
-            readItem(item, table)
+            try {
+                readItem(item, table)
+            } catch (e: Throwable) {
+                LorenzUtils.error("Error in AnitaMedalProfit while reading item '$item'")
+                e.printStackTrace()
+            }
         }
 
         val newList = mutableListOf<List<Any>>()
@@ -59,6 +65,10 @@ class AnitaMedalProfit {
     private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, String>>) {
         var itemName = item.name ?: return
         if (itemName == " ") return
+        if (itemName == "§cClose") return
+        if (itemName == "§eUnique Gold Medals") return
+        if (itemName == "§aMedal Trades") return
+
         if (itemName.endsWith("Enchanted Book")) {
             itemName = item.getLore()[0]
         }
@@ -69,11 +79,9 @@ class AnitaMedalProfit {
         val (name, amount) = ItemUtils.readItemAmount(itemName)
         if (name == null) return
 
-        val internalName = try {
-            NEUItems.getInternalName(name)
-        } catch (e: Exception) {
-            // TODO make a better alternative
-            item.getInternalName()
+        var internalName = NEUItems.getInternalNameOrNull(name)
+        if (internalName == null) {
+            internalName = item.getInternalName()
         }
 
         val itemPrice = NEUItems.getPrice(internalName) * amount

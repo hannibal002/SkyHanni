@@ -29,9 +29,7 @@ class SkyBLockLevelGuideHelper {
                 if (slot.slotNumber != slot.slotIndex) continue
                 val name = slot.stack?.name ?: continue
 
-                if (name.startsWith("§a✔")) {
-//                    slot highlight LorenzColor.GREEN
-                } else if (name.startsWith("§c✖")) {
+                if (name.startsWith("§c✖")) {
                     slot highlight LorenzColor.RED
                 }
             }

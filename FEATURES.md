@@ -180,6 +180,7 @@
 + **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
 + **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
 + **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
+    + Also available to select directly in the rancher boots overlay (contributed by nea)
 + Desk shortcut in SkyBlock Menu.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
 + **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
@@ -199,6 +200,9 @@
 + **Money per Hour Advanced stats** - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
 + **Anita Medal Profit** - Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
 + **Composter Compact Display** - Displays the compost data from the tab list in a compact form as gui element.
++ **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
++ **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
++ **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)

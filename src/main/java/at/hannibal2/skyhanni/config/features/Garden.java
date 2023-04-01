@@ -164,6 +164,12 @@ public class Garden {
     public boolean numberCropUpgrades = true;
 
     @Expose
+    @ConfigOption(name = "Composter Upgrades", desc = "Show the number of upgrades in the composter upgrades inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean numberComposterUpgrades = true;
+
+    @Expose
     @ConfigOption(name = "Crop Milestones", desc = "")
     @ConfigEditorAccordion(id = 6)
     public boolean cropMilestones = false;
@@ -246,7 +252,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Always On",
-            desc = "Show the Best Display always while on the ")
+            desc = "Show the Best Display always while on the garden.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestAlwaysOn = false;
@@ -388,6 +394,15 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean optimalSpeedWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the rancher boots overlay by clicking on the presets.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean optimalSpeedSignEnabled = true;
+
+    @Expose
+    public Position optimalSpeedSignPosition = new Position(200, 20, false, true);
 
     @Expose
     @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
@@ -624,19 +639,20 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Farming Armor Drops", desc = "")
-    @ConfigEditorAccordion(id = 12)
+
+    @ConfigEditorAccordion(id = 18)
     public boolean farmingArmorDrops = false;
 
     @Expose
     @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 18)
     public boolean farmingArmorDropsEnabled = true;
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 18)
     public boolean farmingArmorDropsHideChat = false;
 
     @Expose
@@ -644,13 +660,13 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Teleport Pads", desc = "")
-    @ConfigEditorAccordion(id = 12)
+    @ConfigEditorAccordion(id = 19)
     public boolean teleportPads = false;
 
     @Expose
     @ConfigOption(name = "Compact Name", desc = "Hide the 'Warp to' and 'No Destination' texts over teleport pads.")
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
+    @ConfigAccordionId(id = 19)
     public boolean teleportPadsCompactName = false;
 
     @Expose
@@ -673,7 +689,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Composter", desc = "")
-    @ConfigEditorAccordion(id = 16)
+    @ConfigEditorAccordion(id = 17)
     public boolean composter = false;
 
     @Expose
@@ -682,8 +698,26 @@ public class Garden {
             desc = "Displays the compost data from the tab list in a compact form as gui element."
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 16)
+    @ConfigAccordionId(id = 17)
     public boolean composterDisplayEnabled = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Upgrade Price",
+            desc = "Show the price for the composter upgrade in the lore."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterUpgradePrice = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Highlight Upgrade",
+            desc = "Highlight Upgrades that can be bought right now."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterHighLightUpgrade = true;
 
     @Expose
     public Position composterDisplayPos = new Position(-363, 13, false, true);

@@ -244,6 +244,7 @@ public class SkyHanniMod {
         loadModule(new GardenTeleportPadCompactName());
         loadModule(new AnitaMedalProfit());
         loadModule(new ComposterDisplay());
+        loadModule(new GardenComposterInventoryFeatures());
 
         Commands.INSTANCE.init();
 

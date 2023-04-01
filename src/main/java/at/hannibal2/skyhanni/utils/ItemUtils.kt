@@ -137,7 +137,8 @@ object ItemUtils {
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
 
-    private val pattern = Pattern.compile("(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?")
+    private val patternInFront = Pattern.compile("(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)")
+    private val patternBehind = Pattern.compile("(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?")
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
@@ -145,11 +146,28 @@ object ItemUtils {
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
         }
+
+        var matcher = patternInFront.matcher(input)
+        if (matcher.matches()) {
+            val itemName = matcher.group("name")
+            if (!itemName.contains("§8x")) {
+                val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1
+                val pair = Pair(itemName.trim(), amount)
+                itemAmountCache[input] = pair
+                return pair
+            }
+        }
+
         var string = input.trim()
         val color = string.substring(0, 2)
         string = string.substring(2)
-        val matcher = pattern.matcher(string)
-        if (!matcher.matches()) return Pair(null, 0)
+        matcher = patternBehind.matcher(string)
+        if (!matcher.matches()) {
+            println("")
+            println("input: '$input'")
+            println("string: '$string'")
+            return Pair(null, 0)
+        }
 
         val itemName = color + matcher.group("name").trim()
         val amount = matcher.group("amount")?.replace(",", "")?.toInt() ?: 1

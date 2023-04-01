@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.GsonBuilder
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
@@ -37,14 +38,24 @@ class ConfigManager {
 
         if (configFile!!.exists()) {
             try {
-                BufferedReader(InputStreamReader(FileInputStream(configFile!!), StandardCharsets.UTF_8)).use { reader ->
-                    SkyHanniMod.feature = gson.fromJson(
-                        reader,
-                        Features::class.java
-                    )
+                val inputStreamReader = InputStreamReader(FileInputStream(configFile!!), StandardCharsets.UTF_8)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                val builder = StringBuilder()
+                for (line in bufferedReader.lines()) {
+                    val result = fixConfig(line)
+                    builder.append(result)
+                    builder.append("\n")
                 }
+
+
+                SkyHanniMod.feature = gson.fromJson(
+                    builder.toString(),
+                    Features::class.java
+                )
                 logger.info("Loaded config from file")
             } catch (e: Exception) {
+                println("config error")
+                e.printStackTrace()
                 val backupFile = configFile!!.resolveSibling("config-${System.currentTimeMillis()}-backup.json")
                 logger.error(
                     "Exception while reading $configFile. Will load blank config and save backup to $backupFile",
@@ -75,6 +86,18 @@ class ConfigManager {
             features,
             processor
         )
+    }
+
+    private fun fixConfig(line: String): String {
+        var result = line
+        for (type in CropType.values()) {
+            val normal = "\"${type.cropName}\""
+            val enumName = "\"${type.name}\""
+            while (result.contains(normal)) {
+                result = result.replace(normal, enumName)
+            }
+        }
+        return result
     }
 
     fun saveConfig() {

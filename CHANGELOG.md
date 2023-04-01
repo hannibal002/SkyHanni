@@ -37,6 +37,7 @@
 + Added farming weight next leaderboard position eta.
 + Added **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
+  + Also available to select directly in the rancher boots overlay (contributed by nea)
 + Added **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
 + Added **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
 + Added farming contest timer.
@@ -48,9 +49,12 @@
 + Added **Colored Name** - Show the visitor name in the color of the rarity.
 + Added **Visitor Item Preview** - Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
 + Added **Teleport Pad Compact Name** - Hide the 'Warp to' and 'No Destination' texts over teleport pads.
-+ Added Money per Hour Advanced stats - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
-+ Added Anita Medal Profit - Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
-+ Added Composter Compact Display - Displays the compost data from the tab list in a compact form as gui element.
++ Added **Money per Hour Advanced stats** - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
++ Added **Anita Medal Profit** - Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
++ Added **Composter Compact Display** - Displays the compost data from the tab list in a compact form as gui element.
++ Added **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
++ Added **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
++ Added **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
 
 
 ### Features from other Mods
