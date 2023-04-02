@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import java.text.NumberFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -51,7 +50,8 @@ object NumberUtil {
         if (value < 1000) return value.toString() //deal with easy case
         val (divideBy, suffix) = suffixes.floorEntry(value)
         val truncated = value / (divideBy / 10) //the number part of the output times 10
-        val hasDecimal = truncated < 100 && truncated / 10.0 != (truncated / 10).toDouble()
+        val truncatedAt = if (suffix == "M") 1000 else 100
+        val hasDecimal = truncated < truncatedAt && truncated / 10.0 != (truncated / 10).toDouble()
         return if (hasDecimal) (truncated / 10.0).toString() + suffix else (truncated / 10).toString() + suffix
     }
 
