@@ -39,7 +39,6 @@ class GardenOptimalSpeed {
         }
     }
 
-
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         rancherOverlayList = CropType.values().map { crop ->

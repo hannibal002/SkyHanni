@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.*;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
+import at.hannibal2.skyhanni.features.minion.MinionCollectLogic;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
@@ -116,7 +117,7 @@ public class SkyHanniMod {
         loadModule(new ItemTipHelper());
         loadModule(new RenderLivingEntityHelper());
         loadModule(new SkillExperience());
-        loadModule(new InventoryData());
+        loadModule(new OtherInventoryData());
         loadModule(new TabListData());
         loadModule(new RenderGuiData());
         loadModule(new GardenCropMilestones());
@@ -238,6 +239,7 @@ public class SkyHanniMod {
         loadModule(new AnitaMedalProfit());
         loadModule(new ComposterDisplay());
         loadModule(new GardenComposterInventoryFeatures());
+        loadModule(new MinionCollectLogic());
 
         Commands.INSTANCE.init();
 
