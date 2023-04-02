@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -27,7 +28,7 @@ class CollectionAPI {
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
-        val jsonElement = profileData["collection"]?: return
+        val jsonElement = profileData["collection"] ?: return
         val asJsonObject = jsonElement.asJsonObject ?: return
         for ((rawName, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
@@ -115,6 +116,16 @@ class CollectionAPI {
                 }
             }
             return null
+        }
+
+        // TODO add support for replenish (higher collection than actual items in inv)
+        fun addFromInventory(internalName: String, amount: Int) {
+            val name = NEUItems.getItemStack(internalName).name?.removeColor() ?: return
+
+            val oldValue = collectionValue[name] ?: return
+
+            val newValue = oldValue + amount
+            collectionValue[name] = newValue
         }
     }
 }

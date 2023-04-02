@@ -40,9 +40,7 @@ object InventoryUtils {
         val chestName = if (guiChest is GuiChest) {
             val chest = guiChest.inventorySlots as ContainerChest
             chest.getInventoryName()
-        } else {
-            ""
-        }
+        } else ""
         return chestName
     }
     
@@ -50,10 +48,19 @@ object InventoryUtils {
         return this.lowerChestInventory.displayName.unformattedText.trim()
     }
 
+    fun getItemsInOwnInventory(): MutableList<ItemStack> {
+        val list = mutableListOf<ItemStack>()
+        for (itemStack in Minecraft.getMinecraft().thePlayer.inventory.mainInventory) {
+            itemStack?.let {
+                list.add(it)
+            }
+        }
+
+        return list
+    }
+
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
-        Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-            .filter { it != null && predicate(it) }
-            .sumOf { it.stackSize }
+        getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
 
     fun getArmor(): Array<ItemStack?> =
         Minecraft.getMinecraft().thePlayer.inventory.armorInventory

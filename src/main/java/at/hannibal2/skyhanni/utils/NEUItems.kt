@@ -126,17 +126,17 @@ object NEUItems {
         GlStateManager.popMatrix()
     }
 
-    fun getMultiplier(rawId: String, tryCount: Int = 0): Pair<String, Int> {
-        if (multiplierCache.contains(rawId)) {
-            return multiplierCache[rawId]!!
+    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
+        if (multiplierCache.contains(internalName)) {
+            return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
-            val message = "Error reading getMultiplier for item '$rawId'"
+            val message = "Error reading getMultiplier for item '$internalName'"
             Error(message).printStackTrace()
             LorenzUtils.error(message)
-            return Pair(rawId, 1)
+            return Pair(internalName, 1)
         }
-        for (recipe in getRecipes(rawId)) {
+        for (recipe in getRecipes(internalName)) {
             if (recipe !is CraftingRecipe) continue
 
             val map = mutableMapOf<String, Int>()
@@ -144,22 +144,29 @@ object NEUItems {
                 val count = ingredient.count.toInt()
                 var internalItemId = ingredient.internalItemId
                 // ignore cactus green
-                if (rawId == "ENCHANTED_CACTUS_GREEN") {
+                if (internalName == "ENCHANTED_CACTUS_GREEN") {
                     if (internalItemId == "INK_SACK-2") {
                         internalItemId = "CACTUS"
                     }
                 }
 
                 // ignore wheat in enchanted cookie
-                if (rawId == "ENCHANTED_COOKIE") {
+                if (internalName == "ENCHANTED_COOKIE") {
                     if (internalItemId == "WHEAT") {
                         continue
                     }
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (rawId == "ENCHANTED_GOLDEN_CARROT") {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT") {
                     if (internalItemId == "GOLDEN_CARROT") {
+                        continue
+                    }
+                }
+
+                // ignore rabbit hide in leather
+                if (internalName == "LEATHER") {
+                    if (internalItemId == "RABBIT_HIDE") {
                         continue
                     }
                 }
@@ -177,15 +184,15 @@ object NEUItems {
             return if (current.second > 1) {
                 val child = getMultiplier(id, tryCount + 1)
                 val result = Pair(child.first, child.second * current.second)
-                multiplierCache[rawId] = result
+                multiplierCache[internalName] = result
                 result
             } else {
-                Pair(rawId, 1)
+                Pair(internalName, 1)
             }
         }
 
-        val result = Pair(rawId, 1)
-        multiplierCache[rawId] = result
+        val result = Pair(internalName, 1)
+        multiplierCache[internalName] = result
         return result
     }
 

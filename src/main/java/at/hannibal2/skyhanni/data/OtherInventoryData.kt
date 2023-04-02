@@ -7,7 +7,7 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class InventoryData {
+class OtherInventoryData {
     private var currentInventory: Inventory? = null
     private var acceptItems = false
     private var lateEvent: LateInventoryOpenEvent? = null
