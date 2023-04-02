@@ -95,4 +95,9 @@ public class Slayer {
     @ConfigOption(name = "Quest Warning", desc = "Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.")
     @ConfigEditorBoolean
     public boolean questWarning = true;
+
+    @Expose
+    @ConfigOption(name = "Quest Warning Title", desc = "Sends a Title when warning.")
+    @ConfigEditorBoolean
+    public boolean questWarningTitle = true;
 }
