@@ -51,8 +51,6 @@ object LorenzUtils {
             if (internalChat(DEBUG_PREFIX + message)) {
                 consoleLog("[Debug] $message")
             }
-        } else {
-            consoleLog("[Debug] $message")
         }
     }
 
