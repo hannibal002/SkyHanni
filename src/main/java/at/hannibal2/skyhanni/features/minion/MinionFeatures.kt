@@ -28,7 +28,7 @@ import org.lwjgl.input.Mouse
 import java.awt.Color
 
 class MinionFeatures {
-
+    private val config get() = SkyHanniMod.feature.minions
     private var lastClickedEntity: LorenzVec? = null
     private var lastMinion: LorenzVec? = null
     private var lastMinionOpened = 0L
@@ -69,14 +69,14 @@ class MinionFeatures {
     fun onRenderLastClickedMinion(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!SkyHanniMod.feature.minions.lastClickedMinionDisplay) return
+        if (!config.lastClickedMinionDisplay) return
 
-        val special = SkyHanniMod.feature.minions.lastOpenedMinionColor
+        val special = config.lastOpenedMinionColor
         val color = Color(SpecialColour.specialToChromaRGB(special), true)
 
         val loc = lastMinion
         if (loc != null) {
-            val time = SkyHanniMod.feature.minions.lastOpenedMinionTime * 1_000
+            val time = config.lastOpenedMinionTime * 1_000
             if (lastMinionOpened + time > System.currentTimeMillis()) {
                 event.drawWaypointFilled(
                     loc.add(-0.5, 0.0, -0.5),
@@ -136,7 +136,7 @@ class MinionFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.minions.hopperProfitDisplay) {
+        if (config.hopperProfitDisplay) {
             coinsPerDay = if (minionInventoryOpen) {
                 updateCoinsPerDay()
             } else {
@@ -223,23 +223,25 @@ class MinionFeatures {
         val playerEyeLocation = LocationUtils.playerEyeLocation()
         for (minion in minions) {
             val location = minion.key.add(0.0, 1.0, 0.0)
-            if (LocationUtils.canSee(playerEyeLocation, location)) {
-                val lastEmptied = minion.value.lastClicked
-                if (playerLocation.distance(location) < SkyHanniMod.feature.minions.distance) {
+            if (!LocationUtils.canSee(playerEyeLocation, location)) continue
 
-                    if (SkyHanniMod.feature.minions.nameDisplay) {
-                        val name = "§9" + minion.value.name
-                        event.drawString(location.add(0.0, 0.65, 0.0), name, true)
-                    }
+            val lastEmptied = minion.value.lastClicked
+            if (playerLocation.distance(location) >= config.distance) continue
 
-                    if (SkyHanniMod.feature.minions.emptiedTimeDisplay) {
-                        if (lastEmptied != 0L) {
-                            val duration = System.currentTimeMillis() - lastEmptied
-                            val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
-                            val text = "§eHopper Emptied: $format"
-                            event.drawString(location.add(0.0, 1.15, 0.0), text, true)
-                        }
-                    }
+            if (config.nameDisplay) {
+                val displayName = minion.value.name
+                val name = "§6" + if (config.nameOnlyTier) {
+                    displayName.split(" ").last()
+                } else displayName
+                event.drawString(location.add(0.0, 0.65, 0.0), name, true)
+            }
+
+            if (config.emptiedTimeDisplay) {
+                if (lastEmptied != 0L) {
+                    val duration = System.currentTimeMillis() - lastEmptied
+                    val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
+                    val text = "§eHopper Emptied: $format"
+                    event.drawString(location.add(0.0, 1.15, 0.0), text, true)
                 }
             }
         }
@@ -249,7 +251,7 @@ class MinionFeatures {
     fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!SkyHanniMod.feature.minions.hideMobsNametagNearby) return
+        if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
@@ -266,8 +268,8 @@ class MinionFeatures {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
-        if (SkyHanniMod.feature.minions.hopperProfitDisplay) {
-            SkyHanniMod.feature.minions.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
+        if (config.hopperProfitDisplay) {
+            config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
     }
 }
