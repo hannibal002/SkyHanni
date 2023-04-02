@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -21,7 +22,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
 
 class MinionCraftHelper {
-
     private var minionNamePattern = Pattern.compile("(.*) Minion (.*)")
     private var tick = 0
     private var display = listOf<String>()
@@ -267,4 +267,20 @@ class MinionCraftHelper {
     }
 
     private fun isMinionName(itemName: String) = itemName.contains(" Minion ") && !itemName.contains(" Minion Skin")
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!LorenzUtils.isBingoProfile) return
+        if (event.inventoryName != "Crafted Minions") return
+
+        for ((_, b) in event.inventoryItems) {
+            val name = b.name?: continue
+            if (!name.startsWith("§e")) continue
+
+            val internalName = NEUItems.getInternalName("$name I")
+            if (!tierOneMinionsDone.contains(internalName)) {
+                tierOneMinionsDone.add(internalName)
+            }
+        }
+    }
 }
