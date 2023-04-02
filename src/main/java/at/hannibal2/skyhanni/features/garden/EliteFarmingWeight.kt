@@ -53,6 +53,7 @@ class EliteFarmingWeight {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!isEnabled()) return
         if (tick++ % 5 != 0) return
         update()
     }
