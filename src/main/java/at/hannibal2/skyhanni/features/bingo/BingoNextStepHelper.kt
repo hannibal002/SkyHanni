@@ -47,7 +47,7 @@ class BingoNextStepHelper {
 
         private fun drawDisplay(print: Boolean): MutableList<String> {
             val newCurrentHelp = mutableListOf<String>()
-            newCurrentHelp.add("Bingo Step Helper")
+            newCurrentHelp.add("§6Bingo Step Helper:")
 
             if (currentSteps.isEmpty()) {
                 newCurrentHelp.add("§cOpen the §e/bingo §ccard.")

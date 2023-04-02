@@ -102,8 +102,8 @@ class MinionFeatures {
                     minions[it] = MinionData(name, 0)
                     saveConfig()
                 } else {
-                    if (minions[it]!!.name != name) {
-                        minions[it]!!.name = name
+                    if (minions[it]!!.displayName != name) {
+                        minions[it]!!.displayName = name
                         saveConfig()
                     }
                 }
@@ -189,7 +189,7 @@ class MinionFeatures {
             val coordinates = minion.key.encodeToString()
             val data = minion.value
             minionConfig[coordinates] = data.lastClicked
-            minionName[coordinates] = data.name
+            minionName[coordinates] = data.displayName
         }
     }
 
@@ -229,7 +229,7 @@ class MinionFeatures {
             if (playerLocation.distance(location) >= config.distance) continue
 
             if (config.nameDisplay) {
-                val displayName = minion.value.name
+                val displayName = minion.value.displayName
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName

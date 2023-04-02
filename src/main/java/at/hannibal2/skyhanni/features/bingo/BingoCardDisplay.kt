@@ -127,7 +127,7 @@ class BingoCardDisplay {
     private fun drawDisplay(): MutableList<String> {
         val newList = mutableListOf<String>()
 
-        newList.add("Community Goals")
+        newList.add("§6Community Goals:")
         if (communityGoals.isEmpty()) {
             newList.add("§cOpen the §e/bingo §ccard.")
         } else {
@@ -136,7 +136,7 @@ class BingoCardDisplay {
             val todo = personalGoals.filter { !it.done }
             val done = MAX_PERSONAL_GOALS - todo.size
             newList.add(" ")
-            newList.add("Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
+            newList.add("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
             todo.mapTo(newList) { "  " + it.description }
         }
         return newList
