@@ -104,7 +104,7 @@ class HyPixelData {
         for (line in ScoreboardData.sidebarLinesFormatted) {
             when (line) {
                 " §7Ⓑ §7Bingo", // No Rank
-                " §bⒷ §bBingo", // Rank 1
+                " §aⒷ §aBingo", // Rank 1
                 " §9Ⓑ §9Bingo", // Rank 2
                 " §5Ⓑ §5Bingo", // Rank 3
                 " §6Ⓑ §6Bingo", // Rank 4
