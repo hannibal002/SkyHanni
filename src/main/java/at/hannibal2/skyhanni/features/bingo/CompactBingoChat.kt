@@ -96,6 +96,8 @@ class CompactBingoChat {
 
     private fun onBestiarityUpgrade(event: LorenzChatEvent) {
         val message = event.message
+        if (message.contains("§r§6§lBESTIARY MILESTONE")) return
+
         if (message.startsWith("  §r§3§lBESTIARY §b§l")) {
             blockedBestiarity = true
             return
