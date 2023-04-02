@@ -9,7 +9,6 @@
     "MixinEntityFireball",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
-    "MixinNotEnoughUpdates",
     "MixinRenderItem",
     "MixinRenderManager",
     "gui.AccessorGuiContainer",
