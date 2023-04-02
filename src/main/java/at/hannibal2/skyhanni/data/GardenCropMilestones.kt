@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -27,7 +27,7 @@ class GardenCropMilestones {
 //    }
 
     @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onWorldChange(event: WorldEvent.Load) {
         if (cropCounter.isEmpty()) {
             for (crop in CropType.values()) {
                 crop.setCounter(0)
