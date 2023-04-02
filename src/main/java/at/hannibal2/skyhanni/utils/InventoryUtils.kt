@@ -44,9 +44,7 @@ object InventoryUtils {
         return chestName
     }
     
-    fun ContainerChest.getInventoryName(): String {
-        return this.lowerChestInventory.displayName.unformattedText.trim()
-    }
+    fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getItemsInOwnInventory(): MutableList<ItemStack> {
         val list = mutableListOf<ItemStack>()
