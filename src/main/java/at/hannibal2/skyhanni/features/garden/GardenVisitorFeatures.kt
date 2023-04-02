@@ -274,7 +274,7 @@ class GardenVisitorFeatures {
                     if (config.visitorExactAmountAndTime) {
                         val multiplier = NEUItems.getMultiplier(internalName)
                         val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
-                        CropType.getByName(rawName)?.let {
+                        CropType.getByItemName(rawName)?.let {
                             val speed = it.getSpeed()
                             val cropAmount = multiplier.second.toLong() * amount
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)

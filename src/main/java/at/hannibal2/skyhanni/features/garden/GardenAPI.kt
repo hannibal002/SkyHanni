@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -119,13 +118,6 @@ class GardenAPI {
 
         fun CropType.setSpeed(speed: Int) {
             cropsPerSecond[this] = speed
-        }
-
-        fun itemNameToCropName(itemName: String): CropType? {
-            if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") {
-                return CropType.MUSHROOM
-            }
-            return CropType.getByName(itemName)
         }
 
         fun addGardenCropToList(crop: CropType, list: MutableList<Any>) {
