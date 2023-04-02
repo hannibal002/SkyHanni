@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
+import java.util.regex.Pattern
 
 class MinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
@@ -38,6 +40,7 @@ class MinionFeatures {
     private var lastMinionPickedUp = 0L
     private val minions = mutableMapOf<LorenzVec, MinionData>()
     private var coinsPerDay = ""
+    private val minionUpgradePattern = Pattern.compile("§aYou have upgraded your Minion to Tier (.*)")
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -139,16 +142,14 @@ class MinionFeatures {
         if (config.hopperProfitDisplay) {
             coinsPerDay = if (minionInventoryOpen) {
                 updateCoinsPerDay()
-            } else {
-                ""
-            }
+            } else ""
         }
     }
 
-    private fun getMinionName(inventoryName: String): String {
-        var list = inventoryName.split(" ").toList()
+    private fun getMinionName(oldName: String, newTier: Int = 0): String {
+        var list = oldName.split(" ").toList()
         val last = list.last()
-        val number = last.romanToDecimal()
+        val number = if (newTier != 0) newTier else last.romanToDecimal()
         list = list.dropLast(1)
 
         return list.joinToString(" ") + " $number"
@@ -206,11 +207,22 @@ class MinionFeatures {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
-        if (event.message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
+        val message = event.message
+        if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
             lastCoinsRecived = System.currentTimeMillis()
         }
-        if (event.message.startsWith("§aYou picked up a minion!")) {
+        if (message.startsWith("§aYou picked up a minion!")) {
             lastMinionPickedUp = System.currentTimeMillis()
+        }
+
+        val matcher = minionUpgradePattern.matcher(message)
+        if (matcher.matches()) {
+            val newTier = matcher.group(1).romanToDecimalIfNeeded()
+            minions[lastMinion]?.let {
+                val minionName = getMinionName(it.displayName, newTier)
+                it.displayName = minionName
+                saveConfig()
+            }
         }
     }
 
