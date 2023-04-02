@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.util.ChatComponentText
@@ -188,5 +190,12 @@ object LorenzUtils {
                 list.add(listOf(it, "$displayName   $second"))
             }
         }
+    }
+
+    fun setTextIntoSign(text: String) {
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui !is GuiEditSign) return
+        gui as AccessorGuiEditSign
+        gui.tileSign.signText[0] = ChatComponentText(text)
     }
 }

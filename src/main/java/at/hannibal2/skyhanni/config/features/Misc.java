@@ -244,6 +244,11 @@ public class Misc {
     public boolean hideFireOverlay = false;
 
     @Expose
+    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into Sings when you press Ctrl + V")
+    @ConfigEditorBoolean
+    public boolean pasteIntoSigns = true;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;

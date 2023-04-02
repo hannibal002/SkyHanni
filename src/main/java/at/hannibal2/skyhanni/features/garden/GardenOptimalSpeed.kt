@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -43,10 +42,7 @@ class GardenOptimalSpeed {
     fun onGuiOpen(event: GuiOpenEvent) {
         rancherOverlayList = CropType.values().map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
-                val gui = Minecraft.getMinecraft().currentScreen
-                if (gui !is GuiEditSign) return@link
-                gui as AccessorGuiEditSign
-                gui.tileSign.signText[0] = ChatComponentText("${crop.getOptimalSpeed()}")
+                LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")
             })
         }
     }
