@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -21,6 +22,8 @@ class OwnInventoryData {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+
         val packet = event.packet
         if (packet is S2FPacketSetSlot) {
             val windowId = packet.func_149175_c()
@@ -81,6 +84,11 @@ class OwnInventoryData {
         val internalName = item.getInternalName()
         val (_, amount) = NEUItems.getMultiplier(internalName)
         if (amount > 1) return
+
+        if (internalName == "") {
+            LorenzUtils.debug("OwnInventoryData add is empty for: '$internalName'")
+            return
+        }
 
         addMultiplier(internalName, add)
     }

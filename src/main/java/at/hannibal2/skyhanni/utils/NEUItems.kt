@@ -88,7 +88,7 @@ object NEUItems {
     fun getItemStack(internalName: String): ItemStack {
         val stack = getItemStackOrNull(internalName)
         if (stack == null) {
-            val error = "ItemResolutionQuery returns null for internalName $internalName"
+            val error = "ItemResolutionQuery returns null for internalName '$internalName'"
             LorenzUtils.error(error)
             throw RuntimeException(error)
         }
