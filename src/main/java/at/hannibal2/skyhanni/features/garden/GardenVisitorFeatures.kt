@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ScoreboardData.Companion.sidebarLinesFormatted
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
@@ -29,11 +28,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.regex.Pattern
 
 class GardenVisitorFeatures {
-
     private val visitors = mutableMapOf<String, Visitor>()
     private var display = listOf<List<Any>>()
     private var lastClickedNpc = 0
-    private var onBarnPlot = false
     private var tick = 0
     private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
     private val gardenExperiencePattern = Pattern.compile(" §8\\+§2(.*) §7Garden Experience")
@@ -196,7 +193,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!GardenAPI.inGarden()) return
-        if (!onBarnPlot) return
+        if (!GardenAPI.onBarnPlot) return
         if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
 
         val entity = event.entity
@@ -210,7 +207,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!onBarnPlot) return
+        if (!GardenAPI.onBarnPlot) return
         if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
 
         for (visitor in visitors.values) {
@@ -319,11 +316,9 @@ class GardenVisitorFeatures {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
-        if (tick++ % 30 != 0) return
+        if (tick++ % 10 != 0) return
 
-        onBarnPlot = sidebarLinesFormatted.contains(" §7⏣ §aThe Garden")
-
-        if (onBarnPlot && config.visitorHighlightStatus != 3) {
+        if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
             checkVisitorsReady()
         }
     }
@@ -511,10 +506,7 @@ class GardenVisitorFeatures {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay) return
 
-        if (config.visitorNeedsOnlyWhenClose) {
-            //TODO check if on barn plot (sidebar)
-            if (!onBarnPlot) return
-        }
+        if (config.visitorNeedsOnlyWhenClose && !GardenAPI.onBarnPlot) return
 
         config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
     }

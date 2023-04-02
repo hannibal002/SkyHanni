@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,6 +35,8 @@ class GardenAPI {
         if (!inGarden()) return
         tick++
         if (tick % 10 == 0) {
+            onBarnPlot = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §aThe Garden")
+
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return
             checkItemInHand()
@@ -79,6 +82,7 @@ class GardenAPI {
         private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
         var cropInHand: CropType? = null
         var mushroomCowPet = false
+        var onBarnPlot = false
 
         fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
