@@ -180,6 +180,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (!inVisitorInventory) return
+        if (event.slot.stack?.name != "§cRefuse Offer") return
         if (event.slotId != 33) return
 
         getVisitor(lastClickedNpc)?.let {
