@@ -56,6 +56,10 @@ class ComposterDisplay {
         val newList = mutableListOf<List<Any>>()
         newList.addAsSingletonList("§bComposter")
 
+        for (type in DataType.values()) {
+            if (!data.containsKey(type)) return
+        }
+
         newList.add(DataType.TIME_LEFT.addToList(data))
 
         val list = mutableListOf<Any>()
