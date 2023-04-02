@@ -230,8 +230,7 @@ class EliteFarmingWeight {
 
             result["rank"].asInt
         } catch (e: Exception) {
-            apiError = true
-            LorenzUtils.error("[SkyHanni] Failed to load farming weight data from elitebot.dev! please report this on discord!")
+            error()
             e.printStackTrace()
             -1
         }
@@ -262,8 +261,13 @@ class EliteFarmingWeight {
                 println("url: '$url'")
                 e.printStackTrace()
             }
+            error()
+        }
+
+        private fun error() {
             apiError = true
-            LorenzUtils.error("[SkyHanni] Failed to load farming weight data from elitebot.dev! please report this on discord!")
+            LorenzUtils.error("[SkyHanni] Loading the farming weight data from elitebot.dev failed!")
+            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats itself, please report it on Discord!")
         }
 
         private fun calculateCollectionWeight(round: Boolean = true): MutableMap<CropType, Double> {
