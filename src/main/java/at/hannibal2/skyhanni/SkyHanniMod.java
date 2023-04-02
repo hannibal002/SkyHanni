@@ -240,6 +240,7 @@ public class SkyHanniMod {
         loadModule(new ComposterDisplay());
         loadModule(new GardenComposterInventoryFeatures());
         loadModule(new MinionCollectLogic());
+        loadModule(new PasteIntoSigns());
 
         Commands.INSTANCE.init();
 
