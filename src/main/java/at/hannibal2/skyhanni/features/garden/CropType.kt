@@ -21,9 +21,17 @@ enum class CropType(val cropName: String, val toolName: String, iconSupplier: ()
     val icon by lazy { iconSupplier() }
 
     companion object {
-        fun getByName(name: String) = values().firstOrNull { it.cropName == name }
+        fun getByName(cropName: String) = values().firstOrNull { it.cropName == cropName }
 
         // TODO find better name for this method
         fun getByNameNoNull(name: String) = getByName(name) ?: throw RuntimeException("No valid crop type '$name'")
+
+
+        fun getByItemName(itemName: String): CropType? {
+            if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") {
+                return MUSHROOM
+            }
+            return getByName(itemName)
+        }
     }
 }
