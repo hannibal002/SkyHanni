@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 class GardenInventoryNumbers {
 
     private var patternTierProgress = Pattern.compile("§7Progress to Tier (.*): §e(?:.*)")
-    private var patternUpgradeTier = Pattern.compile("§7Current Tier: §e(.*)§7/§a.*")
+    private var patternUpgradeTier = Pattern.compile("§7Current Tier: §[ea](.*)§7/§a.*")
     private val patternComposterUpgrades =
         Pattern.compile("§a(?:Composter Speed|Multi Drop|Fuel Cap|Organic Matter Cap|Cost Reduction) ?(.*)?")
 
