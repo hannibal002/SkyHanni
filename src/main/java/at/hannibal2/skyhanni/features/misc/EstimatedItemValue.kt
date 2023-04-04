@@ -86,16 +86,27 @@ class EstimatedItemValue {
         lastToolTipTime = System.currentTimeMillis()
     }
 
-    private fun draw(stack: ItemStack): MutableList<List<Any>> {
+    private fun draw(stack: ItemStack): List<List<Any>> {
         val list = mutableListOf<String>()
         list.add("§aEstimated Item Value:")
 
         val internalName = stack.getInternalName()
-        if (internalName == "") return mutableListOf()
+        if (internalName == "") return listOf()
 
         //FIX neu item list
-        if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return mutableListOf()
-        if (stack.item == Items.enchanted_book) return mutableListOf()
+        if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
+        // we don't need this feature to work on books at all
+        if (stack.item == Items.enchanted_book) return listOf()
+        // block catacombs items in mort inventory
+        if (internalName.startsWith("CATACOMBS_PASS_") || internalName.startsWith("MASTER_CATACOMBS_PASS_")) return listOf()
+        // blocks the dungeon map
+        if (internalName.startsWith("MAP-")) return listOf()
+
+
+        if (NEUItems.getItemStackOrNull(internalName) == null) {
+            LorenzUtils.debug("Estimated Item Value is null for internal name: '$internalName'")
+            return listOf()
+        }
 
         var totalPrice = 0.0
         val basePrice = addBaseItem(stack, list)
@@ -126,7 +137,7 @@ class EstimatedItemValue {
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
 
-        if (basePrice == totalPrice) return mutableListOf()
+        if (basePrice == totalPrice) return listOf()
 
         list.add("§aTotal: §6§l" + NumberUtil.format(totalPrice))
 
