@@ -47,6 +47,14 @@ object NEUItems {
             .resolveInternalName() ?: ""
     }
 
+    fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false): Double? {
+        val price = getPrice(internalName, useSellingPrice)
+        if (price == -1.0) {
+            return null
+        }
+        return price
+    }
+
     fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double {
         val bazaarData = BazaarApi.getBazaarDataForInternalName(internalName)
         bazaarData?.let {
