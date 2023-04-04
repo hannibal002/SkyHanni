@@ -258,6 +258,14 @@ public class Garden {
     public boolean cropMilestoneBestAlwaysOn = false;
 
     @Expose
+    @ConfigOption(
+            name = "Compact Display",
+            desc = "Make the best crop time more compact by removing the crop name and exp and making the time format shorter")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean cropMilestoneBestCompact = false;
+
+    @Expose
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
 
     @Expose
