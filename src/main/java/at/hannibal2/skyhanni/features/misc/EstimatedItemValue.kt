@@ -432,16 +432,36 @@ class EstimatedItemValue {
             }
 
             var level = rawLevel
+            var multiplier = 1
+            if (rawName == "ultimate_chimera") {
+
+                when (rawLevel) {
+                    2 -> multiplier = 2
+                    3 -> multiplier = 4
+                    4 -> multiplier = 8
+                    5 -> multiplier = 16
+                }
+                level = 1
+                println("")
+                println("rawName: $rawName")
+                println("rawLevel: $rawLevel")
+                println("multiplier: $multiplier")
+
+            }
+            if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
+                multiplier = 5
+            }
             if (rawName in tieredEnchants) level = 1
 
             val enchantmentName = "$rawName;$level".uppercase()
             val itemStack = NEUItems.getItemStackOrNull(enchantmentName) ?: continue
-            var name = itemStack.getLore()[0]
             val singlePrice = NEUItems.getPriceOrNull(enchantmentName) ?: continue
-            val multiplier = if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
-                name = "§85x $name"
-                5
-            } else 1
+
+
+            var name = itemStack.getLore()[0]
+            if (multiplier > 1) {
+                name = "§8${multiplier}x $name"
+            }
             val price = singlePrice * multiplier
 
             totalPrice += price
