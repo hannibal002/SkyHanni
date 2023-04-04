@@ -34,7 +34,11 @@ class GardenBestCropTime {
         }
 
         val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
-        newList.addAsSingletonList("§eBest Crop Time §7($title§7)")
+        if (config.cropMilestoneBestCompact) {
+            newList.addAsSingletonList("§eBest Crop Time")
+        } else {
+            newList.addAsSingletonList("§eBest Crop Time §7($title§7)")
+        }
 
         if (sorted.isEmpty()) {
             newList.addAsSingletonList("§cFarm crops to add them to this list!")
@@ -44,7 +48,8 @@ class GardenBestCropTime {
         var number = 0
         for (crop in sorted.keys) {
             val millis = timeTillNextCrop[crop]!!
-            val duration = TimeUtils.formatDuration(millis)
+            val maxUnits = if (config.cropMilestoneBestCompact) 2 else -1
+            val duration = TimeUtils.formatDuration(millis, maxUnits = maxUnits)
             val isCurrent = crop == currentCrop
             number++
             if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue
@@ -56,10 +61,12 @@ class GardenBestCropTime {
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
             val nextTier = GardenCropMilestones.getTierForCrops(crop.getCounter()) + 1
-            val cropNameDisplay = "$color$contestFormat${crop.cropName} $nextTier§r"
+
+            val cropName = if (!config.cropMilestoneBestCompact) crop.cropName +" " else ""
+            val cropNameDisplay = "$color$contestFormat$cropName$nextTier§r"
             list.add("$cropNameDisplay §b$duration")
 
-            if (gardenExp) {
+            if (gardenExp && !config.cropMilestoneBestCompact) {
                 val gardenExpForTier = getGardenExpForTier(nextTier)
                 list.add(" §7(§2$gardenExpForTier §7Exp)")
             }
