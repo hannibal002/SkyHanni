@@ -241,6 +241,7 @@ public class SkyHanniMod {
         loadModule(new GardenComposterInventoryFeatures());
         loadModule(new MinionCollectLogic());
         loadModule(new PasteIntoSigns());
+        loadModule(new EstimatedItemValue());
 
         Commands.INSTANCE.init();
 
