@@ -34,10 +34,7 @@ public class Diana {
     public boolean burrowNearestWarp = false;
 
     @Expose
-    @ConfigOption(
-            name = "Warp Key",
-            desc = "Press this key to warp to nearest burrow waypoint."
-    )
+    @ConfigOption(name = "Warp Key", desc = "Press this key to warp to nearest burrow waypoint.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindWarp = Keyboard.KEY_NONE;
 
