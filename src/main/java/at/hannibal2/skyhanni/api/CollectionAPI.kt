@@ -122,7 +122,7 @@ class CollectionAPI {
         fun addFromInventory(internalName: String, amount: Int) {
             val stack = NEUItems.getItemStackOrNull(internalName)
             if (stack == null) {
-                LorenzUtils.debug("CollectionAPI.addFromInventory internalName '$internalName' is null!")
+                LorenzUtils.debug("CollectionAPI.addFromInventory: internalName is null for '$internalName'")
                 return
             }
 
