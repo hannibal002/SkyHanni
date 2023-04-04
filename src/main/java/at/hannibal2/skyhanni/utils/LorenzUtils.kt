@@ -12,6 +12,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -197,5 +199,13 @@ object LorenzUtils {
         if (gui !is GuiEditSign) return
         gui as AccessorGuiEditSign
         gui.tileSign.signText[0] = ChatComponentText(text)
+    }
+
+    fun clickableChat(message: String, command: String) {
+        val text = ChatComponentText(message)
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/$command")
+        text.chatStyle.chatHoverEvent =
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /$command"))
+        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 }

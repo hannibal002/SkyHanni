@@ -9,10 +9,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import net.minecraft.client.Minecraft
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -28,24 +24,16 @@ class JoinCrystalHollows {
         if (message == "§cYou do not have an active Crystal Hollows pass!") {
             lastWrongPassTime = System.currentTimeMillis()
             if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) {
-                sendClickableMessage("§e[SkyHanni] Click here to warp to Dwarven Mines!", "warp mines")
+                LorenzUtils.clickableChat("§e[SkyHanni] Click here to warp to Dwarven Mines!", "warp mines")
             } else {
                 LorenzUtils.chat("§e[SkyHanni] Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
             }
         }
         if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!") {
             if (inTime()) {
-                sendClickableMessage("§e[SkyHanni] Click here to warp to Crystal Hollows!", "warp ch")
+                LorenzUtils.clickableChat("§e[SkyHanni] Click here to warp to Crystal Hollows!", "warp ch")
             }
         }
-    }
-
-    private fun sendClickableMessage(message: String, command: String) {
-        val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/$command")
-        text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /$command"))
-        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
     @SubscribeEvent
@@ -77,5 +65,5 @@ class JoinCrystalHollows {
 
     private fun inTime() = lastWrongPassTime + 1000 * 60 * 2 > System.currentTimeMillis()
 
-    fun isEnabled() =  SkyHanniMod.feature.misc.crystalHollowsJoin
+    fun isEnabled() = SkyHanniMod.feature.misc.crystalHollowsJoin
 }
