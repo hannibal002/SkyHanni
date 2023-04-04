@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
+import at.hannibal2.skyhanni.utils.APIUtil
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -53,6 +54,7 @@ object Commands {
         registerCommand("shsetapikey") { ApiDataLoader.command(it) }
         registerCommand("shtestgardenvisitors") { LorenzTest.testGardenVisitors() }
         registerCommand("shresetitemnames") { BazaarDataGrabber.resetItemNames() }
+        registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
