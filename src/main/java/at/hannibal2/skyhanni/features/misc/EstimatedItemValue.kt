@@ -121,13 +121,13 @@ class EstimatedItemValue {
         totalPrice += addPowerScrolls(stack, list)
         totalPrice += addWoodSingularity(stack, list)
         totalPrice += addJalapenoBook(stack, list)
+        totalPrice += addStatsBook(stack, list)
 
         // counted
         totalPrice += addMasterStars(stack, list)
         totalPrice += addHotPotatoBooks(stack, list)
         totalPrice += addFarmingForDummies(stack, list)
         totalPrice += addSilex(stack, list)
-        totalPrice += addStatsBook(stack, list)
         totalPrice += addTransmissionTuners(stack, list)
         totalPrice += addManaDisintegrators(stack, list)
 
