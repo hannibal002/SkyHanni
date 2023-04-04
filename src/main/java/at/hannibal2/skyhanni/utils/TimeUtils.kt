@@ -12,6 +12,7 @@ object TimeUtils {
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
+        maxUnits: Int = -1
     ): String {
         var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
@@ -24,6 +25,7 @@ object TimeUtils {
         }
 
         val builder = StringBuilder()
+        var count = 0
         for ((unit, value) in map.entries) {
             if (value > 0 || builder.isNotEmpty() || unit == TimeUnit.SECOND) {
                 builder.append(value)
@@ -42,6 +44,11 @@ object TimeUtils {
                     builder.append(name)
                 } else {
                     builder.append("$name ")
+                }
+
+                count++
+                if (maxUnits != -1) {
+                    if (count == maxUnits) break
                 }
             }
         }

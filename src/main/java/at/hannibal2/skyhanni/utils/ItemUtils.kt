@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
@@ -28,15 +29,17 @@ object ItemUtils {
         return list
     }
 
+    // TODO change else janni is sad
     fun isCoopSoulBound(stack: ItemStack): Boolean =
         stack.getLore().any {
             it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
         }
 
+    // TODO change else janni is sad
     fun isSoulBound(stack: ItemStack): Boolean =
         stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
-    fun isRecombobulated(stack: ItemStack): Boolean = stack.getLore().any { it.contains("§k") }//TODO use item api
+    fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
     fun isPet(name: String): Boolean = name.matchRegex("\\[Lvl (.*)] (.*)") && !listOf(
         "Archer",

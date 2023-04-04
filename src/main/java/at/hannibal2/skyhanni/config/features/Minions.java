@@ -11,6 +11,11 @@ public class Minions {
     @ConfigEditorBoolean
     public boolean nameDisplay = true;
 
+    @Expose
+    @ConfigOption(name = "Only Tier", desc = "Show only the tier number over the minion. (Useful for bingo)")
+    @ConfigEditorBoolean
+    public boolean nameOnlyTier = false;
+
     @ConfigOption(name = "Last Clicked", desc = "")
     @ConfigEditorAccordion(id = 0)
     public boolean lastClickedMinion = false;

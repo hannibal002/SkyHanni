@@ -53,6 +53,7 @@ class EliteFarmingWeight {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!isEnabled()) return
         if (tick++ % 5 != 0) return
         update()
     }
@@ -230,8 +231,7 @@ class EliteFarmingWeight {
 
             result["rank"].asInt
         } catch (e: Exception) {
-            apiError = true
-            LorenzUtils.error("[SkyHanni] Failed to load farming weight data from elitebot.dev! please report this on discord!")
+            error()
             e.printStackTrace()
             -1
         }
@@ -262,8 +262,13 @@ class EliteFarmingWeight {
                 println("url: '$url'")
                 e.printStackTrace()
             }
+            error()
+        }
+
+        private fun error() {
             apiError = true
-            LorenzUtils.error("[SkyHanni] Failed to load farming weight data from elitebot.dev! please report this on discord!")
+            LorenzUtils.error("[SkyHanni] Loading the farming weight data from elitebot.dev failed!")
+            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats itself, please report it on Discord!")
         }
 
         private fun calculateCollectionWeight(round: Boolean = true): MutableMap<CropType, Double> {
@@ -303,11 +308,11 @@ class EliteFarmingWeight {
                 CropType.POTATO to 300_000.0,
                 CropType.SUGAR_CANE to 200_000.0,
                 CropType.NETHER_WART to 250_000.0,
-                CropType.PUMPKIN to 87_095.11,
-                CropType.MELON to 435_466.47,
-                CropType.MUSHROOM to 168_925.53,
-                CropType.COCOA_BEANS to 257_214.64,
-                CropType.CACTUS to 169_389.33,
+                CropType.PUMPKIN to 90_066.27,
+                CropType.MELON to 450_324.6,
+                CropType.MUSHROOM to 90_178.06,
+                CropType.COCOA_BEANS to 267_174.04,
+                CropType.CACTUS to 177_254.45,
             )
         }
     }

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,15 +38,11 @@ class GardenOptimalSpeed {
         }
     }
 
-
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         rancherOverlayList = CropType.values().map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
-                val gui = Minecraft.getMinecraft().currentScreen
-                if (gui !is GuiEditSign) return@link
-                gui as AccessorGuiEditSign
-                gui.tileSign.signText[0] = ChatComponentText("${crop.getOptimalSpeed()}")
+                LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")
             })
         }
     }
@@ -92,24 +87,28 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!Minecraft.getMinecraft().thePlayer.onGround) return
 
         if (optimalSpeed == -1) return
 
         val text = "Optimal Speed: §f$optimalSpeed"
         if (optimalSpeed != currentSpeed) {
             config.optimalSpeedPos.renderString("§c$text", posLabel = "Garden Optimal Speed")
-            if (config.optimalSpeedWarning) {
-                if (System.currentTimeMillis() > lastWarnTime + 20_000) {
-                    lastWarnTime = System.currentTimeMillis()
-                    SendTitleHelper.sendTitle("§cWrong speed!", 3_000)
-                    cropInHand?.let {
-                        LorenzUtils.chat("§e[SkyHanni] Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
-                    }
-                }
-            }
+             warn()
         } else {
             config.optimalSpeedPos.renderString("§a$text", posLabel = "Garden Optimal Speed")
+        }
+    }
+
+    private fun warn() {
+        if (!config.optimalSpeedWarning) return
+        if (!Minecraft.getMinecraft().thePlayer.onGround) return
+        if (GardenAPI.onBarnPlot) return
+        if (System.currentTimeMillis() < lastWarnTime + 20_000) return
+
+        lastWarnTime = System.currentTimeMillis()
+        SendTitleHelper.sendTitle("§cWrong speed!", 3_000)
+        cropInHand?.let {
+            LorenzUtils.chat("§e[SkyHanni] Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
         }
     }
 

@@ -202,7 +202,7 @@ class CropMoneyDisplay {
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
                 if (amount < 10) continue
                 val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
-                val crop = GardenAPI.itemNameToCropName(itemName)
+                val crop = CropType.getByItemName(itemName)
                 crop?.let {
                     multipliers[internalName] = amount
                     cropNames[internalName] = it

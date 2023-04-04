@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class SlayerQuestWarning {
-
+    private val config get() = SkyHanniMod.feature.slayer
     private var needSlayerQuest = false
     private var lastWarning = 0L
     private var currentReason = ""
@@ -118,7 +118,7 @@ class SlayerQuestWarning {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        if (!SkyHanniMod.feature.slayer.questWarning) return
+        if (!config.questWarning) return
 
         if (!needSlayerQuest) {
             dirtySidebar = true
@@ -135,7 +135,10 @@ class SlayerQuestWarning {
 
         lastWarning = System.currentTimeMillis()
         LorenzUtils.chat("§e[SkyHanni] $chatMessage")
-        SendTitleHelper.sendTitle("§e$titleMessage", 2_000)
+
+        if (config.questWarningTitle) {
+            SendTitleHelper.sendTitle("§e$titleMessage", 2_000)
+        }
     }
 
     @SubscribeEvent
@@ -170,6 +173,6 @@ class SlayerQuestWarning {
     }
 
     private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.questWarning
+        return LorenzUtils.inSkyBlock && config.questWarning
     }
 }
