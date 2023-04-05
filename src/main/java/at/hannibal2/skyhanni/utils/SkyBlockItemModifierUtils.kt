@@ -32,6 +32,30 @@ object SkyBlockItemModifierUtils {
         return 0
     }
 
+    fun ItemStack.getCultivatingCount(): Int? {
+        for (tags in tagCompound.keySet) {
+            if (tags != "ExtraAttributes") continue
+            val extraAttributes = tagCompound.getCompoundTag(tags)
+            for (attributes in extraAttributes.keySet) {
+                if (attributes != "farmed_cultivating") continue
+                return extraAttributes.getInteger(attributes)
+            }
+        }
+        return null
+    }
+
+    fun ItemStack.getCounter(): Int? {
+        for (tags in tagCompound.keySet) {
+            if (tags != "ExtraAttributes") continue
+            val extraAttributes = tagCompound.getCompoundTag(tags)
+            for (attributes in extraAttributes.keySet) {
+                if (attributes != "mined_crops") continue
+                return extraAttributes.getInteger(attributes)
+            }
+        }
+        return null
+    }
+
     fun ItemStack.getSilexCount(): Int {
         var silexTier = 0
         for ((name, amount) in getEnchantments()) {

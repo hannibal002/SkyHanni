@@ -38,6 +38,9 @@ public class Hidden {
     public Map<CropType, Long> gardenCropCounter = new HashMap<>();
 
     @Expose
+    public Map<CropType, Integer> gardenCropUpgrades = new HashMap<>();
+
+    @Expose
     public Map<CropType, Integer> gardenCropsPerSecond = new HashMap<>();
 
     @Expose

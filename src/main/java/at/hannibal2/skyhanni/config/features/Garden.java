@@ -749,6 +749,23 @@ public class Garden {
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
+    @ConfigOption(name = "Farming Fortune", desc = "")
+    @ConfigEditorAccordion(id = 18)
+    public boolean farmingFortune = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Farming Fortune Display",
+            desc = "Displays current farming fortune, including crop-specific bonuses."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 18)
+    public boolean farmingFortuneDisplay = true;
+
+    @Expose
+    public Position farmingFortunePos = new Position(-375, -200, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
