@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.17.Beta.29"
+version = "0.17.Beta.30"
 
 // Toolchains:
 java {
@@ -72,8 +72,8 @@ dependencies {
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("com.github.notenoughupdates:moulconfig:df01eda")
-    devenvMod("com.github.notenoughupdates:moulconfig:df01eda:test")
+    shadowModImpl("com.github.notenoughupdates:moulconfig:ac39e63")
+    devenvMod("com.github.notenoughupdates:moulconfig:ac39e63:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
 }

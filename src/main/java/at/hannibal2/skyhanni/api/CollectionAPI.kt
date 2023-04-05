@@ -120,8 +120,13 @@ class CollectionAPI {
 
         // TODO add support for replenish (higher collection than actual items in inv)
         fun addFromInventory(internalName: String, amount: Int) {
-            val name = NEUItems.getItemStack(internalName).name?.removeColor() ?: return
+            val stack = NEUItems.getItemStackOrNull(internalName)
+            if (stack == null) {
+                LorenzUtils.debug("CollectionAPI.addFromInventory: internalName is null for '$internalName'")
+                return
+            }
 
+            val name = stack.name!!.removeColor()
             val oldValue = collectionValue[name] ?: return
 
             val newValue = oldValue + amount

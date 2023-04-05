@@ -333,7 +333,7 @@ public class Garden {
     @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
     @ConfigEditorButton(buttonText = "Default")
     @ConfigAccordionId(id = 8)
-    public Runnable keyBindPresetDefault = ()-> {
+    public Runnable keyBindPresetDefault = () -> {
         keyBindAttack = -100;
         keyBindLeft = Keyboard.KEY_A;
         keyBindRight = Keyboard.KEY_D;
@@ -594,6 +594,7 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourAlwaysOn = false;
+
     @Expose
     @ConfigOption(
             name = "Compact Mode",
@@ -601,6 +602,7 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourCompact = false;
+
     @Expose
     @ConfigOption(
             name = "Compact Price",
@@ -608,13 +610,29 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourCompactPrice = false;
+
     @Expose
     @ConfigOption(
-            name = "Advanced stats",
-            desc = "Show not only Sell Offer price but also Instant Sell price and NPC Sell price.")
+            name = "Use Custom",
+            desc = "Use the custom format below instead of classic -> §eSell Offer §7and other profiles -> §eNPC Price.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
-    public boolean moneyPerHourAdvancedStats = false;
+    public boolean moneyPerHourUseCustomFormat = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Custom Format",
+            desc = "Set what prices to show")
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "§eSell Offer",
+                    "§eInstant Sell",
+                    "§eNPC Price"
+            },
+            requireNonEmpty = true
+    )
+    @ConfigAccordionId(id = 13)
+    public List<Integer> moneyPerHourCustomFormat = new ArrayList<>(Arrays.asList(0, 1, 2));
 
     @Expose
     public Position moneyPerHourPos = new Position(16, -232, false, true);
