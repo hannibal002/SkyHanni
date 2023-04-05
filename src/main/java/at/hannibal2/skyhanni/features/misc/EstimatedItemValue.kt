@@ -133,13 +133,15 @@ class EstimatedItemValue {
         totalPrice += addTransmissionTuners(stack, list)
         totalPrice += addManaDisintegrators(stack, list)
 
+        // cosmetic
+        totalPrice += addHelmetSkin(stack, list)
+        totalPrice += addArmorDye(stack, list)
+
         // dynamic
         totalPrice += addAbilityScrolls(stack, list)
         totalPrice += addDrillUpgrades(stack, list)
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
-        totalPrice += addHelmetSkin(stack, list)
-        totalPrice += addDye(stack, list)
 
         if (basePrice == totalPrice) return listOf()
 
@@ -385,7 +387,7 @@ class EstimatedItemValue {
         return price
     }
 
-    private fun addDye(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getDye() ?: return 0.0
 
         val price = NEUItems.getPrice(internalName)

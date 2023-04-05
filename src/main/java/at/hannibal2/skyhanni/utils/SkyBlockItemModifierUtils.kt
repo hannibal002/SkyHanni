@@ -135,7 +135,7 @@ object SkyBlockItemModifierUtils {
         return null
     }
 
-    fun ItemStack.getDye(): String? {
+    fun ItemStack.getArmorDye(): String? {
         for (tags in tagCompound.keySet) {
             if (tags != "ExtraAttributes") continue
             val extraAttributes = tagCompound.getCompoundTag(tags)
