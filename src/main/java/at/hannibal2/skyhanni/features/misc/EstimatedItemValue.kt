@@ -14,9 +14,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMasterStars
@@ -136,6 +138,8 @@ class EstimatedItemValue {
         totalPrice += addDrillUpgrades(stack, list)
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
+        totalPrice += addHelmetSkin(stack, list)
+        totalPrice += addDye(stack, list)
 
         if (basePrice == totalPrice) return listOf()
 
@@ -369,6 +373,24 @@ class EstimatedItemValue {
         val price = NEUItems.getPrice(internalName)
         val name = NEUItems.getItemStack(internalName).name!!.removeColor()
         list.add("§7$name: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
+    private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getHelmetSkin() ?: return 0.0
+
+        val price = NEUItems.getPrice(internalName)
+        val name = NEUItems.getItemStack(internalName).name
+        list.add("§7Skin: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
+    private fun addDye(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getDye() ?: return 0.0
+
+        val price = NEUItems.getPrice(internalName)
+        val name = NEUItems.getItemStack(internalName).name
+        list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
 
