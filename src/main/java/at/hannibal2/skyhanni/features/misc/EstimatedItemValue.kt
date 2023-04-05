@@ -464,10 +464,6 @@ class EstimatedItemValue {
                     5 -> multiplier = 16
                 }
                 level = 1
-                println("")
-                println("rawName: $rawName")
-                println("rawLevel: $rawLevel")
-                println("multiplier: $multiplier")
 
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
