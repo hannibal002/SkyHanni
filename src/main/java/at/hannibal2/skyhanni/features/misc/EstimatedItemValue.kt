@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -388,7 +389,7 @@ class EstimatedItemValue {
     }
 
     private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getDye() ?: return 0.0
+        val internalName = stack.getArmorDye() ?: return 0.0
 
         val price = NEUItems.getPrice(internalName)
         val name = NEUItems.getItemStack(internalName).name
