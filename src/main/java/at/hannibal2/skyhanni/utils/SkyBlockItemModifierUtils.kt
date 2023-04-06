@@ -108,17 +108,8 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getPowerScroll(): String? {
-        for (tags in tagCompound.keySet) {
-            if (tags != "ExtraAttributes") continue
-            val extraAttributes = tagCompound.getCompoundTag(tags)
-            for (attributes in extraAttributes.keySet) {
-                if (attributes == "power_ability_scroll") {
-                    return extraAttributes.getString(attributes)
-                }
-            }
-        }
-
-        return null
+        return tagCompound?.getCompoundTag("ExtraAttributes")?.getString("power_ability_scroll")
+            ?.takeUnless { it.isBlank() }
     }
 
     fun ItemStack.getHelmetSkin(): String? {
