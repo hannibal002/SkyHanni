@@ -122,31 +122,11 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getHelmetSkin(): String? {
-        for (tags in tagCompound.keySet) {
-            if (tags != "ExtraAttributes") continue
-            val extraAttributes = tagCompound.getCompoundTag(tags)
-            for (attributes in extraAttributes.keySet) {
-                if (attributes == "skin") {
-                    return extraAttributes.getString(attributes)
-                }
-            }
-        }
-
-        return null
+        return tagCompound?.getCompoundTag("ExtraAttributes")?.getString("skin")?.takeUnless { it.isBlank() }
     }
 
     fun ItemStack.getArmorDye(): String? {
-        for (tags in tagCompound.keySet) {
-            if (tags != "ExtraAttributes") continue
-            val extraAttributes = tagCompound.getCompoundTag(tags)
-            for (attributes in extraAttributes.keySet) {
-                if (attributes == "dye_item") {
-                    return extraAttributes.getString(attributes)
-                }
-            }
-        }
-
-        return null
+        return tagCompound?.getCompoundTag("ExtraAttributes")?.getString("dye_item")?.takeUnless { it.isBlank() }
     }
 
     fun ItemStack.getAbilityScrolls(): List<String> {
