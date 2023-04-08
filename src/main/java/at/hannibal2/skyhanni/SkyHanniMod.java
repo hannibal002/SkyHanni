@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter;
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier;
 import at.hannibal2.skyhanni.features.commands.WikiCommand;
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager;
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager;
 import at.hannibal2.skyhanni.features.dungeon.*;
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper;
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper;
@@ -242,6 +243,7 @@ public class SkyHanniMod {
         loadModule(new MinionCollectLogic());
         loadModule(new PasteIntoSigns());
         loadModule(new EstimatedItemValue());
+        loadModule(new DiscordRPCManager());
 
         Commands.INSTANCE.init();
 

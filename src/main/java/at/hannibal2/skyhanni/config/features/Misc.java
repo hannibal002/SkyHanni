@@ -232,6 +232,62 @@ public class Misc {
     public boolean estimatedIemValueAlwaysEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Discord RPC", desc = "Shows data about what you are doing in Skyblock through Discord.")
+    @ConfigEditorAccordion(id = 12)
+    public boolean discordRPC = false;
+
+    @Expose
+    @ConfigOption(name = "Discord RPC", desc = "Shows data about what you are doing in Skyblock through Discord (updates on island switch).")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean discordRPCEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Details", desc = "First line, appears immediately below \"Skyblock\".")
+    @ConfigEditorDropdown(
+            values = {
+                    "§bNothing",
+                    "§bLocation",
+                    "§bPurse",
+                    "§bBits",
+//            "§bStats",
+//            "§bZealots",
+                    "§bHeld Item",
+                    "§bSkyblock Date",
+                    "§bProfile (Fruit)",
+                    "§bCustom"
+            }
+    )
+    @ConfigAccordionId(id = 12)
+    public int details = 0;
+
+    @Expose
+    @ConfigOption(name = "Status", desc = "Second line, appears immediately below \"Details\".")
+    @ConfigEditorDropdown(
+            values = {
+                    "§bNothing",
+                    "§bLocation",
+                    "§bPurse",
+                    "§bBits",
+//            "§bStats",
+//            "§bZealots",
+                    "§bHeld Item",
+                    "§bSkyblock Date",
+                    "§bProfile (Fruit)",
+                    "§bCustom"
+            }
+    )
+    @ConfigAccordionId(id = 12)
+    public int status = 0;
+
+
+    @Expose
+    @ConfigOption(name = "Custom", desc = "What should be shown if you select \"Custom\" above.")
+    @ConfigEditorText
+    @ConfigAccordionId(id = 12)
+    public String custom = "";
+
+    @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @Expose

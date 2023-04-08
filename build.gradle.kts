@@ -6,6 +6,7 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("io.freefair.lombok") version "6.6.1" // needed for discord RPC getter and setter. might not actually be necessary. we'll see.
     kotlin("jvm") version "1.7.20-Beta"
 }
 
@@ -21,6 +22,10 @@ java {
 sourceSets.main {
     output.setResourcesDir(file("$buildDir/classes/java/main"))
 }
+
+// Stuff I took from SBA code to support Discord RPC dependency
+configurations.create("bundle")
+configurations.implementation.extendsFrom(configurations.named("bundle").get())
 
 // Dependencies:
 
@@ -53,6 +58,14 @@ dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
+
+    "bundle"("com.github.ILikePlayingGames:DiscordIPC:-SNAPSHOT") {
+        exclude(module = "log4j")
+        because("Different version conflicts with Minecraft's Log4J")
+        exclude(module = "gson")
+        because("Different version conflicts with Minecraft's Log4j")
+    } // More stuff taken from SBA code for Discord RPC
+
 
     // If you don't want mixins, remove these lines
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
