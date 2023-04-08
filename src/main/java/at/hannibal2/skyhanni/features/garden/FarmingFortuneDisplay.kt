@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 
 class FarmingFortuneDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -21,46 +22,17 @@ class FarmingFortuneDisplay {
     private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
     private val counterPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
 
-    private var display = mutableListOf<Any>()
+    private var display = listOf<Any>()
     private var currentCrop: CropType? = null
 
     private var tabFortune: Double = 0.0
     private var toolFortune: Double = 0.0
-    private var counterFortune: Double = 0.0
-    private var turboCropFortune: Double = 0.0
-    private var dedicationFortune: Double = 0.0
-    private var upgradeFortune: Double = 0.0
-
-    private val totalFortune: Double
-        get() = tabFortune +
-                toolFortune +
-                counterFortune +
-                turboCropFortune +
-                dedicationFortune +
-                upgradeFortune
+    private val upgradeFortune: Double?
+        get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
-        if (!GardenAPI.inGarden()) return
-        val cropBroken = CropType.getByBlock(event.getBlockState) ?: return
-        if (cropBroken != currentCrop) {
-            currentCrop = cropBroken
-            updateCropSpecificFortune(event.itemInHand)
-        }
-    }
-
-    @SubscribeEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
-        val heldTool = event.toolItem
-        currentCrop = event.crop ?: currentCrop
-        updateCropSpecificFortune(heldTool)
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onInventoryUpdate(event: OwnInventorItemUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (GardenAPI.getCropTypeFromItem(event.itemStack) == null) return
-        updateCropSpecificFortune(event.itemStack)
+    fun onCropUpgradeUpdate(event: CropUpgradeUpdateEvent) {
+        drawDisplay()
     }
 
     @SubscribeEvent
@@ -72,6 +44,30 @@ class FarmingFortuneDisplay {
         drawDisplay()
     }
 
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onInventoryUpdate(event: OwnInventorItemUpdateEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (GardenAPI.getCropTypeFromItem(event.itemStack) == null) return
+        updateToolFortune(event.itemStack)
+    }
+
+    @SubscribeEvent
+    fun onBlockBreak(event: BlockClickEvent) {
+        if (!GardenAPI.inGarden()) return
+        val cropBroken = CropType.getByBlock(event.getBlockState) ?: return
+        if (cropBroken != currentCrop) {
+            currentCrop = cropBroken
+            updateToolFortune(event.itemInHand)
+        }
+    }
+
+    @SubscribeEvent
+    fun onGardenToolChange(event: GardenToolChangeEvent) {
+        val heldTool = event.toolItem
+        currentCrop = event.crop ?: currentCrop
+        updateToolFortune(heldTool)
+    }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!GardenAPI.inGarden() || !config.farmingFortuneDisplay) return
@@ -80,19 +76,22 @@ class FarmingFortuneDisplay {
 
     private fun drawDisplay() {
         val displayCrop = currentCrop ?: return
-        display.clear()
-        GardenAPI.addGardenCropToList(displayCrop, display)
-        display.add("§6Farming Fortune§7: §e${LorenzUtils.formatDouble(totalFortune, 0)}")
+        val updatedDisplay = mutableListOf<Any>()
+        GardenAPI.addGardenCropToList(displayCrop, updatedDisplay)
+        updatedDisplay.add(upgradeFortune?.let {
+            val totalFortune = it + tabFortune + toolFortune
+            "§6Farming Fortune§7: §e${LorenzUtils.formatDouble(totalFortune, 0)}"
+        } ?: "§cOpen §e/cropupgrades§c to use!")
+        display = updatedDisplay
     }
 
-    private fun updateCropSpecificFortune(tool: ItemStack?) {
+    private fun updateToolFortune(tool: ItemStack?) {
         val cropMatchesTool = currentCrop == GardenAPI.getCropTypeFromItem(tool)
-        toolFortune = if (cropMatchesTool) getToolFortune(tool) else 0.0
-        counterFortune = if (cropMatchesTool) getCounterFortune(tool) else 0.0
-
-        turboCropFortune = getTurboCropFortune(tool)
-        dedicationFortune = getDedicationFortune(tool)
-        upgradeFortune = (currentCrop?.getUpgradeLevel() ?: 0) * 5.0
+        val toolCounterFortune = if (cropMatchesTool) {
+            getToolFortune(tool) + getCounterFortune(tool)
+        } else 0.0
+        toolFortune = toolCounterFortune + getTurboCropFortune(tool) + getDedicationFortune(tool)
+        drawDisplay()
     }
 
     private fun getTurboCropFortune(tool: ItemStack?): Double {

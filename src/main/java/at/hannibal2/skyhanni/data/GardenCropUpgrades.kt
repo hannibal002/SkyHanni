@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.CropUpgradeUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -12,24 +13,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropUpgrades {
     private val tierPattern = "§7Current Tier: §[0-9a-e](\\d)§7/§a9".toRegex()
-    private val chatUpgradePattern = "\\s*§r§6§lCROP UPGRADE §e§f([\\w ]+)§7 #(\\d)§r".toRegex()
+    private val chatUpgradePattern = " {2}§r§6§lCROP UPGRADE §e§f([\\w ]+)§7 #(\\d)".toRegex()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         chatUpgradePattern.matchEntire(event.message)?.groups?.let { matches ->
             val crop = CropType.getByItemName(matches[1]!!.value) ?: return
             val level = matches[2]!!.value.toInt()
-            cropUpgrades[crop] = level
+            crop.setUpgradeLevel(level)
         }
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        if (cropUpgrades.isEmpty()) {
-            for (crop in CropType.values()) {
-                cropUpgrades[crop] = 0
-            }
-        }
+        CropUpgradeUpdateEvent().postAndCatch()
     }
 
     @SubscribeEvent
@@ -44,12 +37,14 @@ class GardenCropUpgrades {
             } ?: return@forEach
             crop.setUpgradeLevel(level)
         }
+        CropUpgradeUpdateEvent().postAndCatch()
     }
 
     companion object {
-        val cropUpgrades: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropUpgrades
+        private val cropUpgrades: MutableMap<CropType, Int> get() =
+            SkyHanniMod.feature.hidden.gardenCropUpgrades
 
-        fun CropType.getUpgradeLevel() = cropUpgrades[this]!!
+        fun CropType.getUpgradeLevel() = cropUpgrades[this]
 
         fun CropType.setUpgradeLevel(level: Int) {
             cropUpgrades[this] = level
