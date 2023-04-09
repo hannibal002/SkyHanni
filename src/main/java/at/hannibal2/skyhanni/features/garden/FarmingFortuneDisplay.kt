@@ -155,7 +155,6 @@ class FarmingFortuneDisplay {
             val lore = tool?.getLore() ?: return 0.0
             var hasCollectionAbility = false
             return lore.firstNotNullOfOrNull {
-                println(it)
                 if (hasCollectionAbility || it == "§6Collection Analysis") {
                     hasCollectionAbility = true
                     collectionPattern.matchEntire(it)?.groups?.get(1)?.value?.toDoubleOrNull()
