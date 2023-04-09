@@ -10,11 +10,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import org.lwjgl.input.Keyboard
+import kotlin.math.floor
+import kotlin.math.log10
 import kotlin.math.roundToInt
 
 class FarmingFortuneDisplay {
@@ -81,15 +84,29 @@ class FarmingFortuneDisplay {
         val crop = GardenAPI.getCropTypeFromItem(event.itemStack) ?: return
         val toolFortune = getToolFortune(event.itemStack)
         val counterFortune = getCounterFortune(event.itemStack)
+        val collectionFortune = getCollectionFortune(event.itemStack)
         val turboCropFortune = getTurboCropFortune(event.itemStack, crop)
         val dedicationFortune = getDedicationFortune(event.itemStack, crop)
-        val cropFortune = (toolFortune + counterFortune + turboCropFortune + dedicationFortune).roundToInt()
+        val cropFortune = (
+                toolFortune +
+                counterFortune +
+                collectionFortune +
+                turboCropFortune +
+                dedicationFortune
+        ).roundToInt()
         val iterator = event.toolTip.listIterator()
         for (line in iterator) {
             val match = tooltipFortunePattern.matchEntire(line)?.groups ?: continue
             val displayedFortune = match[1]!!.value.toInt()
             val theRest = match[2]!!.value
             iterator.set("§7Farming Fortune: §a+${displayedFortune + cropFortune}$theRest §6[+$cropFortune]")
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                iterator.add("  §7Tool Bonus: §a+${toolFortune.roundToInt()}")
+                iterator.add("  §7Logarithmic Counter: §a+${counterFortune.roundToInt()}")
+                iterator.add("  §7Collection Analyst: §a+${collectionFortune.roundToInt()}")
+                iterator.add("  §7Dedication: §a+${dedicationFortune.roundToInt()}")
+                iterator.add("  §7Turbo-Crop: §a+${turboCropFortune.roundToInt()}")
+            }
         }
     }
 
@@ -107,7 +124,7 @@ class FarmingFortuneDisplay {
     private fun updateToolFortune(tool: ItemStack?) {
         val cropMatchesTool = currentCrop == GardenAPI.getCropTypeFromItem(tool)
         val toolCounterFortune = if (cropMatchesTool) {
-            getToolFortune(tool) + getCounterFortune(tool)
+            getToolFortune(tool) + getCounterFortune(tool) + getCollectionFortune(tool)
         } else 0.0
         toolFortune = toolCounterFortune +
                 getTurboCropFortune(tool, currentCrop) +
@@ -116,7 +133,7 @@ class FarmingFortuneDisplay {
     }
 
     companion object {
-        private val counterPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
+        private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
 
         private fun getToolFortune(tool: ItemStack?): Double {
             val internalName = tool?.getInternalName() ?: return 0.0
@@ -134,11 +151,22 @@ class FarmingFortuneDisplay {
             return tool?.getEnchantments()?.get(crop.getTurboCrop())?.let { it * 5.0 } ?: 0.0
         }
 
-        private fun getCounterFortune(tool: ItemStack?): Double {
+        private fun getCollectionFortune(tool: ItemStack?): Double {
             val lore = tool?.getLore() ?: return 0.0
-            return lore.sumOf {
-                counterPattern.matchEntire(it)?.groups?.get(1)?.value?.toDoubleOrNull() ?: 0.0
-            }
+            var hasCollectionAbility = false
+            return lore.firstNotNullOfOrNull {
+                println(it)
+                if (hasCollectionAbility || it == "§6Collection Analysis") {
+                    hasCollectionAbility = true
+                    collectionPattern.matchEntire(it)?.groups?.get(1)?.value?.toDoubleOrNull()
+                } else null
+            } ?: 0.0
+        }
+
+        private fun getCounterFortune(tool: ItemStack?): Double {
+            val counter = tool?.getCounter() ?: return 0.0
+            val digits = floor(log10(counter.toDouble()))
+            return (16 * digits - 48).takeIf { it > 0.0 } ?: 0.0
         }
 
         private fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
