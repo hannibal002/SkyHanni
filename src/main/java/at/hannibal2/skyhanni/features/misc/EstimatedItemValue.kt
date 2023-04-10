@@ -542,37 +542,4 @@ class EstimatedItemValue {
         }
         return totalPrice
     }
-
-    class GemstoneSlot(val type: GemstoneType, val tier: GemstoneTier) {
-        fun getInternalName() = "${tier}_${type}_GEM"
-    }
-
-    enum class GemstoneTier(val displayName: String) {
-        ROUGH("Rough"),
-        FLAWED("Flawed"),
-        FINE("Fine"),
-        FLAWLESS("Flawless"),
-        PERFECT("Perfect"),
-        ;
-
-        companion object {
-            fun getByName(name: String) = GemstoneTier.values().firstOrNull { it.name == name }
-        }
-    }
-
-    enum class GemstoneType(val displayName: String) {
-        JADE("Jade"),
-        AMBER("Amber"),
-        TOPAZ("Topaz"),
-        SAPPHIRE("Sapphire"),
-        AMETHYST("Amethyst"),
-        JASPER("Jasper"),
-        RUBY("Ruby"),
-        OPAL("Opal"),
-        ;
-
-        companion object {
-            fun getByName(name: String) = values().firstOrNull { it.name == name }
-        }
-    }
 }
