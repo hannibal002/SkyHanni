@@ -56,6 +56,7 @@
 + Added **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
 + Added **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
 + Added **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
++ Added **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
 
 
 ### Features from other Mods
