@@ -17,7 +17,7 @@ class ToolTooltipTweaks {
     private val tooltipFortunePattern = "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
 
-    private val reforgeEndLine = setOf("§5§o", "§5§o§7Grants §6+0.2 coins §7per crop.")
+    private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
