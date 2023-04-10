@@ -103,7 +103,7 @@ public class SkyHanniMod {
         // utils
         loadModule(this);
         loadModule(new ChatManager());
-        loadModule(new HyPixelData());
+        loadModule(new HypixelData());
         loadModule(new DungeonData());
         loadModule(new ScoreboardData());
         loadModule(new ApiDataLoader());

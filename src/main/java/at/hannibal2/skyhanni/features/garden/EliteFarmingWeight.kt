@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
@@ -91,7 +91,7 @@ class EliteFarmingWeight {
 
             if (weight == -1.0) {
                 if (!isLoadingWeight) {
-                    val localProfile = HyPixelData.profileName
+                    val localProfile = HypixelData.profileName
                     if (localProfile == "") return
 
                     isLoadingWeight = true
