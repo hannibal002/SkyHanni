@@ -84,8 +84,8 @@ public class SkyHanniMod {
     public static RepoManager repo;
     public static ConfigManager configManager;
     private static Logger logger;
-    public static org.slf4j.Logger getLogger(String name) {
-        return org.slf4j.LoggerFactory.getLogger("SkyHanni." + name);
+    public static Logger getLogger(String name) {
+     return LogManager.getLogger("SkyHanni." + name);
     }
 
     public static List<Object> modules = new ArrayList<>();

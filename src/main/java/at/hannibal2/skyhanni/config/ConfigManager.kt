@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.migration.MigratingConfigLoader
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import java.io.*
+import java.lang.RuntimeException
 import java.nio.charset.StandardCharsets
 
 class ConfigManager {
@@ -25,6 +28,20 @@ class ConfigManager {
     private var configFile: File? = null
     lateinit var processor: MoulConfigProcessor<Features>
 
+    fun loadConfig(file: File): Features {
+        val x = MigratingConfigLoader.loadConfig(
+            gson.fromJson(file.readText(), JsonElement::class.java),
+            Features::class.java
+        )
+        return when (x) {
+            MigratingConfigLoader.LoadResult.UseDefault -> Features()
+            is MigratingConfigLoader.LoadResult.Instance -> x.instance!!
+            is MigratingConfigLoader.LoadResult.Failure -> throw RuntimeException("Failed to load field ${x.field}", x.exception)
+            MigratingConfigLoader.LoadResult.Invalid -> error("LoadResult.Invalid returned directly?")
+        }
+    }
+
+
     fun firstLoad() {
         try {
             configDirectory.mkdir()
@@ -37,24 +54,9 @@ class ConfigManager {
 
         if (configFile!!.exists()) {
             try {
-                val inputStreamReader = InputStreamReader(FileInputStream(configFile!!), StandardCharsets.UTF_8)
-                val bufferedReader = BufferedReader(inputStreamReader)
-                val builder = StringBuilder()
-                for (line in bufferedReader.lines()) {
-                    val result = fixConfig(line)
-                    builder.append(result)
-                    builder.append("\n")
-                }
-
-
-                SkyHanniMod.feature = gson.fromJson(
-                    builder.toString(),
-                    Features::class.java
-                )
+                SkyHanniMod.feature = loadConfig(configFile!!)
                 logger.info("Loaded config from file")
             } catch (e: Exception) {
-                println("config error")
-                e.printStackTrace()
                 val backupFile = configFile!!.resolveSibling("config-${System.currentTimeMillis()}-backup.json")
                 logger.error(
                     "Exception while reading $configFile. Will load blank config and save backup to $backupFile",
