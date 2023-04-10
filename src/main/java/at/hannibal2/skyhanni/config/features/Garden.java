@@ -749,6 +749,15 @@ public class Garden {
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
+    @ConfigOption(
+            name = "Inventory Numbers",
+            desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterInventoryNumbers = true;
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;

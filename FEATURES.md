@@ -203,6 +203,7 @@
 + **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
 + **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
 + **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
++ **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
