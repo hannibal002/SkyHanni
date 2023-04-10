@@ -63,7 +63,7 @@ class EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderitemTooltip(event: RenderItemTooltipEvent) {
+    fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
 
