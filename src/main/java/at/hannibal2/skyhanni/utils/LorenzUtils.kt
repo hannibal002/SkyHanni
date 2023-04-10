@@ -171,6 +171,8 @@ object LorenzUtils {
 
     fun getPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
 
+    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }

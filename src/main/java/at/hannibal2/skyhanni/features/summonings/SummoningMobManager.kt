@@ -82,7 +82,7 @@ class SummoningMobManager {
                     val name = it.displayName.unformattedText
                     val matcher = healthPattern.matcher(name)
                     if (matcher.matches()) {
-                        val playerName = Minecraft.getMinecraft().thePlayer.name
+                        val playerName = LorenzUtils.getPlayerName()
                         if (name.contains(playerName)) {
                             summoningMobNametags.add(it as EntityArmorStand)
                             if (summoningMobNametags.size == summoningsSpawned) {
