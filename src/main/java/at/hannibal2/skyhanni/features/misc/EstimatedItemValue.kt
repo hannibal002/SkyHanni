@@ -13,10 +13,12 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMasterStars
@@ -130,6 +132,10 @@ class EstimatedItemValue {
         totalPrice += addSilex(stack, list)
         totalPrice += addTransmissionTuners(stack, list)
         totalPrice += addManaDisintegrators(stack, list)
+
+        // cosmetic
+        totalPrice += addHelmetSkin(stack, list)
+        totalPrice += addArmorDye(stack, list)
 
         // dynamic
         totalPrice += addAbilityScrolls(stack, list)
@@ -372,6 +378,24 @@ class EstimatedItemValue {
         return price
     }
 
+    private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getHelmetSkin() ?: return 0.0
+
+        val price = NEUItems.getPrice(internalName)
+        val name = NEUItems.getItemStack(internalName).name
+        list.add("§7Skin: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
+    private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getArmorDye() ?: return 0.0
+
+        val price = NEUItems.getPrice(internalName)
+        val name = NEUItems.getItemStack(internalName).name
+        list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
@@ -442,10 +466,6 @@ class EstimatedItemValue {
                     5 -> multiplier = 16
                 }
                 level = 1
-                println("")
-                println("rawName: $rawName")
-                println("rawLevel: $rawLevel")
-                println("multiplier: $multiplier")
 
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
