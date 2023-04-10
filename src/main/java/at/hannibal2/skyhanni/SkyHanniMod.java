@@ -244,6 +244,7 @@ public class SkyHanniMod {
         loadModule(new PasteIntoSigns());
         loadModule(new EstimatedItemValue());
         loadModule(new FarmingFortuneDisplay());
+        loadModule(new ToolTooltipTweaks());
 
         Commands.INSTANCE.init();
 
