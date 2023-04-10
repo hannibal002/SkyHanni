@@ -15,10 +15,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.floor
 import kotlin.math.log10
-import kotlin.math.roundToInt
 
 class FarmingFortuneDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -30,13 +29,10 @@ class FarmingFortuneDisplay {
 
     private var tabFortune: Double = 0.0
     private var toolFortune: Double = 0.0
-    private val upgradeFortune: Double?
-        get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
+    private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
 
-    @SubscribeEvent
-    fun onCropUpgradeUpdate(event: CropUpgradeUpdateEvent) {
-        drawDisplay()
-    }
+    private var lastToolSwitch: Long = 0
+    private var ticks: Int = 0
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -44,7 +40,6 @@ class FarmingFortuneDisplay {
         tabFortune = event.tabList.firstNotNullOfOrNull {
             tabFortunePattern.matchEntire(it)?.groups?.get(1)?.value?.toDoubleOrNull()
         } ?: tabFortune
-        drawDisplay()
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -66,6 +61,7 @@ class FarmingFortuneDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
+        lastToolSwitch = System.currentTimeMillis()
         val heldTool = event.toolItem
         currentCrop = event.crop ?: currentCrop
         updateToolFortune(heldTool)
@@ -73,18 +69,24 @@ class FarmingFortuneDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!GardenAPI.inGarden() || !config.farmingFortuneDisplay) return
+        if (!isEnabled()) return
         config.farmingFortunePos.renderSingleLineWithItems(display, posLabel = "Farming Fortune")
     }
 
-    private fun drawDisplay() {
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START || ticks++ % 5 != 0) return
         val displayCrop = currentCrop ?: return
         val updatedDisplay = mutableListOf<Any>()
         GardenAPI.addGardenCropToList(displayCrop, updatedDisplay)
-        updatedDisplay.add(upgradeFortune?.let {
-            val totalFortune = it + tabFortune + toolFortune
-            "§6Farming Fortune§7: §e${LorenzUtils.formatDouble(totalFortune, 0)}"
-        } ?: "§cOpen §e/cropupgrades§c to use!")
+        val recentlySwitchedTool = System.currentTimeMillis() < lastToolSwitch + 1000
+        val displayString = upgradeFortune?.let {
+            "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool) {
+                val totalFortune = it + tabFortune + toolFortune
+                LorenzUtils.formatDouble(totalFortune, 0)
+            } else "?"
+        } ?: "§cOpen §e/cropupgrades§c to use!"
+        updatedDisplay.add(displayString)
         display = updatedDisplay
     }
 
@@ -94,8 +96,9 @@ class FarmingFortuneDisplay {
             getToolFortune(tool) + getCounterFortune(tool) + getCollectionFortune(tool)
         } else 0.0
         toolFortune = toolCounterFortune + getTurboCropFortune(tool, currentCrop) + getDedicationFortune(tool, currentCrop)
-        drawDisplay()
     }
+
+    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.farmingFortuneDisplay
 
     companion object {
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
