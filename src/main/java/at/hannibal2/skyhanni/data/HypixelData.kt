@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
@@ -15,7 +16,8 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 class HypixelData {
 
     companion object {
-        var hypixel = false
+        var hypixelLive = false
+        var hypixelAlpha = false
         var skyBlock = false
         var skyBlockIsland = IslandType.UNKNOWN
 
@@ -38,13 +40,13 @@ class HypixelData {
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
 
-    @SubscribeEvent
-    fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
-        hypixel = Minecraft.getMinecraft().runCatching {
-            !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
-                ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
-        }.onFailure { it.printStackTrace() }.getOrDefault(false)
-    }
+//    @SubscribeEvent
+//    fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
+//        hypixel = Minecraft.getMinecraft().runCatching {
+//            !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
+//                ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
+//        }.onFailure { it.printStackTrace() }.getOrDefault(false)
+//    }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
@@ -53,13 +55,14 @@ class HypixelData {
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        hypixel = false
+        hypixelLive = false
+        hypixelAlpha = false
         skyBlock = false
     }
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!hypixel) return
+        if (!LorenzUtils.isHypixel) return
 
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
@@ -79,12 +82,14 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!hypixel) return
         if (event.phase != TickEvent.Phase.START) return
 
         tick++
-
         if (tick % 5 != 0) return
+
+        checkHypixel()
+
+        if (!LorenzUtils.isHypixel) return
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
@@ -94,6 +99,21 @@ class HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+    }
+
+    private fun checkHypixel() {
+        val list = ScoreboardData.sidebarLinesFormatted
+        if (list.isEmpty()) return
+
+        val last = list.last()
+        hypixelLive = last == "§ewww.hypixel.net"
+        hypixelAlpha = last == "§ealpha.hypixel.net"
+
+        println("")
+        println("hypixelLive: $hypixelLive")
+        println("hypixelAlpha: $hypixelAlpha")
+        println("last: '$last'")
+
     }
 
     private fun checkSidebar() {
