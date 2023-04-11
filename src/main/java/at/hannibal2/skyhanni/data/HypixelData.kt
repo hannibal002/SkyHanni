@@ -54,7 +54,7 @@ class HypixelData {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.isHypixel) return
+        if (!LorenzUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
@@ -81,7 +81,7 @@ class HypixelData {
 
         checkHypixel()
 
-        if (!LorenzUtils.isHypixel) return
+        if (!LorenzUtils.onHypixel) return
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
