@@ -12,8 +12,8 @@
 + Added **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
 + Added **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + Added **Contest Time** - Adds the real time format to the farming contest description.
-+ Added **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (Thanks appable0)
-+ Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (Thanks appable0)
++ Added **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (contributed by appable)
++ Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (contributed by appable)
 + Added **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
 + Added **Estimated Item Value** - Displays an estimated item value for the item you hover over.
 
@@ -57,6 +57,10 @@
 + Added **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
 + Added **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
 + Added **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
++ Added **True Farming Fortune - Displays** current farming fortune, including crop-specific bonuses. (contributed by appable)
++ Added **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
++ Added **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
++ Added **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 
 
 ### Features from other Mods

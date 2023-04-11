@@ -204,6 +204,10 @@
 + **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
 + **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
 + **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
++ **True Farming Fortune - Displays** current farming fortune, including crop-specific bonuses. (contributed by appable)
++ **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
++ **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
++ **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 
 ## Commands
 - /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
