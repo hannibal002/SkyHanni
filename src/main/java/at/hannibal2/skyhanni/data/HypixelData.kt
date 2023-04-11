@@ -40,14 +40,6 @@ class HypixelData {
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
 
-//    @SubscribeEvent
-//    fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
-//        hypixel = Minecraft.getMinecraft().runCatching {
-//            !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
-//                ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
-//        }.onFailure { it.printStackTrace() }.getOrDefault(false)
-//    }
-
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         skyBlock = false
