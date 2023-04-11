@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.About
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
@@ -14,11 +16,27 @@ import java.util.concurrent.CompletableFuture
 object UpdateManager {
 
     private val logger = SkyHanniMod.getLogger("UpdateManager")
+    private var _activePromise: CompletableFuture<*>? = null
+    private var activePromise: CompletableFuture<*>?
+        get() = _activePromise
+        set(value) {
+            _activePromise?.cancel(true)
+            _activePromise = value
+        }
+
     var updateState: UpdateState = UpdateState.NONE
         private set
 
     fun getNextVersion(): String? {
         return potentialUpdate?.update?.versionNumber?.asString
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        SkyHanniMod.feature.about.updateStream.whenChanged { oldValue, newValue ->
+            if (oldValue != newValue)
+                reset()
+        }
     }
 
     @SubscribeEvent
@@ -39,14 +57,30 @@ object UpdateManager {
         }
     }
 
+    fun isBetaRelease(): Boolean {
+        return getCurrentVersion().contains("beta", ignoreCase = true)
+    }
+
     val config get() = SkyHanniMod.feature.about
+
+    fun reset() {
+        updateState = UpdateState.NONE
+        _activePromise = null
+        potentialUpdate = null
+        logger.info("Reset update state")
+    }
+
     fun checkUpdate() {
         if (updateState != UpdateState.NONE) {
             logger.error("Trying to perform update check while another update is already in progress")
             return
         }
         logger.info("Starting update check")
-        context.checkUpdate(config.updateStream.stream)
+        var updateStream = config.updateStream.get()
+        if (updateStream == About.UpdateStream.RELEASES && isBetaRelease()) {
+            updateStream = About.UpdateStream.BETA
+        }
+        activePromise = context.checkUpdate(updateStream.stream)
             .thenAcceptAsync({
                 logger.info("Update check completed")
                 if (updateState != UpdateState.NONE) {
@@ -66,7 +100,7 @@ object UpdateManager {
             logger.error("Trying to enqueue an update while another one is already downloaded or none is present")
         }
         updateState = UpdateState.QUEUED
-        CompletableFuture.supplyAsync {
+        activePromise = CompletableFuture.supplyAsync {
             logger.info("Update download started")
             potentialUpdate!!.prepareUpdate()
         }.thenAcceptAsync({

@@ -35,6 +35,7 @@ public class Features extends Config {
         return "SkyHanni " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
 
+    @Expose
     @Category(name = "About", desc = "Information about SkyHanni and updates")
     public About about = new About();
 

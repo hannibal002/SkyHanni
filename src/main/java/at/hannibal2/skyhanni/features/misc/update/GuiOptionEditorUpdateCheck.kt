@@ -19,12 +19,13 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         GlStateManager.pushMatrix()
         GlStateManager.translate(x.toFloat() + 10, y.toFloat(), 1F)
         val width = width - 20
+        val nextVersion = UpdateManager.getNextVersion()
 
         button.text = when (UpdateManager.updateState) {
             UpdateManager.UpdateState.AVAILABLE -> "Download update"
             UpdateManager.UpdateState.QUEUED -> "Downloading..."
             UpdateManager.UpdateState.DOWNLOADED -> "Downloaded"
-            UpdateManager.UpdateState.NONE -> "Check for Updates"
+            UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
         button.render(getButtonPosition(width), 10)
 
@@ -40,12 +41,11 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         }
 
         val widthRemaining = width - button.width - 10
-        val nextVersion = UpdateManager.getNextVersion()
 
         GlStateManager.scale(2F, 2F, 1F)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            if (nextVersion != null) "${RED}${UpdateManager.getCurrentVersion()} ➜ ${GREEN}${nextVersion}"
-            else "${GREEN}${UpdateManager.getCurrentVersion()}",
+            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}${UpdateManager.getCurrentVersion()}" +
+                    if (nextVersion != null) "➜ ${GREEN}${nextVersion}" else "",
             fr,
             widthRemaining / 4F,
             10F,
