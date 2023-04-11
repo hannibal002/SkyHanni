@@ -70,7 +70,7 @@ class FarmingFortuneDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.farmingFortunePos.renderSingleLineWithItems(display, posLabel = "Farming Fortune")
+        config.farmingFortunePos.renderSingleLineWithItems(display, posLabel = "True Farming Fortune")
     }
 
     @SubscribeEvent
