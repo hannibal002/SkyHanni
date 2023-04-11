@@ -67,7 +67,21 @@ class GardenAPI {
         if (crop != null) return crop.cropName
 
         val internalName = toolItem?.getInternalName() ?: return null
-        return if (internalName.startsWith("DAEDALUS_AXE")) "Other Tool" else null
+        return if (isOtherTool(internalName)) internalName else null
+    }
+
+    private fun isOtherTool(internalName: String): Boolean {
+        if (internalName.startsWith("DAEDALUS_AXE")) return true
+
+        if (internalName.startsWith("BASIC_GARDENING_HOE")) return true
+        if (internalName.startsWith("ADVANCED_GARDENING_AXE")) return true
+
+        if (internalName.startsWith("BASIC_GARDENING_AXE")) return true
+        if (internalName.startsWith("ADVANCED_GARDENING_HOE")) return true
+
+        if (internalName.startsWith("ROOKIE_HOE")) return true
+
+        return false
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
