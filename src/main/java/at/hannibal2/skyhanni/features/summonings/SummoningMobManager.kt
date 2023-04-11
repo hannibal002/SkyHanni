@@ -37,7 +37,7 @@ class SummoningMobManager {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
         val matcher = spawnPatter.matcher(message)
