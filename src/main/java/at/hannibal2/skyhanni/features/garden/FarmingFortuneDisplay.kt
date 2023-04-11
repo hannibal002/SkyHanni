@@ -9,13 +9,18 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.CompressedStreamTools
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.io.ByteArrayInputStream
+import java.util.*
 import kotlin.math.floor
 import kotlin.math.log10
 
@@ -24,15 +29,28 @@ class FarmingFortuneDisplay {
 
     private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
 
+    private var cropAccessory: CropAccessory?
+        get() = SkyHanniMod.feature.hidden.savedCropAccessory
+        set(accessory) { SkyHanniMod.feature.hidden.savedCropAccessory = accessory }
+
     private var display = listOf<Any>()
     private var currentCrop: CropType? = null
 
     private var tabFortune: Double = 0.0
     private var toolFortune: Double = 0.0
     private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
+    private val accessoryFortune: Double get() = currentCrop?.let { cropAccessory?.getFortune(it) } ?: 0.0
 
     private var lastToolSwitch: Long = 0
     private var ticks: Int = 0
+
+    @SubscribeEvent
+    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
+        val accessories = getCropAccessories(event.profileData["talisman_bag"]).also {
+            it.addAll(getCropAccessories(event.profileData["inv_contents"]))
+        }
+        cropAccessory = accessories.maxOrNull()
+    }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -82,7 +100,7 @@ class FarmingFortuneDisplay {
         val recentlySwitchedTool = System.currentTimeMillis() < lastToolSwitch + 1000
         val displayString = upgradeFortune?.let {
             "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool) {
-                val totalFortune = it + tabFortune + toolFortune
+                val totalFortune = it + tabFortune + toolFortune + accessoryFortune
                 LorenzUtils.formatDouble(totalFortune, 0)
             } else "?"
         } ?: "§cOpen §e/cropupgrades§c to use!"
@@ -143,6 +161,25 @@ class FarmingFortuneDisplay {
                 cropType?.getCounter() ?: 0
             )
             return dedicationMultiplier * cropMilestone
+        }
+
+        // Derived partially from NotEnoughUpdates/NotEnoughUpdates, ProfileViewer.Profile#getInventoryInfo
+        private fun getCropAccessories(inventory: JsonElement?): MutableList<CropAccessory> {
+            if (inventory == null) return mutableListOf()
+            val cropAccessories = mutableListOf<CropAccessory>()
+            val data = inventory.asJsonObject["data"]?.asString
+            val accessoryBagItems = CompressedStreamTools.readCompressed(
+                ByteArrayInputStream(Base64.getDecoder().decode(data))
+            ).getTagList("i", 10)
+            for (j in 0 until accessoryBagItems.tagCount()) {
+                val itemStackTag = accessoryBagItems.getCompoundTagAt(j)
+                if (!itemStackTag.hasKey("tag")) continue
+                val itemTag = itemStackTag.getCompoundTag("tag")
+                val itemName = NEUItems.getInternalNameOrNull(itemTag) ?: continue
+                val itemAsCropAccessory = CropAccessory.getByName(itemName) ?: continue
+                cropAccessories.add(itemAsCropAccessory)
+            }
+            return cropAccessories
         }
     }
 }
