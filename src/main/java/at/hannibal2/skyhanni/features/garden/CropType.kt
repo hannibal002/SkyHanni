@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
@@ -32,6 +33,33 @@ enum class CropType(val cropName: String, val toolName: String, iconSupplier: ()
                 return MUSHROOM
             }
             return getByName(itemName)
+        }
+
+        fun getByBlock(blockState: IBlockState): CropType? {
+            return when (blockState.block) {
+                Blocks.wheat -> WHEAT
+                Blocks.carrots -> CARROT
+                Blocks.potatoes -> POTATO
+                Blocks.pumpkin -> PUMPKIN
+                Blocks.reeds -> SUGAR_CANE
+                Blocks.melon_block -> MELON
+                Blocks.cactus -> CACTUS
+                Blocks.cocoa -> COCOA_BEANS
+                Blocks.red_mushroom -> MUSHROOM
+                Blocks.brown_mushroom -> MUSHROOM
+                Blocks.nether_wart -> NETHER_WART
+                else -> null
+            }
+        }
+
+        fun CropType.getTurboCrop(): String {
+            return when (this) {
+                COCOA_BEANS -> "turbo_coco"
+                SUGAR_CANE -> "turbo_cane"
+                NETHER_WART -> "turbo_warts"
+                MUSHROOM -> "turbo_mushrooms"
+                else -> "turbo_${this.cropName.lowercase()}"
+            }
         }
     }
 }

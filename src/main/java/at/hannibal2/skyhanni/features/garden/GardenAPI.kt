@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCounter
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCount
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -91,23 +93,7 @@ class GardenAPI {
             return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
         }
 
-        fun readCounter(itemStack: ItemStack): Int {
-            if (itemStack.hasTagCompound()) {
-                val tag = itemStack.tagCompound
-                if (tag.hasKey("ExtraAttributes", 10)) {
-                    val ea = tag.getCompoundTag("ExtraAttributes")
-                    if (ea.hasKey("mined_crops", 99)) {
-                        return ea.getInteger("mined_crops")
-                    }
-
-                    // only using cultivating when no crops counter is there
-                    if (ea.hasKey("farmed_cultivating", 99)) {
-                        return ea.getInteger("farmed_cultivating")
-                    }
-                }
-            }
-            return -1
-        }
+        fun readCounter(itemStack: ItemStack): Int = itemStack.getCounter() ?: itemStack.getCultivatingCount() ?: -1
 
         fun CropType.getSpeed(): Int {
             val speed = cropsPerSecond[this]

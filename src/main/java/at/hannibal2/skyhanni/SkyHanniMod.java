@@ -122,6 +122,7 @@ public class SkyHanniMod {
         loadModule(new TabListData());
         loadModule(new RenderGuiData());
         loadModule(new GardenCropMilestones());
+        loadModule(new GardenCropUpgrades());
         loadModule(new OwnInventoryData());
         loadModule(new ToolTipData());
         loadModule(new GuiEditManager());
@@ -244,6 +245,8 @@ public class SkyHanniMod {
         loadModule(new PasteIntoSigns());
         loadModule(new EstimatedItemValue());
         loadModule(new ComposterInventoryNumbers());
+        loadModule(new FarmingFortuneDisplay());
+        loadModule(new ToolTooltipTweaks());
 
         Commands.INSTANCE.init();
 
