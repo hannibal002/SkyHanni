@@ -40,6 +40,11 @@ class GardenBestCropTime {
             newList.addAsSingletonList("§eBest Crop Time §7($title§7)")
         }
 
+        if (!config.cropMilestoneProgress) {
+            newList.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
+            return newList
+        }
+
         if (sorted.isEmpty()) {
             newList.addAsSingletonList("§cFarm crops to add them to this list!")
             return newList
