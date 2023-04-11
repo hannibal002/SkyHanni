@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.misc.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import net.minecraft.item.ItemStack
@@ -132,17 +131,16 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getPowerScroll(): String? {
-        for (tags in tagCompound.keySet) {
-            if (tags != "ExtraAttributes") continue
-            val extraAttributes = tagCompound.getCompoundTag(tags)
-            for (attributes in extraAttributes.keySet) {
-                if (attributes == "power_ability_scroll") {
-                    return extraAttributes.getString(attributes)
-                }
-            }
-        }
+        return tagCompound?.getCompoundTag("ExtraAttributes")?.getString("power_ability_scroll")
+            ?.takeUnless { it.isBlank() }
+    }
 
-        return null
+    fun ItemStack.getHelmetSkin(): String? {
+        return tagCompound?.getCompoundTag("ExtraAttributes")?.getString("skin")?.takeUnless { it.isBlank() }
+    }
+
+    fun ItemStack.getArmorDye(): String? {
+        return tagCompound?.getCompoundTag("ExtraAttributes")?.getString("dye_item")?.takeUnless { it.isBlank() }
     }
 
     fun ItemStack.getAbilityScrolls(): List<String> {
@@ -266,8 +264,8 @@ object SkyBlockItemModifierUtils {
         return map
     }
 
-    fun ItemStack.getGemstones(): List<EstimatedItemValue.GemstoneSlot> {
-        val list = mutableListOf<EstimatedItemValue.GemstoneSlot>()
+    fun ItemStack.getGemstones(): List<GemstoneSlot> {
+        val list = mutableListOf<GemstoneSlot>()
         for (tags in tagCompound.keySet) {
             if (tags != "ExtraAttributes") continue
             val extraAttributes = tagCompound.getCompoundTag(tags)
@@ -281,27 +279,60 @@ object SkyBlockItemModifierUtils {
                     if (value == "") continue
 
                     val rawType = key.split("_")[0]
-                    val type = EstimatedItemValue.GemstoneType.getByName(rawType)
+                    val type = GemstoneType.getByName(rawType)
 
-                    val tier = EstimatedItemValue.GemstoneTier.getByName(value)
+                    val tier = GemstoneTier.getByName(value)
                     if (tier == null) {
                         LorenzUtils.debug("Gemstone tier is null for item $name: ('$key' = '$value')")
                         continue
                     }
                     if (type != null) {
-                        list.add(EstimatedItemValue.GemstoneSlot(type, tier))
+                        list.add(GemstoneSlot(type, tier))
                     } else {
                         val newKey = gemstones.getString(key + "_gem")
-                        val newType = EstimatedItemValue.GemstoneType.getByName(newKey)
+                        val newType = GemstoneType.getByName(newKey)
                         if (newType == null) {
                             LorenzUtils.debug("Gemstone type is null for item $name: ('$newKey' with '$key' = '$value')")
                             continue
                         }
-                        list.add(EstimatedItemValue.GemstoneSlot(newType, tier))
+                        list.add(GemstoneSlot(newType, tier))
                     }
                 }
             }
         }
         return list
+    }
+
+    class GemstoneSlot(val type: GemstoneType, val tier: GemstoneTier) {
+        fun getInternalName() = "${tier}_${type}_GEM"
+    }
+
+    enum class GemstoneTier(val displayName: String) {
+        ROUGH("Rough"),
+        FLAWED("Flawed"),
+        FINE("Fine"),
+        FLAWLESS("Flawless"),
+        PERFECT("Perfect"),
+        ;
+
+        companion object {
+            fun getByName(name: String) = GemstoneTier.values().firstOrNull { it.name == name }
+        }
+    }
+
+    enum class GemstoneType(val displayName: String) {
+        JADE("Jade"),
+        AMBER("Amber"),
+        TOPAZ("Topaz"),
+        SAPPHIRE("Sapphire"),
+        AMETHYST("Amethyst"),
+        JASPER("Jasper"),
+        RUBY("Ruby"),
+        OPAL("Opal"),
+        ;
+
+        companion object {
+            fun getByName(name: String) = values().firstOrNull { it.name == name }
+        }
     }
 }

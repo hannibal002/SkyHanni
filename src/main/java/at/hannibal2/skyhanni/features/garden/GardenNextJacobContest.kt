@@ -31,6 +31,7 @@ class GardenNextJacobContest {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         var next = false
         val newList = mutableListOf<String>()
+        var counter = 0
         for (line in event.tabList) {
             if (line == "§e§lJacob's Contest:") {
                 newList.add(line)
@@ -40,6 +41,8 @@ class GardenNextJacobContest {
             if (next) {
                 if (line == "") break
                 newList.add(line)
+                counter++
+                if (counter == 4) break
             }
         }
         newList.add("§cOpen calendar for")

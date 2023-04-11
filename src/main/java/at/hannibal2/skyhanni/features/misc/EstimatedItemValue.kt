@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -13,10 +14,12 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMasterStars
@@ -36,7 +39,6 @@ import io.github.moulberry.moulconfig.internal.KeybindHelper
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedItemValue {
@@ -61,11 +63,11 @@ class EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: ItemTooltipEvent) {
+    fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
 
-        val item = event.itemStack
+        val item = event.stack
         val oldData = cache[item]
         if (oldData != null) {
             display = oldData
@@ -130,6 +132,10 @@ class EstimatedItemValue {
         totalPrice += addSilex(stack, list)
         totalPrice += addTransmissionTuners(stack, list)
         totalPrice += addManaDisintegrators(stack, list)
+
+        // cosmetic
+        totalPrice += addHelmetSkin(stack, list)
+        totalPrice += addArmorDye(stack, list)
 
         // dynamic
         totalPrice += addAbilityScrolls(stack, list)
@@ -372,6 +378,24 @@ class EstimatedItemValue {
         return price
     }
 
+    private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getHelmetSkin() ?: return 0.0
+
+        val price = NEUItems.getPrice(internalName)
+        val name = NEUItems.getItemStack(internalName).name
+        list.add("§7Skin: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
+    private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getArmorDye() ?: return 0.0
+
+        val price = NEUItems.getPrice(internalName)
+        val name = NEUItems.getItemStack(internalName).name
+        list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
@@ -442,10 +466,6 @@ class EstimatedItemValue {
                     5 -> multiplier = 16
                 }
                 level = 1
-                println("")
-                println("rawName: $rawName")
-                println("rawLevel: $rawLevel")
-                println("multiplier: $multiplier")
 
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
@@ -521,38 +541,5 @@ class EstimatedItemValue {
             list += priceMap.sortedDesc().keys
         }
         return totalPrice
-    }
-
-    class GemstoneSlot(val type: GemstoneType, val tier: GemstoneTier) {
-        fun getInternalName() = "${tier}_${type}_GEM"
-    }
-
-    enum class GemstoneTier(val displayName: String) {
-        ROUGH("Rough"),
-        FLAWED("Flawed"),
-        FINE("Fine"),
-        FLAWLESS("Flawless"),
-        PERFECT("Perfect"),
-        ;
-
-        companion object {
-            fun getByName(name: String) = GemstoneTier.values().firstOrNull { it.name == name }
-        }
-    }
-
-    enum class GemstoneType(val displayName: String) {
-        JADE("Jade"),
-        AMBER("Amber"),
-        TOPAZ("Topaz"),
-        SAPPHIRE("Sapphire"),
-        AMETHYST("Amethyst"),
-        JASPER("Jasper"),
-        RUBY("Ruby"),
-        OPAL("Opal"),
-        ;
-
-        companion object {
-            fun getByName(name: String) = values().firstOrNull { it.name == name }
-        }
     }
 }
