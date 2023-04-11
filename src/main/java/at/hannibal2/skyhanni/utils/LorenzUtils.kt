@@ -22,14 +22,14 @@ import java.util.*
 
 object LorenzUtils {
 
-    val isHypixel: Boolean
+    val onHypixel: Boolean
         get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
 
     val isOnAlphaServer: Boolean
-        get() = isHypixel && HypixelData.hypixelAlpha
+        get() = onHypixel && HypixelData.hypixelAlpha
 
     val inSkyBlock: Boolean
-        get() = isHypixel && HypixelData.skyBlock
+        get() = onHypixel && HypixelData.skyBlock
 
     val inDungeons: Boolean
         get() = inSkyBlock && DungeonData.inDungeon()

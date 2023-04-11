@@ -11,7 +11,7 @@ class PasteIntoSigns {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.isHypixel) return
+        if (!LorenzUtils.onHypixel) return
         if (!SkyHanniMod.feature.misc.pasteIntoSigns) return
 
         if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) && Keyboard.isKeyDown(Keyboard.KEY_V)) {
