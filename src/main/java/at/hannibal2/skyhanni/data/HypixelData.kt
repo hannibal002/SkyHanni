@@ -108,12 +108,6 @@ class HypixelData {
         val last = list.last()
         hypixelLive = last == "§ewww.hypixel.net"
         hypixelAlpha = last == "§ealpha.hypixel.net"
-
-        println("")
-        println("hypixelLive: $hypixelLive")
-        println("hypixelAlpha: $hypixelAlpha")
-        println("last: '$last'")
-
     }
 
     private fun checkSidebar() {
