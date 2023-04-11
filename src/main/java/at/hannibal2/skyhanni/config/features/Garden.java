@@ -758,13 +758,13 @@ public class Garden {
     public boolean composterInventoryNumbers = true;
 
     @Expose
-    @ConfigOption(name = "Farming Fortune", desc = "")
+    @ConfigOption(name = "True Farming Fortune", desc = "")
     @ConfigEditorAccordion(id = 18)
     public boolean farmingFortune = false;
 
     @Expose
     @ConfigOption(
-            name = "Farming Fortune Display",
+            name = "FF Display",
             desc = "Displays current farming fortune, including crop-specific bonuses."
     )
     @ConfigEditorBoolean
@@ -776,36 +776,36 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Tooltip Tweaks", desc = "")
-    @ConfigEditorAccordion(id = 19)
+    @ConfigEditorAccordion(id = 20)
     public boolean tooltipTweaks = false;
 
     @Expose
     @ConfigOption(
-            name = "Compact Tool Tooltips",
+            name = "Compact Descriptions",
             desc = "Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 19)
+    @ConfigAccordionId(id = 20)
     public boolean compactToolTooltips = false;
 
     @Expose
     @ConfigOption(
-            name = "Tooltip Crop Fortune Breakdown",
-            desc = "When keybind pressed, show a breakdown of all fortune sources on a tool."
+            name = "Breakdown Hotkey",
+            desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    @ConfigAccordionId(id = 19)
+    @ConfigAccordionId(id = 20)
     public int fortuneTooltipKeybind = Keyboard.KEY_LSHIFT;
 
     @Expose
     @ConfigOption(
-            name = "Farming Fortune Tooltip Format",
-            desc = "Show crop-specific farming fortune in tooltip. \n" +
+            name = "Tooltip Format",
+            desc = "Show crop-specific farming fortune in tooltip.\n" +
                     "§fShow: §7Crop-specific fortune indicated as §6[+196]\n" +
-                    "§fReplace: §7Edits the total fortune to include crop-specific fortune"
+                    "§fReplace: §7Edits the total fortune to include crop-specific fortune."
     )
     @ConfigEditorDropdown(values = {"Default", "Show", "Replace"})
-    @ConfigAccordionId(id = 19)
+    @ConfigAccordionId(id = 20)
     public int cropTooltipFortune = 1;
 
     @Expose
