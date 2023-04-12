@@ -54,8 +54,7 @@ class GardenBestCropTime {
         var number = 0
         for (crop in sorted.keys) {
             val millis = timeTillNextCrop[crop]!!
-            val maxUnits = if (config.cropMilestoneBestCompact) 2 else -1
-            val duration = TimeUtils.formatDuration(millis, maxUnits = maxUnits)
+            val duration = TimeUtils.formatDuration(millis, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++
             if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue
