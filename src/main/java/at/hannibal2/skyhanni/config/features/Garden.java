@@ -746,6 +746,38 @@ public class Garden {
     public boolean composterHighLightUpgrade = true;
 
     @Expose
+    @ConfigOption(name = "Low Notifiers", desc = "")
+    @ConfigAccordionId(id = 17)
+    @ConfigEditorAccordion(id = 20)
+    public boolean notifiersForCompost = false;
+
+    @Expose
+    @ConfigOption(name = "Organic Matter", desc = "Notifies you when your Organic Matter is running low!")
+    @ConfigEditorSlider(
+            minValue = 3000,
+            maxValue = 540_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 20)
+    public int notifyWhenOrganicMatterLow = 4000;
+
+    @Expose
+    @ConfigOption(name = "Fuel", desc = "Notifies you when your fuel is running low!")
+    @ConfigEditorSlider(
+            minValue = 500,
+            maxValue = 850_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 20)
+    public int notifyWhenFuelLow = 4000;
+
+    @Expose
+    @ConfigOption(name = "Enable Notifiers", desc = "Show a notification as title when organic matter/fuel is low.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 20)
+    public boolean composterNotify = true;
+
+    @Expose
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
@@ -827,6 +859,7 @@ public class Garden {
     @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
     @ConfigEditorBoolean
     public boolean deskInSkyBlockMenu = true;
+
 
     @Expose
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")

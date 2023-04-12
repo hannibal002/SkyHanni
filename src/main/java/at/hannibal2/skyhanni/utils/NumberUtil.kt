@@ -35,6 +35,8 @@ object NumberUtil {
         )
     )
 
+
+
     /**
      * This code was unmodified and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/30661479
@@ -176,5 +178,18 @@ object NumberUtil {
             percentage > 0.25 -> LorenzColor.GOLD
             else -> LorenzColor.RED
         }
+    }
+
+    fun String.formatNumber(): Long {
+        var text = replace(",", "")
+        val multiplier = if (text.endsWith("k")) {
+            text = text.substring(0, text.length - 1)
+            1_000
+        } else if (text.endsWith("m")) {
+            text = text.substring(0, text.length - 1)
+            1_000_000
+        } else 1
+        val d = text.toDouble()
+        return (d * multiplier).toLong()
     }
 }

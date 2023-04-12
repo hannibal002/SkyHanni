@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -17,8 +21,7 @@ class ComposterDisplay {
         ORGANIC_MATTER(" Organic Matter: §r(.*)", "WHEAT"),
         FUEL(" Fuel: §r(.*)", "OIL_BARREL"),
         TIME_LEFT(" Time Left: §r(.*)", "WATCH"),
-        STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST"),
-        ;
+        STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
 
         val displayItem by lazy {
             NEUItems.getItemStack(icon)
@@ -71,6 +74,29 @@ class ComposterDisplay {
         newList.add(DataType.STORED_COMPOST.addToList(data))
 
         display = newList
+
+        if(!config.composterNotify) return
+
+        val organicMatterValue = data[DataType.ORGANIC_MATTER]!!.removeColor().formatNumber()
+        val fuelValue = data[DataType.FUEL]!!.removeColor().formatNumber()
+        notify(organicMatterValue, fuelValue)
+    }
+
+    private fun notify(organicMatterValue: Long, fuelValue: Long) {
+        if (organicMatterValue <= config.notifyWhenOrganicMatterLow) {
+            if (System.currentTimeMillis() >= SkyHanniMod.feature.hidden.informedAboutLowMatter) {
+                SendTitleHelper.sendTitle("§cYour Organic Matter is low", 4_000)
+                LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
+                SkyHanniMod.feature.hidden.informedAboutLowMatter = System.currentTimeMillis()+30_000
+            }
+        }
+
+        if (fuelValue <= config.notifyWhenFuelLow &&
+            System.currentTimeMillis() >= SkyHanniMod.feature.hidden.informedAboutLowFuel) {
+            SendTitleHelper.sendTitle("§cYour Fuel is low", 4_000)
+            LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
+            SkyHanniMod.feature.hidden.informedAboutLowFuel = System.currentTimeMillis()+30_000
+        }
     }
 
     @SubscribeEvent
