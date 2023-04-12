@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -22,8 +24,13 @@ class CropSpeedMeter {
     @SubscribeEvent
     fun onBlockBreak(event: BlockClickEvent) {
         if (!isEnabled()) return
-        val cropBroken = CropType.getByBlock(event.getBlockState) ?: return
         if (startCrops.isEmpty()) return
+
+        val blockState = event.getBlockState
+        val cropBroken = blockState.getCropType() ?: return
+        if (cropBroken.multiplier == 1) {
+            if (blockState.isBabyCrop()) return
+        }
 
         if (currentCrop != cropBroken) {
             currentCrop = cropBroken
