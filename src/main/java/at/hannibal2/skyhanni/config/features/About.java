@@ -11,7 +11,7 @@ public class About {
 
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are running currently")
     @ConfigVersionDisplay
-    public Void currentVersion = null;
+    public transient Void currentVersion = null;
 
     @ConfigOption(name = "Auto Updates", desc = "Automatically check for updates on each startup")
     @Expose
@@ -26,6 +26,7 @@ public class About {
 
     @ConfigOption(name = "Used Software", desc = "Information about used software and licenses")
     @Accordion
+    @Expose
     public Licenses licenses = new Licenses();
 
     public enum UpdateStream {

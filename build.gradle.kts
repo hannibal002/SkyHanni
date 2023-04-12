@@ -145,6 +145,7 @@ tasks.shadowJar {
     }
 
     relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
+    relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
