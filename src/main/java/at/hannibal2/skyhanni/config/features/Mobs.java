@@ -74,7 +74,7 @@ public class Mobs {
     public boolean areaBossRespawnTimer = false;
 
     @Expose
-    @ConfigOption(name = "Enderman Teleportation Hider", desc = "Stops the Enderman Teleportation animation.")
+    @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")
     @ConfigEditorBoolean
     public boolean endermanTeleportationHider = true;
 

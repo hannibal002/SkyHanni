@@ -58,6 +58,11 @@ object APIUtil {
                             LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")
                             println("result: '$retSrc'")
                         }
+                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
+                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            println(" - getJSONResponse: '$urlString'")
+                            LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                        }
                         e.printStackTrace()
                     }
                 }
