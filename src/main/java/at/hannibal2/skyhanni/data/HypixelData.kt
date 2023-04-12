@@ -148,7 +148,7 @@ class HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                println("Unknown island detected: '$newIsland'")
+                LorenzUtils.debug("Unknown island detected: '$newIsland'")
                 loggerIslandChange.log("Unknown: '$newIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)
