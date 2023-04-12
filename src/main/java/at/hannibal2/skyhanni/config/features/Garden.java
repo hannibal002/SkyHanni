@@ -410,7 +410,7 @@ public class Garden {
     public boolean optimalSpeedSignEnabled = true;
 
     @Expose
-    public Position optimalSpeedSignPosition = new Position(200, 20, false, true);
+    public Position optimalSpeedSignPosition = new Position(-450, 119, false, true);
 
     @Expose
     @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
@@ -749,6 +749,66 @@ public class Garden {
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
+    @ConfigOption(
+            name = "Inventory Numbers",
+            desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterInventoryNumbers = true;
+
+    @Expose
+    @ConfigOption(name = "True Farming Fortune", desc = "")
+    @ConfigEditorAccordion(id = 18)
+    public boolean farmingFortune = false;
+
+    @Expose
+    @ConfigOption(
+            name = "FF Display",
+            desc = "Displays current farming fortune, including crop-specific bonuses."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 18)
+    public boolean farmingFortuneDisplay = true;
+
+    @Expose
+    public Position farmingFortunePos = new Position(-375, -200, false, true);
+
+    @Expose
+    @ConfigOption(name = "Tooltip Tweaks", desc = "")
+    @ConfigEditorAccordion(id = 20)
+    public boolean tooltipTweaks = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Compact Descriptions",
+            desc = "Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 20)
+    public boolean compactToolTooltips = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Breakdown Hotkey",
+            desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
+    @ConfigAccordionId(id = 20)
+    public int fortuneTooltipKeybind = Keyboard.KEY_LSHIFT;
+
+    @Expose
+    @ConfigOption(
+            name = "Tooltip Format",
+            desc = "Show crop-specific farming fortune in tooltip.\n" +
+                    "§fShow: §7Crop-specific fortune indicated as §6[+196]\n" +
+                    "§fReplace: §7Edits the total fortune to include crop-specific fortune."
+    )
+    @ConfigEditorDropdown(values = {"Default", "Show", "Replace"})
+    @ConfigAccordionId(id = 20)
+    public int cropTooltipFortune = 1;
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
@@ -762,4 +822,7 @@ public class Garden {
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
     @ConfigEditorBoolean
     public boolean fungiCutterWarn = true;
+
+    @Expose
+    public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 }

@@ -7,17 +7,18 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.setSpeed
+import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.block.properties.PropertyInteger
-import net.minecraft.block.state.IBlockState
 import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.PositionedSound
-import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -123,7 +124,7 @@ class GardenCropMilestoneDisplay {
             val item = event.itemStack
             val counter = GardenAPI.readCounter(item)
             if (counter == -1) return
-            val crop = GardenAPI.getCropTypeFromItem(item) ?: return
+            val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
                 val addedCounter = counter - old
@@ -156,45 +157,16 @@ class GardenCropMilestoneDisplay {
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
+        if (event.clickType != ClickType.LEFT_CLICK) return
 
-        if (event.clickType == ClickType.LEFT_CLICK) {
-            val blockState = event.getBlockState
+        val blockState = event.getBlockState
 
-            val blocks = isFarmBlock(blockState)
-            if (blocks == 0) return
-            if (blocks == 1) {
-                for (property in blockState.block.blockState.properties) {
-                    val name = property.name
-                    if (name == "age") {
-                        if (property is PropertyInteger) {
-                            val value = blockState.getValue(property)!!
-                            if (value == 0) return
-                        }
-                    }
-                }
-            }
-            blocksBroken += blocks
+        val cropType = blockState.getCropType() ?: return
+        val multiplier = cropType.multiplier
+        if (multiplier == 1) {
+            if (blockState.isBabyCrop()) return
         }
-    }
-
-    private fun isFarmBlock(blockState: IBlockState): Int {
-        val block = blockState.block
-        if (block == Blocks.carrots) return 1
-        if (block == Blocks.potatoes) return 1
-        if (block == Blocks.wheat) return 1
-        if (block == Blocks.cocoa) return 1 // Cocoa Beans
-        if (block == Blocks.red_mushroom) return 1
-        if (block == Blocks.brown_mushroom) return 1
-        if (block == Blocks.cactus) return 2
-        if (block == Blocks.reeds) return 2 // Sugar Cane
-        if (block == Blocks.nether_wart) return 1
-        if (block == Blocks.melon_block) return 1
-        if (block == Blocks.pumpkin) return 1
-
-        if (block == Blocks.dirt) return 0
-        if (block == Blocks.farmland) return 0
-
-        return 0
+        blocksBroken += multiplier
     }
 
     private var currentSpeed = 0
@@ -282,7 +254,7 @@ class GardenCropMilestoneDisplay {
         val nextTier = currentTier + 1
 
         val list = mutableListOf<Any>()
-        GardenAPI.addGardenCropToList(crop, list)
+        list.addCropIcon(crop)
         list.add("§7" + crop.cropName + " Tier $nextTier")
         lineMap[1] = list
 
@@ -375,11 +347,8 @@ class GardenCropMilestoneDisplay {
         val missing = need - have
 
         // We assume perfect 20 blocks per seconds
-        val blocksPerSecond = when (currentCrop) {
-            CropType.CACTUS, CropType.SUGAR_CANE -> 40
+        val blocksPerSecond = 20 * (currentCrop?.multiplier ?: 1)
 
-            else -> 20
-        }
         val missingTimeSeconds = missing / blocksPerSecond
         val millis = missingTimeSeconds * 1000
         val duration = TimeUtils.formatDuration(millis)
@@ -387,7 +356,7 @@ class GardenCropMilestoneDisplay {
         lineMap[0] = Collections.singletonList("§6Mooshroom Cow Perk")
 
         val list = mutableListOf<Any>()
-        GardenAPI.addGardenCropToList(CropType.MUSHROOM, list)
+        list.addCropIcon(CropType.MUSHROOM)
         list.add("§7Mushroom Tier $nextTier")
         lineMap[1] = list
 

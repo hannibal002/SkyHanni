@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
 import at.hannibal2.skyhanni.features.fishing.*;
 import at.hannibal2.skyhanni.features.garden.*;
+import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
@@ -109,7 +110,7 @@ public class SkyHanniMod {
         // utils
         loadModule(this);
         loadModule(new ChatManager());
-        loadModule(new HyPixelData());
+        loadModule(new HypixelData());
         loadModule(new DungeonData());
         loadModule(new ScoreboardData());
         loadModule(new ApiDataLoader());
@@ -127,6 +128,7 @@ public class SkyHanniMod {
         loadModule(new TabListData());
         loadModule(new RenderGuiData());
         loadModule(new GardenCropMilestones());
+        loadModule(new GardenCropUpgrades());
         loadModule(new OwnInventoryData());
         loadModule(new ToolTipData());
         loadModule(new GuiEditManager());
@@ -249,6 +251,10 @@ public class SkyHanniMod {
         loadModule(new MinionCollectLogic());
         loadModule(new PasteIntoSigns());
         loadModule(new EstimatedItemValue());
+        loadModule(new ComposterInventoryNumbers());
+        loadModule(new FarmingFortuneDisplay());
+        loadModule(new ToolTooltipTweaks());
+        loadModule(new CropSpeedMeter());
 
         Commands.INSTANCE.init();
 

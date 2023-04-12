@@ -29,7 +29,7 @@ class MarkedPlayerManager {
             val name = displayName.lowercase()
 
 
-            if (name == Minecraft.getMinecraft().thePlayer.name.lowercase()) {
+            if (name == LorenzUtils.getPlayerName().lowercase()) {
                 LorenzUtils.chat("§c[SkyHanni] You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
                 return
             }
@@ -66,7 +66,7 @@ class MarkedPlayerManager {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         SkyHanniMod.feature.markedPlayers.markOwnName.whenChanged { old, new ->
-            val name = Minecraft.getMinecraft().thePlayer.name
+            val name = LorenzUtils.getPlayerName()
             if (new) {
                 if (!playerNamesToMark.contains(name)) {
                     playerNamesToMark.add(name)
@@ -116,7 +116,7 @@ class MarkedPlayerManager {
 
         markedPlayers.clear()
         if (SkyHanniMod.feature.markedPlayers.markOwnName.get()) {
-            val name = Minecraft.getMinecraft().thePlayer.name
+            val name = LorenzUtils.getPlayerName()
             if (!playerNamesToMark.contains(name)) {
                 playerNamesToMark.add(name)
             }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.addCropIcon
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -31,6 +32,7 @@ class GardenNextJacobContest {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         var next = false
         val newList = mutableListOf<String>()
+        var counter = 0
         for (line in event.tabList) {
             if (line == "§e§lJacob's Contest:") {
                 newList.add(line)
@@ -40,6 +42,8 @@ class GardenNextJacobContest {
             if (next) {
                 if (line == "") break
                 newList.add(line)
+                counter++
+                if (counter == 4) break
             }
         }
         newList.add("§cOpen calendar for")
@@ -188,7 +192,7 @@ class GardenNextJacobContest {
         }
         for (crop in nextContest.crops) {
             list.add(" ")
-            GardenAPI.addGardenCropToList(crop, list)
+            list.addCropIcon(crop)
             nextContestCrops.add(crop)
         }
         val format = TimeUtils.formatDuration(duration)
@@ -213,7 +217,7 @@ class GardenNextJacobContest {
         if (!config.nextJacobContestDisplay) return
         if (!inCalendar) return
 
-        if (!display.isEmpty()) {
+        if (display.isNotEmpty()) {
             config.nextJacobContestPos.renderSingleLineWithItems(display, posLabel = "Garden Next Jacob Contest")
         }
     }
