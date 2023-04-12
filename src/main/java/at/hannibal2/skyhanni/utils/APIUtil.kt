@@ -22,7 +22,7 @@ object APIUtil {
     private var showApiErrors = false
 
     val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
+        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.getVersion()}")
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),
