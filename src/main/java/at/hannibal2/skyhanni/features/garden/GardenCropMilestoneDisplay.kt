@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
+import at.hannibal2.skyhanni.data.MayorElectionData
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
+import kotlin.random.Random
 
 class GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
@@ -127,7 +129,8 @@ class GardenCropMilestoneDisplay {
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
-                val addedCounter = counter - old
+                val finneganPerkFactor = if (finneganPerkActive() && Random.nextDouble() <= 0.25) 0.5 else 1.0
+                val addedCounter = ((counter - old) * finneganPerkFactor).toInt()
 
                 if (GardenCropMilestones.cropCounter.isEmpty()) {
                     for (innerCrop in CropType.values()) {
@@ -153,6 +156,9 @@ class GardenCropMilestoneDisplay {
             e.printStackTrace()
         }
     }
+
+    private fun finneganPerkActive() =
+        config.forcefullyEnabledAlwaysFinnegan || MayorElectionData.isPerkActive("Finnegan", "Farming Simulator")
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
