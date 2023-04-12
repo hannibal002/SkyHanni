@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 enum class CropAccessory(val internalName: String, private val affectedCrops: Set<CropType>, private val fortune: Double) {
+    NONE("NONE", emptySet(), 0.0),
     CROPIE("CROPIE_TALISMAN", setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT), 10.0),
     SQUASH(
         "SQUASH_RING",
