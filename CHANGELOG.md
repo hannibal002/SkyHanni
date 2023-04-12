@@ -16,6 +16,9 @@
 + Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (contributed by appable)
 + Added **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
 + Added **Estimated Item Value** - Displays an estimated item value for the item you hover over.
++ Added Arachne to damage indicator.
++ Added **Arachne Minis Hider** -  Hides the nametag above arachne minis.
++ Added **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.

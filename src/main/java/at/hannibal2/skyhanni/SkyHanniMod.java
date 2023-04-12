@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager;
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures;
+import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider;
 import at.hannibal2.skyhanni.features.mobs.MobHighlight;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper;
@@ -256,6 +257,7 @@ public class SkyHanniMod {
         loadModule(new FarmingFortuneDisplay());
         loadModule(new ToolTooltipTweaks());
         loadModule(new CropSpeedMeter());
+        loadModule(new AshfangMinisNametagHider());
 
         Commands.INSTANCE.init();
 

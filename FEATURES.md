@@ -163,6 +163,8 @@
 + Corleone highlighter.
 + Zealots, Bruisers and Special Zealot highlighter.
 + Highlight corrupted mobs.
++ **Arachne Minis Hider** -  Hides the nametag above arachne minis.
++ **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
 
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
