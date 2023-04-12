@@ -8,7 +8,6 @@ import io.github.moulberry.notenoughupdates.util.Utils;
 
 public class About {
 
-
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are running currently")
     @ConfigVersionDisplay
     public Void currentVersion = null;

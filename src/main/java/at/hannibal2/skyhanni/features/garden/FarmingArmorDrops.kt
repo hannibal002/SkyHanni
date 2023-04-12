@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -54,7 +55,7 @@ class FarmingArmorDrops {
         help.add("§7RNG Drops for Farming Armor:")
         for ((drop, amount) in drops.sortedDesc()) {
             val dropName = drop.dropName
-            help.add(" §7- §e${amount}x $dropName")
+            help.add(" §7- §e${amount.addSeparators()}x $dropName")
         }
 
         return help

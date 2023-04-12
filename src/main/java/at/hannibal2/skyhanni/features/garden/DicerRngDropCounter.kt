@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -66,7 +67,7 @@ class DicerRngDropCounter {
         help.add("§7RNG Drops for $toolName§7:")
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName
-            help.add(" §7- §e${amount}x $displayName")
+            help.add(" §7- §e${amount.addSeparators()}x $displayName")
         }
 
         return help
