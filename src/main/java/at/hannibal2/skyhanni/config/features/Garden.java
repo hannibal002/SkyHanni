@@ -410,7 +410,7 @@ public class Garden {
     public boolean optimalSpeedSignEnabled = true;
 
     @Expose
-    public Position optimalSpeedSignPosition = new Position(200, 20, false, true);
+    public Position optimalSpeedSignPosition = new Position(-450, 119, false, true);
 
     @Expose
     @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
