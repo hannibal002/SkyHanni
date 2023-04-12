@@ -54,6 +54,12 @@ public class Hidden {
     public Map<String, Integer> gardenDicerRngDrops = new HashMap<>();
 
     @Expose
+    public long informedAboutLowMatter = 0;
+
+    @Expose
+    public long informedAboutLowFuel = 0;
+
+    @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
