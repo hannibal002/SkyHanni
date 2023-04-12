@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager;
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures;
 import at.hannibal2.skyhanni.features.mobs.MobHighlight;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
@@ -58,6 +59,7 @@ import kotlinx.coroutines.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -70,13 +72,17 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION, clientSideOnly = true, useMetadata = true,
+@Mod(modid = SkyHanniMod.MODID, clientSideOnly = true, useMetadata = true,
         guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
         dependencies = SkyHanniMod.DEPENDENCIES)
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.17.Beta.31";
+
+    public static String getVersion() {
+        return Loader.instance().getIndexedModList().get(MODID).getVersion();
+    }
+
     public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
 
@@ -126,6 +132,7 @@ public class SkyHanniMod {
         loadModule(new OwnInventoryData());
         loadModule(new ToolTipData());
         loadModule(new GuiEditManager());
+        loadModule(UpdateManager.INSTANCE);
 
         // APIs
         loadModule(new BazaarApi());
