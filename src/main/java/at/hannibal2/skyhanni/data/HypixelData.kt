@@ -79,8 +79,9 @@ class HypixelData {
         tick++
         if (tick % 5 != 0) return
 
-        checkHypixel()
-
+        if (!LorenzUtils.onHypixel) {
+            checkHypixel()
+        }
         if (!LorenzUtils.onHypixel) return
 
         val inSkyBlock = checkScoreboard()
