@@ -247,6 +247,7 @@ public class SkyHanniMod {
         loadModule(new ComposterInventoryNumbers());
         loadModule(new FarmingFortuneDisplay());
         loadModule(new ToolTooltipTweaks());
+        loadModule(new CropSpeedMeter());
 
         Commands.INSTANCE.init();
 

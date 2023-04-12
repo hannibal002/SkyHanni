@@ -822,4 +822,7 @@ public class Garden {
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
     @ConfigEditorBoolean
     public boolean fungiCutterWarn = true;
+
+    @Expose
+    public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 }
