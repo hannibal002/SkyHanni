@@ -276,4 +276,7 @@ public class Misc {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
+
+    @Expose
+    public Position inventoryLoadPos = new Position(394, 124, false, true);
 }

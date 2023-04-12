@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getCropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import net.minecraft.item.ItemStack
@@ -28,16 +30,18 @@ class FarmingFortuneDisplay {
 
     private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
 
-    private var display = listOf<Any>()
+    private var display = listOf<List<Any>>()
+    private var accessoryProgressDisplay = ""
     private var currentCrop: CropType? = null
 
     private var tabFortune: Double = 0.0
     private var toolFortune: Double = 0.0
     private val baseFortune: Double get() = if (config.farmingFortuneDropMultiplier) 100.0 else 0.0
     private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
-    private val accessoryFortune: Double? get() = currentCrop?.let {
-        CropAccessoryData.cropAccessory?.getFortune(it)
-    }
+    private val accessoryFortune: Double?
+        get() = currentCrop?.let {
+            CropAccessoryData.cropAccessory?.getFortune(it)
+        }
 
     private var lastToolSwitch: Long = 0
     private var ticks: Int = 0
@@ -78,40 +82,47 @@ class FarmingFortuneDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.farmingFortunePos.renderSingleLineWithItems(display, posLabel = "True Farming Fortune")
+        config.farmingFortunePos.renderStringsAndItems(display, posLabel = "True Farming Fortune")
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!isEnabled()) return
         if (!CropAccessoryData.isLoadingAccessories) return
-        config.farmingFortunePos.renderSingleLineWithItems(display, posLabel = "True Farming Fortune")
+        SkyHanniMod.feature.misc.inventoryLoadPos.renderString(accessoryProgressDisplay, posLabel = "Load Accessory Bags")
     }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || ticks++ % 5 != 0) return
         val displayCrop = currentCrop ?: return
-        val updatedDisplay = mutableListOf<Any>()
-        val recentlySwitchedTool = System.currentTimeMillis() < lastToolSwitch + 1000
-        val upgradeFortune = upgradeFortune
-        val accessoryFortune = accessoryFortune
-        val displayString = when {
-            upgradeFortune == null -> "§cOpen §e/cropupgrades§c to use!"
-            accessoryFortune == null -> {
-                if (CropAccessoryData.isLoadingAccessories) {
-                    "§e${CropAccessoryData.pagesLoaded}/${CropAccessoryData.accessoryBagPageCount} pages viewed"
-                } else "§cOpen §e/accessories§c to use!"
-            }
-            else -> {
-                updatedDisplay.addCropIcon(displayCrop)
+
+        val updatedDisplay = mutableListOf<List<Any>>()
+        updatedDisplay.add(mutableListOf<Any>().also {
+            it.addCropIcon(displayCrop)
+            val recentlySwitchedTool = System.currentTimeMillis() < lastToolSwitch + 1000
+            it.add(
                 "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool) {
+                    val upgradeFortune = upgradeFortune ?: 0.0
+                    val accessoryFortune = accessoryFortune ?: 0.0
                     val totalFortune = baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
                     LorenzUtils.formatDouble(totalFortune, 0)
-                } else "?"
-            }
+                } else "?")
+        })
+
+        if (this.upgradeFortune == null) {
+            updatedDisplay.addAsSingletonList("§cOpen §e/cropupgrades§c for more exact data!")
         }
-        updatedDisplay.add(displayString)
+        if (accessoryFortune == null) {
+            updatedDisplay.addAsSingletonList("§cOpen Accessory Bag for more exact data!")
+            if (CropAccessoryData.isLoadingAccessories) {
+                accessoryProgressDisplay =
+                    "§e${CropAccessoryData.pagesLoaded}/${CropAccessoryData.accessoryBagPageCount} pages viewed"
+            }
+        } else {
+            accessoryProgressDisplay = ""
+        }
+
         display = updatedDisplay
     }
 
@@ -127,10 +138,8 @@ class FarmingFortuneDisplay {
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.farmingFortuneDisplay
 
 
-
     companion object {
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
-
 
 
         fun getToolFortune(tool: ItemStack?): Double {

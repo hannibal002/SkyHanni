@@ -8,7 +8,8 @@ enum class CropAccessory(val internalName: String, private val affectedCrops: Se
         setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT, CropType.COCOA_BEANS, CropType.MELON, CropType.PUMPKIN),
         20.0
     ),
-    FERMENTO("FERMENTO_ARTIFACT", CropType.values().toSet(), 30.0);
+    FERMENTO("FERMENTO_ARTIFACT", CropType.values().toSet(), 30.0),
+    ;
 
     fun getFortune(cropType: CropType): Double {
         return if (this.affectedCrops.contains(cropType)) this.fortune else 0.0
