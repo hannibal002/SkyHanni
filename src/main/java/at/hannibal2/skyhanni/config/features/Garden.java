@@ -772,6 +772,16 @@ public class Garden {
     public boolean farmingFortuneDisplay = true;
 
     @Expose
+    @ConfigOption(
+            name = "Show As Drop Multiplier",
+            desc = "Adds 100 to the displayed farming fortune so that it represents a drop multiplier rather than" +
+                    " the chance for bonus drops. "
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 18)
+    public boolean farmingFortuneDropMultiplier = false;
+
+    @Expose
     public Position farmingFortunePos = new Position(-375, -200, false, true);
 
     @Expose

@@ -30,6 +30,7 @@ class FarmingFortuneDisplay {
 
     private var tabFortune: Double = 0.0
     private var toolFortune: Double = 0.0
+    private val baseFortune: Double get() = if (config.farmingFortuneDropMultiplier) 100.0 else 0.0
     private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
     private val accessoryFortune: Double? get() = currentCrop?.let {
         CropAccessoryData.cropAccessory?.getFortune(it)
@@ -102,7 +103,7 @@ class FarmingFortuneDisplay {
             else -> {
                 GardenAPI.addGardenCropToList(displayCrop, updatedDisplay)
                 "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool) {
-                    val totalFortune = upgradeFortune + tabFortune + toolFortune + accessoryFortune
+                    val totalFortune = baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
                     LorenzUtils.formatDouble(totalFortune, 0)
                 } else "?"
             }
@@ -121,8 +122,12 @@ class FarmingFortuneDisplay {
 
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.farmingFortuneDisplay
 
+
+
     companion object {
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
+
+
 
         fun getToolFortune(tool: ItemStack?): Double {
             val internalName = tool?.getInternalName() ?: return 0.0
