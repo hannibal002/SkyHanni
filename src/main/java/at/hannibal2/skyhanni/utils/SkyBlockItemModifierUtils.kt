@@ -11,9 +11,9 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
 
-    fun ItemStack.getCultivatingCount() = getAttributeInt("farmed_cultivating")
+    fun ItemStack.getCultivatingCounter() = getAttributeInt("farmed_cultivating")
 
-    fun ItemStack.getCounter() = getAttributeInt("mined_crops")
+    fun ItemStack.getHoeCounter() = getAttributeInt("mined_crops")
 
     fun ItemStack.getSilexCount(): Int? {
         val enchantments = getEnchantments() ?: return null

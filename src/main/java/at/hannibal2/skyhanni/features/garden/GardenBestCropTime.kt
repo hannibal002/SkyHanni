@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
@@ -61,13 +62,13 @@ class GardenBestCropTime {
 
             val list = mutableListOf<Any>()
             list.add("§7$number# ")
-            GardenAPI.addGardenCropToList(crop, list)
+            list.addCropIcon(crop)
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
             val nextTier = GardenCropMilestones.getTierForCrops(crop.getCounter()) + 1
 
-            val cropName = if (!config.cropMilestoneBestCompact) crop.cropName +" " else ""
+            val cropName = if (!config.cropMilestoneBestCompact) crop.cropName + " " else ""
             val cropNameDisplay = "$color$contestFormat$cropName$nextTier§r"
             list.add("$cropNameDisplay §b$duration")
 

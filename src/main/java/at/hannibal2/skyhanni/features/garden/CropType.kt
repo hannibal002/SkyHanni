@@ -21,6 +21,8 @@ enum class CropType(val cropName: String, val toolName: String, val baseDrops: D
 
     val icon by lazy { iconSupplier() }
 
+    val multiplier by lazy { if (this == SUGAR_CANE || this == CACTUS) 2 else 1 }
+
     companion object {
         fun getByName(cropName: String) = values().firstOrNull { it.cropName == cropName }
 
@@ -35,8 +37,8 @@ enum class CropType(val cropName: String, val toolName: String, val baseDrops: D
             return getByName(itemName)
         }
 
-        fun getByBlock(blockState: IBlockState): CropType? {
-            return when (blockState.block) {
+        fun IBlockState.getCropType(): CropType? {
+            return when (block) {
                 Blocks.wheat -> WHEAT
                 Blocks.carrots -> CARROT
                 Blocks.potatoes -> POTATO

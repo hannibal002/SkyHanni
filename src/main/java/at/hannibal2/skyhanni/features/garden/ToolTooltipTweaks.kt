@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getCropType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -22,7 +23,7 @@ class ToolTooltipTweaks {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val crop = GardenAPI.getCropTypeFromItem(event.itemStack) ?: return
+        val crop = event.itemStack.getCropType() ?: return
         val toolFortune = FarmingFortuneDisplay.getToolFortune(event.itemStack)
         val counterFortune = FarmingFortuneDisplay.getCounterFortune(event.itemStack)
         val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(event.itemStack)
@@ -90,7 +91,7 @@ class ToolTooltipTweaks {
                 if (counterStartLine.contains(line)) removingCounterDescription = true
 
                 if (line == "§5§o§9Blessed Bonus") removingReforgeDescription = true
-                if (removingReforgeDescription ) {
+                if (removingReforgeDescription) {
                     iterator.remove()
                     removingReforgeDescription = !reforgeEndLine.contains(line)
                 }
