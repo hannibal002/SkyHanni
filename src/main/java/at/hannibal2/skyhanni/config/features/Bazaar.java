@@ -18,7 +18,7 @@ public class Bazaar {
     public boolean bestSellMethod = false;
 
     @Expose
-    public Position bestSellMethodPos = new Position(10, 10, false, true);
+    public Position bestSellMethodPos = new Position(394, 142, false, true);
 
     @Expose
     @ConfigOption(name = "Cancelled Buy Order Clipboard", desc = "Saves missing items from cancelled buy orders to clipboard for faster re-entry.")

@@ -218,7 +218,7 @@ class GardenNextJacobContest {
         if (!inCalendar) return
 
         if (display.isNotEmpty()) {
-            config.nextJacobContestPos.renderSingleLineWithItems(display, posLabel = "Garden Next Jacob Contest")
+            SkyHanniMod.feature.misc.inventoryLoadPos.renderSingleLineWithItems(display, posLabel = "Load SkyBlock Calendar")
         }
     }
 
