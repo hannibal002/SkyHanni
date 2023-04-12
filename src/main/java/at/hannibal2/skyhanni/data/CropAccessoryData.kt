@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompressedStreamTools
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.ByteArrayInputStream
@@ -46,13 +47,25 @@ class CropAccessoryData {
 
     // Handle accessory bag detection
     @SubscribeEvent
-    fun onGuiDraw(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         val groups = accessoryBagNamePattern.matchEntire(event.inventoryName)?.groups ?: return
+        isLoadingAccessories = true
         accessoryBagPageCount = groups[2]!!.value.toInt()
         accessoryBagPageNumber = groups[1]!!.value.toInt()
-        isLoadingAccessories = true
+    }
 
-        val bestCropAccessoryPage = bestCropAccessory(event.inventoryItems.values)
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        isLoadingAccessories = false
+    }
+
+    @SubscribeEvent
+    fun onGuiDraw(event: GuiScreenEvent.DrawScreenEvent) {
+        if (!isLoadingAccessories) return
+        val items = runCatching {
+            InventoryUtils.getItemsInOpenChest()
+        }.getOrNull() ?: return
+        val bestCropAccessoryPage = bestCropAccessory(items.map { it.stack })
         accessoryPage[accessoryBagPageNumber] = bestCropAccessoryPage
         if (accessoryBagPageCount == accessoryPage.size) {
             accessoryInBag = accessoryPage.values.max().also {
@@ -60,11 +73,6 @@ class CropAccessoryData {
             }
             loadedAccessoryThisProfile = true
         }
-    }
-
-    @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
-        isLoadingAccessories = false
     }
 
     // Handle inventory detection
