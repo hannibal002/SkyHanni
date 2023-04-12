@@ -90,7 +90,7 @@ object UpdateManager {
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
-                    LorenzUtils.chat("§e[SkyHanni] §aSkyhanni found a new update: ${it.update.versionName}. Go check §b/sh download update §afor more info.")
+                    LorenzUtils.clickableChat("§e[SkyHanni] §aSkyhanni found a new update: ${it.update.versionName}. Go check §b/sh download update §afor more info.", "sh download update")
                 }
             }, MinecraftExecutor.OnThread)
     }
