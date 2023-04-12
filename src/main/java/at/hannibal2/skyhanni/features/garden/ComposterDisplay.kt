@@ -1,24 +1,28 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden
+    private val hidden get() = SkyHanniMod.feature.hidden
     private var display = listOf<List<Any>>()
 
     enum class DataType(val pattern: String, val icon: String) {
         ORGANIC_MATTER(" Organic Matter: §r(.*)", "WHEAT"),
         FUEL(" Fuel: §r(.*)", "OIL_BARREL"),
         TIME_LEFT(" Time Left: §r(.*)", "WATCH"),
-        STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST"),
-        ;
+        STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
 
         val displayItem by lazy {
             NEUItems.getItemStack(icon)
@@ -71,6 +75,36 @@ class ComposterDisplay {
         newList.add(DataType.STORED_COMPOST.addToList(data))
 
         display = newList
+
+        notify(data)
+    }
+
+    private fun notify(data: MutableMap<DataType, String>) {
+        if (!config.composterNotifyLowEnabled) return
+
+        data[DataType.ORGANIC_MATTER]?.removeColor()?.formatNumber()?.let {
+            if (it <= config.composterNotifyLowOrganicMatter) {
+                if (System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
+                    if (config.composterNotifyLowTitle) {
+                        SendTitleHelper.sendTitle("§cYour Organic Matter is low", 4_000)
+                    }
+                    LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
+                    hidden.informedAboutLowMatter = System.currentTimeMillis() + 30_000
+                }
+            }
+        }
+
+        data[DataType.FUEL]?.removeColor()?.formatNumber()?.let {
+            if (it <= config.composterNotifyLowFuel &&
+                System.currentTimeMillis() >= hidden.informedAboutLowFuel
+            ) {
+                if (config.composterNotifyLowTitle) {
+                    SendTitleHelper.sendTitle("§cYour Fuel is low", 4_000)
+                }
+                LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
+                hidden.informedAboutLowFuel = System.currentTimeMillis() + 30_000
+            }
+        }
     }
 
     @SubscribeEvent
