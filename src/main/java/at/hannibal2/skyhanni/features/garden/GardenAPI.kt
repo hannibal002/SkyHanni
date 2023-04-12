@@ -54,7 +54,7 @@ class GardenAPI {
 
     private fun checkItemInHand() {
         val toolItem = Minecraft.getMinecraft().thePlayer.heldItem
-        val crop = toolItem.getCropType()
+        val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
         if (toolInHand != newTool) {
             toolInHand = newTool
