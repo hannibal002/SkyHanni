@@ -163,6 +163,8 @@
 + Corleone highlighter.
 + Zealots, Bruisers and Special Zealot highlighter.
 + Highlight corrupted mobs.
++ **Arachne Minis Hider** -  Hides the nametag above arachne minis.
++ **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
 
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
@@ -203,11 +205,17 @@
 + **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
 + **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
 + **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
++ **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
++ **True Farming Fortune - Displays** current farming fortune, including crop-specific bonuses. (contributed by appable)
++ **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
++ **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
++ **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 
 ## Commands
-- /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
-- /shmarkplayer <player> (marking a player with yellow color)
-- /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
++ **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
++ **/shmarkplayer <player>** - marking a player with yellow color.
++ **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
++ **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)

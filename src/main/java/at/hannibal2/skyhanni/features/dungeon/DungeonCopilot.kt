@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -25,7 +24,7 @@ class DungeonCopilot {
             changeNextStep("Ready up")
         }
         if (message.endsWith("§a is now ready!")) {
-            var name = Minecraft.getMinecraft().thePlayer.name
+            var name = LorenzUtils.getPlayerName()
             if (message.contains(name)) {
                 changeNextStep("Wait for the dungeon to start!")
             }

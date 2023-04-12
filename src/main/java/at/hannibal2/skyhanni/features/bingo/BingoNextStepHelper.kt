@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.bingo.nextstep.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -118,11 +119,27 @@ class BingoNextStepHelper {
         }
     }
 
+    var nextMessageIsCrystal = false
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!SkyHanniMod.feature.bingo.cardDisplay) return
 
+        for (currentStep in currentSteps) {
+            if (currentStep.displayName == "Obtain a Topaz Crystal") {
+                if (event.message.matchRegex(" *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)")) {
+                    nextMessageIsCrystal = true
+                    return
+                }
+                if (nextMessageIsCrystal) {
+                    nextMessageIsCrystal = false
+                    if (event.message.matchRegex(" *§r§eTopaz Crystal")) {
+                        currentStep.done()
+                    }
+                }
+            }
+        }
         //TODO add thys message
 //        if (event.message == "thys message") {
 //            thys.done()
@@ -189,7 +206,7 @@ class BingoNextStepHelper {
     }
 
     private fun update() {
-        val personalGoals = BingoCardDisplay.personalGoals
+        val personalGoals = BingoCardDisplay.personalGoals.filter { !it.done }
         if (personalGoals.isEmpty()) {
             if (!dirty) {
                 reset()

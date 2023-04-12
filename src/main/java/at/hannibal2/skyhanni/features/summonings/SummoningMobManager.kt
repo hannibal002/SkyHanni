@@ -37,7 +37,7 @@ class SummoningMobManager {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.isHyPixel) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
         val matcher = spawnPatter.matcher(message)
@@ -82,7 +82,7 @@ class SummoningMobManager {
                     val name = it.displayName.unformattedText
                     val matcher = healthPattern.matcher(name)
                     if (matcher.matches()) {
-                        val playerName = Minecraft.getMinecraft().thePlayer.name
+                        val playerName = LorenzUtils.getPlayerName()
                         if (name.contains(playerName)) {
                             summoningMobNametags.add(it as EntityArmorStand)
                             if (summoningMobNametags.size == summoningsSpawned) {

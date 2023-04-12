@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 
 object NEUItems {
     private val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
@@ -45,6 +46,10 @@ object NEUItems {
             .withCurrentGuiContext()
             .withItemStack(itemStack)
             .resolveInternalName() ?: ""
+    }
+
+    fun getInternalNameOrNull(nbt: NBTTagCompound): String? {
+        return ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
     }
 
     fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false): Double? {

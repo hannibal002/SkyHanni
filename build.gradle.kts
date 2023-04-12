@@ -11,13 +11,12 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.17.Beta.30"
+version = "0.17.Beta.31"
 
 // Toolchains:
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
-
 
 sourceSets.main {
     output.setResourcesDir(file("$buildDir/classes/java/main"))
@@ -31,6 +30,7 @@ configurations.implementation.extendsFrom(configurations.named("bundle").get())
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
@@ -39,6 +39,7 @@ repositories {
             includeGroupByRegex("com\\.github\\..*")
         }
     }
+    maven("https://repo.nea.moe/releases")
 }
 
 val shadowImpl by configurations.creating {
@@ -86,6 +87,8 @@ dependencies {
 
     shadowModImpl("com.github.notenoughupdates:moulconfig:ac39e63")
     devenvMod("com.github.notenoughupdates:moulconfig:ac39e63:test")
+
+    shadowImpl("moe.nea:libautoupdate:1.0.3")
 }
 
 // Minecraft configuration:
@@ -114,6 +117,12 @@ loom {
 }
 
 // Tasks:
+tasks.processResources {
+    inputs.property("version", version)
+    filesMatching("mcmod.info") {
+        expand("version" to version)
+    }
+}
 
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"

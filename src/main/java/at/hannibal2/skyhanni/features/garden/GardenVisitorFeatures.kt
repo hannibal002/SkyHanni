@@ -342,6 +342,13 @@ class GardenVisitorFeatures {
                 if (!name.contains("§")) {
                     name = "§f$name"
                 }
+
+                // Hide hypixel watchdog entries
+                if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) continue
+
+                //hide own player name
+                if (name.contains(LorenzUtils.getPlayerUuid())) continue
+
                 visitorsInTab.add(name)
             }
         }

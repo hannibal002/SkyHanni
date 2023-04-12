@@ -56,11 +56,12 @@ public class DamageIndicator {
                     "§bDungeon Floor 7",
                     "§bDiana Mobs",
                     "§bSea Creatures",
-                    "Dummy"
+                    "Dummy",
+                    "§bArachne"
             }
     )
     //TODO only show currently working and tested features
-    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19));
+    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21));
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")

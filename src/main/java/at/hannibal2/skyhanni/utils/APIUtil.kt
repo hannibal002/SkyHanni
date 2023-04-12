@@ -22,7 +22,7 @@ object APIUtil {
     private var showApiErrors = false
 
     val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
+        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.getVersion()}")
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),
@@ -58,6 +58,11 @@ object APIUtil {
                             LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")
                             println("result: '$retSrc'")
                         }
+                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
+                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            println(" - getJSONResponse: '$urlString'")
+                            LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                        }
                         e.printStackTrace()
                     }
                 }
@@ -81,6 +86,6 @@ object APIUtil {
 
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
-        LorenzUtils.chat("§e[SkyHanni] HyPixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
+        LorenzUtils.chat("§e[SkyHanni] Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
     }
 }

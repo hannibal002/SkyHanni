@@ -70,7 +70,9 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     THUNDER("§cThunder", 19),
     LORD_JAWBUS("§cLord Jawbus", 19),
 
-    DUMMY("Dummy", 21),
+    DUMMY("Dummy", 20),
+    ARACHNE_SMALL("§cSmall Arachne", 21),
+    ARACHNE_BIG("§4Big Arachne", 21),
 
     //TODO arachne
 

@@ -76,6 +76,10 @@ class CropMoneyDisplay {
 
         newDisplay.addAsSingletonList(fullTitle(title))
 
+        if (!config.cropMilestoneProgress) {
+            newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
+            return newDisplay
+        }
 
         val moneyPerHourData = calculateMoneyPerHour()
         if (moneyPerHourData.isEmpty()) {

@@ -53,6 +53,12 @@ public class Mobs {
     public boolean corruptedMobHighlight = false;
 
     @Expose
+    @ConfigOption(name = "Arachne Boss", desc = "Highlight the arachne boss in red and mini bosses and orange.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean arachneBossHighlighter = true;
+
+    @Expose
     @ConfigOption(name = "Respawn Timers", desc = "")
     @ConfigEditorAccordion(id = 1)
     public boolean timers = false;
@@ -68,7 +74,12 @@ public class Mobs {
     public boolean areaBossRespawnTimer = false;
 
     @Expose
-    @ConfigOption(name = "Enderman Teleportation Hider", desc = "Stops the Enderman Teleportation animation.")
+    @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")
     @ConfigEditorBoolean
     public boolean endermanTeleportationHider = true;
+
+    @Expose
+    @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametag above arachne minis.")
+    @ConfigEditorBoolean
+    public boolean hideNameTagArachneMinis = true;
 }

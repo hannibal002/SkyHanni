@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -22,30 +22,33 @@ import java.util.*
 
 object LorenzUtils {
 
-    val isHyPixel: Boolean
-        get() = HyPixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
+    val onHypixel: Boolean
+        get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
+
+    val isOnAlphaServer: Boolean
+        get() = onHypixel && HypixelData.hypixelAlpha
 
     val inSkyBlock: Boolean
-        get() = isHyPixel && HyPixelData.skyBlock
+        get() = onHypixel && HypixelData.skyBlock
 
     val inDungeons: Boolean
         get() = inSkyBlock && DungeonData.inDungeon()
 
     val skyBlockIsland: IslandType
-        get() = HyPixelData.skyBlockIsland
+        get() = HypixelData.skyBlockIsland
 
     //TODO add cache
     val skyBlockArea: String
-        get() = HyPixelData.readSkyBlockArea()
+        get() = HypixelData.readSkyBlockArea()
 
     val inKuudraFight: Boolean
         get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
     val noTradeMode: Boolean
-        get() = HyPixelData.noTrade
+        get() = HypixelData.noTrade
 
     val isBingoProfile: Boolean
-        get() = inSkyBlock && HyPixelData.bingo
+        get() = inSkyBlock && HypixelData.bingo
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
@@ -170,6 +173,8 @@ object LorenzUtils {
     }
 
     fun getPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
+
+    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
@@ -81,7 +81,11 @@ class EliteFarmingWeight {
         private fun update() {
             if (!GardenAPI.inGarden()) return
             if (apiError) {
-                display = Collections.singletonList("§6Farming Weight§7: §cAPI Error!")
+                display = listOf(
+                    "§6Farming Weight§7: §cError!",
+                    "§cCannot load data from Elite Farmers!",
+                    "§eRejoin garden to try again."
+                )
                 return
             }
             if (weight == -2.0) {
@@ -91,7 +95,7 @@ class EliteFarmingWeight {
 
             if (weight == -1.0) {
                 if (!isLoadingWeight) {
-                    val localProfile = HyPixelData.profileName
+                    val localProfile = HypixelData.profileName
                     if (localProfile == "") return
 
                     isLoadingWeight = true

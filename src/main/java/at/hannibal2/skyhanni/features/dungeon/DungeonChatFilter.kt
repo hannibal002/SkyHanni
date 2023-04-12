@@ -10,7 +10,7 @@ class DungeonChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.isHyPixel) return
+        if (!LorenzUtils.onHypixel) return
 
         // Workaround since the potion message gets always sent in that moment when skyblock is set as false
         if (!LorenzUtils.inSkyBlock && !event.message.startsWith("§aYour active Potion Effects")) return
