@@ -746,41 +746,6 @@ public class Garden {
     public boolean composterHighLightUpgrade = true;
 
     @Expose
-    @ConfigOption(name = "Low Notifiers", desc = "")
-    @ConfigAccordionId(id = 17)
-    @ConfigEditorAccordion(id = 20)
-    public boolean notifiersForCompost = false;
-
-    @Expose
-    @ConfigOption(name = "Organic Matter", desc = "Notifies you when your Organic Matter is running low!")
-    @ConfigEditorSlider(
-            minValue = 3000,
-            maxValue = 540_000,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 20)
-    public int notifyWhenOrganicMatterLow = 4000;
-
-    @Expose
-    @ConfigOption(name = "Fuel", desc = "Notifies you when your fuel is running low!")
-    @ConfigEditorSlider(
-            minValue = 500,
-            maxValue = 850_000,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 20)
-    public int notifyWhenFuelLow = 4000;
-
-    @Expose
-    @ConfigOption(name = "Enable Notifiers", desc = "Show a notification as title when organic matter/fuel is low.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 20)
-    public boolean composterNotify = true;
-
-    @Expose
-    public Position composterDisplayPos = new Position(-363, 13, false, true);
-
-    @Expose
     @ConfigOption(
             name = "Inventory Numbers",
             desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory."
@@ -788,6 +753,47 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
     public boolean composterInventoryNumbers = true;
+
+    @Expose
+    @ConfigOption(name = "Notification When Low Composter", desc = "")
+    @ConfigAccordionId(id = 17)
+    @ConfigEditorAccordion(id = 21)
+    public boolean composterNotifyLow = false;
+
+    @Expose
+    @ConfigOption(name = "Enable", desc = "Show a notification when organic matter or fuel runs low in your composter.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 21)
+    public boolean composterNotifyLowEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Show Title", desc = "Send a title to notify.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 21)
+    public boolean composterNotifyLowTitle = false;
+
+    @Expose
+    @ConfigOption(name = "Min Organic Matter", desc = "Warn when Organic Matter is below this value.")
+    @ConfigEditorSlider(
+            minValue = 1_000,
+            maxValue = 80_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 21)
+    public int composterNotifyLowOrganicMatter = 20_000;
+
+    @Expose
+    @ConfigOption(name = "Min Fuel Cap", desc = "Warn when Fuel is below this value.")
+    @ConfigEditorSlider(
+            minValue = 500,
+            maxValue = 40_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 21)
+    public int composterNotifyLowFuel = 10_000;
+
+    @Expose
+    public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
     @ConfigOption(name = "True Farming Fortune", desc = "")
