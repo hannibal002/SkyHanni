@@ -133,6 +133,7 @@ public class SkyHanniMod {
         loadModule(new ToolTipData());
         loadModule(new GuiEditManager());
         loadModule(UpdateManager.INSTANCE);
+        loadModule(new CropAccessoryData());
 
         // APIs
         loadModule(new BazaarApi());
