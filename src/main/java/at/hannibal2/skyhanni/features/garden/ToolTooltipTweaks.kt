@@ -30,12 +30,12 @@ class ToolTooltipTweaks {
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(event.itemStack, crop)
 
         val reforgeName = event.itemStack.getReforgeName()?.firstLetterUppercase()
-        val enchantments = event.itemStack.getEnchantments()
+        val enchantments = event.itemStack.getEnchantments() ?: emptyMap()
         val sunderFortune = (enchantments["sunder"] ?: 0) * 12.5
         val harvestingFortune = (enchantments["harvesting"] ?: 0) * 12.5
         val cultivatingFortune = (enchantments["cultivating"] ?: 0).toDouble()
 
-        val ffdFortune = event.itemStack.getFarmingForDummiesCount().toDouble()
+        val ffdFortune = event.itemStack.getFarmingForDummiesCount()?.toDouble() ?: 0.0
         val cropFortune = (toolFortune + counterFortune + collectionFortune + turboCropFortune + dedicationFortune)
         val iterator = event.toolTip.listIterator()
 
