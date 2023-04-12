@@ -81,7 +81,11 @@ class EliteFarmingWeight {
         private fun update() {
             if (!GardenAPI.inGarden()) return
             if (apiError) {
-                display = Collections.singletonList("§6Farming Weight§7: §cAPI Error!")
+                display = listOf(
+                    "§6Farming Weight§7: §cError!",
+                    "§cCannot load data from Elite Farmers!",
+                    "§eRejoin garden to try again."
+                )
                 return
             }
             if (weight == -2.0) {

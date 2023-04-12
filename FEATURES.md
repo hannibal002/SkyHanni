@@ -210,9 +210,10 @@
 + **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 
 ## Commands
-- /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
-- /shmarkplayer <player> (marking a player with yellow color)
-- /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
++ **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
++ **/shmarkplayer <player>** - marking a player with yellow color.
++ **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
++ **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
