@@ -61,6 +61,7 @@
 + Added **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
 + Added **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
 + Added **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
++ Added command **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 
 
 ### Features from other Mods
