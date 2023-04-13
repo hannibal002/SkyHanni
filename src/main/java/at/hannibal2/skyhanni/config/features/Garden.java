@@ -797,7 +797,7 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "True Farming Fortune", desc = "")
-    @ConfigEditorAccordion(id = 18)
+    @ConfigEditorAccordion(id = 22)
     public boolean farmingFortune = false;
 
     @Expose
@@ -806,7 +806,7 @@ public class Garden {
             desc = "Displays current farming fortune, including crop-specific bonuses."
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 18)
+    @ConfigAccordionId(id = 22)
     public boolean farmingFortuneDisplay = true;
 
     @Expose
@@ -816,7 +816,7 @@ public class Garden {
                     " the chance for bonus drops. "
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 18)
+    @ConfigAccordionId(id = 22)
     public boolean farmingFortuneDropMultiplier = false;
 
     @Expose

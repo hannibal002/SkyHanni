@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.data.MayorElectionData
 import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.addCropIcon
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getCropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.setSpeed
+import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI.setSpeed
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList

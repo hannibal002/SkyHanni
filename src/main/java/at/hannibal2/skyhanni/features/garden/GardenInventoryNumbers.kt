@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -10,11 +11,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class GardenInventoryNumbers {
-
     private var patternTierProgress = Pattern.compile("§7Progress to Tier (.*): §e(?:.*)")
     private var patternUpgradeTier = Pattern.compile("§7Current Tier: §[ea](.*)§7/§a.*")
-    private val patternComposterUpgrades =
-        Pattern.compile("§a(?:Composter Speed|Multi Drop|Fuel Cap|Organic Matter Cap|Cost Reduction) ?(.*)?")
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -44,12 +42,10 @@ class GardenInventoryNumbers {
             if (!SkyHanniMod.feature.garden.numberComposterUpgrades) return
 
             event.stack.name?.let {
-                val matcher = patternComposterUpgrades.matcher(it)
+                val matcher = ComposterUpgrade.regex.matcher(it)
                 if (matcher.matches()) {
-                    event.stackTip = if (matcher.groupCount() != 0) {
-                        val group = matcher.group(1)
-                        "" + group.romanToDecimalIfNeeded()
-                    } else "0"
+                    val level = matcher.group("level")?.romanToDecimalIfNeeded() ?: 0
+                    event.stackTip = "$level"
                 }
             }
         }
