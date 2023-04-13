@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
 import kotlin.math.max
@@ -30,8 +32,9 @@ interface Renderable {
             }
         }
 
-        fun link(text: String, onClick: () -> Unit): Renderable {
-            return clickable(hoverable(string("§n$text"), string(text)), onClick)
+        fun link(text: String, onClick: () -> Unit): Renderable = link(string(text), onClick)
+        fun link(renderable: Renderable, onClick: () -> Unit): Renderable {
+            return clickable(hoverable(underlined(renderable), renderable), onClick)
         }
 
         fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0): Renderable {
@@ -39,7 +42,7 @@ interface Renderable {
                 override val width: Int
                     get() = render.width
 
-                var wasDown = false
+                private var wasDown = false
 
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
@@ -50,6 +53,19 @@ interface Renderable {
                     render.render(posX, posY)
                 }
 
+            }
+        }
+
+        fun underlined(renderable: Renderable): Renderable {
+            return object : Renderable {
+                override val width: Int
+                    get() = renderable.width
+
+                override fun render(posX: Int, posY: Int) {
+                    Gui.drawRect(0, 10, width, 11, 0xFFFFFFFF.toInt())
+                    GlStateManager.color(1F, 1F, 1F, 1F)
+                    renderable.render(posX, posY)
+                }
             }
         }
 
