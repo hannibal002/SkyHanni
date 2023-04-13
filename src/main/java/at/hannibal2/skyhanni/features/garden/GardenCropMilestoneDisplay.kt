@@ -26,7 +26,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
-import kotlin.random.Random
 
 class GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
@@ -129,8 +128,14 @@ class GardenCropMilestoneDisplay {
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
-                val finneganPerkFactor = if (finneganPerkActive() && Random.nextDouble() <= 0.25) 0.5 else 1.0
+//                val finneganPerkFactor = if (finneganPerkActive() && Random.nextDouble() <= 0.25) 0.5 else 1.0
+//                val finneganPerkFactor = if (finneganPerkActive()) 0.8 else 1.0
+
+                // 1/(1 + 0.25*2)
+                val multiplier = 0.6666
+                val finneganPerkFactor = if (finneganPerkActive()) multiplier else 1.0
                 val addedCounter = ((counter - old) * finneganPerkFactor).toInt()
+                println("addedCounter: $addedCounter")
 
                 if (GardenCropMilestones.cropCounter.isEmpty()) {
                     for (innerCrop in CropType.values()) {
