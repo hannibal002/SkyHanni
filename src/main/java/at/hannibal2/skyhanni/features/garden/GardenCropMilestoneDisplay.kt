@@ -128,14 +128,7 @@ class GardenCropMilestoneDisplay {
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
-//                val finneganPerkFactor = if (finneganPerkActive() && Random.nextDouble() <= 0.25) 0.5 else 1.0
-//                val finneganPerkFactor = if (finneganPerkActive()) 0.8 else 1.0
-
-                // 1/(1 + 0.25*2)
-                val multiplier = 0.6666
-                val finneganPerkFactor = if (finneganPerkActive()) multiplier else 1.0
-                val addedCounter = ((counter - old) * finneganPerkFactor).toInt()
-                println("addedCounter: $addedCounter")
+                val addedCounter = counter - old
 
                 if (GardenCropMilestones.cropCounter.isEmpty()) {
                     for (innerCrop in CropType.values()) {
@@ -147,8 +140,9 @@ class GardenCropMilestoneDisplay {
                         cropType.setSpeed(-1)
                     }
                 }
-
-                crop.setCounter(crop.getCounter() + addedCounter)
+                if (!finneganPerkActive()) {
+                    crop.setCounter(crop.getCounter() + addedCounter)
+                }
                 EliteFarmingWeight.addCrop(crop, addedCounter)
                 if (currentCrop == crop) {
                     calculateSpeed(addedCounter)
@@ -162,8 +156,14 @@ class GardenCropMilestoneDisplay {
         }
     }
 
-    private fun finneganPerkActive() =
-        config.forcefullyEnabledAlwaysFinnegan || MayorElectionData.isPerkActive("Finnegan", "Farming Simulator")
+    private fun finneganPerkActive(): Boolean {
+        val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
+        val perkActive = MayorElectionData.isPerkActive("Finnegan", "Farming Simulator")
+        MayorElectionData.currentCandidate?.let {
+
+        }
+        return forcefullyEnabledAlwaysFinnegan || perkActive
+    }
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
@@ -209,6 +209,10 @@ class GardenCropMilestoneDisplay {
     }
 
     private fun checkSpeed() {
+        if (finneganPerkActive()) {
+            currentSpeed = (currentSpeed.toDouble() * 0.8).toInt()
+        }
+
         if (countInLastSecond > 8) {
             allCounters.add(currentSpeed)
             while (allCounters.size > 30) {
@@ -217,6 +221,12 @@ class GardenCropMilestoneDisplay {
             averageSpeedPerSecond = allCounters.average().toInt()
         }
         countInLastSecond = 0
+
+        if (finneganPerkActive()) {
+            currentCrop?.let {
+                it.setCounter(it.getCounter() + currentSpeed)
+            }
+        }
         currentSpeed = 0
 
         lastBlocksPerSecond = blocksBroken

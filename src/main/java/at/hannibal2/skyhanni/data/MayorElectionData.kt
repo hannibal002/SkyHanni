@@ -53,9 +53,14 @@ class MayorElectionData {
             SkyHanniMod.coroutineScope.launch {
                 val url = "https://api.hypixel.net/resources/skyblock/election"
                 val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
-                rawMayorData = gson.fromJson(jsonObject, MayorData::class.java).also {
-                    candidates = mapOf(it.mayor.election.getPairs(), it.current.getPairs())
+                rawMayorData = gson.fromJson(jsonObject, MayorData::class.java)
+                val data = rawMayorData ?: return@launch
+                val map = mutableMapOf<Int, Candidate>()
+                map put data.mayor.election.getPairs()
+                data.current?.let {
+                    map put data.current.getPairs()
                 }
+                candidates = map
             }
         }
 
@@ -79,4 +84,8 @@ class MayorElectionData {
     private fun MayorData.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
     private fun List<MayorData.Candidate>.bestCandidate() = maxBy { it.votes }
+
+    private infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
+        this[pairs.first] = pairs.second
+    }
 }
