@@ -75,6 +75,9 @@ dependencies {
     shadowModImpl("com.github.notenoughupdates:moulconfig:ac39e63")
     devenvMod("com.github.notenoughupdates:moulconfig:ac39e63:test")
 
+    shadowModImpl("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.4.0")
+    devenvMod("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.4.0")
+
     shadowImpl("moe.nea:libautoupdate:1.0.3")
 }
 

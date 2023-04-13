@@ -1,20 +1,39 @@
 package at.hannibal2.skyhanni.utils
 
+import kotlinx.datetime.Clock
 import java.util.regex.Pattern
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 object TimeUtils {
-
     private val pattern =
         Pattern.compile("(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?")
+
+    fun formatDuration(
+        duration: Duration,
+        biggestUnit: TimeUnit = TimeUnit.YEAR,
+        showMilliSeconds: Boolean = false,
+        longName: Boolean = false,
+        maxUnits: Int = -1,
+    ): String {
+        return formatDuration(
+            duration.inWholeMilliseconds,
+            biggestUnit,
+            showMilliSeconds,
+            longName,
+            maxUnits
+        )
+    }
 
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
-        maxUnits: Int = -1
+        maxUnits: Int = -1,
     ): String {
-        var milliseconds = millis + 999
+        var milliseconds = millis
         val map = mutableMapOf<TimeUnit, Int>()
         for (unit in TimeUnit.values()) {
             if (unit.ordinal >= biggestUnit.ordinal) {
@@ -55,7 +74,8 @@ object TimeUtils {
         return builder.toString()
     }
 
-    // TODO: use kotlin Duration
+    fun getDuration(string: String) = getMillis(string).toDuration(DurationUnit.MILLISECONDS)
+
     fun getMillis(string: String): Long {
         val matcher = pattern.matcher(string.lowercase().trim())
         if (!matcher.matches()) return tryAlternativeFormat(string)
@@ -101,6 +121,8 @@ object TimeUtils {
             }
         }.toLong()
     }
+
+    fun now() = Clock.System.now()
 }
 
 private const val FACTOR_SECONDS = 1000L

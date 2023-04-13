@@ -7,12 +7,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class GardenVisitorTimer {
     private val patternNextVisitor = Pattern.compile(" Next Visitor: §r§b(.*)")
     private val patternVisitors = Pattern.compile("§b§lVisitors: §r§f\\((\\d)\\)")
     private var render = ""
-    private var lastMillis = 0L
+    private var last = 0.seconds
     private var lastVisitors = 0
 
     @SubscribeEvent
@@ -20,13 +22,13 @@ class GardenVisitorTimer {
         if (!isEnabled()) return
 
         var visitorsAmount = 0
-        var millis = 15 * 60_000L
+        var current = 15.minutes
         var queueFull = false
         for (line in event.tabList) {
             var matcher = patternNextVisitor.matcher(line)
             if (matcher.matches()) {
                 val rawTime = matcher.group(1)
-                millis = TimeUtils.getMillis(rawTime)
+                current = TimeUtils.getDuration(rawTime)
             } else if (line == " Next Visitor: §r§c§lQueue Full!") {
                 queueFull = true
             } else if (line == " Next Visitor: §r§cNot Unlocked!") {
@@ -40,17 +42,17 @@ class GardenVisitorTimer {
             }
         }
 
-        val diff = lastMillis - millis
+        val diff = (last - current).inWholeSeconds
         if (diff == 0L && visitorsAmount == lastVisitors) return
-        lastMillis = millis
+        last = current
         lastVisitors = visitorsAmount
 
-        val extraSpeed = if (diff in 1001..10_000) {
-            val factor = diff / 1000
-            "§7/§e" + TimeUtils.formatDuration(millis / factor)
+        val extraSpeed = if (diff in 2..10) {
+            val d = current / diff.toDouble()
+            "§7/§e" + TimeUtils.formatDuration(d)
         } else ""
 
-        val formatDuration = TimeUtils.formatDuration(millis)
+        val formatDuration = TimeUtils.formatDuration(current)
         val next = if (queueFull) "§cQueue Full!" else {
             "Next in §e$formatDuration$extraSpeed"
         }

@@ -11,11 +11,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlin.time.Duration.Companion.seconds
 
 class ChickenHeadTimer {
     private var tick = 0
     private var hasChickenHead = false
-    private var lastTime = 0L
+    private var lastTime = TimeUtils.now()
     private val config get() = SkyHanniMod.feature.misc
 
     @SubscribeEvent
@@ -30,7 +31,7 @@ class ChickenHeadTimer {
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
-        lastTime = System.currentTimeMillis()
+        lastTime = TimeUtils.now()
     }
 
     @SubscribeEvent
@@ -38,7 +39,7 @@ class ChickenHeadTimer {
         if (!isEnabled()) return
         if (!hasChickenHead) return
         if (event.message == "§aYou laid an egg!") {
-            lastTime = System.currentTimeMillis()
+            lastTime = TimeUtils.now()
             if (config.chickenHeadTimerHideChat) {
                 event.blockedReason = "chicken_head_timer"
             }
@@ -50,14 +51,13 @@ class ChickenHeadTimer {
         if (!isEnabled()) return
         if (!hasChickenHead) return
 
-        val sinceLastTime = System.currentTimeMillis() - lastTime
-        val cooldown = 20_000
-        val remainingTime = cooldown - sinceLastTime
+        val duration = TimeUtils.now().minus(lastTime)
+        val remainingDuration = 20.seconds - duration
 
-        val displayText = if (remainingTime < 0) {
+        val displayText = if (remainingDuration.isNegative()) {
             "Chicken Head Timer: §aNow"
         } else {
-            val formatDuration = TimeUtils.formatDuration(remainingTime)
+            val formatDuration = TimeUtils.formatDuration(remainingDuration)
             "Chicken Head Timer: §b$formatDuration"
         }
 

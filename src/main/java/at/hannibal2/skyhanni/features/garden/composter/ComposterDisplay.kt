@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.DurationUnit
 
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -85,7 +84,6 @@ class ComposterDisplay {
         val newDisplay = mutableListOf<List<Any>>()
         newDisplay.addAsSingletonList("§bComposter")
 
-
         newDisplay.add(DataType.TIME_LEFT.addToList(tabListData))
 
         val list = mutableListOf<Any>()
@@ -102,8 +100,7 @@ class ComposterDisplay {
 
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
-            val millis = emptyTime.toDouble(DurationUnit.MILLISECONDS).toLong()
-            val format = TimeUtils.formatDuration(millis, maxUnits = 2)
+            val format = TimeUtils.formatDuration(emptyTime, maxUnits = 2)
             listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
         } else {
             listOf("§cOpen Composter Upgrades!")
