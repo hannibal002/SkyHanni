@@ -15,23 +15,9 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getHoeCounter() = getAttributeInt("mined_crops")
 
-    fun ItemStack.getSilexCount(): Int? {
-        val enchantments = getEnchantments() ?: return null
-        var silexTier = 0
-        for ((name, amount) in enchantments) {
-            if (name == "efficiency") {
-                if (amount > 5) {
-                    silexTier = amount - 5
-                }
-            }
-        }
-
-        if (getInternalName() == "STONK_PICKAXE") {
-            silexTier--
-        }
-
-        return silexTier
-    }
+    fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
+        it - 5 - if (getInternalName() == "STONK_PICKAXE") 1 else 0
+    }?.takeIf { it > 0 }
 
     fun ItemStack.getTransmissionTunerCount() = getAttributeInt("tuned_transmission")
 
@@ -105,16 +91,9 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.hasArtOfPiece() = getAttributeBoolean("artOfPeaceApplied")
 
-    fun ItemStack.getEnchantments() = getExtraAttributes()?.let {
-        val map = mutableMapOf<String, Int>()
-        for (attributes in it.keySet) {
-            if (attributes != "enchantments") continue
-            val enchantments = it.getCompoundTag(attributes)
-            for (key in enchantments.keySet) {
-                map[key] = enchantments.getInteger(key)
-            }
-        }
-        map
+    fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
+        val enchantments = this.getCompoundTag("enchantments")
+        enchantments.keySet.associateWith { enchantments.getInteger(it) }
     }
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

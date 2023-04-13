@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.MayorData
 import at.hannibal2.skyhanni.utils.MayorData.Candidate
 import com.google.gson.GsonBuilder
@@ -79,5 +78,5 @@ class MayorElectionData {
 
     private fun MayorData.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
-    private fun List<MayorData.Candidate>.bestCandidate() = map { it to it.votes }.sorted().last().first
+    private fun List<MayorData.Candidate>.bestCandidate() = maxBy { it.votes }
 }
