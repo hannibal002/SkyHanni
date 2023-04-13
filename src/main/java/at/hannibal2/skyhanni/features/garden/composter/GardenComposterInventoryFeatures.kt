@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -11,7 +12,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenComposterInventoryFeatures {
-    val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden
 
     @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {

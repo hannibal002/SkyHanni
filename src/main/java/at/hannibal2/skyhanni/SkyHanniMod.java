@@ -25,7 +25,9 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
 import at.hannibal2.skyhanni.features.fishing.*;
 import at.hannibal2.skyhanni.features.garden.*;
+import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay;
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers;
+import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
@@ -136,10 +138,11 @@ public class SkyHanniMod {
         loadModule(UpdateManager.INSTANCE);
         loadModule(new CropAccessoryData());
         loadModule(new MayorElectionData());
+        loadModule(new GardenComposterUpgradesData());
 
         // APIs
         loadModule(new BazaarApi());
-        loadModule(new GardenAPI());
+        loadModule(GardenAPI.INSTANCE);
         loadModule(new CollectionAPI());
 
         // features

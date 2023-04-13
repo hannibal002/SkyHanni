@@ -55,6 +55,7 @@ object TimeUtils {
         return builder.toString()
     }
 
+    // TODO: use kotlin Duration
     fun getMillis(string: String): Long {
         val matcher = pattern.matcher(string.lowercase().trim())
         if (!matcher.matches()) return tryAlternativeFormat(string)
