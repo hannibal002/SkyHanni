@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.data.MayorElectionData
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI.setSpeed

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
