@@ -20,7 +20,7 @@ public class Mobs {
     public boolean areaBossHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Arachne Keeper", desc = "Highlight corrupted mobs in purple color.")
+    @ConfigOption(name = "Arachne Keeper", desc = "Highlight the Arachne Keeper in the Spider's Den in purple color.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean arachneKeeperHighlight = true;
