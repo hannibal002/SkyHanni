@@ -28,7 +28,7 @@ public class Misc {
     public boolean time = false;
 
     @Expose
-    @ConfigOption(name = "Real Time", desc = "Show IRL time. Useful while playing in full screen mode.")
+    @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean realTime = false;
