@@ -195,6 +195,10 @@ class CropMoneyDisplay {
             if (speed == -1.0) continue
             val isSeeds = internalName == "ENCHANTED_SEEDS"
             if (isSeeds) speed *= 1.36
+            if (crop.replenish) {
+                val blockPerSecond = crop.multiplier * 20
+                speed -= blockPerSecond
+            }
 
             val speedPerHour = speed * 60 * 60
             val cropsPerHour = speedPerHour / amount.toDouble()
