@@ -7,26 +7,13 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class WrongFungiCutterWarning {
     private var mode = FungiMode.UNKNOWN
-
     private var lastPlaySoundTime = 0L
-    private val sound = object : PositionedSound(ResourceLocation("random.orb")) {
-        init {
-            volume = 50f
-            repeat = false
-            repeatDelay = 0
-            attenuationType = ISound.AttenuationType.NONE
-        }
-    }
-
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -62,7 +49,7 @@ class WrongFungiCutterWarning {
         SendTitleHelper.sendTitle("§cWrong Fungi Cutter Mode!", 2_000)
         if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
             lastPlaySoundTime = System.currentTimeMillis()
-            sound.playSound()
+            SoundUtils.playBeepSound()
         }
     }
 

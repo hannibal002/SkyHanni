@@ -661,6 +661,22 @@ public class Garden {
     public boolean nextJacobContestOtherGuis = false;
 
     @Expose
+    @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new jacob contest starts.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestWarn = false;
+
+    @Expose
+    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before the Jacobs contest begins.")
+    @ConfigEditorSlider(
+            minValue = 10,
+            maxValue = 60 * 5,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 21)
+    public int nextJacobContestWarnTime = 60 * 2;
+
+    @Expose
     public Position nextJacobContestPos = new Position(-278, 11, false, true);
 
     @Expose

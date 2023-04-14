@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SendTitleHelper
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -8,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -27,6 +29,7 @@ class GardenNextJacobContest {
 
     private val maxContestsPerYear = 124
     private val contestDuration = 1_000 * 60 * 20
+    private var lastWarningTime = 0L
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -189,6 +192,7 @@ class GardenNextJacobContest {
         } else {
             list.add("§eNext: ")
             duration -= contestDuration
+            warn(duration, nextContest.crops)
         }
         for (crop in nextContest.crops) {
             list.add(" ")
@@ -199,6 +203,19 @@ class GardenNextJacobContest {
         list.add("§7(§b$format§7)")
 
         return list
+    }
+
+    private fun warn(timeInMillis: Long, crops: List<CropType>) {
+        if (!config.nextJacobContestWarn) return
+        if (config.nextJacobContestWarnTime <= timeInMillis / 1000) return
+
+        if (System.currentTimeMillis() < lastWarningTime) return
+        lastWarningTime = System.currentTimeMillis() + 60_000 * 40
+
+        val cropText = crops.joinToString("§7, ") { "§a${it.cropName}" }
+        LorenzUtils.chat("§e[SkyHanni] Next farming contest: $cropText")
+        SendTitleHelper.sendTitle("§eFarming Contest!", 5_000)
+        SoundUtils.playBeepSound()
     }
 
     @SubscribeEvent
@@ -218,7 +235,10 @@ class GardenNextJacobContest {
         if (!inCalendar) return
 
         if (display.isNotEmpty()) {
-            SkyHanniMod.feature.misc.inventoryLoadPos.renderSingleLineWithItems(display, posLabel = "Load SkyBlock Calendar")
+            SkyHanniMod.feature.misc.inventoryLoadPos.renderSingleLineWithItems(
+                display,
+                posLabel = "Load SkyBlock Calendar"
+            )
         }
     }
 
