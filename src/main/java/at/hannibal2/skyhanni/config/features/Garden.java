@@ -673,7 +673,7 @@ public class Garden {
             maxValue = 60 * 5,
             minStep = 1
     )
-    @ConfigAccordionId(id = 21)
+    @ConfigAccordionId(id = 14)
     public int nextJacobContestWarnTime = 60 * 2;
 
     @Expose
