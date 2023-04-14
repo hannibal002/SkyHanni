@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
@@ -18,7 +18,7 @@ class BlazeSlayerFirePitsWarning {
         private var nextTickIn = 0
 
         fun fireFirePits() {
-            SendTitleHelper.sendTitle("§cFire Pits!", 2_000)
+            TitleUtils.sendTitle("§cFire Pits!", 2_000)
         }
     }
 

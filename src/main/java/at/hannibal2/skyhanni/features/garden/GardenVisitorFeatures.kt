@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -364,7 +364,7 @@ class GardenVisitorFeatures {
                 visitors[name] = Visitor(name, status = VisitorStatus.NEW)
                 LorenzUtils.debug("new visitor '$name'")
                 if (config.visitorNotificationTitle) {
-                    SendTitleHelper.sendTitle("§eNew Visitor", 5_000)
+                    TitleUtils.sendTitle("§eNew Visitor", 5_000)
                 }
                 if (config.visitorNotificationChat) {
                     val displayName = GardenVisitorColorNames.getColoredName(name)

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -147,7 +147,7 @@ class ComposterDisplay {
         if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter) {
             if (System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
                 if (config.composterNotifyLowTitle) {
-                    SendTitleHelper.sendTitle("§cYour Organic Matter is low", 4_000)
+                    TitleUtils.sendTitle("§cYour Organic Matter is low", 4_000)
                 }
                 LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
                 hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
@@ -158,7 +158,7 @@ class ComposterDisplay {
             System.currentTimeMillis() >= hidden.informedAboutLowFuel
         ) {
             if (config.composterNotifyLowTitle) {
-                SendTitleHelper.sendTitle("§cYour Fuel is low", 4_000)
+                TitleUtils.sendTitle("§cYour Fuel is low", 4_000)
             }
             LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
             hidden.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5

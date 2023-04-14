@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -214,7 +214,7 @@ class GardenNextJacobContest {
 
         val cropText = crops.joinToString("§7, ") { "§a${it.cropName}" }
         LorenzUtils.chat("§e[SkyHanni] Next farming contest: $cropText")
-        SendTitleHelper.sendTitle("§eFarming Contest!", 5_000)
+        TitleUtils.sendTitle("§eFarming Contest!", 5_000)
         SoundUtils.playBeepSound()
     }
 
