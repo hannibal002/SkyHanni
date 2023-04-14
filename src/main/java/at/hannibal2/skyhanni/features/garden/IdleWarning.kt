@@ -9,7 +9,6 @@ import io.github.moulberry.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.EnumChatFormatting.GREEN
 import net.minecraft.util.EnumChatFormatting.RED
 import net.minecraftforge.fml.common.eventhandler.EventPriority
