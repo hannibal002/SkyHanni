@@ -635,6 +635,14 @@ public class Garden {
     public List<Integer> moneyPerHourCustomFormat = new ArrayList<>(Arrays.asList(0, 1, 2));
 
     @Expose
+    @ConfigOption(
+            name = "Merge Seeds",
+            desc = "Merge the seeds price with the wheat price.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourMergeSeeds = true;
+
+    @Expose
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose

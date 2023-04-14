@@ -31,9 +31,9 @@ enum class CropType(val cropName: String, val toolName: String, val baseDrops: D
 
 
         fun getByItemName(itemName: String): CropType? {
-            if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") {
-                return MUSHROOM
-            }
+            if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
+            if (itemName == "Seeds") return WHEAT
+
             return getByName(itemName)
         }
 
