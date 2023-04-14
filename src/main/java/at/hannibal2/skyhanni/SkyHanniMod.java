@@ -96,7 +96,6 @@ public class SkyHanniMod {
 
     public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
-
     public static Features feature;
 
     public static RepoManager repo;
