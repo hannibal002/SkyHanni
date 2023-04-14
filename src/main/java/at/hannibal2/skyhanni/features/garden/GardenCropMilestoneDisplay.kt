@@ -16,12 +16,9 @@ import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
@@ -34,15 +31,6 @@ class GardenCropMilestoneDisplay {
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
 //    val cropMilestoneLevelUpPattern = Pattern.compile("  §r§b§lGARDEN MILESTONE §3(.*) §8XXIII➜§3(.*)")
-
-    private val sound = object : PositionedSound(ResourceLocation("random.orb")) {
-        init {
-            volume = 50f
-            repeat = false
-            repeatDelay = 0
-            attenuationType = ISound.AttenuationType.NONE
-        }
-    }
 
     private var lastPlaySoundTime = 0L
 
@@ -307,7 +295,7 @@ class GardenCropMilestoneDisplay {
                 if (millis < 5_900) {
                     if (System.currentTimeMillis() > lastPlaySoundTime + 1_000) {
                         lastPlaySoundTime = System.currentTimeMillis()
-                        sound.playSound()
+                        SoundUtils.playBeepSound()
                     }
                     SendTitleHelper.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
                 }

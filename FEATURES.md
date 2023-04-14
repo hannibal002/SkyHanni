@@ -211,6 +211,7 @@
 + **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
 + **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 + **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
++ **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

@@ -5,12 +5,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraft.client.Minecraft
-import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -22,15 +18,6 @@ class BarnFishingTimer {
     private var rightLocation = false
     private var currentCount = 0
     private var startTime = 0L
-
-    private val sound = object : PositionedSound(ResourceLocation("random.orb")) {
-        init {
-            volume = 50f
-            repeat = false
-            repeatDelay = 0
-            attenuationType = ISound.AttenuationType.NONE
-        }
-    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -55,7 +42,7 @@ class BarnFishingTimer {
         val duration = System.currentTimeMillis() - startTime
         val barnTimerAlertTime = SkyHanniMod.feature.fishing.barnTimerAlertTime * 1_000
         if (duration > barnTimerAlertTime && duration < barnTimerAlertTime + 3_000) {
-            sound.playSound()
+            SoundUtils.playBeepSound()
         }
     }
 
