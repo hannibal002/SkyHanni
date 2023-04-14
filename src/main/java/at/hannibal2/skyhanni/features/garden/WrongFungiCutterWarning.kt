@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -46,7 +46,7 @@ class WrongFungiCutterWarning {
     private fun notifyWrong() {
         if (!SkyHanniMod.feature.garden.fungiCutterWarn) return
 
-        SendTitleHelper.sendTitle("§cWrong Fungi Cutter Mode!", 2_000)
+        TitleUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2_000)
         if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
             lastPlaySoundTime = System.currentTimeMillis()
             SoundUtils.playBeepSound()

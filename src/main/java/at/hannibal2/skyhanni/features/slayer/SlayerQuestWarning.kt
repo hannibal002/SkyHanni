@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -137,7 +137,7 @@ class SlayerQuestWarning {
         LorenzUtils.chat("§e[SkyHanni] $chatMessage")
 
         if (config.questWarningTitle) {
-            SendTitleHelper.sendTitle("§e$titleMessage", 2_000)
+            TitleUtils.sendTitle("§e$titleMessage", 2_000)
         }
     }
 

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.data.MayorElectionData
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
@@ -297,7 +297,7 @@ class GardenCropMilestoneDisplay {
                         lastPlaySoundTime = System.currentTimeMillis()
                         SoundUtils.playBeepSound()
                     }
-                    SendTitleHelper.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
+                    TitleUtils.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
                 }
             }
             lineMap[3] = Collections.singletonList("§7In §b$duration")

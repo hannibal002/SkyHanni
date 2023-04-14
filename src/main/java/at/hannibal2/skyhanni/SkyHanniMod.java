@@ -123,7 +123,7 @@ public class SkyHanniMod {
         loadModule(new EntityMovementData());
         loadModule(new ItemClickData());
         loadModule(new MinecraftData());
-        loadModule(new SendTitleHelper());
+        loadModule(new TitleUtils());
         loadModule(new ItemTipHelper());
         loadModule(new RenderLivingEntityHelper());
         loadModule(new SkillExperience());

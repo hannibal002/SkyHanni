@@ -7,7 +7,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SendTitleHelper {
+class TitleUtils {
 
     companion object {
         private var display = ""
