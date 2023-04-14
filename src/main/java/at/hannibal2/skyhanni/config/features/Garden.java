@@ -902,5 +902,59 @@ public class Garden {
     public boolean forcefullyEnabledAlwaysFinnegan = false;
 
     @Expose
+    @ConfigOption(name = "Idle Notifier", desc = "Idle Notifier")
+    @ConfigEditorAccordion(id = 29)
+    public boolean idleNotifierAccordion = false;
+
+    @Expose
+    @ConfigOption(name = "Idle Notifier", desc = "Notify you when you stop gaining crops")
+    @ConfigAccordionId(id = 29)
+    @ConfigEditorBoolean
+    public boolean idleNotifier = false;
+    @Expose
+    @ConfigOption(name = "Idle Notifier Strategy", desc = "Flash your screen or play a sound when you stop gaining crops")
+    @ConfigAccordionId(id = 29)
+    @ConfigEditorDropdown
+    public IdleNotifierStrategy idleNotifierStrategy = IdleNotifierStrategy.AUDIBLE;
+    @Expose
+    @ConfigOption(name = "Idle Notifier Colour", desc = "In which colour should your screen flash if you stop gaining crops")
+    @ConfigAccordionId(id = 29)
+    @ConfigEditorColour
+    public String idleNotifierColor = "00:50:64:224:208";
+    @Expose
+    @ConfigOption(name = "Idle Notifier Timeout", desc = "How long to wait before notifing the player")
+    @ConfigAccordionId(id = 29)
+    @ConfigEditorSlider(minValue = 1, maxValue = 60, minStep = 0.1F)
+    public float idleNotifierTimeout = 10F;
+
+    @Expose
+    @ConfigOption(name = "Idle Notifier Keybind", desc = "Keybinding to toggle the idle notifier")
+    @ConfigAccordionId(id = 29)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int idleNotifierKeybinding = Keyboard.KEY_NONE;
+
+    public enum IdleNotifierStrategy {
+        AUDIBLE("Audio only"), VISUAL("Flash only"), BOTH("Audio and Visual");
+        final String display;
+
+        IdleNotifierStrategy(String display) {
+            this.display = display;
+        }
+
+        public boolean isAudio() {
+            return this == AUDIBLE || this == BOTH;
+        }
+
+        public boolean isVisual() {
+            return this == VISUAL || this == BOTH;
+        }
+
+        @Override
+        public String toString() {
+            return display;
+        }
+    }
+
+    @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 }

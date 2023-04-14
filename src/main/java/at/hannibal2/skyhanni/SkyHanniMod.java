@@ -218,6 +218,7 @@ public class SkyHanniMod {
         loadModule(new CollectionCounter());
         loadModule(new HighlightBonzoMasks());
         loadModule(new DungeonLevelColor());
+        loadModule(new IdleWarning());
         loadModule(new BazaarCancelledBuyOrderClipboard());
         loadModule(new CompactSplashPotionMessage());
         loadModule(new CroesusUnopenedChestTracker());

@@ -77,7 +77,12 @@ object GardenAPI {
         return if (isOtherTool(internalName)) internalName else null
     }
 
-    private fun isOtherTool(internalName: String): Boolean {
+    fun isTool(toolItem: ItemStack?): Boolean {
+        val internalName = toolItem?.getInternalName() ?: return false
+        return isOtherTool(internalName) || CropType.values().any { internalName.startsWith(it.toolName) }
+    }
+
+    fun isOtherTool(internalName: String): Boolean {
         if (internalName.startsWith("DAEDALUS_AXE")) return true
 
         if (internalName.startsWith("BASIC_GARDENING_HOE")) return true
