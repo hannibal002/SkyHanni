@@ -213,4 +213,15 @@ object LorenzUtils {
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /$command"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
+
+    fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
+        val entry = entries.find(matcher)
+        if (entry != null) {
+            val newMap = linkedMapOf(entry.key to entry.value)
+            newMap.putAll(this)
+            return newMap
+        }
+        return this
+    }
+
 }
