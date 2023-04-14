@@ -150,7 +150,7 @@ class ComposterDisplay {
                     SendTitleHelper.sendTitle("§cYour Organic Matter is low", 4_000)
                 }
                 LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
-                hidden.informedAboutLowMatter = System.currentTimeMillis() + 30_000
+                hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
             }
         }
 
@@ -161,7 +161,7 @@ class ComposterDisplay {
                 SendTitleHelper.sendTitle("§cYour Fuel is low", 4_000)
             }
             LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
-            hidden.informedAboutLowFuel = System.currentTimeMillis() + 30_000
+            hidden.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
         }
     }
 
