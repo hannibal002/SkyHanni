@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -236,7 +237,7 @@ class GardenVisitorFeatures {
 
         for (visitor in visitors.values) {
             visitor.getNameTagEntity()?.getLorenzVec()?.let {
-                if (it.distance(LocationUtils.playerLocation()) < 15) {
+                if (it.distanceToPlayer() < 15) {
                     val text = visitor.status.displayName
                     event.drawString(it.add(0.0, 2.23, 0.0), text)
                 }

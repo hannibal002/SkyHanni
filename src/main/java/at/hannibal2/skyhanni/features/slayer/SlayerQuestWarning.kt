@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -146,7 +146,7 @@ class SlayerQuestWarning {
         if (!isEnabled()) return
 
         val entity = event.entity
-        if (entity.getLorenzVec().distance(LocationUtils.playerLocation()) < 5) {
+        if (entity.getLorenzVec().distanceToPlayer() < 5) {
             if (isSlayerMob(entity)) {
                 tryWarn()
             }
