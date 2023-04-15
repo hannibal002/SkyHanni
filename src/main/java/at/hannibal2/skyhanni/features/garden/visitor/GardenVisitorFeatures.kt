@@ -36,9 +36,9 @@ class GardenVisitorFeatures {
     private var display = listOf<List<Any>>()
     private var lastClickedNpc = 0
     private var tick = 0
+    private val newVisitorArrivedMessage = Pattern.compile(".* §r§ehas arrived on your §r§bGarden§r§e!")
     private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
     private val gardenExperiencePattern = Pattern.compile(" §8\\+§2(.*) §7Garden Experience")
-    private val offerAcceptedPattern = Pattern.compile("§6§lOFFER ACCEPTED §r§8with §r(.*) §r.*")
     private val config get() = SkyHanniMod.feature.garden
 
     companion object {
@@ -187,7 +187,6 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
-            println("OwnInventorItemUpdateEvent")
             update()
         }
     }
@@ -401,18 +400,11 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-//        val matcher = offerAcceptedPattern.matcher(event.message)
-//        if (!matcher.matches()) return
-//
-//        val visitorName = matcher.group(1)
-//        for (visitor in visitors) {
-//            if (visitor.key == visitorName) {
-//                oldStatus(visitor.value)
-//                visitor.value.status = VisitorStatus.ACCEPTED
-//                statusChange(visitor.value)
-//                update()
-//            }
-//        }
+        if (config.visitorHypixelArrivedMessage) {
+            if (newVisitorArrivedMessage.matcher(event.message).matches()) {
+                event.blockedReason = "new_visitor_arrived"
+            }
+        }
     }
 
     private fun update() {
@@ -421,7 +413,6 @@ class GardenVisitorFeatures {
     }
 
     private fun checkVisitorsReady() {
-//        println("checkVisitorsReady")
         for ((visitorName, visitor) in visitors) {
             val entity = visitor.getEntity()
             if (entity == null) {
@@ -485,7 +476,6 @@ class GardenVisitorFeatures {
         }
 
         if (visitorName in listOf("Jacob", "Anita")) {
-
             // Only detect jacob/anita npc if the "wrong" npc got found as well
             if (foundVisitorNameTags.size != 2) return null
 
