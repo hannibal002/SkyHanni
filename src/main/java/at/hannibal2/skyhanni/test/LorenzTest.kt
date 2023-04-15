@@ -194,7 +194,7 @@ class LorenzTest {
     @SubscribeEvent
     fun onSoundPlay(event: PlaySoundEvent) {
 //        val location = event.location
-//        val distance = location.distance(LocationUtils.playerLocation())
+//        val distance = location.distanceToPlayer()
 //        val soundName = event.soundName
 //        val pitch = event.pitch
 //        val volume = event.volume

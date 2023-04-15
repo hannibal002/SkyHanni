@@ -17,16 +17,16 @@ class CollectionAPI {
     private val counterPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
     private val singleCounterPattern = Pattern.compile("§7Total Collected: §e(.*)")
 
-    private val hypixelApiHasWrongItems = listOf(
-        "WOOL",
-        "CORRUPTED_FRAGMENT",
-        "EGG",
-        "POISONOUS_POTATO",
-        "REDSTONE_BLOCK",
-        "MUSHROOM_COLLECTION",
-        "RAW_SOULFLOW",
-        "GEMSTONE_COLLECTION",
-    )
+//    private val hypixelApiHasWrongItems = listOf(
+//        "WOOL",
+//        "CORRUPTED_FRAGMENT",
+//        "EGG",
+//        "POISONOUS_POTATO",
+//        "REDSTONE_BLOCK",
+//        "MUSHROOM_COLLECTION",
+//        "RAW_SOULFLOW",
+//        "GEMSTONE_COLLECTION",
+//    )
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
@@ -38,10 +38,10 @@ class CollectionAPI {
             val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
             val itemName = BazaarApi.getBazaarDataByInternalName(neuItemId)?.displayName
             // Hypixel moment
-            if (hypixelApiHasWrongItems.contains(neuItemId)) continue
+//            if (hypixelApiHasWrongItems.contains(neuItemId)) continue
 
             if (itemName == null) {
-                LorenzUtils.debug("collection name is null for '$neuItemId'")
+//                LorenzUtils.debug("collection name is null for '$neuItemId'")
                 continue
             }
             collectionValue[neuItemId] = counter

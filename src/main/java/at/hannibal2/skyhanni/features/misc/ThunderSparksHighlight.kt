@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SpecialColour
@@ -46,7 +47,7 @@ class ThunderSparksHighlight {
             val sparkLocation = spark.getLorenzVec()
             val block = sparkLocation.getBlockAt()
             val seeThroughBlocks =
-                sparkLocation.distance(LocationUtils.playerLocation()) < 6 && (block == Blocks.flowing_lava || block == Blocks.lava)
+                sparkLocation.distanceToPlayer() < 6 && (block == Blocks.flowing_lava || block == Blocks.lava)
             event.drawWaypointFilled(
                 sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks
             )

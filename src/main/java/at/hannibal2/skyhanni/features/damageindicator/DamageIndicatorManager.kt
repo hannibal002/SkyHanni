@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -418,7 +419,7 @@ class DamageIndicatorManager {
             BossType.NETHER_BARBARIAN_DUKE,
             -> {
                 val location = entity.getLorenzVec()
-                entityData.ignoreBlocks = location.y == 117.0 && location.distance(LocationUtils.playerLocation()) < 15
+                entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
             }
 
             else -> return ""
