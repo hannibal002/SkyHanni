@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import net.minecraft.client.Minecraft
@@ -44,10 +45,12 @@ class TabListData {
         val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return null
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
         val result: MutableList<String> = ArrayList()
+        tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
             result.add(LorenzUtils.stripVanillaMessage(name))
         }
+        tabListGuard = false
         return result.dropLast(1)
     }
 

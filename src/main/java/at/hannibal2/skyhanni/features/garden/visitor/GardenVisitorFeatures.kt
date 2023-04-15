@@ -361,10 +361,7 @@ class GardenVisitorFeatures {
                     found = false
                     continue
                 }
-                var name = line.trim().replace("§r", "")
-                if (!name.contains("§")) {
-                    name = "§f$name"
-                }
+                val name = fromHypixelName(line)
 
                 // Hide hypixel watchdog entries
                 if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) continue
@@ -395,6 +392,26 @@ class GardenVisitorFeatures {
                 }
                 updateDisplay()
             }
+        }
+    }
+
+    private fun fromHypixelName(line: String): String {
+        var name = line.trim().replace("§r", "").trim()
+        if (!name.contains("§")) {
+            name = "§f$name"
+        }
+        return name
+    }
+
+    @SubscribeEvent
+    fun onTabListText(event: TabListLineRenderEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (!SkyHanniMod.feature.garden.visitorColoredName) return
+        val text = event.text
+        val replace = fromHypixelName(text)
+        val visitor = visitors[replace]
+        visitor?.let {
+            event.text = " " + GardenVisitorColorNames.getColoredName(it.visitorName)
         }
     }
 
@@ -530,7 +547,8 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLivingB(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+        if (!SkyHanniMod.feature.garden.visitorColoredName) return
         val entity = event.entity
         val entityId = entity.entityId
         for (visitor in visitors.values) {
@@ -554,11 +572,11 @@ class GardenVisitorFeatures {
     }
 
     enum class VisitorStatus(val displayName: String, val color: Int) {
-        NEW("§e§lNew", LorenzColor.YELLOW.toColor().withAlpha(100)),
-        WAITING("§lWaiting", -1),
-        READY("§a§lItems Ready", LorenzColor.GREEN.toColor().withAlpha(80)),
-        ACCEPTED("§7§lAccepted", LorenzColor.DARK_GRAY.toColor().withAlpha(80)),
-        REFUSED("§c§lRefused", LorenzColor.RED.toColor().withAlpha(60)),
+        NEW("§eNew", LorenzColor.YELLOW.toColor().withAlpha(100)),
+        WAITING("Waiting", -1),
+        READY("§aItems Ready", LorenzColor.GREEN.toColor().withAlpha(80)),
+        ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().withAlpha(80)),
+        REFUSED("§cRefused", LorenzColor.RED.toColor().withAlpha(60)),
     }
 }
 
