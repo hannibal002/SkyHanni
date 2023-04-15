@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlinx.coroutines.launch
 import kotlin.concurrent.fixedRateTimer
 
@@ -27,8 +26,7 @@ class BazaarDataHolder {
                 if (jsonObject.has("npc_sell_price")) {
                     val hypixelId = jsonObject["id"].asString
                     val npcPrice = jsonObject["npc_sell_price"].asDouble
-                    val auctionManager = NotEnoughUpdates.INSTANCE.manager.auctionManager
-                    val neuItemId = auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
+                    val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
                     list[neuItemId] = npcPrice
                 }
             }
