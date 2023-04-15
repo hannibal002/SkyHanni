@@ -62,6 +62,7 @@ class GardenVisitorFeatures {
 
         val offerItem = event.inventoryItems[29] ?: return
         if (offerItem.name != "§aAccept Offer") return
+
         inVisitorInventory = true
 
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
@@ -85,12 +86,17 @@ class GardenVisitorFeatures {
             visitor.items[internalName] = amount
         }
         if (visitor.status == VisitorStatus.NEW) {
-            oldStatus(visitor)
-            visitor.status = VisitorStatus.WAITING
-            statusChange(visitor)
+            val alreadyReady = event.inventoryItems[29]?.getLore()?.any { it == "§eClick to give!" } == true
+            if (alreadyReady) {
+                changeStatus(visitor, VisitorStatus.READY, "inSacks")
+                visitor.inSacks = true
+                update()
+            } else {
+                val waiting = VisitorStatus.WAITING
+                changeStatus(visitor, waiting, "firstContact")
+            }
+            update()
         }
-
-        update()
     }
 
     private fun updateDisplay() {
@@ -177,17 +183,32 @@ class GardenVisitorFeatures {
         return newDisplay
     }
 
+    @SubscribeEvent
+    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+        if (GardenAPI.onBarnPlot) {
+            println("OwnInventorItemUpdateEvent")
+            update()
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (!inVisitorInventory) return
-        if (event.slot.stack?.name != "§cRefuse Offer") return
-        if (event.slotId != 33) return
 
-        getVisitor(lastClickedNpc)?.let {
-            oldStatus(it)
-            it.status = VisitorStatus.REFUSED
-            statusChange(it)
+        val visitor = getVisitor(lastClickedNpc) ?: return
+
+        if (event.slotId == 33) {
+            if (event.slot.stack?.name != "§cRefuse Offer") return
+            changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             update()
+            return
+        }
+        if (event.slotId == 29) {
+            if (event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
+                changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
+                update()
+                return
+            }
         }
     }
 
@@ -320,6 +341,7 @@ class GardenVisitorFeatures {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
         if (tick++ % 10 != 0) return
+//        if (tick++ % 300 != 0) return
 
         if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
             checkVisitorsReady()
@@ -379,18 +401,18 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        val matcher = offerAcceptedPattern.matcher(event.message)
-        if (!matcher.matches()) return
-
-        val visitorName = matcher.group(1)
-        for (visitor in visitors) {
-            if (visitor.key == visitorName) {
-                oldStatus(visitor.value)
-                visitor.value.status = VisitorStatus.ACCEPTED
-                statusChange(visitor.value)
-                update()
-            }
-        }
+//        val matcher = offerAcceptedPattern.matcher(event.message)
+//        if (!matcher.matches()) return
+//
+//        val visitorName = matcher.group(1)
+//        for (visitor in visitors) {
+//            if (visitor.key == visitorName) {
+//                oldStatus(visitor.value)
+//                visitor.value.status = VisitorStatus.ACCEPTED
+//                statusChange(visitor.value)
+//                update()
+//            }
+//        }
     }
 
     private fun update() {
@@ -399,6 +421,7 @@ class GardenVisitorFeatures {
     }
 
     private fun checkVisitorsReady() {
+//        println("checkVisitorsReady")
         for ((visitorName, visitor) in visitors) {
             val entity = visitor.getEntity()
             if (entity == null) {
@@ -407,16 +430,17 @@ class GardenVisitorFeatures {
                 }
             }
 
-            val status = visitor.status
-            if (status == VisitorStatus.WAITING || status == VisitorStatus.READY) {
-                oldStatus(visitor)
-                visitor.status = if (isReady(visitor)) VisitorStatus.READY else VisitorStatus.WAITING
-                statusChange(visitor)
+            if (!visitor.inSacks) {
+                val status = visitor.status
+                if (status == VisitorStatus.WAITING || status == VisitorStatus.READY) {
+                    val newStatus = if (hasItemsInInventory(visitor)) VisitorStatus.READY else VisitorStatus.WAITING
+                    changeStatus(visitor, newStatus, "hasItemsInInventory")
+                }
             }
 
             if (config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2) {
                 if (entity is EntityLivingBase) {
-                    val color = status.color
+                    val color = visitor.status.color
                     if (color != -1) {
                         RenderLivingEntityHelper.setEntityColor(
                             entity,
@@ -430,18 +454,14 @@ class GardenVisitorFeatures {
         }
     }
 
-    val oldValue = mutableMapOf<Visitor, VisitorStatus>()
-
-    private fun oldStatus(visitor: Visitor) {
-        oldValue[visitor] = visitor.status
-    }
-
-    private fun statusChange(visitor: Visitor) {
-        val old = oldValue[visitor]
-        val new = visitor.status
-        if (old == new) return
+    private fun changeStatus(visitor: Visitor, newStatus: VisitorStatus, reason: String) {
+        val old = visitor.status
+        if (old == newStatus) return
+        visitor.status = newStatus
         val name = visitor.visitorName.removeColor()
-        LorenzUtils.debug("Visitor status change for $name: $old -> $new")
+        val message = "Visitor status change for $name: $old->$newStatus ($reason)"
+        println(message)
+//        LorenzUtils.debug(message)
     }
 
     private fun Visitor.getEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
@@ -487,7 +507,7 @@ class GardenVisitorFeatures {
         return foundVisitorNameTags[0]
     }
 
-    private fun isReady(visitor: Visitor): Boolean {
+    private fun hasItemsInInventory(visitor: Visitor): Boolean {
         var ready = true
         for ((internalName, need) in visitor.items) {
             val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
@@ -537,6 +557,7 @@ class GardenVisitorFeatures {
         var entityId: Int = -1,
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
+        var inSacks: Boolean = false,
         val items: MutableMap<String, Int> = mutableMapOf(),
     )
 

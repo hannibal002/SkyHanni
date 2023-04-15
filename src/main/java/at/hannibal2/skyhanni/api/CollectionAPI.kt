@@ -23,6 +23,9 @@ class CollectionAPI {
         "EGG",
         "POISONOUS_POTATO",
         "REDSTONE_BLOCK",
+        "MUSHROOM_COLLECTION",
+        "RAW_SOULFLOW",
+        "GEMSTONE_COLLECTION",
     )
 
     @SubscribeEvent
