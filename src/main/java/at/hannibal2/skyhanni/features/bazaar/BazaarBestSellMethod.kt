@@ -38,7 +38,7 @@ class BazaarBestSellMethod {
             val bazaarItem = inv.getStackInSlot(13) ?: return ""
             var name = bazaarItem.displayName
             name = BazaarApi.getCleanBazaarName(name)
-            val data = BazaarApi.getBazaarDataForName(name) ?: return ""
+            val data = BazaarApi.getBazaarDataByName(name) ?: return ""
 
             var having = 0
             for (slot in chest.inventorySlots) {
