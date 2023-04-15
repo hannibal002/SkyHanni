@@ -7,8 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import io.github.moulberry.notenoughupdates.util.stripControlCodes
-import net.minecraftforge.event.world.WorldEvent
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropUpgrades {
@@ -29,7 +28,7 @@ class GardenCropUpgrades {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Crop Upgrades") return
         event.inventoryItems.forEach { (_, item) ->
-            val crop = item.name?.stripControlCodes()?.let {
+            val crop = item.name?.removeColor()?.let {
                 CropType.getByName(it)
             } ?: return@forEach
             val level = item.getLore().firstNotNullOfOrNull {
