@@ -68,4 +68,7 @@ public class Hidden {
 
     @Expose
     public Map<ComposterUpgrade, Integer> gardenComposterUpgrades = new HashMap<>();
+
+    @Expose
+    public Map<CropType, Boolean> gardenToolHasBountiful = new HashMap<>();
 }

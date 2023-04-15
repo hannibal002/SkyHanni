@@ -17,9 +17,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -32,6 +34,7 @@ class CropMoneyDisplay {
     private var multipliers = mapOf<String, Int>()
     private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
     private var hasCropInHand = false
+    private val toolHasBountiful: MutableMap<CropType, Boolean> get() = SkyHanniMod.feature.hidden.gardenToolHasBountiful
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -83,6 +86,13 @@ class CropMoneyDisplay {
         if (!config.cropMilestoneProgress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
             return newDisplay
+        }
+
+        GardenAPI.cropInHand?.let {
+            val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
+            val reforgeName = heldItem.getReforgeName()
+            val bountiful = reforgeName == "bountiful"
+            toolHasBountiful[it] = bountiful
         }
 
         val moneyPerHourData = calculateMoneyPerHour()
@@ -237,7 +247,9 @@ class CropMoneyDisplay {
                 }
             }
 
-            moneyPerHours[internalName] = formatNumbers(sellOffer, instantSell, npcPrice)
+            val bountifulMoney = if (toolHasBountiful[crop] == true) speedPerHour * 0.2 else 0.0
+            moneyPerHours[internalName] =
+                formatNumbers(sellOffer + bountifulMoney, instantSell + bountifulMoney, npcPrice + bountifulMoney)
         }
         return moneyPerHours
     }
