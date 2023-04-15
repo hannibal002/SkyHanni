@@ -235,10 +235,11 @@ class GardenVisitorFeatures {
         if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
 
         for (visitor in visitors.values) {
-            visitor.getEntity()?.let {
-                val location = it.getLorenzVec().add(0.0, 2.2, 0.0)
-                val text = visitor.status.displayName
-                event.drawString(location, text)
+            visitor.getNameTagEntity()?.getLorenzVec()?.let {
+                if (it.distance(LocationUtils.playerLocation()) < 15) {
+                    val text = visitor.status.displayName
+                    event.drawString(it.add(0.0, 2.23, 0.0), text)
+                }
             }
         }
     }
@@ -383,7 +384,7 @@ class GardenVisitorFeatures {
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
                 visitors[name] = Visitor(name, status = VisitorStatus.NEW)
-                LorenzUtils.debug("new visitor '$name'")
+//                LorenzUtils.debug("new visitor '$name'")
                 if (config.visitorNotificationTitle) {
                     TitleUtils.sendTitle("§eNew Visitor", 5_000)
                 }
@@ -460,8 +461,6 @@ class GardenVisitorFeatures {
         println(message)
 //        LorenzUtils.debug(message)
     }
-
-    private fun Visitor.getEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
         for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
@@ -556,7 +555,11 @@ class GardenVisitorFeatures {
         var status: VisitorStatus,
         var inSacks: Boolean = false,
         val items: MutableMap<String, Int> = mutableMapOf(),
-    )
+    ) {
+        fun getEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
+
+        fun getNameTagEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
+    }
 
     enum class VisitorStatus(val displayName: String, val color: Int) {
         NEW("§e§lNew", LorenzColor.YELLOW.toColor().withAlpha(100)),
