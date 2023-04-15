@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.data.*;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
-import at.hannibal2.skyhanni.features.bazaar.*;
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
+import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
+import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard;
+import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay;
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper;
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat;
@@ -25,7 +28,17 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
 import at.hannibal2.skyhanni.features.fishing.*;
 import at.hannibal2.skyhanni.features.garden.*;
+import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay;
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers;
+import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures;
+import at.hannibal2.skyhanni.features.garden.farming.*;
+import at.hannibal2.skyhanni.features.garden.inventory.GardenDeskInSBMenu;
+import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers;
+import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice;
+import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice;
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames;
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures;
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
@@ -86,7 +99,6 @@ public class SkyHanniMod {
 
     public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
-
     public static Features feature;
 
     public static RepoManager repo;
@@ -121,7 +133,7 @@ public class SkyHanniMod {
         loadModule(new EntityMovementData());
         loadModule(new ItemClickData());
         loadModule(new MinecraftData());
-        loadModule(new SendTitleHelper());
+        loadModule(new TitleUtils());
         loadModule(new ItemTipHelper());
         loadModule(new RenderLivingEntityHelper());
         loadModule(new SkillExperience());
@@ -135,10 +147,12 @@ public class SkyHanniMod {
         loadModule(new GuiEditManager());
         loadModule(UpdateManager.INSTANCE);
         loadModule(new CropAccessoryData());
+        loadModule(new MayorElectionData());
+        loadModule(new GardenComposterUpgradesData());
 
         // APIs
         loadModule(new BazaarApi());
-        loadModule(new GardenAPI());
+        loadModule(GardenAPI.INSTANCE);
         loadModule(new CollectionAPI());
 
         // features
@@ -212,7 +226,6 @@ public class SkyHanniMod {
         loadModule(new CroesusUnopenedChestTracker());
         loadModule(new CompactBingoChat());
         loadModule(new BrewingStandOverlay());
-        loadModule(new BazaarUpdateTimer());
         loadModule(new BarnFishingTimer());
         loadModule(new CrimsonIsleReputationHelper(this));
         loadModule(new SharkFishCounter());

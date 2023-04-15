@@ -15,7 +15,14 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class GardenAPI {
+object GardenAPI {
+    private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
+
+    var toolInHand: String? = null
+    var cropInHand: CropType? = null
+    var mushroomCowPet = false
+    var onBarnPlot = false
+
     var tick = 0
 
     @SubscribeEvent
@@ -93,45 +100,37 @@ class GardenAPI {
         }
     }
 
-    companion object {
-        var toolInHand: String? = null
-        private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
-        var cropInHand: CropType? = null
-        var mushroomCowPet = false
-        var onBarnPlot = false
+    fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
-        fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
-
-        fun ItemStack.getCropType(): CropType? {
-            val internalName = getInternalName()
-            return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
-        }
-
-        fun readCounter(itemStack: ItemStack): Int = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1
-
-        fun CropType.getSpeed(): Int {
-            val speed = cropsPerSecond[this]
-            if (speed != null) return speed
-
-            val message = "Set speed for $this to -1!"
-            println(message)
-            LorenzUtils.debug(message)
-            setSpeed(-1)
-            return -1
-        }
-
-        fun CropType.setSpeed(speed: Int) {
-            cropsPerSecond[this] = speed
-        }
-
-        fun MutableList<Any>.addCropIcon(crop: CropType) {
-            try {
-                add(crop.icon)
-            } catch (e: NullPointerException) {
-                e.printStackTrace()
-            }
-        }
-
-        fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
+    fun ItemStack.getCropType(): CropType? {
+        val internalName = getInternalName()
+        return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
     }
+
+    fun readCounter(itemStack: ItemStack): Int = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1
+
+    fun CropType.getSpeed(): Int {
+        val speed = cropsPerSecond[this]
+        if (speed != null) return speed
+
+        val message = "Set speed for $this to -1!"
+        println(message)
+        LorenzUtils.debug(message)
+        setSpeed(-1)
+        return -1
+    }
+
+    fun CropType.setSpeed(speed: Int) {
+        cropsPerSecond[this] = speed
+    }
+
+    fun MutableList<Any>.addCropIcon(crop: CropType) {
+        try {
+            add(crop.icon)
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
 }

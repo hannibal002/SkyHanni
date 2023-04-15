@@ -7,6 +7,8 @@ import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
 
 object SoundUtils {
+    private val beepSound by lazy { createSound("random.orb", 1f) }
+
     fun ISound.playSound() {
         val gameSettings = Minecraft.getMinecraft().gameSettings
         val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
@@ -39,5 +41,9 @@ object SoundUtils {
             }
         }
         return sound
+    }
+
+    fun playBeepSound() {
+        beepSound.playSound()
     }
 }

@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.features.bazaar.BazaarDataGrabber
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
-import at.hannibal2.skyhanni.features.garden.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.LorenzTest
@@ -54,7 +53,6 @@ object Commands {
         registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
         registerCommand("shsetapikey") { ApiDataLoader.command(it) }
         registerCommand("shtestgardenvisitors") { LorenzTest.testGardenVisitors() }
-        registerCommand("shresetitemnames") { BazaarDataGrabber.resetItemNames() }
         registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
         registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
     }

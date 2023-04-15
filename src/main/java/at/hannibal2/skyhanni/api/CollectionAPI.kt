@@ -17,40 +17,34 @@ class CollectionAPI {
     private val counterPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
     private val singleCounterPattern = Pattern.compile("§7Total Collected: §e(.*)")
 
-    private val hypixelApiHasWrongItems = listOf(
-        "WOOL",
-        "CORRUPTED_FRAGMENT",
-        "EGG",
-        "POISONOUS_POTATO",
-        "REDSTONE_BLOCK",
-    )
+//    private val hypixelApiHasWrongItems = listOf(
+//        "WOOL",
+//        "CORRUPTED_FRAGMENT",
+//        "EGG",
+//        "POISONOUS_POTATO",
+//        "REDSTONE_BLOCK",
+//        "MUSHROOM_COLLECTION",
+//        "RAW_SOULFLOW",
+//        "GEMSTONE_COLLECTION",
+//    )
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
         val jsonElement = profileData["collection"] ?: return
         val asJsonObject = jsonElement.asJsonObject ?: return
-        for ((rawName, rawCounter) in asJsonObject.entrySet()) {
+        for ((hypixelId, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
-            var itemName = BazaarApi.getBazaarDataForInternalName(rawName)?.itemName
-            if (rawName == "MUSHROOM_COLLECTION") {
-                itemName = "Mushroom"
-            }
-            if (rawName == "MELON") {
-                itemName = "Melon"
-            }
-            if (rawName == "GEMSTONE_COLLECTION") {
-                itemName = "Gemstone"
-            }
-
+            val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
+            val itemName = BazaarApi.getBazaarDataByInternalName(neuItemId)?.displayName
             // Hypixel moment
-            if (hypixelApiHasWrongItems.contains(rawName)) continue
+//            if (hypixelApiHasWrongItems.contains(neuItemId)) continue
 
             if (itemName == null) {
-                LorenzUtils.debug("collection name is null for '$rawName'")
+//                LorenzUtils.debug("collection name is null for '$neuItemId'")
                 continue
             }
-            collectionValue[itemName] = counter
+            collectionValue[neuItemId] = counter
         }
 
         CollectionUpdateEvent().postAndCatch()

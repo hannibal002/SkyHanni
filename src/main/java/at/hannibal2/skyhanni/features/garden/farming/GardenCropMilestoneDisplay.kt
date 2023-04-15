@@ -1,26 +1,26 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.MayorElectionData
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.addCropIcon
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getCropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.setSpeed
+import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI.setSpeed
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
@@ -33,15 +33,6 @@ class GardenCropMilestoneDisplay {
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
 //    val cropMilestoneLevelUpPattern = Pattern.compile("  §r§b§lGARDEN MILESTONE §3(.*) §8XXIII➜§3(.*)")
-
-    private val sound = object : PositionedSound(ResourceLocation("random.orb")) {
-        init {
-            volume = 50f
-            repeat = false
-            repeatDelay = 0
-            attenuationType = ISound.AttenuationType.NONE
-        }
-    }
 
     private var lastPlaySoundTime = 0L
 
@@ -139,8 +130,9 @@ class GardenCropMilestoneDisplay {
                         cropType.setSpeed(-1)
                     }
                 }
-
-                crop.setCounter(crop.getCounter() + addedCounter)
+                if (!finneganPerkActive()) {
+                    crop.setCounter(crop.getCounter() + addedCounter)
+                }
                 EliteFarmingWeight.addCrop(crop, addedCounter)
                 if (currentCrop == crop) {
                     calculateSpeed(addedCounter)
@@ -152,6 +144,15 @@ class GardenCropMilestoneDisplay {
             LorenzUtils.error("[SkyHanni] Error in OwnInventorItemUpdateEvent")
             e.printStackTrace()
         }
+    }
+
+    private fun finneganPerkActive(): Boolean {
+        val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
+        val perkActive = MayorElectionData.isPerkActive("Finnegan", "Farming Simulator")
+        MayorElectionData.currentCandidate?.let {
+
+        }
+        return forcefullyEnabledAlwaysFinnegan || perkActive
     }
 
     @SubscribeEvent
@@ -198,6 +199,10 @@ class GardenCropMilestoneDisplay {
     }
 
     private fun checkSpeed() {
+        if (finneganPerkActive()) {
+            currentSpeed = (currentSpeed.toDouble() * 0.8).toInt()
+        }
+
         if (countInLastSecond > 8) {
             allCounters.add(currentSpeed)
             while (allCounters.size > 30) {
@@ -206,6 +211,12 @@ class GardenCropMilestoneDisplay {
             averageSpeedPerSecond = allCounters.average().toInt()
         }
         countInLastSecond = 0
+
+        if (finneganPerkActive()) {
+            currentCrop?.let {
+                it.setCounter(it.getCounter() + currentSpeed)
+            }
+        }
         currentSpeed = 0
 
         lastBlocksPerSecond = blocksBroken
@@ -286,9 +297,9 @@ class GardenCropMilestoneDisplay {
                 if (millis < 5_900) {
                     if (System.currentTimeMillis() > lastPlaySoundTime + 1_000) {
                         lastPlaySoundTime = System.currentTimeMillis()
-                        sound.playSound()
+                        SoundUtils.playBeepSound()
                     }
-                    SendTitleHelper.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
+                    TitleUtils.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
                 }
             }
             lineMap[3] = Collections.singletonList("§7In §b$duration")

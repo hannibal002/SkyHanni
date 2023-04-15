@@ -10,7 +10,7 @@ public class About {
 
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are running currently")
     @ConfigVersionDisplay
-    public Void currentVersion = null;
+    public transient Void currentVersion = null;
 
     @ConfigOption(name = "Auto Updates", desc = "Automatically check for updates on each startup")
     @Expose
@@ -25,6 +25,7 @@ public class About {
 
     @ConfigOption(name = "Used Software", desc = "Information about used software and licenses")
     @Accordion
+    @Expose
     public Licenses licenses = new Licenses();
 
     public enum UpdateStream {
@@ -53,23 +54,23 @@ public class About {
     public static class Licenses {
 
         @ConfigOption(name = "MoulConfig", desc = "MoulConfig is available under the LGPL 3.0 License or later version")
-        @ConfigEditorButton(buttonText = "GitHub")
+        @ConfigEditorButton(buttonText = "Source")
         public Runnable moulConfig = () -> Utils.openUrl("https://github.com/NotEnoughUpdates/MoulConfig");
 
         @ConfigOption(name = "NotEnoughUpdates", desc = "NotEnoughUpdates is available under the LGPL 3.0 License or later version")
-        @ConfigEditorButton(buttonText = "GitHub")
+        @ConfigEditorButton(buttonText = "Source")
         public Runnable notEnoughUpdates = () -> Utils.openUrl("https://github.com/NotEnoughUpdates/NotEnoughUpdates");
 
         @ConfigOption(name = "Forge", desc = "Forge is available under the LGPL 3.0 license")
-        @ConfigEditorButton(buttonText = "GitHub")
+        @ConfigEditorButton(buttonText = "Source")
         public Runnable forge = () -> Utils.openUrl("https://github.com/MinecraftForge/MinecraftForge");
 
         @ConfigOption(name = "LibAutoUpdate", desc = "LibAutoUpdate is available under the BSD 2 Clause License")
-        @ConfigEditorButton(buttonText = "Git")
+        @ConfigEditorButton(buttonText = "Source")
         public Runnable libAutoUpdate = () -> Utils.openUrl("https://git.nea.moe/nea/libautoupdate/");
 
-        @ConfigOption(name = "Mixin", desc = "LibAutoUpdate is available under the MIT License")
-        @ConfigEditorButton(buttonText = "GitHub")
+        @ConfigOption(name = "Mixin", desc = "Mixin is available under the MIT License")
+        @ConfigEditorButton(buttonText = "Source")
         public Runnable mixin = () -> Utils.openUrl("https://github.com/SpongePowered/Mixin/");
 
     }

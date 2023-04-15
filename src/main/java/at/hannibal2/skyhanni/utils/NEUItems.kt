@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -60,23 +59,18 @@ object NEUItems {
         return price
     }
 
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double {
-        val bazaarData = BazaarApi.getBazaarDataForInternalName(internalName)
-        bazaarData?.let {
-            val buyPrice = it.buyPrice
-            if (buyPrice > 0) return buyPrice
+    fun getPrice(internalName: String): Double {
+        return getPrice(internalName, false)
+    }
 
-            val sellPrice = it.sellPrice
-            if (sellPrice > 0) return sellPrice
+    fun transHypixelNameToInternalName(hypixelId: String): String =
+        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
 
-            return it.npcPrice
-        }
-
+    fun getPrice(internalName: String, useSellingPrice: Boolean): Double {
         val result = manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
-        // TODO remove workaround
         if (result == -1.0) {
             if (internalName == "JACK_O_LANTERN") {
-                return getPrice("PUMPKIN") + 1
+                return getPrice("PUMPKIN", useSellingPrice) + 1
             }
             if (internalName == "GOLDEN_CARROT") {
                 // 6.8 for some players

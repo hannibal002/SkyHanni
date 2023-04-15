@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.17.Beta.31"
+version = "0.17.Beta.33"
 
 // Toolchains:
 java {
@@ -143,12 +143,13 @@ tasks.withType(Jar::class) {
 
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    archiveClassifier.set("all")
+    archiveClassifier.set("")
     from(tasks.shadowJar)
     input.set(tasks.shadowJar.get().archiveFile)
 }
 
 tasks.shadowJar {
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl, shadowModImpl)
     doLast {
@@ -158,8 +159,12 @@ tasks.shadowJar {
     }
 
     relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
+    relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
 }
-
+tasks.jar {
+    archiveClassifier.set("nodeps")
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+}
 tasks.assemble.get().dependsOn(tasks.remapJar)
 
 val compileKotlin: KotlinCompile by tasks

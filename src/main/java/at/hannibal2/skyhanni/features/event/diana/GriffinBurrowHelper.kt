@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -176,7 +177,7 @@ class GriffinBurrowHelper {
             BurrowWarpHelper.currentWarp?.let { warp ->
                 animationLocation?.let {
                     event.drawColor(it.add(0.0, 1.0, 0.0), LorenzColor.AQUA)
-                    if (it.distance(LocationUtils.playerLocation()) < 10) {
+                    if (it.distanceToPlayer() < 10) {
                         event.drawString(it.add(0.5, 1.5, 0.5), "§bWarp to " + warp.displayName, true)
                     }
                     return

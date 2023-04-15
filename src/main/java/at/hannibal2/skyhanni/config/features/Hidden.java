@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
@@ -54,8 +55,17 @@ public class Hidden {
     public Map<String, Integer> gardenDicerRngDrops = new HashMap<>();
 
     @Expose
+    public long informedAboutLowMatter = 0;
+
+    @Expose
+    public long informedAboutLowFuel = 0;
+
+    @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
     public Map<String, Integer> gardenFarmingArmorDrops = new HashMap<>();
+
+    @Expose
+    public Map<ComposterUpgrade, Integer> gardenComposterUpgrades = new HashMap<>();
 }

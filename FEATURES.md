@@ -210,6 +210,8 @@
 + **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
 + **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
 + **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
++ **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
++ **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
@@ -221,7 +223,7 @@
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
 - Hiding exp Bottles lying on the ground.
-- Gui element showing the real time.
+- **Real Time** - Display the current computer time, a handy feature when playing in full-screen mode.
 - Highlight the voidling extremist in pink color.
 - Highlight millenia aged blaze color in red
 - Option to hide all damage splashes, from anywhere in Skyblock.

@@ -1,14 +1,18 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -25,7 +29,7 @@ class CropMoneyDisplay {
     private var tick = 0
     private var loaded = false
     private var ready = false
-    private val multipliers = mutableMapOf<String, Int>()
+    private var multipliers = mapOf<String, Int>()
     private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
     private var hasCropInHand = false
 
@@ -110,7 +114,15 @@ class CropMoneyDisplay {
             }
 
             try {
-                list.add(NEUItems.getItemStack(internalName))
+                if (isSeeds(internalName)) {
+                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS"))
+                } else {
+                    list.add(NEUItems.getItemStack(internalName))
+                }
+
+                if (cropNames[internalName] == CropType.WHEAT && config.moneyPerHourMergeSeeds) {
+                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS"))
+                }
             } catch (e: NullPointerException) {
                 e.printStackTrace()
             }
@@ -173,26 +185,66 @@ class CropMoneyDisplay {
 
     private fun calculateMoneyPerHour(): Map<String, Array<Double>> {
         val moneyPerHours = mutableMapOf<String, Array<Double>>()
-        for ((internalName, amount) in multipliers) {
+
+        var seedsPrice: BazaarData? = null
+        var seedsPerHour = 0.0
+
+        val onlyNpcPrice = (!config.moneyPerHourUseCustomFormat && LorenzUtils.noTradeMode) ||
+                (config.moneyPerHourUseCustomFormat && config.moneyPerHourCustomFormat.size == 1
+                        && config.moneyPerHourCustomFormat[0] == 2)
+
+        for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!
-            val speed = crop.getSpeed()
-            // No speed data for item in hand
-            if (speed == -1) continue
+            // When only the NPC price is shown, display the price exclusively for the base item
+            if (onlyNpcPrice) {
+                if (amount != 1) continue
+            } else {
+                if (amount < 10) {
+                    continue
+                }
+            }
 
-            val speedPerHr = speed.toDouble() * 60 * 60
-            val blocksPerHour = speedPerHr / amount.toDouble()
+            var speed = crop.getSpeed().toDouble()
+            if (speed == -1.0) continue
 
-            val bazaarData = BazaarApi.getBazaarDataForInternalName(internalName) ?: continue
-            moneyPerHours[internalName] = formatNumbers(bazaarData, blocksPerHour)
+            val isSeeds = isSeeds(internalName)
+            if (isSeeds) speed *= 1.36
+            if (crop.replenish) {
+                val blockPerSecond = crop.multiplier * 20
+                speed -= blockPerSecond
+            }
+
+            val speedPerHour = speed * 60 * 60
+            val cropsPerHour = speedPerHour / amount.toDouble()
+
+            val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName) ?: continue
+
+            var npcPrice = bazaarData.npcPrice * cropsPerHour
+            var sellOffer = bazaarData.buyPrice * cropsPerHour
+            var instantSell = bazaarData.sellPrice * cropsPerHour
+
+            if (crop == CropType.WHEAT && config.moneyPerHourMergeSeeds) {
+                if (isSeeds) {
+                    seedsPrice = bazaarData
+                    seedsPerHour = cropsPerHour
+                    continue
+                } else {
+                    seedsPrice?.let {
+                        npcPrice += it.npcPrice * seedsPerHour
+                        sellOffer += it.buyPrice * seedsPerHour
+                        instantSell += it.sellPrice * seedsPerHour
+                    }
+                }
+            }
+
+            moneyPerHours[internalName] = formatNumbers(sellOffer, instantSell, npcPrice)
         }
         return moneyPerHours
     }
 
-    private fun formatNumbers(bazaarData: BazaarData, blocksPerHour: Double): Array<Double> {
-        val npcPrice = bazaarData.npcPrice * blocksPerHour
-        val sellOffer = bazaarData.buyPrice * blocksPerHour
-        val instantSell = bazaarData.sellPrice * blocksPerHour
+    private fun isSeeds(internalName: String) = (internalName == "ENCHANTED_SEEDS" || internalName == "SEEDS")
 
+    private fun formatNumbers(sellOffer: Double, instantSell: Double, npcPrice: Double): Array<Double> {
         return if (config.moneyPerHourUseCustomFormat) {
             val map = mapOf(
                 0 to sellOffer,
@@ -217,30 +269,25 @@ class CropMoneyDisplay {
 
     private fun init() {
         if (loaded) return
-
-        if (BazaarApi.bazaarMap.isEmpty()) {
-            LorenzUtils.debug("bz not ready for money/time!")
-            return
-        }
-
         loaded = true
 
         SkyHanniMod.coroutineScope.launch {
-
+            val map = mutableMapOf<String, Int>()
             for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
                 if (!BazaarApi.isBazaarItem(internalName)) continue
                 if (internalName == "ENCHANTED_PAPER") continue
+                if (internalName == "ENCHANTED_BREAD") continue
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
-                if (amount < 10) continue
                 val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
                 val crop = CropType.getByItemName(itemName)
                 crop?.let {
-                    multipliers[internalName] = amount
+                    map[internalName] = amount
                     cropNames[internalName] = it
                 }
             }
 
+            multipliers = map
 
             ready = true
             update()

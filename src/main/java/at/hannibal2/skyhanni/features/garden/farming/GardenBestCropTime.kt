@@ -1,10 +1,12 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.addCropIcon
-import at.hannibal2.skyhanni.features.garden.GardenAPI.Companion.getSpeed
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -54,8 +56,7 @@ class GardenBestCropTime {
         var number = 0
         for (crop in sorted.keys) {
             val millis = timeTillNextCrop[crop]!!
-            val maxUnits = if (config.cropMilestoneBestCompact) 2 else -1
-            val duration = TimeUtils.formatDuration(millis, maxUnits = maxUnits)
+            val duration = TimeUtils.formatDuration(millis, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++
             if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue

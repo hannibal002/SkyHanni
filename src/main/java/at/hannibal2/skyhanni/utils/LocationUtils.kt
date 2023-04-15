@@ -8,9 +8,9 @@ object LocationUtils {
         return Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3()) == null
     }
 
-    fun playerLocation(): LorenzVec {
-        return Minecraft.getMinecraft().thePlayer.getLorenzVec()
-    }
+    fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+
+    fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 
     fun playerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer

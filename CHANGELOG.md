@@ -65,7 +65,8 @@
 + Added **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
 + Added **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 + Added command **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
-
++ Added **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
++ Added **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
@@ -360,7 +361,7 @@
 - Added a marker to the last opened minion for a couple of seconds (Seen through walls)
 - Added option to hide mob nametags close to minions
 - Added showing stars on all items (Not only dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
-- Added a display timer that show the real time
+- Added **Real Time** - Display the current computer time, a handy feature when playing in full-screen mode.
 - Added overlay features to the RNG meter inventory (Highlight selected drop and floors without a drop and show floor)
 - Added minion hopper coins per day display (Using the held coins in the hopper and the last time the hopper was collected to calculate the coins a hopper collects in a day)
 

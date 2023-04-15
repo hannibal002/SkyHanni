@@ -147,6 +147,12 @@ public class Garden {
     public boolean visitorColoredName = true;
 
     @Expose
+    @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from hypixel that a new visitor has arrived at your garden")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorHypixelArrivedMessage = true;
+
+    @Expose
     @ConfigOption(name = "Numbers", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean numbers = false;
@@ -635,6 +641,14 @@ public class Garden {
     public List<Integer> moneyPerHourCustomFormat = new ArrayList<>(Arrays.asList(0, 1, 2));
 
     @Expose
+    @ConfigOption(
+            name = "Merge Seeds",
+            desc = "Merge the seeds price with the wheat price.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourMergeSeeds = true;
+
+    @Expose
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
@@ -659,6 +673,22 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestOtherGuis = false;
+
+    @Expose
+    @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new jacob contest starts.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestWarn = false;
+
+    @Expose
+    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before the Jacobs contest begins.")
+    @ConfigEditorSlider(
+            minValue = 10,
+            maxValue = 60 * 5,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 14)
+    public int nextJacobContestWarnTime = 60 * 2;
 
     @Expose
     public Position nextJacobContestPos = new Position(-278, 11, false, true);
@@ -746,9 +776,6 @@ public class Garden {
     public boolean composterHighLightUpgrade = true;
 
     @Expose
-    public Position composterDisplayPos = new Position(-363, 13, false, true);
-
-    @Expose
     @ConfigOption(
             name = "Inventory Numbers",
             desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory."
@@ -758,8 +785,49 @@ public class Garden {
     public boolean composterInventoryNumbers = true;
 
     @Expose
+    @ConfigOption(name = "Notification When Low Composter", desc = "")
+    @ConfigAccordionId(id = 17)
+    @ConfigEditorAccordion(id = 21)
+    public boolean composterNotifyLow = false;
+
+    @Expose
+    @ConfigOption(name = "Enable", desc = "Show a notification when organic matter or fuel runs low in your composter.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 21)
+    public boolean composterNotifyLowEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Show Title", desc = "Send a title to notify.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 21)
+    public boolean composterNotifyLowTitle = false;
+
+    @Expose
+    @ConfigOption(name = "Min Organic Matter", desc = "Warn when Organic Matter is below this value.")
+    @ConfigEditorSlider(
+            minValue = 1_000,
+            maxValue = 80_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 21)
+    public int composterNotifyLowOrganicMatter = 20_000;
+
+    @Expose
+    @ConfigOption(name = "Min Fuel Cap", desc = "Warn when Fuel is below this value.")
+    @ConfigEditorSlider(
+            minValue = 500,
+            maxValue = 40_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 21)
+    public int composterNotifyLowFuel = 10_000;
+
+    @Expose
+    public Position composterDisplayPos = new Position(-363, 13, false, true);
+
+    @Expose
     @ConfigOption(name = "True Farming Fortune", desc = "")
-    @ConfigEditorAccordion(id = 18)
+    @ConfigEditorAccordion(id = 22)
     public boolean farmingFortune = false;
 
     @Expose
@@ -768,7 +836,7 @@ public class Garden {
             desc = "Displays current farming fortune, including crop-specific bonuses."
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 18)
+    @ConfigAccordionId(id = 22)
     public boolean farmingFortuneDisplay = true;
 
     @Expose
@@ -778,7 +846,7 @@ public class Garden {
                     " the chance for bonus drops. "
     )
     @ConfigEditorBoolean
-    @ConfigAccordionId(id = 18)
+    @ConfigAccordionId(id = 22)
     public boolean farmingFortuneDropMultiplier = false;
 
     @Expose
@@ -828,10 +896,16 @@ public class Garden {
     @ConfigEditorBoolean
     public boolean deskInSkyBlockMenu = true;
 
+
     @Expose
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
     @ConfigEditorBoolean
     public boolean fungiCutterWarn = true;
+
+    @Expose
+    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto major detection fails.")
+    @ConfigEditorBoolean
+    public boolean forcefullyEnabledAlwaysFinnegan = false;
 
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
