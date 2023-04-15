@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
@@ -566,9 +567,9 @@ class GardenVisitorFeatures {
         var inSacks: Boolean = false,
         val items: MutableMap<String, Int> = mutableMapOf(),
     ) {
-        fun getEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
+        fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
 
-        fun getNameTagEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
+        fun getNameTagEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
     }
 
     enum class VisitorStatus(val displayName: String, val color: Int) {

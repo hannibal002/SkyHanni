@@ -67,6 +67,7 @@
 + Added command **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 + Added **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
 + Added **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
++ Added **Inventory Numbers** - Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
