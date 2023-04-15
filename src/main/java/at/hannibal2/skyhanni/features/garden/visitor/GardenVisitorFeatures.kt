@@ -166,10 +166,10 @@ class GardenVisitorFeatures {
                         list.add("§7(§fAny§7)")
                     } else {
                         for (item in items) {
-                            try {
-                                val internalName = NEUItems.getInternalName(item)
+                            val internalName = NEUItems.getInternalNameOrNull(item)
+                            if (internalName != null) {
                                 list.add(NEUItems.getItemStack(internalName))
-                            } catch (e: Exception) {
+                            } else {
                                 list.add(" '$item' ")
                             }
                         }
@@ -275,14 +275,11 @@ class GardenVisitorFeatures {
             if (i > 1 && !endReached) {
                 val (itemName, amount) = ItemUtils.readItemAmount(line)
                 if (itemName != null) {
-                    var internalName: String
-                    try {
-                        internalName = NEUItems.getInternalName(itemName)
-                    } catch (e: NullPointerException) {
+                    val internalName = NEUItems.getInternalNameOrNull(itemName)
+                    if (internalName == null) {
                         val message = "internal name is null: '$itemName'"
                         println(message)
                         LorenzUtils.error(message)
-                        e.printStackTrace()
                         return
                     }
                     val price = NEUItems.getPrice(internalName) * amount
