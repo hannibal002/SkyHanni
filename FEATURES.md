@@ -212,6 +212,7 @@
 + **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 + **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
 + **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
++ **Inventory Numbers** - Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

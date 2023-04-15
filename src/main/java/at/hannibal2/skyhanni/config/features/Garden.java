@@ -726,6 +726,12 @@ public class Garden {
     public boolean teleportPadsCompactName = false;
 
     @Expose
+    @ConfigOption(name = "Inventory Numbers", desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 19)
+    public boolean teleportPadsInventoryNumbers = false;
+
+    @Expose
     @ConfigOption(name = "Anita Medal Profit", desc = "")
     @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
