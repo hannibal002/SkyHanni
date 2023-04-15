@@ -40,6 +40,7 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
+            SoundUtils.playBeepSound()
 
 //            for ((i, s) in ScoreboardData.sidebarLinesFormatted().withIndex()) {
 //                println("$i: '$s'")
@@ -52,8 +53,8 @@ class LorenzTest {
 //            SoundUtils.createSound(name, pitch).playSound()
 
 
-            a = args[0].toDouble()
-            b = args[1].toDouble()
+//            a = args[0].toDouble()
+//            b = args[1].toDouble()
 //            c = args[2].toDouble()
 
 //            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
@@ -165,6 +166,14 @@ class LorenzTest {
 //        if (itemStack != null) {
 //            val internalName = itemStack.getInternalName()
 //            event.toolTip.add("internal name: $internalName")
+//            val data = BazaarApi.getBazaarDataByInternalName(internalName)
+//            if (data == null) {
+//                event.toolTip.add("SkyHanni Price: null")
+//            } else {
+//                val buyPrice = data.buyPrice
+//                val sellPrice = data.sellPrice
+//                event.toolTip.add("SkyHanni Price: $buyPrice / $sellPrice")
+//            }
 //        }
     }
 

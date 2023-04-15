@@ -63,6 +63,9 @@ object NEUItems {
         return getPrice(internalName, false)
     }
 
+    fun transHypixelNameToInternalName(hypixelId: String): String =
+        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
+
     fun getPrice(internalName: String, useSellingPrice: Boolean): Double {
         val result = manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
         if (result == -1.0) {
@@ -73,7 +76,6 @@ object NEUItems {
                 // 6.8 for some players
                 return 7.0 // NPC price
             }
-            LorenzUtils.debug("Item price is null for '$internalName'")
         }
         return result
     }
