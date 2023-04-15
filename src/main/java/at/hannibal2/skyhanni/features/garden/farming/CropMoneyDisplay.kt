@@ -114,7 +114,7 @@ class CropMoneyDisplay {
             }
 
             try {
-                if (internalName == "ENCHANTED_SEEDS") {
+                if (isSeeds(internalName)) {
                     list.add(NEUItems.getItemStack("BOX_OF_SEEDS"))
                 } else {
                     list.add(NEUItems.getItemStack(internalName))
@@ -189,11 +189,25 @@ class CropMoneyDisplay {
         var seedsPrice: BazaarData? = null
         var seedsPerHour = 0.0
 
-        for ((internalName, amount) in multipliers.moveEntryToTop { it.key == "ENCHANTED_SEEDS" }) {
+        val onlyNpcPrice = (!config.moneyPerHourUseCustomFormat && LorenzUtils.noTradeMode) ||
+                (config.moneyPerHourUseCustomFormat && config.moneyPerHourCustomFormat.size == 1
+                        && config.moneyPerHourCustomFormat[0] == 2)
+
+        for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!
+            // When only the NPC price is shown, display the price exclusively for the base item
+            if (onlyNpcPrice) {
+                if (amount != 1) continue
+            } else {
+                if (amount < 10) {
+                    continue
+                }
+            }
+
             var speed = crop.getSpeed().toDouble()
             if (speed == -1.0) continue
-            val isSeeds = internalName == "ENCHANTED_SEEDS"
+
+            val isSeeds = isSeeds(internalName)
             if (isSeeds) speed *= 1.36
             if (crop.replenish) {
                 val blockPerSecond = crop.multiplier * 20
@@ -228,6 +242,8 @@ class CropMoneyDisplay {
         return moneyPerHours
     }
 
+    private fun isSeeds(internalName: String) = (internalName == "ENCHANTED_SEEDS" || internalName == "SEEDS")
+
     private fun formatNumbers(sellOffer: Double, instantSell: Double, npcPrice: Double): Array<Double> {
         return if (config.moneyPerHourUseCustomFormat) {
             val map = mapOf(
@@ -253,12 +269,6 @@ class CropMoneyDisplay {
 
     private fun init() {
         if (loaded) return
-
-        if (BazaarApi.bazaarMap.isEmpty()) {
-            LorenzUtils.debug("bz not ready for money/time!")
-            return
-        }
-
         loaded = true
 
         SkyHanniMod.coroutineScope.launch {
@@ -269,7 +279,6 @@ class CropMoneyDisplay {
                 if (internalName == "ENCHANTED_BREAD") continue
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
-                if (amount < 10) continue
                 val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
                 val crop = CropType.getByItemName(itemName)
                 crop?.let {
