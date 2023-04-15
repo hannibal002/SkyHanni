@@ -47,7 +47,7 @@ class BazaarOrderHelper {
 
             val rawName = itemName.split(if (isBuying) "BUY " else "SELL ")[1]
             val bazaarName = BazaarApi.getCleanBazaarName(rawName)
-            val data = BazaarApi.getBazaarDataForName(bazaarName)
+            val data = BazaarApi.getBazaarDataByName(bazaarName)
             if (data == null) {
                 LorenzUtils.debug("Bazaar data is null!")
                 println("Bazaar data is null for '$rawName'/'$bazaarName'")

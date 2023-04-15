@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.features.bazaar.BazaarDataGrabber
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -54,7 +53,6 @@ object Commands {
         registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
         registerCommand("shsetapikey") { ApiDataLoader.command(it) }
         registerCommand("shtestgardenvisitors") { LorenzTest.testGardenVisitors() }
-        registerCommand("shresetitemnames") { BazaarDataGrabber.resetItemNames() }
         registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
         registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
     }

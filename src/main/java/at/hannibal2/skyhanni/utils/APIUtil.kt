@@ -45,7 +45,11 @@ object APIUtil {
                     try {
                         return parser.parse(retSrc) as JsonObject
                     } catch (e: JsonSyntaxException) {
-                        if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
+                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
+                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            println(" - getJSONResponse: '$urlString'")
+                            LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                        } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
                             if (showApiErrors) {
                                 LorenzUtils.clickableChat(
                                     "[SkyHanni] Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
@@ -57,11 +61,6 @@ object APIUtil {
                             println("JsonSyntaxException at getJSONResponse '$urlString'")
                             LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")
                             println("result: '$retSrc'")
-                        }
-                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
-                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
-                            println(" - getJSONResponse: '$urlString'")
-                            LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
                         }
                         e.printStackTrace()
                     }

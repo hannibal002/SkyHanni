@@ -203,7 +203,7 @@ class CropMoneyDisplay {
             val speedPerHour = speed * 60 * 60
             val cropsPerHour = speedPerHour / amount.toDouble()
 
-            val bazaarData = BazaarApi.getBazaarDataForInternalName(internalName) ?: continue
+            val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName) ?: continue
 
             var npcPrice = bazaarData.npcPrice * cropsPerHour
             var sellOffer = bazaarData.buyPrice * cropsPerHour

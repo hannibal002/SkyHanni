@@ -32,7 +32,7 @@ class CollectionAPI {
         val asJsonObject = jsonElement.asJsonObject ?: return
         for ((rawName, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
-            var itemName = BazaarApi.getBazaarDataForInternalName(rawName)?.itemName
+            var itemName = BazaarApi.getBazaarDataByInternalName(rawName)?.displayName
             if (rawName == "MUSHROOM_COLLECTION") {
                 itemName = "Mushroom"
             }
