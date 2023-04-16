@@ -55,7 +55,7 @@ class BazaarDataHolder {
         val buyPrice = NEUItems.getPrice(internalName, false)
         val npcPrice = npcPrices[internalName].let {
             if (it == null) {
-                if (!internalName.startsWith("TURBO_") && internalName != "PURPLE_CANDY") {
+                if (!ignoreNoNpcPrice(internalName)) {
                     LorenzUtils.debug("NPC price not found for item '$internalName'")
                 }
                 0.0
@@ -65,5 +65,13 @@ class BazaarDataHolder {
         val data = BazaarData(internalName, displayName, sellPrice, buyPrice, npcPrice)
         bazaarData[internalName] = data
         return data
+    }
+
+    private fun ignoreNoNpcPrice(internalName: String): Boolean {
+        if (internalName.startsWith("TURBO_")) return true
+        if (internalName == "PURPLE_CANDY") return true
+        if (internalName == "JACOBS_TICKET") return true
+
+        return false
     }
 }
