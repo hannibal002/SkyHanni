@@ -88,11 +88,22 @@ class CropMoneyDisplay {
             return newDisplay
         }
 
+        var extraNetherWartPrices = 0.0
         GardenAPI.cropInHand?.let {
             val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
             val reforgeName = heldItem.getReforgeName()
             val bountiful = reforgeName == "bountiful"
             toolHasBountiful[it] = bountiful
+
+            if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM) {
+                if (!GardenCropMilestoneDisplay.mushroom_cow_nether_warts || it != CropType.NETHER_WART) {
+                    val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
+                    val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
+                    val mushroomPrice = (redPrice + brownPrice) / 2
+                    val perSecond = 20.0 * it.multiplier * mushroomPrice
+                    extraNetherWartPrices = perSecond * 60 * 60
+                }
+            }
         }
 
         val moneyPerHourData = calculateMoneyPerHour()
@@ -148,7 +159,7 @@ class CropMoneyDisplay {
             val moneyArray = moneyPerHourData[internalName]!!
 
             for (price in moneyArray) {
-                val format = format(price)
+                val format = format(price + extraNetherWartPrices)
                 list.add("$coinsColor$format")
                 list.add("§7/")
             }
