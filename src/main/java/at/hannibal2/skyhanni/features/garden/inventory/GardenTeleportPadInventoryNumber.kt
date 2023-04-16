@@ -57,10 +57,12 @@ class GardenTeleportPadInventoryNumber {
     }
 
     private var inTeleportPad = false
+    private val pattern = "§.(.*) teleport pad".toPattern()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inTeleportPad = event.inventoryName == "Set Destination" && SkyHanniMod.feature.garden.teleportPadsInventoryNumbers
+        inTeleportPad =
+            event.inventoryName == "Set Destination" && SkyHanniMod.feature.garden.teleportPadsInventoryNumbers
     }
 
     @SubscribeEvent
@@ -69,12 +71,10 @@ class GardenTeleportPadInventoryNumber {
         if (!inTeleportPad) return
 
         val name = event.stack.name?.lowercase() ?: return
-        val pattern = "§.(.*) teleport pad".toPattern()
-
         val matcher = pattern.matcher(name)
         if (!matcher.matches()) return
-        val text = matcher.group(1)
 
+        val text = matcher.group(1)
         numbers[text]?.let {
             event.stackTip = "$it"
             return
