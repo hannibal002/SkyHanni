@@ -38,7 +38,9 @@ class GardenCropMilestoneDisplay {
 
     private var needsInventory = false
 
-    private var mushroom_cow_nether_warts = true
+    companion object {
+        var mushroom_cow_nether_warts = true
+    }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
