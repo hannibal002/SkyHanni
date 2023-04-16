@@ -64,6 +64,7 @@ class BazaarOrderHelper {
         for (line in itemLore) {
             if (filledPattern.matcher(line).matches()) {
                 slot highlight LorenzColor.GREEN
+                return
             }
 
             val matcher = pricePattern.matcher(line)
@@ -71,7 +72,7 @@ class BazaarOrderHelper {
                 val price = matcher.group("number").replace(",", "").toDouble()
                 if (buyOrSell.first && price < data.sellPrice || buyOrSell.second && price > data.buyPrice) {
                     slot highlight LorenzColor.GOLD
-                    break
+                    return
                 }
             }
         }
