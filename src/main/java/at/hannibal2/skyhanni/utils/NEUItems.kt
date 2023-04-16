@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -19,6 +20,7 @@ object NEUItems {
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
+    private val turboBookPattern = "§fTurbo-(?<name>.*) (?<level>.)".toPattern()
 
     fun getInternalName(itemName: String): String {
         return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
@@ -28,7 +30,16 @@ object NEUItems {
         if (itemNameCache.containsKey(itemName)) {
             return itemNameCache[itemName]!!
         }
-        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+
+        val matcher = turboBookPattern.matcher(itemName)
+        var internalName = if (matcher.matches()) {
+            val type = matcher.group("name")
+            val level = matcher.group("level").romanToDecimal()
+            val name = turboCheck(type).uppercase()
+            "TURBO_$name;$level"
+        } else {
+            ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+        }
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
@@ -38,6 +49,12 @@ object NEUItems {
 
         itemNameCache[itemName] = internalName
         return internalName
+    }
+
+    private fun turboCheck(text: String): String {
+        if (text == "Cocoa") return "Coco"
+        if (text == "Cacti") return "Cactus"
+        return text
     }
 
     fun getInternalName(itemStack: ItemStack): String {

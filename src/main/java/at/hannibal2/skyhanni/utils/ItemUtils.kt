@@ -138,6 +138,18 @@ object ItemUtils {
             setStackDisplayName(value)
         }
 
+    val ItemStack.nameWithEnchantment: String?
+        get() {
+            val name = name
+            name?.let {
+                if (name.endsWith("Enchanted Book")) {
+                    return getLore()[0]
+                }
+            }
+
+            return name
+        }
+
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
 
     private val patternInFront = Pattern.compile("(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)")

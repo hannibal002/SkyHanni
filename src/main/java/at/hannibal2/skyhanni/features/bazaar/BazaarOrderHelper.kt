@@ -13,6 +13,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarOrderHelper {
+    private val bazaarItemNamePattern = "§.§l(?<type>BUY|SELL) (?<name>.*)".toPattern()
 
     companion object {
         fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
@@ -41,21 +42,16 @@ class BazaarOrderHelper {
             val stack = slot.stack
             val itemName = stack.name ?: continue
 
-            val isSelling = itemName.startsWith("§6§lSELL ")
-            val isBuying = itemName.startsWith("§a§lBUY ")
-            if (!isSelling && !isBuying) continue
+            val matcher = bazaarItemNamePattern.matcher(itemName)
+            if (!matcher.matches()) continue
 
-            val rawName = itemName.split(if (isBuying) "BUY " else "SELL ")[1]
-            val bazaarName = BazaarApi.getCleanBazaarName(rawName)
-            val data = BazaarApi.getBazaarDataByName(bazaarName)
+            val (isBuying, isSelling) = matcher.group("type").let { (it == "BUY") to (it == "SELL") }
+            if (!isBuying && !isSelling) continue
+
+            val bazaarItemName = matcher.group("name")
+            val data = BazaarApi.getBazaarDataByName(bazaarItemName)
             if (data == null) {
-                LorenzUtils.debug("Bazaar data is null!")
-                println("Bazaar data is null for '$rawName'/'$bazaarName'")
-//                for (key in BazaarApi.bazaarMap.keys) {
-//                    if (key.lowercase().contains("hay")) {
-//                        println("key: '$key'")
-//                    }
-//                }
+                LorenzUtils.debug("Bazaar data is null for bazaarItemName '$bazaarItemName'")
                 continue
             }
 

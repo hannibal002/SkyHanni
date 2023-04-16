@@ -90,10 +90,8 @@ class CropMoneyDisplay {
 
         var extraNetherWartPrices = 0.0
         GardenAPI.cropInHand?.let {
-            val heldItem = Minecraft.getMinecraft().thePlayer.heldItem
-            val reforgeName = heldItem.getReforgeName()
-            val bountiful = reforgeName == "bountiful"
-            toolHasBountiful[it] = bountiful
+            val reforgeName = Minecraft.getMinecraft().thePlayer.heldItem?.getReforgeName()
+            toolHasBountiful[it] = reforgeName == "bountiful"
 
             if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM) {
                 if (!GardenCropMilestoneDisplay.mushroom_cow_nether_warts || it != CropType.NETHER_WART) {

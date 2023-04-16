@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -47,11 +47,7 @@ class SkyMartCopperPrice {
                 val priceFormat = NumberUtil.format(lowestBin)
                 val amountFormat = NumberUtil.format(amount)
 
-                var name = stack.name!!
-                if (name == "§fEnchanted Book") {
-                    name = stack.getLore()[0]
-                }
-
+                val name = stack.nameWithEnchantment!!
                 val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
                     " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
                 } else ""
