@@ -17,24 +17,6 @@ class BazaarApi {
         val holder = BazaarDataHolder()
         var inBazaarInventory = false
 
-        fun getCleanBazaarName(name: String): String {
-            var newName = name
-            if (newName.endsWith(" Gemstone")) {
-                return newName.substring(6)
-            }
-            if (newName.contains("Turbo-Cocoa ")) {
-                newName = newName.replace("Cocoa", "Coco")
-            }
-            if (newName.contains("Turbo-Cacti ")) {
-                newName = newName.replace("Cacti", "Cactus")
-            }
-            newName = newName.removeColor()
-            if (!name.contains("Tightly-Tied")) {
-                newName = newName.replace("-", " ")
-            }
-            return newName
-        }
-
         fun getBazaarDataByName(name: String): BazaarData? =
             NEUItems.getInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
 

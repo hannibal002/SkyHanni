@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -64,15 +64,11 @@ class AnitaMedalProfit {
     }
 
     private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, String>>) {
-        var itemName = item.name ?: return
+        val itemName = item.nameWithEnchantment ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return
         if (itemName == "§aMedal Trades") return
-
-        if (itemName.endsWith("Enchanted Book")) {
-            itemName = item.getLore()[0]
-        }
 
         val fullCost = getFullCost(getRequiredItems(item))
         if (fullCost < 0) return
