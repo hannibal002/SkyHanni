@@ -41,7 +41,7 @@ class HideMobNames {
     }
 
     private fun addMobToHide(bossName: String) {
-        patterns.add(Pattern.compile("§8\\[§7Lv(\\d+)§8] §c$bossName§r §[ae](.+)§f/§a(.+)§c❤"))
+        patterns.add("§8\\[§7Lv(\\d+)§8] §c$bossName§r §[ae](.+)§f/§a(.+)§c❤".toPattern())
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

@@ -7,11 +7,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class ComposterInventoryNumbers {
-    private val valuePattern = Pattern.compile("(?:.*) §e(.*)§6\\/(.*)")
-    private val compostsPattern = Pattern.compile("§7§7Compost Available: §a(.*)")
+    private val valuePattern = "(?:.*) §e(.*)§6\\/(.*)".toPattern()
+    private val compostsPattern = "§7§7Compost Available: §a(.*)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {

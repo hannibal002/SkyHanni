@@ -11,11 +11,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class StatsTuning {
 
-    private val patternStatPoints = Pattern.compile("§7Stat has: §e(\\d+) point(s)?")
+    private val patternStatPoints = "§7Stat has: §e(\\d+) point(s)?".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {

@@ -11,12 +11,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class SkillExperience {
 
-    private val actionBarPattern = Pattern.compile("(?:.*)§3\\+(?:.*) (.*) \\((.*)\\/(.*)\\)(?:.*)")
-    private val inventoryPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
+    private val actionBarPattern = "(?:.*)§3\\+(?:.*) (.*) \\((.*)\\/(.*)\\)(?:.*)".toPattern()
+    private val inventoryPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {

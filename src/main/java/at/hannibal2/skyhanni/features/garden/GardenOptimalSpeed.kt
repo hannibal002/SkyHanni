@@ -16,14 +16,13 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class GardenOptimalSpeed {
     private val config get() = SkyHanniMod.feature.garden
     private val configCustomSpeed get() = config.optimalSpeedCustom
     private var currentSpeed = 100
     private var optimalSpeed = -1
-    private val currentSpeedPattern = Pattern.compile(" Speed: §r§f✦(.*)")
+    private val currentSpeedPattern = " Speed: §r§f✦(.*)".toPattern()
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()

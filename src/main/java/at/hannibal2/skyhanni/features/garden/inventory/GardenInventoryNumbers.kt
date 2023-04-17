@@ -9,11 +9,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class GardenInventoryNumbers {
-    private var patternTierProgress = Pattern.compile("§7Progress to Tier (.*): §e(?:.*)")
-    private var patternUpgradeTier = Pattern.compile("§7Current Tier: §[ea](.*)§7/§a.*")
+    private var patternTierProgress = "§7Progress to Tier (.*): §e(?:.*)".toPattern()
+    private var patternUpgradeTier = "§7Current Tier: §[ea](.*)§7/§a.*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
