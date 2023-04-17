@@ -6,7 +6,6 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("io.freefair.lombok") version "6.6.1" // needed for discord RPC getter and setter. might not actually be necessary. we'll see.
     kotlin("jvm") version "1.7.20-Beta"
 }
 
@@ -22,7 +21,7 @@ sourceSets.main {
     output.setResourcesDir(file("$buildDir/classes/java/main"))
 }
 
-// Stuff I took from SBA code to support Discord RPC dependency
+// Taken from SBA code to support Discord RPC dependency
 configurations.create("bundle")
 configurations.implementation.extendsFrom(configurations.named("bundle").get())
 
@@ -65,7 +64,7 @@ dependencies {
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
         because("Different version conflicts with Minecraft's Log4j")
-    } // More stuff taken from SBA code for Discord RPC
+    } // Discord RPC client
 
 
     // If you don't want mixins, remove these lines

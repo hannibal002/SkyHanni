@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityC
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager;
@@ -271,6 +272,7 @@ public class SkyHanniMod {
         loadModule(new AshfangMinisNametagHider());
         loadModule(new GardenTeleportPadInventoryNumber());
         loadModule(new ComposterOverlay());
+        loadModule(new DiscordRPCManager());
 
         Commands.INSTANCE.init();
 

@@ -232,6 +232,53 @@ public class Misc {
     public boolean estimatedIemValueAlwaysEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Discord Rich Presence", desc = "")
+    @ConfigEditorAccordion(id = 12)
+    public boolean discordRPC = false;
+
+    @Expose
+    @ConfigOption(name = "Enable Discord RPC", desc = "Details about your Skyblock session displayed through Discord.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 12)
+    public boolean discordRPCEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Details", desc = "Appears immediately below \"Skyblock\".")
+    @ConfigEditorDropdown(values = {
+        "Nothing",
+        "Location",
+        "Purse",
+        "Bits",
+        "Held Item",
+        "Skyblock Date",
+        "Profile (Fruit)",
+        "Custom"
+    })
+    @ConfigAccordionId(id = 12)
+    public int details = 0;
+
+    @Expose
+    @ConfigOption(name = "Status", desc = "Appears immediately below \"Details\".")
+    @ConfigEditorDropdown(values = {
+        "Nothing",
+        "Location",
+        "Purse",
+        "Bits",
+        "Held Item",
+        "Skyblock Date",
+        "Profile (Fruit)",
+        "Custom"
+    })
+    @ConfigAccordionId(id = 12)
+    public int status = 0;
+
+    @Expose
+    @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
+    @ConfigEditorText
+    @ConfigAccordionId(id = 12)
+    public String custom = "";
+
+    @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @Expose

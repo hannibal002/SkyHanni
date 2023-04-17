@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 // SkyblockAddons code, adapted for SkyHanni
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -80,7 +80,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
         fun formatNum(num: Int): Int {
             val rem = num % 10
-            var returnNum = num - rem // we're so fancy with our precision down to the nearest minute that eventually gets floor()ed away anyway
+            var returnNum = num - rem // floor()
             if (returnNum ==  0) {
                 returnNum = "0$num".toInt() // and this is so that if the minute value is ever a single digit (0 after being floored), it displays as 00 because 12:0pm just looks bad
             }
@@ -100,7 +100,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     PROFILE({
-        HyPixelData.profileName.firstLetterUppercase()
+        HypixelData.profileName.firstLetterUppercase()
     }),
 
     CUSTOM({

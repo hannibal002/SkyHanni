@@ -73,5 +73,9 @@ public class About {
         @ConfigEditorButton(buttonText = "Source")
         public Runnable mixin = () -> Utils.openUrl("https://github.com/SpongePowered/Mixin/");
 
+        @ConfigOption(name = "DiscordIPC", desc = "DiscordIPC is available under the Apache License 2.0")
+        @ConfigEditorButton(buttonText = "GitHub")
+        public Runnable discordRPC = () -> Utils.openUrl("https://github.com/jagrosh/DiscordIPC");
+
     }
 }
