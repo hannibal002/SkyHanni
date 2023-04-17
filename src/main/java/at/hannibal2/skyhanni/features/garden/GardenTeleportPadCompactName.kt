@@ -6,11 +6,10 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class GardenTeleportPadCompactName {
-    private val patternName = Pattern.compile("§.✦ §aWarp To (.*)")
-    private val patternNoName = Pattern.compile("§.✦ §cNo Destination")
+    private val patternName = "§.✦ §aWarp To (.*)".toPattern()
+    private val patternNoName = "§.✦ §cNo Destination".toPattern()
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLivingB(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {

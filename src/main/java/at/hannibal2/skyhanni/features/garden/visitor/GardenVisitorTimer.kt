@@ -11,12 +11,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 import kotlin.math.roundToLong
 
 class GardenVisitorTimer {
-    private val patternNextVisitor = Pattern.compile(" Next Visitor: §r§b(.*)")
-    private val patternVisitors = Pattern.compile("§b§lVisitors: §r§f\\((\\d)\\)")
+    private val patternNextVisitor = " Next Visitor: §r§b(.*)".toPattern()
+    private val patternVisitors = "§b§lVisitors: §r§f\\((\\d)\\)".toPattern()
     private var render = ""
     private var lastMillis = 0L
     private var lastVisitors: Int = -1

@@ -17,7 +17,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.regex.Pattern
 
 class JacobFarmingContestsInventory {
 
@@ -26,7 +25,7 @@ class JacobFarmingContestsInventory {
 
     private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.US)
     private val formatTime = SimpleDateFormat("HH:mm", Locale.US)
-    private val pattern = Pattern.compile("§a(.*) (.*)(?:rd|st|nd|th), Year (.*)")
+    private val pattern = "§a(.*) (.*)(?:rd|st|nd|th), Year (.*)".toPattern()
     private val config get() = SkyHanniMod.feature.inventory
 
     // Render the contests a tick delayed to feel smoother

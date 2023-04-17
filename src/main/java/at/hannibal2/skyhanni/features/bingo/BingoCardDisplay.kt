@@ -18,7 +18,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class BingoCardDisplay {
 
@@ -28,7 +27,7 @@ class BingoCardDisplay {
     private var tick = 0
     private var display = listOf<String>()
     private val config get() = SkyHanniMod.feature.bingo
-    private val goalCompletePattern = Pattern.compile("§6§lBINGO GOAL COMPLETE! §r§e(.*)")
+    private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(.*)".toPattern()
 
     init {
         update()

@@ -34,16 +34,15 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
     private var display = listOf<List<Any>>()
     private var lastClickedNpc = 0
     private var tick = 0
-    private val newVisitorArrivedMessage = Pattern.compile(".* §r§ehas arrived on your §r§bGarden§r§e!")
-    private val copperPattern = Pattern.compile(" §8\\+§c(.*) Copper")
-    private val gardenExperiencePattern = Pattern.compile(" §8\\+§2(.*) §7Garden Experience")
+    private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
+    private val copperPattern = " §8\\+§c(.*) Copper".toPattern()
+    private val gardenExperiencePattern = " §8\\+§2(.*) §7Garden Experience".toPattern()
     private val config get() = SkyHanniMod.feature.garden
 
     companion object {

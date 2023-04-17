@@ -11,11 +11,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class CollectionAPI {
-    private val counterPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
-    private val singleCounterPattern = Pattern.compile("§7Total Collected: §e(.*)")
+    private val counterPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
+    private val singleCounterPattern = "§7Total Collected: §e(.*)".toPattern()
 
 //    private val hypixelApiHasWrongItems = listOf(
 //        "WOOL",
@@ -99,7 +98,7 @@ class CollectionAPI {
 
     companion object {
         private val collectionValue = mutableMapOf<String, Long>()
-        private val collectionTier0Pattern = Pattern.compile("§7Progress to .* I: .*")
+        private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 

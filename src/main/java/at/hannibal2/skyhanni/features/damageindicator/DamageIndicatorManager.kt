@@ -34,7 +34,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.max
 
 class DamageIndicatorManager {
@@ -45,7 +44,7 @@ class DamageIndicatorManager {
 
     companion object {
         private var data = mutableMapOf<UUID, EntityData>()
-        private val damagePattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)")
+        private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
         fun isBoss(entity: EntityLivingBase): Boolean {
             return data.values.any { it.entity == entity }

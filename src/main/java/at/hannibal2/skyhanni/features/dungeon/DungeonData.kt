@@ -9,11 +9,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class DungeonData {
 
-    private val pattern = Pattern.compile(" §7⏣ §cThe Catacombs §7\\((.*)\\)")
+    private val pattern = " §7⏣ §cThe Catacombs §7\\((.*)\\)".toPattern()
 
     companion object {
         var dungeonFloor: String? = null

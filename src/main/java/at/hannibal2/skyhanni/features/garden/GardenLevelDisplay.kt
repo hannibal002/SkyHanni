@@ -12,20 +12,19 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 class GardenLevelDisplay {
     private val config get() = SkyHanniMod.feature.garden
-    private val overflowPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
-    private val namePattern = Pattern.compile("Garden Level (.*)")
+    private val overflowPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
+    private val namePattern = "Garden Level (.*)".toPattern()
     private var gardenExp
         get() = SkyHanniMod.feature.hidden.gardenExp
         set(value) {
             SkyHanniMod.feature.hidden.gardenExp = value
         }
     private var display = ""
-    private var visitorRewardPattern = Pattern.compile(" {4}§r§8\\+§r§2(.*) §r§7Garden Experience")
+    private var visitorRewardPattern = " {4}§r§8\\+§r§2(.*) §r§7Garden Experience".toPattern()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {

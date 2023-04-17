@@ -14,10 +14,9 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class SkyMartCopperPrice {
-    private val pattern = Pattern.compile("§c(.*) Copper")
+    private val pattern = "§c(.*) Copper".toPattern()
     private var display = listOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
 
