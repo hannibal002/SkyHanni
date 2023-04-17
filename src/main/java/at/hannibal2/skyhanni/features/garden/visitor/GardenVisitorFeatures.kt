@@ -560,14 +560,26 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay) return
 
-        if (config.visitorNeedsOnlyWhenClose && !GardenAPI.onBarnPlot) return
-
-        if (!GardenAPI.hideExtraGuis()) {
+        if (showGui()) {
             config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
         }
+    }
+
+    private fun showGui(): Boolean {
+        if (config.visitorNeedsInBazaarAlley) {
+            if (LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+                return true
+            }
+        }
+
+        if (GardenAPI.hideExtraGuis()) return false
+        if (GardenAPI.inGarden()) {
+            if (GardenAPI.onBarnPlot) return true
+            if (!config.visitorNeedsOnlyWhenClose) return true
+        }
+        return false
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
