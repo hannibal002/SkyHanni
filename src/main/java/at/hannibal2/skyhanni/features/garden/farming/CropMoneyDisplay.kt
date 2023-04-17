@@ -83,7 +83,9 @@ class CropMoneyDisplay {
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
-        newDisplay.addAsSingletonList(fullTitle(title))
+        if (!config.moneyPerHourHideTitle) {
+            newDisplay.addAsSingletonList(fullTitle(title))
+        }
 
         if (!config.cropMilestoneProgress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
