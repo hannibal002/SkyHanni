@@ -756,8 +756,23 @@ public class Garden {
 
     @Expose
     @ConfigOption(
-            name = "Compact Display",
-            desc = "Displays the compost data from the tab list in a compact form as gui element."
+            name = "Composter Overlay",
+            desc = "Show organic matter, fuel, and profit prices while inside the Composter Inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterOverlay = true;
+
+    @Expose
+    public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
+
+    @Expose
+    public Position composterOverlayFuelExtrasPos = new Position(-320, 152, false, true);
+
+    @Expose
+    @ConfigOption(
+            name = "Display Element",
+            desc = "Displays the compost data from the tab list as gui element."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)

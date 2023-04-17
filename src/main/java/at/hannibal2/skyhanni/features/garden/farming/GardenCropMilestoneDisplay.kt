@@ -77,6 +77,7 @@ class GardenCropMilestoneDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (GardenAPI.hideExtraGuis()) return
 
         config.cropMilestoneProgressDisplayPos.renderStringsAndItems(
             progressDisplay,

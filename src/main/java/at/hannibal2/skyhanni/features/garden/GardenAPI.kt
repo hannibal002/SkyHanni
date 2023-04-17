@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
+import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
@@ -133,4 +135,6 @@ object GardenAPI {
     }
 
     fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
+
+    fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory || SkyMartCopperPrice.inInventory
 }

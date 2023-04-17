@@ -544,7 +544,9 @@ class GardenVisitorFeatures {
 
         if (config.visitorNeedsOnlyWhenClose && !GardenAPI.onBarnPlot) return
 
-        config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+        if (!GardenAPI.hideExtraGuis()) {
+            config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

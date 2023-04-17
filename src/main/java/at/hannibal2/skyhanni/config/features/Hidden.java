@@ -71,4 +71,10 @@ public class Hidden {
 
     @Expose
     public Map<CropType, Boolean> gardenToolHasBountiful = new HashMap<>();
+
+    @Expose
+    public String gardenComposterCurrentOrganicMatterItem = "";
+
+    @Expose
+    public String gardenComposterCurrentFuelItem = "";
 }

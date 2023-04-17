@@ -52,7 +52,7 @@ object TimeUtils {
                 }
             }
         }
-        return builder.toString()
+        return builder.toString().trim()
     }
 
     // TODO: use kotlin Duration
