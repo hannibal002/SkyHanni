@@ -47,7 +47,7 @@ class TpsCounter {
 
             display = if (tpsList.size < minDataAmount) {
                 val current = minDataAmount - tpsList.size
-                "§eTps: §f[(${current}s])"
+                "§eTps: §f(${current}s)"
             } else {
                 val sum = tpsList.sum().toDouble()
                 var tps = (sum / tpsList.size).round(1)
