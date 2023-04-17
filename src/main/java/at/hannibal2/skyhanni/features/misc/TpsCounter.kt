@@ -100,7 +100,7 @@ class TpsCounter {
         } else if (tps > 12) {
             "§c"
         } else {
-            "§8"
+            "§4"
         }
     }
 }
