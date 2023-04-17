@@ -116,7 +116,7 @@ class GardenVisitorFeatures {
         val requiredItems = mutableMapOf<String, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in visitors) {
-            if (visitor.status != VisitorStatus.WAITING && visitor.status != VisitorStatus.NEW) continue
+            if (visitor.status == VisitorStatus.ACCEPTED || visitor.status == VisitorStatus.REFUSED) continue
 
             val items = visitor.items
             if (items.isEmpty()) {
