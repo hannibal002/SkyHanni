@@ -61,6 +61,9 @@ public class Hidden {
     public long informedAboutLowFuel = 0;
 
     @Expose
+    public long visitorInterval = 15 * 60_000L;
+
+    @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
