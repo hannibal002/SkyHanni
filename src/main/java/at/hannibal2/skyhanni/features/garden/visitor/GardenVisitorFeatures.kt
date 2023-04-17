@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -17,13 +18,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -132,7 +136,10 @@ class GardenVisitorFeatures {
                 val list = mutableListOf<Any>()
                 list.add(" §7- ")
                 list.add(itemStack)
-                list.add("$name §8x${amount.addSeparators()}")
+
+                list.add(Renderable.link("$name §8x${amount.addSeparators()}") {
+                    LorenzUtils.setTextIntoSign("$amount")
+                })
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
@@ -535,6 +542,20 @@ class GardenVisitorFeatures {
         val entityId = entity.entityId
 
         lastClickedNpc = entityId
+    }
+
+    @SubscribeEvent
+    fun onRenderInSigns(event: DrawScreenEvent.Post) {
+        if (!GardenAPI.inGarden()) return
+        if (!config.visitorNeedsDisplay) return
+        val gui = event.gui
+        if (gui !is GuiEditSign) return
+
+        if (config.visitorNeedsOnlyWhenClose && !GardenAPI.onBarnPlot) return
+
+        if (!GardenAPI.hideExtraGuis()) {
+            config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+        }
     }
 
     @SubscribeEvent
