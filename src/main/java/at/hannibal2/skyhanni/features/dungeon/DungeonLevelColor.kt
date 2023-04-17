@@ -6,11 +6,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class DungeonLevelColor {
 
-    private val pattern = Pattern.compile(" §.(.*)§f: §e(.*)§b \\(§e(.*)§b\\)")
+    private val pattern = " §.(.*)§f: §e(.*)§b \\(§e(.*)§b\\)".toPattern()
 
     @SubscribeEvent
     fun onItemTooltip(event: ItemTooltipEvent) {

@@ -19,10 +19,9 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class MinionCraftHelper {
-    private var minionNamePattern = Pattern.compile("(.*) Minion (.*)")
+    private var minionNamePattern = "(.*) Minion (.*)".toPattern()
     private var tick = 0
     private var display = listOf<String>()
     private var hasMinionInInventory = false

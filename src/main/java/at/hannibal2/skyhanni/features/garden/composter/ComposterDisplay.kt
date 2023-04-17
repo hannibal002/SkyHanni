@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -23,7 +22,7 @@ class ComposterDisplay {
 
     private var tabListData by ComposterAPI::tabListData
 
-    enum class DataType(val pattern: String, val icon: String) {
+    enum class DataType(rawPattern: String, val icon: String) {
         ORGANIC_MATTER(" Organic Matter: §r(.*)", "WHEAT"),
         FUEL(" Fuel: §r(.*)", "OIL_BARREL"),
         TIME_LEFT(" Time Left: §r(.*)", "WATCH"),
@@ -32,6 +31,8 @@ class ComposterDisplay {
         val displayItem by lazy {
             NEUItems.getItemStack(icon)
         }
+
+        val pattern by lazy {rawPattern.toPattern()}
 
         fun addToList(map: Map<DataType, String>): List<Any> {
             return listOf(displayItem, map[this]!!)
@@ -114,8 +115,7 @@ class ComposterDisplay {
             if (next) {
                 if (line == "") break
                 for (type in DataType.values()) {
-                    val pattern = Pattern.compile(type.pattern)
-                    val matcher = pattern.matcher(line)
+                    val matcher = type.pattern.matcher(line)
                     if (matcher.matches()) {
                         newData[type] = matcher.group(1)
                     }

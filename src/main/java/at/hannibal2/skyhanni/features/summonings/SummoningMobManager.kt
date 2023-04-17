@@ -14,7 +14,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class SummoningMobManager {
 
@@ -26,14 +25,14 @@ class SummoningMobManager {
     private var searchMobs = false
 
     //§aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
-    private val spawnPatter = Pattern.compile("§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)")
-    private val despawnPatter = Pattern.compile("§cYou have despawned your (monster|monsters)!")
+    private val spawnPatter = "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)".toPattern()
+    private val despawnPatter = "§cYou have despawned your (monster|monsters)!".toPattern()
 
     //§a§ohannibal2's Tank Zombie§r §a160k§c❤
-    private val healthPattern = Pattern.compile("§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤")
+    private val healthPattern = "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤".toPattern()
 
     //§cThe Seraph recalled your 3 summoned allies!
-    private val seraphRecallPattern = Pattern.compile("§cThe Seraph recalled your (\\d) summoned allies!")
+    private val seraphRecallPattern = "§cThe Seraph recalled your (\\d) summoned allies!".toPattern()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {

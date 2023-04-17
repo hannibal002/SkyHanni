@@ -7,11 +7,10 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class GardenCropMilestones {
-    private val cropPattern = Pattern.compile("§7Harvest §f(.*) §7on .*")
-    private val totalPattern = Pattern.compile("§7Total: §a(.*)")
+    private val cropPattern = "§7Harvest §f(.*) §7on .*".toPattern()
+    private val totalPattern = "§7Total: §a(.*)".toPattern()
 
     // Add when api support is there
 //    @SubscribeEvent

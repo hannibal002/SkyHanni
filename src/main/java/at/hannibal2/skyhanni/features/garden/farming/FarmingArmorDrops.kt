@@ -12,14 +12,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class FarmingArmorDrops {
     private var display = listOf<String>()
     private val drops = mutableMapOf<ArmorDropType, Int>()
     private var hasArmor = false
     private var tick = 0
-    private val armorPattern = Pattern.compile("(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)")
+    private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
     private val config get() = SkyHanniMod.feature.garden
 
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
