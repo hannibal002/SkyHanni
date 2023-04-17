@@ -227,6 +227,7 @@ public class Garden {
                     "§7In §b12m 34s",
                     "§7Crops/Minute§8: §e12,345",
                     "§7Blocks/Second§8: §e20",
+                    "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 6)
@@ -315,6 +316,7 @@ public class Garden {
                     "§7Mushroom Tier 8",
                     "§e6,700§8/§e15,000",
                     "§7In §b12m 34s",
+                    "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 15)
