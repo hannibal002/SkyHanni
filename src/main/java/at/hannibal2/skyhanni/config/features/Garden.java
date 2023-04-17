@@ -663,6 +663,14 @@ public class Garden {
     public boolean moneyPerHourMergeSeeds = true;
 
     @Expose
+    @ConfigOption(
+            name = "Hide Title",
+            desc = "Hides the first line of 'Money Per Hour' entirely.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourHideTitle = false;
+
+    @Expose
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
