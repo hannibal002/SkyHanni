@@ -81,6 +81,13 @@ public class Garden {
     public boolean visitorNeedsOnlyWhenClose = false;
 
     @Expose
+    @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub. " +
+            "This helps buying the correct amount when not having a booster cookie buff active.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean visitorNeedsInBazaarAlley = true;
+
+    @Expose
     @ConfigOption(name = "Show Price", desc = "Show the coin price in the items needed list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
