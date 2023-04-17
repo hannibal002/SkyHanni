@@ -40,7 +40,9 @@ class CropMoneyDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.moneyPerHourPos.renderStringsAndItems(display, posLabel = "Garden Crop Money Per Hour")
+        if (!GardenAPI.hideExtraGuis()) {
+            config.moneyPerHourPos.renderStringsAndItems(display, posLabel = "Garden Crop Money Per Hour")
+        }
     }
 
     @SubscribeEvent

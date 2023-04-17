@@ -135,7 +135,6 @@ class JacobFarmingContestsInventory {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val slot = event.slot.slotNumber
-
         if (config.jacobFarmingContestHideDuplicates) {
             if (duplicateSlots.contains(slot)) {
                 event.toolTip.clear()

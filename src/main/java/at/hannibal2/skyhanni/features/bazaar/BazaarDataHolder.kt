@@ -17,7 +17,6 @@ class BazaarDataHolder {
     }
 
     private fun loadNpcPrices(): MutableMap<String, Double> {
-        println("loadNpcPrices")
         val list = mutableMapOf<String, Double>()
         try {
             val itemsData = APIUtil.getJSONResponse("https://api.hypixel.net/resources/skyblock/items")
@@ -71,6 +70,7 @@ class BazaarDataHolder {
         if (internalName.startsWith("TURBO_")) return true
         if (internalName == "PURPLE_CANDY") return true
         if (internalName == "JACOBS_TICKET") return true
+        if (internalName == "RAW_SOULFLOW") return true
 
         return false
     }

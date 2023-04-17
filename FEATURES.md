@@ -213,6 +213,9 @@
 + **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
 + **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
 + **Inventory Numbers** - Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
++ **Composter Overlay** - Show the cheapest items for organic matter and fuel, show profit per compost/hour/day and time per compost
++ **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
++ Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

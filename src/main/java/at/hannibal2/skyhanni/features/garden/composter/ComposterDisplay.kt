@@ -2,11 +2,9 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -15,7 +13,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 
 class ComposterDisplay {
@@ -63,15 +60,10 @@ class ComposterDisplay {
             return
         }
 
-        val speedUpgrade = ComposterUpgrade.COMPOSTER_SPEED.getLevel()
-        val speedFactor = 1 + speedUpgrade * 0.2
-        val baseDuration = 10.minutes
-        val timePerCompost = baseDuration / speedFactor
+        val timePerCompost = ComposterAPI.timePerCompost(null)
 
-        val costReduction = ComposterUpgrade.COST_REDUCTION.getLevel()
-        val costFactor = 1.0 - costReduction.toDouble() / 100
-        val organicMatterRequired = 4_000.0 * costFactor
-        val fuelRequired = 2_000.0 * costFactor
+        val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
+        val fuelRequired = ComposterAPI.fuelRequiredPer(null)
 
         val organicMatterRemaining = organicMatter / organicMatterRequired
         val fuelRemaining = fuel / fuelRequired
