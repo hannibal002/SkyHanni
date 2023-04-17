@@ -47,7 +47,7 @@ class TpsCounter {
 
             display = if (tpsList.size < minDataAmount) {
                 val current = minDataAmount - tpsList.size
-                "§eTps: §fCalculating.. (${current}s)"
+                "§eTps: §f[(${current}s])"
             } else {
                 val sum = tpsList.sum().toDouble()
                 var tps = (sum / tpsList.size).round(1)
@@ -100,7 +100,7 @@ class TpsCounter {
         } else if (tps > 12) {
             "§c"
         } else {
-            "§8NOT PLAYABLE - "
+            "§8"
         }
     }
 }
