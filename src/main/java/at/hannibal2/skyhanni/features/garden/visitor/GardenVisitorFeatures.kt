@@ -137,9 +137,9 @@ class GardenVisitorFeatures {
                 list.add(" §7- ")
                 list.add(itemStack)
 
-                list.add(Renderable.link("$name §8x${amount.addSeparators()}") {
+                list.add(Renderable.optionalLink("$name §8x${amount.addSeparators()}", {
                     LorenzUtils.setTextIntoSign("$amount")
-                })
+                }) { Minecraft.getMinecraft().currentScreen is GuiEditSign })
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
