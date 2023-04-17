@@ -30,12 +30,13 @@ interface Renderable {
             else -> null
         }
 
-        fun link(text: String, onClick: () -> Unit): Renderable = link(string(text), onClick)
-        fun link(renderable: Renderable, onClick: () -> Unit): Renderable {
-            return clickable(hoverable(underlined(renderable), renderable), onClick)
+        fun link(text: String, onClick: () -> Unit): Renderable = link(string(text), onClick) { true }
+        fun optionalLink(text: String, onClick: () -> Unit, condition: () -> Boolean = {true}): Renderable = link(string(text), onClick, condition)
+        fun link(renderable: Renderable, onClick: () -> Unit, condition: () -> Boolean = {true}): Renderable {
+            return clickable(hoverable(underlined(renderable), renderable, condition), onClick, 0, condition)
         }
 
-        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0) = object : Renderable {
+        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0, condition: () -> Boolean = {true}) = object : Renderable {
             override val width: Int
                 get() = render.width
 
@@ -44,7 +45,9 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 val isDown = Mouse.isButtonDown(button)
                 if (isDown > wasDown && isHovered(posX, posY)) {
-                    onClick()
+                    if (condition()) {
+                        onClick()
+                    }
                 }
                 wasDown = isDown
                 render.render(posX, posY)
@@ -63,12 +66,12 @@ interface Renderable {
             }
         }
 
-        fun hoverable(hovered: Renderable, unhovered: Renderable) = object : Renderable {
+        fun hoverable(hovered: Renderable, unhovered: Renderable, condition: () -> Boolean = {true}) = object : Renderable {
             override val width: Int
                 get() = max(hovered.width, unhovered.width)
 
             override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY))
+                if (isHovered(posX, posY) && condition())
                     hovered.render(posX, posY)
                 else
                     unhovered.render(posX, posY)
