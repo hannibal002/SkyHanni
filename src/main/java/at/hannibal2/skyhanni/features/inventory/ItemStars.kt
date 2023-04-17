@@ -8,13 +8,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class ItemStars {
 
     private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
-    private val STAR_FIND_PATCHER = Pattern.compile("(.*)§.✪(.*)")
+    private val STAR_FIND_PATCHER = "(.*)§.✪(.*)".toPattern()
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
 
     @SubscribeEvent(priority = EventPriority.LOW)

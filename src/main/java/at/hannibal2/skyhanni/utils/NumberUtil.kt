@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import java.text.NumberFormat
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -161,7 +160,7 @@ object NumberUtil {
         }
     }
 
-    val pattern = Pattern.compile("^[0-9]*$")
+    val pattern = "^[0-9]*$".toPattern()
 
     fun String.isInt(): Boolean {
         return isNotEmpty() && pattern.matcher(this).matches()

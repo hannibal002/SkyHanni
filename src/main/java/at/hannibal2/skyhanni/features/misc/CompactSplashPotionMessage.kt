@@ -6,15 +6,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class CompactSplashPotionMessage {
 
     private val POTION_EFFECT_PATTERN =
-        Pattern.compile("§a§lBUFF! §fYou have gained §r(.*)§r§f! Press TAB or type /effects to view your active effects!")
+        "§a§lBUFF! §fYou have gained §r(.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern()
 
     private val POTION_EFFECT_OTHERS_PATTERN =
-        Pattern.compile("§a§lBUFF! §fYou were splashed by (.*) §fwith §r(.*)§r§f! Press TAB or type /effects to view your active effects!")
+        "§a§lBUFF! §fYou were splashed by (.*) §fwith §r(.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {

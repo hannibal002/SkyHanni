@@ -10,7 +10,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.util.Constants
 import java.util.*
-import java.util.regex.Pattern
 
 object ItemUtils {
 
@@ -152,8 +151,8 @@ object ItemUtils {
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
 
-    private val patternInFront = Pattern.compile("(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)")
-    private val patternBehind = Pattern.compile("(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?")
+    private val patternInFront = "(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)".toPattern()
+    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 

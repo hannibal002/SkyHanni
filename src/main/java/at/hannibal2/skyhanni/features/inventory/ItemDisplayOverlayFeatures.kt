@@ -15,12 +15,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class ItemDisplayOverlayFeatures {
 
-    private val wishingCompassPattern = Pattern.compile("§7Remaining Uses: §e(.*)§8/§e3")
-    private val rangerBootsSpeedCapPattern = Pattern.compile("§7Current Speed Cap: §a(.*)")
+    private val wishingCompassPattern = "§7Remaining Uses: §e(.*)§8/§e3".toPattern()
+    private val rangerBootsSpeedCapPattern = "§7Current Speed Cap: §a(.*)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {

@@ -15,7 +15,6 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.time.Instant
-import java.util.regex.Pattern
 
 class GardenNextJacobContest {
     private var display = listOf<Any>()
@@ -23,9 +22,9 @@ class GardenNextJacobContest {
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
-    private val patternDay = Pattern.compile("§aDay (.*)")
-    private val patternMonth = Pattern.compile("(.*), Year (.*)")
-    private val patternCrop = Pattern.compile("§e○ §7(.*)")
+    private val patternDay = "§aDay (.*)".toPattern()
+    private val patternMonth = "(.*), Year (.*)".toPattern()
+    private val patternCrop = "§e○ §7(.*)".toPattern()
 
     private val maxContestsPerYear = 124
     private val contestDuration = 1_000 * 60 * 20

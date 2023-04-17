@@ -14,7 +14,7 @@ class BazaarCancelledBuyOrderClipboard {
 
     private val patternLastAmount = Pattern.compile("§a(.*)§7x")
     private val patternCancelledMessage =
-        Pattern.compile("§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(.*) coins §r§7from cancelling Buy Order!")
+        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(.*) coins §r§7from cancelling Buy Order!".toPattern()
 
     private var latestAmount: String? = null
 

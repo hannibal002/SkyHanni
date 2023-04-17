@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.nbt.NBTTagCompound
@@ -162,19 +163,12 @@ class LorenzTest {
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
-//        val itemStack = event.itemStack
-//        if (itemStack != null) {
-//            val internalName = itemStack.getInternalName()
-//            event.toolTip.add("internal name: $internalName")
-//            val data = BazaarApi.getBazaarDataByInternalName(internalName)
-//            if (data == null) {
-//                event.toolTip.add("SkyHanni Price: null")
-//            } else {
-//                val buyPrice = data.buyPrice
-//                val sellPrice = data.sellPrice
-//                event.toolTip.add("SkyHanni Price: $buyPrice / $sellPrice")
-//            }
-//        }
+        if (!SkyHanniMod.feature.dev.debugEnabled) return
+        val itemStack = event.itemStack
+        if (itemStack != null) {
+            val internalName = itemStack.getInternalName()
+            event.toolTip.add("Internal Name: '$internalName'")
+        }
     }
 
     @SubscribeEvent
