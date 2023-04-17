@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -17,12 +18,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -111,7 +116,7 @@ class GardenVisitorFeatures {
         val requiredItems = mutableMapOf<String, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in visitors) {
-            if (visitor.status != VisitorStatus.WAITING && visitor.status != VisitorStatus.NEW) continue
+            if (visitor.status == VisitorStatus.ACCEPTED || visitor.status == VisitorStatus.REFUSED) continue
 
             val items = visitor.items
             if (items.isEmpty()) {
@@ -131,7 +136,10 @@ class GardenVisitorFeatures {
                 val list = mutableListOf<Any>()
                 list.add(" §7- ")
                 list.add(itemStack)
-                list.add("$name §8x${amount.addSeparators()}")
+
+                list.add(Renderable.optionalLink("$name §8x${amount.addSeparators()}", {
+                    LorenzUtils.setTextIntoSign("$amount")
+                }) { Minecraft.getMinecraft().currentScreen is GuiEditSign })
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
@@ -537,13 +545,41 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onRenderInSigns(event: DrawScreenEvent.Post) {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay) return
+        val gui = event.gui
+        if (gui !is GuiEditSign) return
 
         if (config.visitorNeedsOnlyWhenClose && !GardenAPI.onBarnPlot) return
 
-        config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+        if (!GardenAPI.hideExtraGuis()) {
+            config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (!config.visitorNeedsDisplay) return
+
+        if (showGui()) {
+            config.visitorNeedsPos.renderStringsAndItems(display, posLabel = "Visitor Items Needed")
+        }
+    }
+
+    private fun showGui(): Boolean {
+        if (config.visitorNeedsInBazaarAlley) {
+            if (LorenzUtils.skyBlockIsland == IslandType.HUB && LorenzUtils.skyBlockArea == "Bazaar Alley") {
+                return true
+            }
+        }
+
+        if (GardenAPI.hideExtraGuis()) return false
+        if (GardenAPI.inGarden()) {
+            if (GardenAPI.onBarnPlot) return true
+            if (!config.visitorNeedsOnlyWhenClose) return true
+        }
+        return false
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -566,9 +602,9 @@ class GardenVisitorFeatures {
         var inSacks: Boolean = false,
         val items: MutableMap<String, Int> = mutableMapOf(),
     ) {
-        fun getEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
+        fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
 
-        fun getNameTagEntity() = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
+        fun getNameTagEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
     }
 
     enum class VisitorStatus(val displayName: String, val color: Int) {

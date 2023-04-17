@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.gui.inventory.GuiChest
@@ -36,30 +38,26 @@ class BazaarBestSellMethod {
             val buyInstantly = inv.getStackInSlot(10)
             if (buyInstantly == null || buyInstantly.displayName != "§aBuy Instantly") return ""
             val bazaarItem = inv.getStackInSlot(13) ?: return ""
-            var name = bazaarItem.displayName
-            name = BazaarApi.getCleanBazaarName(name)
-            val data = BazaarApi.getBazaarDataByName(name) ?: return ""
+
+            val internalName = NEUItems.getInternalNameOrNull(bazaarItem.displayName) ?: return ""
 
             var having = 0
             for (slot in chest.inventorySlots) {
                 if (slot == null) continue
                 if (slot.slotNumber == slot.slotIndex) continue
                 val stack = slot.stack ?: continue
-
-                var displayName = stack.displayName
-                if (displayName.endsWith("Enchanted Book")) {
-                    displayName = stack.getLore()[0]
-                }
-                if (BazaarApi.getCleanBazaarName(displayName) == name) {
+                if (internalName == stack.getInternalName()) {
                     having += stack.stackSize
                 }
             }
 
             if (having <= 0) return ""
 
+            val data = BazaarApi.getBazaarDataByInternalName(internalName) ?: return ""
             val totalDiff = (data.buyPrice - data.sellPrice) * having
             val result = NumberUtil.format(totalDiff.toInt())
 
+            val name = NEUItems.getItemStack(internalName).nameWithEnchantment
             return "§b$name§f sell difference: §e$result coins"
         } catch (e: Error) {
             e.printStackTrace()

@@ -61,6 +61,9 @@ public class Hidden {
     public long informedAboutLowFuel = 0;
 
     @Expose
+    public long visitorInterval = 15 * 60_000L;
+
+    @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
@@ -68,4 +71,13 @@ public class Hidden {
 
     @Expose
     public Map<ComposterUpgrade, Integer> gardenComposterUpgrades = new HashMap<>();
+
+    @Expose
+    public Map<CropType, Boolean> gardenToolHasBountiful = new HashMap<>();
+
+    @Expose
+    public String gardenComposterCurrentOrganicMatterItem = "";
+
+    @Expose
+    public String gardenComposterCurrentFuelItem = "";
 }

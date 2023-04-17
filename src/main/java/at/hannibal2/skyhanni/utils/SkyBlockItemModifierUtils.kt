@@ -104,19 +104,23 @@ object SkyBlockItemModifierUtils {
             for (key in gemstones.keySet) {
                 if (key.endsWith("_gem")) continue
                 if (key == "unlocked_slots") continue
-                val value = gemstones.getString(key)
-                if (value == "") continue
+                var value = gemstones.getString(key)
+                if (value == "") {
+                    val tag = gemstones.getCompoundTag(key)
+                    value = tag.getString("quality")
+                    if (value == "") continue
+                }
 
                 val rawType = key.split("_")[0]
                 val type = GemstoneType.getByName(rawType)
 
-                val tier = GemstoneTier.getByName(value)
-                if (tier == null) {
-                    LorenzUtils.debug("Gemstone tier is null for item $name: ('$key' = '$value')")
+                val quality = GemstoneQuality.getByName(value)
+                if (quality == null) {
+                    LorenzUtils.debug("Gemstone quality is null for item $name: ('$key' = '$value')")
                     continue
                 }
                 if (type != null) {
-                    list.add(GemstoneSlot(type, tier))
+                    list.add(GemstoneSlot(type, quality))
                 } else {
                     val newKey = gemstones.getString(key + "_gem")
                     val newType = GemstoneType.getByName(newKey)
@@ -124,7 +128,7 @@ object SkyBlockItemModifierUtils {
                         LorenzUtils.debug("Gemstone type is null for item $name: ('$newKey' with '$key' = '$value')")
                         continue
                     }
-                    list.add(GemstoneSlot(newType, tier))
+                    list.add(GemstoneSlot(newType, quality))
                 }
             }
         }
@@ -143,11 +147,11 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
 
-    class GemstoneSlot(val type: GemstoneType, val tier: GemstoneTier) {
-        fun getInternalName() = "${tier}_${type}_GEM"
+    class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
+        fun getInternalName() = "${quality}_${type}_GEM"
     }
 
-    enum class GemstoneTier(val displayName: String) {
+    enum class GemstoneQuality(val displayName: String) {
         ROUGH("Rough"),
         FLAWED("Flawed"),
         FINE("Fine"),
@@ -156,7 +160,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
-            fun getByName(name: String) = GemstoneTier.values().firstOrNull { it.name == name }
+            fun getByName(name: String) = GemstoneQuality.values().firstOrNull { it.name == name }
         }
     }
 

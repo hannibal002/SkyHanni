@@ -38,7 +38,9 @@ class GardenCropMilestoneDisplay {
 
     private var needsInventory = false
 
-    private var mushroom_cow_nether_warts = true
+    companion object {
+        var mushroom_cow_nether_warts = true
+    }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -75,6 +77,7 @@ class GardenCropMilestoneDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (GardenAPI.hideExtraGuis()) return
 
         config.cropMilestoneProgressDisplayPos.renderStringsAndItems(
             progressDisplay,
@@ -309,6 +312,9 @@ class GardenCropMilestoneDisplay {
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$lastBlocksPerSecond")
         }
 
+        val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
+        lineMap[6] = Collections.singletonList("§7Percentage: §e$percentageFormat")
+
         if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
             if (mushroom_cow_nether_warts && crop == CropType.NETHER_WART) {
                 mushroomCowPerkDisplay = listOf(
@@ -373,6 +379,9 @@ class GardenCropMilestoneDisplay {
 
         lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
         lineMap[3] = Collections.singletonList("§7In §b$duration")
+
+        val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
+        lineMap[4] = Collections.singletonList("§7Percentage: §e$percentageFormat")
 
         val newList = mutableListOf<List<Any>>()
         for (index in config.cropMilestoneMushroomPetPerkText) {

@@ -54,6 +54,13 @@ public class Garden {
     public boolean visitorTimerEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Sixth Visitor Estimate", desc = "Estimate when the sixth visitor in the queue will arrive. " +
+            "May be inaccurate with coop members farming simultaneously.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean visitorTimerSixthVisitorEnabled = true;
+
+    @Expose
 //    @ConfigOption(name = "Visitor Timer Position", desc = "")
 //    @ConfigEditorButton(runnableId = "visitorTimer", buttonText = "Edit")
 //    @ConfigAccordionId(id = 2)
@@ -79,6 +86,13 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean visitorNeedsOnlyWhenClose = false;
+
+    @Expose
+    @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub. " +
+            "This helps buying the correct amount when not having a booster cookie buff active.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean visitorNeedsInBazaarAlley = true;
 
     @Expose
     @ConfigOption(name = "Show Price", desc = "Show the coin price in the items needed list.")
@@ -213,6 +227,7 @@ public class Garden {
                     "§7In §b12m 34s",
                     "§7Crops/Minute§8: §e12,345",
                     "§7Blocks/Second§8: §e20",
+                    "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 6)
@@ -301,6 +316,7 @@ public class Garden {
                     "§7Mushroom Tier 8",
                     "§e6,700§8/§e15,000",
                     "§7In §b12m 34s",
+                    "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 15)
@@ -649,6 +665,14 @@ public class Garden {
     public boolean moneyPerHourMergeSeeds = true;
 
     @Expose
+    @ConfigOption(
+            name = "Hide Title",
+            desc = "Hides the first line of 'Money Per Hour' entirely.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourHideTitle = false;
+
+    @Expose
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
@@ -726,6 +750,12 @@ public class Garden {
     public boolean teleportPadsCompactName = false;
 
     @Expose
+    @ConfigOption(name = "Inventory Numbers", desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 19)
+    public boolean teleportPadsInventoryNumbers = false;
+
+    @Expose
     @ConfigOption(name = "Anita Medal Profit", desc = "")
     @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
@@ -750,8 +780,23 @@ public class Garden {
 
     @Expose
     @ConfigOption(
-            name = "Compact Display",
-            desc = "Displays the compost data from the tab list in a compact form as gui element."
+            name = "Composter Overlay",
+            desc = "Show organic matter, fuel, and profit prices while inside the Composter Inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterOverlay = true;
+
+    @Expose
+    public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
+
+    @Expose
+    public Position composterOverlayFuelExtrasPos = new Position(-320, 152, false, true);
+
+    @Expose
+    @ConfigOption(
+            name = "Display Element",
+            desc = "Displays the compost data from the tab list as gui element."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)

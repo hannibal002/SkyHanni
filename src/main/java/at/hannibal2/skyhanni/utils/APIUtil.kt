@@ -56,13 +56,14 @@ object APIUtil {
                                     "shtogglehypixelapierrors"
                                 )
                             }
+                            e.printStackTrace()
 
                         } else {
                             println("JsonSyntaxException at getJSONResponse '$urlString'")
                             LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")
                             println("result: '$retSrc'")
+                            e.printStackTrace()
                         }
-                        e.printStackTrace()
                     }
                 }
             }

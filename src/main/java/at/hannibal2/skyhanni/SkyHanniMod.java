@@ -30,12 +30,10 @@ import at.hannibal2.skyhanni.features.fishing.*;
 import at.hannibal2.skyhanni.features.garden.*;
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay;
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers;
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay;
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures;
 import at.hannibal2.skyhanni.features.garden.farming.*;
-import at.hannibal2.skyhanni.features.garden.inventory.GardenDeskInSBMenu;
-import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers;
-import at.hannibal2.skyhanni.features.garden.inventory.GardenNextPlotPrice;
-import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice;
+import at.hannibal2.skyhanni.features.garden.inventory.*;
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames;
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures;
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer;
@@ -271,6 +269,8 @@ public class SkyHanniMod {
         loadModule(new ToolTooltipTweaks());
         loadModule(new CropSpeedMeter());
         loadModule(new AshfangMinisNametagHider());
+        loadModule(new GardenTeleportPadInventoryNumber());
+        loadModule(new ComposterOverlay());
 
         Commands.INSTANCE.init();
 

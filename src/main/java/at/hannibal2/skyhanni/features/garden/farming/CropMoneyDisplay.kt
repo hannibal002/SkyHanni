@@ -17,9 +17,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -32,12 +34,15 @@ class CropMoneyDisplay {
     private var multipliers = mapOf<String, Int>()
     private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
     private var hasCropInHand = false
+    private val toolHasBountiful: MutableMap<CropType, Boolean> get() = SkyHanniMod.feature.hidden.gardenToolHasBountiful
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.moneyPerHourPos.renderStringsAndItems(display, posLabel = "Garden Crop Money Per Hour")
+        if (!GardenAPI.hideExtraGuis()) {
+            config.moneyPerHourPos.renderStringsAndItems(display, posLabel = "Garden Crop Money Per Hour")
+        }
     }
 
     @SubscribeEvent
@@ -78,11 +83,29 @@ class CropMoneyDisplay {
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
-        newDisplay.addAsSingletonList(fullTitle(title))
+        if (!config.moneyPerHourHideTitle) {
+            newDisplay.addAsSingletonList(fullTitle(title))
+        }
 
         if (!config.cropMilestoneProgress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
             return newDisplay
+        }
+
+        var extraNetherWartPrices = 0.0
+        GardenAPI.cropInHand?.let {
+            val reforgeName = Minecraft.getMinecraft().thePlayer.heldItem?.getReforgeName()
+            toolHasBountiful[it] = reforgeName == "bountiful"
+
+            if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM) {
+                if (!GardenCropMilestoneDisplay.mushroom_cow_nether_warts || it != CropType.NETHER_WART) {
+                    val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
+                    val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
+                    val mushroomPrice = (redPrice + brownPrice) / 2
+                    val perSecond = 20.0 * it.multiplier * mushroomPrice
+                    extraNetherWartPrices = perSecond * 60 * 60
+                }
+            }
         }
 
         val moneyPerHourData = calculateMoneyPerHour()
@@ -138,7 +161,7 @@ class CropMoneyDisplay {
             val moneyArray = moneyPerHourData[internalName]!!
 
             for (price in moneyArray) {
-                val format = format(price)
+                val format = format(price + extraNetherWartPrices)
                 list.add("$coinsColor$format")
                 list.add("§7/")
             }
@@ -237,7 +260,9 @@ class CropMoneyDisplay {
                 }
             }
 
-            moneyPerHours[internalName] = formatNumbers(sellOffer, instantSell, npcPrice)
+            val bountifulMoney = if (toolHasBountiful[crop] == true) speedPerHour * 0.2 else 0.0
+            moneyPerHours[internalName] =
+                formatNumbers(sellOffer + bountifulMoney, instantSell + bountifulMoney, npcPrice + bountifulMoney)
         }
         return moneyPerHours
     }
