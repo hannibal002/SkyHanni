@@ -171,7 +171,7 @@ public class Misc {
     public boolean hideFireBlockParticles = true;
 
     @Expose
-    @ConfigOption(name = "Smoke Particle", desc = "Hide smoke particles.")
+    @ConfigOption(name = "Smoke Particles", desc = "Hide smoke particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean hideSmokeParticles = false;
@@ -200,7 +200,7 @@ public class Misc {
     public boolean chickenHeadTimerDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You lay an egg' chat message'.")
+    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You lay an egg' chat message.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 10)
     public boolean chickenHeadTimerHideChat = true;
