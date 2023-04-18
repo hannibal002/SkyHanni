@@ -34,7 +34,7 @@ class TpsCounter {
             if (ignoreFirstTicks > 0) {
                 ignoreFirstTicks--
                 val current = ignoreFirstTicks + minDataAmount
-                display = "§eTps: §fCalculating.. (${current}s)"
+                display = "§eTps: §f(${current}s)"
                 packetsFromLastSecond = 0
                 return@fixedRateTimer
             }
