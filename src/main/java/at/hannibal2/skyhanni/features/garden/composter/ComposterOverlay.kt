@@ -408,7 +408,9 @@ class ComposterOverlay {
             if (internalName.endsWith("_HELMET")) continue
             if (internalName.endsWith("_CHESTPLATE")) continue
             if (internalName.endsWith("_LEGGINGS")) continue
+            if (internalName == "SPEED_TALISMAN") continue
             val (newId, amount) = NEUItems.getMultiplier(internalName)
+            if (amount <= 9) continue
             val finalAmount =
                 if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                     //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
