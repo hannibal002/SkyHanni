@@ -201,6 +201,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (!inVisitorInventory) return
+        if (event.clickType != 0) return
 
         val visitor = getVisitor(lastClickedNpc) ?: return
 
