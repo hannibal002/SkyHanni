@@ -137,8 +137,14 @@ class GardenVisitorFeatures {
                 list.add(itemStack)
 
                 list.add(Renderable.optionalLink("$name §8x${amount.addSeparators()}", {
-                    LorenzUtils.setTextIntoSign("$amount")
-                }) { Minecraft.getMinecraft().currentScreen is GuiEditSign })
+                    if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                        LorenzUtils.setTextIntoSign("$amount")
+                    } else {
+                        val thePlayer = Minecraft.getMinecraft().thePlayer
+                        val baseName = name.removeColor()
+                        thePlayer.sendChatMessage("/bz $baseName");
+                    }
+                }) { GardenAPI.inGarden() })
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
