@@ -143,7 +143,7 @@ class GardenVisitorFeatures {
                         val thePlayer = Minecraft.getMinecraft().thePlayer
                         thePlayer.sendChatMessage("/bz ${name.removeColor()}");
                     }
-                }) { GardenAPI.inGarden() && InventoryUtils.inStorage() })
+                }) { GardenAPI.inGarden() && !InventoryUtils.inStorage() })
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
