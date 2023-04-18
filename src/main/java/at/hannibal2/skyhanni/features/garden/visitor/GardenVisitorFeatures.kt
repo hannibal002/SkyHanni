@@ -137,8 +137,13 @@ class GardenVisitorFeatures {
                 list.add(itemStack)
 
                 list.add(Renderable.optionalLink("$name §8x${amount.addSeparators()}", {
-                    LorenzUtils.setTextIntoSign("$amount")
-                }) { Minecraft.getMinecraft().currentScreen is GuiEditSign })
+                    if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                        LorenzUtils.setTextIntoSign("$amount")
+                    } else if (!InventoryUtils.inStorage()) {
+                        val thePlayer = Minecraft.getMinecraft().thePlayer
+                        thePlayer.sendChatMessage("/bz ${name.removeColor()}");
+                    }
+                }) { GardenAPI.inGarden() && !InventoryUtils.inStorage() })
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
@@ -201,6 +206,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (!inVisitorInventory) return
+        if (event.clickType != 0) return
 
         val visitor = getVisitor(lastClickedNpc) ?: return
 

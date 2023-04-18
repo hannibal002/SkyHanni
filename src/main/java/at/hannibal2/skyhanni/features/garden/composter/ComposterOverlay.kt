@@ -291,7 +291,7 @@ class ComposterOverlay {
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
 
 
-        val organicMatterPrice = NEUItems.getPrice(organicMatterItem)
+        val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
 
         val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
@@ -300,7 +300,7 @@ class ComposterOverlay {
         val organicMatterPricePer = organicMatterPrice * (organicMatterRequired / organicMatterFactor)
         val organicMatterPricePerPreview = organicMatterPrice * (organicMatterRequiredPreview / organicMatterFactor)
 
-        val fuelPrice = NEUItems.getPrice(fuelItem)
+        val fuelPrice = getPrice(fuelItem)
         val fuelFactor = fuelFactors[fuelItem]!!
 
         val fuelRequired = ComposterAPI.fuelRequiredPer(null)
@@ -309,8 +309,8 @@ class ComposterOverlay {
         val fuelPricePer = fuelPrice * (fuelRequired / fuelFactor)
         val fuelPricePerPreview = fuelPrice * (fuelRequiredPreview / fuelFactor)
 
-        val totalCost = (fuelPricePer + organicMatterPricePer) * multiplier
-        val totalCostPreview = (fuelPricePerPreview + organicMatterPricePerPreview) * multiplierPreview
+        val totalCost = (fuelPricePer + organicMatterPricePer) * timeMultiplier
+        val totalCostPreview = (fuelPricePerPreview + organicMatterPricePerPreview) * timeMultiplierPreview
 
         val materialCostFormatPreview =
             if (totalCost != totalCostPreview) " §c➜ §6" + NumberUtil.format(totalCostPreview) else ""
@@ -319,7 +319,7 @@ class ComposterOverlay {
         newList.addAsSingletonList(materialCostFormat)
 
 
-        val priceCompost = NEUItems.getPrice("COMPOST")
+        val priceCompost = getPrice("COMPOST")
         val profit = (priceCompost - (fuelPricePer + organicMatterPricePer)) * multiplier
         val profitPreview = (priceCompost - (fuelPricePerPreview + organicMatterPricePerPreview)) * multiplierPreview
 
@@ -338,7 +338,7 @@ class ComposterOverlay {
     ): String {
         val map = mutableMapOf<String, Double>()
         for ((internalName, factor) in factors) {
-            map[internalName] = factor / NEUItems.getPrice(internalName)
+            map[internalName] = factor / getPrice(internalName)
         }
 
         var i = 0
@@ -349,7 +349,7 @@ class ComposterOverlay {
 
             val item = NEUItems.getItemStack(internalName)
             val itemName = item.name!!
-            val price = NEUItems.getPrice(internalName)
+            val price = getPrice(internalName)
             val itemsNeeded = ceil(missing / factor)
             val totalPrice = itemsNeeded * price
 
@@ -370,6 +370,13 @@ class ComposterOverlay {
         }
 
         return first!!
+    }
+
+    private fun getPrice(internalName: String): Double {
+        val price = NEUItems.getPrice(internalName)
+        if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
+
+        return price
     }
 
     @SubscribeEvent
@@ -401,7 +408,9 @@ class ComposterOverlay {
             if (internalName.endsWith("_HELMET")) continue
             if (internalName.endsWith("_CHESTPLATE")) continue
             if (internalName.endsWith("_LEGGINGS")) continue
+            if (internalName == "SPEED_TALISMAN") continue
             val (newId, amount) = NEUItems.getMultiplier(internalName)
+            if (amount <= 9) continue
             val finalAmount =
                 if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                     //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error

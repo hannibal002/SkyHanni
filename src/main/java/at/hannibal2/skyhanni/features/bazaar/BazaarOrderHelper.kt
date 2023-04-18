@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarOrderHelper {
     private val bazaarItemNamePattern = "§.§l(?<type>BUY|SELL) (?<name>.*)".toPattern()
-    private val filledPattern = "§7Filled: §6.*§7/.* §a§l100%!".toPattern()
+    private val filledPattern = "§7Filled: §[a6].*§7/.* §a§l100%!".toPattern()
     private val pricePattern = "§7Price per unit: §6(?<number>.*) coins".toPattern()
 
     companion object {
