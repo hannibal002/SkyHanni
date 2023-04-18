@@ -705,9 +705,9 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestWarn = false;
-
+//added consistency and "fixed" grammar
     @Expose
-    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before the Jacobs contest begins.")
+    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before a jacob contest begins.")
     @ConfigEditorSlider(
             minValue = 10,
             maxValue = 60 * 5,
