@@ -99,8 +99,11 @@ class GardenCustomKeybinds {
     }
 
     private fun KeyBinding.unpressKeyIfDown() {
-        if (KeybindHelper.isKeyDown(keyCode)) {
-            (this as AccessorKeyBinding).skyhanni_unpressKey()
+        try {
+            if (KeybindHelper.isKeyDown(keyCode)) {
+                (this as AccessorKeyBinding).skyhanni_unpressKey()
+            }
+        } catch (_: IllegalStateException) {
         }
     }
 
