@@ -291,7 +291,7 @@ class ComposterOverlay {
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
 
 
-        val organicMatterPrice = NEUItems.getPrice(organicMatterItem)
+        val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
 
         val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
@@ -300,7 +300,7 @@ class ComposterOverlay {
         val organicMatterPricePer = organicMatterPrice * (organicMatterRequired / organicMatterFactor)
         val organicMatterPricePerPreview = organicMatterPrice * (organicMatterRequiredPreview / organicMatterFactor)
 
-        val fuelPrice = NEUItems.getPrice(fuelItem)
+        val fuelPrice = getPrice(fuelItem)
         val fuelFactor = fuelFactors[fuelItem]!!
 
         val fuelRequired = ComposterAPI.fuelRequiredPer(null)
@@ -319,7 +319,7 @@ class ComposterOverlay {
         newList.addAsSingletonList(materialCostFormat)
 
 
-        val priceCompost = NEUItems.getPrice("COMPOST")
+        val priceCompost = getPrice("COMPOST")
         val profit = (priceCompost - (fuelPricePer + organicMatterPricePer)) * multiplier
         val profitPreview = (priceCompost - (fuelPricePerPreview + organicMatterPricePerPreview)) * multiplierPreview
 
@@ -338,7 +338,7 @@ class ComposterOverlay {
     ): String {
         val map = mutableMapOf<String, Double>()
         for ((internalName, factor) in factors) {
-            map[internalName] = factor / NEUItems.getPrice(internalName)
+            map[internalName] = factor / getPrice(internalName)
         }
 
         var i = 0
@@ -349,7 +349,7 @@ class ComposterOverlay {
 
             val item = NEUItems.getItemStack(internalName)
             val itemName = item.name!!
-            val price = NEUItems.getPrice(internalName)
+            val price = getPrice(internalName)
             val itemsNeeded = ceil(missing / factor)
             val totalPrice = itemsNeeded * price
 
@@ -370,6 +370,13 @@ class ComposterOverlay {
         }
 
         return first!!
+    }
+
+    private fun getPrice(internalName: String): Double {
+        val price = NEUItems.getPrice(internalName)
+        if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
+
+        return price
     }
 
     @SubscribeEvent
