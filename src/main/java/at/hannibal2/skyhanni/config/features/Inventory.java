@@ -146,7 +146,7 @@ public class Inventory {
 
     @Expose
     @ConfigOption(name = "Item Stars",
-            desc = "Show a compact star count in the item name for all items")
+            desc = "Show a compact star count in the item name for all items.")
     @ConfigEditorBoolean
     public boolean itemStars = false;
 
