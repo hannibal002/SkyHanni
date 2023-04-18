@@ -309,8 +309,8 @@ class ComposterOverlay {
         val fuelPricePer = fuelPrice * (fuelRequired / fuelFactor)
         val fuelPricePerPreview = fuelPrice * (fuelRequiredPreview / fuelFactor)
 
-        val totalCost = (fuelPricePer + organicMatterPricePer) * multiplier
-        val totalCostPreview = (fuelPricePerPreview + organicMatterPricePerPreview) * multiplierPreview
+        val totalCost = (fuelPricePer + organicMatterPricePer) * timeMultiplier
+        val totalCostPreview = (fuelPricePerPreview + organicMatterPricePerPreview) * timeMultiplierPreview
 
         val materialCostFormatPreview =
             if (totalCost != totalCostPreview) " §c➜ §6" + NumberUtil.format(totalCostPreview) else ""
