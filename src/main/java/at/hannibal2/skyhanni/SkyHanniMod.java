@@ -271,6 +271,7 @@ public class SkyHanniMod {
         loadModule(new AshfangMinisNametagHider());
         loadModule(new GardenTeleportPadInventoryNumber());
         loadModule(new ComposterOverlay());
+        loadModule(new GardenCropMilestoneFix());
 
         Commands.INSTANCE.init();
 
