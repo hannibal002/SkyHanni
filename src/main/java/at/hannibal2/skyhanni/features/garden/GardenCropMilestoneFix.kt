@@ -35,7 +35,7 @@ class GardenCropMilestoneFix {
         val progress = progressCrops * (percentage / 100)
         val smallestPercentage = progressCrops * 0.0005
 
-        val crop = CropType.getByName(cropName)
+        val crop = CropType.getByNameOrNull(cropName)
         if (crop == null) {
             LorenzUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
             return
