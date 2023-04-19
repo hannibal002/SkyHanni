@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -66,7 +66,7 @@ class ComposterOverlay {
         var inInventory = false
     }
 
-    var garden: JsonObject? = null
+    var garden: GardenJson? = null
 
     @SubscribeEvent
     fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
@@ -396,17 +396,16 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        garden = event.getConstant("Garden")!!
+        garden = event.getConstant<GardenJson>("Garden")!!
         updateOrganicMatterFactors()
     }
 
     private fun updateOrganicMatterFactors() {
         try {
             val garden = this.garden ?: return
-            organicMatterFactors = updateOrganicMatterFactors(
-                garden["organic_matter"].asJsonObject.entrySet().associate { it.key to it.value.asDouble })
+            organicMatterFactors = updateOrganicMatterFactors(garden.organic_matter)
+            fuelFactors = garden.fuel
 
-            fuelFactors = garden["fuel"].asJsonObject.entrySet().associate { it.key to it.value.asDouble }
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
