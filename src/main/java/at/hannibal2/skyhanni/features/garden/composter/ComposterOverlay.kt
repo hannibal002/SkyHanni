@@ -402,12 +402,11 @@ class ComposterOverlay {
 
     private fun updateOrganicMatterFactors() {
         try {
-            garden?.run {
-                organicMatterFactors = updateOrganicMatterFactors(
-                    this["organic_matter"].asJsonObject.entrySet().associate { it.key to it.value.asDouble })
+            val garden = this.garden ?: return
+            organicMatterFactors = updateOrganicMatterFactors(
+                garden["organic_matter"].asJsonObject.entrySet().associate { it.key to it.value.asDouble })
 
-                fuelFactors = this["fuel"].asJsonObject.entrySet().associate { it.key to it.value.asDouble }
-            }
+            fuelFactors = garden["fuel"].asJsonObject.entrySet().associate { it.key to it.value.asDouble }
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
