@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
-import at.hannibal2.skyhanni.data.MayorElectionData
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -151,8 +151,8 @@ class GardenCropMilestoneDisplay {
 
     private fun finneganPerkActive(): Boolean {
         val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
-        val perkActive = MayorElectionData.isPerkActive("Finnegan", "Farming Simulator")
-        MayorElectionData.currentCandidate?.let {
+        val perkActive = MayorElection.isPerkActive("Finnegan", "Farming Simulator")
+        MayorElection.currentCandidate?.let {
 
         }
         return forcefullyEnabledAlwaysFinnegan || perkActive

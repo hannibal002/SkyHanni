@@ -145,7 +145,7 @@ public class SkyHanniMod {
         loadModule(new GuiEditManager());
         loadModule(UpdateManager.INSTANCE);
         loadModule(new CropAccessoryData());
-        loadModule(new MayorElectionData());
+        loadModule(new MayorElection());
         loadModule(new GardenComposterUpgradesData());
 
         // APIs
