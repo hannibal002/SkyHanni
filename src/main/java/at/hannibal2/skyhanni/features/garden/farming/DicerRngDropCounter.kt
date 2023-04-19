@@ -118,7 +118,7 @@ class DicerRngDropCounter {
     fun onConfigLoad(event: ConfigLoadEvent) {
         for ((internalName, amount) in SkyHanniMod.feature.hidden.gardenDicerRngDrops) {
             val split = internalName.split(".")
-            val crop = CropType.getByNameNoNull(split[0])
+            val crop = CropType.getByName(split[0])
             val rarityName = split[1]
             val rarity = DropRarity.valueOf(rarityName)
             drops[crop]!![rarity] = amount

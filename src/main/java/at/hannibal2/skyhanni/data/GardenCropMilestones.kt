@@ -44,7 +44,7 @@ class GardenCropMilestones {
                 var matcher = cropPattern.matcher(line)
                 if (matcher.matches()) {
                     val name = matcher.group(1)
-                    crop = CropType.getByName(name) ?: continue
+                    crop = CropType.getByNameOrNull(name) ?: continue
                 }
                 matcher = totalPattern.matcher(line)
                 if (matcher.matches()) {

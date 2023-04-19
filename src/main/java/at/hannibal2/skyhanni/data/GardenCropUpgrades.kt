@@ -29,7 +29,7 @@ class GardenCropUpgrades {
         if (event.inventoryName != "Crop Upgrades") return
         event.inventoryItems.forEach { (_, item) ->
             val crop = item.name?.removeColor()?.let {
-                CropType.getByName(it)
+                CropType.getByNameOrNull(it)
             } ?: return@forEach
             val level = item.getLore().firstNotNullOfOrNull {
                 tierPattern.matchEntire(it)?.groups?.get(1)?.value?.toIntOrNull()
