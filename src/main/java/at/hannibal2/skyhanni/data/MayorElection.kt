@@ -3,8 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.MayorData
-import at.hannibal2.skyhanni.utils.MayorData.Candidate
+import at.hannibal2.skyhanni.utils.jsonobjects.MayorJson
 import com.google.gson.GsonBuilder
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -14,7 +13,7 @@ import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class MayorElectionData {
+class MayorElection {
     private var tick = 0
     private var lastUpdate = 0L
 
@@ -23,9 +22,9 @@ class MayorElectionData {
         .create()
 
     companion object {
-        var rawMayorData: MayorData? = null
-        var candidates = mapOf<Int, Candidate>()
-        var currentCandidate: Candidate? = null
+        var rawMayorData: MayorJson? = null
+        var candidates = mapOf<Int, MayorJson.Candidate>()
+        var currentCandidate: MayorJson.Candidate? = null
 
         fun isPerkActive(mayor: String, perk: String): Boolean {
             return currentCandidate?.let { currentCandidate ->
@@ -53,9 +52,9 @@ class MayorElectionData {
             SkyHanniMod.coroutineScope.launch {
                 val url = "https://api.hypixel.net/resources/skyblock/election"
                 val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
-                rawMayorData = gson.fromJson(jsonObject, MayorData::class.java)
+                rawMayorData = gson.fromJson(jsonObject, MayorJson::class.java)
                 val data = rawMayorData ?: return@launch
-                val map = mutableMapOf<Int, Candidate>()
+                val map = mutableMapOf<Int, MayorJson.Candidate>()
                 map put data.mayor.election.getPairs()
                 data.current?.let {
                     map put data.current.getPairs()
@@ -81,9 +80,9 @@ class MayorElectionData {
         currentCandidate = candidates[currentYear]
     }
 
-    private fun MayorData.Election.getPairs() = year + 1 to candidates.bestCandidate()
+    private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
-    private fun List<MayorData.Candidate>.bestCandidate() = maxBy { it.votes }
+    private fun List<MayorJson.Candidate>.bestCandidate() = maxBy { it.votes }
 
     private infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
         this[pairs.first] = pairs.second
