@@ -22,11 +22,6 @@ public class Diana {
     @ConfigOption(name = "Smooth Transition", desc = "Show the way from one burrow to another smoothly.")
     @ConfigEditorBoolean
     public boolean burrowSmoothTransition = false;
-//Add a description for "Griffin Burrows" as users may not know what it does, including me.
-    @Expose
-    @ConfigOption(name = "Griffin Burrows", desc = "")
-    @ConfigEditorBoolean
-    public boolean griffinBurrows = false;
 
     @Expose
     @ConfigOption(name = "Nearest Warp", desc = "Warps to the nearest warp point on the hub, if closer to the next burrow.")
