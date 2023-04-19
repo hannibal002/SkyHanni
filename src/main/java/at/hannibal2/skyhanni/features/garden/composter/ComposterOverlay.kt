@@ -18,11 +18,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.util.*
 import kotlin.math.ceil
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -63,6 +65,8 @@ class ComposterOverlay {
     companion object {
         var inInventory = false
     }
+
+    var garden: JsonObject? = null
 
     @SubscribeEvent
     fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
@@ -128,6 +132,11 @@ class ComposterOverlay {
     }
 
     private fun update() {
+        if (organicMatterFactors.isEmpty()) {
+            organicMatterDisplay = Collections.singletonList(listOf("§cSkyHanni composter error:", "§cRepo data not loaded!"))
+            return
+        }
+
         if (inComposter) {
             organicMatterDisplay = drawOrganicMatterDisplay()
             fuelExtraDisplay = drawFuelExtraDisplay()
@@ -330,6 +339,12 @@ class ComposterOverlay {
         newList.addAsSingletonList("")
     }
 
+    private val mutableMap: MutableMap<String, Double>
+        get() {
+            val baseValues = mutableMapOf<String, Double>()
+            return baseValues
+        }
+
     private fun fillList(
         bigList: MutableList<List<Any>>,
         factors: Map<String, Double>,
@@ -380,21 +395,31 @@ class ComposterOverlay {
     }
 
     @SubscribeEvent
+    fun onRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
+        updateOrganicMatterFactors()
+    }
+
+    @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
+        garden = event.getConstant("Garden")!!
+        updateOrganicMatterFactors()
+    }
+
+    private fun updateOrganicMatterFactors() {
         try {
-            val garden = event.getConstant("Garden")!!
+            garden?.let {
+                val baseValues = mutableMapOf<String, Double>()
+                for ((name, value) in it["organic_matter"].asJsonObject.entrySet()) {
+                    baseValues[name] = value.asDouble
+                }
+                organicMatterFactors = updateOrganicMatterFactors(baseValues)
 
-            val baseValues = mutableMapOf<String, Double>()
-            for ((name, value) in garden["organic_matter"].asJsonObject.entrySet()) {
-                baseValues[name] = value.asDouble
+                val fuelMap = mutableMapOf<String, Double>()
+                for ((name, value) in it["fuel"].asJsonObject.entrySet()) {
+                    fuelMap[name] = value.asDouble
+                }
+                fuelFactors = fuelMap
             }
-            organicMatterFactors = updateOrganicMatterFactors(baseValues)
-
-            val fuelMap = mutableMapOf<String, Double>()
-            for ((name, value) in garden["fuel"].asJsonObject.entrySet()) {
-                fuelMap[name] = value.asDouble
-            }
-            fuelFactors = fuelMap
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
