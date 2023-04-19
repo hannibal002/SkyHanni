@@ -302,6 +302,8 @@ class CropMoneyDisplay {
                 if (!BazaarApi.isBazaarItem(internalName)) continue
                 if (internalName == "ENCHANTED_PAPER") continue
                 if (internalName == "ENCHANTED_BREAD") continue
+                if (internalName == "SIMPLE_CARROT_CANDY") continue
+                if (internalName == "BOX_OF_SEEDS") continue
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
                 val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
