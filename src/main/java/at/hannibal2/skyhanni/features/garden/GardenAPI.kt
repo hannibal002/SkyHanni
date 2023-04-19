@@ -109,7 +109,7 @@ object GardenAPI {
         return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Int = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1
+    fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
     fun CropType.getSpeed(): Int {
         val speed = cropsPerSecond[this]

@@ -29,7 +29,7 @@ import kotlin.concurrent.fixedRateTimer
 class GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
     private var mushroomCowPerkDisplay = listOf<List<Any>>()
-    private val cultivatingData = mutableMapOf<CropType, Int>()
+    private val cultivatingData = mutableMapOf<CropType, Long>()
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
 //    val cropMilestoneLevelUpPattern = Pattern.compile("  §r§b§lGARDEN MILESTONE §3(.*) §8XXIII➜§3(.*)")
@@ -117,11 +117,11 @@ class GardenCropMilestoneDisplay {
         try {
             val item = event.itemStack
             val counter = GardenAPI.readCounter(item)
-            if (counter == -1) return
+            if (counter == -1L) return
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
-                val addedCounter = counter - old
+                val addedCounter = (counter - old).toInt()
 
                 if (GardenCropMilestones.cropCounter.isEmpty()) {
                     for (innerCrop in CropType.values()) {
@@ -283,7 +283,7 @@ class GardenCropMilestoneDisplay {
         lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
 
         lastItemInHand?.let {
-            if (GardenAPI.readCounter(it) == -1) {
+            if (GardenAPI.readCounter(it) == -1L) {
                 lineMap[3] = Collections.singletonList("§cWarning: You need Cultivating!")
                 return formatDisplay(lineMap)
             }
