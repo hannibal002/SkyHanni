@@ -164,10 +164,12 @@ class DiscordRPCManager: IPCListener {
             1 ->  DiscordStatus.LOCATION
             2 ->  DiscordStatus.PURSE
             3 ->  DiscordStatus.BITS
-            4 ->  DiscordStatus.ITEM
-            5 ->  DiscordStatus.TIME
-            6 ->  DiscordStatus.PROFILE
-            7 ->  DiscordStatus.CUSTOM
+            4 ->  DiscordStatus.STATS
+            5 ->  DiscordStatus.ITEM
+            6 ->  DiscordStatus.TIME
+            7 ->  DiscordStatus.PROFILE
+            8 ->  DiscordStatus.SLAYER
+            9 ->  DiscordStatus.CUSTOM
             else ->  DiscordStatus.NONE
         }
     }

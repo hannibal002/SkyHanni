@@ -249,9 +249,11 @@ public class Misc {
         "Location",
         "Purse",
         "Bits",
+        "Stats",
         "Held Item",
         "Skyblock Date",
         "Profile (Fruit)",
+        "Slayer",
         "Custom"
     })
     @ConfigAccordionId(id = 12)
@@ -264,9 +266,11 @@ public class Misc {
         "Location",
         "Purse",
         "Bits",
+        "Stats",
         "Held Item",
         "Skyblock Date",
         "Profile (Fruit)",
+        "Slayer",
         "Custom"
     })
     @ConfigAccordionId(id = 12)

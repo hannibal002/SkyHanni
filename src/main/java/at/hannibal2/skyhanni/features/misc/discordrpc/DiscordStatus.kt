@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 // SkyblockAddons code, adapted for SkyHanni
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
+import java.util.regex.Pattern
 
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) { // implements "ButtonSelect:SelectItem". no idea how to translate that into skyhanni
 
@@ -56,12 +58,24 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             }
         }
 
-        if (bits ==  "1") {
-            "1 Bit"
+        when (bits) {
+            "1" -> "1 Bit"
+            "" -> "0 Bits"
+            else -> "$bits Bits"
         }
-        else {
-            "$bits Bits"
+    }),
+
+    STATS({
+        val groups = ActionBarData.groups
+        var statString = ""
+        for (item in groups.indices) {
+            when(groups[item]) {
+                "❤" ->  statString = "❤${groups[item - 1]} "
+                "❈ Defense" ->  statString = "$statString❈${groups[item - 1]} "
+                "✎ Mana" ->  statString = "$statString✎${groups[item - 1]} "
+            }
         }
+        statString
     }),
 
     // I'm not doing zealot counter. Who even farms those anymore?
@@ -103,11 +117,34 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         HypixelData.profileName.firstLetterUppercase()
     }),
 
+    SLAYER({
+        var slayerName = ""
+        var slayerLevel = ""
+        var bossAlive = "spawning"
+        val slayerRegex = Pattern.compile("((?:\\w| )*) ([IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
+
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            val noColorLine = line.removeColor()
+            val match = slayerRegex.matcher(noColorLine)
+            if (match.matches()) {
+                slayerName = match.group(1)
+                slayerLevel = match.group(2)
+            }
+            else if (noColorLine ==  "Slay the boss!") bossAlive = "slaying"
+            else if (noColorLine ==  "Boss slain!") bossAlive = "slain"
+        }
+
+        if (slayerLevel ==  "") "Planning to do a slayer quest"// selected slayer in rpc but hasn't started a quest
+        else if (bossAlive ==  "spawning") "Spawning a $slayerName $slayerLevel boss."
+        else if (bossAlive ==  "slaying") "Slaying a $slayerName $slayerLevel boss."
+        else if (bossAlive ==  "slain") "Finished slaying a $slayerName $slayerLevel boss."
+        else "Something went wrong with slayer detection!"
+    }),
+
     CUSTOM({
         SkyHanniMod.feature.misc.custom // custom field in the config
     })
 
-    // Someone else can do stats (requires actionbar shenanigans), slayers (requires scoreboard: regex + ScoreboardData.sidebarLinesFormatted), or auto (requires slayers) if they want to
     // See SkyblockAddons code for reference
     ;
 
