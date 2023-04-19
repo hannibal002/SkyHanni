@@ -115,7 +115,7 @@ public class Dungeon {
     public boolean messageFilter = false;
 
     @Expose
-    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in a dungeon.")
+    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean messageFilterKeysAndDoors = false;
