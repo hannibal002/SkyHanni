@@ -133,7 +133,8 @@ class ComposterOverlay {
 
     private fun update() {
         if (organicMatterFactors.isEmpty()) {
-            organicMatterDisplay = Collections.singletonList(listOf("§cSkyHanni composter error:", "§cRepo data not loaded!"))
+            organicMatterDisplay =
+                Collections.singletonList(listOf("§cSkyHanni composter error:", "§cRepo data not loaded!"))
             return
         }
 
@@ -339,12 +340,6 @@ class ComposterOverlay {
         newList.addAsSingletonList("")
     }
 
-    private val mutableMap: MutableMap<String, Double>
-        get() {
-            val baseValues = mutableMapOf<String, Double>()
-            return baseValues
-        }
-
     private fun fillList(
         bigList: MutableList<List<Any>>,
         factors: Map<String, Double>,
@@ -407,18 +402,11 @@ class ComposterOverlay {
 
     private fun updateOrganicMatterFactors() {
         try {
-            garden?.let {
-                val baseValues = mutableMapOf<String, Double>()
-                for ((name, value) in it["organic_matter"].asJsonObject.entrySet()) {
-                    baseValues[name] = value.asDouble
-                }
-                organicMatterFactors = updateOrganicMatterFactors(baseValues)
+            garden?.run {
+                organicMatterFactors = updateOrganicMatterFactors(
+                    this["organic_matter"].asJsonObject.entrySet().associate { it.key to it.value.asDouble })
 
-                val fuelMap = mutableMapOf<String, Double>()
-                for ((name, value) in it["fuel"].asJsonObject.entrySet()) {
-                    fuelMap[name] = value.asDouble
-                }
-                fuelFactors = fuelMap
+                fuelFactors = this["fuel"].asJsonObject.entrySet().associate { it.key to it.value.asDouble }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -426,7 +414,7 @@ class ComposterOverlay {
         }
     }
 
-    private fun updateOrganicMatterFactors(baseValues: MutableMap<String, Double>): Map<String, Double> {
+    private fun updateOrganicMatterFactors(baseValues: Map<String, Double>): Map<String, Double> {
         val map = mutableMapOf<String, Double>()
         for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
             if (internalName.endsWith("_BOOTS")) continue
