@@ -386,7 +386,8 @@ class ComposterOverlay {
     }
 
     private fun getPrice(internalName: String): Double {
-        val price = NEUItems.getPrice(internalName)
+        val useSellPrice = config.composterOverlayPriceType == 1
+        val price = NEUItems.getPrice(internalName, useSellPrice)
         if (internalName == "BIOFUEL" && price > 20_000) return 20_000.0
 
         return price
