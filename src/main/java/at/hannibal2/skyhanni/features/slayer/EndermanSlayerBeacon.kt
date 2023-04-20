@@ -26,6 +26,7 @@ class EndermanSlayerBeacon {
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private val flyingBeacons = mutableListOf<EntityArmorStand>()
     private val sittingBeacon = mutableListOf<LorenzVec>()
+    private val logger = LorenzLogger("slayer/voildgloom_beacon")
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
@@ -35,6 +36,7 @@ class EndermanSlayerBeacon {
         if (entity is EntityEnderman) {
             if (hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
                 endermenWithBeacons.add(entity)
+                logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
             }
         }
 
@@ -42,6 +44,7 @@ class EndermanSlayerBeacon {
             val stack = entity.inventory[4] ?: return
             if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
                 flyingBeacons.add(entity)
+                logger.log("Added flying beacons at ${entity.getLorenzVec()}")
             }
         }
     }
@@ -90,9 +93,11 @@ class EndermanSlayerBeacon {
                 if (armorStand != null) {
                     flyingBeacons.remove(armorStand)
                     sittingBeacon.add(location)
+                    logger.log("Replaced flying beacon with sitting beacon at $location")
                 }
             } else {
                 if (location in sittingBeacon) {
+                    logger.log("Removed sitting beacon $location")
                     sittingBeacon.remove(location)
                 }
             }
@@ -113,5 +118,6 @@ class EndermanSlayerBeacon {
         endermenWithBeacons.clear()
         flyingBeacons.clear()
         sittingBeacon.clear()
+        logger.log("Reset everything (world change)")
     }
 }
