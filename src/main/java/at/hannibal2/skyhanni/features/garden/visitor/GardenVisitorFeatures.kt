@@ -142,6 +142,7 @@ class GardenVisitorFeatures {
                     } else if (!InventoryUtils.inStorage()) {
                         val thePlayer = Minecraft.getMinecraft().thePlayer
                         thePlayer.sendChatMessage("/bz ${name.removeColor()}");
+                        OSUtils.copyToClipboard("$amount")
                     }
                 }) { GardenAPI.inGarden() && !InventoryUtils.inStorage() })
 
