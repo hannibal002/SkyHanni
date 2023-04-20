@@ -2,4 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import net.minecraft.item.ItemStack
 
-class OwnInventorItemUpdateEvent(val itemStack: ItemStack): LorenzEvent()
+/**
+ * Note: This event is async and may not be executed on the main minecraft thread.
+ */
+data class OwnInventorItemUpdateEvent(val itemStack: ItemStack): LorenzEvent()
