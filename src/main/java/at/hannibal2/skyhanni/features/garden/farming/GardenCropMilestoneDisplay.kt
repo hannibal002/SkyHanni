@@ -32,7 +32,6 @@ class GardenCropMilestoneDisplay {
     private val cultivatingData = mutableMapOf<CropType, Long>()
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
-//    val cropMilestoneLevelUpPattern = Pattern.compile("  §r§b§lGARDEN MILESTONE §3(.*) §8XXIII➜§3(.*)")
 
     private var lastPlaySoundTime = 0L
 
@@ -63,15 +62,6 @@ class GardenCropMilestoneDisplay {
         if (event.message == "§a§lUNCOMMON DROP! §r§eDicer dropped §r§f64x §r§fPumpkin§r§e!") {
             CropType.PUMPKIN.setCounter(CropType.PUMPKIN.getCounter() + 64)
         }
-//        if (config.cropMilestoneWarnClose) {
-//            val matcher = cropMilestoneLevelUpPattern.matcher(event.message)
-//            if (matcher.matches()) {
-//                val cropType = matcher.group(1)
-//                val newLevel = matcher.group(2).romanToDecimalIfNeeded()
-//                LorenzUtils.debug("found milestone messsage!")
-//                SendTitleHelper.sendTitle("§b$cropType $newLevel", 1_500)
-//            }
-//        }
     }
 
     @SubscribeEvent
