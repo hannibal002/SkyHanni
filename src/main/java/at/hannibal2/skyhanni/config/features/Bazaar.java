@@ -13,7 +13,7 @@ public class Bazaar {
     public boolean orderHelper = false;
 
     @Expose
-    @ConfigOption(name = "Best Sell Method", desc = "Difference between sell instantly and sell offer.")
+    @ConfigOption(name = "Best Sell Method", desc = "Show the price difference between sell instantly and sell offer.")
     @ConfigEditorBoolean
     public boolean bestSellMethod = false;
 

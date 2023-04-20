@@ -23,7 +23,7 @@ public class Dungeon {
     public Position showMileStonesDisplayPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeons.")
+    @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeon.")
     @ConfigEditorBoolean
     public boolean deathCounterDisplay = false;
 
@@ -105,7 +105,7 @@ public class Dungeon {
     public boolean hideHealerOrbs = false;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the golden fairy that follows the healer in dungeon.")
+    @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the golden fairy that follows the healer in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean hideHealerFairy = false;
@@ -115,7 +115,7 @@ public class Dungeon {
     public boolean messageFilter = false;
 
     @Expose
-    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in dungeon.")
+    @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean messageFilterKeysAndDoors = false;
