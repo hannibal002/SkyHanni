@@ -142,8 +142,7 @@ class GardenVisitorFeatures {
                     if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                         LorenzUtils.setTextIntoSign("$amount")
                     } else if (!InventoryUtils.inStorage()) {
-                        val thePlayer = Minecraft.getMinecraft().thePlayer
-                        thePlayer.sendChatMessage("/bz ${name.removeColor()}");
+                        LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
                         OSUtils.copyToClipboard("$amount")
                     }
                 }) { GardenAPI.inGarden() && !InventoryUtils.inStorage() })

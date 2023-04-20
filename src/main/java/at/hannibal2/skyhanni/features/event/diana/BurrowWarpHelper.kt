@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
 import org.lwjgl.input.Keyboard
@@ -29,8 +28,7 @@ class BurrowWarpHelper {
             currentWarp?.let {
                 if (System.currentTimeMillis() > lastWarpTime + 5_000) {
                     lastWarpTime = System.currentTimeMillis()
-                    val thePlayer = Minecraft.getMinecraft().thePlayer
-                    thePlayer.sendChatMessage("/warp " + currentWarp?.name)
+                    LorenzUtils.sendCommandToServer("warp " + currentWarp?.name)
                     lastWarp = currentWarp
                 }
             }
