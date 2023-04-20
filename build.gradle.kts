@@ -85,7 +85,7 @@ loom {
             // If you don't want mixins, remove these lines
             property("mixin.debug", "true")
             property("asmhelper.verbose", "true")
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--tweakClass", "at.hannibal2.skyhanni.loader.SkyhanniTweaker")
             arg("--mixin", "mixins.skyhanni.json")
             val modFiles = devenvMod
                 .incoming.artifacts.resolvedArtifacts.get()
@@ -123,7 +123,7 @@ tasks.withType(Jar::class) {
         this["ForceLoadAsMod"] = "true"
 
         // If you don't want mixins, remove these lines
-        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
+        this["TweakClass"] = "at.hannibal2.skyhanni.loader.SkyhanniTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
 }
