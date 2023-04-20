@@ -790,6 +790,12 @@ public class Garden {
     public boolean composterOverlay = true;
 
     @Expose
+    @ConfigOption(name = "Overlay Price", desc = "Toggle for bazaar 'buy order' vs 'instant buy' price in composter overlay.")
+    @ConfigEditorDropdown(values = {"Instant Buy", "Buy Order"})
+    @ConfigAccordionId(id = 17)
+    public int composterOverlayPriceType = 0;
+
+    @Expose
     public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
 
     @Expose
