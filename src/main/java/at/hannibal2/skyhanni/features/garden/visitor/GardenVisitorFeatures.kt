@@ -400,7 +400,7 @@ class GardenVisitorFeatures {
                 val time = System.currentTimeMillis() - SBInfo.getInstance().joinedWorld
                 val removed = it !in visitorsInTab && time > 2_000
                 if (removed) {
-                    logger.log("Removed old visitor: $it")
+                    logger.log("Removed old visitor: '$it'")
                 }
                 removed
             }) {
@@ -409,7 +409,7 @@ class GardenVisitorFeatures {
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
                 visitors[name] = Visitor(name, status = VisitorStatus.NEW)
-                logger.log("New visitor detected: $name")
+                logger.log("New visitor detected: '$name'")
                 if (config.visitorNotificationTitle) {
                     TitleUtils.sendTitle("§eNew Visitor", 5_000)
                 }
@@ -494,7 +494,7 @@ class GardenVisitorFeatures {
         if (old == newStatus) return
         visitor.status = newStatus
         val name = visitor.visitorName.removeColor()
-        logger.log("Visitor status change for $name: $old->$newStatus ($reason)")
+        logger.log("Visitor status change for '$name': $old -> $newStatus ($reason)")
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
