@@ -44,6 +44,7 @@ class GardenVisitorFeatures {
     private val copperPattern = " §8\\+§c(.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(.*) §7Garden Experience".toPattern()
     private val config get() = SkyHanniMod.feature.garden
+    private val logger = LorenzLogger("garden/visitors")
 
     companion object {
         var inVisitorInventory = false
@@ -142,6 +143,7 @@ class GardenVisitorFeatures {
                     } else if (!InventoryUtils.inStorage()) {
                         val thePlayer = Minecraft.getMinecraft().thePlayer
                         thePlayer.sendChatMessage("/bz ${name.removeColor()}");
+                        OSUtils.copyToClipboard("$amount")
                     }
                 }) { GardenAPI.inGarden() && !InventoryUtils.inStorage() })
 
@@ -170,7 +172,9 @@ class GardenVisitorFeatures {
                 if (config.visitorItemPreview) {
                     val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
                     if (items == null) {
-                        LorenzUtils.debug("Visitor '$visitor' has no items in repo!")
+                        val text = "Visitor '$visitor' has no items in repo!"
+                        logger.log(text)
+                        LorenzUtils.debug(text)
                         list.add(" §7(§c?§7)")
                         continue
                     }
@@ -377,25 +381,35 @@ class GardenVisitorFeatures {
                 val name = fromHypixelName(line)
 
                 // Hide hypixel watchdog entries
-                if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) continue
+                if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
+                    logger.log("Ignore wrong red name: '$name'")
+                    continue
+                }
 
 
                 //hide own player name
-                if (name.contains(LorenzUtils.getPlayerName())) continue
+                if (name.contains(LorenzUtils.getPlayerName())) {
+                    logger.log("Ignore wrong own name: '$name'")
+                    continue
+                }
 
                 visitorsInTab.add(name)
             }
         }
         if (visitors.keys.removeIf {
                 val time = System.currentTimeMillis() - SBInfo.getInstance().joinedWorld
-                it !in visitorsInTab && time > 2_000
+                val removed = it !in visitorsInTab && time > 2_000
+                if (removed) {
+                    logger.log("Removed old visitor: '$it'")
+                }
+                removed
             }) {
             updateDisplay()
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
                 visitors[name] = Visitor(name, status = VisitorStatus.NEW)
-//                LorenzUtils.debug("new visitor '$name'")
+                logger.log("New visitor detected: '$name'")
                 if (config.visitorNotificationTitle) {
                     TitleUtils.sendTitle("§eNew Visitor", 5_000)
                 }
@@ -480,9 +494,7 @@ class GardenVisitorFeatures {
         if (old == newStatus) return
         visitor.status = newStatus
         val name = visitor.visitorName.removeColor()
-        val message = "Visitor status change for $name: $old->$newStatus ($reason)"
-        println(message)
-//        LorenzUtils.debug(message)
+        logger.log("Visitor status change for '$name': $old -> $newStatus ($reason)")
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {

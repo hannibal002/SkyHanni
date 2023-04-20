@@ -118,7 +118,7 @@ class GardenNextJacobContest {
             for (line in lore) {
                 val matcherCrop = patternCrop.matcher(line)
                 if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByNameNoNull(matcherCrop.group(1)))
+                crops.add(CropType.getByName(matcherCrop.group(1)))
             }
             val contest = FarmingContest(startTime + contestDuration, crops)
             contests[startTime] = contest

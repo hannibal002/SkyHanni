@@ -45,7 +45,6 @@ class BazaarCancelledBuyOrderClipboard {
             event.blockedReason = "bazaar cancelled buy order clipbaord"
             val coins = matcher.group(1)
 
-
             LorenzUtils.chat("§e[SkyHanni] Bazaar buy order cancelled. $latestAmount saved to clipboard. ($coins coins)")
 
             latestAmount?.let { OSUtils.copyToClipboard(it.replace(",", "")) }
