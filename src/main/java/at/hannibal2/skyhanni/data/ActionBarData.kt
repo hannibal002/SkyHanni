@@ -17,6 +17,7 @@ class ActionBarData {
 
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
+        groups = arrayListOf()
         if (!LorenzUtils.inSkyBlock) return
 
         val matcher = pattern.matcher(event.message)
