@@ -950,7 +950,7 @@ public class Garden {
     public boolean fungiCutterWarn = true;
 
     @Expose
-    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto major detection fails.")
+    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
     public boolean forcefullyEnabledAlwaysFinnegan = false;
 
