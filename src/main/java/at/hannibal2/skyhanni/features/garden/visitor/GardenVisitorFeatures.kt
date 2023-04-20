@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
+import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -203,7 +204,9 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
-            update()
+            MinecraftExecutor.OnThread.execute {
+                update()
+            }
         }
     }
 
