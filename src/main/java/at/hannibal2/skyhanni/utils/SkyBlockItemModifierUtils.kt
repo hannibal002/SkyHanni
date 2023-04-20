@@ -11,9 +11,9 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
 
-    fun ItemStack.getCultivatingCounter() = getAttributeInt("farmed_cultivating")
+    fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
-    fun ItemStack.getHoeCounter() = getAttributeInt("mined_crops")
+    fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
     fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
         it - 5 - if (getInternalName() == "STONK_PICKAXE") 1 else 0
@@ -140,6 +140,9 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.getAttributeInt(label: String) =
         getExtraAttributes()?.getInteger(label)?.takeUnless { it == 0 }
+
+    private fun ItemStack.getAttributeLong(label: String) =
+        getExtraAttributes()?.getLong(label)?.takeUnless { it == 0L }
 
     private fun ItemStack.getAttributeBoolean(label: String): Boolean {
         return getExtraAttributes()?.hasKey(label) ?: false

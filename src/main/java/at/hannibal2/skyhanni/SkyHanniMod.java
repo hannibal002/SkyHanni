@@ -146,7 +146,7 @@ public class SkyHanniMod {
         loadModule(new GuiEditManager());
         loadModule(UpdateManager.INSTANCE);
         loadModule(new CropAccessoryData());
-        loadModule(new MayorElectionData());
+        loadModule(new MayorElection());
         loadModule(new GardenComposterUpgradesData());
         loadModule(new ActionBarData());
 
@@ -274,6 +274,7 @@ public class SkyHanniMod {
         loadModule(new GardenTeleportPadInventoryNumber());
         loadModule(new ComposterOverlay());
         loadModule(new DiscordRPCManager());
+        loadModule(new GardenCropMilestoneFix());
 
         Commands.INSTANCE.init();
 

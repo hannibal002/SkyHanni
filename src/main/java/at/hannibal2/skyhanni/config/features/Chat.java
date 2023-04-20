@@ -60,7 +60,7 @@ public class Chat {
 
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in crystal hollows. " +
-            "(Except power numbers over 1k, Prehistoric Egg and Robotron Parts)")
+            "(Except powder numbers over 1k, Prehistoric Egg and Automaton Parts)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean powderMining = true;

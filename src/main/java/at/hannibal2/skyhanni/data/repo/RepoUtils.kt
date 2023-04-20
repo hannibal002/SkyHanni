@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.repo
 
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -77,11 +76,7 @@ object RepoUtils {
         return false
     }
 
-    fun getConstant(repoLocation: File, constant: String, gson: Gson): JsonObject? {
-        return getConstant(repoLocation, constant, gson, JsonObject::class.java)
-    }
-
-    private fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?): T? {
+    fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?): T? {
         if (repo.exists()) {
             val jsonFile = File(repo, "constants/$constant.json")
             try {

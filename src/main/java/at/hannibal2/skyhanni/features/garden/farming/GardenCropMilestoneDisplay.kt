@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
-import at.hannibal2.skyhanni.data.MayorElectionData
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -29,10 +29,9 @@ import kotlin.concurrent.fixedRateTimer
 class GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
     private var mushroomCowPerkDisplay = listOf<List<Any>>()
-    private val cultivatingData = mutableMapOf<CropType, Int>()
+    private val cultivatingData = mutableMapOf<CropType, Long>()
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()
-//    val cropMilestoneLevelUpPattern = Pattern.compile("  §r§b§lGARDEN MILESTONE §3(.*) §8XXIII➜§3(.*)")
 
     private var lastPlaySoundTime = 0L
 
@@ -63,15 +62,6 @@ class GardenCropMilestoneDisplay {
         if (event.message == "§a§lUNCOMMON DROP! §r§eDicer dropped §r§f64x §r§fPumpkin§r§e!") {
             CropType.PUMPKIN.setCounter(CropType.PUMPKIN.getCounter() + 64)
         }
-//        if (config.cropMilestoneWarnClose) {
-//            val matcher = cropMilestoneLevelUpPattern.matcher(event.message)
-//            if (matcher.matches()) {
-//                val cropType = matcher.group(1)
-//                val newLevel = matcher.group(2).romanToDecimalIfNeeded()
-//                LorenzUtils.debug("found milestone messsage!")
-//                SendTitleHelper.sendTitle("§b$cropType $newLevel", 1_500)
-//            }
-//        }
     }
 
     @SubscribeEvent
@@ -117,11 +107,11 @@ class GardenCropMilestoneDisplay {
         try {
             val item = event.itemStack
             val counter = GardenAPI.readCounter(item)
-            if (counter == -1) return
+            if (counter == -1L) return
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
-                val addedCounter = counter - old
+                val addedCounter = (counter - old).toInt()
 
                 if (GardenCropMilestones.cropCounter.isEmpty()) {
                     for (innerCrop in CropType.values()) {
@@ -151,8 +141,8 @@ class GardenCropMilestoneDisplay {
 
     private fun finneganPerkActive(): Boolean {
         val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
-        val perkActive = MayorElectionData.isPerkActive("Finnegan", "Farming Simulator")
-        MayorElectionData.currentCandidate?.let {
+        val perkActive = MayorElection.isPerkActive("Finnegan", "Farming Simulator")
+        MayorElection.currentCandidate?.let {
 
         }
         return forcefullyEnabledAlwaysFinnegan || perkActive
@@ -283,7 +273,7 @@ class GardenCropMilestoneDisplay {
         lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
 
         lastItemInHand?.let {
-            if (GardenAPI.readCounter(it) == -1) {
+            if (GardenAPI.readCounter(it) == -1L) {
                 lineMap[3] = Collections.singletonList("§cWarning: You need Cultivating!")
                 return formatDisplay(lineMap)
             }

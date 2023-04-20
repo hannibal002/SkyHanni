@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import com.google.gson.GsonBuilder
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
@@ -11,6 +11,7 @@ import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import java.io.*
 import java.nio.charset.StandardCharsets
+import kotlin.concurrent.fixedRateTimer
 
 class ConfigManager {
     companion object {
@@ -27,6 +28,10 @@ class ConfigManager {
     lateinit var processor: MoulConfigProcessor<Features>
 
     fun firstLoad() {
+        fixedRateTimer(name = "config-auto-save", period = 60_000L) {
+            saveConfig()
+        }
+
         try {
             configDirectory.mkdir()
         } catch (ignored: Exception) {

@@ -678,12 +678,12 @@ public class Garden {
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
-    @ConfigOption(name = "Next Jacob Contest", desc = "")
+    @ConfigOption(name = "Next Jacob's Contest", desc = "")
     @ConfigEditorAccordion(id = 14)
     public boolean nextJacobContest = false;
 
     @Expose
-    @ConfigOption(name = "Show Jacob Contest", desc = "Show the current or next jacob farming contest time and crops.")
+    @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestDisplay = true;
@@ -701,13 +701,13 @@ public class Garden {
     public boolean nextJacobContestOtherGuis = false;
 
     @Expose
-    @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new jacob contest starts.")
+    @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's contest starts.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestWarn = false;
 
     @Expose
-    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before the Jacobs contest begins.")
+    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before a Jacob's contest begins.")
     @ConfigEditorSlider(
             minValue = 10,
             maxValue = 60 * 5,
@@ -950,7 +950,7 @@ public class Garden {
     public boolean fungiCutterWarn = true;
 
     @Expose
-    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto major detection fails.")
+    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
     public boolean forcefullyEnabledAlwaysFinnegan = false;
 
