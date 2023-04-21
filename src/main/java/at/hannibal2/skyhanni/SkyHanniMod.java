@@ -65,6 +65,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.test.PacketTest;
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
+import at.hannibal2.skyhanni.utils.NEUVersionCheck;
 import at.hannibal2.skyhanni.utils.TabListData;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.*;
@@ -85,8 +86,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mod(modid = SkyHanniMod.MODID, clientSideOnly = true, useMetadata = true,
-        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-        dependencies = SkyHanniMod.DEPENDENCIES)
+        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop"
+)
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
@@ -94,8 +95,6 @@ public class SkyHanniMod {
     public static String getVersion() {
         return Loader.instance().getIndexedModList().get(MODID).getVersion();
     }
-
-    public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
     public static Features feature;
 
@@ -116,6 +115,8 @@ public class SkyHanniMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        NEUVersionCheck.checkIfNeuIsLoaded();
+
         logger = LogManager.getLogger("SkyHanni");
 
         // utils
