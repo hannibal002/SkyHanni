@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -298,7 +297,7 @@ class CropMoneyDisplay {
 
         SkyHanniMod.coroutineScope.launch {
             val map = mutableMapOf<String, Int>()
-            for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
+            for ((internalName, _) in NEUItems.manager.itemInformation) {
                 if (!BazaarApi.isBazaarItem(internalName)) continue
                 if (internalName == "ENCHANTED_PAPER") continue
                 if (internalName == "ENCHANTED_BREAD") continue

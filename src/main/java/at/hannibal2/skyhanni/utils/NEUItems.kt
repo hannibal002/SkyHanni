@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
 object NEUItems {
-    private val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
+    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemCache = mutableMapOf<String, ItemStack>()
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
