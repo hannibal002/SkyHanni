@@ -51,6 +51,9 @@ object LorenzUtils {
     val isBingoProfile: Boolean
         get() = inSkyBlock && HypixelData.bingo
 
+    val lastWorldSwitch: Long
+        get() = HypixelData.joinedWorld
+
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
 

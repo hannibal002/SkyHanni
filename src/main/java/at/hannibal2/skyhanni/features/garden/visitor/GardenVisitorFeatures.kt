@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
-import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.Entity
@@ -399,7 +398,7 @@ class GardenVisitorFeatures {
             }
         }
         if (visitors.keys.removeIf {
-                val time = System.currentTimeMillis() - SBInfo.getInstance().joinedWorld
+                val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
                 val removed = it !in visitorsInTab && time > 2_000
                 if (removed) {
                     logger.log("Removed old visitor: '$it'")
@@ -410,16 +409,28 @@ class GardenVisitorFeatures {
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
-                visitors[name] = Visitor(name, status = VisitorStatus.NEW)
-                logger.log("New visitor detected: '$name'")
-                if (config.visitorNotificationTitle) {
-                    TitleUtils.sendTitle("§eNew Visitor", 5_000)
-                }
-                if (config.visitorNotificationChat) {
-                    val displayName = GardenVisitorColorNames.getColoredName(name)
-                    LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
-                }
-                updateDisplay()
+                addVisitor(name)
+            }
+        }
+    }
+
+    private fun addVisitor(name: String) {
+        visitors[name] = Visitor(name, status = VisitorStatus.NEW)
+        logger.log("New visitor detected: '$name'")
+
+        if (config.visitorNotificationTitle) {
+            TitleUtils.sendTitle("§eNew Visitor", 5_000)
+        }
+        if (config.visitorNotificationChat) {
+            val displayName = GardenVisitorColorNames.getColoredName(name)
+            LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
+        }
+        updateDisplay()
+
+        if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+            if (name.removeColor().contains("Jerry")) {
+                logger.log("Jerry!")
+                ItemBlink.setBlink(NEUItems.getItemStackOrNull("JERRY;4"), 5_000)
             }
         }
     }
