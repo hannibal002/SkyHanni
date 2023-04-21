@@ -29,6 +29,7 @@ class HypixelData {
         var bingo = false
 
         var profileName = ""
+        var joinedWorld = 0L
 
         fun readSkyBlockArea(): String {
             return ScoreboardData.sidebarLinesFormatted
@@ -43,6 +44,7 @@ class HypixelData {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         skyBlock = false
+        joinedWorld = System.currentTimeMillis()
     }
 
     @SubscribeEvent
