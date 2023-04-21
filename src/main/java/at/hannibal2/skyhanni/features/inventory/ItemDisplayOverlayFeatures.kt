@@ -20,6 +20,7 @@ class ItemDisplayOverlayFeatures {
 
     private val wishingCompassPattern = "§7Remaining Uses: §e(.*)§8/§e3".toPattern()
     private val rangerBootsSpeedCapPattern = "§7Current Speed Cap: §a(.*)".toPattern()
+    private val petLevelPattern = "\\[Lvl (?<level>.*)] (?:.*)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -69,9 +70,12 @@ class ItemDisplayOverlayFeatures {
             val chestName = InventoryUtils.openInventoryName()
             if (!chestName.endsWith("Sea Creature Guide")) {
                 if (ItemUtils.isPet(itemName)) {
-                    val level = itemName.between("Lvl ", "] ").toInt()
-                    if (level != ItemUtils.maxPetLevel(itemName)) {
-                        return "$level"
+                    val matcher = petLevelPattern.matcher(itemName)
+                    if (matcher.matches()) {
+                        val level = matcher.group("level").toInt()
+                        if (level != ItemUtils.maxPetLevel(itemName)) {
+                            return "$level"
+                        }
                     }
                 }
             }
