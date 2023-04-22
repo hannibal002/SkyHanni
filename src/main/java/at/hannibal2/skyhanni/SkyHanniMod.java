@@ -290,7 +290,7 @@ public class SkyHanniMod {
 
         MinecraftConsoleFilter.Companion.initLogging();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> configManager.saveConfig("shutdown-hook")));
 
         repo = new RepoManager(configManager.getConfigDirectory());
         repo.loadRepoInformation();
