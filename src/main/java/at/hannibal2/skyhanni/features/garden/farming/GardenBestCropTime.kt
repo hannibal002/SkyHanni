@@ -65,7 +65,9 @@ class GardenBestCropTime {
             if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue
 
             val list = mutableListOf<Any>()
-            list.add("§7$number# ")
+            if (!config.cropMilestoneBestCompact) {
+                list.add("§7$number# ")
+            }
             list.addCropIcon(crop)
 
             val color = if (isCurrent) "§e" else "§7"

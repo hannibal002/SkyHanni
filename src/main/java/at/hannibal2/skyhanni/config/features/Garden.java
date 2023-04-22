@@ -281,7 +281,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Compact Display",
-            desc = "Make the best crop time more compact by removing the crop name and exp and making the time format shorter")
+            desc = "A more compact best crop time: Removing the crop name and exp, hide the # number and using a more compact time format.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestCompact = false;
