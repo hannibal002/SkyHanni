@@ -37,7 +37,6 @@ class GardenCropMilestoneDisplay {
     private val bestCropTime = GardenBestCropTime()
 
     private var lastPlaySoundTime = 0L
-
     private var needsInventory = false
 
     companion object {
@@ -303,7 +302,9 @@ class GardenCropMilestoneDisplay {
                         lastPlaySoundTime = System.currentTimeMillis()
                         SoundUtils.playBeepSound()
                     }
-                    TitleUtils.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
+                    if (!needsInventory) {
+                        TitleUtils.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
+                    }
                 }
             }
             lineMap[3] = Collections.singletonList("§7In §b$duration")
