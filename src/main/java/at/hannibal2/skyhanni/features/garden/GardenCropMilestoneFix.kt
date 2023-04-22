@@ -75,12 +75,17 @@ class GardenCropMilestoneFix {
         tabListCropProgress[crop] = newValue
     }
 
+    private val loadedCrops = mutableListOf<CropType>()
+
     private fun changedValue(crop: CropType, tabListValue: Long, source: String) {
         val calculated = crop.getCounter()
         val diff = calculated - tabListValue
         if (diff < -5_000) {
             crop.setCounter(tabListValue)
-            LorenzUtils.chat("§e[SkyHanni] Loaded ${crop.cropName} milestone data from $source!")
+            if (!loadedCrops.contains(crop)) {
+                LorenzUtils.chat("§e[SkyHanni] Loaded ${crop.cropName} milestone data from $source!")
+                loadedCrops.add(crop)
+            }
         }
         if (diff > 5_000) {
             LorenzUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
