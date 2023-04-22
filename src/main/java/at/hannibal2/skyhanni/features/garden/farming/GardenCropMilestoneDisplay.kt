@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
@@ -165,7 +166,6 @@ class GardenCropMilestoneDisplay {
 
     private var currentSpeed = 0
     private var averageSpeedPerSecond = 0
-    private var countInLastSecond = 0
     private val allCounters = mutableListOf<Int>()
     private var lastItemInHand: ItemStack? = null
     private var currentCrop: CropType? = null
@@ -175,7 +175,7 @@ class GardenCropMilestoneDisplay {
     private fun resetSpeed() {
         currentSpeed = 0
         averageSpeedPerSecond = 0
-        countInLastSecond = 0
+        blocksBroken = 0
         allCounters.clear()
     }
 
@@ -196,14 +196,16 @@ class GardenCropMilestoneDisplay {
             currentSpeed = (currentSpeed.toDouble() * 0.8).toInt()
         }
 
-        if (countInLastSecond > 8) {
+        lastBlocksPerSecond = blocksBroken
+        blocksBroken = 0
+
+        if (lastBlocksPerSecond >= 5) {
             allCounters.add(currentSpeed)
             while (allCounters.size > 30) {
                 allCounters.removeFirst()
             }
             averageSpeedPerSecond = allCounters.average().toInt()
         }
-        countInLastSecond = 0
 
         if (finneganPerkActive()) {
             currentCrop?.let {
@@ -211,15 +213,11 @@ class GardenCropMilestoneDisplay {
             }
         }
         currentSpeed = 0
-
-        lastBlocksPerSecond = blocksBroken
-        blocksBroken = 0
     }
 
 
     private fun calculateSpeed(addedCounter: Int) {
         currentSpeed += addedCounter
-        countInLastSecond++
     }
 
     @SubscribeEvent
