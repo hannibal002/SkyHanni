@@ -75,6 +75,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -280,6 +281,10 @@ public class SkyHanniMod {
         loadModule(new ButtonOnPause());
         loadModule(new PacketTest());
 
+    }
+
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
         configManager = new ConfigManager();
         configManager.firstLoad();
 
