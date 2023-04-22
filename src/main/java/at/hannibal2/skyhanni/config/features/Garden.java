@@ -717,6 +717,12 @@ public class Garden {
     public int nextJacobContestWarnTime = 60 * 2;
 
     @Expose
+    @ConfigOption(name = "Pupup Warning", desc = "Opens a popup when the warning time is reached and minecraft is not in focus.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestWarnPopup = false;
+
+    @Expose
     public Position nextJacobContestPos = new Position(-278, 11, false, true);
 
     @Expose
