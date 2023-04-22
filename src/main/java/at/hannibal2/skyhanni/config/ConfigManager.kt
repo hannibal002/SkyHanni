@@ -28,16 +28,12 @@ class ConfigManager {
     lateinit var processor: MoulConfigProcessor<Features>
 
     fun firstLoad() {
+        configDirectory.mkdir()
+
+        configFile = File(configDirectory, "config.json")
         fixedRateTimer(name = "config-auto-save", period = 60_000L) {
             saveConfig()
         }
-
-        try {
-            configDirectory.mkdir()
-        } catch (ignored: Exception) {
-        }
-
-        configFile = File(configDirectory, "config.json")
 
         logger.info("Trying to load config from $configFile")
 
@@ -106,15 +102,16 @@ class ConfigManager {
     }
 
     fun saveConfig() {
+        val file = configFile ?: throw Error("Can not save config, configFile is null!")
         try {
             logger.info("Saving config file")
-            configFile!!.parentFile.mkdirs()
-            configFile!!.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(configFile!!), StandardCharsets.UTF_8)).use { writer ->
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
                 writer.write(gson.toJson(SkyHanniMod.feature))
             }
         } catch (e: IOException) {
-            logger.error("Could not save config file to $configFile", e)
+            logger.error("Could not save config file to $file", e)
         }
     }
 }
