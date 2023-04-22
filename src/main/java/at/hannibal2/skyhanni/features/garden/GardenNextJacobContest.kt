@@ -10,11 +10,20 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import org.lwjgl.opengl.Display
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.time.Instant
+import javax.swing.JButton
+import javax.swing.JFrame
+import javax.swing.JOptionPane
+import javax.swing.UIManager
 
 class GardenNextJacobContest {
     private var display = listOf<Any>()
@@ -215,6 +224,53 @@ class GardenNextJacobContest {
         LorenzUtils.chat("§e[SkyHanni] Next farming contest: $cropText")
         TitleUtils.sendTitle("§eFarming Contest!", 5_000)
         SoundUtils.playBeepSound()
+
+        if (config.nextJacobContestWarnPopup && !Display.isActive()) {
+            SkyHanniMod.coroutineScope.launch {
+                openPopupWindow(
+                    "Farming Contest soon!\n" +
+                            "Crops: ${cropText.removeColor()}"
+                )
+            }
+        }
+    }
+
+    /**
+     * Taken and modified from Skytils
+     */
+    private fun openPopupWindow(message: String) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        val frame = JFrame()
+        frame.isUndecorated = true
+        frame.isAlwaysOnTop = true
+        frame.setLocationRelativeTo(null)
+        frame.isVisible = true
+
+        val buttons = mutableListOf<JButton>()
+        val close = JButton("Ok")
+        close.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(event: MouseEvent) {
+                frame.isVisible = false
+            }
+        })
+        buttons.add(close)
+
+        val allOptions = buttons.toTypedArray()
+        JOptionPane.showOptionDialog(
+            frame,
+            message,
+            "SkyHanni Jacob Contest Notification",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE,
+            null,
+            allOptions,
+            allOptions[0]
+        )
     }
 
     @SubscribeEvent
