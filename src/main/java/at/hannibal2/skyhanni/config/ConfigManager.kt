@@ -34,7 +34,7 @@ class ConfigManager {
         configFile = File(configDirectory, "config.json")
 
         fixedRateTimer(name = "config-auto-save", period = 60_000L, initialDelay = 60_000L) {
-            saveConfig("autp-save-60s")
+            saveConfig("auto-save-60s")
         }
 
         logger.log("Trying to load config from $configFile")
@@ -104,9 +104,7 @@ class ConfigManager {
     }
 
     fun saveConfig(reason: String) {
-        val text = "saveConfig: $reason"
-        println(text)
-        logger.log(text)
+        logger.log("saveConfig: $reason")
         val file = configFile ?: throw Error("Can not save config, configFile is null!")
         try {
             logger.log("Saving config file")
