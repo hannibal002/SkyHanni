@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.setSpeed
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
+import kotlin.math.abs
 
 class GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
@@ -157,26 +159,26 @@ class GardenCropMilestoneDisplay {
         val blockState = event.getBlockState
 
         val cropType = blockState.getCropType() ?: return
-        val multiplier = cropType.multiplier
-        if (multiplier == 1) {
+        if (cropType.multiplier == 1) {
             if (blockState.isBabyCrop()) return
         }
-        blocksBroken += multiplier
+        blocksBroken++
     }
 
     private var currentSpeed = 0
-    private var averageSpeedPerSecond = 0
-    private val allCounters = mutableListOf<Int>()
+    private var averageBlocksPerSecond = 0.0
+
+    private val blocksSpeedList = mutableListOf<Int>()
     private var lastItemInHand: ItemStack? = null
     private var currentCrop: CropType? = null
     private var blocksBroken = 0
-    private var lastBlocksPerSecond = 0
+    private var lastBlocksBroken = 0
 
     private fun resetSpeed() {
         currentSpeed = 0
-        averageSpeedPerSecond = 0
+        averageBlocksPerSecond = 0.0
         blocksBroken = 0
-        allCounters.clear()
+        blocksSpeedList.clear()
     }
 
     init {
@@ -196,16 +198,23 @@ class GardenCropMilestoneDisplay {
             currentSpeed = (currentSpeed.toDouble() * 0.8).toInt()
         }
 
-        lastBlocksPerSecond = blocksBroken
-        blocksBroken = 0
+        val blocksBroken = blocksBroken.coerceAtMost(20)
+        this.blocksBroken = 0
 
-        if (lastBlocksPerSecond >= 5) {
-            allCounters.add(currentSpeed)
-            while (allCounters.size > 30) {
-                allCounters.removeFirst()
+        // If the difference in speed between the current and the previous bps value is too high, disregard this value
+        if (abs(lastBlocksBroken - blocksBroken) > 4) {
+            if (blocksSpeedList.isNotEmpty()) {
+                blocksSpeedList.removeLast()
             }
-            averageSpeedPerSecond = allCounters.average().toInt()
+        } else if (blocksBroken >= 2) {
+            blocksSpeedList.add(blocksBroken)
+            while (blocksSpeedList.size > 120) {
+                blocksSpeedList.removeFirst()
+            }
+            averageBlocksPerSecond = blocksSpeedList.average()
+
         }
+        lastBlocksBroken = blocksBroken
 
         if (finneganPerkActive()) {
             currentCrop?.let {
@@ -277,13 +286,14 @@ class GardenCropMilestoneDisplay {
             }
         }
 
-        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
-        val farmingFortuneSpeed = farmingFortune * crop.baseDrops * crop.multiplier * 20 / 100
 
-        if (averageSpeedPerSecond != 0) {
-            crop.setSpeed(averageSpeedPerSecond)
+        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
+        val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * averageBlocksPerSecond / 100).round(1).toInt()
+
+        if (farmingFortuneSpeed > 0) {
+            crop.setSpeed(farmingFortuneSpeed)
             val missing = need - have
-            val missingTimeSeconds = missing / farmingFortuneSpeed.toInt()
+            val missingTimeSeconds = missing / farmingFortuneSpeed
             val millis = missingTimeSeconds * 1000
             bestCropTime.timeTillNextCrop[crop] = millis
             val duration = TimeUtils.formatDuration(millis)
@@ -298,9 +308,10 @@ class GardenCropMilestoneDisplay {
             }
             lineMap[3] = Collections.singletonList("§7In §b$duration")
 
-            val format = LorenzUtils.formatInteger(averageSpeedPerSecond * 60)
+            val format = LorenzUtils.formatInteger(farmingFortuneSpeed * 60)
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
-            lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$lastBlocksPerSecond")
+            val formatBps = LorenzUtils.formatDouble(averageBlocksPerSecond)
+            lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$formatBps")
         }
 
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
@@ -354,12 +365,11 @@ class GardenCropMilestoneDisplay {
 
         val missing = need - have
 
-        // We assume perfect 20 blocks per seconds
-        val blocksPerSecond = 20 * (currentCrop?.multiplier ?: 1)
+        val blocksPerSecond = averageBlocksPerSecond * (currentCrop?.multiplier ?: 1)
 
         val missingTimeSeconds = missing / blocksPerSecond
         val millis = missingTimeSeconds * 1000
-        val duration = TimeUtils.formatDuration(millis)
+        val duration = TimeUtils.formatDuration(millis.toLong())
 
         lineMap[0] = Collections.singletonList("§6Mooshroom Cow Perk")
 
