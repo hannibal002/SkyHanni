@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -67,7 +68,8 @@ interface Renderable {
             val c = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
                 ToolTipData.lastSlot == null
             } else true
-            return a && b && c
+            val d = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
+            return a && b && c && d
         }
 
         fun underlined(renderable: Renderable) = object : Renderable {
