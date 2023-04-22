@@ -211,7 +211,7 @@ public class Garden {
                     "Useful for switching to a different pet for leveling.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
-    public boolean cropMilestoneWarnClose = true;
+    public boolean cropMilestoneWarnClose = false;
 
     @Expose
     @ConfigOption(
