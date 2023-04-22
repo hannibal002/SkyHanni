@@ -279,10 +279,13 @@ class GardenCropMilestoneDisplay {
             }
         }
 
+        val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
+        val farmingFortuneSpeed = farmingFortune * crop.baseDrops * crop.multiplier * 20 / 100
+
         if (averageSpeedPerSecond != 0) {
             crop.setSpeed(averageSpeedPerSecond)
             val missing = need - have
-            val missingTimeSeconds = missing / averageSpeedPerSecond
+            val missingTimeSeconds = missing / farmingFortuneSpeed.toInt()
             val millis = missingTimeSeconds * 1000
             bestCropTime.timeTillNextCrop[crop] = millis
             val duration = TimeUtils.formatDuration(millis)
