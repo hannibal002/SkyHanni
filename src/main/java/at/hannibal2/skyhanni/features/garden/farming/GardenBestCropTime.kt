@@ -36,11 +36,14 @@ class GardenBestCropTime {
             timeTillNextCrop.sorted()
         }
 
-        val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
-        if (config.cropMilestoneBestCompact) {
-            newList.addAsSingletonList("§eBest Crop Time")
-        } else {
-            newList.addAsSingletonList("§eBest Crop Time §7($title§7)")
+
+        if (!config.cropMilestoneBestHideTitle) {
+            val title = if (gardenExp) "§2Garden Experience" else "§bSkyBlock Level"
+            if (config.cropMilestoneBestCompact) {
+                newList.addAsSingletonList("§eBest Crop Time")
+            } else {
+                newList.addAsSingletonList("§eBest Crop Time §7($title§7)")
+            }
         }
 
         if (!config.cropMilestoneProgress) {
