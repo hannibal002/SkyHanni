@@ -39,24 +39,6 @@ class GardenCropMilestoneDisplay {
     private var lastPlaySoundTime = 0L
     private var needsInventory = false
 
-    companion object {
-        var mushroom_cow_nether_warts = true
-    }
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val constant = event.getConstant("DisabledFeatures")
-            mushroom_cow_nether_warts = if (constant != null) {
-                if (constant.has("mushroom_cow_nether_warts")) {
-                    constant["mushroom_cow_nether_warts"].asBoolean
-                } else false
-            } else false
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
@@ -319,15 +301,7 @@ class GardenCropMilestoneDisplay {
         lineMap[6] = Collections.singletonList("§7Percentage: §e$percentageFormat")
 
         if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
-            if (mushroom_cow_nether_warts && crop == CropType.NETHER_WART) {
-                mushroomCowPerkDisplay = listOf(
-                    listOf("§6Mooshroom Cow Perk"),
-                    listOf("§cNether Warts don't give mushrooms."),
-                    listOf("§7(Hypixel please fix this)")
-                )
-            } else {
-                addMushroomCowData()
-            }
+            addMushroomCowData()
         }
 
         return formatDisplay(lineMap)
