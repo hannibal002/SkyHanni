@@ -970,6 +970,12 @@ public class Garden {
     @ConfigEditorBoolean
     public boolean fungiCutterWarn = true;
 
+
+    @Expose
+    @ConfigOption(name = "Burrowing Spores", desc = "Show a notification when a Burrowing Spores spawns during farming mushrooms.")
+    @ConfigEditorBoolean
+    public boolean burrowingSporesNotification = true;
+
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
