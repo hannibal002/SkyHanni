@@ -287,6 +287,15 @@ public class Garden {
     public boolean cropMilestoneBestCompact = false;
 
     @Expose
+    @ConfigOption(
+            name = "Hide Title",
+            desc = "Hides the 'Best Crop Time' line entirely.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean cropMilestoneBestHideTitle = false;
+
+
+    @Expose
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
 
     @Expose
