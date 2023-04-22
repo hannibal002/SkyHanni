@@ -140,7 +140,7 @@ class GardenVisitorFeatures {
                 list.add(Renderable.optionalLink("$name §8x${amount.addSeparators()}", {
                     if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                         LorenzUtils.setTextIntoSign("$amount")
-                    } else if (!InventoryUtils.inStorage()) {
+                    } else if (!InventoryUtils.inStorage() && !LorenzUtils.noTradeMode) {
                         LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
                         OSUtils.copyToClipboard("$amount")
                     }

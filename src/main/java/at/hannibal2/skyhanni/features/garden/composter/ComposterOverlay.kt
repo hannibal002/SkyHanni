@@ -369,7 +369,7 @@ class ComposterOverlay {
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name§r §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
-                if (LorenzUtils.isControlKeyDown()) {
+                if (LorenzUtils.isControlKeyDown() && !LorenzUtils.noTradeMode) {
                     inInventory = false
                     LorenzUtils.sendCommandToServer("bz $rawItemName")
                     OSUtils.copyToClipboard("${itemsNeeded.toInt()}")
