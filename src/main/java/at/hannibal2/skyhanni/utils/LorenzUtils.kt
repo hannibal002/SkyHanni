@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HyPixelData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -12,7 +12,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import org.lwjgl.input.Keyboard
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -20,30 +23,36 @@ import java.util.*
 
 object LorenzUtils {
 
-    val isHyPixel: Boolean
-        get() = HyPixelData.hypixel && Minecraft.getMinecraft().thePlayer != null
+    val onHypixel: Boolean
+        get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
+
+    val isOnAlphaServer: Boolean
+        get() = onHypixel && HypixelData.hypixelAlpha
 
     val inSkyBlock: Boolean
-        get() = isHyPixel && HyPixelData.skyBlock
+        get() = onHypixel && HypixelData.skyBlock
 
     val inDungeons: Boolean
         get() = inSkyBlock && DungeonData.inDungeon()
 
     val skyBlockIsland: IslandType
-        get() = HyPixelData.skyBlockIsland
+        get() = HypixelData.skyBlockIsland
 
     //TODO add cache
     val skyBlockArea: String
-        get() = HyPixelData.readSkyBlockArea()
+        get() = HypixelData.readSkyBlockArea()
 
     val inKuudraFight: Boolean
         get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
     val noTradeMode: Boolean
-        get() = HyPixelData.noTrade
+        get() = HypixelData.noTrade
 
     val isBingoProfile: Boolean
-        get() = inSkyBlock && HyPixelData.bingo
+        get() = inSkyBlock && HypixelData.bingo
+
+    val lastWorldSwitch: Long
+        get() = HypixelData.joinedWorld
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
@@ -169,6 +178,8 @@ object LorenzUtils {
 
     fun getPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
 
+    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }
@@ -198,4 +209,36 @@ object LorenzUtils {
         gui as AccessorGuiEditSign
         gui.tileSign.signText[0] = ChatComponentText(text)
     }
+
+    fun clickableChat(message: String, command: String) {
+        val text = ChatComponentText(message)
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/$command")
+        text.chatStyle.chatHoverEvent =
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /$command"))
+        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+    }
+
+    fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
+        val entry = entries.find(matcher)
+        if (entry != null) {
+            val newMap = linkedMapOf(entry.key to entry.value)
+            newMap.putAll(this)
+            return newMap
+        }
+        return this
+    }
+
+    private var lastCommandSent = 0L
+
+    fun sendCommandToServer(command: String) {
+        if (System.currentTimeMillis() > lastCommandSent + 2_000) {
+            lastCommandSent = System.currentTimeMillis()
+            val thePlayer = Minecraft.getMinecraft().thePlayer
+            thePlayer.sendChatMessage("/$command")
+        }
+    }
+
+    fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
+
+    fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
 }

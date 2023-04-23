@@ -9,20 +9,12 @@ import org.lwjgl.input.Keyboard;
 
 public class GUI {
 
-    @ConfigOption(
-            name = "Edit GUI Locations",
-            desc = "Change the position of SkyHanni's overlays"
-    )
-    @ConfigEditorButton(
-            buttonText = "Edit"
-    )
+    @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays")
+    @ConfigEditorButton(buttonText = "Edit")
     public Runnable positions = GuiEditManager::openGuiEditor;
 
     @Expose
-    @ConfigOption(
-            name = "Open Hotkey",
-            desc = "Press this key to open the GUI Editor."
-    )
+    @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindOpen = Keyboard.KEY_NONE;
 }

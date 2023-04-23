@@ -54,6 +54,13 @@ public class Garden {
     public boolean visitorTimerEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Sixth Visitor Estimate", desc = "Estimate when the sixth visitor in the queue will arrive. " +
+            "May be inaccurate with coop members farming simultaneously.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean visitorTimerSixthVisitorEnabled = true;
+
+    @Expose
 //    @ConfigOption(name = "Visitor Timer Position", desc = "")
 //    @ConfigEditorButton(runnableId = "visitorTimer", buttonText = "Edit")
 //    @ConfigAccordionId(id = 2)
@@ -79,6 +86,13 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
     public boolean visitorNeedsOnlyWhenClose = false;
+
+    @Expose
+    @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub. " +
+            "This helps buying the correct amount when not having a booster cookie buff active.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean visitorNeedsInBazaarAlley = true;
 
     @Expose
     @ConfigOption(name = "Show Price", desc = "Show the coin price in the items needed list.")
@@ -147,6 +161,18 @@ public class Garden {
     public boolean visitorColoredName = true;
 
     @Expose
+    @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from hypixel that a new visitor has arrived at your garden")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorHypixelArrivedMessage = true;
+
+    @Expose
+    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in garden. (Except Beth and Spaceman)")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorHideChat = true;
+
+    @Expose
     @ConfigOption(name = "Numbers", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean numbers = false;
@@ -191,7 +217,7 @@ public class Garden {
                     "Useful for switching to a different pet for leveling.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
-    public boolean cropMilestoneWarnClose = true;
+    public boolean cropMilestoneWarnClose = false;
 
     @Expose
     @ConfigOption(
@@ -207,6 +233,7 @@ public class Garden {
                     "§7In §b12m 34s",
                     "§7Crops/Minute§8: §e12,345",
                     "§7Blocks/Second§8: §e20",
+                    "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 6)
@@ -258,6 +285,23 @@ public class Garden {
     public boolean cropMilestoneBestAlwaysOn = false;
 
     @Expose
+    @ConfigOption(
+            name = "Compact Display",
+            desc = "A more compact best crop time: Removing the crop name and exp, hide the # number and using a more compact time format.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean cropMilestoneBestCompact = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Hide Title",
+            desc = "Hides the 'Best Crop Time' line entirely.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean cropMilestoneBestHideTitle = false;
+
+
+    @Expose
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
 
     @Expose
@@ -287,6 +331,7 @@ public class Garden {
                     "§7Mushroom Tier 8",
                     "§e6,700§8/§e15,000",
                     "§7In §b12m 34s",
+                    "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 15)
@@ -325,7 +370,7 @@ public class Garden {
     @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
     @ConfigEditorButton(buttonText = "Default")
     @ConfigAccordionId(id = 8)
-    public Runnable keyBindPresetDefault = ()-> {
+    public Runnable keyBindPresetDefault = () -> {
         keyBindAttack = -100;
         keyBindLeft = Keyboard.KEY_A;
         keyBindRight = Keyboard.KEY_D;
@@ -402,7 +447,7 @@ public class Garden {
     public boolean optimalSpeedSignEnabled = true;
 
     @Expose
-    public Position optimalSpeedSignPosition = new Position(200, 20, false, true);
+    public Position optimalSpeedSignPosition = new Position(-450, 119, false, true);
 
     @Expose
     @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
@@ -562,7 +607,9 @@ public class Garden {
     public boolean moneyPerHour = false;
 
     @Expose
-    @ConfigOption(name = "Show money per Hour", desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.")
+    @ConfigOption(name = "Show money per Hour",
+            desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
+                    "Supports Bountiful and Mushroom Cow Perk.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourDisplay = true;
@@ -586,6 +633,7 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourAlwaysOn = false;
+
     @Expose
     @ConfigOption(
             name = "Compact Mode",
@@ -593,6 +641,7 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourCompact = false;
+
     @Expose
     @ConfigOption(
             name = "Compact Price",
@@ -600,24 +649,56 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourCompactPrice = false;
+
     @Expose
     @ConfigOption(
-            name = "Advanced stats",
-            desc = "Show not only Sell Offer price but also Instant Sell price and NPC Sell price.")
+            name = "Use Custom",
+            desc = "Use the custom format below instead of classic -> §eSell Offer §7and other profiles -> §eNPC Price.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
-    public boolean moneyPerHourAdvancedStats = false;
+    public boolean moneyPerHourUseCustomFormat = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Custom Format",
+            desc = "Set what prices to show")
+    @ConfigEditorDraggableList(
+            exampleText = {
+                    "§eSell Offer",
+                    "§eInstant Sell",
+                    "§eNPC Price"
+            },
+            requireNonEmpty = true
+    )
+    @ConfigAccordionId(id = 13)
+    public List<Integer> moneyPerHourCustomFormat = new ArrayList<>(Arrays.asList(0, 1, 2));
+
+    @Expose
+    @ConfigOption(
+            name = "Merge Seeds",
+            desc = "Merge the seeds price with the wheat price.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourMergeSeeds = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Hide Title",
+            desc = "Hides the first line of 'Money Per Hour' entirely.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourHideTitle = false;
 
     @Expose
     public Position moneyPerHourPos = new Position(16, -232, false, true);
 
     @Expose
-    @ConfigOption(name = "Next Jacob Contest", desc = "")
+    @ConfigOption(name = "Next Jacob's Contest", desc = "")
     @ConfigEditorAccordion(id = 14)
     public boolean nextJacobContest = false;
 
     @Expose
-    @ConfigOption(name = "Show Jacob Contest", desc = "Show the current or next jacob farming contest time and crops.")
+    @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestDisplay = true;
@@ -633,6 +714,28 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestOtherGuis = false;
+
+    @Expose
+    @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's contest starts.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestWarn = false;
+
+    @Expose
+    @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before a Jacob's contest begins.")
+    @ConfigEditorSlider(
+            minValue = 10,
+            maxValue = 60 * 5,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 14)
+    public int nextJacobContestWarnTime = 60 * 2;
+
+    @Expose
+    @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and minecraft is not in focus.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestWarnPopup = false;
 
     @Expose
     public Position nextJacobContestPos = new Position(-278, 11, false, true);
@@ -670,6 +773,12 @@ public class Garden {
     public boolean teleportPadsCompactName = false;
 
     @Expose
+    @ConfigOption(name = "Inventory Numbers", desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 19)
+    public boolean teleportPadsInventoryNumbers = false;
+
+    @Expose
     @ConfigOption(name = "Anita Medal Profit", desc = "")
     @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
@@ -694,8 +803,29 @@ public class Garden {
 
     @Expose
     @ConfigOption(
-            name = "Compact Display",
-            desc = "Displays the compost data from the tab list in a compact form as gui element."
+            name = "Composter Overlay",
+            desc = "Show organic matter, fuel, and profit prices while inside the Composter Inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterOverlay = true;
+
+    @Expose
+    @ConfigOption(name = "Overlay Price", desc = "Toggle for bazaar 'buy order' vs 'instant buy' price in composter overlay.")
+    @ConfigEditorDropdown(values = {"Instant Buy", "Buy Order"})
+    @ConfigAccordionId(id = 17)
+    public int composterOverlayPriceType = 0;
+
+    @Expose
+    public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
+
+    @Expose
+    public Position composterOverlayFuelExtrasPos = new Position(-320, 152, false, true);
+
+    @Expose
+    @ConfigOption(
+            name = "Display Element",
+            desc = "Displays the compost data from the tab list as gui element."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
@@ -720,7 +850,115 @@ public class Garden {
     public boolean composterHighLightUpgrade = true;
 
     @Expose
+    @ConfigOption(
+            name = "Inventory Numbers",
+            desc = "Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterInventoryNumbers = true;
+
+    @Expose
+    @ConfigOption(name = "Notification When Low Composter", desc = "")
+    @ConfigAccordionId(id = 17)
+    @ConfigEditorAccordion(id = 21)
+    public boolean composterNotifyLow = false;
+
+    @Expose
+    @ConfigOption(name = "Enable", desc = "Show a notification when organic matter or fuel runs low in your composter.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 21)
+    public boolean composterNotifyLowEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Show Title", desc = "Send a title to notify.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 21)
+    public boolean composterNotifyLowTitle = false;
+
+    @Expose
+    @ConfigOption(name = "Min Organic Matter", desc = "Warn when Organic Matter is below this value.")
+    @ConfigEditorSlider(
+            minValue = 1_000,
+            maxValue = 80_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 21)
+    public int composterNotifyLowOrganicMatter = 20_000;
+
+    @Expose
+    @ConfigOption(name = "Min Fuel Cap", desc = "Warn when Fuel is below this value.")
+    @ConfigEditorSlider(
+            minValue = 500,
+            maxValue = 40_000,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 21)
+    public int composterNotifyLowFuel = 10_000;
+
+    @Expose
     public Position composterDisplayPos = new Position(-363, 13, false, true);
+
+    @Expose
+    @ConfigOption(name = "True Farming Fortune", desc = "")
+    @ConfigEditorAccordion(id = 22)
+    public boolean farmingFortune = false;
+
+    @Expose
+    @ConfigOption(
+            name = "FF Display",
+            desc = "Displays current farming fortune, including crop-specific bonuses."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 22)
+    public boolean farmingFortuneDisplay = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Show As Drop Multiplier",
+            desc = "Adds 100 to the displayed farming fortune so that it represents a drop multiplier rather than" +
+                    " the chance for bonus drops. "
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 22)
+    public boolean farmingFortuneDropMultiplier = false;
+
+    @Expose
+    public Position farmingFortunePos = new Position(-375, -200, false, true);
+
+    @Expose
+    @ConfigOption(name = "Tooltip Tweaks", desc = "")
+    @ConfigEditorAccordion(id = 20)
+    public boolean tooltipTweaks = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Compact Descriptions",
+            desc = "Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 20)
+    public boolean compactToolTooltips = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Breakdown Hotkey",
+            desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
+    @ConfigAccordionId(id = 20)
+    public int fortuneTooltipKeybind = Keyboard.KEY_LSHIFT;
+
+    @Expose
+    @ConfigOption(
+            name = "Tooltip Format",
+            desc = "Show crop-specific farming fortune in tooltip.\n" +
+                    "§fShow: §7Crop-specific fortune indicated as §6[+196]\n" +
+                    "§fReplace: §7Edits the total fortune to include crop-specific fortune."
+    )
+    @ConfigEditorDropdown(values = {"Default", "Show", "Replace"})
+    @ConfigAccordionId(id = 20)
+    public int cropTooltipFortune = 1;
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
@@ -732,8 +970,23 @@ public class Garden {
     @ConfigEditorBoolean
     public boolean deskInSkyBlockMenu = true;
 
+
     @Expose
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
     @ConfigEditorBoolean
     public boolean fungiCutterWarn = true;
+
+
+    @Expose
+    @ConfigOption(name = "Burrowing Spores", desc = "Show a notification when a Burrowing Spores spawns during farming mushrooms.")
+    @ConfigEditorBoolean
+    public boolean burrowingSporesNotification = true;
+
+    @Expose
+    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
+    @ConfigEditorBoolean
+    public boolean forcefullyEnabledAlwaysFinnegan = false;
+
+    @Expose
+    public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 }

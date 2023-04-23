@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class PlayerDeathMessages {
 
@@ -19,7 +18,7 @@ class PlayerDeathMessages {
     private val lastTimePlayerSeen = mutableMapOf<String, Long>()
 
     //§c ☠ §r§7§r§bZeroHazel§r§7 was killed by §r§8§lAshfang§r§7§r§7.
-    private val pattern = Pattern.compile("§c ☠ §r§7§r§.(.+)§r§7 (.+)")
+    private val pattern = "§c ☠ §r§7§r§.(.+)§r§7 (.+)".toPattern()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

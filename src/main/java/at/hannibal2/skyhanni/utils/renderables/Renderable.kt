@@ -1,8 +1,14 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Mouse
 import kotlin.math.max
@@ -20,81 +26,98 @@ interface Renderable {
     fun render(posX: Int, posY: Int)
 
     companion object {
-        fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? {
-            return when (any) {
-                null -> placeholder(12)
-                is Renderable -> any
-                is String -> string(any)
-                is ItemStack -> itemStack(any, itemScale)
-                else -> null
-            }
+        fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
+            null -> placeholder(12)
+            is Renderable -> any
+            is String -> string(any)
+            is ItemStack -> itemStack(any, itemScale)
+            else -> null
         }
 
-        fun link(text: String, onClick: () -> Unit): Renderable {
-            return clickable(hoverable(string("§n$text"), string(text)), onClick)
+        fun link(text: String, onClick: () -> Unit): Renderable = link(string(text), onClick) { true }
+        fun optionalLink(text: String, onClick: () -> Unit, condition: () -> Boolean = { true }): Renderable =
+            link(string(text), onClick, condition)
+
+        fun link(renderable: Renderable, onClick: () -> Unit, condition: () -> Boolean = { true }): Renderable {
+            return clickable(hoverable(underlined(renderable), renderable, condition), onClick, 0, condition)
         }
 
-        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0): Renderable {
-            return object : Renderable {
+        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0, condition: () -> Boolean = { true }) =
+            object : Renderable {
                 override val width: Int
                     get() = render.width
 
-                var wasDown = false
+                private var wasDown = false
 
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
                     if (isDown > wasDown && isHovered(posX, posY)) {
-                        onClick()
+                        if (condition() && shouldAllowLink()) {
+                            onClick()
+                        }
                     }
                     wasDown = isDown
                     render.render(posX, posY)
                 }
 
             }
+
+        private fun shouldAllowLink(): Boolean {
+            val a = Minecraft.getMinecraft().currentScreen != null
+            val b = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
+            val c = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
+                ToolTipData.lastSlot == null
+            } else true
+            val d = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
+            return a && b && c && d
         }
 
-        fun hoverable(hovered: Renderable, unhovered: Renderable): Renderable {
-            return object : Renderable {
+        fun underlined(renderable: Renderable) = object : Renderable {
+            override val width: Int
+                get() = renderable.width
+
+            override fun render(posX: Int, posY: Int) {
+                Gui.drawRect(0, 10, width, 11, 0xFFFFFFFF.toInt())
+                GlStateManager.color(1F, 1F, 1F, 1F)
+                renderable.render(posX, posY)
+            }
+        }
+
+        fun hoverable(hovered: Renderable, unhovered: Renderable, condition: () -> Boolean = { true }) =
+            object : Renderable {
                 override val width: Int
                     get() = max(hovered.width, unhovered.width)
 
                 override fun render(posX: Int, posY: Int) {
-                    if (isHovered(posX, posY))
+                    if (isHovered(posX, posY) && condition() && shouldAllowLink())
                         hovered.render(posX, posY)
                     else
                         unhovered.render(posX, posY)
                 }
             }
-        }
 
-        fun itemStack(any: ItemStack, scale: Double = 1.0): Renderable {
-            return object : Renderable {
-                override val width: Int
-                    get() = 12
+        fun itemStack(any: ItemStack, scale: Double = 1.0) = object : Renderable {
+            override val width: Int
+                get() = 12
 
-                override fun render(posX: Int, posY: Int) {
-                    any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
-                }
+            override fun render(posX: Int, posY: Int) {
+                any.renderOnScreen(0F, 0F, scaleMultiplier = scale)
             }
         }
 
-        fun string(string: String): Renderable {
-            return object : Renderable {
-                override val width: Int
-                    get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(string)
+        fun string(string: String) = object : Renderable {
+            override val width: Int
+                get() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(string)
 
-                override fun render(posX: Int, posY: Int) {
-                    Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§f$string", 1f, 1f, 0)
-                }
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§f$string", 1f, 1f, 0)
             }
         }
 
-        fun placeholder(width: Int): Renderable {
-            return object : Renderable {
-                override val width: Int = width
+        fun placeholder(width: Int) = object : Renderable {
+            override val width: Int = width
 
-                override fun render(posX: Int, posY: Int) {
-                }
+            override fun render(posX: Int, posY: Int) {
             }
         }
     }

@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -12,13 +13,15 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 
 object NEUItems {
-    private val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
+    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemCache = mutableMapOf<String, ItemStack>()
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
+    private val turboBookPattern = "§fTurbo-(?<name>.*) (?<level>.)".toPattern()
 
     fun getInternalName(itemName: String): String {
         return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
@@ -28,7 +31,16 @@ object NEUItems {
         if (itemNameCache.containsKey(itemName)) {
             return itemNameCache[itemName]!!
         }
-        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+
+        val matcher = turboBookPattern.matcher(itemName)
+        var internalName = if (matcher.matches()) {
+            val type = matcher.group("name")
+            val level = matcher.group("level").romanToDecimal()
+            val name = turboCheck(type).uppercase()
+            "TURBO_$name;$level"
+        } else {
+            ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+        }
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
@@ -40,6 +52,12 @@ object NEUItems {
         return internalName
     }
 
+    private fun turboCheck(text: String): String {
+        if (text == "Cocoa") return "Coco"
+        if (text == "Cacti") return "Cactus"
+        return text
+    }
+
     fun getInternalName(itemStack: ItemStack): String {
         return ItemResolutionQuery(manager)
             .withCurrentGuiContext()
@@ -47,23 +65,30 @@ object NEUItems {
             .resolveInternalName() ?: ""
     }
 
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double {
-        val bazaarData = BazaarApi.getBazaarDataForInternalName(internalName)
-        bazaarData?.let {
-            val buyPrice = it.buyPrice
-            if (buyPrice > 0) return buyPrice
+    fun getInternalNameOrNull(nbt: NBTTagCompound): String? {
+        return ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
+    }
 
-            val sellPrice = it.sellPrice
-            if (sellPrice > 0) return sellPrice
-
-            return it.npcPrice
+    fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false): Double? {
+        val price = getPrice(internalName, useSellingPrice)
+        if (price == -1.0) {
+            return null
         }
+        return price
+    }
 
+    fun getPrice(internalName: String): Double {
+        return getPrice(internalName, false)
+    }
+
+    fun transHypixelNameToInternalName(hypixelId: String): String =
+        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
+
+    fun getPrice(internalName: String, useSellingPrice: Boolean): Double {
         val result = manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
-        // TODO remove workaround
         if (result == -1.0) {
             if (internalName == "JACK_O_LANTERN") {
-                return getPrice("PUMPKIN") + 1
+                return getPrice("PUMPKIN", useSellingPrice) + 1
             }
             if (internalName == "GOLDEN_CARROT") {
                 // 6.8 for some players
@@ -98,7 +123,8 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
-        val isSkull = item === Items.skull
+        val item = checkBlinkItem()
+        val isSkull = item.item === Items.skull
 
         val baseScale = (if (isSkull) 0.8f else 0.6f)
         val finalScale = baseScale * scaleMultiplier
@@ -120,7 +146,7 @@ object NEUItems {
         GlStateManager.scale(finalScale, finalScale, 1.0)
 
         RenderHelper.enableGUIStandardItemLighting()
-        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(this, 0, 0)
+        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()

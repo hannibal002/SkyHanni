@@ -1,17 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
-import java.util.regex.Pattern
-
 object TimeUtils {
 
     private val pattern =
-        Pattern.compile("(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?")
+        "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
+        maxUnits: Int = -1
     ): String {
         var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
@@ -24,6 +23,7 @@ object TimeUtils {
         }
 
         val builder = StringBuilder()
+        var count = 0
         for ((unit, value) in map.entries) {
             if (value > 0 || builder.isNotEmpty() || unit == TimeUnit.SECOND) {
                 builder.append(value)
@@ -43,11 +43,17 @@ object TimeUtils {
                 } else {
                     builder.append("$name ")
                 }
+
+                count++
+                if (maxUnits != -1) {
+                    if (count == maxUnits) break
+                }
             }
         }
-        return builder.toString()
+        return builder.toString().trim()
     }
 
+    // TODO: use kotlin Duration
     fun getMillis(string: String): Long {
         val matcher = pattern.matcher(string.lowercase().trim())
         if (!matcher.matches()) return tryAlternativeFormat(string)

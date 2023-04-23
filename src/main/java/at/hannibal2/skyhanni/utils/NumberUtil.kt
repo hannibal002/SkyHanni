@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import java.text.NumberFormat
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -161,7 +160,7 @@ object NumberUtil {
         }
     }
 
-    val pattern = Pattern.compile("^[0-9]*$")
+    val pattern = "^[0-9]*$".toPattern()
 
     fun String.isInt(): Boolean {
         return isNotEmpty() && pattern.matcher(this).matches()
@@ -176,5 +175,18 @@ object NumberUtil {
             percentage > 0.25 -> LorenzColor.GOLD
             else -> LorenzColor.RED
         }
+    }
+
+    fun String.formatNumber(): Long {
+        var text = replace(",", "")
+        val multiplier = if (text.endsWith("k")) {
+            text = text.substring(0, text.length - 1)
+            1_000
+        } else if (text.endsWith("m")) {
+            text = text.substring(0, text.length - 1)
+            1_000_000
+        } else 1
+        val d = text.toDouble()
+        return (d * multiplier).toLong()
     }
 }

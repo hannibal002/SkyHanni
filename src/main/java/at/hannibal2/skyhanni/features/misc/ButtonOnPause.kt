@@ -13,7 +13,7 @@ class ButtonOnPause {
 
     @SubscribeEvent
     fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
-        if (!LorenzUtils.isHyPixel) return
+        if (!LorenzUtils.onHypixel) return
 
         if (SkyHanniMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
             ConfigGuiManager.openConfigGui()
@@ -22,7 +22,7 @@ class ButtonOnPause {
 
     @SubscribeEvent
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
-        if (!LorenzUtils.isHyPixel) return
+        if (!LorenzUtils.onHypixel) return
 
         if (SkyHanniMod.feature.misc.configButtonOnPause && event.gui is GuiIngameMenu) {
             val x = event.gui.width - 105

@@ -163,6 +163,8 @@
 + Corleone highlighter.
 + Zealots, Bruisers and Special Zealot highlighter.
 + Highlight corrupted mobs.
++ **Arachne Minis Hider** -  Hides the nametag above arachne minis.
++ **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
 
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
@@ -203,17 +205,30 @@
 + **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
 + **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
 + **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
++ **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
++ **True Farming Fortune - Displays** current farming fortune, including crop-specific bonuses. (contributed by appable)
++ **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
++ **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
++ **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
++ **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
++ **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
++ **Inventory Numbers** - Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
++ **Composter Overlay** - Show the cheapest items for organic matter and fuel, show profit per compost/hour/day and time per compost
++ **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
++ Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
++ Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 
 ## Commands
-- /wiki (using hypixel-skyblock.fandom.com instead of Hypixel wiki)
-- /shmarkplayer <player> (marking a player with yellow color)
-- /shtrackcollection <item> - This tracks the number of items you collect, but it does not work with sacks.
++ **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
++ **/shmarkplayer <player>** - marking a player with yellow color.
++ **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
++ **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
 - Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
 - Hiding exp Bottles lying on the ground.
-- Gui element showing the real time.
+- **Real Time** - Display the current computer time, a handy feature when playing in full-screen mode.
 - Highlight the voidling extremist in pink color.
 - Highlight millenia aged blaze color in red
 - Option to hide all damage splashes, from anywhere in Skyblock.
@@ -231,3 +246,4 @@
 + Chicken Head Timer.
 + **rancher boots** speed display.
 + **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
++ **Estimated Item Value** - Displays an estimated item value for the item you hover over.

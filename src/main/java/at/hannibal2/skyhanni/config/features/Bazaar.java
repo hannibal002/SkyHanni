@@ -13,23 +13,15 @@ public class Bazaar {
     public boolean orderHelper = false;
 
     @Expose
-    @ConfigOption(name = "Best Sell Method", desc = "Difference between sell instantly and sell offer.")
+    @ConfigOption(name = "Best Sell Method", desc = "Show the price difference between sell instantly and sell offer.")
     @ConfigEditorBoolean
     public boolean bestSellMethod = false;
 
     @Expose
-    public Position bestSellMethodPos = new Position(10, 10, false, true);
+    public Position bestSellMethodPos = new Position(394, 142, false, true);
 
     @Expose
     @ConfigOption(name = "Cancelled Buy Order Clipboard", desc = "Saves missing items from cancelled buy orders to clipboard for faster re-entry.")
     @ConfigEditorBoolean
     public boolean cancelledBuyOrderClipboard = false;
-
-    @Expose
-    @ConfigOption(name = "Update Timer", desc = "A countdown timer for the next Bazaar data update.")
-    @ConfigEditorBoolean
-    public boolean updateTimer = false;
-
-    @Expose
-    public Position updateTimerPos = new Position(10, 10, false, true);
 }

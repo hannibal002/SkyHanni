@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -16,14 +16,13 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class GardenOptimalSpeed {
     private val config get() = SkyHanniMod.feature.garden
     private val configCustomSpeed get() = config.optimalSpeedCustom
     private var currentSpeed = 100
     private var optimalSpeed = -1
-    private val currentSpeedPattern = Pattern.compile(" Speed: §r§f✦(.*)")
+    private val currentSpeedPattern = " Speed: §r§f✦(.*)".toPattern()
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()
@@ -106,7 +105,7 @@ class GardenOptimalSpeed {
         if (System.currentTimeMillis() < lastWarnTime + 20_000) return
 
         lastWarnTime = System.currentTimeMillis()
-        SendTitleHelper.sendTitle("§cWrong speed!", 3_000)
+        TitleUtils.sendTitle("§cWrong speed!", 3_000)
         cropInHand?.let {
             LorenzUtils.chat("§e[SkyHanni] Wrong speed for ${it.cropName}: §f$currentSpeed §e(§f$optimalSpeed §eis optimal)")
         }

@@ -9,14 +9,13 @@ import org.apache.logging.log4j.core.LogEvent
 import org.apache.logging.log4j.core.Logger
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.message.Message
-import java.util.regex.Pattern
 
 class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 
     private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
     private val loggerUnfiltered = LorenzLogger("debug/mc_console/unfiltered")
 
-    private val patternBiomeIdBounds = Pattern.compile("Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)")
+    private val patternBiomeIdBounds = "Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)".toPattern()
 
     companion object {
         fun initLogging() {

@@ -27,7 +27,6 @@ import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
-import java.util.regex.Pattern
 
 class MinionFeatures {
     private val config get() = SkyHanniMod.feature.minions
@@ -40,7 +39,7 @@ class MinionFeatures {
     private var lastMinionPickedUp = 0L
     private val minions = mutableMapOf<LorenzVec, MinionData>()
     private var coinsPerDay = ""
-    private val minionUpgradePattern = Pattern.compile("§aYou have upgraded your Minion to Tier (.*)")
+    private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (.*)".toPattern()
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {

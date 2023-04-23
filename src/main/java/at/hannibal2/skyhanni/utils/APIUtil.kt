@@ -19,9 +19,10 @@ import java.nio.charset.StandardCharsets
 
 object APIUtil {
     private val parser = JsonParser()
+    private var showApiErrors = false
 
     val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
+        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.getVersion()}")
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),
@@ -44,14 +45,25 @@ object APIUtil {
                     try {
                         return parser.parse(retSrc) as JsonObject
                     } catch (e: JsonSyntaxException) {
-                        if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
-                            LorenzUtils.error("[SkyHanni] Hypixel API is down :(")
+                        if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
+                            println("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            println(" - getJSONResponse: '$urlString'")
+                            LorenzUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                        } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
+                            if (showApiErrors) {
+                                LorenzUtils.clickableChat(
+                                    "[SkyHanni] Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
+                                    "shtogglehypixelapierrors"
+                                )
+                            }
+                            e.printStackTrace()
+
                         } else {
                             println("JsonSyntaxException at getJSONResponse '$urlString'")
                             LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")
                             println("result: '$retSrc'")
+                            e.printStackTrace()
                         }
-                        e.printStackTrace()
                     }
                 }
             }
@@ -70,5 +82,10 @@ object APIUtil {
 
     fun readFile(file: File): BufferedReader {
         return BufferedReader(InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8))
+    }
+
+    fun toggleApiErrorMessages() {
+        showApiErrors = !showApiErrors
+        LorenzUtils.chat("§e[SkyHanni] Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
     }
 }

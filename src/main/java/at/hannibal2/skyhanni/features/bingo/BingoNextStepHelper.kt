@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.features.bingo.nextstep.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class BingoNextStepHelper {
     private var tick = 0
@@ -22,8 +22,9 @@ class BingoNextStepHelper {
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
     private val itemRequired = mutableMapOf<String, NextStep>()
     private val islands = mutableMapOf<IslandType, IslandVisitStep>()
-    private val collectionPattern = Pattern.compile("Reach ([0-9]+(?:,\\d+)*) (.*) Collection\\.")
-    private val crystalPattern = Pattern.compile("Obtain a (\\w+) Crystal in the Crystal Hollows\\.")
+    private val collectionPattern = "Reach ([0-9]+(?:,\\d+)*) (.*) Collection\\.".toPattern()
+    private val crystalPattern = "Obtain a (\\w+) Crystal in the Crystal Hollows\\.".toPattern()
+    private val skillPattern = "Obtain level (.*) in the (.*) Skill.".toPattern()
 
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
@@ -118,11 +119,27 @@ class BingoNextStepHelper {
         }
     }
 
+    var nextMessageIsCrystal = false
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!SkyHanniMod.feature.bingo.cardDisplay) return
 
+        for (currentStep in currentSteps) {
+            if (currentStep.displayName == "Obtain a Topaz Crystal") {
+                if (event.message.matchRegex(" *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)")) {
+                    nextMessageIsCrystal = true
+                    return
+                }
+                if (nextMessageIsCrystal) {
+                    nextMessageIsCrystal = false
+                    if (event.message.matchRegex(" *§r§eTopaz Crystal")) {
+                        currentStep.done()
+                    }
+                }
+            }
+        }
         //TODO add thys message
 //        if (event.message == "thys message") {
 //            thys.done()
@@ -189,7 +206,7 @@ class BingoNextStepHelper {
     }
 
     private fun update() {
-        val personalGoals = BingoCardDisplay.personalGoals
+        val personalGoals = BingoCardDisplay.personalGoals.filter { !it.done }
         if (personalGoals.isEmpty()) {
             if (!dirty) {
                 reset()
@@ -234,8 +251,7 @@ class BingoNextStepHelper {
                 val crystal = crystalMatcher.group(1)
                 ChatMessageStep("Obtain a $crystal Crystal").apply { finalSteps.add(this) } requires IslandType.CRYSTAL_HOLLOWS.getStep()
             }
-            val pattern = Pattern.compile("Obtain level (.*) in the (.*) Skill.")
-            val matcher = pattern.matcher(description)
+            val matcher = skillPattern.matcher(description)
             if (matcher.matches()) {
                 val level = matcher.group(1).toInt()
                 val skillName = matcher.group(2)

@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.data.*;
 import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper;
-import at.hannibal2.skyhanni.features.bazaar.*;
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi;
+import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod;
+import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard;
+import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper;
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay;
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper;
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat;
@@ -25,6 +28,15 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder;
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow;
 import at.hannibal2.skyhanni.features.fishing.*;
 import at.hannibal2.skyhanni.features.garden.*;
+import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay;
+import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers;
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay;
+import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures;
+import at.hannibal2.skyhanni.features.garden.farming.*;
+import at.hannibal2.skyhanni.features.garden.inventory.*;
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames;
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures;
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer;
 import at.hannibal2.skyhanni.features.inventory.*;
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles;
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown;
@@ -33,7 +45,9 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager;
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures;
+import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider;
 import at.hannibal2.skyhanni.features.mobs.MobHighlight;
 import at.hannibal2.skyhanni.features.nether.ashfang.*;
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper;
@@ -51,14 +65,17 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.test.PacketTest;
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
+import at.hannibal2.skyhanni.utils.NEUVersionCheck;
 import at.hannibal2.skyhanni.utils.TabListData;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -69,15 +86,16 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod(modid = SkyHanniMod.MODID, version = SkyHanniMod.VERSION, clientSideOnly = true, useMetadata = true,
-        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-        dependencies = SkyHanniMod.DEPENDENCIES)
+@Mod(modid = SkyHanniMod.MODID, clientSideOnly = true, useMetadata = true,
+        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop"
+)
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
-    public static final String VERSION = "0.17.Beta.28";
-    public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
+    public static String getVersion() {
+        return Loader.instance().getIndexedModList().get(MODID).getVersion();
+    }
 
     public static Features feature;
 
@@ -98,12 +116,14 @@ public class SkyHanniMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        NEUVersionCheck.checkIfNeuIsLoaded();
+
         logger = LogManager.getLogger("SkyHanni");
 
         // utils
         loadModule(this);
         loadModule(new ChatManager());
-        loadModule(new HyPixelData());
+        loadModule(new HypixelData());
         loadModule(new DungeonData());
         loadModule(new ScoreboardData());
         loadModule(new ApiDataLoader());
@@ -113,7 +133,7 @@ public class SkyHanniMod {
         loadModule(new EntityMovementData());
         loadModule(new ItemClickData());
         loadModule(new MinecraftData());
-        loadModule(new SendTitleHelper());
+        loadModule(new TitleUtils());
         loadModule(new ItemTipHelper());
         loadModule(new RenderLivingEntityHelper());
         loadModule(new SkillExperience());
@@ -121,13 +141,18 @@ public class SkyHanniMod {
         loadModule(new TabListData());
         loadModule(new RenderGuiData());
         loadModule(new GardenCropMilestones());
+        loadModule(new GardenCropUpgrades());
         loadModule(new OwnInventoryData());
         loadModule(new ToolTipData());
         loadModule(new GuiEditManager());
+        loadModule(UpdateManager.INSTANCE);
+        loadModule(new CropAccessoryData());
+        loadModule(new MayorElection());
+        loadModule(new GardenComposterUpgradesData());
 
         // APIs
         loadModule(new BazaarApi());
-        loadModule(new GardenAPI());
+        loadModule(GardenAPI.INSTANCE);
         loadModule(new CollectionAPI());
 
         // features
@@ -201,7 +226,6 @@ public class SkyHanniMod {
         loadModule(new CroesusUnopenedChestTracker());
         loadModule(new CompactBingoChat());
         loadModule(new BrewingStandOverlay());
-        loadModule(new BazaarUpdateTimer());
         loadModule(new BarnFishingTimer());
         loadModule(new CrimsonIsleReputationHelper(this));
         loadModule(new SharkFishCounter());
@@ -241,6 +265,16 @@ public class SkyHanniMod {
         loadModule(new GardenComposterInventoryFeatures());
         loadModule(new MinionCollectLogic());
         loadModule(new PasteIntoSigns());
+        loadModule(new EstimatedItemValue());
+        loadModule(new ComposterInventoryNumbers());
+        loadModule(new FarmingFortuneDisplay());
+        loadModule(new ToolTooltipTweaks());
+        loadModule(new CropSpeedMeter());
+        loadModule(new AshfangMinisNametagHider());
+        loadModule(new GardenTeleportPadInventoryNumber());
+        loadModule(new ComposterOverlay());
+        loadModule(new GardenCropMilestoneFix());
+        loadModule(new GardenBurrowingSporesNotifier());
 
         Commands.INSTANCE.init();
 
@@ -248,12 +282,16 @@ public class SkyHanniMod {
         loadModule(new ButtonOnPause());
         loadModule(new PacketTest());
 
+    }
+
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
         configManager = new ConfigManager();
         configManager.firstLoad();
 
         MinecraftConsoleFilter.Companion.initLogging();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> configManager.saveConfig("shutdown-hook")));
 
         repo = new RepoManager(configManager.getConfigDirectory());
         repo.loadRepoInformation();

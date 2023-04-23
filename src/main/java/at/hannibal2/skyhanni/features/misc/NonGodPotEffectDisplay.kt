@@ -18,7 +18,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class NonGodPotEffectDisplay {
 
@@ -44,7 +43,7 @@ class NonGodPotEffectDisplay {
         "GABAGOEY" to "§9Gabagoey Mixin",
     )
 
-    private var patternEffectsCount = Pattern.compile("§7You have §e(\\d+) §7non-god effects\\.")
+    private var patternEffectsCount = "§7You have §e(\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0
 
     @SubscribeEvent

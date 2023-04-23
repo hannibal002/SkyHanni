@@ -1,11 +1,16 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -207,7 +212,7 @@ class MobFinder {
                     return EntityResult(bossType = BossType.NETHER_MAGE_OUTLAW)
                 }
                 if (entity.name == "DukeBarb ") {
-                    if (entity.getLorenzVec().distance(LocationUtils.playerLocation()) < 30) {
+                    if (entity.getLorenzVec().distanceToPlayer() < 30) {
                         return EntityResult(bossType = BossType.NETHER_BARBARIAN_DUKE)
                     }
                 }
@@ -295,13 +300,16 @@ class MobFinder {
                 }
             }
 
-            if (entity is EntitySpider && entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
-                when {
-                    entity.hasMaxHealth(740) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
-                    entity.hasMaxHealth(30_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
-                    entity.hasMaxHealth(900_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
-                    entity.hasMaxHealth(2_400_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+            if (entity is EntitySpider) {
+                if (entity.hasNameTagWith(1, "§5☠ §4Tarantula Broodfather ")) {
+                    when {
+                        entity.hasMaxHealth(740) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_1)
+                        entity.hasMaxHealth(30_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
+                        entity.hasMaxHealth(900_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
+                        entity.hasMaxHealth(2_400_000) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+                    }
                 }
+                checkArachne(entity)?.let { return it }
             }
             if (entity is EntityWolf) {
                 if (entity.hasNameTagWith(1, "§c☠ §fSven Packmaster ")) {
@@ -337,6 +345,57 @@ class MobFinder {
         }
 
         return null
+    }
+
+    private fun checkArachne(entity: EntitySpider): EntityResult? {
+        if (entity.hasNameTagWith(1, "[§7Lv300§8] §cArachne") ||
+            entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne")
+        ) {
+            val maxHealth = entity.baseMaxHealth
+            if (maxHealth == 12) {
+                markArachneMinis(entity)
+                return null
+            }
+            if (maxHealth == 4000) {
+                markArachneMinis(entity)
+                return null
+            }
+            markArachne(entity)
+            return EntityResult(bossType = BossType.ARACHNE_SMALL)
+        }
+        if (entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") ||
+            entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
+        ) {
+            val maxHealth = entity.baseMaxHealth
+            if (maxHealth == 12) {
+                markArachneMinis(entity)
+                return null
+            }
+            if (maxHealth == 20000) {
+                markArachneMinis(entity)
+                return null
+            }
+            markArachne(entity)
+            return EntityResult(bossType = BossType.ARACHNE_BIG)
+        }
+
+        return null
+    }
+
+    private fun markArachneMinis(entity: EntityLivingBase) {
+        if (SkyHanniMod.feature.mobs.arachneBossHighlighter) {
+            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.GOLD.toColor().withAlpha(50))
+            { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
+        }
+    }
+
+    private fun markArachne(entity: EntityLivingBase) {
+        if (SkyHanniMod.feature.mobs.arachneBossHighlighter) {
+            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
+            { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
+        }
     }
 
     private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Long {

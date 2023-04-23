@@ -10,9 +10,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarOrderHelper {
+    private val bazaarItemNamePattern = "§.§l(?<type>BUY|SELL) (?<name>.*)".toPattern()
+    private val filledPattern = "§7Filled: §[a6].*§7/.* §a§l100%!".toPattern()
+    private val pricePattern = "§7Price per unit: §6(?<number>.*) coins".toPattern()
 
     companion object {
         fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
@@ -38,44 +42,37 @@ class BazaarOrderHelper {
             if (slot.slotNumber != slot.slotIndex) continue
             if (slot.stack == null) continue
 
-            val stack = slot.stack
-            val itemName = stack.name ?: continue
+            val itemName = slot.stack.name ?: continue
+            val matcher = bazaarItemNamePattern.matcher(itemName)
+            if (!matcher.matches()) continue
 
-            val isSelling = itemName.startsWith("§6§lSELL ")
-            val isBuying = itemName.startsWith("§a§lBUY ")
-            if (!isSelling && !isBuying) continue
+            val buyOrSell = matcher.group("type").let { (it == "BUY") to (it == "SELL") }
+            if (buyOrSell.let { !it.first && !it.second }) continue
 
-            val rawName = itemName.split(if (isBuying) "BUY " else "SELL ")[1]
-            val bazaarName = BazaarApi.getCleanBazaarName(rawName)
-            val data = BazaarApi.getBazaarDataForName(bazaarName)
-            if (data == null) {
-                LorenzUtils.debug("Bazaar data is null!")
-                println("Bazaar data is null for '$rawName'/'$bazaarName'")
-//                for (key in BazaarApi.bazaarMap.keys) {
-//                    if (key.lowercase().contains("hay")) {
-//                        println("key: '$key'")
-//                    }
-//                }
-                continue
+            highlightItem(matcher.group("name"), slot, buyOrSell)
+        }
+    }
+
+    private fun highlightItem(itemName: String, slot: Slot, buyOrSell: Pair<Boolean, Boolean>) {
+        val data = BazaarApi.getBazaarDataByName(itemName)
+        if (data == null) {
+            LorenzUtils.debug("Bazaar data is null for bazaarItemName '$itemName'")
+            return
+        }
+
+        val itemLore = slot.stack.getLore()
+        for (line in itemLore) {
+            if (filledPattern.matcher(line).matches()) {
+                slot highlight LorenzColor.GREEN
+                return
             }
 
-            val itemLore = stack.getLore()
-            for (line in itemLore) {
-                if (line.startsWith("§7Filled:")) {
-                    if (line.endsWith(" §a§l100%!")) {
-                        slot highlight LorenzColor.GREEN
-                        break
-                    }
-                }
-                if (line.startsWith("§7Price per unit:")) {
-                    var text = line.split(": §6")[1]
-                    text = text.substring(0, text.length - 6)
-                    text = text.replace(",", "")
-                    val price = text.toDouble()
-                    if (isSelling && price > data.buyPrice || isBuying && price < data.sellPrice) {
-                        slot highlight LorenzColor.GOLD
-                        break
-                    }
+            val matcher = pricePattern.matcher(line)
+            if (matcher.matches()) {
+                val price = matcher.group("number").replace(",", "").toDouble()
+                if (buyOrSell.first && price < data.sellPrice || buyOrSell.second && price > data.buyPrice) {
+                    slot highlight LorenzColor.GOLD
+                    return
                 }
             }
         }

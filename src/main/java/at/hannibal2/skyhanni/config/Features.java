@@ -32,8 +32,12 @@ public class Features extends Config {
 
     @Override
     public String getTitle() {
-        return "SkyHanni " + SkyHanniMod.VERSION + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
+        return "SkyHanni " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
+
+    @Expose
+    @Category(name = "About", desc = "Information about SkyHanni and updates")
+    public About about = new About();
 
     @Expose
     @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")

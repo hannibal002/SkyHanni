@@ -23,12 +23,13 @@ class ItemClickData {
             val position = packet.position.toLorenzVec()
             BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
         }
-        val itemInHand = Minecraft.getMinecraft().thePlayer.heldItem
         if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
+            val itemInHand = Minecraft.getMinecraft().thePlayer.heldItem
             val position = packet.position.toLorenzVec()
             BlockClickEvent(ClickType.LEFT_CLICK, position, itemInHand).postAndCatch()
         }
         if (packet is C0APacketAnimation) {
+            val itemInHand = Minecraft.getMinecraft().thePlayer.heldItem
             ItemClickEvent(itemInHand).postAndCatch()
         }
     }

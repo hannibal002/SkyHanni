@@ -2,11 +2,9 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 public class Misc {
 
@@ -30,7 +28,7 @@ public class Misc {
     public boolean time = false;
 
     @Expose
-    @ConfigOption(name = "Real Time", desc = "Show IRL time. Useful while playing in full screen mode.")
+    @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean realTime = false;
@@ -173,7 +171,7 @@ public class Misc {
     public boolean hideFireBlockParticles = true;
 
     @Expose
-    @ConfigOption(name = "Smoke Particle", desc = "Hide smoke particles.")
+    @ConfigOption(name = "Smoke Particles", desc = "Hide smoke particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
     public boolean hideSmokeParticles = false;
@@ -202,13 +200,39 @@ public class Misc {
     public boolean chickenHeadTimerDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You lay an egg' chat message'.")
+    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You lay an egg' chat message.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 10)
     public boolean chickenHeadTimerHideChat = true;
 
     @Expose
     public Position chickenHeadTimerPosition = new Position(-372, 73, false, true);
+
+    @Expose
+    @ConfigOption(name = "Estimated Item Value", desc = "(Enchantments, reforging stone prices, gemstones, gemstones, drill parts and more)")
+    @ConfigEditorAccordion(id = 11)
+    public boolean estimatedItemValue = false;
+
+    @Expose
+    @ConfigOption(name = "Enable Estimated Price", desc = "Displays an estimated item value for the item you hover over.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean estimatedIemValueEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Hotkey", desc = "Press this key to show the estimated item value.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 11)
+    public int estimatedItemValueHotkey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Show always", desc = "Ignore the hotkey and always display the item value.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean estimatedIemValueAlwaysEnabled = true;
+
+    @Expose
+    public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
@@ -252,4 +276,7 @@ public class Misc {
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
+
+    @Expose
+    public Position inventoryLoadPos = new Position(394, 124, false, true);
 }

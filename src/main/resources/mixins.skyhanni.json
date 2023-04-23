@@ -20,6 +20,8 @@
     "AccessorKeyBinding",
     "MixinEntityRenderer",
     "MixinGuiIngame",
-    "gui.MixinGuiNewChat"
+    "MixinGuiPlayerTabOverlay",
+    "gui.MixinGuiNewChat",
+    "gui.MixinGuiScreen"
   ]
 }

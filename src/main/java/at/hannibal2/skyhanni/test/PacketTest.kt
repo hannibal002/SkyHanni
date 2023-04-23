@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
@@ -127,7 +131,7 @@ class PacketTest {
     }
 
     private fun getDistance(location: LorenzVec?): Double {
-        return location?.distance(LocationUtils.playerLocation())?.round(1) ?: 0.0
+        return location?.distanceToPlayer()?.round(1) ?: 0.0
     }
 
     private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {

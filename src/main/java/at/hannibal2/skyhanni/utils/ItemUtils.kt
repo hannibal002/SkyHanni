@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
@@ -9,7 +10,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.util.Constants
 import java.util.*
-import java.util.regex.Pattern
 
 object ItemUtils {
 
@@ -28,15 +28,17 @@ object ItemUtils {
         return list
     }
 
+    // TODO change else janni is sad
     fun isCoopSoulBound(stack: ItemStack): Boolean =
         stack.getLore().any {
             it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
         }
 
+    // TODO change else janni is sad
     fun isSoulBound(stack: ItemStack): Boolean =
         stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
-    fun isRecombobulated(stack: ItemStack): Boolean = stack.getLore().any { it.contains("§k") }//TODO use item api
+    fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
     fun isPet(name: String): Boolean = name.matchRegex("\\[Lvl (.*)] (.*)") && !listOf(
         "Archer",
@@ -135,10 +137,22 @@ object ItemUtils {
             setStackDisplayName(value)
         }
 
+    val ItemStack.nameWithEnchantment: String?
+        get() {
+            val name = name
+            name?.let {
+                if (name.endsWith("Enchanted Book")) {
+                    return getLore()[0]
+                }
+            }
+
+            return name
+        }
+
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
 
-    private val patternInFront = Pattern.compile("(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)")
-    private val patternBehind = Pattern.compile("(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?")
+    private val patternInFront = "(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)".toPattern()
+    private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 

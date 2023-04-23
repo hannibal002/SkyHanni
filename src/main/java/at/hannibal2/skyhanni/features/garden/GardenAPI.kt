@@ -4,8 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
+import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -13,7 +17,14 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class GardenAPI {
+object GardenAPI {
+    private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
+
+    var toolInHand: String? = null
+    var cropInHand: CropType? = null
+    var mushroomCowPet = false
+    var onBarnPlot = false
+
     var tick = 0
 
     @SubscribeEvent
@@ -52,7 +63,7 @@ class GardenAPI {
 
     private fun checkItemInHand() {
         val toolItem = Minecraft.getMinecraft().thePlayer.heldItem
-        val crop = getCropTypeFromItem(toolItem)
+        val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
         if (toolInHand != newTool) {
             toolInHand = newTool
@@ -65,7 +76,21 @@ class GardenAPI {
         if (crop != null) return crop.cropName
 
         val internalName = toolItem?.getInternalName() ?: return null
-        return if (internalName.startsWith("DAEDALUS_AXE")) "Other Tool" else null
+        return if (isOtherTool(internalName)) internalName else null
+    }
+
+    private fun isOtherTool(internalName: String): Boolean {
+        if (internalName.startsWith("DAEDALUS_AXE")) return true
+
+        if (internalName.startsWith("BASIC_GARDENING_HOE")) return true
+        if (internalName.startsWith("ADVANCED_GARDENING_AXE")) return true
+
+        if (internalName.startsWith("BASIC_GARDENING_AXE")) return true
+        if (internalName.startsWith("ADVANCED_GARDENING_HOE")) return true
+
+        if (internalName.startsWith("ROOKIE_HOE")) return true
+
+        return false
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -77,61 +102,39 @@ class GardenAPI {
         }
     }
 
-    companion object {
-        var toolInHand: String? = null
-        private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
-        var cropInHand: CropType? = null
-        var mushroomCowPet = false
-        var onBarnPlot = false
+    fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
-        fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
-
-        fun getCropTypeFromItem(item: ItemStack?): CropType? {
-            val internalName = item?.getInternalName() ?: return null
-            return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
-        }
-
-        fun readCounter(itemStack: ItemStack): Int {
-            if (itemStack.hasTagCompound()) {
-                val tag = itemStack.tagCompound
-                if (tag.hasKey("ExtraAttributes", 10)) {
-                    val ea = tag.getCompoundTag("ExtraAttributes")
-                    if (ea.hasKey("mined_crops", 99)) {
-                        return ea.getInteger("mined_crops")
-                    }
-
-                    // only using cultivating when no crops counter is there
-                    if (ea.hasKey("farmed_cultivating", 99)) {
-                        return ea.getInteger("farmed_cultivating")
-                    }
-                }
-            }
-            return -1
-        }
-
-        fun CropType.getSpeed(): Int {
-            val speed = cropsPerSecond[this]
-            if (speed != null) return speed
-
-            val message = "Set speed for $this to -1!"
-            println(message)
-            LorenzUtils.debug(message)
-            setSpeed(-1)
-            return -1
-        }
-
-        fun CropType.setSpeed(speed: Int) {
-            cropsPerSecond[this] = speed
-        }
-
-        fun addGardenCropToList(crop: CropType, list: MutableList<Any>) {
-            try {
-                list.add(crop.icon)
-            } catch (e: NullPointerException) {
-                e.printStackTrace()
-            }
-        }
-
-        fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
+    fun ItemStack.getCropType(): CropType? {
+        val internalName = getInternalName()
+        return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
     }
+
+    fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
+
+    fun CropType.getSpeed(): Int {
+        val speed = cropsPerSecond[this]
+        if (speed != null) return speed
+
+        val message = "Set speed for $this to -1!"
+        println(message)
+        LorenzUtils.debug(message)
+        setSpeed(-1)
+        return -1
+    }
+
+    fun CropType.setSpeed(speed: Int) {
+        cropsPerSecond[this] = speed
+    }
+
+    fun MutableList<Any>.addCropIcon(crop: CropType) {
+        try {
+            add(crop.icon)
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
+
+    fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory || SkyMartCopperPrice.inInventory
 }

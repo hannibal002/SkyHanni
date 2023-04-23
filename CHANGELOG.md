@@ -12,9 +12,13 @@
 + Added **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
 + Added **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + Added **Contest Time** - Adds the real time format to the farming contest description.
-+ Added **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (Thanks appable0)
-+ Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (Thanks appable0)
++ Added **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (contributed by appable)
++ Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (contributed by appable)
 + Added **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
++ Added **Estimated Item Value** - Displays an estimated item value for the item you hover over.
++ Added Arachne to damage indicator.
++ Added **Arachne Minis Hider** -  Hides the nametag above arachne minis.
++ Added **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
@@ -55,7 +59,19 @@
 + Added **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
 + Added **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
 + Added **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
-
++ Added **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
++ Added **True Farming Fortune - Displays** current farming fortune, including crop-specific bonuses. (contributed by appable)
++ Added **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
++ Added **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
++ Added **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
++ Added command **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
++ Added **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
++ Added **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
++ Added **Inventory Numbers** - Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
++ Added **Composter Overlay** - Show the cheapest items for organic matter and fuel, show profit per compost/hour/day and time per compost
++ Added **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
++ Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
++ Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
@@ -350,7 +366,7 @@
 - Added a marker to the last opened minion for a couple of seconds (Seen through walls)
 - Added option to hide mob nametags close to minions
 - Added showing stars on all items (Not only dungeon stars and master stars but also on crimson armors, cloaks and fishing rods)
-- Added a display timer that show the real time
+- Added **Real Time** - Display the current computer time, a handy feature when playing in full-screen mode.
 - Added overlay features to the RNG meter inventory (Highlight selected drop and floors without a drop and show floor)
 - Added minion hopper coins per day display (Using the held coins in the hopper and the last time the hopper was collected to calculate the coins a hopper collects in a day)
 

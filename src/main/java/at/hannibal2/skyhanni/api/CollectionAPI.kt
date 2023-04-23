@@ -11,46 +11,39 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class CollectionAPI {
-    private val counterPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
-    private val singleCounterPattern = Pattern.compile("§7Total Collected: §e(.*)")
+    private val counterPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
+    private val singleCounterPattern = "§7Total Collected: §e(.*)".toPattern()
 
-    private val hypixelApiHasWrongItems = listOf(
-        "WOOL",
-        "CORRUPTED_FRAGMENT",
-        "EGG",
-        "POISONOUS_POTATO",
-        "REDSTONE_BLOCK",
-    )
+//    private val hypixelApiHasWrongItems = listOf(
+//        "WOOL",
+//        "CORRUPTED_FRAGMENT",
+//        "EGG",
+//        "POISONOUS_POTATO",
+//        "REDSTONE_BLOCK",
+//        "MUSHROOM_COLLECTION",
+//        "RAW_SOULFLOW",
+//        "GEMSTONE_COLLECTION",
+//    )
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
         val jsonElement = profileData["collection"] ?: return
         val asJsonObject = jsonElement.asJsonObject ?: return
-        for ((rawName, rawCounter) in asJsonObject.entrySet()) {
+        for ((hypixelId, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
-            var itemName = BazaarApi.getBazaarDataForInternalName(rawName)?.itemName
-            if (rawName == "MUSHROOM_COLLECTION") {
-                itemName = "Mushroom"
-            }
-            if (rawName == "MELON") {
-                itemName = "Melon"
-            }
-            if (rawName == "GEMSTONE_COLLECTION") {
-                itemName = "Gemstone"
-            }
-
+            val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
+            val itemName = BazaarApi.getBazaarDataByInternalName(neuItemId)?.displayName
             // Hypixel moment
-            if (hypixelApiHasWrongItems.contains(rawName)) continue
+//            if (hypixelApiHasWrongItems.contains(neuItemId)) continue
 
             if (itemName == null) {
-                LorenzUtils.debug("collection name is null for '$rawName'")
+//                LorenzUtils.debug("collection name is null for '$neuItemId'")
                 continue
             }
-            collectionValue[itemName] = counter
+            collectionValue[neuItemId] = counter
         }
 
         CollectionUpdateEvent().postAndCatch()
@@ -105,7 +98,7 @@ class CollectionAPI {
 
     companion object {
         private val collectionValue = mutableMapOf<String, Long>()
-        private val collectionTier0Pattern = Pattern.compile("§7Progress to .* I: .*")
+        private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
@@ -120,8 +113,13 @@ class CollectionAPI {
 
         // TODO add support for replenish (higher collection than actual items in inv)
         fun addFromInventory(internalName: String, amount: Int) {
-            val name = NEUItems.getItemStack(internalName).name?.removeColor() ?: return
+            val stack = NEUItems.getItemStackOrNull(internalName)
+            if (stack == null) {
+                LorenzUtils.debug("CollectionAPI.addFromInventory: internalName is null for '$internalName'")
+                return
+            }
 
+            val name = stack.name!!.removeColor()
             val oldValue = collectionValue[name] ?: return
 
             val newValue = oldValue + amount

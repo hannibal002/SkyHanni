@@ -5,8 +5,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.garden.GardenVisitorColorNames
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.nbt.NBTTagCompound
@@ -40,6 +41,7 @@ class LorenzTest {
         }
 
         fun testCommand(args: Array<String>) {
+            SoundUtils.playBeepSound()
 
 //            for ((i, s) in ScoreboardData.sidebarLinesFormatted().withIndex()) {
 //                println("$i: '$s'")
@@ -52,8 +54,8 @@ class LorenzTest {
 //            SoundUtils.createSound(name, pitch).playSound()
 
 
-            a = args[0].toDouble()
-            b = args[1].toDouble()
+//            a = args[0].toDouble()
+//            b = args[1].toDouble()
 //            c = args[2].toDouble()
 
 //            for (line in (Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay).footer.unformattedText
@@ -161,11 +163,12 @@ class LorenzTest {
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
-//        val itemStack = event.itemStack
-//        if (itemStack != null) {
-//            val internalName = itemStack.getInternalName()
-//            event.toolTip.add("internal name: $internalName")
-//        }
+        if (!SkyHanniMod.feature.dev.debugEnabled) return
+        val itemStack = event.itemStack
+        if (itemStack != null) {
+            val internalName = itemStack.getInternalName()
+            event.toolTip.add("Internal Name: '$internalName'")
+        }
     }
 
     @SubscribeEvent
@@ -185,7 +188,7 @@ class LorenzTest {
     @SubscribeEvent
     fun onSoundPlay(event: PlaySoundEvent) {
 //        val location = event.location
-//        val distance = location.distance(LocationUtils.playerLocation())
+//        val distance = location.distanceToPlayer()
 //        val soundName = event.soundName
 //        val pitch = event.pitch
 //        val volume = event.volume

@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -117,9 +116,9 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
             val data = extraData.asJsonObject
             val displayItem = data["item"]?.asString
-            val patterns = " *§r§6§l${displayName.uppercase()} DOWN!"
+            val patterns = " *§r§6§l${displayName.uppercase()} DOWN!".toPattern()
             val location = reputationHelper.readLocationData(data)
-            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, Pattern.compile(patterns)))
+            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, patterns))
         }
 
         //Config

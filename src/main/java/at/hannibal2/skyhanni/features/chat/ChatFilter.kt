@@ -11,7 +11,7 @@ class ChatFilter {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.isHyPixel) return
+        if (!LorenzUtils.onHypixel) return
 
         val blockReason = block(event.message)
         if (blockReason != "") {
@@ -273,7 +273,7 @@ class ChatFilter {
 
         //mystery box
         message.matchRegex("§b✦ §r.* §r§7found a §r§e.* §r§bMystery Box§r§7!") -> true
-        message.matchRegex("§b✦ §r.* §r§7found (a|an) §r.* §r§7in a §r§aMystery Box§r§7!") -> true
+        message.matchRegex("§b✦ §r.* §r§7found (a|an) §r.* §r§7in a §r§a(Holiday )?Mystery Box§r§7!") -> true
 
         //prototype
         message.contains("§r§6§lWelcome to the Prototype Lobby§r") -> true

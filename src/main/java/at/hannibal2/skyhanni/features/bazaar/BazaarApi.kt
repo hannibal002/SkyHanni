@@ -5,55 +5,30 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarApi {
 
     companion object {
-        val bazaarMap = mutableMapOf<String, BazaarData>()
+        val holder = BazaarDataHolder()
         var inBazaarInventory = false
 
-        fun getCleanBazaarName(name: String): String {
-            var newName = name
-            if (newName.endsWith(" Gemstone")) {
-                return newName.substring(6)
-            }
-            if (newName.contains("Turbo-Cocoa ")) {
-                newName = newName.replace("Cocoa", "Coco")
-            }
-            if (newName.contains("Turbo-Cacti ")) {
-                newName = newName.replace("Cacti", "Cactus")
-            }
-            newName = newName.removeColor()
-            if (!name.contains("Tightly-Tied")) {
-                newName = newName.replace("-", " ")
-            }
-            return newName
-        }
+        fun getBazaarDataByName(name: String): BazaarData? =
+            NEUItems.getInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
 
-        fun getBazaarDataForName(name: String): BazaarData? {
-            if (bazaarMap.containsKey(name)) {
-                val bazaarData = bazaarMap[name]
-                if (bazaarData != null) {
-                    return bazaarData
-                }
-                LorenzUtils.error("Bazaar data not found! '$name'")
-            }
-            return null
+        fun getBazaarDataByInternalName(internalName: String): BazaarData? {
+            return if (isBazaarItem(internalName)) {
+                holder.getData(internalName)
+            } else null
         }
-
-        fun getBazaarDataForInternalName(internalName: String) =
-            bazaarMap.values.firstOrNull { it.apiName == internalName }
 
         fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
 
         fun isBazaarItem(internalName: String): Boolean {
-            val bazaarInfo = NotEnoughUpdates.INSTANCE.manager.auctionManager.getBazaarInfo(internalName)
-            return bazaarInfo != null
+            return NEUItems.manager.auctionManager.getBazaarInfo(internalName) != null
         }
     }
 
@@ -95,6 +70,6 @@ class BazaarApi {
     }
 
     init {
-        BazaarDataGrabber(bazaarMap).start()
+        holder.start()
     }
 }

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -33,7 +34,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.max
 
 class DamageIndicatorManager {
@@ -44,7 +44,7 @@ class DamageIndicatorManager {
 
     companion object {
         private var data = mutableMapOf<UUID, EntityData>()
-        private val damagePattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)")
+        private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
         fun isBoss(entity: EntityLivingBase): Boolean {
             return data.values.any { it.entity == entity }
@@ -418,7 +418,7 @@ class DamageIndicatorManager {
             BossType.NETHER_BARBARIAN_DUKE,
             -> {
                 val location = entity.getLorenzVec()
-                entityData.ignoreBlocks = location.y == 117.0 && location.distance(LocationUtils.playerLocation()) < 15
+                entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
             }
 
             else -> return ""

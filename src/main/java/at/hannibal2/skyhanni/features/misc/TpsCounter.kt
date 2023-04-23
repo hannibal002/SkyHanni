@@ -34,7 +34,7 @@ class TpsCounter {
             if (ignoreFirstTicks > 0) {
                 ignoreFirstTicks--
                 val current = ignoreFirstTicks + minDataAmount
-                display = "§eTps: §fCalculating.. (${current}s)"
+                display = "§eTps: §f(${current}s)"
                 packetsFromLastSecond = 0
                 return@fixedRateTimer
             }
@@ -47,7 +47,7 @@ class TpsCounter {
 
             display = if (tpsList.size < minDataAmount) {
                 val current = minDataAmount - tpsList.size
-                "§eTps: §fCalculating.. (${current}s)"
+                "§eTps: §f(${current}s)"
             } else {
                 val sum = tpsList.sum().toDouble()
                 var tps = (sum / tpsList.size).round(1)
@@ -100,7 +100,7 @@ class TpsCounter {
         } else if (tps > 12) {
             "§c"
         } else {
-            "§8NOT PLAYABLE - "
+            "§4"
         }
     }
 }

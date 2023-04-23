@@ -1,18 +1,29 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import org.lwjgl.opengl.Display
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.time.Instant
-import java.util.regex.Pattern
+import javax.swing.JButton
+import javax.swing.JFrame
+import javax.swing.JOptionPane
+import javax.swing.UIManager
 
 class GardenNextJacobContest {
     private var display = listOf<Any>()
@@ -20,17 +31,19 @@ class GardenNextJacobContest {
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
-    private val patternDay = Pattern.compile("§aDay (.*)")
-    private val patternMonth = Pattern.compile("(.*), Year (.*)")
-    private val patternCrop = Pattern.compile("§e○ §7(.*)")
+    private val patternDay = "§aDay (.*)".toPattern()
+    private val patternMonth = "(.*), Year (.*)".toPattern()
+    private val patternCrop = "§e○ §7(.*)".toPattern()
 
     private val maxContestsPerYear = 124
     private val contestDuration = 1_000 * 60 * 20
+    private var lastWarningTime = 0L
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         var next = false
         val newList = mutableListOf<String>()
+        var counter = 0
         for (line in event.tabList) {
             if (line == "§e§lJacob's Contest:") {
                 newList.add(line)
@@ -40,6 +53,8 @@ class GardenNextJacobContest {
             if (next) {
                 if (line == "") break
                 newList.add(line)
+                counter++
+                if (counter == 4) break
             }
         }
         newList.add("§cOpen calendar for")
@@ -112,7 +127,7 @@ class GardenNextJacobContest {
             for (line in lore) {
                 val matcherCrop = patternCrop.matcher(line)
                 if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByNameNoNull(matcherCrop.group(1)))
+                crops.add(CropType.getByName(matcherCrop.group(1)))
             }
             val contest = FarmingContest(startTime + contestDuration, crops)
             contests[startTime] = contest
@@ -185,16 +200,77 @@ class GardenNextJacobContest {
         } else {
             list.add("§eNext: ")
             duration -= contestDuration
+            warn(duration, nextContest.crops)
         }
         for (crop in nextContest.crops) {
             list.add(" ")
-            GardenAPI.addGardenCropToList(crop, list)
+            list.addCropIcon(crop)
             nextContestCrops.add(crop)
         }
         val format = TimeUtils.formatDuration(duration)
         list.add("§7(§b$format§7)")
 
         return list
+    }
+
+    private fun warn(timeInMillis: Long, crops: List<CropType>) {
+        if (!config.nextJacobContestWarn) return
+        if (config.nextJacobContestWarnTime <= timeInMillis / 1000) return
+
+        if (System.currentTimeMillis() < lastWarningTime) return
+        lastWarningTime = System.currentTimeMillis() + 60_000 * 40
+
+        val cropText = crops.joinToString("§7, ") { "§a${it.cropName}" }
+        LorenzUtils.chat("§e[SkyHanni] Next farming contest: $cropText")
+        TitleUtils.sendTitle("§eFarming Contest!", 5_000)
+        SoundUtils.playBeepSound()
+
+        if (config.nextJacobContestWarnPopup && !Display.isActive()) {
+            SkyHanniMod.coroutineScope.launch {
+                openPopupWindow(
+                    "Farming Contest soon!\n" +
+                            "Crops: ${cropText.removeColor()}"
+                )
+            }
+        }
+    }
+
+    /**
+     * Taken and modified from Skytils
+     */
+    private fun openPopupWindow(message: String) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        val frame = JFrame()
+        frame.isUndecorated = true
+        frame.isAlwaysOnTop = true
+        frame.setLocationRelativeTo(null)
+        frame.isVisible = true
+
+        val buttons = mutableListOf<JButton>()
+        val close = JButton("Ok")
+        close.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(event: MouseEvent) {
+                frame.isVisible = false
+            }
+        })
+        buttons.add(close)
+
+        val allOptions = buttons.toTypedArray()
+        JOptionPane.showOptionDialog(
+            frame,
+            message,
+            "SkyHanni Jacob Contest Notification",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE,
+            null,
+            allOptions,
+            allOptions[0]
+        )
     }
 
     @SubscribeEvent
@@ -213,8 +289,11 @@ class GardenNextJacobContest {
         if (!config.nextJacobContestDisplay) return
         if (!inCalendar) return
 
-        if (!display.isEmpty()) {
-            config.nextJacobContestPos.renderSingleLineWithItems(display, posLabel = "Garden Next Jacob Contest")
+        if (display.isNotEmpty()) {
+            SkyHanniMod.feature.misc.inventoryLoadPos.renderSingleLineWithItems(
+                display,
+                posLabel = "Load SkyBlock Calendar"
+            )
         }
     }
 

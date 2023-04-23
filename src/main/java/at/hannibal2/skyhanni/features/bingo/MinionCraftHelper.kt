@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SendTitleHelper
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -19,10 +19,9 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.regex.Pattern
 
 class MinionCraftHelper {
-    private var minionNamePattern = Pattern.compile("(.*) Minion (.*)")
+    private var minionNamePattern = "(.*) Minion (.*)".toPattern()
     private var tick = 0
     private var display = listOf<String>()
     private var hasMinionInInventory = false
@@ -256,7 +255,7 @@ class MinionCraftHelper {
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
-        SendTitleHelper.sendTitle("Can craft $minionName", 3_000)
+        TitleUtils.sendTitle("Can craft $minionName", 3_000)
         alreadyNotified.add(minionName)
     }
 

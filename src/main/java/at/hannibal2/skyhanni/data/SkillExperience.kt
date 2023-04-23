@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 class SkillExperience {
 
-    private val actionBarPattern = Pattern.compile("(?:.*)§3\\+(?:.*) (.*) \\((.*)\\/(.*)\\)(?:.*)")
-    private val inventoryPattern = Pattern.compile("(?:.*) §e(.*)§6\\/(?:.*)")
+    private val actionBarPattern = "(?:.*)§3\\+(?:.*) (.*) \\((.*)\\/(.*)\\)(?:.*)".toPattern()
+    private val inventoryPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
@@ -182,15 +182,3 @@ class SkillExperience {
     }
 }
 
-private fun String.formatNumber(): Long {
-    var text = replace(",", "")
-    val multiplier = if (text.endsWith("k")) {
-        text = text.substring(0, text.length - 1)
-        1_000
-    } else if (text.endsWith("m")) {
-        text = text.substring(0, text.length - 1)
-        1_000_000
-    } else 1
-    val d = text.toDouble()
-    return (d * multiplier).toLong()
-}

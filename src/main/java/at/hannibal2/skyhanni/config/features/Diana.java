@@ -24,20 +24,12 @@ public class Diana {
     public boolean burrowSmoothTransition = false;
 
     @Expose
-    @ConfigOption(name = "Griffin Burrows", desc = "")
-    @ConfigEditorBoolean
-    public boolean griffinBurrows = false;
-
-    @Expose
     @ConfigOption(name = "Nearest Warp", desc = "Warps to the nearest warp point on the hub, if closer to the next burrow.")
     @ConfigEditorBoolean
     public boolean burrowNearestWarp = false;
 
     @Expose
-    @ConfigOption(
-            name = "Warp Key",
-            desc = "Press this key to warp to nearest burrow waypoint."
-    )
+    @ConfigOption(name = "Warp Key", desc = "Press this key to warp to nearest burrow waypoint.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindWarp = Keyboard.KEY_NONE;
 
