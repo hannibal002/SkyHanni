@@ -1,41 +1,35 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.config.features.Garden
+import at.hannibal2.skyhanni.config.migration.LoadResult
 import at.hannibal2.skyhanni.config.migration.MigratingConfigLoader
+import at.hannibal2.skyhanni.config.migration.ResolutionPath
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.lang.reflect.Field
 import java.lang.reflect.Type
 import kotlin.reflect.KProperty1
 
 
 data class ConfigMigrationEvent(
-    val property: Field?,
+    val loader: MigratingConfigLoader,
+    val resolutionPath: ResolutionPath,
     val objectHierarchy: List<JsonElement?>,
     val type: Type,
-    var value: MigratingConfigLoader.LoadResult<*>
+    var value: LoadResult<*>
 ) : LorenzEvent() {
-
-
-    @SubscribeEvent
-    fun migrateSomething(event: ConfigMigrationEvent) {
-        migrate(Garden::composter) {
-            parent().parent().child("oldPropertyIdk")
-        }
-    }
+    val property = (resolutionPath as? ResolutionPath.FieldChild)?.field
 
 
     fun use(value: Any?) {
-        this.value = MigratingConfigLoader.LoadResult.Instance(value)
+        this.value = LoadResult.Instance(value)
     }
 
     fun isFailing(): Boolean {
-        return value is MigratingConfigLoader.LoadResult.Failure || value is MigratingConfigLoader.LoadResult.Invalid
+        return value is LoadResult.Failure || value is LoadResult.Invalid
     }
 
     fun useDefault() {
-        this.value = MigratingConfigLoader.LoadResult.UseDefault
+        this.value = LoadResult.UseDefault
     }
 
     data class MigrateContext(val hierarchy: List<JsonElement?>) {
@@ -73,7 +67,7 @@ data class ConfigMigrationEvent(
     fun migrate(prop: Field, block: MigrateContext.() -> MigrateContext, oldType: Type, mapper: (Any?) -> Any?) {
         if (prop != property) return
         this.value =
-            MigratingConfigLoader.loadElement(null, MigrateContext(objectHierarchy).let(block).hierarchy, oldType)
+            loader.loadElement(resolutionPath, MigrateContext(objectHierarchy).let(block).hierarchy, oldType)
                 .map(mapper)
     }
 }

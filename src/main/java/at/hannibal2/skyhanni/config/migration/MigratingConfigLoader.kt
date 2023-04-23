@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.migration
 
-import at.hannibal2.skyhanni.config.migration.MigratingConfigLoader.LoadingAdapter
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigMigrationEvent
+import at.hannibal2.skyhanni.utils.allAccessibleFields
+import at.hannibal2.skyhanni.utils.nonGeneric
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
@@ -9,128 +11,70 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import io.github.moulberry.moulconfig.observer.Property
 import net.minecraftforge.common.MinecraftForge
-import java.lang.reflect.*
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
-val <T> Class<T>.allFields: List<Field>
-    get() = this.declaredFields.toList() + (this.superclass?.allFields ?: listOf())
-val <T> Class<T>.allAccessibleFields: List<Field>
-    get() = allFields.also { it.forEach { it.isAccessible = true } }
 
-val Type.nonGeneric: Class<*>?
-    get() = when (this) {
-        is ParameterizedType -> this.rawType.nonGeneric
-        is Class<*> -> this
-        is WildcardType -> this.upperBounds[0].nonGeneric
-        is TypeVariable<*> -> this.bounds[0].nonGeneric
-        else -> null
-    }
-
-object MigratingConfigLoader {
-
-    interface ResolutionPath {
-        val parent: ResolutionPath?
-        val label: String
-        fun path(): String = parent?.path()?.let { "$it." } + label
-
-        object Root : ResolutionPath {
-            override val parent: ResolutionPath? get() = null
-            override val label: String get() = "Root"
-        }
-
-        data class FieldChild(val field: Field, override val parent: ResolutionPath) : ResolutionPath {
-            override val label: String = field.name
-        }
-
-        data class IndirectChild(override val label: String, override val parent: ResolutionPath) : ResolutionPath
-    }
-
-    sealed interface LoadResult<out T> {
-        fun <V> map(mapper: (T?) -> V?): LoadResult<V> {
-            if (this is Instance<T>) {
-                return Instance(mapper(this.instance))
-            }
-            return this as LoadResult<V>
-        }
-
-        fun or(other: LoadResult<@UnsafeVariance T>): LoadResult<T>
-
-        data class Instance<T>(val instance: T?) : LoadResult<T> {
-            override fun or(other: LoadResult<T>): LoadResult<T> {
-                return this
-            }
-        }
-
-        data class Failure(val exception: Throwable, val field: Field?) : LoadResult<Nothing> {
-            override fun or(other: LoadResult<Nothing>): LoadResult<Nothing> {
-                if (other is Invalid) return this
-                return other
-            }
-        }
-
-        object UseDefault : LoadResult<Nothing> {
-            override fun or(other: LoadResult<Nothing>): LoadResult<Nothing> {
-                if (other is Instance) return other
-                return this
-            }
-        }
-
-        object Invalid : LoadResult<Nothing> {
-            override fun or(other: LoadResult<Nothing>): LoadResult<Nothing> {
-                return other
-            }
-        }
-    }
-
-    fun interface LoadingAdapter<T> {
-        fun adapt(field: Field?, hierarchy: List<JsonElement?>, type: Type): LoadResult<T>
-    }
+class MigratingConfigLoader {
+    val logger = SkyHanniMod.getLogger("ConfigMigrator")
+    val allFailures = mutableListOf<LoadResult.Failure>()
 
     val adapters = listOf(
-        LoadingAdapter { field, hierarchy, type ->
+        LoadingAdapter { path, hierarchy, type ->
             val ng = type.nonGeneric ?: return@LoadingAdapter LoadResult.Invalid
             if (!ng.isPrimitive) return@LoadingAdapter LoadResult.Invalid
+            @Suppress("RemoveRedundantQualifierName")
             loadElement(
-                field, hierarchy, mapOf(
-                    java.lang.Integer.TYPE to java.lang.Integer::class.java,
-                    java.lang.Boolean.TYPE to java.lang.Boolean::class.java,
-                    java.lang.Short.TYPE to java.lang.Short::class.java,
-                    java.lang.Float.TYPE to java.lang.Float::class.java,
-                    java.lang.Double.TYPE to java.lang.Double::class.java,
-                    java.lang.Long.TYPE to java.lang.Long::class.java,
-                    java.lang.Byte.TYPE to java.lang.Byte::class.java,
-                    java.lang.Character.TYPE to java.lang.Character::class.java,
+                path, hierarchy, mapOf(
+                    java.lang.Integer.TYPE to Integer::class.java,
+                    java.lang.Boolean.TYPE to Boolean::class.java,
+                    java.lang.Short.TYPE to Short::class.java,
+                    java.lang.Float.TYPE to Float::class.java,
+                    java.lang.Double.TYPE to Double::class.java,
+                    java.lang.Long.TYPE to Long::class.java,
+                    java.lang.Byte.TYPE to Byte::class.java,
+                    java.lang.Character.TYPE to Character::class.java,
                 )[ng]!!
             )
         },
-        directLoader { LoadResult.Instance(it.asString) },
-        directLoader { LoadResult.Instance(it.asInt) },
-        directLoader { LoadResult.Instance(it.asFloat) },
-        directLoader { LoadResult.Instance(it.asLong) },
-        directLoader { LoadResult.Instance(it.asDouble) },
-        directLoader { LoadResult.Instance(it.asNumber) },
-        directLoader { LoadResult.Instance(it.asBigDecimal) },
-        directLoader { LoadResult.Instance(it.asBigInteger) },
-        directLoader { LoadResult.Instance(it.asBoolean) },
-        directLoader { LoadResult.Instance(it.asShort) },
-        directLoader { LoadResult.Instance(it.asJsonObject) },
-        directLoader { LoadResult.Instance(it.asJsonArray) },
-        directLoader { LoadResult.Instance(it.asJsonPrimitive) },
-        directLoader { LoadResult.Instance(it as JsonNull) },
-        directLoader { LoadResult.Instance(it.asByte) },
-        directLoader { LoadResult.Instance(it.asCharacter) },
-        LoadingAdapter { field, hierarchy, type ->
+        directLoader { if (!it.asJsonPrimitive.isString) error("String expected, found $it") else LoadResult.Instance(it.asString) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asInt) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asFloat) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asLong) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asDouble) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asNumber) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asBigDecimal) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asBigInteger) },
+        directLoader {
+            if (!it.asJsonPrimitive.isBoolean) error("Boolean expected, found $it") else LoadResult.Instance(
+                it.asBoolean
+            )
+        },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asShort) },
+        directLoader { if (!it.isJsonObject) error("JsonObject expected, found $it") else LoadResult.Instance(it.asJsonObject) },
+        directLoader { if (!it.isJsonArray) error("JsonArray expected, found $it") else LoadResult.Instance(it.asJsonArray) },
+        directLoader { if (!it.isJsonPrimitive) error("JsonPrimitive expected, found $it") else LoadResult.Instance(it.asJsonPrimitive) },
+        directLoader { if (!it.isJsonNull) error("Null expected, found $it") else LoadResult.Instance(it as JsonNull) },
+        directLoader { if (!it.asJsonPrimitive.isNumber) error("Number expected, found $it") else LoadResult.Instance(it.asByte) },
+        directLoader {
+            if (!it.asJsonPrimitive.isString || it.asString.length > 1) error("1-length String expected, found $it") else LoadResult.Instance(
+                it.asCharacter
+            )
+        },
+        LoadingAdapter { path, hierarchy, type ->
             val ng = type.nonGeneric ?: return@LoadingAdapter LoadResult.Invalid
             if (ng != List::class.java) return@LoadingAdapter LoadResult.Invalid
             type as ParameterizedType
+            val childPath = ResolutionPath.IndirectChild("element", path)
             val builder = mutableListOf<Any?>()
             for (jsonElement in hierarchy.last()!!.asJsonArray) {
-                val x = loadElement(null, hierarchy + jsonElement, type.actualTypeArguments[0])
+                val x = loadElement(childPath, hierarchy + jsonElement, type.actualTypeArguments[0])
                 if (x is LoadResult.Instance) {
                     builder.add(x.instance)
                 } else if (x is LoadResult.UseDefault) {
                     return@LoadingAdapter LoadResult.Failure(
                         RuntimeException("Cannot UseDefault for list element"),
-                        field
+                        childPath
                     )
                 } else {
                     return@LoadingAdapter x
@@ -138,28 +82,30 @@ object MigratingConfigLoader {
             }
             return@LoadingAdapter LoadResult.Instance(builder)
         },
-        LoadingAdapter { field, hierarchy, type ->
+        LoadingAdapter { path, hierarchy, type ->
             val ng = type.nonGeneric ?: return@LoadingAdapter LoadResult.Invalid
             if (ng != Map::class.java) return@LoadingAdapter LoadResult.Invalid
             type as ParameterizedType
             val builder = mutableMapOf<Any?, Any?>()
+            val keyPath = ResolutionPath.IndirectChild("key", path)
+            val valuePath = ResolutionPath.IndirectChild("value", path)
             for ((key, value) in (hierarchy.last()!! as JsonObject).entrySet()) {
-                val keyEl = loadElement(null, hierarchy + JsonPrimitive(key), type.actualTypeArguments[0])
+                val keyEl = loadElement(keyPath, hierarchy + JsonPrimitive(key), type.actualTypeArguments[0])
                 if (keyEl !is LoadResult.Instance<*>) {
                     if (keyEl is LoadResult.UseDefault) {
                         return@LoadingAdapter LoadResult.Failure(
                             RuntimeException("Cannot UseDefault for map key"),
-                            field
+                            keyPath
                         )
                     }
                     return@LoadingAdapter keyEl
                 }
-                val valueEl = loadElement(null, hierarchy + value, type.actualTypeArguments[0])
+                val valueEl = loadElement(valuePath, hierarchy + value, type.actualTypeArguments[0])
                 if (valueEl !is LoadResult.Instance<*>) {
                     if (valueEl is LoadResult.UseDefault) {
                         return@LoadingAdapter LoadResult.Failure(
                             RuntimeException("Cannot UseDefault for map key"),
-                            field
+                            valuePath
                         )
                     }
                     return@LoadingAdapter keyEl
@@ -168,17 +114,17 @@ object MigratingConfigLoader {
             }
             return@LoadingAdapter LoadResult.Instance(builder)
         },
-        LoadingAdapter { field, hierarchy, type ->
+        LoadingAdapter { path, hierarchy, type ->
             val ng = type.nonGeneric ?: return@LoadingAdapter LoadResult.Invalid
             if (ng != Property::class.java) return@LoadingAdapter LoadResult.Invalid
             if (type !is ParameterizedType) return@LoadingAdapter LoadResult.Invalid
             loadElement(
-                ng.getDeclaredField("value").also { it.isAccessible = true },
+                ResolutionPath.FieldChild(ng.getDeclaredField("value").also { it.isAccessible = true }, path),
                 hierarchy + hierarchy.last(),
                 type.actualTypeArguments[0]
             ).map { Property.of(it) }
         },
-        LoadingAdapter { field, hierarchy, type ->
+        LoadingAdapter { path, hierarchy, type ->
             val ng = type.nonGeneric ?: return@LoadingAdapter LoadResult.Invalid
             if (!ng.isEnum) return@LoadingAdapter LoadResult.Invalid
             ng as Class<out Enum<*>>
@@ -190,35 +136,34 @@ object MigratingConfigLoader {
 
 
     fun <T : Any> loadConfig(root: JsonElement, clazz: Class<T>): LoadResult<T> {
-        return loadElement(null, listOf(root), clazz)
-    }
-
-    inline fun <reified T : Any> loader(crossinline block: (field: Field?, hierarchy: List<JsonElement?>) -> LoadResult<T>): LoadingAdapter<T> {
-        return LoadingAdapter { field, hierarchy, type ->
-            if (type.nonGeneric != T::class.java) LoadResult.Invalid
-            else block(field, hierarchy)
-        }
+        val result = loadElement(ResolutionPath.Root, listOf(root), clazz)
+        logLoadResult(ResolutionPath.Root, result)
+        return result
     }
 
     inline fun <reified T : Any> directLoader(crossinline block: (element: JsonElement) -> LoadResult<T>): LoadingAdapter<T> {
-        return LoadingAdapter { field, hierarchy, type ->
+        return LoadingAdapter { path, hierarchy, type ->
             if (type.nonGeneric != T::class.java) LoadResult.Invalid
-            else block(hierarchy.last()!!)
+            else try {
+                block(hierarchy.last()!!)
+            } catch (e: Throwable) {
+                LoadResult.Failure(e, path)
+            }
         }
     }
 
 
-    fun <T : Any> loadElement(field: Field?, hierarchy: List<JsonElement?>, clazz: Class<T>): LoadResult<T> {
-        return loadElement(field, hierarchy, clazz as Type) as LoadResult<T>
+    fun <T : Any> loadElement(path: ResolutionPath, hierarchy: List<JsonElement?>, clazz: Class<T>): LoadResult<T> {
+        return loadElement(path, hierarchy, clazz as Type) as LoadResult<T>
     }
 
-    fun loadElement(field: Field?, hierarchy: List<JsonElement?>, type: Type): LoadResult<Any?> {
+    fun loadElement(path: ResolutionPath, hierarchy: List<JsonElement?>, type: Type): LoadResult<Any?> {
         var bestResult: LoadResult<Any?> = LoadResult.Invalid
         for (adapter in adapters) {
             val adapt = try {
-                adapter.adapt(field, hierarchy, type)
+                adapter.adapt(path, hierarchy, type)
             } catch (e: Exception) {
-                LoadResult.Failure(e, field)
+                LoadResult.Failure(e, path)
             }
             if (adapt is LoadResult.Instance<*>) {
                 bestResult = adapt
@@ -226,43 +171,63 @@ object MigratingConfigLoader {
             }
             bestResult = bestResult.or(adapt)
         }
-        val event = ConfigMigrationEvent(field, hierarchy, type, bestResult).also {
+        val event = ConfigMigrationEvent(this, path, hierarchy, type, bestResult).also {
             try {
                 MinecraftForge.EVENT_BUS.post(it)
             } catch (e: Throwable) {
-                it.value = it.value.or(LoadResult.Failure(e, field))
+                it.value = it.value.or(LoadResult.Failure(e, path))
             }
         }
         if (event.value is LoadResult.Invalid) {
             return LoadResult.Failure(
                 RuntimeException("Could not resolve a loader for ${type.typeName} (${type.nonGeneric})"),
-                field
+                path
             )
         }
         return event.value
     }
 
-    private fun loadClass(field: Field?, hierarchy: List<JsonElement?>, type: Type): LoadResult<Any?> {
+    private fun loadClass(path: ResolutionPath, hierarchy: List<JsonElement?>, type: Type): LoadResult<Any?> {
         val ng = type.nonGeneric ?: return LoadResult.Invalid
         if (ng.isAnonymousClass || ng.isEnum || ng.isInterface || ng.isPrimitive) return LoadResult.Invalid
         val instance = ng.getDeclaredConstructor().also { it.isAccessible = true }.newInstance()
         require(ng.isInstance(instance)) // this is all we can check at runtime, sadly
         val toBeFilled = ng.allAccessibleFields.filter { it.isAnnotationPresent(Expose::class.java) }
         for (childField in toBeFilled) {
+            val childPath = ResolutionPath.FieldChild(childField, path)
             when (
                 val value = loadElement(
-                    childField,
+                    childPath,
                     hierarchy + hierarchy.last()?.asJsonObject?.get(childField.name),
                     childField.genericType
                 )
             ) {
                 is LoadResult.Instance -> childField.set(instance, value.instance)
                 LoadResult.UseDefault -> {}
-                is LoadResult.Failure -> return value
-                LoadResult.Invalid -> return value
+                is LoadResult.Failure -> logLoadResult(childPath, value)
+                LoadResult.Invalid -> logLoadResult(childPath, value)
             }
         }
         return LoadResult.Instance(instance)
     }
 
+    fun logLoadResult(path: ResolutionPath, loadResult: LoadResult<*>) {
+        when (loadResult) {
+            is LoadResult.Failure -> {
+                allFailures.add(loadResult)
+                logger.error(
+                    "${path}: Encountered failure propagated from ${loadResult.path}",
+                    loadResult.exception
+                )
+            }
+
+            is LoadResult.Instance -> {}
+            LoadResult.Invalid -> logger.info("${path}: Encountered Invalid load result.")
+            LoadResult.UseDefault -> logger.info("${path}: Encountered UseDefault load result.")
+        }
+    }
+
+    fun hasAnyFailure(): Boolean {
+        return allFailures.any()
+    }
 }

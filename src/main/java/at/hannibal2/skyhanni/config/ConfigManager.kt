@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.migration.LoadResult
 import at.hannibal2.skyhanni.config.migration.MigratingConfigLoader
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -11,7 +12,6 @@ import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import java.io.*
-import java.lang.RuntimeException
 import java.nio.charset.StandardCharsets
 
 class ConfigManager {
@@ -28,16 +28,32 @@ class ConfigManager {
     private var configFile: File? = null
     lateinit var processor: MoulConfigProcessor<Features>
 
+    var lastFailures: List<LoadResult.Failure> = listOf()
+        private set
+
     fun loadConfig(file: File): Features {
-        val x = MigratingConfigLoader.loadConfig(
+        val migrator = MigratingConfigLoader()
+        val x = migrator.loadConfig(
             gson.fromJson(file.readText(), JsonElement::class.java),
             Features::class.java
         )
+        lastFailures = migrator.allFailures
+        if (migrator.hasAnyFailure()) {
+            val backupFile = file.resolveSibling("config-${System.currentTimeMillis()}-backup.json")
+            logger.error(
+                "Error while reading $file. Will save backup to $backupFile"
+            )
+            try {
+                file.copyTo(backupFile)
+            } catch (e: Exception) {
+                logger.error("Could not create backup for config file", e)
+            }
+        }
         return when (x) {
-            MigratingConfigLoader.LoadResult.UseDefault -> Features()
-            is MigratingConfigLoader.LoadResult.Instance -> x.instance!!
-            is MigratingConfigLoader.LoadResult.Failure -> throw RuntimeException("Failed to load field ${x.field}", x.exception)
-            MigratingConfigLoader.LoadResult.Invalid -> error("LoadResult.Invalid returned directly?")
+            LoadResult.UseDefault -> Features()
+            is LoadResult.Instance -> x.instance!!
+            is LoadResult.Failure -> Features()
+            LoadResult.Invalid -> error("LoadResult.Invalid returned directly?")
         }
     }
 
@@ -53,21 +69,8 @@ class ConfigManager {
         logger.info("Trying to load config from $configFile")
 
         if (configFile!!.exists()) {
-            try {
                 SkyHanniMod.feature = loadConfig(configFile!!)
                 logger.info("Loaded config from file")
-            } catch (e: Exception) {
-                val backupFile = configFile!!.resolveSibling("config-${System.currentTimeMillis()}-backup.json")
-                logger.error(
-                    "Exception while reading $configFile. Will load blank config and save backup to $backupFile",
-                    e
-                )
-                try {
-                    configFile!!.copyTo(backupFile)
-                } catch (e: Exception) {
-                    logger.error("Could not create backup for config file", e)
-                }
-            }
         }
 
         if (SkyHanniMod.feature == null) {
