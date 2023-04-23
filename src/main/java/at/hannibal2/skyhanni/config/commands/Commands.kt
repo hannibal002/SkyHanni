@@ -42,7 +42,7 @@ object Commands {
         registerCommand("copylocation") { LorenzTest.copyLocation() }
         registerCommand("copyentities") { CopyNearbyEntitiesCommand.command(it) }
         registerCommand("copyitem") { CopyItemCommand.command(it) }
-        registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig() }
+        registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig("manual-command") }
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
         registerCommand("shtestpacket") { PacketTest.toggle() }
         registerCommand("shreloadlisteners") { LorenzTest.reloadListeners() }

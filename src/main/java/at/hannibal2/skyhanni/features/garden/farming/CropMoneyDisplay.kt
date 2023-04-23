@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -98,13 +97,11 @@ class CropMoneyDisplay {
             toolHasBountiful[it] = reforgeName == "bountiful"
 
             if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM) {
-                if (!GardenCropMilestoneDisplay.mushroom_cow_nether_warts || it != CropType.NETHER_WART) {
-                    val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
-                    val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
-                    val mushroomPrice = (redPrice + brownPrice) / 2
-                    val perSecond = 20.0 * it.multiplier * mushroomPrice
-                    extraNetherWartPrices = perSecond * 60 * 60
-                }
+                val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
+                val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
+                val mushroomPrice = (redPrice + brownPrice) / 2
+                val perSecond = 20.0 * it.multiplier * mushroomPrice
+                extraNetherWartPrices = perSecond * 60 * 60
             }
         }
 
@@ -298,7 +295,7 @@ class CropMoneyDisplay {
 
         SkyHanniMod.coroutineScope.launch {
             val map = mutableMapOf<String, Int>()
-            for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
+            for ((internalName, _) in NEUItems.manager.itemInformation) {
                 if (!BazaarApi.isBazaarItem(internalName)) continue
                 if (internalName == "ENCHANTED_PAPER") continue
                 if (internalName == "ENCHANTED_BREAD") continue

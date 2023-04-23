@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
-import net.minecraft.client.Minecraft
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -45,8 +45,7 @@ class GardenDeskInSBMenu {
     fun onStackClick(event: SlotClickEvent) {
         if (showItem && event.slotId == 10) {
             event.isCanceled =  true
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            thePlayer.sendChatMessage("/desk")
+            LorenzUtils.sendCommandToServer("desk")
         }
     }
 }

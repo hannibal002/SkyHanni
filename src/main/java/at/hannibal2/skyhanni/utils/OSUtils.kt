@@ -12,6 +12,7 @@ import java.net.URI
 
 object OSUtils {
 
+    @JvmStatic
     fun openBrowser(url: String) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {

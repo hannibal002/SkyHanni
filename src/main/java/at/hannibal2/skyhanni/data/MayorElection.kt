@@ -73,7 +73,7 @@ class MayorElection {
         val month = 3 // Late Spring
         val nextMayorTime = SkyBlockTime(currentYear, month, day = 27).toMillis()
 
-        // Is it still the major from old sb year?
+        // Is it still the mayor from old sb year?
         if (nextMayorTime > System.currentTimeMillis()) {
             currentYear--
         }

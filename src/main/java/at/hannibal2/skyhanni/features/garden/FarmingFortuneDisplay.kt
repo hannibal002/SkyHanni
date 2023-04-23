@@ -26,22 +26,11 @@ import kotlin.math.floor
 import kotlin.math.log10
 
 class FarmingFortuneDisplay {
-    private val config get() = SkyHanniMod.feature.garden
 
     private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
 
     private var display = listOf<List<Any>>()
     private var accessoryProgressDisplay = ""
-    private var currentCrop: CropType? = null
-
-    private var tabFortune: Double = 0.0
-    private var toolFortune: Double = 0.0
-    private val baseFortune: Double get() = if (config.farmingFortuneDropMultiplier) 100.0 else 0.0
-    private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
-    private val accessoryFortune: Double?
-        get() = currentCrop?.let {
-            CropAccessoryData.cropAccessory?.getFortune(it)
-        }
 
     private var lastToolSwitch: Long = 0
     private var ticks: Int = 0
@@ -89,7 +78,10 @@ class FarmingFortuneDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!isEnabled()) return
         if (!CropAccessoryData.isLoadingAccessories) return
-        SkyHanniMod.feature.misc.inventoryLoadPos.renderString(accessoryProgressDisplay, posLabel = "Load Accessory Bags")
+        SkyHanniMod.feature.misc.inventoryLoadPos.renderString(
+            accessoryProgressDisplay,
+            posLabel = "Load Accessory Bags"
+        )
     }
 
     @SubscribeEvent
@@ -103,14 +95,12 @@ class FarmingFortuneDisplay {
             val recentlySwitchedTool = System.currentTimeMillis() < lastToolSwitch + 1000
             it.add(
                 "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool) {
-                    val upgradeFortune = upgradeFortune ?: 0.0
-                    val accessoryFortune = accessoryFortune ?: 0.0
-                    val totalFortune = baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
-                    LorenzUtils.formatDouble(totalFortune, 0)
-                } else "?")
+                    LorenzUtils.formatDouble(getCurrentFarmingFortune(), 0)
+                } else "?"
+            )
         })
 
-        if (this.upgradeFortune == null) {
+        if (upgradeFortune == null) {
             updatedDisplay.addAsSingletonList("§cOpen §e/cropupgrades§c for more exact data!")
         }
         if (accessoryFortune == null) {
@@ -139,8 +129,20 @@ class FarmingFortuneDisplay {
 
 
     companion object {
-        private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
+        private val config get() = SkyHanniMod.feature.garden
 
+        private var currentCrop: CropType? = null
+
+        private var tabFortune: Double = 0.0
+        private var toolFortune: Double = 0.0
+        private val baseFortune: Double get() = if (config.farmingFortuneDropMultiplier) 100.0 else 0.0
+        private val upgradeFortune: Double? get() = currentCrop?.getUpgradeLevel()?.let { it * 5.0 }
+        private val accessoryFortune: Double?
+            get() = currentCrop?.let {
+                CropAccessoryData.cropAccessory?.getFortune(it)
+            }
+
+        private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
 
         fun getToolFortune(tool: ItemStack?): Double {
             val internalName = tool?.getInternalName() ?: return 0.0
@@ -184,6 +186,12 @@ class FarmingFortuneDisplay {
             return dedicationMultiplier * cropMilestone
         }
 
+        fun getCurrentFarmingFortune(alwaysBaseFortune: Boolean = false): Double {
+            val upgradeFortune = upgradeFortune ?: 0.0
+            val accessoryFortune = accessoryFortune ?: 0.0
 
+            val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
+            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
+        }
     }
 }

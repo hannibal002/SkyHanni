@@ -22,7 +22,8 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
-import io.github.moulberry.notenoughupdates.util.Utils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -51,7 +52,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     }
 
     private fun renderLabels(hoveredPos: Int) {
-        Utils.drawStringCentered(
+        RenderUtils.drawStringCentered(
             "§cSkyHanni Position Editor",
             Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 8f, true, 0xffffff
         )
@@ -69,12 +70,12 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         if (displayPos == -1) return
 
         val pos = positions[displayPos]
-        Utils.drawStringCentered(
+        RenderUtils.drawStringCentered(
             "§b" + pos.internalName,
             Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 18f, true, 0xffffff
         )
         val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
-        Utils.drawStringCentered(
+        RenderUtils.drawStringCentered(
             location,
             Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 28f, true, 0xffffff
         )
@@ -156,8 +157,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         val position = positions[clickedPos]
         if (position.clicked) return
 
-        val shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
-        val dist = if (shiftHeld) 10 else 1
+        val dist = if (LorenzUtils.isShiftKeyDown()) 10 else 1
         val elementWidth = position.getDummySize(true).x
         val elementHeight = position.getDummySize(true).y
         if (keyCode == Keyboard.KEY_DOWN) {
@@ -191,7 +191,6 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
-            Utils.pushGuiScale(-1)
         }
     }
 }

@@ -56,7 +56,7 @@ public class Chat {
     @ConfigOption(name = "Winter Gifts", desc = "Hide useless winter gift messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
-    public boolean winterGift = true;
+    public boolean winterGift = false;
 
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in crystal hollows. " +
@@ -93,7 +93,7 @@ public class Chat {
     @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks in all chat messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
-    public boolean playerRankHider = true;
+    public boolean playerRankHider = false;
 
     @Expose
     @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and grey out the message if any are found.")

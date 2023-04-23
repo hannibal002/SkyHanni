@@ -15,6 +15,7 @@ import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import org.lwjgl.input.Keyboard
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -49,6 +50,9 @@ object LorenzUtils {
 
     val isBingoProfile: Boolean
         get() = inSkyBlock && HypixelData.bingo
+
+    val lastWorldSwitch: Long
+        get() = HypixelData.joinedWorld
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
@@ -224,4 +228,17 @@ object LorenzUtils {
         return this
     }
 
+    private var lastCommandSent = 0L
+
+    fun sendCommandToServer(command: String) {
+        if (System.currentTimeMillis() > lastCommandSent + 2_000) {
+            lastCommandSent = System.currentTimeMillis()
+            val thePlayer = Minecraft.getMinecraft().thePlayer
+            thePlayer.sendChatMessage("/$command")
+        }
+    }
+
+    fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
+
+    fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
 }

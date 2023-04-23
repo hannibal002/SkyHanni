@@ -167,6 +167,12 @@ public class Garden {
     public boolean visitorHypixelArrivedMessage = true;
 
     @Expose
+    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in garden. (Except Beth and Spaceman)")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean visitorHideChat = true;
+
+    @Expose
     @ConfigOption(name = "Numbers", desc = "")
     @ConfigEditorAccordion(id = 5)
     public boolean numbers = false;
@@ -211,7 +217,7 @@ public class Garden {
                     "Useful for switching to a different pet for leveling.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
-    public boolean cropMilestoneWarnClose = true;
+    public boolean cropMilestoneWarnClose = false;
 
     @Expose
     @ConfigOption(
@@ -281,10 +287,19 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Compact Display",
-            desc = "Make the best crop time more compact by removing the crop name and exp and making the time format shorter")
+            desc = "A more compact best crop time: Removing the crop name and exp, hide the # number and using a more compact time format.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestCompact = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Hide Title",
+            desc = "Hides the 'Best Crop Time' line entirely.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean cropMilestoneBestHideTitle = false;
+
 
     @Expose
     public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
@@ -717,6 +732,12 @@ public class Garden {
     public int nextJacobContestWarnTime = 60 * 2;
 
     @Expose
+    @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and minecraft is not in focus.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestWarnPopup = false;
+
+    @Expose
     public Position nextJacobContestPos = new Position(-278, 11, false, true);
 
     @Expose
@@ -788,6 +809,12 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
     public boolean composterOverlay = true;
+
+    @Expose
+    @ConfigOption(name = "Overlay Price", desc = "Toggle for bazaar 'buy order' vs 'instant buy' price in composter overlay.")
+    @ConfigEditorDropdown(values = {"Instant Buy", "Buy Order"})
+    @ConfigAccordionId(id = 17)
+    public int composterOverlayPriceType = 0;
 
     @Expose
     public Position composterOverlayOrganicMatterPos = new Position(140, 152, false, true);
@@ -949,8 +976,14 @@ public class Garden {
     @ConfigEditorBoolean
     public boolean fungiCutterWarn = true;
 
+
     @Expose
-    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto major detection fails.")
+    @ConfigOption(name = "Burrowing Spores", desc = "Show a notification when a Burrowing Spores spawns during farming mushrooms.")
+    @ConfigEditorBoolean
+    public boolean burrowingSporesNotification = true;
+
+    @Expose
+    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
     public boolean forcefullyEnabledAlwaysFinnegan = false;
 
