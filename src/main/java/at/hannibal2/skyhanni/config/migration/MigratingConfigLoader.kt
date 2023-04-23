@@ -11,6 +11,7 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import io.github.moulberry.moulconfig.observer.Property
 import net.minecraftforge.common.MinecraftForge
+import org.lwjgl.input.Keyboard
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -26,14 +27,14 @@ class MigratingConfigLoader {
             @Suppress("RemoveRedundantQualifierName")
             loadElement(
                 path, hierarchy, mapOf(
-                    java.lang.Integer.TYPE to Integer::class.java,
-                    java.lang.Boolean.TYPE to Boolean::class.java,
-                    java.lang.Short.TYPE to Short::class.java,
-                    java.lang.Float.TYPE to Float::class.java,
-                    java.lang.Double.TYPE to Double::class.java,
-                    java.lang.Long.TYPE to Long::class.java,
-                    java.lang.Byte.TYPE to Byte::class.java,
-                    java.lang.Character.TYPE to Character::class.java,
+                    java.lang.Integer.TYPE to java.lang.Integer::class.java,
+                    java.lang.Boolean.TYPE to java.lang.Boolean::class.java,
+                    java.lang.Short.TYPE to java.lang.Short::class.java,
+                    java.lang.Float.TYPE to java.lang.Float::class.java,
+                    java.lang.Double.TYPE to java.lang.Double::class.java,
+                    java.lang.Long.TYPE to java.lang.Long::class.java,
+                    java.lang.Byte.TYPE to java.lang.Byte::class.java,
+                    java.lang.Character.TYPE to java.lang.Character::class.java,
                 )[ng]!!
             )
         },
