@@ -71,6 +71,7 @@
 + Added **Composter Overlay** - Show the cheapest items for organic matter and fuel, show profit per compost/hour/day and time per compost
 + Added **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
++ Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
