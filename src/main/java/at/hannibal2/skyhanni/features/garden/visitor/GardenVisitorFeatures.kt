@@ -43,6 +43,7 @@ class GardenVisitorFeatures {
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
     private val copperPattern = " §8\\+§c(.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(.*) §7Garden Experience".toPattern()
+    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r§f.*".toPattern()
     private val config get() = SkyHanniMod.feature.garden
     private val logger = LorenzLogger("garden/visitors")
 
@@ -462,6 +463,30 @@ class GardenVisitorFeatures {
                 event.blockedReason = "new_visitor_arrived"
             }
         }
+
+        if (GardenAPI.inGarden()) {
+            if (config.visitorHideChat) {
+                if (hideVisitorMessage(event.message)) {
+                    event.blockedReason = "garden_visitor_message"
+                }
+            }
+        }
+    }
+
+    private fun hideVisitorMessage(message: String): Boolean {
+        val matcher = visitorChatMessagePattern.matcher(message)
+        if (!matcher.matches()) return false
+
+        val name = matcher.group("name")
+        if (name == "Spaceman") return false
+        if (name == "Beth") return false
+
+        if (visitors.keys.any { it.removeColor() == name }) {
+            println("blocked msg from '$name'")
+            return true
+        }
+
+        return false
     }
 
     private fun update() {
