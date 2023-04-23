@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -34,7 +35,7 @@ class ComposterInventoryNumbers {
 
                 event.offsetY = -2
                 event.offsetX = -20
-                event.stackTip = "§6$total"
+                event.stackTip = "§6${total.addSeparators()}"
                 return
             }
         }
