@@ -340,12 +340,6 @@ class GardenCropMilestoneDisplay {
 
         val missing = need - have
 
-        val blocksPerSecond = averageBlocksPerSecond * (currentCrop?.multiplier ?: 1)
-
-        val missingTimeSeconds = missing / blocksPerSecond
-        val millis = missingTimeSeconds * 1000
-        val duration = TimeUtils.formatDuration(millis.toLong())
-
         lineMap[0] = Collections.singletonList("§6Mooshroom Cow Perk")
 
         val list = mutableListOf<Any>()
@@ -354,7 +348,16 @@ class GardenCropMilestoneDisplay {
         lineMap[1] = list
 
         lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
-        lineMap[3] = Collections.singletonList("§7In §b$duration")
+
+
+        if (averageBlocksPerSecond != 0.0) {
+            val blocksPerSecond = averageBlocksPerSecond * (currentCrop?.multiplier ?: 1)
+
+            val missingTimeSeconds = missing / blocksPerSecond
+            val millis = missingTimeSeconds * 1000
+            val duration = TimeUtils.formatDuration(millis.toLong())
+            lineMap[3] = Collections.singletonList("§7In §b$duration")
+        }
 
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
         lineMap[4] = Collections.singletonList("§7Percentage: §e$percentageFormat")
