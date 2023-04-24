@@ -66,6 +66,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.test.LorenzTest;
 import at.hannibal2.skyhanni.test.PacketTest;
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter;
+import at.hannibal2.skyhanni.utils.NEUVersionCheck;
 import at.hannibal2.skyhanni.utils.TabListData;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.*;
@@ -75,6 +76,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -86,8 +88,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mod(modid = SkyHanniMod.MODID, clientSideOnly = true, useMetadata = true,
-        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-        dependencies = SkyHanniMod.DEPENDENCIES)
+        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop"
+)
 public class SkyHanniMod {
 
     public static final String MODID = "skyhanni";
@@ -95,8 +97,6 @@ public class SkyHanniMod {
     public static String getVersion() {
         return Loader.instance().getIndexedModList().get(MODID).getVersion();
     }
-
-    public static final String DEPENDENCIES = "after:notenoughupdates@[2.1.1,);";
 
     public static Features feature;
 
@@ -117,6 +117,8 @@ public class SkyHanniMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        NEUVersionCheck.checkIfNeuIsLoaded();
+
         logger = LogManager.getLogger("SkyHanni");
 
         // utils
@@ -275,6 +277,7 @@ public class SkyHanniMod {
         loadModule(new ComposterOverlay());
         loadModule(new DiscordRPCManager());
         loadModule(new GardenCropMilestoneFix());
+        loadModule(new GardenBurrowingSporesNotifier());
 
         Commands.INSTANCE.init();
 
@@ -282,12 +285,16 @@ public class SkyHanniMod {
         loadModule(new ButtonOnPause());
         loadModule(new PacketTest());
 
+    }
+
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
         configManager = new ConfigManager();
         configManager.firstLoad();
 
         MinecraftConsoleFilter.Companion.initLogging();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> configManager.saveConfig("shutdown-hook")));
 
         repo = new RepoManager(configManager.getConfigDirectory());
         repo.loadRepoInformation();

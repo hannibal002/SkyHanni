@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
-import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.Entity
@@ -44,6 +43,7 @@ class GardenVisitorFeatures {
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
     private val copperPattern = " §8\\+§c(.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(.*) §7Garden Experience".toPattern()
+    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r§f.*".toPattern()
     private val config get() = SkyHanniMod.feature.garden
     private val logger = LorenzLogger("garden/visitors")
 
@@ -141,7 +141,7 @@ class GardenVisitorFeatures {
                 list.add(Renderable.optionalLink("$name §8x${amount.addSeparators()}", {
                     if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                         LorenzUtils.setTextIntoSign("$amount")
-                    } else if (!InventoryUtils.inStorage()) {
+                    } else if (!InventoryUtils.inStorage() && !LorenzUtils.noTradeMode) {
                         LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
                         OSUtils.copyToClipboard("$amount")
                     }
@@ -399,7 +399,7 @@ class GardenVisitorFeatures {
             }
         }
         if (visitors.keys.removeIf {
-                val time = System.currentTimeMillis() - SBInfo.getInstance().joinedWorld
+                val time = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
                 val removed = it !in visitorsInTab && time > 2_000
                 if (removed) {
                     logger.log("Removed old visitor: '$it'")
@@ -410,16 +410,28 @@ class GardenVisitorFeatures {
         }
         for (name in visitorsInTab) {
             if (!visitors.containsKey(name)) {
-                visitors[name] = Visitor(name, status = VisitorStatus.NEW)
-                logger.log("New visitor detected: '$name'")
-                if (config.visitorNotificationTitle) {
-                    TitleUtils.sendTitle("§eNew Visitor", 5_000)
-                }
-                if (config.visitorNotificationChat) {
-                    val displayName = GardenVisitorColorNames.getColoredName(name)
-                    LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
-                }
-                updateDisplay()
+                addVisitor(name)
+            }
+        }
+    }
+
+    private fun addVisitor(name: String) {
+        visitors[name] = Visitor(name, status = VisitorStatus.NEW)
+        logger.log("New visitor detected: '$name'")
+
+        if (config.visitorNotificationTitle) {
+            TitleUtils.sendTitle("§eNew Visitor", 5_000)
+        }
+        if (config.visitorNotificationChat) {
+            val displayName = GardenVisitorColorNames.getColoredName(name)
+            LorenzUtils.chat("§e[SkyHanni] $displayName §eis visiting your garden!")
+        }
+        updateDisplay()
+
+        if (System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
+            if (name.removeColor().contains("Jerry")) {
+                logger.log("Jerry!")
+                ItemBlink.setBlink(NEUItems.getItemStackOrNull("JERRY;4"), 5_000)
             }
         }
     }
@@ -451,6 +463,30 @@ class GardenVisitorFeatures {
                 event.blockedReason = "new_visitor_arrived"
             }
         }
+
+        if (GardenAPI.inGarden()) {
+            if (config.visitorHideChat) {
+                if (hideVisitorMessage(event.message)) {
+                    event.blockedReason = "garden_visitor_message"
+                }
+            }
+        }
+    }
+
+    private fun hideVisitorMessage(message: String): Boolean {
+        val matcher = visitorChatMessagePattern.matcher(message)
+        if (!matcher.matches()) return false
+
+        val name = matcher.group("name")
+        if (name == "Spaceman") return false
+        if (name == "Beth") return false
+
+        if (visitors.keys.any { it.removeColor() == name }) {
+            println("blocked msg from '$name'")
+            return true
+        }
+
+        return false
     }
 
     private fun update() {

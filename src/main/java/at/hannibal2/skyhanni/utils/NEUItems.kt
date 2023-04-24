@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import io.github.moulberry.notenoughupdates.NEUManager
@@ -15,7 +16,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
 object NEUItems {
-    private val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
+    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemCache = mutableMapOf<String, ItemStack>()
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
@@ -122,7 +123,8 @@ object NEUItems {
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
-        val isSkull = item === Items.skull
+        val item = checkBlinkItem()
+        val isSkull = item.item === Items.skull
 
         val baseScale = (if (isSkull) 0.8f else 0.6f)
         val finalScale = baseScale * scaleMultiplier
@@ -144,7 +146,7 @@ object NEUItems {
         GlStateManager.scale(finalScale, finalScale, 1.0)
 
         RenderHelper.enableGUIStandardItemLighting()
-        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(this, 0, 0)
+        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
