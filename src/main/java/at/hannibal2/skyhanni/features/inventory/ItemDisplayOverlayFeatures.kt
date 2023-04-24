@@ -128,6 +128,7 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9)) {
             if (InventoryUtils.openInventoryName() == "Your Skills") {
                 if (item.getLore().any { it.contains("Click to view!") }) {
+                    if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
                     if (!itemName.contains("Dungeon")) {
                         val text = itemName.split(" ").last()
                         return "" + text.romanToDecimalIfNeeded()
