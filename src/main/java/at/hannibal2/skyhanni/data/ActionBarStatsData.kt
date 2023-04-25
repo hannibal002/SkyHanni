@@ -5,26 +5,31 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-class ActionBarData {
-    private val regex = "..((?:\\d|,)*)\\/(?:\\d|,)*(.) *..((?:\\d|,)*)..(. \\w*) *..((?:\\d|,)*)\\/(?:\\d|,)*(.*)"
-    private val pattern = Pattern.compile(regex)
+class ActionBarStatsData {
+    private val pattern =
+        Pattern.compile("..((?:\\d|,)*)\\/(?:\\d|,)*(.) *..((?:\\d|,)*)..(. \\w*) *..((?:\\d|,)*)\\/(?:\\d|,)*(.*)")
 // Sample input: §c2,817/2,817❤     §a703§a❈ Defense     §b3,479/3,479✎ Mana
 // Returns the following groups: 1 = 2,817; 2 = ❤; 3 = 703; 4 = ❈ Defense; 5 = 3,479; 6 = ✎ Mana
 
     companion object {
-        var groups = arrayListOf<Any>()
+        var groups = listOf<String>()
     }
 
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
-        groups = arrayListOf()
-        if (!LorenzUtils.inSkyBlock) return
+        groups = readGroups(event.message)
+    }
 
-        val matcher = pattern.matcher(event.message)
-        if (!matcher.matches()) return
+    private fun readGroups(message: String): List<String> {
+        if (!LorenzUtils.inSkyBlock) return emptyList()
 
+        val matcher = pattern.matcher(message)
+        if (!matcher.matches()) return emptyList()
+
+        val list = mutableListOf<String>()
         for (i in 1..matcher.groupCount()) {
-            groups.add(matcher.group(i))
+            list.add(matcher.group(i))
         }
+        return list
     }
 }

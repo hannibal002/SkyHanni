@@ -257,7 +257,7 @@ public class Misc {
         "Custom"
     })
     @ConfigAccordionId(id = 12)
-    public int details = 0;
+    public int discordRPCDetails = 0;
 
     @Expose
     @ConfigOption(name = "Status", desc = "Appears immediately below \"Details\".")
@@ -274,13 +274,13 @@ public class Misc {
         "Custom"
     })
     @ConfigAccordionId(id = 12)
-    public int status = 0;
+    public int discordRPCStatus = 0;
 
     @Expose
     @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
     @ConfigEditorText
     @ConfigAccordionId(id = 12)
-    public String custom = "";
+    public String discordRPCCustom = "";
 
     @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);

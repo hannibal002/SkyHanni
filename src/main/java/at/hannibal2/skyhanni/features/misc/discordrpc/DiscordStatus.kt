@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 // SkyblockAddons code, adapted for SkyHanni
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ActionBarData
+import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -66,7 +66,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     STATS({
-        val groups = ActionBarData.groups
+        val groups = ActionBarStatsData.groups
         var statString = ""
         for (item in groups.indices) {
             when(groups[item]) {
@@ -142,7 +142,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     CUSTOM({
-        SkyHanniMod.feature.misc.custom // custom field in the config
+        SkyHanniMod.feature.misc.discordRPCCustom // custom field in the config
     })
 
     // See SkyblockAddons code for reference

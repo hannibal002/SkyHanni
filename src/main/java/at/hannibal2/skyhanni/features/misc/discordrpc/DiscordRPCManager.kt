@@ -42,8 +42,8 @@ class DiscordRPCManager: IPCListener {
                 }
                 consoleLog("Starting Discord RPC...")
 
-                stateLine = getStatusByConfigId(config.status)
-                detailsLine = getStatusByConfigId(config.details)
+                stateLine = getStatusByConfigId(config.discordRPCStatus)
+                detailsLine = getStatusByConfigId(config.discordRPCDetails)
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(applicationID)
                 client?.setListener(this@DiscordRPCManager) // why must kotlin be this way
@@ -81,8 +81,8 @@ class DiscordRPCManager: IPCListener {
         val location = LorenzUtils.skyBlockArea
         val discordIconKey: String = getDiscordIconKey(location)
 
-        stateLine = getStatusByConfigId(config.status)
-        detailsLine = getStatusByConfigId(config.details)
+        stateLine = getStatusByConfigId(config.discordRPCStatus)
+        detailsLine = getStatusByConfigId(config.discordRPCDetails)
         val presence: RichPresence = RichPresence.Builder()
             .setState(stateLine.getDisplayString(DiscordStatusEntry.STATE))
             .setDetails(detailsLine.getDisplayString(DiscordStatusEntry.DETAILS))

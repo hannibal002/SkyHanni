@@ -150,7 +150,7 @@ public class SkyHanniMod {
         loadModule(new CropAccessoryData());
         loadModule(new MayorElection());
         loadModule(new GardenComposterUpgradesData());
-        loadModule(new ActionBarData());
+        loadModule(new ActionBarStatsData());
 
         // APIs
         loadModule(new BazaarApi());
