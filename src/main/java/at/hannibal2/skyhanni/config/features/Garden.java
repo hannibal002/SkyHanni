@@ -275,6 +275,12 @@ public class Garden {
     @ConfigAccordionId(id = 7)
     public int cropMilestoneShowOnlyBest = 10;
 
+    @Expose
+    @ConfigOption(name = "Expand top list by current Crop", desc = "Add active crop to the end of the list by expanding the set limit")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean cropMilestoneShowCurrent = true;
+
     // TODO moulconfig runnable support
     @Expose
     @ConfigOption(
@@ -624,6 +630,12 @@ public class Garden {
     )
     @ConfigAccordionId(id = 13)
     public int moneyPerHourShowOnlyBest = 5;
+
+    @Expose
+    @ConfigOption(name = "Expand top list by current Crop", desc = "Add active crop to the end of the list by expanding the set limit")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourShowCurrent = true;
 
     // TODO moulconfig runnable support
     @Expose
