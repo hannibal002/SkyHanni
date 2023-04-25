@@ -126,7 +126,7 @@ class CropMoneyDisplay {
             number++
             val cropName = cropNames[internalName]!!
             val isCurrent = cropName == GardenAPI.cropInHand
-            if (number > config.moneyPerHourShowOnlyBest && !isCurrent) continue
+            if (number > config.moneyPerHourShowOnlyBest && (!config.moneyPerHourShowCurrent && isCurrent || !isCurrent)) continue
 
             val list = mutableListOf<Any>()
             if (!config.moneyPerHourCompact) {
