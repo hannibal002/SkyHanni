@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.CropUpgradeUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -17,7 +18,7 @@ class GardenCropUpgrades {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         chatUpgradePattern.matchEntire(event.message)?.groups?.let { matches ->
-            val crop = CropType.getByItemName(matches[1]!!.value) ?: return
+            val crop = getByNameOrNull(matches[1]!!.value) ?: return
             val level = matches[2]!!.value.toInt()
             crop.setUpgradeLevel(level)
         }

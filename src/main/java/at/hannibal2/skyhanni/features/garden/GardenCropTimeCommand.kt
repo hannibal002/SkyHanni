@@ -1,0 +1,73 @@
+package at.hannibal2.skyhanni.features.garden
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
+import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
+import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
+
+object GardenCropTimeCommand {
+    private val config get() = SkyHanniMod.feature.garden
+
+    fun onCommand(args: Array<String>) {
+        if (!config.moneyPerHourDisplay) {
+            LorenzUtils.chat("§c[SkyHanni] §cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            return
+        }
+
+        if (args.size < 2) {
+            LorenzUtils.chat("§cUsage: /shcroptime <amount> <item>")
+            return
+        }
+
+        val rawAmount = args[0]
+        val amount = try {
+            rawAmount.toInt()
+        } catch (e: NumberFormatException) {
+            LorenzUtils.chat("§cNot a valid number: '$rawAmount'")
+            return
+        }
+
+        val rawSearchName = args.toMutableList().drop(1).joinToString(" ")
+        val searchName = rawSearchName.lowercase()
+
+        val map = mutableMapOf<String, Long>()
+        for (entry in CropMoneyDisplay.multipliers) {
+            val internalName = entry.key
+            val itemName = NEUItems.getItemStack(internalName).name!!
+            if (itemName.removeColor().lowercase().contains(searchName)) {
+                val (baseId, baseAmount) = NEUItems.getMultiplier(internalName)
+                val baseName = NEUItems.getItemStack(baseId).name!!
+                val crop = CropType.getByName(baseName.removeColor())
+                val speed = crop.getSpeed()
+
+                val fullAmount = baseAmount.toLong() * amount.toLong()
+                val text = if (baseAmount == 1) {
+                    "§e${amount.addSeparators()}x $itemName"
+                } else {
+                    "§e${amount.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
+                }
+
+                if (speed == -1) {
+                    map["$text §cNo speed data!"] = -1
+                } else {
+                    val missingTimeSeconds = fullAmount / speed
+                    val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
+                    map["$text §b$duration"] = missingTimeSeconds
+                }
+            }
+        }
+
+        if (map.isEmpty()) {
+            LorenzUtils.chat("§c[SkyHanni] §cNo crop item found for '$rawSearchName'")
+            return
+        }
+
+        LorenzUtils.chat("§e[SkyHanni] Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+    }
+}

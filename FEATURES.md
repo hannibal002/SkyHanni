@@ -223,6 +223,7 @@
 + **/shmarkplayer <player>** - marking a player with yellow color.
 + **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
 + **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
++ **/shcroptime <amount> <item>** Displays the estimated time it will take to gather the requested quantity of a particular item based on the current crop speed.
 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)

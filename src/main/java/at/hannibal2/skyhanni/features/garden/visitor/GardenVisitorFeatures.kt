@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -313,7 +313,7 @@ class GardenVisitorFeatures {
                     if (config.visitorExactAmountAndTime) {
                         val multiplier = NEUItems.getMultiplier(internalName)
                         val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
-                        CropType.getByItemName(rawName)?.let {
+                        getByNameOrNull(rawName)?.let {
                             val speed = it.getSpeed()
                             val cropAmount = multiplier.second.toLong() * amount
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
@@ -481,12 +481,7 @@ class GardenVisitorFeatures {
         if (name == "Spaceman") return false
         if (name == "Beth") return false
 
-        if (visitors.keys.any { it.removeColor() == name }) {
-            println("blocked msg from '$name'")
-            return true
-        }
-
-        return false
+        return visitors.keys.any { it.removeColor() == name }
     }
 
     private fun update() {

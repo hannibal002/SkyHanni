@@ -72,6 +72,7 @@
 + Added **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
 + Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
++ Introduced a new command '/shcroptime <amount> <item>' that displays the estimated time it will take to gather the requested quantity of a particular item based on the current crop speed.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
