@@ -33,17 +33,13 @@ enum class CropType(
     val multiplier by lazy { if (this == SUGAR_CANE || this == CACTUS) 2 else 1 }
 
     companion object {
-        fun getByNameOrNull(cropName: String) = values().firstOrNull { it.cropName == cropName }
-
-        fun getByName(name: String) = getByNameOrNull(name) ?: throw RuntimeException("No valid crop type '$name'")
-
-
-        fun getByItemName(itemName: String): CropType? {
+        fun getByNameOrNull(itemName: String): CropType? {
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
             if (itemName == "Seeds") return WHEAT
-
-            return getByNameOrNull(itemName)
+            return values().firstOrNull { it.cropName == itemName }
         }
+
+        fun getByName(name: String) = getByNameOrNull(name) ?: throw RuntimeException("No valid crop type '$name'")
 
         fun IBlockState.getCropType(): CropType? {
             return when (block) {

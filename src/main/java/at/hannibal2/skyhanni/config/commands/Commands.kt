@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -55,6 +56,7 @@ object Commands {
         registerCommand("shtestgardenvisitors") { LorenzTest.testGardenVisitors() }
         registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
         registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
+        registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

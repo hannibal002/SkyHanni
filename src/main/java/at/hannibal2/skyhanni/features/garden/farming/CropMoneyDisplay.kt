@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -25,12 +26,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CropMoneyDisplay {
+    companion object {
+        var multipliers = mapOf<String, Int>()
+    }
+
     private var display = mutableListOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
     private var tick = 0
     private var loaded = false
     private var ready = false
-    private var multipliers = mapOf<String, Int>()
     private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
     private var hasCropInHand = false
     private val toolHasBountiful: MutableMap<CropType, Boolean> get() = SkyHanniMod.feature.hidden.gardenToolHasBountiful
@@ -304,7 +308,7 @@ class CropMoneyDisplay {
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
                 val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
-                val crop = CropType.getByItemName(itemName)
+                val crop = getByNameOrNull(itemName)
                 crop?.let {
                     map[internalName] = amount
                     cropNames[internalName] = it
