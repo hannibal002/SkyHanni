@@ -62,7 +62,7 @@ class GardenBestCropTime {
             val duration = TimeUtils.formatDuration(millis, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++
-            if (number > config.cropMilestoneShowOnlyBest && !isCurrent) continue
+            if (number > config.cropMilestoneShowOnlyBest && (!config.cropMilestoneShowCurrent && isCurrent || !isCurrent)) continue
 
             val list = mutableListOf<Any>()
             if (!config.cropMilestoneBestCompact) {
