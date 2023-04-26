@@ -21,9 +21,8 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 class DiscordRPCManager : IPCListener {
-
-    private val applicationID: Long = 653443797182578707L
-    private val updatePeriod: Long = 4200L
+    private val applicationID = 653443797182578707L
+    private val updatePeriod = 4200L
 
     private val config get() = feature.misc.discordRPC
 
@@ -34,7 +33,9 @@ class DiscordRPCManager : IPCListener {
     private var startOnce = false
 
     private var updateTimer: Timer? = null
-    private var connected: Boolean = false
+    private var connected = false
+
+    private val DiscordLocationKey = DiscordLocationKey()
 
     private fun start() {
         coroutineScope.launch {
@@ -106,7 +107,7 @@ class DiscordRPCManager : IPCListener {
     fun updatePresence() {
         println("updatePresence")
         val location = LorenzUtils.skyBlockArea
-        val discordIconKey = getDiscordIconKey(location)
+        val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
 
         secondLine = getStatusByConfigId(config.secondLine.get())
         firstLine = getStatusByConfigId(config.firstLine.get())
@@ -117,128 +118,6 @@ class DiscordRPCManager : IPCListener {
             .setLargeImage(discordIconKey, location)
             .build()
         client?.sendRichPresence(presence)
-    }
-
-//    fun setStateLine(status: DiscordStatus) {
-//        this.stateLine = status
-//        if (isActive()) {
-//            updatePresence()
-//        }
-//    }
-//
-//    fun setDetailsLine(status: DiscordStatus) {
-//        this.detailsLine = status
-//        if (isActive()) {
-//            updatePresence()
-//        }
-//    }
-
-    private fun getDiscordIconKey(location: String): String {
-        val normalRPC: Set<String> = setOf(
-            "auction-house",
-            "bank",
-            "canvas-room",
-            "coal-mine",
-            "colosseum",
-            "farm",
-            "fashion-shop",
-            "flower-house",
-            "forest",
-            "graveyard",
-            "library",
-            "mountain",
-            "ruins",
-            "tavern",
-            "village",
-            "wilderness",
-            "wizard-tower",
-            "birch-park",
-            "spruce-woods",
-            "savanna-woodland",
-            "dark-thicket",
-            "jungle-island",
-            "gold-mine",
-            "slimehill",
-            "diamond-reserve",
-            "obsidian-sanctuary",
-            "the-barn",
-            "mushroom-desert",
-            "the-end"
-        )
-        // list of tokens where the name can just be lowercased and spaces can be replaced with dashes
-
-        val specialRPC: Map<String, String> = mapOf(
-            "Fisherman's Hut" to "fishermans-hut", "Unincorporated" to "high-level",
-            "Dragon's Nest" to "dragons-nest", "Void Sepulture" to "the-end", "Void Slate" to "the-end",
-            "Zealot Bruiser Hideout" to "the-end", "Desert Settlement" to "mushroom-desert",
-            "Oasis" to "mushroom-desert", "Desert Mountain" to "mushroom-desert", "Jake's House" to "mushroom-desert",
-            "Trapper's Den" to "mushroom-desert", "Mushroom Gorge" to "mushroom-desert",
-            "Glowing Mushroom Cave" to "mushroom-desert", "Overgrown Mushroom Cave" to "mushroom-desert",
-            "Shepherd's Keep" to "mushroom-desert", "Treasure Hunter Camp" to "mushroom-desert",
-            "Windmill" to "the-barn", "Spider's Den" to "spiders-den", "Arachne's Burrow" to "spiders-den",
-            "Arachne's Sanctuary" to "spiders-den", "Archaeologist's Camp" to "spiders-den",
-            "Grandma's House" to "spiders-den", "Gravel Mines" to "spiders-den", "Spider Mound" to "spiders-den",
-            "Melody's Plateau" to "forest", "Viking Longhouse" to "forest", "Lonely Island" to "forest",
-            "Howling Cave" to "forest"
-        ) // maps locations that do have a token, but have parentheses or a legacy key
-
-        val specialNetherRPC: Array<String> = arrayOf(
-            "Aura's Lab",
-            "Barbarian Outpost",
-            "Belly of the Beast",
-            "Blazing Volcano",
-            "Burning Desert",
-            "Cathedral",
-            "Chief's Hut",
-            "Courtyard",
-            "Crimson Fields",
-            "Crimson Isle",
-            "Dojo",
-            "Dragontail Auction House",
-            "Dragontail Bank",
-            "Dragontail Bazaar",
-            "Dragontail Blacksmith",
-            "Dragontail Townsquare",
-            "Dragontail",
-            "Forgotten Skull",
-            "Igrupan's Chicken Coop",
-            "Igrupan's House",
-            "Mage Council",
-            "Mage Outpost",
-            "Magma Chamber",
-            "Matriarch's Lair",
-            "Minion Shop",
-            "Mystic Marsh",
-            "Odger's Hut",
-            "Plhlegblast Pool",
-            "Ruins of Ashfang",
-            "Scarleton Auction House",
-            "Scarleton Bank",
-            "Scarleton Bazaar",
-            "Scarleton Blacksmith",
-            "Scarleton Minion Shop",
-            "Scarleton Plaza",
-            "Scarleton",
-            "Smoldering Tomb",
-            "Stronghold",
-            "The Bastion",
-            "The Dukedom",
-            "The Wasteland",
-            "Throne Room"
-        )
-        // list of nether locations because there are sooo many (truncated some according to scoreboard)
-
-        val keyIfNormal: String = location.lowercase().replace(' ', '-')
-
-        return if (normalRPC.contains(keyIfNormal)) {
-            keyIfNormal
-        } else if (specialRPC.containsKey(location)) {
-            specialRPC[location]!!
-        } else if (specialNetherRPC.contains(location)) {
-            "blazing-fortress"
-        } else {
-            "skyblock" // future proofing since we can't update the images anymore :(
-        }
     }
 
     override fun onReady(client: IPCClient) {
@@ -267,13 +146,13 @@ class DiscordRPCManager : IPCListener {
     }
 
     private fun cancelTimer() {
-        if (updateTimer != null) {
-            updateTimer?.cancel()
+        updateTimer?.let {
+            it.cancel()
             updateTimer = null
         }
     }
 
-    private fun getStatusByConfigId(id: Int) = DiscordStatus.values().getOrElse(id) { DiscordStatus.BITS }
+    private fun getStatusByConfigId(id: Int) = DiscordStatus.values().getOrElse(id) { DiscordStatus.NONE }
 
     private fun isEnabled() = config.enabled.get()
 
