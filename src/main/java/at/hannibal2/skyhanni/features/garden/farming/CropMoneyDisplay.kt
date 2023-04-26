@@ -30,7 +30,7 @@ class CropMoneyDisplay {
         var multipliers = mapOf<String, Int>()
     }
 
-    private var display = mutableListOf<List<Any>>()
+    private var display = listOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
     private var tick = 0
     private var loaded = false
@@ -69,7 +69,7 @@ class CropMoneyDisplay {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): MutableList<List<Any>> {
+    private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
 
         val title = if (config.moneyPerHourCompact) {
@@ -86,9 +86,7 @@ class CropMoneyDisplay {
 
         if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
 
-        if (!config.moneyPerHourHideTitle) {
-            newDisplay.addAsSingletonList(fullTitle(title))
-        }
+        newDisplay.addAsSingletonList(fullTitle(title))
 
         if (!config.cropMilestoneProgress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
@@ -170,8 +168,7 @@ class CropMoneyDisplay {
 
             newDisplay.add(list)
         }
-
-        return newDisplay
+        return if (config.moneyPerHourHideTitle) newDisplay.drop(1) else newDisplay
     }
 
     private fun fullTitle(title: String): String {

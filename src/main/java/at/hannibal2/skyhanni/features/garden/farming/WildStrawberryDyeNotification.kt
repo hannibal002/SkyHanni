@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.OwnInventorItemUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -37,6 +39,7 @@ class WildStrawberryDyeNotification {
                 TitleUtils.sendTitle(name, 5_000)
                 LorenzUtils.chat("§e[SkyHanni] You found a $name§e!")
                 SoundUtils.playBeepSound()
+                ItemBlink.setBlink(NEUItems.getItemStackOrNull("DYE_WILD_STRAWBERRY"), 5_000)
             }
         }
     }

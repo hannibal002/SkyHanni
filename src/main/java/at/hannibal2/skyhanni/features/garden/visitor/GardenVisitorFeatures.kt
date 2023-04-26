@@ -433,6 +433,10 @@ class GardenVisitorFeatures {
                 logger.log("Jerry!")
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("JERRY;4"), 5_000)
             }
+            if (name.removeColor().contains("Spaceman")) {
+                logger.log("Spaceman!")
+                ItemBlink.setBlink(NEUItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
+            }
         }
     }
 
