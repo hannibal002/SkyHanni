@@ -244,7 +244,7 @@ public class Misc {
         public Property<Boolean> enabled = Property.of(false);
 
         @Expose
-        @ConfigOption(name = "Details", desc = "Appears immediately below \"Skyblock\".")
+        @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
         @ConfigEditorDropdown(values = {
                 "Nothing",
                 "Location",
@@ -257,10 +257,10 @@ public class Misc {
                 "Slayer",
                 "Custom"
         })
-        public Property<Integer> details = Property.of(0);
+        public Property<Integer> firstLine = Property.of(0);
 
         @Expose
-        @ConfigOption(name = "Status", desc = "Appears immediately below \"Details\".")
+        @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
         @ConfigEditorDropdown(values = {
                 "Nothing",
                 "Location",
@@ -273,7 +273,7 @@ public class Misc {
                 "Slayer",
                 "Custom"
         })
-        public Property<Integer> status = Property.of(0);
+        public Property<Integer> secondLine = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")

@@ -28,8 +28,8 @@ class DiscordRPCManager : IPCListener {
     private val config get() = feature.misc.discordRPC
 
     private var client: IPCClient? = null
-    private lateinit var detailsLine: DiscordStatus
-    private lateinit var stateLine: DiscordStatus
+    private lateinit var secondLine: DiscordStatus
+    private lateinit var firstLine: DiscordStatus
     private var startTimestamp: Long? = null
     private var startOnce = false
 
@@ -44,8 +44,8 @@ class DiscordRPCManager : IPCListener {
                 }
                 consoleLog("Starting Discord RPC...")
 
-                stateLine = getStatusByConfigId(config.status.get())
-                detailsLine = getStatusByConfigId(config.details.get())
+                firstLine = getStatusByConfigId(config.firstLine.get())
+                secondLine = getStatusByConfigId(config.secondLine.get())
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(applicationID)
                 client?.setListener(this@DiscordRPCManager) // why must kotlin be this way
@@ -80,12 +80,22 @@ class DiscordRPCManager : IPCListener {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (property in listOf(
-            config.enabled,
-            config.details,
-            config.status,
+            config.firstLine,
+            config.secondLine,
             config.customText,
         )) {
-            property.whenChangedWithDifference { updatePresence() }
+            property.whenChangedWithDifference {
+                if (isActive()) {
+                    updatePresence()
+                }
+            }
+        }
+        config.enabled.whenChanged { _, new ->
+            if (new) {
+//                start()
+            } else {
+                stop()
+            }
         }
     }
 
@@ -98,11 +108,11 @@ class DiscordRPCManager : IPCListener {
         val location = LorenzUtils.skyBlockArea
         val discordIconKey = getDiscordIconKey(location)
 
-        stateLine = getStatusByConfigId(config.status.get())
-        detailsLine = getStatusByConfigId(config.details.get())
+        secondLine = getStatusByConfigId(config.secondLine.get())
+        firstLine = getStatusByConfigId(config.firstLine.get())
         val presence: RichPresence = RichPresence.Builder()
-            .setState(stateLine.getDisplayString(DiscordStatusEntry.STATE))
-            .setDetails(detailsLine.getDisplayString(DiscordStatusEntry.DETAILS))
+            .setDetails(firstLine.getDisplayString(DiscordStatusEntry.DETAILS))
+            .setState(secondLine.getDisplayString(DiscordStatusEntry.STATE))
             .setStartTimestamp(startTimestamp!!)
             .setLargeImage(discordIconKey, location)
             .build()
