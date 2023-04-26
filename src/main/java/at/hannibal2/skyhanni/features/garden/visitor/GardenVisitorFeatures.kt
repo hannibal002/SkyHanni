@@ -416,7 +416,10 @@ class GardenVisitorFeatures {
     }
 
     private fun addVisitor(name: String) {
-        visitors[name] = Visitor(name, status = VisitorStatus.NEW)
+        val visitor = Visitor(name, status = VisitorStatus.NEW)
+        visitors[name] = visitor
+        VisitorArrivalEvent(visitor).postAndCatch()
+
         logger.log("New visitor detected: '$name'")
 
         if (config.visitorNotificationTitle) {
