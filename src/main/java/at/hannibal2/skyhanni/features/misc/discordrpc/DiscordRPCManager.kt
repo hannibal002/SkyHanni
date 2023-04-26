@@ -103,7 +103,6 @@ class DiscordRPCManager : IPCListener {
     }
 
     fun updatePresence() {
-        println("updatePresence")
         val location = LorenzUtils.skyBlockArea
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
 
