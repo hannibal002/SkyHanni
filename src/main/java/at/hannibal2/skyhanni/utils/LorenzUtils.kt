@@ -134,8 +134,11 @@ object LorenzUtils {
 
     fun formatInteger(l: Long): String = NumberFormat.getIntegerInstance().format(l)
 
-    fun formatDouble(d: Double, round: Int = 1): String =
-        NumberFormat.getNumberInstance().format(d.round(round))
+    fun formatDouble(d: Double, round: Int = 1): String {
+        val numberInstance = NumberFormat.getNumberInstance()
+        numberInstance.maximumFractionDigits = round
+        return numberInstance.format(d.round(round))
+    }
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
