@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.LorenzTest
@@ -61,6 +62,7 @@ object Commands {
         registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
         registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
         registerCommand("shclearcropspeed") { GardenAPI.clearCropSpeed() }
+        registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
