@@ -20,10 +20,9 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     LOCATION({
         val location = LorenzUtils.skyBlockArea
-        if (location ==  "Your Island") {
+        if (location == "Your Island") {
             "Private Island"
-        }
-        else {
+        } else {
             location
             /**
              * looks slightly weird if visiting someone else's island,
@@ -48,7 +47,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             }
         }
 
-        if (coins ==  "1") "1 Coin" else "$coins Coins"
+        if (coins == "1") "1 Coin" else "$coins Coins"
     }),
 
     BITS({
@@ -70,10 +69,10 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val groups = ActionBarStatsData.groups
         var statString = ""
         for (item in groups.indices) {
-            when(groups[item]) {
-                "❤" ->  statString = "❤${groups[item - 1]} "
-                "❈ Defense" ->  statString = "$statString❈${groups[item - 1]} "
-                "✎ Mana" ->  statString = "$statString✎${groups[item - 1]} "
+            when (groups[item]) {
+                "❤" -> statString = "❤${groups[item - 1]} "
+                "❈ Defense" -> statString = "$statString❈${groups[item - 1]} "
+                "✎ Mana" -> statString = "$statString✎${groups[item - 1]} "
             }
         }
         statString
@@ -81,10 +80,9 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     ITEM({
         val player: net.minecraft.client.entity.EntityPlayerSP = net.minecraft.client.Minecraft.getMinecraft().thePlayer
-        if (player.heldItem !=  null) {
+        if (player.heldItem != null) {
             String.format("Holding ${player.heldItem.displayName.removeColor()}")
-        }
-        else {
+        } else {
             "No item in hand"
         }
     }),
@@ -93,7 +91,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         fun formatNum(num: Int): Int {
             val rem = num % 10
             var returnNum = num - rem // floor()
-            if (returnNum ==  0) {
+            if (returnNum == 0) {
                 returnNum = "0$num".toInt()
                 /**
                  * and this is so that if the minute value is ever
@@ -117,7 +115,8 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         var slayerName = ""
         var slayerLevel = ""
         var bossAlive = "spawning"
-        val slayerRegex = Pattern.compile("((?:\\w| )*) ([IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
+        val slayerRegex =
+            Pattern.compile("((?:\\w| )*) ([IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val noColorLine = line.removeColor()
@@ -125,15 +124,14 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             if (match.matches()) {
                 slayerName = match.group(1)
                 slayerLevel = match.group(2)
-            }
-            else if (noColorLine ==  "Slay the boss!") bossAlive = "slaying"
-            else if (noColorLine ==  "Boss slain!") bossAlive = "slain"
+            } else if (noColorLine == "Slay the boss!") bossAlive = "slaying"
+            else if (noColorLine == "Boss slain!") bossAlive = "slain"
         }
 
-        if (slayerLevel ==  "") "Planning to do a slayer quest"// selected slayer in rpc but hasn't started a quest
-        else if (bossAlive ==  "spawning") "Spawning a $slayerName $slayerLevel boss."
-        else if (bossAlive ==  "slaying") "Slaying a $slayerName $slayerLevel boss."
-        else if (bossAlive ==  "slain") "Finished slaying a $slayerName $slayerLevel boss."
+        if (slayerLevel == "") "Planning to do a slayer quest"// selected slayer in rpc but hasn't started a quest
+        else if (bossAlive == "spawning") "Spawning a $slayerName $slayerLevel boss."
+        else if (bossAlive == "slaying") "Slaying a $slayerName $slayerLevel boss."
+        else if (bossAlive == "slain") "Finished slaying a $slayerName $slayerLevel boss."
         else "Something went wrong with slayer detection!"
     }),
 
