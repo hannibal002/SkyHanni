@@ -142,7 +142,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     CUSTOM({
-        SkyHanniMod.feature.misc.discordRPCCustom // custom field in the config
+        SkyHanniMod.feature.misc.discordRPC.customText // custom field in the config
     })
 
     // See SkyblockAddons code for reference

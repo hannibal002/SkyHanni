@@ -23,7 +23,7 @@ class DiscordRPCManager: IPCListener {
     private val applicationID: Long = 653443797182578707L
     private val updatePeriod: Long = 4200L
 
-    private val config get() = feature.misc
+    private val config get() = feature.misc.discordRPC
 
     private var client: IPCClient? = null
     private lateinit var detailsLine: DiscordStatus
@@ -42,8 +42,8 @@ class DiscordRPCManager: IPCListener {
                 }
                 consoleLog("Starting Discord RPC...")
 
-                stateLine = getStatusByConfigId(config.discordRPCStatus)
-                detailsLine = getStatusByConfigId(config.discordRPCDetails)
+                stateLine = getStatusByConfigId(config.status)
+                detailsLine = getStatusByConfigId(config.details)
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(applicationID)
                 client?.setListener(this@DiscordRPCManager) // why must kotlin be this way
@@ -81,8 +81,8 @@ class DiscordRPCManager: IPCListener {
         val location = LorenzUtils.skyBlockArea
         val discordIconKey: String = getDiscordIconKey(location)
 
-        stateLine = getStatusByConfigId(config.discordRPCStatus)
-        detailsLine = getStatusByConfigId(config.discordRPCDetails)
+        stateLine = getStatusByConfigId(config.status)
+        detailsLine = getStatusByConfigId(config.details)
         val presence: RichPresence = RichPresence.Builder()
             .setState(stateLine.getDisplayString(DiscordStatusEntry.STATE))
             .setDetails(detailsLine.getDisplayString(DiscordStatusEntry.DETAILS))
@@ -179,7 +179,7 @@ class DiscordRPCManager: IPCListener {
     }
 
     private fun isEnabled(): Boolean {
-        return config.discordRPCEnabled
+        return config.enabled
     }
 
     @SubscribeEvent

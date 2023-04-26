@@ -231,56 +231,55 @@ public class Misc {
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
 
-    @Expose
     @ConfigOption(name = "Discord Rich Presence", desc = "")
-    @ConfigEditorAccordion(id = 12)
-    public boolean discordRPC = false;
-
+    @Accordion
     @Expose
-    @ConfigOption(name = "Enable Discord RPC", desc = "Details about your Skyblock session displayed through Discord.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
-    public boolean discordRPCEnabled = false;
+    public DiscordRPC discordRPC = new DiscordRPC();
 
-    @Expose
-    @ConfigOption(name = "Details", desc = "Appears immediately below \"Skyblock\".")
-    @ConfigEditorDropdown(values = {
-        "Nothing",
-        "Location",
-        "Purse",
-        "Bits",
-        "Stats",
-        "Held Item",
-        "Skyblock Date",
-        "Profile (Fruit)",
-        "Slayer",
-        "Custom"
-    })
-    @ConfigAccordionId(id = 12)
-    public int discordRPCDetails = 0;
+    public static class DiscordRPC {
 
-    @Expose
-    @ConfigOption(name = "Status", desc = "Appears immediately below \"Details\".")
-    @ConfigEditorDropdown(values = {
-        "Nothing",
-        "Location",
-        "Purse",
-        "Bits",
-        "Stats",
-        "Held Item",
-        "Skyblock Date",
-        "Profile (Fruit)",
-        "Slayer",
-        "Custom"
-    })
-    @ConfigAccordionId(id = 12)
-    public int discordRPCStatus = 0;
+        @Expose
+        @ConfigOption(name = "Enable Discord RPC", desc = "Details about your Skyblock session displayed through Discord.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
 
-    @Expose
-    @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
-    @ConfigEditorText
-    @ConfigAccordionId(id = 12)
-    public String discordRPCCustom = "";
+        @Expose
+        @ConfigOption(name = "Details", desc = "Appears immediately below \"Skyblock\".")
+        @ConfigEditorDropdown(values = {
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom"
+        })
+        public int details = 0;
+
+        @Expose
+        @ConfigOption(name = "Status", desc = "Appears immediately below \"Details\".")
+        @ConfigEditorDropdown(values = {
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom"
+        })
+        public int status = 0;
+
+        @Expose
+        @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
+        @ConfigEditorText
+        public String customText = "";
+    }
 
     @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);

@@ -75,7 +75,6 @@ public class About {
 
         @ConfigOption(name = "DiscordIPC", desc = "DiscordIPC is available under the Apache License 2.0")
         @ConfigEditorButton(buttonText = "GitHub")
-        public Runnable discordRPC = () -> Utils.openUrl("https://github.com/jagrosh/DiscordIPC");
-
+        public Runnable discordRPC = () -> OSUtils.openBrowser("https://github.com/jagrosh/DiscordIPC");
     }
 }
