@@ -80,7 +80,7 @@ class GardenCropMilestoneDisplay {
     @SubscribeEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         needsInventory = false
-        bestCropTime.updateTimeTillNextCrop()
+        GardenBestCropTime.updateTimeTillNextCrop()
         update()
     }
 
@@ -285,7 +285,7 @@ class GardenCropMilestoneDisplay {
             val missing = need - have
             val missingTimeSeconds = missing / farmingFortuneSpeed
             val millis = missingTimeSeconds * 1000
-            bestCropTime.timeTillNextCrop[crop] = millis
+            GardenBestCropTime.timeTillNextCrop[crop] = millis
             val duration = TimeUtils.formatDuration(millis)
             if (config.cropMilestoneWarnClose) {
                 if (millis < 5_900) {

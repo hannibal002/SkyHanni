@@ -275,6 +275,7 @@ public class SkyHanniMod {
         loadModule(new ComposterOverlay());
         loadModule(new GardenCropMilestoneFix());
         loadModule(new GardenBurrowingSporesNotifier());
+        loadModule(new WildStrawberryDyeNotification());
 
         Commands.INSTANCE.init();
 

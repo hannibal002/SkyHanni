@@ -5,22 +5,30 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
+import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
     private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
 
     var toolInHand: String? = null
+    var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
     var mushroomCowPet = false
     var onBarnPlot = false
@@ -61,6 +69,22 @@ object GardenAPI {
         }
     }
 
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        SkyHanniMod.coroutineScope.launch {
+            delay(2.seconds)
+            withContext(MinecraftDispatcher) {
+                if (inGarden()) {
+                    checkItemInHand()
+                }
+            }
+        }
+    }
+
+    private fun updateGardenTool() {
+        GardenToolChangeEvent(cropInHand, itemInHand).postAndCatch()
+    }
+
     private fun checkItemInHand() {
         val toolItem = Minecraft.getMinecraft().thePlayer.heldItem
         val crop = toolItem?.getCropType()
@@ -68,7 +92,8 @@ object GardenAPI {
         if (toolInHand != newTool) {
             toolInHand = newTool
             cropInHand = crop
-            GardenToolChangeEvent(crop, toolItem).postAndCatch()
+            itemInHand = toolItem
+            updateGardenTool()
         }
     }
 
@@ -137,4 +162,13 @@ object GardenAPI {
     fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory || SkyMartCopperPrice.inInventory
+
+    fun clearCropSpeed() {
+        for (type in CropType.values()) {
+            type.setSpeed(-1)
+        }
+        GardenBestCropTime.reset()
+        updateGardenTool()
+        LorenzUtils.chat("§e[SkyHanni] Manually reset all crop speed data!")
+    }
 }

@@ -62,6 +62,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
+    // TODO use OwnInventorItemUpdateEvent
     private fun checkInventoryForTrophyFish() {
         val fishQuest = getQuest<TrophyFishQuest>() ?: return
         if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return

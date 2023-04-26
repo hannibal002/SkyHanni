@@ -295,6 +295,12 @@ public class Garden {
     @ConfigAccordionId(id = 7)
     public int cropMilestoneShowOnlyBest = 10;
 
+    @Expose
+    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 7)
+    public boolean cropMilestoneShowCurrent = true;
+
     // TODO moulconfig runnable support
     @Expose
     @ConfigOption(
@@ -644,6 +650,12 @@ public class Garden {
     )
     @ConfigAccordionId(id = 13)
     public int moneyPerHourShowOnlyBest = 5;
+
+    @Expose
+    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourShowCurrent = true;
 
     // TODO moulconfig runnable support
     @Expose
@@ -996,11 +1008,15 @@ public class Garden {
     @ConfigEditorBoolean
     public boolean fungiCutterWarn = true;
 
-
     @Expose
     @ConfigOption(name = "Burrowing Spores", desc = "Show a notification when a Burrowing Spores spawns during farming mushrooms.")
     @ConfigEditorBoolean
     public boolean burrowingSporesNotification = true;
+
+    @Expose
+    @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops during farming.")
+    @ConfigEditorBoolean
+    public boolean wildStrawberryDyeNotification = true;
 
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")

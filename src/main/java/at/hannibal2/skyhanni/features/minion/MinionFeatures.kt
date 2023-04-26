@@ -37,7 +37,6 @@ class MinionFeatures {
 
     private var lastCoinsRecived = 0L
     private var lastMinionPickedUp = 0L
-    private val minions = mutableMapOf<LorenzVec, MinionData>()
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (.*)".toPattern()
 
@@ -179,20 +178,6 @@ class MinionFeatures {
         return "§7Coins/day with $hopperName§7: §6$format coins"
     }
 
-    private fun saveConfig() {
-        val minionConfig = SkyHanniMod.feature.hidden.minionLastClick
-        val minionName = SkyHanniMod.feature.hidden.minionName
-
-        minionConfig.clear()
-        minionName.clear()
-        for (minion in minions) {
-            val coordinates = minion.key.encodeToString()
-            val data = minion.value
-            minionConfig[coordinates] = data.lastClicked
-            minionName[coordinates] = data.displayName
-        }
-    }
-
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         lastClickedEntity = null
@@ -281,6 +266,30 @@ class MinionFeatures {
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
         if (config.hopperProfitDisplay) {
             config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
+        }
+    }
+
+    companion object {
+        private val minions = mutableMapOf<LorenzVec, MinionData>()
+
+        fun clearMinionData() {
+            minions.clear()
+            saveConfig()
+            LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
+        }
+
+        private fun saveConfig() {
+            val minionConfig = SkyHanniMod.feature.hidden.minionLastClick
+            val minionName = SkyHanniMod.feature.hidden.minionName
+
+            minionConfig.clear()
+            minionName.clear()
+            for (minion in minions) {
+                val coordinates = minion.key.encodeToString()
+                val data = minion.value
+                minionConfig[coordinates] = data.lastClicked
+                minionName[coordinates] = data.displayName
+            }
         }
     }
 }
