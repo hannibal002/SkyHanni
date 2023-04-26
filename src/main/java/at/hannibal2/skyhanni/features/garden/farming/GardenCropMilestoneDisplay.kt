@@ -154,12 +154,14 @@ class GardenCropMilestoneDisplay {
     private var currentCrop: CropType? = null
     private var blocksBroken = 0
     private var lastBlocksBroken = 0
+    private var secondsStopped = 0
 
     private fun resetSpeed() {
         currentSpeed = 0
         averageBlocksPerSecond = 0.0
         blocksBroken = 0
         blocksSpeedList.clear()
+        secondsStopped = 0
     }
 
     init {
@@ -182,20 +184,27 @@ class GardenCropMilestoneDisplay {
         val blocksBroken = blocksBroken.coerceAtMost(20)
         this.blocksBroken = 0
 
-        // If the difference in speed between the current and the previous bps value is too high, disregard this value
-        if (abs(lastBlocksBroken - blocksBroken) > 4) {
-            if (blocksSpeedList.isNotEmpty()) {
-                blocksSpeedList.removeLast()
-            }
-        } else if (blocksBroken >= 2) {
+        // skipping seconds when not farming momentarily eg. typing in chat hopefully doesn't skip the time it takes to change between rows
+        if (blocksBroken >= config.blocksReset) {
             blocksSpeedList.add(blocksBroken)
-            while (blocksSpeedList.size > 120) {
+            // removing the first second of tracking as it is not a full second
+            if (blocksSpeedList.size == 2) {
                 blocksSpeedList.removeFirst()
+                blocksSpeedList.add(blocksBroken)
             }
+
             averageBlocksPerSecond = blocksSpeedList.average()
+            secondsStopped = 0
 
         }
+        else {
+            secondsStopped ++
+            if (secondsStopped >= 5) {
+                resetSpeed()
+            }
+        }
         lastBlocksBroken = blocksBroken
+
 
         if (finneganPerkActive()) {
             currentCrop?.let {
@@ -293,7 +302,7 @@ class GardenCropMilestoneDisplay {
 
             val format = LorenzUtils.formatInteger(farmingFortuneSpeed * 60)
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
-            val formatBps = LorenzUtils.formatDouble(averageBlocksPerSecond)
+            val formatBps = LorenzUtils.formatDouble(averageBlocksPerSecond, config.blocksDecimals)
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$formatBps")
         }
 

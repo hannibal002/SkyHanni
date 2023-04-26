@@ -232,12 +232,32 @@ public class Garden {
                     "§e12,300§8/§e100,000",
                     "§7In §b12m 34s",
                     "§7Crops/Minute§8: §e12,345",
-                    "§7Blocks/Second§8: §e20",
+                    "§7Blocks/Second§8: §e19.85",
                     "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 6)
-    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
+    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+
+    @Expose
+    @ConfigOption(name = "Block Broken Precision", desc = "How many decimal places in blocks/second")
+    @ConfigEditorSlider(
+            minValue = 0,
+            maxValue = 4,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 6)
+    public int blocksDecimals = 2;
+
+    @Expose
+    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds of not farming until blocks/second resets")
+    @ConfigEditorSlider(
+            minValue = 2,
+            maxValue = 60,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 6)
+    public int blocksReset = 10;
 
     @Expose
     public Position cropMilestoneProgressDisplayPos = new Position(376, 19, false, true);
@@ -732,7 +752,7 @@ public class Garden {
     public int nextJacobContestWarnTime = 60 * 2;
 
     @Expose
-    @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
+    @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and minecraft is not in focus.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestWarnPopup = false;
