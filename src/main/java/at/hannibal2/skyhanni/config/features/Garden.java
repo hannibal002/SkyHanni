@@ -632,7 +632,7 @@ public class Garden {
     public int moneyPerHourShowOnlyBest = 5;
 
     @Expose
-    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list")
+    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourShowCurrent = true;
