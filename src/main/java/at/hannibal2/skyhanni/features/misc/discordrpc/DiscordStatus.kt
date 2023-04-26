@@ -13,8 +13,8 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
 import java.util.regex.Pattern
 
-enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) { // implements "ButtonSelect:SelectItem". no idea how to translate that into skyhanni
-
+enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
+    // implements "ButtonSelect:SelectItem". no idea how to translate that into skyhanni
 
     NONE(null),
 
@@ -24,9 +24,17 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             "Private Island"
         }
         else {
-            location // looks slightly weird if visiting someone else's island, I was thinking of using LorenzUtils.skyblockIsland to determine if they're visitng but it takes too long to load, so we'd have to put in some sort of artificial delay like what I did in DiscordRPCManager.onWorldChange.
-            // after that, use the tablist "Owner:" line to get the person we're visiting but i don't know if that'll work with coops and you'd have to deal with color codes as well
-            // then again, I'm pretty sure sba had "'s Island" without the name filled in this entire time so I'd rather have [RANK] NameThatGetsCutOff for example than 's Island
+            location
+            /**
+             * looks slightly weird if visiting someone else's island,
+             *    I was thinking of using LorenzUtils . skyblockIsland to determine if they're visiting,
+             *    but it takes too long to load, so we 'd have to put in some sort of artificial delay
+             *    like what I did in DiscordRPCManager.onWorldChange.
+             *    after that, use the tab-list "Owner:" line to get the person we're visiting, but I don't know if
+             *    that'll work with coops, and you'd have to deal with color codes as well
+             *    as again, I'm pretty sure sba had "'s Island" without the name filled in this entire time,
+             *    so I 'd rather have [RANK] NameThatGetsCutOff for example than 's Island
+             */
         }
     }),
 
@@ -40,19 +48,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             }
         }
 
-        if (coins ==  "1") {
-            "1 Coin"
-        }
-        else {
-            "$coins Coins"
-        }
+        if (coins ==  "1") "1 Coin" else "$coins Coins"
     }),
 
     BITS({
-       val scoreboard = ScoreboardData.sidebarLinesFormatted
-       var bits = ""
-
-        for (line in scoreboard) {
+        var bits = ""
+        for (line in ScoreboardData.sidebarLinesFormatted) {
             if (line.startsWith("Bits: ")) {
                 bits = line.subSequence(8 until line.length).toString()
             }
@@ -78,8 +79,6 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         statString
     }),
 
-    // I'm not doing zealot counter. Who even farms those anymore?
-
     ITEM({
         val player: net.minecraft.client.entity.EntityPlayerSP = net.minecraft.client.Minecraft.getMinecraft().thePlayer
         if (player.heldItem !=  null) {
@@ -91,12 +90,15 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     TIME({
-
         fun formatNum(num: Int): Int {
             val rem = num % 10
             var returnNum = num - rem // floor()
             if (returnNum ==  0) {
-                returnNum = "0$num".toInt() // and this is so that if the minute value is ever a single digit (0 after being floored), it displays as 00 because 12:0pm just looks bad
+                returnNum = "0$num".toInt()
+                /**
+                 * and this is so that if the minute value is ever
+                 * a single digit (0 after being floored), it displays as 00 because 12:0pm just looks bad
+                 */
             }
             return returnNum
         }
@@ -104,13 +106,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val date: SkyBlockTime = SkyBlockTime.now()
         val hour = if (date.hour > 12) date.hour - 12 else date.hour
         val timeOfDay = if (date.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        val dateString = "${SkyBlockTime.monthName(date.month)} ${date.day}${SkyBlockTime.daySuffix(date.day)}, $hour:${formatNum(date.minute)}$timeOfDay" // Early Winter 1st, 12:00pm
-        if (dateString !=  "") {
-            dateString
-        }
-        else {
-            ""
-        }
+        "${SkyBlockTime.monthName(date.month)} ${date.day}${SkyBlockTime.daySuffix(date.day)}, $hour:${formatNum(date.minute)}$timeOfDay" // Early Winter 1st, 12:00pm
     }),
 
     PROFILE({
@@ -144,27 +140,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     CUSTOM({
         SkyHanniMod.feature.misc.discordRPC.customText.get() // custom field in the config
     })
-
-    // See SkyblockAddons code for reference
     ;
 
-
-    fun getDisplayString(currentEntry: DiscordStatusEntry): String {
-        DiscordRPCManager.currentEntry = currentEntry
+    fun getDisplayString(): String {
         if (displayMessageSupplier != null) {
             return displayMessageSupplier.get()
         }
         return ""
     }
-
-
-//    @Override
-//    fun getName(): String {
-//        return title
-//    }
-//
-//    @Override
-//    fun getDescription(): String {
-//        return description
-//    }
 }

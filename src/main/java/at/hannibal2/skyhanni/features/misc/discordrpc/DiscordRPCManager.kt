@@ -111,8 +111,8 @@ class DiscordRPCManager : IPCListener {
         secondLine = getStatusByConfigId(config.secondLine.get())
         firstLine = getStatusByConfigId(config.firstLine.get())
         val presence: RichPresence = RichPresence.Builder()
-            .setDetails(firstLine.getDisplayString(DiscordStatusEntry.DETAILS))
-            .setState(secondLine.getDisplayString(DiscordStatusEntry.STATE))
+            .setDetails(firstLine.getDisplayString())
+            .setState(secondLine.getDisplayString())
             .setStartTimestamp(startTimestamp!!)
             .setLargeImage(discordIconKey, location)
             .build()
@@ -274,10 +274,6 @@ class DiscordRPCManager : IPCListener {
     }
 
     private fun getStatusByConfigId(id: Int) = DiscordStatus.values().getOrElse(id) { DiscordStatus.BITS }
-
-    companion object {
-        lateinit var currentEntry: DiscordStatusEntry
-    }
 
     private fun isEnabled() = config.enabled.get()
 
