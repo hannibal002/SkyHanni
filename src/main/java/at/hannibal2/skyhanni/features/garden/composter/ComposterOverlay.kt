@@ -60,6 +60,16 @@ class ComposterOverlay {
     private var lastHovered = 0L
 
     companion object {
+        var testOffset = 0
+        fun onCommand(args: Array<String>) {
+            if (args.size != 1) {
+                LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")
+                return
+            }
+            testOffset = args[0].toInt()
+            LorenzUtils.chat("§e[SkyHanni] Composter test offset set to $testOffset.")
+        }
+
         var inInventory = false
     }
 
@@ -207,7 +217,7 @@ class ComposterOverlay {
 
         val newList = mutableListOf<List<Any>>()
         newList.addAsSingletonList("§7Items needed to fill §eOrganic Matter")
-        val fillList = fillList(newList, organicMatterFactors, missingOrganicMatter) {
+        val fillList = fillList(newList, organicMatterFactors, missingOrganicMatter, testOffset) {
             currentOrganicMatterItem = it
             update()
         }
@@ -341,6 +351,7 @@ class ComposterOverlay {
         bigList: MutableList<List<Any>>,
         factors: Map<String, Double>,
         missing: Double,
+        testOffset: Int = 0,
         onClick: (String) -> Unit,
     ): String {
         val map = mutableMapOf<String, Double>()
@@ -351,6 +362,8 @@ class ComposterOverlay {
         var i = 0
         var first: String? = null
         for (internalName in map.sortedDesc().keys) {
+            i++
+            if (i < testOffset) continue
             if (first == null) first = internalName
             val factor = factors[internalName]!!
 
@@ -378,8 +391,7 @@ class ComposterOverlay {
             bigList.add(list)
 
 
-            i++
-            if (i == 10) break
+            if (i == 10 + testOffset) break
         }
 
         return first!!
@@ -419,6 +431,8 @@ class ComposterOverlay {
     private fun updateOrganicMatterFactors(baseValues: Map<String, Double>): Map<String, Double> {
         val map = mutableMapOf<String, Double>()
         for ((internalName, _) in NotEnoughUpdates.INSTANCE.manager.itemInformation) {
+            if (internalName == "POTION_AFFINITY_TALISMAN") continue
+            if (internalName == "CROPIE_TALISMAN") continue
             if (internalName.endsWith("_BOOTS")) continue
             if (internalName.endsWith("_HELMET")) continue
             if (internalName.endsWith("_CHESTPLATE")) continue
