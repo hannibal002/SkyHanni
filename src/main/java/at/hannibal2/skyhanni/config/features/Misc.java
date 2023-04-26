@@ -241,7 +241,7 @@ public class Misc {
         @Expose
         @ConfigOption(name = "Enable Discord RPC", desc = "Details about your Skyblock session displayed through Discord.")
         @ConfigEditorBoolean
-        public boolean enabled = false;
+        public Property<Boolean> enabled = Property.of(false);
 
         @Expose
         @ConfigOption(name = "Details", desc = "Appears immediately below \"Skyblock\".")
@@ -257,7 +257,7 @@ public class Misc {
                 "Slayer",
                 "Custom"
         })
-        public int details = 0;
+        public Property<Integer> details = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Status", desc = "Appears immediately below \"Details\".")
@@ -273,12 +273,12 @@ public class Misc {
                 "Slayer",
                 "Custom"
         })
-        public int status = 0;
+        public Property<Integer> status = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
         @ConfigEditorText
-        public String customText = "";
+        public Property<String> customText = Property.of("");
     }
 
     @Expose
