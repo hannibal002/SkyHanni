@@ -240,14 +240,14 @@ public class Garden {
     public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
 
     @Expose
-    @ConfigOption(name = "Block Broken Precision", desc = "How many decimal places in blocks/second")
+    @ConfigOption(name = "Block Broken Precision", desc = "Set amount of decimal places in blocks/second.")
     @ConfigEditorSlider(
             minValue = 0,
             maxValue = 4,
             minStep = 1
     )
     @ConfigAccordionId(id = 6)
-    public int blocksDecimals = 2;
+    public int cropMilestoneBlocksPerSecondPrecision = 2;
 
     @Expose
     @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds of not farming until blocks/second resets")

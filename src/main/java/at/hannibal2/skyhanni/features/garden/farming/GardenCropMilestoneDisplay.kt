@@ -27,7 +27,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
-import kotlin.math.abs
 
 class GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
@@ -184,7 +183,7 @@ class GardenCropMilestoneDisplay {
         val blocksBroken = blocksBroken.coerceAtMost(20)
         this.blocksBroken = 0
 
-        // skipping seconds when not farming momentarily eg. typing in chat hopefully doesn't skip the time it takes to change between rows
+        // skipping seconds when not farming momentarily e.g. typing in chat hopefully doesn't skip the time it takes to change between rows
         if (blocksBroken >= config.blocksReset) {
             blocksSpeedList.add(blocksBroken)
             // removing the first second of tracking as it is not a full second
@@ -196,9 +195,8 @@ class GardenCropMilestoneDisplay {
             averageBlocksPerSecond = blocksSpeedList.average()
             secondsStopped = 0
 
-        }
-        else {
-            secondsStopped ++
+        } else {
+            secondsStopped++
             if (secondsStopped >= 5) {
                 resetSpeed()
             }
@@ -302,7 +300,8 @@ class GardenCropMilestoneDisplay {
 
             val format = LorenzUtils.formatInteger(farmingFortuneSpeed * 60)
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
-            val formatBps = LorenzUtils.formatDouble(averageBlocksPerSecond, config.blocksDecimals)
+            val formatBps =
+                LorenzUtils.formatDouble(averageBlocksPerSecond, config.cropMilestoneBlocksPerSecondPrecision)
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$formatBps")
         }
 
