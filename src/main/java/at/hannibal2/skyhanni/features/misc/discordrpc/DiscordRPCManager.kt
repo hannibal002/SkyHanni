@@ -74,9 +74,7 @@ class DiscordRPCManager : IPCListener {
         }
     }
 
-    private fun isActive(): Boolean {
-        return client != null && connected
-    }
+    private fun isActive() = client != null && connected
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
