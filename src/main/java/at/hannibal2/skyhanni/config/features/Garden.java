@@ -276,7 +276,7 @@ public class Garden {
     public int cropMilestoneShowOnlyBest = 10;
 
     @Expose
-    @ConfigOption(name = "Expand top list by current Crop", desc = "Add active crop to the end of the list by expanding the set limit")
+    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneShowCurrent = true;
@@ -632,7 +632,7 @@ public class Garden {
     public int moneyPerHourShowOnlyBest = 5;
 
     @Expose
-    @ConfigOption(name = "Expand top list by current Crop", desc = "Add active crop to the end of the list by expanding the set limit")
+    @ConfigOption(name = "Extend top list", desc = "Add current crop to the list if its lower ranked than the set limit by extending the list")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourShowCurrent = true;
