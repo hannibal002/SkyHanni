@@ -73,7 +73,7 @@ class SkyMartCopperPrice {
                 display,
                 extraSpace = 5,
                 itemScale = 1.7,
-                posLabel = "Sky Mart Copper Price"
+                posLabel = "SkyMart Copper Price"
             )
         }
     }
