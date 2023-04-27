@@ -31,7 +31,7 @@ object GardenCustomKeybinds {
 
     private fun isEnabled() = GardenAPI.inGarden() && shConfig.keyBindEnabled
 
-    private fun isActive() = isEnabled() && GardenAPI.toolInHand != null
+    private fun isActive() = isEnabled() && GardenAPI.toolInHand != null && Minecraft.getMinecraft().currentScreen == null
 
 
     private fun isHeld(keyCode: Int): Boolean {
