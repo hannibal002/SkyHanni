@@ -20,6 +20,7 @@ object GardenCustomKeybinds {
 
     init {
         map[mcSettings.keyBindAttack] = { shConfig.keyBindAttack }
+        map[mcSettings.keyBindUseItem] = { shConfig.keyBindUseItem }
         map[mcSettings.keyBindLeft] = { shConfig.keyBindLeft }
         map[mcSettings.keyBindRight] = { shConfig.keyBindRight }
         map[mcSettings.keyBindForward] = { shConfig.keyBindForward }
