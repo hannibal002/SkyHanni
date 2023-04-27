@@ -268,7 +268,7 @@ public class Misc {
     public boolean hideFireOverlay = false;
 
     @Expose
-    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into Sings when you press Ctrl + V")
+    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into signs when you press Ctrl + V")
     @ConfigEditorBoolean
     public boolean pasteIntoSigns = true;
 
