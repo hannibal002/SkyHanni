@@ -303,6 +303,11 @@ public class Misc {
     public boolean hideScoreboardNumbers = false;
 
     @Expose
+    @ConfigOption(name = "Hide Piggy", desc = "Replacing 'Piggy' with 'Purse' in the Scoreboard.")
+    @ConfigEditorBoolean
+    public boolean hidePiggyScoreboard = true;
+
+    @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")
     @ConfigEditorBoolean
     public boolean hideExplosions = false;
