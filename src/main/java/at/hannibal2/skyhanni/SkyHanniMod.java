@@ -151,6 +151,7 @@ public class SkyHanniMod {
         loadModule(new MayorElection());
         loadModule(new GardenComposterUpgradesData());
         loadModule(new ActionBarStatsData());
+        loadModule(new GardenCropMilestoneAverage());
 
         // APIs
         loadModule(new BazaarApi());

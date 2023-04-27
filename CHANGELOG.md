@@ -74,6 +74,7 @@
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
 + Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 + Introduced a new command '/shcroptime <amount> <item>' that displays the estimated time it will take to gather the requested quantity of a particular item based on the current crop speed.
++ Show the average crop milestone in the crop milestone inventory.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*

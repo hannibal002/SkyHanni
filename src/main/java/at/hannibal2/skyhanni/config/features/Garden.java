@@ -184,6 +184,12 @@ public class Garden {
     public boolean numberCropMilestone = true;
 
     @Expose
+    @ConfigOption(name = "Average Milestone", desc = "Show the average crop milestone in the crop milestone inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean numberAverageCropMilestone = true;
+
+    @Expose
     @ConfigOption(name = "Crop Upgrades", desc = "Show the number of upgrades in the crop upgrades inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
