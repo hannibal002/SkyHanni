@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -26,6 +27,8 @@ interface Renderable {
     fun render(posX: Int, posY: Int)
 
     companion object {
+        val logger = LorenzLogger("debug/renderable")
+
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
@@ -52,7 +55,7 @@ interface Renderable {
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
                     if (isDown > wasDown && isHovered(posX, posY)) {
-                        if (condition() && shouldAllowLink()) {
+                        if (condition() && shouldAllowLink(true)) {
                             onClick()
                         }
                     }
@@ -62,14 +65,30 @@ interface Renderable {
 
             }
 
-        private fun shouldAllowLink(): Boolean {
-            val a = Minecraft.getMinecraft().currentScreen != null
-            val b = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
-            val c = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
+        private fun shouldAllowLink(debug: Boolean = false): Boolean {
+            val isGuiScreen = Minecraft.getMinecraft().currentScreen != null
+            val isGuiPositionEditor = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
+            val isNotInSignAndOnSlot = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
                 ToolTipData.lastSlot == null
             } else true
-            val d = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
-            return a && b && c && d
+            val isConfigScreen = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
+            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen
+
+            if (debug) {
+                if (!result) {
+                    logger.log("")
+                    logger.log("blocked link because:")
+                    if (!isGuiScreen) logger.log("isGuiScreen")
+                    if (!isGuiPositionEditor) logger.log("isGuiPositionEditor")
+                    if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
+                    if (!isConfigScreen) logger.log("isConfigScreen")
+                    logger.log("")
+                } else {
+                    logger.log("allowed click")
+                }
+            }
+
+            return result
         }
 
         fun underlined(renderable: Renderable) = object : Renderable {
