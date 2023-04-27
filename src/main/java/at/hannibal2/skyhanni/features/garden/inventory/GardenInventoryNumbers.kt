@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenInventoryNumbers {
+    private val config get() = SkyHanniMod.feature.garden
+
     private var patternTierProgress = "§7Progress to Tier (.*): §e(?:.*)".toPattern()
     private var patternUpgradeTier = "§7Current Tier: §[ea](.*)§7/§a.*".toPattern()
 
@@ -19,7 +21,7 @@ class GardenInventoryNumbers {
         if (!GardenAPI.inGarden()) return
 
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
-            if (!SkyHanniMod.feature.garden.numberCropMilestone) return
+            if (!config.numberCropMilestone) return
 
             event.stack.getLore()
                 .map { patternTierProgress.matcher(it) }
@@ -29,7 +31,7 @@ class GardenInventoryNumbers {
         }
 
         if (InventoryUtils.openInventoryName() == "Crop Upgrades") {
-            if (!SkyHanniMod.feature.garden.numberCropUpgrades) return
+            if (!config.numberCropUpgrades) return
 
             event.stack.getLore()
                 .map { patternUpgradeTier.matcher(it) }
@@ -39,7 +41,7 @@ class GardenInventoryNumbers {
         }
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
-            if (!SkyHanniMod.feature.garden.numberComposterUpgrades) return
+            if (!config.numberComposterUpgrades) return
 
             event.stack.name?.let {
                 val matcher = ComposterUpgrade.regex.matcher(it)

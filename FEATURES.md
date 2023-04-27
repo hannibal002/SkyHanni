@@ -217,6 +217,7 @@
 + **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
 + Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
++ Show the average crop milestone in the crop milestone inventory.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
