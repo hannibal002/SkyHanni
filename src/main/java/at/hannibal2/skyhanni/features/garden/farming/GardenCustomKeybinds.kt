@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.Garden
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -32,6 +34,12 @@ object GardenCustomKeybinds {
     private fun isEnabled() = GardenAPI.inGarden() && shConfig.keyBindEnabled
 
     private fun isActive() = isEnabled() && GardenAPI.toolInHand != null
+    @SubscribeEvent
+    fun onToolChange(event: GardenToolChangeEvent){
+        KeyBinding.unPressAllKeys()
+    }
+
+
 
     @JvmStatic
     fun onTick(keyCode: Int, ci: CallbackInfo) {
