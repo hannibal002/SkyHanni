@@ -161,7 +161,7 @@ public class Garden {
     public boolean visitorColoredName = true;
 
     @Expose
-    @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from hypixel that a new visitor has arrived at your garden")
+    @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean visitorHypixelArrivedMessage = true;

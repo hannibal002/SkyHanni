@@ -43,7 +43,7 @@ public class Dungeon {
 
     @Expose
     @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 guardians from the clean end feature when " +
-            "sneaking. Makes it easier to kill them after the boss died already. Thanks hypixel.")
+            "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean cleanEndF3IgnoreGuardians = false;
