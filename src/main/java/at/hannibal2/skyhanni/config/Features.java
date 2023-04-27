@@ -16,7 +16,6 @@ public class Features extends Config {
     public static final ResourceLocation DISCORD = new ResourceLocation("notenoughupdates:social/discord.png");
     public static final ResourceLocation GITHUB = new ResourceLocation("notenoughupdates:social/github.png");
 
-
     @Override
     public boolean shouldAutoFocusSearchbar() {
         return true;
@@ -28,6 +27,11 @@ public class Features extends Config {
                 Social.forLink("Join our Discord", DISCORD, "https://discord.gg/8DXVN4BJz3"),
                 Social.forLink("Look at the code", GITHUB, "https://github.com/hannibal002/SkyHanni")
         );
+    }
+
+    @Override
+    public void saveNow() {
+        SkyHanniMod.configManager.saveConfig("close-gui");
     }
 
     @Override
