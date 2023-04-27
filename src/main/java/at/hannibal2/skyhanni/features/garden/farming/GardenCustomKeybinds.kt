@@ -33,24 +33,6 @@ object GardenCustomKeybinds {
 
     private fun isActive() = isEnabled() && GardenAPI.toolInHand != null
 
-
-    private fun isHeld(keyCode: Int): Boolean {
-        if (keyCode == 0) return false
-        return if (keyCode < 0) {
-            Mouse.isButtonDown(keyCode + 100)
-        } else {
-            Keyboard.isKeyDown(keyCode)
-        }
-    }
-
-    @JvmStatic
-    fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
-        val override = map[keyBinding] ?: return
-        val keyCode = override()
-        cir.returnValue = isHeld(keyCode)
-    }
-
     @JvmStatic
     fun onTick(keyCode: Int, ci: CallbackInfo) {
         if (!isActive()) return
@@ -59,5 +41,15 @@ object GardenCustomKeybinds {
         ci.cancel()
         keyBinding as AccessorKeyBinding
         keyBinding.pressTime_skyhanni++
+    }
+
+    @JvmStatic
+    fun setKeyBindState(keyCode: Int, pressed: Boolean, ci: CallbackInfo) {
+        if (!isActive()) return
+        if (keyCode == 0) return
+        val keyBinding = map.entries.firstOrNull { it.value() == keyCode }?.key ?: return
+        ci.cancel()
+        keyBinding as AccessorKeyBinding
+        keyBinding.pressed_skyhanni = pressed
     }
 }
