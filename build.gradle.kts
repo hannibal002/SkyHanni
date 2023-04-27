@@ -21,11 +21,16 @@ sourceSets.main {
     output.setResourcesDir(file("$buildDir/classes/java/main"))
 }
 
+// Taken from SBA code to support Discord RPC dependency
+configurations.create("bundle")
+configurations.implementation.extendsFrom(configurations.named("bundle").get())
+
 // Dependencies:
 
 repositories {
     mavenCentral()
     mavenLocal()
+    maven("https://maven.notenoughupdates.org/releases")
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
@@ -55,6 +60,14 @@ dependencies {
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
+    "bundle"("com.github.ILikePlayingGames:DiscordIPC:-SNAPSHOT") {
+        exclude(module = "log4j")
+        because("Different version conflicts with Minecraft's Log4J")
+        exclude(module = "gson")
+        because("Different version conflicts with Minecraft's Log4j")
+    } // Discord RPC client
+
+
     // If you don't want mixins, remove these lines
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -72,8 +85,8 @@ dependencies {
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("com.github.notenoughupdates:moulconfig:ac39e63")
-    devenvMod("com.github.notenoughupdates:moulconfig:ac39e63:test")
+    shadowModImpl("org.notenoughupdates.moulconfig:MoulConfig:1.1.0")
+    devenvMod("org.notenoughupdates.moulconfig:MoulConfig:1.1.0:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
 }
