@@ -74,10 +74,12 @@ class GardenVisitorTimer {
             millis = sixthVisitorArrivalTime - System.currentTimeMillis()
             if (isSixthVisitorEnabled() &&  millis < 0) {
                 visitorsAmount++
-                if (!sixthVisitorReady && isSixthVisitorWarningEnabled()) {
-                    sixthVisitorReady = true
-                    SoundUtils.playBeepSound()
+                if (sixthVisitorReady == false) {
                     TitleUtils.sendTitle("§a6th Visitor Ready", 2_000)
+                    sixthVisitorReady = true
+                    if (isSixthVisitorWarningEnabled()) {
+                        SoundUtils.playBeepSound()
+                    }
                 }
             } else {
                 SkyHanniMod.feature.hidden.nextSixthVisitorArrival = System.currentTimeMillis() + millis + (5 - lastVisitors) * visitorInterval
