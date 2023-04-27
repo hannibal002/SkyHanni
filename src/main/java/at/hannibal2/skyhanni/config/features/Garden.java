@@ -369,6 +369,7 @@ public class Garden {
     @ConfigAccordionId(id = 8)
     public Runnable keyBindPresetDisable = () -> {
         keyBindAttack = Keyboard.KEY_NONE;
+        keyBindUseItem = Keyboard.KEY_NONE;
         keyBindLeft = Keyboard.KEY_NONE;
         keyBindRight = Keyboard.KEY_NONE;
         keyBindForward = Keyboard.KEY_NONE;
@@ -384,6 +385,7 @@ public class Garden {
     @ConfigAccordionId(id = 8)
     public Runnable keyBindPresetDefault = () -> {
         keyBindAttack = -100;
+        keyBindUseItem = -99;
         keyBindLeft = Keyboard.KEY_A;
         keyBindRight = Keyboard.KEY_D;
         keyBindForward = Keyboard.KEY_W;
@@ -398,6 +400,12 @@ public class Garden {
     @ConfigAccordionId(id = 8)
     @ConfigEditorKeybind(defaultKey = -100)
     public int keyBindAttack = -100;
+
+    @Expose
+    @ConfigOption(name = "Use Item", desc = "")
+    @ConfigAccordionId(id = 8)
+    @ConfigEditorKeybind(defaultKey = -99)
+    public int keyBindUseItem = -99;
 
     @Expose
     @ConfigOption(name = "Move Left", desc = "")
