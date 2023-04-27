@@ -19,7 +19,7 @@
 + Added Arachne to damage indicator.
 + Added **Arachne Minis Hider** -  Hides the nametag above arachne minis.
 + Added **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
-+ Added **Discord RCP** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
++ Added **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
