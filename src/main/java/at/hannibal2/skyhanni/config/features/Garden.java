@@ -61,6 +61,13 @@ public class Garden {
     public boolean visitorTimerSixthVisitorEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Sixth Visitor Warning", desc = "Notifies when it is believed that the sixth visitor has arrived. " +
+            "May be inaccurate with coop members farming simultaneously or when joining the server.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean visitorTimerSixthVisitorWarning = false;
+
+    @Expose
 //    @ConfigOption(name = "Visitor Timer Position", desc = "")
 //    @ConfigEditorButton(runnableId = "visitorTimer", buttonText = "Edit")
 //    @ConfigAccordionId(id = 2)
