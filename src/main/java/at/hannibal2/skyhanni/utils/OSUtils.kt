@@ -19,10 +19,11 @@ object OSUtils {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: IOException) {
                 e.printStackTrace()
-                LorenzUtils.error("[SkyHanni] Error opening website!")
+                LorenzUtils.error("[SkyHanni] Error opening website: $url!")
             }
         } else {
-            LorenzUtils.warning("[SkyHanni] Web browser is not supported!")
+            copyToClipboard(url)
+            LorenzUtils.warning("[SkyHanni] Web browser is not supported! Copied url to clipboard.")
         }
     }
 
