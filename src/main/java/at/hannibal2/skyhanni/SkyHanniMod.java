@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityC
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic;
 import at.hannibal2.skyhanni.features.minion.MinionFeatures;
 import at.hannibal2.skyhanni.features.misc.*;
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper;
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints;
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager;
@@ -149,6 +150,8 @@ public class SkyHanniMod {
         loadModule(new CropAccessoryData());
         loadModule(new MayorElection());
         loadModule(new GardenComposterUpgradesData());
+        loadModule(new ActionBarStatsData());
+        loadModule(new GardenCropMilestoneAverage());
 
         // APIs
         loadModule(new BazaarApi());
@@ -245,7 +248,7 @@ public class SkyHanniMod {
         loadModule(new GardenVisitorTimer());
         loadModule(new GardenNextPlotPrice());
         loadModule(new GardenCropMilestoneDisplay());
-        loadModule(new GardenCustomKeybinds());
+        loadModule(GardenCustomKeybinds.INSTANCE);
         loadModule(new ChickenHeadTimer());
         loadModule(new GardenOptimalSpeed());
         loadModule(new GardenDeskInSBMenu());
@@ -273,6 +276,7 @@ public class SkyHanniMod {
         loadModule(new AshfangMinisNametagHider());
         loadModule(new GardenTeleportPadInventoryNumber());
         loadModule(new ComposterOverlay());
+        loadModule(new DiscordRPCManager());
         loadModule(new GardenCropMilestoneFix());
         loadModule(new GardenBurrowingSporesNotifier());
         loadModule(new WildStrawberryDyeNotification());

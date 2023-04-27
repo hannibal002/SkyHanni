@@ -231,6 +231,56 @@ public class Misc {
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
 
+    @ConfigOption(name = "Discord Rich Presence", desc = "")
+    @Accordion
+    @Expose
+    public DiscordRPC discordRPC = new DiscordRPC();
+
+    public static class DiscordRPC {
+
+        @Expose
+        @ConfigOption(name = "Enable Discord RPC", desc = "Details about your Skyblock session displayed through Discord.")
+        @ConfigEditorBoolean
+        public Property<Boolean> enabled = Property.of(false);
+
+        @Expose
+        @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
+        @ConfigEditorDropdown(values = {
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom"
+        })
+        public Property<Integer> firstLine = Property.of(0);
+
+        @Expose
+        @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
+        @ConfigEditorDropdown(values = {
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom"
+        })
+        public Property<Integer> secondLine = Property.of(0);
+
+        @Expose
+        @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
+        @ConfigEditorText
+        public Property<String> customText = Property.of("");
+    }
+
     @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 
@@ -268,7 +318,7 @@ public class Misc {
     public boolean hideFireOverlay = false;
 
     @Expose
-    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into Sings when you press Ctrl + V")
+    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into signs when you press Ctrl + V")
     @ConfigEditorBoolean
     public boolean pasteIntoSigns = true;
 

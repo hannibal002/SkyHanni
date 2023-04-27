@@ -16,7 +16,8 @@ import kotlin.math.roundToInt
 
 class GardenLevelDisplay {
     private val config get() = SkyHanniMod.feature.garden
-    private val overflowPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
+    private val expToNextLevelPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
+    private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (.*)".toPattern()
     private var gardenExp
         get() = SkyHanniMod.feature.hidden.gardenExp
@@ -53,16 +54,23 @@ class GardenLevelDisplay {
         val nameMatcher = namePattern.matcher(name)
         if (!nameMatcher.matches()) return
         val currentLevel = nameMatcher.group(1).romanToDecimalIfNeeded()
-        var overflow = 0
+        var nextLevelExp = 0
         for (line in item.getLore()) {
-            val matcher = overflowPattern.matcher(line)
+            var matcher = expToNextLevelPattern.matcher(line)
             if (matcher.matches()) {
-                overflow = matcher.group(1).replace(",", "").toDouble().roundToInt()
+                nextLevelExp = matcher.group(1).replace(",", "").toDouble().roundToInt()
                 break
+            }
+            matcher = overflowPattern.matcher(line)
+            if (matcher.matches()) {
+                val overflow = matcher.group("overflow").replace(",", "").toDouble().roundToInt()
+                gardenExp = overflow
+                update()
+                return
             }
         }
         val expForLevel = getExpForLevel(currentLevel).toInt()
-        gardenExp = expForLevel + overflow
+        gardenExp = expForLevel + nextLevelExp
         update()
     }
 
@@ -137,10 +145,37 @@ class GardenLevelDisplay {
         2000,
         2500,
         3000,
-        10000,
-        10000,
-        10000,
-        10000,
-        10000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000, // level 15
+
+        // overflow levels till 40 for now, in 10k steps
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
     )
 }

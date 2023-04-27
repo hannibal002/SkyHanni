@@ -19,6 +19,7 @@
 + Added Arachne to damage indicator.
 + Added **Arachne Minis Hider** -  Hides the nametag above arachne minis.
 + Added **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
++ Added **Discord RCP** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
 
 ### Garden Features
 + Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
@@ -73,6 +74,7 @@
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
 + Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 + Introduced a new command '/shcroptime <amount> <item>' that displays the estimated time it will take to gather the requested quantity of a particular item based on the current crop speed.
++ Show the average crop milestone in the crop milestone inventory.
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
