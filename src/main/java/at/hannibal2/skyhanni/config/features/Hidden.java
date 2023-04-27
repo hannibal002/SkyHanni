@@ -64,6 +64,9 @@ public class Hidden {
     public long visitorInterval = 15 * 60_000L;
 
     @Expose
+    public long nextSixthVisitorArrival = 0;
+
+    @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
