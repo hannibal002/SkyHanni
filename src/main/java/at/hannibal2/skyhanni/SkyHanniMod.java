@@ -245,7 +245,7 @@ public class SkyHanniMod {
         loadModule(new GardenVisitorTimer());
         loadModule(new GardenNextPlotPrice());
         loadModule(new GardenCropMilestoneDisplay());
-        loadModule(new GardenCustomKeybinds());
+        loadModule(GardenCustomKeybinds.INSTANCE);
         loadModule(new ChickenHeadTimer());
         loadModule(new GardenOptimalSpeed());
         loadModule(new GardenDeskInSBMenu());

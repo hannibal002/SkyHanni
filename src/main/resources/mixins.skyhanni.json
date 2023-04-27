@@ -21,6 +21,7 @@
     "MixinEntityRenderer",
     "MixinGuiIngame",
     "MixinGuiPlayerTabOverlay",
+    "MixinKeyBinding",
     "gui.MixinGuiNewChat",
     "gui.MixinGuiScreen"
   ]
