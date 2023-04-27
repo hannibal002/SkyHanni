@@ -65,7 +65,7 @@ public class Misc {
     public boolean damageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in Skyblock.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean hideDamageSplash = false;
@@ -239,7 +239,7 @@ public class Misc {
     public static class DiscordRPC {
 
         @Expose
-        @ConfigOption(name = "Enable Discord RPC", desc = "Details about your Skyblock session displayed through Discord.")
+        @ConfigOption(name = "Enable Discord RPC", desc = "Details about your SkyBlock session displayed through Discord.")
         @ConfigEditorBoolean
         public Property<Boolean> enabled = Property.of(false);
 
