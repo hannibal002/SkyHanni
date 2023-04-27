@@ -33,7 +33,7 @@ object GardenCustomKeybinds {
     private fun isActive() = isEnabled() && GardenAPI.toolInHand != null
 
 
-    fun isHeld(keyCode: Int): Boolean {
+    private fun isHeld(keyCode: Int): Boolean {
         if (keyCode == 0) return false
         return if (keyCode < 0) {
             Mouse.isButtonDown(keyCode + 100)
@@ -59,5 +59,4 @@ object GardenCustomKeybinds {
         keyBinding as AccessorKeyBinding
         keyBinding.pressTime_skyhanni++
     }
-
 }
