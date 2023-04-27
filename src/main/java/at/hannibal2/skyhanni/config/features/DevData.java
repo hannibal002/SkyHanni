@@ -125,7 +125,7 @@ public class DevData {
     public boolean filterBiomeIdBounds = true;
 
     @Expose
-    @ConfigOption(name = "Print Event Timings", desc = "Prints every 10 seconds the timings of all SkyHanni events in the chat.")
+    @ConfigOption(name = "Print Event Timings", desc = "Print the timings of all SkyHanni events to the console every 10 seconds.")
     @ConfigEditorBoolean
     public boolean printEventTimings = false;
 }
