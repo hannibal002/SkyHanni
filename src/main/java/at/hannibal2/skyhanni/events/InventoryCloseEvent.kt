@@ -7,5 +7,5 @@ class InventoryCloseEvent(val inventory: OtherInventoryData.Inventory): LorenzEv
     val inventoryId: Int by lazy { inventory.windowId }
     val inventoryName: String by lazy {inventory.title }
     val inventorySize: Int by lazy {inventory.slotCount }
-    val inventoryItems: MutableMap<Int, ItemStack>  by lazy {inventory.items }
+    val inventoryItems: Map<Int, ItemStack>  by lazy {inventory.items }
 }
