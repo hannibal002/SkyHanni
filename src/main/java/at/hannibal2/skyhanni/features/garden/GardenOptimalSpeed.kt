@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
@@ -22,7 +23,7 @@ class GardenOptimalSpeed {
     private val configCustomSpeed get() = config.optimalSpeedCustom
     private var currentSpeed = 100
     private var optimalSpeed = -1
-    private val currentSpeedPattern = " Speed: §r§f✦(.*)".toPattern()
+    private val currentSpeedPattern = " Speed: §r§f✦(?<speed>.*)".toPattern()
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()
@@ -30,9 +31,8 @@ class GardenOptimalSpeed {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (line in event.tabList) {
-            val matcher = currentSpeedPattern.matcher(line)
-            if (matcher.matches()) {
-                currentSpeed = matcher.group(1).toInt()
+            currentSpeedPattern.matchMatcher(line) {
+                currentSpeed = group("speed").toInt()
             }
         }
     }

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -115,9 +116,8 @@ class ComposterDisplay {
             if (next) {
                 if (line == "") break
                 for (type in DataType.values()) {
-                    val matcher = type.pattern.matcher(line)
-                    if (matcher.matches()) {
-                        newData[type] = matcher.group(1)
+                    type.pattern.matchMatcher(line) {
+                        newData[type] = group(1)
                     }
                 }
             }

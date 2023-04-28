@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -19,34 +20,28 @@ class GardenCropMilestoneFix {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        val matcher = levelUpPattern.matcher(event.message)
-        if (!matcher.matches()) return
+        levelUpPattern.matchMatcher(event.message) {
+            val cropName = group("crop")
+            val crop = CropType.getByNameOrNull(cropName) ?: return
 
-        val cropName = matcher.group("crop")
-        val crop = CropType.getByNameOrNull(cropName)
-        if (crop == null) {
-            LorenzUtils.debug("GardenCropMilestoneFix: crop is null: '$cropName'")
-            return
+            val tier = group("tier").romanToDecimalIfNeeded()
+
+            val crops = GardenCropMilestones.getCropsForTier(tier)
+            changedValue(crop, crops, "level up chat message")
         }
-
-        val tier = matcher.group("tier").romanToDecimalIfNeeded()
-
-        val crops = GardenCropMilestones.getCropsForTier(tier)
-        changedValue(crop, crops, "level up chat message")
     }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (line in event.tabList) {
-            val matcher = tabListPattern.matcher(line)
-            if (!matcher.matches()) continue
+            tabListPattern.matchMatcher(line) {
+                val tier = group("tier").toInt()
+                val percentage = group("percentage").toDouble()
+                val cropName = group("crop")
 
-            val tier = matcher.group("tier").toInt()
-            val percentage = matcher.group("percentage").toDouble()
-            val cropName = matcher.group("crop")
-
-            check(cropName, tier, percentage)
-            return
+                check(cropName, tier, percentage)
+                return
+            }
         }
     }
 

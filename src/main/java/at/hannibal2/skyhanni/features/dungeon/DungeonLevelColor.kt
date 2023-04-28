@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonLevelColor {
-
-    private val pattern = " §.(.*)§f: §e(.*)§b \\(§e(.*)§b\\)".toPattern()
+    private val pattern = " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)".toPattern()
 
     @SubscribeEvent
     fun onItemTooltip(event: ItemTooltipEvent) {
@@ -24,14 +24,14 @@ class DungeonLevelColor {
         var index = 0
         for (line in stack.getLore()) {
             index++
-            val matcher = pattern.matcher(line)
-            if (!matcher.matches()) continue
 
-            val playerName = matcher.group(1)
-            val className = matcher.group(2)
-            val level = matcher.group(3).toInt()
-            val color = getColor(level)
-            event.toolTip[index] = " §b$playerName§f: §e$className $color$level"
+            pattern.matchMatcher(line) {
+                val playerName = group("playerName")
+                val className = group("className")
+                val level = group("level").toInt()
+                val color = getColor(level)
+                event.toolTip[index] = " §b$playerName§f: §e$className $color$level"
+            }
         }
     }
 

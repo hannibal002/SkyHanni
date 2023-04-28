@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
@@ -39,8 +40,7 @@ class SummoningMobManager {
         if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
-        val matcher = spawnPatter.matcher(message)
-        if (matcher.matches()) {
+        spawnPatter.matchMatcher(message) {
             if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"
             }
@@ -79,8 +79,7 @@ class SummoningMobManager {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filter { it is EntityArmorStand && it !in summoningMobNametags }
                 .forEach {
                     val name = it.displayName.unformattedText
-                    val matcher = healthPattern.matcher(name)
-                    if (matcher.matches()) {
+                    healthPattern.matchMatcher(name) {
                         val playerName = LorenzUtils.getPlayerName()
                         if (name.contains(playerName)) {
                             summoningMobNametags.add(it as EntityArmorStand)

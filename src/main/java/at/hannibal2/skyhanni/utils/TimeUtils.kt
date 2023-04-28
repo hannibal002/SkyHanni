@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-object TimeUtils {
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 
+object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
@@ -54,15 +55,12 @@ object TimeUtils {
     }
 
     // TODO: use kotlin Duration
-    fun getMillis(string: String): Long {
-        val matcher = pattern.matcher(string.lowercase().trim())
-        if (!matcher.matches()) return tryAlternativeFormat(string)
-
-        val years = matcher.group("y")?.toLong() ?: 0L
-        val days = matcher.group("d")?.toLong() ?: 0L
-        val hours = matcher.group("h")?.toLong() ?: 0L
-        val minutes = matcher.group("m")?.toLong() ?: 0L
-        val seconds = matcher.group("s")?.toLong() ?: 0L
+    fun getMillis(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
+        val years = group("y")?.toLong() ?: 0L
+        val days = group("d")?.toLong() ?: 0L
+        val hours = group("h")?.toLong() ?: 0L
+        val minutes = group("m")?.toLong() ?: 0L
+        val seconds = group("s")?.toLong() ?: 0L
 
         var millis = 0L
         millis += seconds * 1000
@@ -71,8 +69,8 @@ object TimeUtils {
         millis += days * 24 * 60 * 60 * 1000
         millis += (years * 365.25 * 24 * 60 * 60 * 1000).toLong()
 
-        return millis
-    }
+         millis
+    } ?: tryAlternativeFormat(string)
 
     private fun tryAlternativeFormat(string: String): Long {
         val split = string.split(":")

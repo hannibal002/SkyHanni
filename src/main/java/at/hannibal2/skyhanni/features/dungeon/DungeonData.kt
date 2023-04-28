@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class DungeonData {
-
-    private val pattern = " §7⏣ §cThe Catacombs §7\\((.*)\\)".toPattern()
+    private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
 
     companion object {
         var dungeonFloor: String? = null
@@ -66,9 +66,8 @@ class DungeonData {
         if (event.phase != TickEvent.Phase.START) return
         if (dungeonFloor == null) {
             for (line in ScoreboardData.sidebarLinesFormatted) {
-                val matcher = pattern.matcher(line)
-                if (matcher.matches()) {
-                    val floor = matcher.group(1)
+                floorPattern.matchMatcher(line) {
+                    val floor = group("floor")
                     dungeonFloor = floor
                     DungeonEnterEvent(floor).postAndCatch()
                 }

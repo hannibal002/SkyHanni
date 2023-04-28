@@ -33,6 +33,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
         val amount: Int
         val name: String
+        // TODO use regex
         if (text.contains(" §r§8x")) {
             val split = text.split(" §r§8x")
             name = split[0]

@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class StatsTuning {
-
-    private val patternStatPoints = "§7Stat has: §e(\\d+) point(s)?".toPattern()
+    private val patternStatPoints = "§7Stat has: §e(?<amount>\\d+) points?".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
@@ -85,9 +85,8 @@ class StatsTuning {
         if (SkyHanniMod.feature.inventory.statsTuningPoints) {
             if (inventoryName == "Stats Tuning") {
                 for (line in stack.getLore()) {
-                    val matcher = patternStatPoints.matcher(line)
-                    if (matcher.matches()) {
-                        val points = matcher.group(1)
+                    patternStatPoints.matchMatcher(line) {
+                        val points = group("amount")
                         event.stackTip = points
                     }
                 }
