@@ -280,6 +280,7 @@ public class SkyHanniMod {
         loadModule(new GardenCropMilestoneFix());
         loadModule(new GardenBurrowingSporesNotifier());
         loadModule(new WildStrawberryDyeNotification());
+        loadModule(new GardenYawAndPitch());
 
         Commands.INSTANCE.init();
 
