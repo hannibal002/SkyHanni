@@ -987,43 +987,6 @@ public class Garden {
     public int cropTooltipFortune = 1;
 
     @Expose
-    @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
-    @ConfigEditorBoolean
-    public boolean plotPrice = true;
-
-    @Expose
-    @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
-    @ConfigEditorBoolean
-    public boolean deskInSkyBlockMenu = true;
-
-
-    @Expose
-    @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
-    @ConfigEditorBoolean
-    public boolean fungiCutterWarn = true;
-
-    @Expose
-    @ConfigOption(name = "Burrowing Spores", desc = "Show a notification when a Burrowing Spores spawns during farming mushrooms.")
-    @ConfigEditorBoolean
-    public boolean burrowingSporesNotification = true;
-
-    @Expose
-    @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops during farming.")
-    @ConfigEditorBoolean
-    public boolean wildStrawberryDyeNotification = true;
-
-    @Expose
-    @ConfigOption(
-            name = "FF for Contest",
-            desc = "Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory."
-    )
-    @ConfigEditorBoolean
-    public boolean farmingFortuneForContest = true;
-
-    @Expose
-    public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
-
-    @Expose
     @ConfigOption(name = "Yaw / Pitch", desc = "")
     @ConfigEditorAccordion(id = 23)
     public boolean yawpitch = false;
@@ -1066,6 +1029,43 @@ public class Garden {
 
     @Expose
     public Position YawAndPitchDisplayPos = new Position(445, 225, false, true);
+
+    @Expose
+    @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
+    @ConfigEditorBoolean
+    public boolean plotPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
+    @ConfigEditorBoolean
+    public boolean deskInSkyBlockMenu = true;
+
+
+    @Expose
+    @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
+    @ConfigEditorBoolean
+    public boolean fungiCutterWarn = true;
+
+    @Expose
+    @ConfigOption(name = "Burrowing Spores", desc = "Show a notification when a Burrowing Spores spawns during farming mushrooms.")
+    @ConfigEditorBoolean
+    public boolean burrowingSporesNotification = true;
+
+    @Expose
+    @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops during farming.")
+    @ConfigEditorBoolean
+    public boolean wildStrawberryDyeNotification = true;
+
+    @Expose
+    @ConfigOption(
+            name = "FF for Contest",
+            desc = "Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory."
+    )
+    @ConfigEditorBoolean
+    public boolean farmingFortuneForContest = true;
+
+    @Expose
+    public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
