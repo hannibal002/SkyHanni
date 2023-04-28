@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -120,10 +121,9 @@ class ComposterOverlay {
             for (upgrade in ComposterUpgrade.values()) {
                 event.itemStack?.name?.let {
                     if (it.contains(upgrade.displayName)) {
-                        val matcher = ComposterUpgrade.regex.matcher(it)
-                        matcher.matches()
-                        val level = matcher.group("level")?.romanToDecimalIfNeeded() ?: 0
-                        maxLevel = level == 25
+                        maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
+                            group("level")?.romanToDecimalIfNeeded() ?: 0
+                        } == 25
                         extraComposterUpgrade = upgrade
                         update()
                         return

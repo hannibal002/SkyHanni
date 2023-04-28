@@ -12,14 +12,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
 
-    private val wishingCompassPattern = "§7Remaining Uses: §e(.*)§8/§e3".toPattern()
-    private val rangerBootsSpeedCapPattern = "§7Current Speed Cap: §a(.*)".toPattern()
+    private val wishingCompassPattern = "§7Remaining Uses: §e(?<amount>.*)§8/§e3".toPattern()
+    private val rangerBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] (?:.*)".toPattern()
 
     @SubscribeEvent
@@ -70,9 +71,8 @@ class ItemDisplayOverlayFeatures {
             val chestName = InventoryUtils.openInventoryName()
             if (!chestName.endsWith("Sea Creature Guide")) {
                 if (ItemUtils.isPet(itemName)) {
-                    val matcher = petLevelPattern.matcher(itemName)
-                    if (matcher.matches()) {
-                        val level = matcher.group("level").toInt()
+                    petLevelPattern.matchMatcher(itemName) {
+                        val level = group("level").toInt()
                         if (level != ItemUtils.maxPetLevel(itemName)) {
                             return "$level"
                         }
@@ -101,9 +101,8 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(7)) {
             if (itemName.contains("Wishing Compass")) {
                 for (line in item.getLore()) {
-                    val matcher = wishingCompassPattern.matcher(line)
-                    if (matcher.matches()) {
-                        val uses = matcher.group(1)
+                    wishingCompassPattern.matchMatcher(line) {
+                        val uses = group("amount")
                         if (uses != "3") {
                             return uses
                         }
@@ -155,9 +154,8 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
             if (item.getInternalName() == "RANCHERS_BOOTS") {
                 for (line in item.getLore()) {
-                    val matcher = rangerBootsSpeedCapPattern.matcher(line)
-                    if (matcher.matches()) {
-                        return matcher.group(1)
+                    rangerBootsSpeedCapPattern.matchMatcher(line) {
+                        return group("cap")
                     }
                 }
             }

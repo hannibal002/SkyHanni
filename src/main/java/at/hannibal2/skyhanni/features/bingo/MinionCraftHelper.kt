@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class MinionCraftHelper {
-    private var minionNamePattern = "(.*) Minion (.*)".toPattern()
+    private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
     private var tick = 0
     private var display = listOf<String>()
     private var hasMinionInInventory = false
@@ -75,11 +76,11 @@ class MinionCraftHelper {
     ): MutableList<String> {
         val newDisplay = mutableListOf<String>()
         for ((minionName, minionId) in minions) {
-            val matcher = minionNamePattern.matcher(minionName)
-            if (!matcher.matches()) continue
-            val cleanName = matcher.group(1).removeColor()
-            val number = matcher.group(2).romanToDecimalIfNeeded()
-            addMinion(cleanName, number, minionId, otherItems, newDisplay)
+            minionNamePattern.matchMatcher(minionName) {
+                val cleanName = group("name").removeColor()
+                val number = group("number").romanToDecimalIfNeeded()
+                addMinion(cleanName, number, minionId, otherItems, newDisplay)
+            }
         }
         return newDisplay
     }
@@ -273,7 +274,7 @@ class MinionCraftHelper {
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
-            val name = b.name?: continue
+            val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
 
             val internalName = NEUItems.getInternalName("$name I")

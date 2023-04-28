@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.network.play.server.S30PacketWindowItems
@@ -43,7 +44,7 @@ class NonGodPotEffectDisplay {
         "GABAGOEY" to "§9Gabagoey Mixin",
     )
 
-    private var patternEffectsCount = "§7You have §e(\\d+) §7non-god effects\\.".toPattern()
+    private var patternEffectsCount = "§7You have §e(?<name>\\d+) §7non-god effects\\.".toPattern()
     private var totalEffectsCount = 0
 
     @SubscribeEvent
@@ -174,9 +175,8 @@ class NonGodPotEffectDisplay {
                     activeEffects["§2Mushed Glowy Tonic I"] = System.currentTimeMillis() + duration
                     update()
                 }
-                val matcher = patternEffectsCount.matcher(line)
-                if (matcher.matches()) {
-                    val group = matcher.group(1)
+                patternEffectsCount.matchMatcher(line) {
+                    val group = group("name")
                     effectsCount = group.toInt()
                 }
             }

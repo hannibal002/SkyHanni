@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
-
-    private val actionBarPattern = "(?:.*)§3\\+(?:.*) (.*) \\((.*)\\/(.*)\\)(?:.*)".toPattern()
-    private val inventoryPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
+    private val actionBarPattern = "(?:.*)§3\\+(?:.*) (?<skill>.*) \\((?<overflow>.*)\\/(?<needed>.*)\\)(?:.*)".toPattern()
+    private val inventoryPattern = "(?:.*) §e(?<number>.*)§6\\/(?:.*)".toPattern()
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
@@ -38,15 +38,14 @@ class SkillExperience {
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        val matcher = actionBarPattern.matcher(event.message)
-        if (!matcher.matches()) return
-
-        val skill = matcher.group(1).lowercase()
-        val overflow = matcher.group(2).formatNumber()
-        val neededForNextLevel = matcher.group(3).formatNumber()
-        val nextLevel = getLevelForExpExactly(neededForNextLevel)
-        val baseExp = getExpForLevel(nextLevel - 1)
-        skillExp[skill] = baseExp + overflow
+        actionBarPattern.matchMatcher(event.message) {
+            val skill = group("skill").lowercase()
+            val overflow = group("overflow").formatNumber()
+            val neededForNextLevel = group("needed").formatNumber()
+            val nextLevel = getLevelForExpExactly(neededForNextLevel)
+            val baseExp = getExpForLevel(nextLevel - 1)
+            skillExp[skill] = baseExp + overflow
+        }
     }
 
     @SubscribeEvent
@@ -70,9 +69,8 @@ class SkillExperience {
                     val skillName = split[0].lowercase()
                     val level = split[1].romanToDecimal()
                     val baseExp = getExpForLevel(level)
-                    val matcher = inventoryPattern.matcher(line)
-                    if (matcher.matches()) {
-                        val rawNumber = matcher.group(1)
+                    inventoryPattern.matchMatcher(line) {
+                        val rawNumber = group("number")
                         val overflow = rawNumber.formatNumber()
                         val experience = baseExp + overflow
                         skillExp[skillName] = experience

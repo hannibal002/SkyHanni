@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
@@ -43,13 +44,12 @@ class BazaarOrderHelper {
             if (slot.stack == null) continue
 
             val itemName = slot.stack.name ?: continue
-            val matcher = bazaarItemNamePattern.matcher(itemName)
-            if (!matcher.matches()) continue
+            bazaarItemNamePattern.matchMatcher(itemName) {
+                val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
+                if (buyOrSell.let { !it.first && !it.second }) return
 
-            val buyOrSell = matcher.group("type").let { (it == "BUY") to (it == "SELL") }
-            if (buyOrSell.let { !it.first && !it.second }) continue
-
-            highlightItem(matcher.group("name"), slot, buyOrSell)
+                highlightItem(group("name"), slot, buyOrSell)
+            }
         }
     }
 
@@ -62,14 +62,13 @@ class BazaarOrderHelper {
 
         val itemLore = slot.stack.getLore()
         for (line in itemLore) {
-            if (filledPattern.matcher(line).matches()) {
+            filledPattern.matchMatcher(line) {
                 slot highlight LorenzColor.GREEN
                 return
             }
 
-            val matcher = pricePattern.matcher(line)
-            if (matcher.matches()) {
-                val price = matcher.group("number").replace(",", "").toDouble()
+            pricePattern.matchMatcher(line) {
+                val price = group("number").replace(",", "").toDouble()
                 if (buyOrSell.first && price < data.sellPrice || buyOrSell.second && price > data.buyPrice) {
                     slot highlight LorenzColor.GOLD
                     return

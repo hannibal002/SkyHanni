@@ -6,15 +6,16 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class BazaarCancelledBuyOrderClipboard {
 
-    private val patternLastAmount = Pattern.compile("§a(.*)§7x")
+    private val patternLastAmount = Pattern.compile("§a(?<amount>.*)§7x")
     private val patternCancelledMessage =
-        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(.*) coins §r§7from cancelling Buy Order!".toPattern()
+        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?<coins>.*) coins §r§7from cancelling Buy Order!".toPattern()
 
     private var latestAmount: String? = null
 
@@ -29,7 +30,7 @@ class BazaarCancelledBuyOrderClipboard {
         for (line in stack.getLore()) {
             val matcher = patternLastAmount.matcher(line)
             if (matcher.find()) {
-                latestAmount = matcher.group(1)
+                latestAmount = matcher.group("amount")
             }
         }
     }
@@ -38,13 +39,9 @@ class BazaarCancelledBuyOrderClipboard {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        val message = event.message
-
-        val matcher = patternCancelledMessage.matcher(message)
-        if (matcher.matches()) {
+        patternCancelledMessage.matchMatcher(event.message) {
             event.blockedReason = "bazaar cancelled buy order clipbaord"
-            val coins = matcher.group(1)
-
+            val coins = group("coins")
             LorenzUtils.chat("§e[SkyHanni] Bazaar buy order cancelled. $latestAmount saved to clipboard. ($coins coins)")
 
             latestAmount?.let { OSUtils.copyToClipboard(it.replace(",", "")) }

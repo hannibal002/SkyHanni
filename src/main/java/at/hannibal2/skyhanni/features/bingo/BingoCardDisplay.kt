@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
@@ -27,7 +28,7 @@ class BingoCardDisplay {
     private var tick = 0
     private var display = listOf<String>()
     private val config get() = SkyHanniMod.feature.bingo
-    private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(.*)".toPattern()
+    private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
     init {
         update()
@@ -179,9 +180,8 @@ class BingoCardDisplay {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.cardDisplay) return
 
-        val matcher = goalCompletePattern.matcher(event.message)
-        if (matcher.matches()) {
-            val name = matcher.group(1)
+        goalCompletePattern.matchMatcher(event.message) {
+            val name = group("name")
             personalGoals.filter { it.displayName == name }
                 .forEach {
                     it.done = true

@@ -9,12 +9,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CollectionAPI {
-    private val counterPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
-    private val singleCounterPattern = "§7Total Collected: §e(.*)".toPattern()
+    private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
+    private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
 
 //    private val hypixelApiHasWrongItems = listOf(
 //        "WOOL",
@@ -60,9 +61,8 @@ class CollectionAPI {
         if (inventoryName.endsWith(" Collection")) {
             val stack = event.inventoryItems[4] ?: return
             for (line in stack.getLore()) {
-                val matcher = singleCounterPattern.matcher(line)
-                if (matcher.matches()) {
-                    val counter = matcher.group(1).replace(",", "").toLong()
+                singleCounterPattern.matchMatcher(line) {
+                    val counter = group("amount").replace(",", "").toLong()
                     val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                     collectionValue[name] = counter
                 }
@@ -85,9 +85,8 @@ class CollectionAPI {
                 }
 
                 for (line in lore) {
-                    val matcher = counterPattern.matcher(line)
-                    if (matcher.matches()) {
-                        val counter = matcher.group(1).replace(",", "").toLong()
+                    counterPattern.matchMatcher(line) {
+                        val counter = group("amount").replace(",", "").toLong()
                         collectionValue[name] = counter
                     }
                 }
