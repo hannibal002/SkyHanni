@@ -1013,6 +1013,17 @@ public class Garden {
     public boolean wildStrawberryDyeNotification = true;
 
     @Expose
+    @ConfigOption(
+            name = "FF for Contest",
+            desc = "Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory."
+    )
+    @ConfigEditorBoolean
+    public boolean farmingFortuneForContest = true;
+
+    @Expose
+    public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
+
+    @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
     public boolean forcefullyEnabledAlwaysFinnegan = false;

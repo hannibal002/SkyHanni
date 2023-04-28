@@ -218,6 +218,7 @@
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
 + Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 + Show the average crop milestone in the crop milestone inventory.
++ **FF for Contest** - Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
