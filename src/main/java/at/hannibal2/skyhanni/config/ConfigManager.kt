@@ -77,7 +77,7 @@ class ConfigManager {
             }
         }
 
-        if (::features.isInitialized) {
+        if (!::features.isInitialized) {
             logger.log("Creating blank config and saving to file")
             features = Features()
             saveConfig("blank config")
