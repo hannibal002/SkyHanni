@@ -1024,9 +1024,45 @@ public class Garden {
     public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
-    @ConfigOption(name = "Yaw / Pitch", desc = "Displays yaw and pitch with 4-digit accuracy while holding a farming tool. Automatically fades out if there is no movement for 3 seconds.")
+    @ConfigOption(name = "Yaw / Pitch", desc = "")
+    @ConfigEditorAccordion(id = 23)
+    public boolean yawpitch = false;
+
+    @Expose
+    @ConfigOption(name = "Enable", desc = "Displays yaw and pitch with 4-digit accuracy while holding a farming tool. Automatically fades out if there is no movement for 3 seconds.")
     @ConfigEditorBoolean
+    @ConfigAccordionId(id = 23)
     public boolean showYawAndPitch = false;
+
+    @Expose
+    @ConfigOption(name = "Yaw Precision", desc = "Yaw precision up to specified decimal.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 10,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 23)
+    public int yawPrecision = 4;
+
+    @Expose
+    @ConfigOption(name = "Pitch Precision", desc = "Pitch precision up to specified decimal.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 10,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 23)
+    public int pitchPrecision = 4;
+
+    @Expose
+    @ConfigOption(name = "Display timeout", desc = "Amount of time in seconds the overlay is being displayed after moving.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 20,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 23)
+    public int yawpitchTimeout = 5;
 
     @Expose
     public Position YawAndPitchDisplayPos = new Position(445, 225, false, true);
