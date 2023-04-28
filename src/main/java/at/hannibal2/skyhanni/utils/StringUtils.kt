@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import org.intellij.lang.annotations.Language
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 object StringUtils {
     fun String.firstLetterUppercase(): String {
@@ -56,4 +58,8 @@ object StringUtils {
     fun String.matchRegex(@Language("RegExp") regex: String): Boolean = regex.toRegex().matches(this)
 
     private fun String.removeAtBeginning(text: String): String = if (this.startsWith(text)) substring(text.length) else this
+
+    // TODO find better name for this method
+    inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
+        matcher(text).let { if (it.matches()) consumer(it) else null }
 }

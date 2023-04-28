@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -25,7 +24,6 @@ class JacobFarmingContestsInventory {
 
     private val formatDay = SimpleDateFormat("dd MMMM yyyy", Locale.US)
     private val formatTime = SimpleDateFormat("HH:mm", Locale.US)
-    private val pattern = "§a(.*) (.*)(?:rd|st|nd|th), Year (.*)".toPattern()
     private val config get() = SkyHanniMod.feature.inventory
 
     // Render the contests a tick delayed to feel smoother
@@ -59,27 +57,19 @@ class JacobFarmingContestsInventory {
             } else {
                 foundEvents.add(name)
             }
+            val time = FarmingContestAPI.getSbTimeFor(name) ?: continue
+            FarmingContestAPI.addContest(time, item)
             if (config.jacobFarmingContestRealTime) {
-                readRealTime(name, slot)
+                readRealTime(time, slot)
             }
         }
         hideEverything = false
     }
 
-    private fun readRealTime(name: String, slot: Int) {
-        val matcher = pattern.matcher(name)
-        if (!matcher.matches()) return
-
-        val month = matcher.group(1)
-        val day = matcher.group(2).toInt()
-        val year = matcher.group(3).toInt()
-
-        val monthNr = LorenzUtils.getSBMonthByName(month)
-        val time = SkyBlockTime(year, monthNr, day)
-        val toMillis = time.toMillis()
-        val dayFormat = formatDay.format(toMillis)
-        val startTimeFormat = formatTime.format(toMillis)
-        val endTimeFormat = formatTime.format(toMillis + 1000 * 60 * 20)
+    private fun readRealTime(time: Long, slot: Int) {
+        val dayFormat = formatDay.format(time)
+        val startTimeFormat = formatTime.format(time)
+        val endTimeFormat = formatTime.format(time + 1000 * 60 * 20)
         realTime[slot] = "$dayFormat $startTimeFormat-$endTimeFormat"
     }
 
@@ -137,7 +127,8 @@ class JacobFarmingContestsInventory {
         if (config.jacobFarmingContestHideDuplicates) {
             if (duplicateSlots.contains(slot)) {
                 event.toolTip.clear()
-                event.toolTip.add("§7Duplicate contest!")
+                event.toolTip.add("§7Duplicate contest")
+                event.toolTip.add("§7hidden by SkyHanni!")
                 return
             }
         }
