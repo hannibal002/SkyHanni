@@ -155,6 +155,7 @@ public class SkyHanniMod {
         loadModule(new GardenComposterUpgradesData());
         loadModule(new ActionBarStatsData());
         loadModule(new GardenCropMilestoneAverage());
+        loadModule(GardenCropSpeed.INSTANCE);
 
         // APIs
         loadModule(new BazaarApi());
@@ -251,7 +252,7 @@ public class SkyHanniMod {
         loadModule(new GardenInventoryNumbers());
         loadModule(new GardenVisitorTimer());
         loadModule(new GardenNextPlotPrice());
-        loadModule(new GardenCropMilestoneDisplay());
+        loadModule(GardenCropMilestoneDisplay.INSTANCE);
         loadModule(GardenCustomKeybinds.INSTANCE);
         loadModule(new ChickenHeadTimer());
         loadModule(new GardenOptimalSpeed());

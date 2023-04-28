@@ -36,7 +36,6 @@ class CropMoneyDisplay {
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
-    private var hasCropInHand = false
     private val toolHasBountiful: MutableMap<CropType, Boolean> get() = SkyHanniMod.feature.hidden.gardenToolHasBountiful
 
     @SubscribeEvent
@@ -50,7 +49,6 @@ class CropMoneyDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        hasCropInHand = event.crop != null
         update()
     }
 
@@ -58,7 +56,8 @@ class CropMoneyDisplay {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
         if (tick++ % (20 * 5) != 0) return
-        if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return
+
+        if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.moneyPerHourAlwaysOn) return
 
         update()
     }
@@ -84,7 +83,7 @@ class CropMoneyDisplay {
             return newDisplay
         }
 
-        if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
+        if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.moneyPerHourAlwaysOn) return newDisplay
 
         newDisplay.addAsSingletonList(fullTitle(title))
 
@@ -94,7 +93,7 @@ class CropMoneyDisplay {
         }
 
         var extraNetherWartPrices = 0.0
-        GardenAPI.cropInHand?.let {
+        GardenAPI.getCurrentlyFarmedCrop()?.let {
             val reforgeName = Minecraft.getMinecraft().thePlayer.heldItem?.getReforgeName()
             toolHasBountiful[it] = reforgeName == "bountiful"
 
@@ -127,7 +126,7 @@ class CropMoneyDisplay {
         for (internalName in help.sortedDesc().keys) {
             number++
             val cropName = cropNames[internalName]!!
-            val isCurrent = cropName == GardenAPI.cropInHand
+            val isCurrent = cropName == GardenAPI.getCurrentlyFarmedCrop()
             if (number > config.moneyPerHourShowOnlyBest && (!config.moneyPerHourShowCurrent || !isCurrent)) continue
 
             val list = mutableListOf<Any>()

@@ -1,35 +1,28 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
-import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI.setSpeed
-import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
-import kotlin.concurrent.fixedRateTimer
-import kotlin.math.abs
 
-class GardenCropMilestoneDisplay {
+object GardenCropMilestoneDisplay {
     private var progressDisplay = listOf<List<Any>>()
     private var mushroomCowPerkDisplay = listOf<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
@@ -107,14 +100,13 @@ class GardenCropMilestoneDisplay {
                         cropType.setSpeed(-1)
                     }
                 }
-                if (!finneganPerkActive()) {
-                    crop.setCounter(crop.getCounter() + addedCounter)
-                }
                 EliteFarmingWeight.addCrop(crop, addedCounter)
-                if (currentCrop == crop) {
-                    calculateSpeed(addedCounter)
-                    update()
-                }
+                update()
+                crop.setCounter(
+                    crop.getCounter() + if (GardenCropSpeed.finneganPerkActive()) {
+                        (addedCounter.toDouble() * 0.8).toInt()
+                    } else addedCounter
+                )
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
@@ -123,117 +115,18 @@ class GardenCropMilestoneDisplay {
         }
     }
 
-    private fun finneganPerkActive(): Boolean {
-        val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
-        val perkActive = MayorElection.isPerkActive("Finnegan", "Farming Simulator")
-        MayorElection.currentCandidate?.let {
-
-        }
-        return forcefullyEnabledAlwaysFinnegan || perkActive
-    }
-
-    @SubscribeEvent
-    fun onBlockClick(event: BlockClickEvent) {
-        if (!isEnabled()) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
-
-        val blockState = event.getBlockState
-
-        val cropType = blockState.getCropType() ?: return
-        if (cropType.multiplier == 1) {
-            if (blockState.isBabyCrop()) return
-        }
-        blocksBroken++
-    }
-
-    private var currentSpeed = 0
-    private var averageBlocksPerSecond = 0.0
-
-    private val blocksSpeedList = mutableListOf<Int>()
-    private var lastItemInHand: ItemStack? = null
-    private var currentCrop: CropType? = null
-    private var blocksBroken = 0
-    private var lastBlocksBroken = 0
-
-    private fun resetSpeed() {
-        currentSpeed = 0
-        averageBlocksPerSecond = 0.0
-        blocksBroken = 0
-        blocksSpeedList.clear()
-    }
-
-    init {
-        fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
-            if (GardenAPI.inGarden() && GardenAPI.mushroomCowPet) {
-                CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
-                update()
-            }
-            if (isEnabled()) {
-                checkSpeed()
-            }
-        }
-    }
-
-    private fun checkSpeed() {
-        if (finneganPerkActive()) {
-            currentSpeed = (currentSpeed.toDouble() * 0.8).toInt()
-        }
-
-        val blocksBroken = blocksBroken.coerceAtMost(20)
-        this.blocksBroken = 0
-
-        // If the difference in speed between the current and the previous bps value is too high, disregard this value
-        if (abs(lastBlocksBroken - blocksBroken) > 4) {
-            if (blocksSpeedList.isNotEmpty()) {
-                blocksSpeedList.removeLast()
-            }
-        } else if (blocksBroken >= 2) {
-            blocksSpeedList.add(blocksBroken)
-            while (blocksSpeedList.size > 120) {
-                blocksSpeedList.removeFirst()
-            }
-            averageBlocksPerSecond = blocksSpeedList.average()
-
-        }
-        lastBlocksBroken = blocksBroken
-
-        if (finneganPerkActive()) {
-            currentCrop?.let {
-                it.setCounter(it.getCounter() + currentSpeed)
-            }
-        }
-        currentSpeed = 0
-    }
-
-
-    private fun calculateSpeed(addedCounter: Int) {
-        currentSpeed += addedCounter
-    }
-
-    @SubscribeEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
-        lastItemInHand = event.toolItem
-        currentCrop = event.crop
-
-        if (isEnabled()) {
-            resetSpeed()
-            update()
-        }
-    }
-
-    private fun update() {
+    fun update() {
         progressDisplay = emptyList()
         mushroomCowPerkDisplay = emptyList()
         bestCropTime.display = emptyList()
+        val currentCrop = GardenAPI.getCurrentlyFarmedCrop()
         currentCrop?.let {
             progressDisplay = drawProgressDisplay(it, it.getCounter())
-            if (config.cropMilestoneBestDisplay) {
-                bestCropTime.display = bestCropTime.drawBestDisplay(it)
-            }
         }
-        if (config.cropMilestoneBestAlwaysOn) {
-            if (currentCrop == null) {
-                bestCropTime.display = bestCropTime.drawBestDisplay(null)
+
+        if (config.cropMilestoneBestDisplay) {
+            if (config.cropMilestoneBestAlwaysOn || currentCrop != null) {
+                bestCropTime.display = bestCropTime.drawBestDisplay(currentCrop)
             }
         }
     }
@@ -260,16 +153,9 @@ class GardenCropMilestoneDisplay {
         val needFormat = LorenzUtils.formatInteger(need)
         lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
 
-        lastItemInHand?.let {
-            if (GardenAPI.readCounter(it) == -1L) {
-                lineMap[3] = Collections.singletonList("§cWarning: You need Cultivating!")
-                return formatDisplay(lineMap)
-            }
-        }
-
-
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
-        val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * averageBlocksPerSecond / 100).round(1).toInt()
+        val speed = GardenCropSpeed.averageBlocksPerSecond
+        val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
@@ -289,11 +175,17 @@ class GardenCropMilestoneDisplay {
                     }
                 }
             }
-            lineMap[3] = Collections.singletonList("§7In §b$duration")
+            val speedText = "§7In §b$duration"
+            lineMap[3] = Collections.singletonList(speedText)
+            GardenAPI.itemInHand?.let {
+                if (GardenAPI.readCounter(it) == -1L) {
+                    lineMap[3] = listOf(speedText, " §7Inaccurate!")
+                }
+            }
 
             val format = LorenzUtils.formatInteger(farmingFortuneSpeed * 60)
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
-            val formatBps = LorenzUtils.formatDouble(averageBlocksPerSecond, 2)
+            val formatBps = LorenzUtils.formatDouble(speed, 2)
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$formatBps")
         }
 
@@ -349,9 +241,9 @@ class GardenCropMilestoneDisplay {
 
         lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
 
-
-        if (averageBlocksPerSecond != 0.0) {
-            val blocksPerSecond = averageBlocksPerSecond * (currentCrop?.multiplier ?: 1)
+        val speed = GardenCropSpeed.averageBlocksPerSecond
+        if (speed != 0.0) {
+            val blocksPerSecond = speed * (GardenAPI.getCurrentlyFarmedCrop()?.multiplier ?: 1)
 
             val missingTimeSeconds = missing / blocksPerSecond
             val millis = missingTimeSeconds * 1000
