@@ -103,7 +103,7 @@ class GardenNextJacobContest {
         }
     }
 
-    private fun readCalendar(items: MutableCollection<ItemStack>, year: Int, month: Int) {
+    private fun readCalendar(items: Collection<ItemStack>, year: Int, month: Int) {
         if (contests.isNotEmpty()) {
             val contest = contests.values.first()
             val endTime = contest.endTime
