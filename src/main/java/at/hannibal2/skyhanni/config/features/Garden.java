@@ -13,18 +13,18 @@ import java.util.List;
 public class Garden {
 
     @Expose
-    @ConfigOption(name = "Sky Mart", desc = "")
+    @ConfigOption(name = "SkyMart", desc = "")
     @ConfigEditorAccordion(id = 0)
     public boolean skyMart = false;
 
     @Expose
-    @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the Sky Mart inventory.")
+    @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean skyMartCopperPrice = true;
 
     @Expose
-    @ConfigOption(name = "Advanced stats", desc = "Show additionally the bin price and copper price for every item.")
+    @ConfigOption(name = "Advanced Stats", desc = "Show the bin price and copper price for every item.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean skyMartCopperPriceAdvancedStats = false;
