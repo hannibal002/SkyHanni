@@ -158,7 +158,7 @@ public class Inventory {
 
     @Expose
     @ConfigOption(name = "Highlight Missing SkyBlock Level Guide",
-            desc = "Highlight stuff that is missing in the skyblock level guide inventory.")
+            desc = "Highlight stuff that is missing in the SkyBlock level guide inventory.")
     @ConfigEditorBoolean
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
