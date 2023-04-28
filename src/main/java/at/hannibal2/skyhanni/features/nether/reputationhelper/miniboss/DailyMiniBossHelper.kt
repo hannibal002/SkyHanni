@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -29,7 +30,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
 
         val message = event.message
         for (miniBoss in miniBosses) {
-            if (miniBoss.pattern.matcher(message).matches()) {
+            miniBoss.pattern.matchMatcher(message) {
                 finished(miniBoss)
             }
         }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenTeleportPadInventoryNumber {
@@ -57,7 +58,7 @@ class GardenTeleportPadInventoryNumber {
     }
 
     private var inTeleportPad = false
-    private val pattern = "§.(.*) teleport pad".toPattern()
+    private val pattern = "§.(?<number>.*) teleport pad".toPattern()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
@@ -71,13 +72,12 @@ class GardenTeleportPadInventoryNumber {
         if (!inTeleportPad) return
 
         val name = event.stack.name?.lowercase() ?: return
-        val matcher = pattern.matcher(name)
-        if (!matcher.matches()) return
 
-        val text = matcher.group(1)
-        numbers[text]?.let {
-            event.stackTip = "$it"
-            return
+        pattern.matchMatcher(name) {
+            val text = group("number")
+            numbers[text]?.let {
+                event.stackTip = "$it"
+            }
         }
     }
 }

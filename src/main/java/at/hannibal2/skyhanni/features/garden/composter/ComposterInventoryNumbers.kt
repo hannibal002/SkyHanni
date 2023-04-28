@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ComposterInventoryNumbers {
-    private val valuePattern = "(?:.*) §e(.*)§6\\/(.*)".toPattern()
-    private val compostsPattern = "§7§7Compost Available: §a(.*)".toPattern()
+    private val valuePattern = "(?:.*) §e(?<having>.*)§6\\/(?<total>.*)".toPattern()
+    private val compostsPattern = "§7§7Compost Available: §a(?<amount>.*)".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
@@ -27,45 +28,41 @@ class ComposterInventoryNumbers {
         // Composts Available
         if (slotNumber == 22) {
             for (line in stack.getLore()) {
-                val matcher = compostsPattern.matcher(line)
-                if (!matcher.matches()) continue
-
-                val total = matcher.group(1).replace(",", "").toInt()
-                if (total <= 64) continue
-
-                event.offsetY = -2
-                event.offsetX = -20
-                event.stackTip = "§6${total.addSeparators()}"
-                return
+                compostsPattern.matchMatcher(line) {
+                    val total = group("amount").replace(",", "").toInt()
+                    event.offsetY = -2
+                    event.offsetX = -20
+                    event.stackTip = "§6${total.addSeparators()}"
+                    return
+                }
             }
         }
 
         // Organic Matter or Fuel
         if (slotNumber == 46 || slotNumber == 52) {
             for (line in stack.getLore()) {
-                val matcher = valuePattern.matcher(line)
-                if (!matcher.matches()) continue
-
-                val having = matcher.group(1).removeColor().replace(",", "").toDouble().toInt()
-                val havingFormat = NumberUtil.format(having)
-                val total = matcher.group(2).removeColor()
+                valuePattern.matchMatcher(line) {
+                    val having = group("having").removeColor().replace(",", "").toDouble().toInt()
+                    val havingFormat = NumberUtil.format(having)
+                    val total = group("total").removeColor()
 
 
-                val color = if (slotNumber == 46) {
-                    // Organic Matter
-                    event.offsetY = -95
-                    event.offsetX = 5
-                    event.alignLeft = false
-                    "§e"
-                } else {
-                    // Fuel
-                    event.offsetY = -76
-                    event.offsetX = -20
-                    "§a"
+                    val color = if (slotNumber == 46) {
+                        // Organic Matter
+                        event.offsetY = -95
+                        event.offsetX = 5
+                        event.alignLeft = false
+                        "§e"
+                    } else {
+                        // Fuel
+                        event.offsetY = -76
+                        event.offsetX = -20
+                        "§a"
+                    }
+
+                    event.stackTip = "$color$havingFormat/$total"
+                    return
                 }
-
-                event.stackTip = "$color$havingFormat/$total"
-                return
             }
         }
     }

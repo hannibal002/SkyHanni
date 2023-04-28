@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -32,15 +33,12 @@ object NEUItems {
             return itemNameCache[itemName]!!
         }
 
-        val matcher = turboBookPattern.matcher(itemName)
-        var internalName = if (matcher.matches()) {
-            val type = matcher.group("name")
-            val level = matcher.group("level").romanToDecimal()
+        var internalName = turboBookPattern.matchMatcher(itemName) {
+            val type = group("name")
+            val level = group("level").romanToDecimal()
             val name = turboCheck(type).uppercase()
             "TURBO_$name;$level"
-        } else {
-            ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
-        }
+        } ?: ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -118,7 +119,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
 //            }
 //        }
         if (SkyHanniMod.feature.dev.filterBiomeIdBounds) {
-            if (patternBiomeIdBounds.matcher(formattedMessage).matches()) {
+            patternBiomeIdBounds.matchMatcher(formattedMessage) {
                 filterConsole("Biome ID bounds")
                 return Filter.Result.DENY
             }

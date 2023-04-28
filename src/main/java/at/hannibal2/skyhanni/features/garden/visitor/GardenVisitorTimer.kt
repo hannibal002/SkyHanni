@@ -8,14 +8,15 @@ import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.roundToLong
 
 class GardenVisitorTimer {
-    private val patternNextVisitor = " Next Visitor: §r§b(.*)".toPattern()
-    private val patternVisitors = "§b§lVisitors: §r§f\\((\\d)\\)".toPattern()
+    private val patternNextVisitor = " Next Visitor: §r§b(?<time>.*)".toPattern()
+    private val patternVisitors = "§b§lVisitors: §r§f\\((?<amount>\\d)\\)".toPattern()
     private var render = ""
     private var lastMillis = 0L
     private var lastVisitors: Int = -1
@@ -38,9 +39,9 @@ class GardenVisitorTimer {
         var millis = visitorInterval
         var queueFull = false
         for (line in event.tabList) {
-            var matcher = patternNextVisitor.matcher(line)
+            val matcher = patternNextVisitor.matcher(line)
             if (matcher.matches()) {
-                val rawTime = matcher.group(1)
+                val rawTime = matcher.group("time")
                 millis = TimeUtils.getMillis(rawTime)
             } else if (line == " Next Visitor: §r§c§lQueue Full!") {
                 queueFull = true
@@ -49,9 +50,8 @@ class GardenVisitorTimer {
                 return
             }
 
-            matcher = patternVisitors.matcher(line)
-            if (matcher.matches()) {
-                visitorsAmount = matcher.group(1).toInt()
+            patternVisitors.matchMatcher(line) {
+                visitorsAmount = group("amount").toInt()
             }
         }
 

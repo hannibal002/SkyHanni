@@ -116,14 +116,14 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         var slayerLevel = ""
         var bossAlive = "spawning"
         val slayerRegex =
-            Pattern.compile("((?:\\w| )*) ([IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
+            Pattern.compile("(?<name>(?:\\w| )*) (?<level>[IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val noColorLine = line.removeColor()
             val match = slayerRegex.matcher(noColorLine)
             if (match.matches()) {
-                slayerName = match.group(1)
-                slayerLevel = match.group(2)
+                slayerName = match.group("name")
+                slayerLevel = match.group("level")
             } else if (noColorLine == "Slay the boss!") bossAlive = "slaying"
             else if (noColorLine == "Boss slain!") bossAlive = "slain"
         }

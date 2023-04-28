@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.bingo.nextstep.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,9 +23,9 @@ class BingoNextStepHelper {
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
     private val itemRequired = mutableMapOf<String, NextStep>()
     private val islands = mutableMapOf<IslandType, IslandVisitStep>()
-    private val collectionPattern = "Reach ([0-9]+(?:,\\d+)*) (.*) Collection\\.".toPattern()
-    private val crystalPattern = "Obtain a (\\w+) Crystal in the Crystal Hollows\\.".toPattern()
-    private val skillPattern = "Obtain level (.*) in the (.*) Skill.".toPattern()
+    private val collectionPattern = "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.".toPattern()
+    private val crystalPattern = "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.".toPattern()
+    private val skillPattern = "Obtain level (?<level>.*) in the (?<skill>.*) Skill.".toPattern()
 
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
@@ -219,49 +220,52 @@ class BingoNextStepHelper {
         dirty = false
 
         for (goal in personalGoals) {
-            val description = goal.description.removeColor()
-
-            val collectionMatcher = collectionPattern.matcher(description)
-            if (collectionMatcher.matches()) {
-                val amount = collectionMatcher.group(1).replace(",", "").toInt()
-                val name = collectionMatcher.group(2)
-
-                val collectionStep = CollectionStep(name, amount).apply { finalSteps.add(this) }
-                createItemIslandRequirement(name, collectionStep)
-                continue
-            }
-            if (description == "Craft an Emerald Ring.") {
-                CraftStep("Emerald Ring").apply { finalSteps.add(this) } requires ItemsStep(
-                    "32x Enchanted Emerald",
-                    "Emerald",
-                    160 * 32,
-                    mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
-                ).apply { this requires IslandType.DWARVEN_MINES.getStep() }
-            }
-            if (description == "Obtain a Mathematical Hoe Blueprint.") {
-                CraftStep("Mathematical Hoe Blueprint").apply { finalSteps.add(this) } requires ItemsStep(
-                    "32x Jacob's Ticket",
-                    "Jacob's Ticket",
-                    32,
-                    mapOf("Jacob's Ticket" to 1)
-                ).apply { this requires IslandType.GARDEN.getStep() }.addItemRequirements()
-            }
-            val crystalMatcher = crystalPattern.matcher(description)
-            if (crystalMatcher.matches()) {
-                val crystal = crystalMatcher.group(1)
-                ChatMessageStep("Obtain a $crystal Crystal").apply { finalSteps.add(this) } requires IslandType.CRYSTAL_HOLLOWS.getStep()
-            }
-            val matcher = skillPattern.matcher(description)
-            if (matcher.matches()) {
-                val level = matcher.group(1).toInt()
-                val skillName = matcher.group(2)
-                SkillLevelStep(skillName, level).apply { finalSteps.add(this) }
-            }
-
-            println("No help for goal: '$description'")
+            readDescription(goal.description.removeColor())
         }
 
         updateResult()
+    }
+
+    private fun readDescription(description: String) {
+        collectionPattern.matchMatcher(description) {
+            val amount = group("amount").replace(",", "").toInt()
+            val name = group("name")
+
+            val collectionStep = CollectionStep(name, amount).apply { finalSteps.add(this) }
+            createItemIslandRequirement(name, collectionStep)
+            return
+        }
+
+        if (description == "Craft an Emerald Ring.") {
+            CraftStep("Emerald Ring").apply { finalSteps.add(this) } requires ItemsStep(
+                "32x Enchanted Emerald",
+                "Emerald",
+                160 * 32,
+                mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
+            ).apply { this requires IslandType.DWARVEN_MINES.getStep() }
+        }
+
+        if (description == "Obtain a Mathematical Hoe Blueprint.") {
+            CraftStep("Mathematical Hoe Blueprint").apply { finalSteps.add(this) } requires ItemsStep(
+                "32x Jacob's Ticket",
+                "Jacob's Ticket",
+                32,
+                mapOf("Jacob's Ticket" to 1)
+            ).apply { this requires IslandType.GARDEN.getStep() }.addItemRequirements()
+        }
+
+        crystalPattern.matchMatcher(description) {
+            val crystal = group("name")
+            ChatMessageStep("Obtain a $crystal Crystal").apply { finalSteps.add(this) } requires IslandType.CRYSTAL_HOLLOWS.getStep()
+        }
+
+        skillPattern.matchMatcher(description) {
+            val level = group("level").toInt()
+            val skill = group("skill")
+            SkillLevelStep(skill, level).apply { finalSteps.add(this) }
+        }
+
+        println("No help for goal: '$description'")
     }
 
     @SubscribeEvent

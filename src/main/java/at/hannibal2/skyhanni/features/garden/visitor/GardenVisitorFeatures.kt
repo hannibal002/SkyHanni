@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
@@ -41,8 +42,8 @@ class GardenVisitorFeatures {
     private var lastClickedNpc = 0
     private var tick = 0
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
-    private val copperPattern = " §8\\+§c(.*) Copper".toPattern()
-    private val gardenExperiencePattern = " §8\\+§2(.*) §7Garden Experience".toPattern()
+    private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
+    private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
     private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r§f.*".toPattern()
     private val config get() = SkyHanniMod.feature.garden
     private val logger = LorenzLogger("garden/visitors")
@@ -335,17 +336,15 @@ class GardenVisitorFeatures {
             }
 
             if (config.visitorCopperPrice) {
-                val matcher = copperPattern.matcher(line)
-                if (matcher.matches()) {
-                    val coppers = matcher.group(1).replace(",", "").toInt()
+                copperPattern.matchMatcher(line) {
+                    val coppers = group("amount").replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
                     list[i + itemsWithSpeedCounter] = "$line §7(price per §6$pricePerCopper§7)"
                 }
             }
             if (config.visitorExperiencePrice) {
-                val matcher = gardenExperiencePattern.matcher(line)
-                if (matcher.matches()) {
-                    val gardenExp = matcher.group(1).replace(",", "").toInt()
+                gardenExperiencePattern.matchMatcher(line) {
+                    val gardenExp = group("amount").replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / gardenExp).toInt())
                     list[i + itemsWithSpeedCounter] = "$line §7(price per §6$pricePerCopper§7)"
                 }
@@ -480,16 +479,13 @@ class GardenVisitorFeatures {
         }
     }
 
-    private fun hideVisitorMessage(message: String): Boolean {
-        val matcher = visitorChatMessagePattern.matcher(message)
-        if (!matcher.matches()) return false
+    private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+         val name = group("name")
+         if (name == "Spaceman") return false
+         if (name == "Beth") return false
 
-        val name = matcher.group("name")
-        if (name == "Spaceman") return false
-        if (name == "Beth") return false
-
-        return visitors.keys.any { it.removeColor() == name }
-    }
+         return visitors.keys.any { it.removeColor() == name }
+     } ?: false
 
     private fun update() {
         checkVisitorsReady()

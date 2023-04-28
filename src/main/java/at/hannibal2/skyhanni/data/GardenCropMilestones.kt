@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropMilestones {
-    private val cropPattern = "§7Harvest §f(.*) §7on .*".toPattern()
-    private val totalPattern = "§7Total: §a(.*)".toPattern()
+    private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
+    private val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
 
     // Add when api support is there
 //    @SubscribeEvent
@@ -41,14 +42,12 @@ class GardenCropMilestones {
         for ((_, stack) in event.inventoryItems) {
             var crop: CropType? = null
             for (line in stack.getLore()) {
-                var matcher = cropPattern.matcher(line)
-                if (matcher.matches()) {
-                    val name = matcher.group(1)
-                    crop = CropType.getByNameOrNull(name) ?: continue
+                cropPattern.matchMatcher(line) {
+                    val name = group("name")
+                    crop = CropType.getByNameOrNull(name)
                 }
-                matcher = totalPattern.matcher(line)
-                if (matcher.matches()) {
-                    val amount = matcher.group(1).replace(",", "").toLong()
+                totalPattern.matchMatcher(line) {
+                    val amount = group("name").replace(",", "").toLong()
                     crop?.setCounter(amount)
                 }
             }

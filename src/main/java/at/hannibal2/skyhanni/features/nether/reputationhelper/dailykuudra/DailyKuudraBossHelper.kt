@@ -12,12 +12,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
     val kuudraTiers = mutableListOf<KuudraTier>()
-    private val pattern = "  Kuudra's Hollow \\(T(.*)\\)".toPattern()
+    private val pattern = "  Kuudra's Hollow \\(T(?<tier>.*)\\)".toPattern()
 
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
@@ -46,9 +47,8 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         if (message != "                               §r§6§lKUUDRA DOWN!") return
 
         for (line in ScoreboardData.sidebarLines) {
-            val matcher = pattern.matcher(line)
-            if (matcher.matches()) {
-                val tier = matcher.group(1).toInt()
+            pattern.matchMatcher(line) {
+                val tier = group("tier").toInt()
                 val kuudraTier = getByTier(tier)!!
                 finished(kuudraTier)
                 return
