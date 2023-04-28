@@ -138,7 +138,7 @@ class GardenVisitorFeatures {
                 list.add(" §7- ")
                 list.add(itemStack)
 
-                list.add(Renderable.optionalLink("$name §8x${amount.addSeparators()}", {
+                list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
                     if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                         LorenzUtils.setTextIntoSign("$amount")
                     } else if (!InventoryUtils.inStorage() && !LorenzUtils.noTradeMode) {
