@@ -130,6 +130,7 @@ class SkyHanniMod {
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData())
         loadModule(GardenCropMilestoneAverage())
+        loadModule(GardenCropSpeed)
 
         // APIs
         loadModule(BazaarApi())
@@ -226,7 +227,7 @@ class SkyHanniMod {
         loadModule(GardenInventoryNumbers())
         loadModule(GardenVisitorTimer())
         loadModule(GardenNextPlotPrice())
-        loadModule(GardenCropMilestoneDisplay())
+        loadModule(GardenCropMilestoneDisplay)
         loadModule(GardenCustomKeybinds)
         loadModule(ChickenHeadTimer())
         loadModule(GardenOptimalSpeed())
