@@ -21,10 +21,10 @@ class GardenYawAndPitch {
         var pYaw = player.rotationYaw % 360
         if (pYaw < 0) pYaw += 360
         if (pYaw > 180) pYaw -= 360
-        ypList.add("§aYaw: §e${pYaw.toDouble().round(2)}")
+        ypList.add("§aYaw: §f${pYaw.toDouble().round(2)}")
 
         val pPitch = player.rotationPitch
-        ypList.add("§aPitch: §e${pPitch.toDouble().round(2)}")
+        ypList.add("§aPitch: §f${pPitch.toDouble().round(2)}")
 
         yawandpitchDisplay = ypList
 
