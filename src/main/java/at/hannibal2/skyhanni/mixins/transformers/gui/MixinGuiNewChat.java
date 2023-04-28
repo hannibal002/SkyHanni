@@ -14,9 +14,9 @@ public class MixinGuiNewChat {
 
     @Inject(method = "getChatOpen", at = @At("HEAD"), cancellable = true)
     public void onIsOpen(CallbackInfoReturnable<Boolean> cir) {
-        if (SkyHanniMod.feature.chat.peekChat > Keyboard.KEY_NONE
+        if (SkyHanniMod.getFeature().chat.peekChat > Keyboard.KEY_NONE
                 && Minecraft.getMinecraft().thePlayer != null
-                && Keyboard.isKeyDown(SkyHanniMod.feature.chat.peekChat))
+                && Keyboard.isKeyDown(SkyHanniMod.getFeature().chat.peekChat))
             cir.setReturnValue(true);
     }
 }

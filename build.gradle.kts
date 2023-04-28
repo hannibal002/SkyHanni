@@ -6,7 +6,7 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.7.20-Beta"
+    kotlin("jvm") version "1.8.20-RC"
 }
 
 group = "at.hannibal2.skyhanni"
@@ -83,6 +83,14 @@ dependencies {
     devenvMod("org.notenoughupdates.moulconfig:MoulConfig:1.1.0:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
+}
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = "2.0"
+            enableLanguageFeature("BreakContinueInInlineLambdas")
+        }
+    }
 }
 
 // Minecraft configuration:
