@@ -75,8 +75,6 @@ class GardenVisitorTimer {
         if (queueFull) {
             if (visitorJustArrived && visitorsAmount - lastVisitors == 1) {
                 updateSixthVisitorArrivalTime()
-                println(visitorsAmount)
-                println(lastVisitors)
                 visitorJustArrived = false
                 sixthVisitorReady = false
             }
@@ -87,9 +85,7 @@ class GardenVisitorTimer {
                 if (!sixthVisitorReady) {
                     TitleUtils.sendTitle("§a6th Visitor Ready", 2_000)
                     sixthVisitorReady = true
-                    if (isSixthVisitorWarningEnabled()) {
-                        SoundUtils.playBeepSound()
-                    }
+                    if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
                 }
             }
         }
