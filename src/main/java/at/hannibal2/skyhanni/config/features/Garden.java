@@ -258,14 +258,14 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Best Display",
-            desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.")
+            desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestDisplay = true;
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden exp or by skyblock exp.")
+    @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock exp.")
     @ConfigEditorDropdown(values = {"Garden Exp", "SkyBlock Exp"})
     @ConfigAccordionId(id = 7)
     public int cropMilestoneBestType = 0;
@@ -730,7 +730,7 @@ public class Garden {
     public boolean nextJacobContestDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in garden but everywhere in skyblock.")
+    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestEverywhere = false;

@@ -35,7 +35,7 @@ public class Chat {
     public boolean warping = true;
 
     @Expose
-    @ConfigOption(name = "Welcome", desc = "Hide the 'welcome to skyblock' message.")
+    @ConfigOption(name = "Welcome", desc = "Hide the 'welcome to SkyBlock' message.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean welcome = true;
@@ -107,7 +107,7 @@ public class Chat {
     public boolean dungeonMessages = true;
 
     @Expose
-    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from watcher and bosses in the dungeon.")
+    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the watcher and bosses in the dungeon.")
     @ConfigEditorBoolean
     public boolean dungeonBossMessages = false;
 
