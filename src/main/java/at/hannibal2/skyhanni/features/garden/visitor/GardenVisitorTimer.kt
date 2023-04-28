@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.data.TitleUtils
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.concurrent.fixedRateTimer
 import kotlin.math.roundToLong
 
 class GardenVisitorTimer {
@@ -33,14 +34,19 @@ class GardenVisitorTimer {
         visitorJustArrived = true
     }
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    init {
+        fixedRateTimer(name = "skyhanni-update-visitor-display", period = 1000L) {
+            updateVisitorDisplay()
+        }
+    }
+// check money/hr display try reset command made
+    private fun updateVisitorDisplay() {
         if (!isEnabled()) return
 
         var visitorsAmount = 0
         var millis = visitorInterval
         var queueFull = false
-        for (line in event.tabList) {
+        for (line in TabListData.getTabList()) {
             var matcher = patternNextVisitor.matcher(line)
             if (matcher.matches()) {
                 val rawTime = matcher.group(1)
@@ -67,22 +73,24 @@ class GardenVisitorTimer {
         }
 
         if (queueFull) {
-            if (sixthVisitorArrivalTime != 0L && visitorJustArrived) {
+            if (visitorJustArrived && visitorsAmount - lastVisitors == 1) {
+                updateSixthVisitorArrivalTime()
+                println(visitorsAmount)
+                println(lastVisitors)
                 visitorJustArrived = false
                 sixthVisitorReady = false
             }
             millis = sixthVisitorArrivalTime - System.currentTimeMillis()
+            SkyHanniMod.feature.hidden.nextSixthVisitorArrival = System.currentTimeMillis() + millis + (5 - visitorsAmount) * visitorInterval
             if (isSixthVisitorEnabled() &&  millis < 0) {
                 visitorsAmount++
-                if (sixthVisitorReady == false) {
+                if (!sixthVisitorReady) {
                     TitleUtils.sendTitle("§a6th Visitor Ready", 2_000)
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) {
                         SoundUtils.playBeepSound()
                     }
                 }
-            } else {
-                SkyHanniMod.feature.hidden.nextSixthVisitorArrival = System.currentTimeMillis() + millis + (5 - lastVisitors) * visitorInterval
             }
         }
 
