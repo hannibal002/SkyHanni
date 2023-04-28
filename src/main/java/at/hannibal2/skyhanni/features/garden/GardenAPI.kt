@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -172,5 +173,10 @@ object GardenAPI {
         GardenBestCropTime.reset()
         updateGardenTool()
         LorenzUtils.chat("§e[SkyHanni] Manually reset all crop speed data!")
+    }
+
+    fun getCurrentlyFarmedCrop(): CropType? {
+        val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
+        return cropInHand ?: brokenCrop
     }
 }
