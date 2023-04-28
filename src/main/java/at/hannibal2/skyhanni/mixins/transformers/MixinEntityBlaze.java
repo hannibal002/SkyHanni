@@ -13,7 +13,7 @@ public class MixinEntityBlaze {
 
     @Redirect(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnParticle(Lnet/minecraft/util/EnumParticleTypes;DDDDDD[I)V"))
     private void onLivingUpdate(World world, EnumParticleTypes particleType, double x, double y, double z, double xOffset, double yOffset, double zOffset, int[] p_175688_14_) {
-        if (!SkyHanniMod.feature.misc.hideBlazeParticles) {
+        if (!SkyHanniMod.getFeature().misc.hideBlazeParticles) {
             world.spawnParticle(particleType, x, y, z, xOffset, yOffset, zOffset, p_175688_14_);
         }
     }

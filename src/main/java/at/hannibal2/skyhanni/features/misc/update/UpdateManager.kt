@@ -49,7 +49,7 @@ object UpdateManager {
     }
 
     fun getCurrentVersion(): String {
-        return SkyHanniMod.getVersion()
+        return SkyHanniMod.version
     }
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
@@ -114,7 +114,7 @@ object UpdateManager {
     val context = UpdateContext(
         UpdateSource.githubUpdateSource("hannibal002", "Skyhanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
-        CurrentVersion.ofTag(SkyHanniMod.getVersion()),
+        CurrentVersion.ofTag(SkyHanniMod.version),
         SkyHanniMod.MODID,
     )
 
