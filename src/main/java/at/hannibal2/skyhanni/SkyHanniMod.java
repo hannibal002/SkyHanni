@@ -32,6 +32,9 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay;
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers;
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay;
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures;
+import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI;
+import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay;
+import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory;
 import at.hannibal2.skyhanni.features.garden.farming.*;
 import at.hannibal2.skyhanni.features.garden.inventory.*;
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames;
@@ -157,6 +160,7 @@ public class SkyHanniMod {
         loadModule(new BazaarApi());
         loadModule(GardenAPI.INSTANCE);
         loadModule(new CollectionAPI());
+        loadModule(FarmingContestAPI.INSTANCE);
 
         // features
         loadModule(new BazaarOrderHelper());
@@ -280,6 +284,7 @@ public class SkyHanniMod {
         loadModule(new GardenCropMilestoneFix());
         loadModule(new GardenBurrowingSporesNotifier());
         loadModule(new WildStrawberryDyeNotification());
+        loadModule(new JacobContestFFNeededDisplay());
 
         Commands.INSTANCE.init();
 
