@@ -1032,7 +1032,7 @@ public class Garden {
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 
     @Expose
-    @ConfigOption(name = "Yaw / Pitch", desc = "Show Yaw and Pitch")
+    @ConfigOption(name = "Yaw / Pitch", desc = "Show Yaw and Pitch.")
     @ConfigEditorBoolean
     public boolean showYawAndPitch = false;
 
