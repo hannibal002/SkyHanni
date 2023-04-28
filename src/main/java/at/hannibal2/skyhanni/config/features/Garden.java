@@ -1024,6 +1024,14 @@ public class Garden {
     public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
+    @ConfigOption(name = "Yaw / Pitch", desc = "Displays yaw and pitch with 4-digit accuracy while holding a farming tool. Automatically fades out if there is no movement for 3 seconds.")
+    @ConfigEditorBoolean
+    public boolean showYawAndPitch = false;
+
+    @Expose
+    public Position YawAndPitchDisplayPos = new Position(445, 225, false, true);
+
+    @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
     public boolean forcefullyEnabledAlwaysFinnegan = false;

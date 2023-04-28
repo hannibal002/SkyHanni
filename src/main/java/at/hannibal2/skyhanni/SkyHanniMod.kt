@@ -261,6 +261,7 @@ class SkyHanniMod {
         loadModule(GardenBurrowingSporesNotifier())
         loadModule(WildStrawberryDyeNotification())
         loadModule(JacobContestFFNeededDisplay())
+        loadModule(GardenYawAndPitch())
         init()
         loadModule(LorenzTest())
         loadModule(ButtonOnPause())
