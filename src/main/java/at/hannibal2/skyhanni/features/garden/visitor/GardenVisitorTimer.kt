@@ -39,7 +39,7 @@ class GardenVisitorTimer {
             updateVisitorDisplay()
         }
     }
-// check money/hr display try reset command made
+
     private fun updateVisitorDisplay() {
         if (!isEnabled()) return
 
