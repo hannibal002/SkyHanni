@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenYawAndPitch {
-    private val config get() = SkyHanniMod.feature.garden
+    private val config get() = SkyHanniMod.feature.garden.yawPitchDisplay
     private var lastChange = 0L
     private var lastYaw = 0f
     private var lastPitch = 0f
@@ -19,27 +19,26 @@ class GardenYawAndPitch {
         if (!isEnabled()) return
         if (GardenAPI.toolInHand == null) return
 
-        val ypList = mutableListOf<String>()
         val player = Minecraft.getMinecraft().thePlayer
 
-        var pYaw = player.rotationYaw % 360
-        if (pYaw < 0) pYaw += 360
-        if (pYaw > 180) pYaw -= 360
-        val pPitch = player.rotationPitch
+        var yaw = player.rotationYaw % 360
+        if (yaw < 0) yaw += 360
+        if (yaw > 180) yaw -= 360
+        val pitch = player.rotationPitch
 
-        if (pYaw != lastYaw || pPitch != lastPitch) {
+        if (yaw != lastYaw || pitch != lastPitch) {
             lastChange = System.currentTimeMillis()
         }
-        lastYaw = pYaw
-        lastPitch = pPitch
+        lastYaw = yaw
+        lastPitch = pitch
 
-        if (System.currentTimeMillis() > lastChange + 3_000) return
+        if (!config.showAlways && System.currentTimeMillis() > lastChange + (config.timeout * 1000)) return
 
-        ypList.add("§aYaw: §f${pYaw.toDouble().round(4)}")
-
-        ypList.add("§aPitch: §f${pPitch.toDouble().round(4)}")
-
-        config.YawAndPitchDisplayPos.renderStrings(ypList, posLabel = "Yaw and Pitch")
+        val displayList = listOf(
+            "§aYaw: §f${yaw.toDouble().round(config.yawPrecision)}",
+            "§aPitch: §f${pitch.toDouble().round(config.pitchPrecision)}",
+        )
+        config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")
     }
 
     @SubscribeEvent
@@ -47,5 +46,5 @@ class GardenYawAndPitch {
         lastChange = System.currentTimeMillis()
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.showYawAndPitch
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 }
