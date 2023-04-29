@@ -992,7 +992,7 @@ public class Garden {
     public boolean yawpitch = false;
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Displays yaw and pitch with 4-digit accuracy while holding a farming tool. Automatically fades out if there is no movement for 3 seconds.")
+    @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 23)
     public boolean showYawAndPitch = false;
