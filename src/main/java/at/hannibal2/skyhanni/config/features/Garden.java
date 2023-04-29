@@ -987,54 +987,52 @@ public class Garden {
     public int cropTooltipFortune = 1;
 
     @Expose
-    @ConfigOption(name = "Yaw / Pitch", desc = "")
-    @ConfigEditorAccordion(id = 23)
-    public boolean yawpitch = false;
+    @ConfigOption(name = "Yaw and Pitch", desc = "")
+    @Accordion
+    public YawPitchDisplay yawPitchDisplay = new YawPitchDisplay();
 
-    @Expose
-    @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 23)
-    public boolean showYawAndPitch = false;
+    public static class YawPitchDisplay {
 
-    @Expose
-    @ConfigOption(name = "Yaw Precision", desc = "Yaw precision up to specified decimal.")
-    @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 10,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 23)
-    public int yawPrecision = 4;
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
 
-    @Expose
-    @ConfigOption(name = "Pitch Precision", desc = "Pitch precision up to specified decimal.")
-    @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 10,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 23)
-    public int pitchPrecision = 4;
+        @Expose
+        @ConfigOption(name = "Yaw Precision", desc = "Yaw precision up to specified decimal.")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 10,
+                minStep = 1
+        )
+        public int yawPrecision = 4;
 
-    @Expose
-    @ConfigOption(name = "Display timeout", desc = "Amount of time in seconds the overlay is being displayed after moving.")
-    @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 20,
-            minStep = 1
-    )
-    @ConfigAccordionId(id = 23)
-    public int yawpitchTimeout = 5;
+        @Expose
+        @ConfigOption(name = "Pitch Precision", desc = "Pitch precision up to specified decimal.")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 10,
+                minStep = 1
+        )
+        public int pitchPrecision = 4;
 
-    @Expose
-    @ConfigOption(name = "Always show", desc = "Always show the overlay.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 23)
-    public boolean alwaysShowYawAndPitch = false;
+        @Expose
+        @ConfigOption(name = "Display Timeout", desc = "Duration in seconds for which the overlay is being displayed after moving.")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 20,
+                minStep = 1
+        )
+        public int timeout = 5;
 
-    @Expose
-    public Position YawAndPitchDisplayPos = new Position(445, 225, false, true);
+        @Expose
+        @ConfigOption(name = "Always Shown", desc = "Always show the Yaw and Pitch overlay, ignoring the timeout.")
+        @ConfigEditorBoolean
+        public boolean showAlways = false;
+
+        @Expose
+        public Position pos = new Position(445, 225, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
