@@ -72,7 +72,10 @@ class JacobContestFFNeededDisplay {
     private fun getLine(rank: ContestRank, map: Map<ContestRank, Int>, crop: CropType): String {
         val counter = map[rank]!!
         val cropsPerSecond = counter.toDouble() / 20 / 60
-        val farmingFortune = ceil(cropsPerSecond * 100 / 20 / crop.baseDrops)
+        // allows for crop specific block/second data from the user in the future either through config or through the existing block/second function
+        val blocksPerSecond = if (crop.cropName == "Cactus" && !config.cactusAboveSpeedLimit) 17 else config.farmingBlocksBrokenPerSecond
+        var farmingFortune = ceil(cropsPerSecond * 100 / blocksPerSecond.toDouble() / crop.baseDrops)
+        if (!config.farmingFortuneDropMultiplier)  farmingFortune -= 100
         return " ${rank.displayName}§f: §6${farmingFortune.addSeparators()} FF §7(${counter.addSeparators()} crops)"
     }
 

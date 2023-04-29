@@ -987,6 +987,36 @@ public class Garden {
     public int cropTooltipFortune = 1;
 
     @Expose
+    @ConfigOption(name = "Contest Farming Fortune", desc = "")
+    @ConfigEditorAccordion(id = 24)
+    public boolean contestFortunDisplay = false;
+
+    @Expose
+    @ConfigOption(
+            name = "FF for Contest",
+            desc = "Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 24)
+    public boolean farmingFortuneForContest = true;
+
+    @Expose
+    @ConfigOption(name = "Average Blocks/Second", desc = "The average amount of blocks you break per second while farming. Does not include cactus.")
+    @ConfigEditorSlider(
+            minValue = 18,
+            maxValue = 20,
+            minStep = .1f
+    )
+    @ConfigAccordionId(id = 24)
+    public float farmingBlocksBrokenPerSecond = 19.9f;
+
+    @Expose
+    @ConfigOption(name = "Above 400 Speed", desc = "Toggle if you farm cactus over 400 speed.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 24)
+    public boolean cactusAboveSpeedLimit = false;
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
@@ -1012,13 +1042,7 @@ public class Garden {
     @ConfigEditorBoolean
     public boolean wildStrawberryDyeNotification = true;
 
-    @Expose
-    @ConfigOption(
-            name = "FF for Contest",
-            desc = "Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory."
-    )
-    @ConfigEditorBoolean
-    public boolean farmingFortuneForContest = true;
+
 
     @Expose
     public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
