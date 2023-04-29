@@ -1028,6 +1028,12 @@ public class Garden {
     public int yawpitchTimeout = 5;
 
     @Expose
+    @ConfigOption(name = "Always show", desc = "Always show the overlay.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 23)
+    public boolean alwaysShowYawAndPitch = false;
+
+    @Expose
     public Position YawAndPitchDisplayPos = new Position(445, 225, false, true);
 
     @Expose

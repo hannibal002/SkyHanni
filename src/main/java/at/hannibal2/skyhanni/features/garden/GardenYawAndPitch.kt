@@ -33,7 +33,7 @@ class GardenYawAndPitch {
         lastYaw = pYaw
         lastPitch = pPitch
 
-        if (System.currentTimeMillis() > lastChange + (config.yawpitchTimeout*1000)) return
+        if (!config.alwaysShowYawAndPitch && System.currentTimeMillis() > lastChange + (config.yawpitchTimeout*1000)) return
 
         ypList.add("§aYaw: §f${pYaw.toDouble().round(config.yawPrecision)}")
 
