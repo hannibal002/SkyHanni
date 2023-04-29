@@ -994,7 +994,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "FF for Contest",
-            desc = "Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory."
+            desc = "Show the minimum needed Farming Fortune for reaching each medal in the Jacob's Farming Contest inventory."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 24)
@@ -1008,7 +1008,7 @@ public class Garden {
             minStep = .1f
     )
     @ConfigAccordionId(id = 24)
-    public float farmingBlocksBrokenPerSecond = 19.9f;
+    public float farmingBlocksBrokenPerSecond = 19.8f;
 
     @Expose
     @ConfigOption(name = "Above 400 Speed", desc = "Toggle if you farm cactus over 400 speed.")
