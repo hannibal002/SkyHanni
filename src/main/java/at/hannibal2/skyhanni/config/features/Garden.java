@@ -1030,33 +1030,36 @@ public class Garden {
 
     @Expose
     @ConfigOption(name = "Contest Farming Fortune", desc = "")
-    @ConfigEditorAccordion(id = 24)
-    public boolean contestFortunDisplay = false;
+    @Accordion
+    public ContestFarmingFortune contestFarmingFortune = new ContestFarmingFortune();
 
-    @Expose
-    @ConfigOption(
-            name = "FF for Contest",
-            desc = "Show the minimum needed Farming Fortune for reaching each medal in the Jacob's Farming Contest inventory."
-    )
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 24)
-    public boolean farmingFortuneForContest = true;
+    public static class ContestFarmingFortune {
 
-    @Expose
-    @ConfigOption(name = "Average Blocks/Second", desc = "The average amount of blocks you break per second while farming. Does not include cactus.")
-    @ConfigEditorSlider(
-            minValue = 18,
-            maxValue = 20,
-            minStep = .1f
-    )
-    @ConfigAccordionId(id = 24)
-    public float farmingBlocksBrokenPerSecond = 19.8f;
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Show the minimum needed Farming Fortune for reaching each medal in the Jacob's Farming Contest inventory."
+        )
+        @ConfigEditorBoolean
+        public boolean enabled = true;
 
-    @Expose
-    @ConfigOption(name = "Above 400 Speed", desc = "Toggle if you farm cactus over 400 speed.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 24)
-    public boolean cactusAboveSpeedLimit = false;
+        @Expose
+        @ConfigOption(name = "Average Blocks/Second", desc = "The average amount of blocks you break per second while farming. Does not include cactus.")
+        @ConfigEditorSlider(
+                minValue = 18,
+                maxValue = 20,
+                minStep = .1f
+        )
+        public float blocksPerSecond = 19.8f;
+
+        @Expose
+        @ConfigOption(name = "Above 400 Speed", desc = "Toggle if you farm cactus over 400 speed.")
+        @ConfigEditorBoolean
+        public boolean cactusAboveSpeedLimit = false;
+
+        @Expose
+        public Position pos = new Position(180, 156, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
@@ -1086,8 +1089,6 @@ public class Garden {
 
 
 
-    @Expose
-    public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
