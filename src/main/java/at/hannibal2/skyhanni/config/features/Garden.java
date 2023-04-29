@@ -30,9 +30,6 @@ public class Garden {
     public boolean skyMartCopperPriceAdvancedStats = false;
 
     @Expose
-//    @ConfigOption(name = "Copper Price Position", desc = "")
-//    @ConfigEditorButton(runnableId = "skyMartCopperPrice", buttonText = "Edit")
-//    @ConfigAccordionId(id = 0)
     public Position skyMartCopperPricePos = new Position(211, 132, false, true);
 
     @Expose
@@ -61,9 +58,6 @@ public class Garden {
     public boolean visitorTimerSixthVisitorEnabled = true;
 
     @Expose
-//    @ConfigOption(name = "Visitor Timer Position", desc = "")
-//    @ConfigEditorButton(runnableId = "visitorTimer", buttonText = "Edit")
-//    @ConfigAccordionId(id = 2)
     public Position visitorTimerPos = new Position(-373, -203, false, true);
 
     @Expose
