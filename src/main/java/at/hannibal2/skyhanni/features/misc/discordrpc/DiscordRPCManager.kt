@@ -51,7 +51,7 @@ class DiscordRPCManager : IPCListener {
                 secondLine = getStatusByConfigId(config.secondLine.get())
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(applicationID)
-                client?.setListener(this@DiscordRPCManager) // why must kotlin be this way
+                client?.setListener(this@DiscordRPCManager)
 
                 try {
                     client?.connect()

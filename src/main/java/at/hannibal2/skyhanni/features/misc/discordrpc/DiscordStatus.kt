@@ -4,8 +4,12 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCropsForTier
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -137,6 +141,71 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     CUSTOM({
         SkyHanniMod.feature.misc.discordRPC.customText.get() // custom field in the config
+    }),
+
+    AUTO({
+        val slayerResult = SLAYER.displayMessageSupplier!!.get()
+        val milestoneResult = try {
+            CROPMILESTONES.displayMessageSupplier!!.get()
+        }
+        catch (e: Exception){
+            "Unable to get milestone"
+        }
+        if (slayerResult != "Planning to do a slayer quest") slayerResult
+        else if (milestoneResult != "Unable to get milestone" && milestoneResult != "Unknown Item") milestoneResult
+        else {
+            val statusNoAuto = DiscordStatus.values().toMutableList()
+            statusNoAuto.removeAt(10)
+            statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+        }
+    }),
+
+    CROPMILESTONES({
+        val item = net.minecraft.client.Minecraft.getMinecraft().thePlayer.heldItem
+        val crop = item.getCropType()
+        val cropCounter = crop?.getCounter()
+        val tier = cropCounter?.let { getTierForCrops(it) }
+
+        val progress = if (cropCounter != null && tier != null) {
+//            consoleLog(cropCounter.toString())
+//            consoleLog(getCropsForTier(tier + 1).toString())
+            val currentTierOffset = getCropsForTier(tier)
+            ((100 * (cropCounter - currentTierOffset)) / (getCropsForTier(tier + 1) - currentTierOffset)).toInt()
+            /*
+             * e.g. Milestone 14 (200k), 55% to 15 (300k) so 255k crops.
+             * cropCounter = 255k. currentTierOffset = 200k. getCropsForTier(tier + 1) = 300k
+             * (100 * (255k - 200k)) / (300k - 200k)
+             * = 100 * 55k / 100k
+             * = 5.5m / 100k
+             * = 55k / 1k
+             * = 55%
+             */
+        } else {
+            100
+        } // percentage to next milestone
+
+        if (crop != null && tier!= null) "${crop.cropName}: Milestone $tier ($progress%)"
+        else ""
+    }),
+
+    PETS({
+        val pet = SkyHanniMod.feature.hidden.currentPet
+        val colorCode = pet.subSequence(1..1).toString()
+        val petName = pet.subSequence(2 until pet.length)
+
+        fun toRarity(colorCode: String): String {
+            return when (colorCode) {
+                "f" ->  "Common"
+                "a" ->  "Uncommon"
+                "9" ->  "Rare"
+                "5" ->  "Epic"
+                "6" ->  "Legendary"
+                "d" ->  "Mythic"
+                else ->  "Divine?"
+            }
+        }
+
+        "${toRarity(colorCode)} $petName"
     })
     ;
 

@@ -246,32 +246,38 @@ public class Misc {
         @Expose
         @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
         @ConfigEditorDropdown(values = {
-                "Nothing",
-                "Location",
-                "Purse",
-                "Bits",
-                "Stats",
-                "Held Item",
-                "Skyblock Date",
-                "Profile (Fruit)",
-                "Slayer",
-                "Custom"
+            "Nothing",
+            "Location",
+            "Purse",
+            "Bits",
+            "Stats",
+            "Held Item",
+            "Skyblock Date",
+            "Profile (Fruit)",
+            "Slayer",
+            "Custom",
+            "Auto",
+            "Garden Crop Milestone",
+            "Current Pet"
         })
         public Property<Integer> firstLine = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
         @ConfigEditorDropdown(values = {
-                "Nothing",
-                "Location",
-                "Purse",
-                "Bits",
-                "Stats",
-                "Held Item",
-                "Skyblock Date",
-                "Profile (Fruit)",
-                "Slayer",
-                "Custom"
+            "Nothing",
+            "Location",
+            "Purse",
+            "Bits",
+            "Stats",
+            "Held Item",
+            "Skyblock Date",
+            "Profile (Fruit)",
+            "Slayer",
+            "Custom",
+            "Auto",
+            "Garden Crop Milestone",
+            "Current Pet"
         })
         public Property<Integer> secondLine = Property.of(0);
 
@@ -279,6 +285,24 @@ public class Misc {
         @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
         @ConfigEditorText
         public Property<String> customText = Property.of("");
+
+        @Expose
+        @ConfigOption(name = "Auto", desc = "What should be displayed when not in Garden or doing Slayers.")
+        @ConfigEditorDropdown(values = {
+            "Nothing",
+            "Location",
+            "Purse",
+            "Bits",
+            "Stats",
+            "Held Item",
+            "Skyblock Date",
+            "Profile (Fruit)",
+            "Slayer",
+            "Custom",
+            "Garden Crop Milestone",
+            "Current Pet"
+        })
+        public Property<Integer> auto = Property.of(0);
     }
 
     @Expose
