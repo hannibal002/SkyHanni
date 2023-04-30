@@ -18,7 +18,7 @@ import kotlin.math.ceil
 
 class JacobContestFFNeededDisplay {
     private val gardenConfig get() = SkyHanniMod.feature.garden
-    private val config get() = gardenConfig.contestFarmingFortune
+    private val config get() = gardenConfig
     private var display = listOf<List<Any>>()
     private var lastToolTipTime = 0L
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
@@ -74,9 +74,10 @@ class JacobContestFFNeededDisplay {
         val counter = map[rank]!!
         val cropsPerSecond = counter.toDouble() / 20 / 60
         // allows for crop specific block/second data from the user in the future either through config or through the existing block/second function
-        val blocksPerSecond = if (crop.cropName == "Cactus" && !config.cactusAboveSpeedLimit) 17 else config.blocksPerSecond
+        val blocksPerSecond = if (crop.cropName == "Cactus" && !config.cactusAboveSpeedLimit) 17 else config.farmingBlocksBrokenPerSecond
         var farmingFortune = ceil(cropsPerSecond * 100 / blocksPerSecond.toDouble() / crop.baseDrops)
         if (!gardenConfig.farmingFortuneDropMultiplier)  farmingFortune -= 100
+        if (farmingFortune <= 0) farmingFortune = 0.toDouble()
         return " ${rank.displayName}§f: §6${farmingFortune.addSeparators()} FF §7(${counter.addSeparators()} crops)"
     }
 
@@ -99,8 +100,8 @@ class JacobContestFFNeededDisplay {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
-        config.pos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
+        config.gardenFortuneDisplayPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest
 }
