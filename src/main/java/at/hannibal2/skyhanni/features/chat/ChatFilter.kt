@@ -20,7 +20,6 @@ class ChatFilter {
     }
 
     private fun block(message: String): String = when {
-        message.startsWith("§aYou are playing on profile: §e") -> "profile"//TODO move into own class
         lobby(message) && config.hypixelHub -> "lobby"
         empty(message) && config.empty -> "empty"
         warping(message) && config.warping -> "warping"
@@ -30,6 +29,7 @@ class ChatFilter {
         killCombo(message) && config.killCombo -> "kill_combo"
         watchdogAnnouncement(message) && config.watchDog -> "watchdog"
 
+        message.startsWith("§aYou are playing on profile: §e") && config.others -> "profile"//TODO move into own class
         bazaarAndAHMiniMessages(message) && config.others -> "bz_ah_minis"
         slayer(message) && config.others -> "slayer"
         slayerDrop(message) && config.others -> "slayer_drop"
