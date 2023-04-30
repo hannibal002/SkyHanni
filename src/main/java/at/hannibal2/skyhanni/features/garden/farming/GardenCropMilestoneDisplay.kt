@@ -11,7 +11,8 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI.setSpeed
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -95,7 +96,7 @@ object GardenCropMilestoneDisplay {
                         innerCrop.setCounter(0)
                     }
                 }
-                if (GardenAPI.isSpeedDataEmpty()) {
+                if (isSpeedDataEmpty()) {
                     for (cropType in CropType.values()) {
                         cropType.setSpeed(-1)
                     }

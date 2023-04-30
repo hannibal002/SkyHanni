@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -24,14 +25,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
-    private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
-
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
@@ -123,15 +121,6 @@ object GardenAPI {
         return false
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        if (cropsPerSecond.isEmpty()) {
-            for (cropType in CropType.values()) {
-                cropType.setSpeed(-1)
-            }
-        }
-    }
-
     fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
     fun ItemStack.getCropType(): CropType? {
@@ -141,21 +130,6 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    fun CropType.getSpeed(): Int {
-        val speed = cropsPerSecond[this]
-        if (speed != null) return speed
-
-        val message = "Set speed for $this to -1!"
-        println(message)
-        LorenzUtils.debug(message)
-        setSpeed(-1)
-        return -1
-    }
-
-    fun CropType.setSpeed(speed: Int) {
-        cropsPerSecond[this] = speed
-    }
-
     fun MutableList<Any>.addCropIcon(crop: CropType) {
         try {
             add(crop.icon)
@@ -163,8 +137,6 @@ object GardenAPI {
             e.printStackTrace()
         }
     }
-
-    fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
             SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
