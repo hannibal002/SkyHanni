@@ -18,7 +18,8 @@ import net.minecraft.nbt.NBTTagCompound
 
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val itemCache = mutableMapOf<String, ItemStack>()
+    private val itemIdCache = mutableMapOf<ItemStack, String>() // stack -> internal name
+    private val idItemCache = mutableMapOf<String, ItemStack>() // internal name -> stack
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
@@ -57,10 +58,16 @@ object NEUItems {
     }
 
     fun getInternalName(itemStack: ItemStack): String {
-        return ItemResolutionQuery(manager)
+        if (itemIdCache.containsKey(itemStack)) {
+            return itemIdCache[itemStack]!!
+        }
+
+        val internalId = ItemResolutionQuery(manager)
             .withCurrentGuiContext()
             .withItemStack(itemStack)
             .resolveInternalName() ?: ""
+        itemIdCache[itemStack] = internalId
+        return internalId
     }
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): String? {
@@ -97,14 +104,14 @@ object NEUItems {
     }
 
     fun getItemStackOrNull(internalName: String): ItemStack? {
-        if (itemCache.contains(internalName)) {
-            return itemCache[internalName]!!.copy()
+        if (idItemCache.contains(internalName)) {
+            return idItemCache[internalName]!!.copy()
         }
 
         val itemStack = ItemResolutionQuery(manager)
             .withKnownInternalName(internalName)
             .resolveToItemStack() ?: return null
-        itemCache[internalName] = itemStack
+        idItemCache[internalName] = itemStack
         return itemStack.copy()
     }
 
