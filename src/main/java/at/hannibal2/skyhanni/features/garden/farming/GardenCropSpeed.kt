@@ -20,6 +20,7 @@ object GardenCropSpeed {
     private val hidden get() = SkyHanniMod.feature.hidden
     private val cropsPerSecond: MutableMap<CropType, Int> get() = hidden.gardenCropsPerSecond
     private val latestBlocksPerSecond: MutableMap<CropType, Double> get() = hidden.gardenLatestBlocksPerSecond
+    private const val updatesPerSecond: Int = 20
 
     var lastBrokenCrop: CropType? = null
     var averageBlocksPerSecond = 0.0
@@ -30,7 +31,7 @@ object GardenCropSpeed {
 
 
     init {
-        fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
+        fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L/updatesPerSecond) {
             if (isEnabled()) {
                 if (GardenAPI.mushroomCowPet) {
                     CropType.MUSHROOM.setCounter(CropType.MUSHROOM.getCounter() + blocksBroken)
@@ -63,14 +64,14 @@ object GardenCropSpeed {
     }
 
     private fun checkSpeed() {
-        val blocksBroken = blocksBroken.coerceAtMost(20)
+        val blocksBroken = blocksBroken
         this.blocksBroken = 0
 
         if (blocksBroken == 0) {
             if (blocksSpeedList.size == 0) return
             secondsStopped ++
         } else {
-            if (secondsStopped >= config.blocksBrokenResetTime) {
+            if (secondsStopped >= config.blocksBrokenResetTime * updatesPerSecond) {
                 resetSpeed()
             }
             while (secondsStopped > 0) {
@@ -82,7 +83,7 @@ object GardenCropSpeed {
                 blocksSpeedList.removeFirst()
                 blocksSpeedList.add(blocksBroken)
             }
-            averageBlocksPerSecond = blocksSpeedList.dropLast(1).average()
+            averageBlocksPerSecond = blocksSpeedList.dropLast(1).average() * updatesPerSecond
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 latestBlocksPerSecond[it] = averageBlocksPerSecond
             }
