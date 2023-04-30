@@ -17,6 +17,7 @@ object GardenCustomKeybinds {
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()
+    private var lastWindowOpenTime = 0L
 
     init {
         map[mcSettings.keyBindAttack] = { shConfig.keyBindAttack }
@@ -31,8 +32,20 @@ object GardenCustomKeybinds {
 
     private fun isEnabled() = GardenAPI.inGarden() && shConfig.keyBindEnabled
 
-    private fun isActive() = isEnabled() && GardenAPI.toolInHand != null && Minecraft.getMinecraft().currentScreen == null
+    private fun isActive(): Boolean {
+        if (!isEnabled()) return false
+        if (GardenAPI.toolInHand == null) return false
 
+        if (Minecraft.getMinecraft().currentScreen != null) {
+            lastWindowOpenTime = System.currentTimeMillis()
+            return false
+        }
+
+        // TODO remove workaround
+        if (System.currentTimeMillis() < lastWindowOpenTime + 300) return false
+
+        return true
+    }
 
     private fun isHeld(keyCode: Int): Boolean {
         if (keyCode == 0) return false

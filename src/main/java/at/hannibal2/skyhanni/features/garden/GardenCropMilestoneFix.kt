@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -27,7 +28,7 @@ class GardenCropMilestoneFix {
             val tier = group("tier").romanToDecimalIfNeeded()
 
             val crops = GardenCropMilestones.getCropsForTier(tier)
-            changedValue(crop, crops, "level up chat message")
+            changedValue(crop, crops, "level up chat message", 0)
         }
     }
 
@@ -64,7 +65,7 @@ class GardenCropMilestoneFix {
         val newValue = tabListValue.toLong()
         if (tabListCropProgress[crop] != newValue) {
             if (tabListCropProgress.containsKey(crop)) {
-                changedValue(crop, newValue, "tab list")
+                changedValue(crop, newValue, "tab list", smallestPercentage.toInt())
             }
         }
         tabListCropProgress[crop] = newValue
@@ -72,19 +73,21 @@ class GardenCropMilestoneFix {
 
     private val loadedCrops = mutableListOf<CropType>()
 
-    private fun changedValue(crop: CropType, tabListValue: Long, source: String) {
+    private fun changedValue(crop: CropType, tabListValue: Long, source: String, minDiff: Int) {
         val calculated = crop.getCounter()
         val diff = calculated - tabListValue
-        if (diff < -5_000) {
+
+        if (diff <= -minDiff) {
             crop.setCounter(tabListValue)
+            GardenCropMilestoneDisplay.update()
             if (!loadedCrops.contains(crop)) {
                 LorenzUtils.chat("§e[SkyHanni] Loaded ${crop.cropName} milestone data from $source!")
                 loadedCrops.add(crop)
             }
-        }
-        if (diff > 5_000) {
+        } else if (diff >= minDiff) {
             LorenzUtils.debug("Fixed wrong ${crop.cropName} milestone data from $source: ${diff.addSeparators()}")
             crop.setCounter(tabListValue)
+            GardenCropMilestoneDisplay.update()
         }
     }
 }

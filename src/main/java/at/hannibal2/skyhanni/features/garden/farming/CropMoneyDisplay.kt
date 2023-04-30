@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -108,7 +109,7 @@ class CropMoneyDisplay {
 
         val moneyPerHourData = calculateMoneyPerHour()
         if (moneyPerHourData.isEmpty()) {
-            if (!GardenAPI.isSpeedDataEmpty()) {
+            if (!isSpeedDataEmpty()) {
                 val message = "money/hr empty but speed data not empty, retry"
                 LorenzUtils.debug(message)
                 println(message)

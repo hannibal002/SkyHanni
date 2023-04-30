@@ -4,13 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
@@ -21,14 +25,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
-    private val cropsPerSecond: MutableMap<CropType, Int> get() = SkyHanniMod.feature.hidden.gardenCropsPerSecond
-
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
@@ -120,15 +121,6 @@ object GardenAPI {
         return false
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        if (cropsPerSecond.isEmpty()) {
-            for (cropType in CropType.values()) {
-                cropType.setSpeed(-1)
-            }
-        }
-    }
-
     fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
     fun ItemStack.getCropType(): CropType? {
@@ -138,21 +130,6 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    fun CropType.getSpeed(): Int {
-        val speed = cropsPerSecond[this]
-        if (speed != null) return speed
-
-        val message = "Set speed for $this to -1!"
-        println(message)
-        LorenzUtils.debug(message)
-        setSpeed(-1)
-        return -1
-    }
-
-    fun CropType.setSpeed(speed: Int) {
-        cropsPerSecond[this] = speed
-    }
-
     fun MutableList<Any>.addCropIcon(crop: CropType) {
         try {
             add(crop.icon)
@@ -161,10 +138,8 @@ object GardenAPI {
         }
     }
 
-    fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
-
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-                SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
+            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
 
     fun clearCropSpeed() {
         for (type in CropType.values()) {
@@ -178,5 +153,26 @@ object GardenAPI {
     fun getCurrentlyFarmedCrop(): CropType? {
         val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
         return cropInHand ?: brokenCrop
+    }
+
+    private var lastLocation: LorenzVec? = null
+
+    @SubscribeEvent
+    fun onBlockBreak(event: BlockClickEvent) {
+        if (!inGarden()) return
+
+        val blockState = event.getBlockState
+        val cropBroken = blockState.getCropType() ?: return
+        if (cropBroken.multiplier == 1) {
+            if (blockState.isBabyCrop()) return
+        }
+
+        val position = event.position
+        if (lastLocation == position) {
+            return
+        }
+
+        lastLocation = position
+        CropClickEvent(cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
     }
 }

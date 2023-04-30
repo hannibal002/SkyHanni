@@ -262,7 +262,10 @@ class SkyHanniMod {
         loadModule(WildStrawberryDyeNotification())
         loadModule(JacobContestFFNeededDisplay())
         loadModule(GardenYawAndPitch())
+        loadModule(MovementSpeedDisplay())
+
         init()
+
         loadModule(LorenzTest())
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
