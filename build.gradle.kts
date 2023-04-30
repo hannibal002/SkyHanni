@@ -55,12 +55,12 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-//    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:-SNAPSHOT") {
-//        exclude(module = "log4j")
-//        because("Different version conflicts with Minecraft's Log4J")
-//        exclude(module = "gson")
-//        because("Different version conflicts with Minecraft's Log4j")
-//    }
+    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:f91ed4b") {
+        exclude(module = "log4j")
+        because("Different version conflicts with Minecraft's Log4J")
+        exclude(module = "gson")
+        because("Different version conflicts with Minecraft's Log4j")
+    }
 
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
