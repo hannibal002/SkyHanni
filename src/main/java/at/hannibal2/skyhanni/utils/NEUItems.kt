@@ -18,8 +18,6 @@ import net.minecraft.nbt.NBTTagCompound
 
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val itemIdCache = mutableMapOf<ItemStack, String>() // stack -> internal name
-    private val idItemCache = mutableMapOf<String, ItemStack>() // internal name -> stack
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
@@ -57,22 +55,13 @@ object NEUItems {
         return text
     }
 
-    fun getInternalName(itemStack: ItemStack): String {
-        if (itemIdCache.containsKey(itemStack)) {
-            return itemIdCache[itemStack]!!
-        }
+    fun getInternalName(itemStack: ItemStack) = ItemResolutionQuery(manager)
+        .withCurrentGuiContext()
+        .withItemStack(itemStack)
+        .resolveInternalName() ?: ""
 
-        val internalId = ItemResolutionQuery(manager)
-            .withCurrentGuiContext()
-            .withItemStack(itemStack)
-            .resolveInternalName() ?: ""
-        itemIdCache[itemStack] = internalId
-        return internalId
-    }
-
-    fun getInternalNameOrNull(nbt: NBTTagCompound): String? {
-        return ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
-    }
+    fun getInternalNameOrNull(nbt: NBTTagCompound) =
+        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
 
     fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false): Double? {
         val price = getPrice(internalName, useSellingPrice)
@@ -103,17 +92,9 @@ object NEUItems {
         return result
     }
 
-    fun getItemStackOrNull(internalName: String): ItemStack? {
-        if (idItemCache.contains(internalName)) {
-            return idItemCache[internalName]!!.copy()
-        }
-
-        val itemStack = ItemResolutionQuery(manager)
-            .withKnownInternalName(internalName)
-            .resolveToItemStack() ?: return null
-        idItemCache[internalName] = itemStack
-        return itemStack.copy()
-    }
+    fun getItemStackOrNull(internalName: String) = ItemResolutionQuery(manager)
+        .withKnownInternalName(internalName)
+        .resolveToItemStack()?.copy()
 
     fun getItemStack(internalName: String): ItemStack {
         val stack = getItemStackOrNull(internalName)
