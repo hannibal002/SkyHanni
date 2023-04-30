@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
-import kotlin.math.abs
 
 object GardenCropSpeed {
     private val config get() = SkyHanniMod.feature.garden
@@ -27,7 +26,7 @@ object GardenCropSpeed {
 
     private val blocksSpeedList = mutableListOf<Int>()
     private var blocksBroken = 0
-    private var lastBlocksBroken = 0
+    private var secondsStopped = 0
 
 
     init {
@@ -67,30 +66,33 @@ object GardenCropSpeed {
         val blocksBroken = blocksBroken.coerceAtMost(20)
         this.blocksBroken = 0
 
-        // If the difference in speed between the current and the previous bps value is too high, disregard this value
-        if (abs(lastBlocksBroken - blocksBroken) > 4) {
-            if (blocksSpeedList.isNotEmpty()) {
-                blocksSpeedList.removeLast()
+        if (blocksBroken == 0) {
+            if (blocksSpeedList.size == 0) return
+            secondsStopped ++
+        } else {
+            if (secondsStopped >= config.blocksBrokenResetTime) {
+                resetSpeed()
             }
-        } else if (blocksBroken >= 2) {
+            while (secondsStopped > 0) {
+                blocksSpeedList.add(0)
+                secondsStopped -= 1
+            }
             blocksSpeedList.add(blocksBroken)
-            while (blocksSpeedList.size > 120) {
+            if (blocksSpeedList.size == 2) {
                 blocksSpeedList.removeFirst()
+                blocksSpeedList.add(blocksBroken)
             }
-            averageBlocksPerSecond = blocksSpeedList.average()
+            averageBlocksPerSecond = blocksSpeedList.dropLast(1).average()
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 latestBlocksPerSecond[it] = averageBlocksPerSecond
             }
-
-
         }
-        lastBlocksBroken = blocksBroken
     }
 
     private fun resetSpeed() {
         averageBlocksPerSecond = 0.0
-        blocksBroken = 0
         blocksSpeedList.clear()
+        secondsStopped = 0
     }
 
     fun finneganPerkActive(): Boolean {
