@@ -20,7 +20,7 @@ object GardenCropSpeed {
     private val config get() = SkyHanniMod.feature.garden
     private val hidden get() = SkyHanniMod.feature.hidden
     private val cropsPerSecond: MutableMap<CropType, Int> get() = hidden.gardenCropsPerSecond
-
+    private val latestBlocksPerSecond: MutableMap<CropType, Double> get() = hidden.gardenLatestBlocksPerSecond
 
     var lastBrokenCrop: CropType? = null
     var averageBlocksPerSecond = 0.0
@@ -78,6 +78,10 @@ object GardenCropSpeed {
                 blocksSpeedList.removeFirst()
             }
             averageBlocksPerSecond = blocksSpeedList.average()
+            GardenAPI.getCurrentlyFarmedCrop()?.let {
+                latestBlocksPerSecond[it] = averageBlocksPerSecond
+            }
+
 
         }
         lastBlocksBroken = blocksBroken
@@ -120,6 +124,8 @@ object GardenCropSpeed {
     fun CropType.setSpeed(speed: Int) {
         cropsPerSecond[this] = speed
     }
+
+    fun CropType.getLatestBlocksPerSecond() = latestBlocksPerSecond[this]
 
     fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
 }

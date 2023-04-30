@@ -25,7 +25,6 @@ import kotlin.math.floor
 import kotlin.math.log10
 
 class FarmingFortuneDisplay {
-
     private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
 
     private var display = listOf<List<Any>>()
@@ -96,6 +95,9 @@ class FarmingFortuneDisplay {
                     LorenzUtils.formatDouble(getCurrentFarmingFortune(), 0)
                 } else "?"
             )
+            if (GardenAPI.toolInHand != null) {
+                latestTrueFarmingFortune[displayCrop] = getCurrentFarmingFortune(true)
+            }
         })
 
         if (upgradeFortune == null) {
@@ -128,6 +130,8 @@ class FarmingFortuneDisplay {
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
+        private val hidden get() = SkyHanniMod.feature.hidden
+        private val latestTrueFarmingFortune: MutableMap<CropType, Double> get() = hidden.gardenLatestTrueFarmingFortune
 
         private var currentCrop: CropType? = null
 
@@ -191,5 +195,7 @@ class FarmingFortuneDisplay {
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
             return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
         }
+
+        fun CropType.getLatestTrueFarmingFortune() = latestTrueFarmingFortune[this]
     }
 }

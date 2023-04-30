@@ -5,10 +5,13 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getLatestTrueFarmingFortune
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -56,24 +59,54 @@ class JacobContestFFNeededDisplay {
         addAsSingletonList("")
 
         val crop = contest.crop
-        add(listOf("For this ", crop.icon, "${crop.cropName} contest:"))
+        add(listOf("§7For this ", crop.icon, "§7${crop.cropName} contest:"))
         for (rank in ContestRank.values()) {
             addAsSingletonList(getLine(rank, contest.ranks, crop))
         }
         addAsSingletonList("")
 
         val (size, averages) = calculateAverages(crop)
-        add(listOf("For the last $size ", crop.icon, "${crop.cropName} contests:"))
+        add(listOf("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:"))
         for (rank in ContestRank.values()) {
             addAsSingletonList(getLine(rank, averages, crop))
         }
+        addAsSingletonList("")
+
+        val blocksPerSecond = crop.getLatestBlocksPerSecond()
+        if (blocksPerSecond == null) {
+            add(listOf("§cNo ", crop.icon, "§cblocks/second data,"))
+            addAsSingletonList("§cassuming 20.")
+        } else {
+            add(listOf("§7Using latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.round(2)}"))
+        }
+        addAsSingletonList("")
+
+        val trueFF = crop.getLatestTrueFarmingFortune()
+        if (trueFF == null) {
+            addAsSingletonList("§cNo latest true FF saved!")
+        } else {
+            val farmingFortune = formatFarmingFortune(trueFF)
+            add(listOf("§6Your ", crop.icon, "§6FF: $farmingFortune"))
+        }
+    }
+
+    private fun formatFarmingFortune(farmingFortune: Double): String {
+        var ff = farmingFortune
+        if (!config.farmingFortuneDropMultiplier) {
+            ff -= 100
+            if (ff < 100) {
+                ff = 0.0
+            }
+        }
+        return ceil(ff).addSeparators()
     }
 
     private fun getLine(rank: ContestRank, map: Map<ContestRank, Int>, crop: CropType): String {
         val counter = map[rank]!!
-        val cropsPerSecond = counter.toDouble() / 20 / 60
-        val farmingFortune = ceil(cropsPerSecond * 100 / 20 / crop.baseDrops)
-        return " ${rank.displayName}§f: §6${farmingFortune.addSeparators()} FF §7(${counter.addSeparators()} crops)"
+        val blocksPerSecond = crop.getLatestBlocksPerSecond() ?: 20.0
+        val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
+        val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)
+        return " ${rank.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
     }
 
     private fun calculateAverages(crop: CropType): Pair<Int, Map<ContestRank, Int>> {
