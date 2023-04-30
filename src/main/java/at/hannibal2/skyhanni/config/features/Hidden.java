@@ -46,6 +46,12 @@ public class Hidden {
     public Map<CropType, Integer> gardenCropsPerSecond = new HashMap<>();
 
     @Expose
+    public Map<CropType, Double> gardenLatestBlocksPerSecond = new HashMap<>();
+
+    @Expose
+    public Map<CropType, Double> gardenLatestTrueFarmingFortune = new HashMap<>();
+
+    @Expose
     public int gardenExp = -1;
 
     @Expose
