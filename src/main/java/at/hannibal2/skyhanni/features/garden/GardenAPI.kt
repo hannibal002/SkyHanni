@@ -4,13 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
@@ -164,7 +167,7 @@ object GardenAPI {
     fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-                SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
+            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
 
     fun clearCropSpeed() {
         for (type in CropType.values()) {
@@ -178,5 +181,26 @@ object GardenAPI {
     fun getCurrentlyFarmedCrop(): CropType? {
         val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
         return cropInHand ?: brokenCrop
+    }
+
+    private var lastLocation: LorenzVec? = null
+
+    @SubscribeEvent
+    fun onBlockBreak(event: BlockClickEvent) {
+        if (!inGarden()) return
+
+        val blockState = event.getBlockState
+        val cropBroken = blockState.getCropType() ?: return
+        if (cropBroken.multiplier == 1) {
+            if (blockState.isBabyCrop()) return
+        }
+
+        val position = event.position
+        if (lastLocation == position) {
+            return
+        }
+
+        lastLocation = position
+        CropClickEvent(cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
     }
 }

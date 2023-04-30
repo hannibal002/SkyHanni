@@ -2,13 +2,11 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -24,18 +22,13 @@ class CropSpeedMeter {
     private var snapshot = listOf<String>()
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
+    fun onBlockBreak(event: CropClickEvent) {
         if (!isEnabled()) return
         if (startCrops.isEmpty()) return
 
-        val blockState = event.getBlockState
-        val cropBroken = blockState.getCropType() ?: return
-        if (cropBroken.multiplier == 1) {
-            if (blockState.isBabyCrop()) return
-        }
-
-        if (currentCrop != cropBroken) {
-            currentCrop = cropBroken
+        val crop = event.crop
+        if (currentCrop != crop) {
+            currentCrop = crop
             currentBlocks = 0
             snapshot = emptyList()
         }

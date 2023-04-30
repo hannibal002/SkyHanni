@@ -5,12 +5,10 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.data.MayorElection
-import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.math.abs
@@ -51,17 +49,11 @@ object GardenCropSpeed {
     }
 
     @SubscribeEvent
-    fun onBlockClick(event: BlockClickEvent) {
+    fun onBlockClick(event: CropClickEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
-        val blockState = event.getBlockState
-
-        val cropType = blockState.getCropType() ?: return
-        if (cropType.multiplier == 1) {
-            if (blockState.isBabyCrop()) return
-        }
-        lastBrokenCrop = cropType
+        lastBrokenCrop = event.crop
         blocksBroken++
     }
 

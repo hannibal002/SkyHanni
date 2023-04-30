@@ -38,7 +38,7 @@ class ConfigManager {
 
         configFile = File(configDirectory, "config.json")
 
-        fixedRateTimer(name = "config-auto-save", period = 60_000L, initialDelay = 60_000L) {
+        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig("auto-save-60s")
         }
 
