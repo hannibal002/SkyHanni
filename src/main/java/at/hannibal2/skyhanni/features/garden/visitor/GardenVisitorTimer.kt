@@ -1,22 +1,23 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.data.TitleUtils
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.math.roundToLong
 
 class GardenVisitorTimer {
+    private val config get() = SkyHanniMod.feature.garden
     private val patternNextVisitor = " Next Visitor: §r§b(?<time>.*)".toPattern()
     private val patternVisitors = "§b§lVisitors: §r§f\\((?<amount>\\d)\\)".toPattern()
     private var render = ""
@@ -115,7 +116,7 @@ class GardenVisitorTimer {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.garden.visitorTimerPos.renderString(render, posLabel = "Garden Visitor Timer")
+        config.visitorTimerPos.renderString(render, posLabel = "Garden Visitor Timer")
     }
 
     @SubscribeEvent
@@ -136,7 +137,7 @@ class GardenVisitorTimer {
         sixthVisitorArrivalTime = System.currentTimeMillis() + visitorInterval
     }
 
-    private fun isSixthVisitorEnabled() = SkyHanniMod.feature.garden.visitorTimerSixthVisitorEnabled
-    private fun isSixthVisitorWarningEnabled() = SkyHanniMod.feature.garden.visitorTimerSixthVisitorWarning
-    private fun isEnabled() = GardenAPI.inGarden() && SkyHanniMod.feature.garden.visitorTimerEnabled
+    private fun isSixthVisitorEnabled() = config.visitorTimerSixthVisitorEnabled
+    private fun isSixthVisitorWarningEnabled() = config.visitorTimerSixthVisitorWarning
+    private fun isEnabled() = GardenAPI.inGarden() && config.visitorTimerEnabled
 }
