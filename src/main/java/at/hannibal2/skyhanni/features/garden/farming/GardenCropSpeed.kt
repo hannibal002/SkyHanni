@@ -82,9 +82,7 @@ object GardenCropSpeed {
                 blocksSpeedList.removeFirst()
                 blocksSpeedList.add(blocksBroken)
             }
-            val copy: MutableList<Int> = blocksSpeedList.toMutableList()
-            copy.removeLast()
-            averageBlocksPerSecond = copy.average()
+            averageBlocksPerSecond = blocksSpeedList.dropLast(1).average()
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 latestBlocksPerSecond[it] = averageBlocksPerSecond
             }
