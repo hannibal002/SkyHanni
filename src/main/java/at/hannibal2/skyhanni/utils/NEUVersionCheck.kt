@@ -20,6 +20,7 @@ object NEUVersionCheck {
             neuWarning(
                 "NotEnoughUpdates is missing!\n" +
                         "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
+                        "You currently need NEU version 2.1.1-Alpha-15 or later.\n" +
                         "Use these links to download the latest version:"
             )
             return
@@ -40,6 +41,7 @@ object NEUVersionCheck {
         neuWarning(
             "NotEnoughUpdates is outdated!\n" +
                     "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
+                    "You currently need NEU version 2.1.1-Alpha-15 or later.\n" +
                     "Use these links to download the latest version:"
         )
     }
