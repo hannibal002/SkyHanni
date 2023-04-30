@@ -328,6 +328,14 @@ public class Misc {
     public boolean pasteIntoSigns = true;
 
     @Expose
+    @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
+    @ConfigEditorBoolean
+    public boolean playerMovementSpeed = false;
+
+    @Expose
+    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
