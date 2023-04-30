@@ -239,12 +239,32 @@ public class Garden {
                     "§e12,300§8/§e100,000",
                     "§7In §b12m 34s",
                     "§7Crops/Minute§8: §e12,345",
-                    "§7Blocks/Second§8: §e20",
+                    "§7Blocks/Second§8: §e19.85",
                     "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 6)
-    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
+    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+
+    @Expose
+    @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimals displayed in blocks/second.")
+    @ConfigEditorSlider(
+            minValue = 0,
+            maxValue = 6,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 6)
+    public int blocksBrokenPrecision = 2;
+
+    @Expose
+    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds of not farming until blocks/second resets.")
+    @ConfigEditorSlider(
+            minValue = 2,
+            maxValue = 60,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 6)
+    public int blocksBrokenResetTime = 5;
 
     @Expose
     public Position cropMilestoneProgressDisplayPos = new Position(376, 19, false, true);
@@ -1064,7 +1084,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "FF for Contest",
-            desc = "Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory."
+            desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."
     )
     @ConfigEditorBoolean
     public boolean farmingFortuneForContest = true;
