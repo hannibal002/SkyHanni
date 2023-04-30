@@ -17,7 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 
 class JacobContestFFNeededDisplay {
-    private val config get() = SkyHanniMod.feature.garden
+    private val gardenConfig get() = SkyHanniMod.feature.garden
+    private val config get() = gardenConfig.contestFarmingFortune
     private var display = listOf<List<Any>>()
     private var lastToolTipTime = 0L
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
@@ -72,10 +73,10 @@ class JacobContestFFNeededDisplay {
     private fun getLine(rank: ContestRank, map: Map<ContestRank, Int>, crop: CropType): String {
         val counter = map[rank]!!
         val cropsPerSecond = counter.toDouble() / 20 / 60
-        val blocksPerSecond = if (crop.cropName == "Cactus" && !config.cactusAboveSpeedLimit) 17 else config.farmingBlocksBrokenPerSecond
+        // allows for crop specific block/second data from the user in the future either through config or through the existing block/second function
+        val blocksPerSecond = if (crop.cropName == "Cactus" && !config.cactusAboveSpeedLimit) 17 else config.blocksPerSecond
         var farmingFortune = ceil(cropsPerSecond * 100 / blocksPerSecond.toDouble() / crop.baseDrops)
-        if (!config.farmingFortuneDropMultiplier)  farmingFortune -= 100
-        if (farmingFortune < 0) farmingFortune = 0.toDouble()
+        if (!gardenConfig.farmingFortuneDropMultiplier)  farmingFortune -= 100
         return " ${rank.displayName}§f: §6${farmingFortune.addSeparators()} FF §7(${counter.addSeparators()} crops)"
     }
 
@@ -98,8 +99,8 @@ class JacobContestFFNeededDisplay {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
-        config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
+        config.pos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
