@@ -13,10 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkyMartCopperPrice {
-    private val pattern = "§c(.*) Copper".toPattern()
+    private val pattern = "§c(?<amount>.*) Copper".toPattern()
     private var display = listOf<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
 
@@ -33,25 +34,23 @@ class SkyMartCopperPrice {
         val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
         for (stack in event.inventoryItems.values) {
             for (line in stack.getLore()) {
-                val matcher = pattern.matcher(line)
-                if (!matcher.matches()) continue
-
                 val internalName = stack.getInternalName()
                 val lowestBin = NEUItems.getPrice(internalName)
                 if (lowestBin == -1.0) continue
+                pattern.matchMatcher(line) {
+                    val amount = group("amount").replace(",", "").toInt()
+                    val factor = lowestBin / amount
+                    val perFormat = NumberUtil.format(factor)
+                    val priceFormat = NumberUtil.format(lowestBin)
+                    val amountFormat = NumberUtil.format(amount)
 
-                val amount = matcher.group(1).replace(",", "").toInt()
-                val factor = lowestBin / amount
-                val perFormat = NumberUtil.format(factor)
-                val priceFormat = NumberUtil.format(lowestBin)
-                val amountFormat = NumberUtil.format(amount)
-
-                val name = stack.nameWithEnchantment!!
-                val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
-                    " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
-                } else ""
-                val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
-                table[pair] = Pair(factor, internalName)
+                    val name = stack.nameWithEnchantment!!
+                    val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
+                        " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
+                    } else ""
+                    val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
+                    table[pair] = Pair(factor, internalName)
+                }
             }
         }
 
@@ -73,7 +72,7 @@ class SkyMartCopperPrice {
                 display,
                 extraSpace = 5,
                 itemScale = 1.7,
-                posLabel = "Sky Mart Copper Price"
+                posLabel = "SkyMart Copper Price"
             )
         }
     }

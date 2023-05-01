@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
@@ -18,7 +19,7 @@ class PlayerDeathMessages {
     private val lastTimePlayerSeen = mutableMapOf<String, Long>()
 
     //§c ☠ §r§7§r§bZeroHazel§r§7 was killed by §r§8§lAshfang§r§7§r§7.
-    private val pattern = "§c ☠ §r§7§r§.(.+)§r§7 (.+)".toPattern()
+    private val deathMessagePattern = "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)".toPattern()
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -34,12 +35,11 @@ class PlayerDeathMessages {
         if (!LorenzUtils.inSkyBlock) return
 
         val message = event.message
-        val matcher = pattern.matcher(message)
-        if (matcher.matches()) {
-            val name = matcher.group(1)
+        deathMessagePattern.matchMatcher(message) {
+            val name = group("name")
             if (SkyHanniMod.feature.markedPlayers.highlightInChat && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight) {
                 if (MarkedPlayerManager.isMarkedPlayer(name)) {
-                    val reason = matcher.group(2).removeColor()
+                    val reason = group("reason").removeColor()
                     LorenzUtils.chat(" §c☠ §e$name §7$reason")
                     event.blockedReason = "marked_player_death"
                     return

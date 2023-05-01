@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.launch
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.opengl.Display
@@ -31,9 +33,9 @@ class GardenNextJacobContest {
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
-    private val patternDay = "§aDay (.*)".toPattern()
-    private val patternMonth = "(.*), Year (.*)".toPattern()
-    private val patternCrop = "§e○ §7(.*)".toPattern()
+    private val patternDay = "§aDay (?<day>.*)".toPattern()
+    private val patternMonth = "(?<month>.*), Year (?<year>.*)".toPattern()
+    private val patternCrop = "§e○ §7(?<crop>.*)".toPattern()
 
     private val maxContestsPerYear = 124
     private val contestDuration = 1_000 * 60 * 20
@@ -92,17 +94,16 @@ class GardenNextJacobContest {
         if (lore[0] != "§7To Calendar and Events") return
 
         inCalendar = true
-        readCalendar(event)
+
+        patternMonth.matchMatcher(event.inventoryName) {
+            val month = LorenzUtils.getSBMonthByName(group("month"))
+            val year = group("year").toInt()
+
+            readCalendar(event.inventoryItems.values, year, month)
+        }
     }
 
-    private fun readCalendar(event: InventoryOpenEvent) {
-        val inventoryName = event.inventoryName
-
-        val matcher = patternMonth.matcher(inventoryName)
-        if (!matcher.matches()) return
-        val month = LorenzUtils.getSBMonthByName(matcher.group(1))
-        val year = matcher.group(2).toInt()
-
+    private fun readCalendar(items: Collection<ItemStack>, year: Int, month: Int) {
         if (contests.isNotEmpty()) {
             val contest = contests.values.first()
             val endTime = contest.endTime
@@ -113,7 +114,7 @@ class GardenNextJacobContest {
             }
         }
 
-        for (item in event.inventoryItems.values) {
+        for (item in items) {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
@@ -121,13 +122,13 @@ class GardenNextJacobContest {
             val matcherDay = patternDay.matcher(name)
             if (!matcherDay.matches()) continue
 
-            val day = matcherDay.group(1).toInt()
+            val day = matcherDay.group("day").toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()
             val crops = mutableListOf<CropType>()
             for (line in lore) {
                 val matcherCrop = patternCrop.matcher(line)
                 if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByName(matcherCrop.group(1)))
+                crops.add(CropType.getByName(matcherCrop.group("crop")))
             }
             val contest = FarmingContest(startTime + contestDuration, crops)
             contests[startTime] = contest

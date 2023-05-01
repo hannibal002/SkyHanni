@@ -30,7 +30,7 @@ class DungeonMilestonesDisplay {
     }
 
     init {
-        fixedRateTimer(name = "dungeon-milestone-display", period = 200) {
+        fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 200) {
             if (!isEnabled()) return@fixedRateTimer
             checkVisibility()
         }

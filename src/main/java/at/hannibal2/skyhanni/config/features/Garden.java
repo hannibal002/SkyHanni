@@ -13,26 +13,23 @@ import java.util.List;
 public class Garden {
 
     @Expose
-    @ConfigOption(name = "Sky Mart", desc = "")
+    @ConfigOption(name = "SkyMart", desc = "")
     @ConfigEditorAccordion(id = 0)
     public boolean skyMart = false;
 
     @Expose
-    @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the Sky Mart inventory.")
+    @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean skyMartCopperPrice = true;
 
     @Expose
-    @ConfigOption(name = "Advanced stats", desc = "Show additionally the bin price and copper price for every item.")
+    @ConfigOption(name = "Advanced Stats", desc = "Show the bin price and copper price for every item.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean skyMartCopperPriceAdvancedStats = false;
 
     @Expose
-//    @ConfigOption(name = "Copper Price Position", desc = "")
-//    @ConfigEditorButton(runnableId = "skyMartCopperPrice", buttonText = "Edit")
-//    @ConfigAccordionId(id = 0)
     public Position skyMartCopperPricePos = new Position(211, 132, false, true);
 
     @Expose
@@ -61,9 +58,13 @@ public class Garden {
     public boolean visitorTimerSixthVisitorEnabled = true;
 
     @Expose
-//    @ConfigOption(name = "Visitor Timer Position", desc = "")
-//    @ConfigEditorButton(runnableId = "visitorTimer", buttonText = "Edit")
-//    @ConfigAccordionId(id = 2)
+    @ConfigOption(name = "Sixth Visitor Warning", desc = "Notifies when it is believed that the sixth visitor has arrived. " +
+            "May be inaccurate with coop members farming simultaneously.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean visitorTimerSixthVisitorWarning = true;
+
+    @Expose
     public Position visitorTimerPos = new Position(-373, -203, false, true);
 
     @Expose
@@ -238,12 +239,32 @@ public class Garden {
                     "§e12,300§8/§e100,000",
                     "§7In §b12m 34s",
                     "§7Crops/Minute§8: §e12,345",
-                    "§7Blocks/Second§8: §e20",
+                    "§7Blocks/Second§8: §e19.85",
                     "§7Percentage: §e12.34%",
             }
     )
     @ConfigAccordionId(id = 6)
-    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
+    public List<Integer> cropMilestoneText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+
+    @Expose
+    @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimals displayed in blocks/second.")
+    @ConfigEditorSlider(
+            minValue = 0,
+            maxValue = 6,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 6)
+    public int blocksBrokenPrecision = 2;
+
+    @Expose
+    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds of not farming until blocks/second resets.")
+    @ConfigEditorSlider(
+            minValue = 2,
+            maxValue = 60,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 6)
+    public int blocksBrokenResetTime = 5;
 
     @Expose
     public Position cropMilestoneProgressDisplayPos = new Position(376, 19, false, true);
@@ -258,14 +279,14 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Best Display",
-            desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.")
+            desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
     public boolean cropMilestoneBestDisplay = true;
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden exp or by skyblock exp.")
+    @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock exp.")
     @ConfigEditorDropdown(values = {"Garden Exp", "SkyBlock Exp"})
     @ConfigAccordionId(id = 7)
     public int cropMilestoneBestType = 0;
@@ -730,7 +751,7 @@ public class Garden {
     public boolean nextJacobContestDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in garden but everywhere in skyblock.")
+    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestEverywhere = false;
@@ -987,6 +1008,54 @@ public class Garden {
     public int cropTooltipFortune = 1;
 
     @Expose
+    @ConfigOption(name = "Yaw and Pitch", desc = "")
+    @Accordion
+    public YawPitchDisplay yawPitchDisplay = new YawPitchDisplay();
+
+    public static class YawPitchDisplay {
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Yaw Precision", desc = "Yaw precision up to specified decimal.")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 10,
+                minStep = 1
+        )
+        public int yawPrecision = 4;
+
+        @Expose
+        @ConfigOption(name = "Pitch Precision", desc = "Pitch precision up to specified decimal.")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 10,
+                minStep = 1
+        )
+        public int pitchPrecision = 4;
+
+        @Expose
+        @ConfigOption(name = "Display Timeout", desc = "Duration in seconds for which the overlay is being displayed after moving.")
+        @ConfigEditorSlider(
+                minValue = 1,
+                maxValue = 20,
+                minStep = 1
+        )
+        public int timeout = 5;
+
+        @Expose
+        @ConfigOption(name = "Always Shown", desc = "Always show the Yaw and Pitch overlay, ignoring the timeout.")
+        @ConfigEditorBoolean
+        public boolean showAlways = false;
+
+        @Expose
+        public Position pos = new Position(445, 225, false, true);
+    }
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
@@ -1011,6 +1080,17 @@ public class Garden {
     @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops during farming.")
     @ConfigEditorBoolean
     public boolean wildStrawberryDyeNotification = true;
+
+    @Expose
+    @ConfigOption(
+            name = "FF for Contest",
+            desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."
+    )
+    @ConfigEditorBoolean
+    public boolean farmingFortuneForContest = true;
+
+    @Expose
+    public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")

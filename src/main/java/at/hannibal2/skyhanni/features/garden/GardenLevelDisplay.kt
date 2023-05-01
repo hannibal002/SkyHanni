@@ -10,22 +10,23 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.roundToInt
 
 class GardenLevelDisplay {
     private val config get() = SkyHanniMod.feature.garden
-    private val expToNextLevelPattern = "(?:.*) §e(.*)§6\\/(?:.*)".toPattern()
+    private val expToNextLevelPattern = "(?:.*) §e(?<nextLevelExp>.*)§6\\/(?:.*)".toPattern()
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
-    private val namePattern = "Garden Level (.*)".toPattern()
+    private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
     private var gardenExp
         get() = SkyHanniMod.feature.hidden.gardenExp
         set(value) {
             SkyHanniMod.feature.hidden.gardenExp = value
         }
     private var display = ""
-    private var visitorRewardPattern = " {4}§r§8\\+§r§2(.*) §r§7Garden Experience".toPattern()
+    private var visitorRewardPattern = " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience".toPattern()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -36,12 +37,25 @@ class GardenLevelDisplay {
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        val matcher = visitorRewardPattern.matcher(event.message)
-        if (matcher.matches()) {
-            val moreExp = matcher.group(1).toInt()
-            gardenExp += moreExp
-            update()
+        visitorRewardPattern.matchMatcher(event.message) {
+            addExp(group("exp").toInt())
         }
+    }
+
+    private fun addExp(moreExp: Int) {
+        val oldLevel = getLevelForExp(gardenExp.toLong())
+        gardenExp += moreExp
+        val newLevel = getLevelForExp(gardenExp.toLong())
+        if (newLevel == oldLevel + 1) {
+            if (newLevel > 15) {
+                LorenzUtils.chat(
+                    " \n" +
+                            "§b§lGARDEN LEVEL UP §8$oldLevel -> §b$newLevel\n" +
+                            " §8+§aRespect from Elite Farmers and SkyHanni members :)\n "
+                )
+            }
+        }
+        update()
     }
 
     @SubscribeEvent
@@ -50,28 +64,24 @@ class GardenLevelDisplay {
         if (event.inventoryName != "Desk") return
         val item = event.inventoryItems[4]!!
 
-        val name = item.name!!.removeColor()
-        val nameMatcher = namePattern.matcher(name)
-        if (!nameMatcher.matches()) return
-        val currentLevel = nameMatcher.group(1).romanToDecimalIfNeeded()
-        var nextLevelExp = 0
-        for (line in item.getLore()) {
-            var matcher = expToNextLevelPattern.matcher(line)
-            if (matcher.matches()) {
-                nextLevelExp = matcher.group(1).replace(",", "").toDouble().roundToInt()
-                break
+        namePattern.matchMatcher(item.name!!.removeColor()) {
+            val currentLevel = group("currentLevel").romanToDecimalIfNeeded()
+            var nextLevelExp = 0
+            for (line in item.getLore()) {
+                expToNextLevelPattern.matchMatcher(line) {
+                    nextLevelExp = group("nextLevelExp").replace(",", "").toDouble().roundToInt()
+                }
+                overflowPattern.matchMatcher(line) {
+                    val overflow = group("overflow").replace(",", "").toDouble().roundToInt()
+                    gardenExp = overflow
+                    update()
+                    return
+                }
             }
-            matcher = overflowPattern.matcher(line)
-            if (matcher.matches()) {
-                val overflow = matcher.group("overflow").replace(",", "").toDouble().roundToInt()
-                gardenExp = overflow
-                update()
-                return
-            }
+            val expForLevel = getExpForLevel(currentLevel).toInt()
+            gardenExp = expForLevel + nextLevelExp
+            update()
         }
-        val expForLevel = getExpForLevel(currentLevel).toInt()
-        gardenExp = expForLevel + nextLevelExp
-        update()
     }
 
     private fun update() {

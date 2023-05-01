@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
@@ -26,7 +25,6 @@ import kotlin.math.floor
 import kotlin.math.log10
 
 class FarmingFortuneDisplay {
-
     private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
 
     private var display = listOf<List<Any>>()
@@ -51,9 +49,8 @@ class FarmingFortuneDisplay {
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
-        if (!GardenAPI.inGarden()) return
-        val cropBroken = event.getBlockState.getCropType() ?: return
+    fun onBlockBreak(event: CropClickEvent) {
+        val cropBroken = event.crop
         if (cropBroken != currentCrop) {
             currentCrop = cropBroken
             updateToolFortune(event.itemInHand)
@@ -98,6 +95,9 @@ class FarmingFortuneDisplay {
                     LorenzUtils.formatDouble(getCurrentFarmingFortune(), 0)
                 } else "?"
             )
+            if (GardenAPI.toolInHand != null) {
+                latestTrueFarmingFortune[displayCrop] = getCurrentFarmingFortune(true)
+            }
         })
 
         if (upgradeFortune == null) {
@@ -130,6 +130,8 @@ class FarmingFortuneDisplay {
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
+        private val hidden get() = SkyHanniMod.feature.hidden
+        private val latestTrueFarmingFortune: MutableMap<CropType, Double> get() = hidden.gardenLatestTrueFarmingFortune
 
         private var currentCrop: CropType? = null
 
@@ -193,5 +195,7 @@ class FarmingFortuneDisplay {
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
             return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
         }
+
+        fun CropType.getLatestTrueFarmingFortune() = latestTrueFarmingFortune[this]
     }
 }

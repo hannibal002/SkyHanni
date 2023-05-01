@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
@@ -38,7 +39,7 @@ class MinionFeatures {
     private var lastCoinsRecived = 0L
     private var lastMinionPickedUp = 0L
     private var coinsPerDay = ""
-    private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (.*)".toPattern()
+    private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -199,9 +200,8 @@ class MinionFeatures {
             lastMinionPickedUp = System.currentTimeMillis()
         }
 
-        val matcher = minionUpgradePattern.matcher(message)
-        if (matcher.matches()) {
-            val newTier = matcher.group(1).romanToDecimalIfNeeded()
+        minionUpgradePattern.matchMatcher(message) {
+            val newTier = group("tier").romanToDecimalIfNeeded()
             minions[lastMinion]?.let {
                 val minionName = getMinionName(it.displayName, newTier)
                 it.displayName = minionName

@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getSpeed
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -36,7 +37,6 @@ class CropMoneyDisplay {
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
-    private var hasCropInHand = false
     private val toolHasBountiful: MutableMap<CropType, Boolean> get() = SkyHanniMod.feature.hidden.gardenToolHasBountiful
 
     @SubscribeEvent
@@ -50,7 +50,6 @@ class CropMoneyDisplay {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        hasCropInHand = event.crop != null
         update()
     }
 
@@ -58,7 +57,8 @@ class CropMoneyDisplay {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
         if (tick++ % (20 * 5) != 0) return
-        if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return
+
+        if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.moneyPerHourAlwaysOn) return
 
         update()
     }
@@ -84,7 +84,7 @@ class CropMoneyDisplay {
             return newDisplay
         }
 
-        if (!hasCropInHand && !config.moneyPerHourAlwaysOn) return newDisplay
+        if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.moneyPerHourAlwaysOn) return newDisplay
 
         newDisplay.addAsSingletonList(fullTitle(title))
 
@@ -94,7 +94,7 @@ class CropMoneyDisplay {
         }
 
         var extraNetherWartPrices = 0.0
-        GardenAPI.cropInHand?.let {
+        GardenAPI.getCurrentlyFarmedCrop()?.let {
             val reforgeName = Minecraft.getMinecraft().thePlayer.heldItem?.getReforgeName()
             toolHasBountiful[it] = reforgeName == "bountiful"
 
@@ -109,7 +109,7 @@ class CropMoneyDisplay {
 
         val moneyPerHourData = calculateMoneyPerHour()
         if (moneyPerHourData.isEmpty()) {
-            if (!GardenAPI.isSpeedDataEmpty()) {
+            if (!isSpeedDataEmpty()) {
                 val message = "money/hr empty but speed data not empty, retry"
                 LorenzUtils.debug(message)
                 println(message)
@@ -127,7 +127,7 @@ class CropMoneyDisplay {
         for (internalName in help.sortedDesc().keys) {
             number++
             val cropName = cropNames[internalName]!!
-            val isCurrent = cropName == GardenAPI.cropInHand
+            val isCurrent = cropName == GardenAPI.getCurrentlyFarmedCrop()
             if (number > config.moneyPerHourShowOnlyBest && (!config.moneyPerHourShowCurrent || !isCurrent)) continue
 
             val list = mutableListOf<Any>()

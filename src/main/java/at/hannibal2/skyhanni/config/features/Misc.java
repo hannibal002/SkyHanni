@@ -65,7 +65,7 @@ public class Misc {
     public boolean damageSplash = false;
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in Skyblock.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean hideDamageSplash = false;
@@ -239,7 +239,7 @@ public class Misc {
     public static class DiscordRPC {
 
         @Expose
-        @ConfigOption(name = "Enable Discord RPC", desc = "Details about your Skyblock session displayed through Discord.")
+        @ConfigOption(name = "Enable Discord RPC", desc = "Details about your SkyBlock session displayed through Discord.")
         @ConfigEditorBoolean
         public Property<Boolean> enabled = Property.of(false);
 
@@ -326,6 +326,14 @@ public class Misc {
     @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into signs when you press Ctrl + V")
     @ConfigEditorBoolean
     public boolean pasteIntoSigns = true;
+
+    @Expose
+    @ConfigOption(name = "Movement Speed", desc = "Show the player movement speed in blocks per second.")
+    @ConfigEditorBoolean
+    public boolean playerMovementSpeed = false;
+
+    @Expose
+    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

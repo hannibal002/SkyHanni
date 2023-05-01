@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -41,7 +42,7 @@ class HideMobNames {
     }
 
     private fun addMobToHide(bossName: String) {
-        patterns.add("§8\\[§7Lv(\\d+)§8] §c$bossName§r §[ae](.+)§f/§a(.+)§c❤".toPattern())
+        patterns.add("§8\\[§7Lv(?:\\d+)§8] §c$bossName§r §[ae](?<min>.+)§f/§a(?<max>.+)§c❤".toPattern())
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -72,10 +73,9 @@ class HideMobNames {
 
     private fun shouldNameBeHidden(name: String): Boolean {
         for (pattern in patterns) {
-            val matcher = pattern.matcher(name)
-            if (matcher.matches()) {
-                val min = matcher.group(2)
-                val max = matcher.group(3)
+            pattern.matchMatcher(name) {
+                val min = group("min")
+                val max = group("max")
                 if (min == max || min == "0") {
                     return true
                 }

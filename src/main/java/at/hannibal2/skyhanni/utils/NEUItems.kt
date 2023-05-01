@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -17,7 +18,6 @@ import net.minecraft.nbt.NBTTagCompound
 
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val itemCache = mutableMapOf<String, ItemStack>()
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
@@ -32,15 +32,12 @@ object NEUItems {
             return itemNameCache[itemName]!!
         }
 
-        val matcher = turboBookPattern.matcher(itemName)
-        var internalName = if (matcher.matches()) {
-            val type = matcher.group("name")
-            val level = matcher.group("level").romanToDecimal()
+        var internalName = turboBookPattern.matchMatcher(itemName) {
+            val type = group("name")
+            val level = group("level").romanToDecimal()
             val name = turboCheck(type).uppercase()
             "TURBO_$name;$level"
-        } else {
-            ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
-        }
+        } ?: ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
@@ -58,16 +55,13 @@ object NEUItems {
         return text
     }
 
-    fun getInternalName(itemStack: ItemStack): String {
-        return ItemResolutionQuery(manager)
-            .withCurrentGuiContext()
-            .withItemStack(itemStack)
-            .resolveInternalName() ?: ""
-    }
+    fun getInternalName(itemStack: ItemStack) = ItemResolutionQuery(manager)
+        .withCurrentGuiContext()
+        .withItemStack(itemStack)
+        .resolveInternalName() ?: ""
 
-    fun getInternalNameOrNull(nbt: NBTTagCompound): String? {
-        return ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
-    }
+    fun getInternalNameOrNull(nbt: NBTTagCompound) =
+        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
 
     fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false): Double? {
         val price = getPrice(internalName, useSellingPrice)
@@ -98,17 +92,9 @@ object NEUItems {
         return result
     }
 
-    fun getItemStackOrNull(internalName: String): ItemStack? {
-        if (itemCache.contains(internalName)) {
-            return itemCache[internalName]!!.copy()
-        }
-
-        val itemStack = ItemResolutionQuery(manager)
-            .withKnownInternalName(internalName)
-            .resolveToItemStack() ?: return null
-        itemCache[internalName] = itemStack
-        return itemStack.copy()
-    }
+    fun getItemStackOrNull(internalName: String) = ItemResolutionQuery(manager)
+        .withKnownInternalName(internalName)
+        .resolveToItemStack()?.copy()
 
     fun getItemStack(internalName: String): ItemStack {
         val stack = getItemStackOrNull(internalName)

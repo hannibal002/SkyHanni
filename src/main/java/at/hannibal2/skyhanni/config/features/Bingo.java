@@ -14,7 +14,7 @@ public class Bingo {
     public boolean compactChatMessages = true;
 
     @Expose
-    @ConfigOption(name = "Bingo Card View", desc = "Simply showing the bingo card. Toggle by sneaking with skyblock menu in hand.")
+    @ConfigOption(name = "Bingo Card View", desc = "Simply showing the bingo card. Toggle by sneaking with SkyBlock menu in hand.")
     @ConfigEditorBoolean
     public boolean cardDisplay = true;
 

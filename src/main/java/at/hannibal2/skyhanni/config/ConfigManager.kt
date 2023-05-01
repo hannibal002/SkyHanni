@@ -22,18 +22,23 @@ class ConfigManager {
             .create()
     }
 
-    val logger = LorenzLogger("config_manager")
+    lateinit var features: Features
+        private set
+    private val logger = LorenzLogger("config_manager")
 
     var configDirectory = File("config/skyhanni")
     private var configFile: File? = null
     lateinit var processor: MoulConfigProcessor<Features>
 
     fun firstLoad() {
+        if (::features.isInitialized) {
+            logger.log("Loading config despite config being already loaded?")
+        }
         configDirectory.mkdir()
 
         configFile = File(configDirectory, "config.json")
 
-        fixedRateTimer(name = "config-auto-save", period = 60_000L, initialDelay = 60_000L) {
+        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig("auto-save-60s")
         }
 
@@ -52,7 +57,7 @@ class ConfigManager {
 
 
                 logger.log("load-config-now")
-                SkyHanniMod.feature = gson.fromJson(
+                features = gson.fromJson(
                     builder.toString(),
                     Features::class.java
                 )
@@ -72,9 +77,9 @@ class ConfigManager {
             }
         }
 
-        if (SkyHanniMod.feature == null) {
+        if (!::features.isInitialized) {
             logger.log("Creating blank config and saving to file")
-            SkyHanniMod.feature = Features()
+            features = Features()
             saveConfig("blank config")
         }
 

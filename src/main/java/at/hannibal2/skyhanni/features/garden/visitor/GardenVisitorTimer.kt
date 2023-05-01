@@ -1,46 +1,58 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.VisitorArrivalEvent
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.concurrent.fixedRateTimer
 import kotlin.math.roundToLong
 
 class GardenVisitorTimer {
-    private val patternNextVisitor = " Next Visitor: §r§b(.*)".toPattern()
-    private val patternVisitors = "§b§lVisitors: §r§f\\((\\d)\\)".toPattern()
+    private val config get() = SkyHanniMod.feature.garden
+    private val patternNextVisitor = " Next Visitor: §r§b(?<time>.*)".toPattern()
+    private val patternVisitors = "§b§lVisitors: §r§f\\((?<amount>\\d)\\)".toPattern()
     private var render = ""
     private var lastMillis = 0L
     private var lastVisitors: Int = -1
     private var sixthVisitorArrivalTime: Long = 0
     private var visitorJustArrived: Boolean = false
+    private var sixthVisitorReady: Boolean = false
     private var visitorInterval
         get() = SkyHanniMod.feature.hidden.visitorInterval
-        set(value) { SkyHanniMod.feature.hidden.visitorInterval = value }
+        set(value) {
+            SkyHanniMod.feature.hidden.visitorInterval = value
+        }
 
     @SubscribeEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         visitorJustArrived = true
     }
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    init {
+        fixedRateTimer(name = "skyhanni-update-visitor-display", period = 1000L) {
+            updateVisitorDisplay()
+        }
+    }
+
+    private fun updateVisitorDisplay() {
         if (!isEnabled()) return
 
         var visitorsAmount = 0
         var millis = visitorInterval
         var queueFull = false
-        for (line in event.tabList) {
-            var matcher = patternNextVisitor.matcher(line)
+        for (line in TabListData.getTabList()) {
+            val matcher = patternNextVisitor.matcher(line)
             if (matcher.matches()) {
-                val rawTime = matcher.group(1)
+                val rawTime = matcher.group("time")
                 millis = TimeUtils.getMillis(rawTime)
             } else if (line == " Next Visitor: §r§c§lQueue Full!") {
                 queueFull = true
@@ -49,9 +61,8 @@ class GardenVisitorTimer {
                 return
             }
 
-            matcher = patternVisitors.matcher(line)
-            if (matcher.matches()) {
-                visitorsAmount = matcher.group(1).toInt()
+            patternVisitors.matchMatcher(line) {
+                visitorsAmount = group("amount").toInt()
             }
         }
 
@@ -64,13 +75,20 @@ class GardenVisitorTimer {
         }
 
         if (queueFull) {
-            if (sixthVisitorArrivalTime != 0L && visitorJustArrived) {
+            if (visitorJustArrived && visitorsAmount - lastVisitors == 1) {
                 updateSixthVisitorArrivalTime()
                 visitorJustArrived = false
+                sixthVisitorReady = false
             }
             millis = sixthVisitorArrivalTime - System.currentTimeMillis()
-            if (isSixthVisitorEnabled() && sixthVisitorArrivalTime != 0L && millis < 0) {
+            SkyHanniMod.feature.hidden.nextSixthVisitorArrival = System.currentTimeMillis() + millis + (5 - visitorsAmount) * visitorInterval
+            if (isSixthVisitorEnabled() &&  millis < 0) {
                 visitorsAmount++
+                if (!sixthVisitorReady) {
+                    TitleUtils.sendTitle("§a6th Visitor Ready", 5_000)
+                    sixthVisitorReady = true
+                    if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
+                }
             }
         }
 
@@ -88,8 +106,8 @@ class GardenVisitorTimer {
 
         val formatDuration = TimeUtils.formatDuration(millis)
         val next = if (queueFull && (!isSixthVisitorEnabled() || millis < 0)) "§cQueue Full!" else {
-                "Next in §$formatColor$formatDuration$extraSpeed"
-            }
+            "Next in §$formatColor$formatDuration$extraSpeed"
+        }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
         render = "§b$visitorsAmount $visitorLabel §7($next§7)"
     }
@@ -98,24 +116,28 @@ class GardenVisitorTimer {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.garden.visitorTimerPos.renderString(render, posLabel = "Garden Visitor Timer")
+        config.visitorTimerPos.renderString(render, posLabel = "Garden Visitor Timer")
     }
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         lastVisitors = -1
-        sixthVisitorArrivalTime = 0
+        sixthVisitorArrivalTime = SkyHanniMod.feature.hidden.nextSixthVisitorArrival
+        sixthVisitorReady = false
+        lastMillis = sixthVisitorArrivalTime - System.currentTimeMillis()
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
-        if (!isEnabled() || event.getBlockState.getCropType() == null) return
+    fun onBlockBreak(event: CropClickEvent) {
+        if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100
     }
 
     private fun updateSixthVisitorArrivalTime() {
         sixthVisitorArrivalTime = System.currentTimeMillis() + visitorInterval
     }
-    private fun isSixthVisitorEnabled() = SkyHanniMod.feature.garden.visitorTimerSixthVisitorEnabled
-    private fun isEnabled() = GardenAPI.inGarden() && SkyHanniMod.feature.garden.visitorTimerEnabled
+
+    private fun isSixthVisitorEnabled() = config.visitorTimerSixthVisitorEnabled
+    private fun isSixthVisitorWarningEnabled() = config.visitorTimerSixthVisitorWarning
+    private fun isEnabled() = GardenAPI.inGarden() && config.visitorTimerEnabled
 }

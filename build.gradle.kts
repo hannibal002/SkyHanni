@@ -6,11 +6,11 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.7.20-Beta"
+    kotlin("jvm") version "1.8.20-RC"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.17.Beta.38"
+version = "0.17.Beta.39.1"
 
 // Toolchains:
 java {
@@ -24,7 +24,6 @@ sourceSets.main {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://maven.notenoughupdates.org/releases")
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
@@ -55,7 +54,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:-SNAPSHOT") {
+    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:f91ed4b") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
@@ -79,10 +78,18 @@ dependencies {
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("org.notenoughupdates.moulconfig:MoulConfig:1.1.0")
-    devenvMod("org.notenoughupdates.moulconfig:MoulConfig:1.1.0:test")
+    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.0")
+    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.0:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
+}
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = "2.0"
+            enableLanguageFeature("BreakContinueInInlineLambdas")
+        }
+    }
 }
 
 // Minecraft configuration:

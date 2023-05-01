@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.gui.FontRenderer
 
 private val piggyPattern = "Piggy: (?<coins>.*)".toPattern()
@@ -18,9 +19,8 @@ fun drawString(
         }
     }
     if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-        val matcher = piggyPattern.matcher(text)
-        if (matcher.matches()) {
-            val coins = matcher.group("coins")
+        piggyPattern.matchMatcher(text) {
+            val coins = group("coins")
             return instance.drawString("Purse: $coins", x, y, color)
         }
     }
