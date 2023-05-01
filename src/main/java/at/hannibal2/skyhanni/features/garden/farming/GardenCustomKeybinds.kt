@@ -8,10 +8,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.*
 
 object GardenCustomKeybinds {
@@ -19,6 +16,7 @@ object GardenCustomKeybinds {
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()
+    private val cache: MutableMap<Int, Boolean> = mutableMapOf()
 
     init {
         map[mcSettings.keyBindAttack] = { shConfig.keyBindAttack }
@@ -34,17 +32,20 @@ object GardenCustomKeybinds {
     private fun isEnabled() = GardenAPI.inGarden() && shConfig.keyBindEnabled
 
     private fun isActive() = isEnabled() && GardenAPI.toolInHand != null
+
     @SubscribeEvent
-    fun onToolChange(event: GardenToolChangeEvent){
-        KeyBinding.unPressAllKeys()
+    fun onToolChange(event: GardenToolChangeEvent) {
+        map.forEach { (keyBinding, override) ->
+            keyBinding as AccessorKeyBinding
+            val keyCode = if (isActive()) override() else keyBinding.keyCode
+            keyBinding.pressed_skyhanni = cache[keyCode] ?: false
+        }
     }
-
-
 
     @JvmStatic
     fun onTick(keyCode: Int, ci: CallbackInfo) {
-        if (!isActive()) return
         if (keyCode == 0) return
+        if (!isActive()) return
         val keyBinding = map.entries.firstOrNull { it.value() == keyCode }?.key ?: return
         ci.cancel()
         keyBinding as AccessorKeyBinding
@@ -53,8 +54,9 @@ object GardenCustomKeybinds {
 
     @JvmStatic
     fun setKeyBindState(keyCode: Int, pressed: Boolean, ci: CallbackInfo) {
-        if (!isActive()) return
         if (keyCode == 0) return
+        cache[keyCode] = pressed
+        if (!isActive()) return
         val keyBinding = map.entries.firstOrNull { it.value() == keyCode }?.key ?: return
         ci.cancel()
         keyBinding as AccessorKeyBinding
