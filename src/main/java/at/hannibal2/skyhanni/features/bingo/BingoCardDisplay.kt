@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.bingo.card.CommunityGoal
@@ -127,15 +128,18 @@ class BingoCardDisplay {
     private fun drawDisplay(): MutableList<String> {
         val newList = mutableListOf<String>()
 
-        newList.add("§6Community Goals:")
         if (communityGoals.isEmpty()) {
+            newList.add("§6Bingo Goals:")
             newList.add("§cOpen the §e/bingo §ccard.")
         } else {
-            communityGoals.mapTo(newList) { "  " + it.description + if (it.done) " §aDONE" else "" }
+            if (!config.hideCommunityGoals.get()) {
+                newList.add("§6Community Goals:")
+                communityGoals.mapTo(newList) { "  " + it.description + if (it.done) " §aDONE" else "" }
+                newList.add(" ")
+            }
 
             val todo = personalGoals.filter { !it.done }
             val done = MAX_PERSONAL_GOALS - todo.size
-            newList.add(" ")
             newList.add("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)")
             todo.mapTo(newList) { "  " + it.description }
         }
@@ -188,5 +192,10 @@ class BingoCardDisplay {
                     update()
                 }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.hideCommunityGoals.whenChanged { _, _ -> update() }
     }
 }
