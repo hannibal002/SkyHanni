@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class Bingo {
 
@@ -24,6 +25,11 @@ public class Bingo {
                 "§cThis feature is in early development. Expect bugs and missing goals.")
         @ConfigEditorBoolean
         public boolean stepHelper = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Community Goals", desc = "Hide Community Goals from the Bingo Card display.")
+        @ConfigEditorBoolean
+        public Property<Boolean> hideCommunityGoals = Property.of(false);
 
         @Expose
         public Position bingoCardPos = new Position(10, 10, false, true);
