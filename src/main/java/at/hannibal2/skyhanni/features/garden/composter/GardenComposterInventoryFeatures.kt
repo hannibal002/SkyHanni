@@ -44,7 +44,13 @@ class GardenComposterInventoryFeatures {
                     LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                     continue
                 }
-                val lowestBin = NEUItems.getPrice(NEUItems.getInternalName(itemName))
+                val internalName = NEUItems.getInternalNameOrNull(itemName)
+                if (internalName == null) {
+                    LorenzUtils.chat("§c[SkyHanni] Error reading internal name for item '$itemName' " +
+                            "(in GardenComposterInventoryFeatures)")
+                    continue
+                }
+                val lowestBin = NEUItems.getPrice(internalName)
                 val price = lowestBin * amount
                 fullPrice += price
                 val format = NumberUtil.format(price)
