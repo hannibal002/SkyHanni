@@ -3,26 +3,39 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactBingoChat {
 
     private var blockedSkillLevelUp = false
+    private var blockedSkyblockLevelUp = false
     private var blockedCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
     private var blockedBestiarity = false
+    private val healthPattern = "   §r§7§8\\+§a.* §c❤ Health".toPattern()
+    private val strengthPattern = "   §r§7§8\\+§a. §c❁ Strength".toPattern()
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!SkyHanniMod.feature.bingo.compactChatMessages) return
 
-        if (onSkillLevelUp(event.message)) event.blockedReason = "compact_skill_level_up"
-        if (onCollectionLevelUp(event.message)) event.blockedReason = "compact_collection_level_up"
-        if (onNewAreaDiscovered(event.message)) event.blockedReason = "compact_new_area_discovered"
-        if (onBestiarityUpgrade(event.message)) event.blockedReason = "compact_skill_level_up"
+        val message = event.message
+        if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
+            blockedSkillLevelUp = false
+            blockedSkyblockLevelUp = false
+            event.blockedReason = "compact_skill_or_skyblock_level_up"
+            return
+        }
+
+        if (onSkillLevelUp(message)) event.blockedReason = "compact_skill_level_up"
+        if (onSkyBlockLevelUp(message)) event.blockedReason = "compact_skyblock_level_up"
+        if (onCollectionLevelUp(message)) event.blockedReason = "compact_collection_level_up"
+        if (onNewAreaDiscovered(message)) event.blockedReason = "compact_new_area_discovered"
+        if (onBestiarityUpgrade(message)) event.blockedReason = "compact_skill_level_up"
     }
 
     private fun onSkillLevelUp(message: String): Boolean {
@@ -30,15 +43,38 @@ class CompactBingoChat {
             blockedSkillLevelUp = true
             return false
         }
-        if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
-            blockedSkillLevelUp = false
-            return true
-        }
 
         if (blockedSkillLevelUp) {
             if (!message.contains("Access to") && !message.endsWith(" Enchantment")) {
                 return true
             }
+        }
+
+        return false
+    }
+
+    private fun onSkyBlockLevelUp(message: String): Boolean {
+        if (message.startsWith("  §r§3§lSKYBLOCK LEVEL UP §bLevel ")) {
+            blockedSkyblockLevelUp = true
+            return false
+        }
+
+        if (blockedSkyblockLevelUp) {
+            if (message == "  §r§a§lREWARDS") return true
+            // We don't care about extra health & strength
+            healthPattern.matchMatcher(message) {
+                return true
+            }
+            strengthPattern.matchMatcher(message) {
+                return true
+            }
+
+            // No Bazaar and Community Shopin bingo
+            if (message == "   §r§7§6Access to Bazaar") return true
+            if (message == "   §r§7§bAccess to Community Shop") return true
+
+            // Always enabled in bingo
+            if (message == "   §r§7§8+§aAuto-pickup block and mob drops") return true
         }
 
         return false
