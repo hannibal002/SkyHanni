@@ -265,6 +265,7 @@ class SkyHanniMod {
         loadModule(JacobContestFFNeededDisplay())
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
+        loadModule(ChumBucketHider())
 
         init()
 
