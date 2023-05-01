@@ -58,9 +58,13 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         )
 
         RenderUtils.drawStringCentered(
-            "§eTo edit hidden GUI elements set a key in /sh gui\n" +
-                    "§ethen click that key while that GUI element is visible",
-            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 15f, true, 0xffffff
+            "§eTo edit hidden GUI elements set a key in /sh edit",
+            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 20f, true, 0xffffff
+        )
+
+        RenderUtils.drawStringCentered(
+            "§ethen click that key while the GUI element is visible",
+            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 32f, true, 0xffffff
         )
 
         var displayPos = -1
