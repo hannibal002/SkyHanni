@@ -88,6 +88,13 @@ class JacobContestFFNeededDisplay {
             val farmingFortune = formatFarmingFortune(trueFF)
             add(listOf("§6Your ", crop.icon, "§6FF: $farmingFortune"))
         }
+        addAsSingletonList("")
+       if (blocksPerSecond == null || trueFF == null) {
+           add(listOf("§cMissing data from above!"))
+       } else {
+           val predictedScore = (trueFF * blocksPerSecond * 20 * 60 / 100).toInt().addSeparators()
+           add(listOf("§6Predicted ", crop.icon, "§6score: $predictedScore"))
+       }
     }
 
     private fun formatFarmingFortune(farmingFortune: Double): String {
