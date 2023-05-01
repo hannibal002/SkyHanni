@@ -264,6 +264,7 @@ class SkyHanniMod {
         loadModule(JacobContestFFNeededDisplay())
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
+        loadModule(TrevorFeatures())
 
         init()
 
