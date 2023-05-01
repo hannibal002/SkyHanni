@@ -13,8 +13,8 @@ class PlayerChatModifier {
     private val patterns = mutableListOf<Regex>()
 
     init {
-        patterns.add("§(?:a|b|6)\\[(?:VIP|MVP)(?:(?:§.|\\+)*)](?: {1,2})(?:§[7ab6])?(\\w{2,16})".toRegex()) // ranked player everywhere
-        patterns.add("§(?:7|a|b|6)((?:\\w){2,16})§r(?!§7x)".toRegex()) // nons in notification message
+        patterns.add("§[ab6]\\[(?:VIP|MVP)(?:(?:§.|\\+)*)](?: {1,2})(?:§[7ab6])?(\\w{2,16})".toRegex()) // ranked player with prefix everywhere
+        patterns.add("§[7ab6]((?:\\w){2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
         patterns.add("(?:§7 )?§7((?:\\w){2,16})§7§r".toRegex()) // nons user chat
     }
 
@@ -35,7 +35,6 @@ class PlayerChatModifier {
         val original = event.chatComponent.formattedText
         val newText = cutMessage(original)
         if (original == newText) return
-
 
         val text = ChatComponentText(newText)
         if (size == 1) {
@@ -73,8 +72,8 @@ class PlayerChatModifier {
             for (pattern in patterns) {
                 string = string.replace(pattern, "§b$1")
             }
-            string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16})'s", "§b$1's")
-            string = string.replace("§(?:7|a|b|6)((?:\\w+){2,16}) (§.)", "§b$1 $2")
+            string = string.replace("§[7ab6]((?:\\w+){2,16})'s", "§b$1's")
+            string = string.replace("§[7ab6]((?:\\w+){2,16}) (§.)", "§b$1 $2")
 
             // TODO remove workaround
             if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {

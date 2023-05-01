@@ -18,6 +18,7 @@ class ConfigManager {
     companion object {
         val gson = GsonBuilder().setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
+            .serializeSpecialFloatingPointValues()
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .create()
     }

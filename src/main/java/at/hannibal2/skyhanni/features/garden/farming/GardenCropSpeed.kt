@@ -69,7 +69,7 @@ object GardenCropSpeed {
 
         if (blocksBroken == 0) {
             if (blocksSpeedList.size == 0) return
-            secondsStopped ++
+            secondsStopped++
         } else {
             if (secondsStopped >= config.blocksBrokenResetTime * updatesPerSecond) {
                 resetSpeed()
@@ -80,6 +80,7 @@ object GardenCropSpeed {
             }
             blocksSpeedList.add(blocksBroken)
             averageBlocksPerSecond = blocksSpeedList.average() * updatesPerSecond
+
             GardenAPI.getCurrentlyFarmedCrop()?.let {
                 latestBlocksPerSecond[it] = averageBlocksPerSecond
             }

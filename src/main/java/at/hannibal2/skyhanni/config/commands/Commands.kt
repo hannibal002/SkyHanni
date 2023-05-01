@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -63,6 +64,7 @@ object Commands {
         registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
         registerCommand("shclearcropspeed") { GardenAPI.clearCropSpeed() }
         registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
+        registerCommand("shtestbingo") { TestBingo.toggle() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

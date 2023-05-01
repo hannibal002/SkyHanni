@@ -24,7 +24,6 @@ sourceSets.main {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://maven.notenoughupdates.org/releases")
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
@@ -79,8 +78,8 @@ dependencies {
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("org.notenoughupdates.moulconfig:MoulConfig:1.1.0")
-    devenvMod("org.notenoughupdates.moulconfig:MoulConfig:1.1.0:test")
+    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.0")
+    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.0:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
 }
