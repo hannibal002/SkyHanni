@@ -27,7 +27,7 @@ class BingoCardDisplay {
 
     private var tick = 0
     private var display = listOf<String>()
-    private val config get() = SkyHanniMod.feature.bingo
+    private val config get() = SkyHanniMod.feature.bingo.bingoCard
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
     init {
@@ -54,7 +54,7 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!config.cardDisplay) return
+        if (!config.enabled) return
         if (event.phase != TickEvent.Phase.START) return
 
         tick++
@@ -148,7 +148,7 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!config.cardDisplay) return
+        if (!config.enabled) return
 
         val stack = Minecraft.getMinecraft().thePlayer.heldItem //TODO into ItemUtils or InventoryUtils
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -178,7 +178,7 @@ class BingoCardDisplay {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!config.cardDisplay) return
+        if (!config.enabled) return
 
         goalCompletePattern.matchMatcher(event.message) {
             val name = group("name")

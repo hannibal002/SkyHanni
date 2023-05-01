@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactBingoChat {
+    private val config get() = SkyHanniMod.feature.bingo.compactChat
 
     private var blockedSkillLevelUp = false
     private var blockedSkyblockLevelUp = false
@@ -20,14 +21,16 @@ class CompactBingoChat {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.compactChatMessages) return
+        if (!config.enabled) return
+        if (!LorenzUtils.isBingoProfile && !config.outsideBingo) return
 
         val message = event.message
         if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
             blockedSkillLevelUp = false
             blockedSkyblockLevelUp = false
-            event.blockedReason = "compact_skill_or_skyblock_level_up"
+            if (config.hideBorder) {
+                event.blockedReason = "compact_skill_or_skyblock_level_up"
+            }
             return
         }
 
@@ -86,7 +89,7 @@ class CompactBingoChat {
             return false
         }
         if (message == "§e§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
-            blockedCollectionLevelUp = false
+            blockedCollectionLevelUp = config.hideBorder
             return true
         }
 
@@ -139,7 +142,7 @@ class CompactBingoChat {
             return false
         }
         if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
-            blockedBestiarity = false
+            blockedBestiarity = config.hideBorder
             return true
         }
 
