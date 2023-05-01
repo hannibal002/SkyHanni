@@ -65,7 +65,7 @@ class MarkedPlayerManager {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        SkyHanniMod.feature.markedPlayers.markOwnName.whenChanged { old, new ->
+        SkyHanniMod.feature.markedPlayers.markOwnName.whenChanged { _, new ->
             val name = LorenzUtils.getPlayerName()
             if (new) {
                 if (!playerNamesToMark.contains(name)) {

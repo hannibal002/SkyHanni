@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import io.github.moulberry.moulconfig.observer.Observer
+import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -49,10 +49,8 @@ class HideArmor {
 
     @SubscribeEvent
     fun onConfigLoaded(event: ConfigLoadEvent) {
-        val observer = Observer<Boolean> { a, b -> updateArmor() }
-        SkyHanniMod.feature.misc.hideArmorEnabled.whenChanged(observer)
-        SkyHanniMod.feature.misc.hideArmorOwn.whenChanged(observer)
-        SkyHanniMod.feature.misc.hideArmorOnlyHelmet.whenChanged(observer)
+        val misc = SkyHanniMod.feature.misc
+        onToggle(misc.hideArmorEnabled, misc.hideArmorOwn, misc.hideArmorOnlyHelmet) { updateArmor() }
     }
 
 

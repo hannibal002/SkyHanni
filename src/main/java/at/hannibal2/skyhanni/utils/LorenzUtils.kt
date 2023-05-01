@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import io.github.moulberry.moulconfig.observer.Observer
+import io.github.moulberry.moulconfig.observer.Property
 import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
@@ -245,4 +247,15 @@ object LorenzUtils {
     fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
 
     fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
+
+    // MoulConfig is in Java, I don't want to downgrade this logic
+    fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
+        for (property in properties) {
+            property.whenChanged { a, b -> observer.observeChange(a, b) }
+        }
+    }
+
+    fun <T> onToggle(vararg properties: Property<out T>, observer: Runnable) {
+        onChange(*properties)  { _, _ -> observer.run() }
+    }
 }

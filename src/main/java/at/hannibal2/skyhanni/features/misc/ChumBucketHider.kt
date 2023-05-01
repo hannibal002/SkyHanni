@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -75,10 +76,7 @@ class ChumBucketHider {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val function: (oldValue: Boolean, newValue: Boolean) -> Unit = { _, _ -> reset() }
-        config.enabled.whenChanged(function)
-        config.hideBucket.whenChanged(function)
-        config.hideOwn.whenChanged(function)
+        onToggle(config.enabled, config.hideBucket, config.hideOwn) { HideArmor.updateArmor() }
     }
 
     private fun reset() {
