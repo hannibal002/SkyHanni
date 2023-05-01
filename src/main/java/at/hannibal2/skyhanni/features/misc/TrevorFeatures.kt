@@ -149,9 +149,9 @@ class TrevorFeatures {
     }
 
     enum class TrapperStatus(val color: Int) {
-        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(5)),
+        READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75)),
         WAITING( LorenzColor.DARK_AQUA.toColor().withAlpha(75)),
-        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(5)),
+        ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75)),
     }
 
     private fun onFarmingIsland() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.THE_FARMING_ISLANDS
