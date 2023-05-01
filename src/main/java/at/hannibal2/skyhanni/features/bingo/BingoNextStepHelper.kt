@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BingoNextStepHelper {
+    private val config get() = SkyHanniMod.feature.bingo.bingoCard
     private var tick = 0
     private var dirty = true
 
@@ -107,7 +108,7 @@ class BingoNextStepHelper {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.cardDisplay) return
+        if (!config.enabled) return
         if (event.phase != TickEvent.Phase.START) return
 
         tick++
@@ -125,7 +126,7 @@ class BingoNextStepHelper {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.isBingoProfile) return
-        if (!SkyHanniMod.feature.bingo.cardDisplay) return
+        if (!config.enabled) return
 
         for (currentStep in currentSteps) {
             if (currentStep.displayName == "Obtain a Topaz Crystal") {
@@ -191,7 +192,7 @@ class BingoNextStepHelper {
         done = true
         updateResult()
         if (!silent) {
-            if (SkyHanniMod.feature.bingo.stepHelper) {
+            if (config.stepHelper) {
                 LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
             }
         }
