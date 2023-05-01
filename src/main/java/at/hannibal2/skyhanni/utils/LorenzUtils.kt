@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
@@ -49,7 +50,7 @@ object LorenzUtils {
         get() = HypixelData.noTrade
 
     val isBingoProfile: Boolean
-        get() = inSkyBlock && HypixelData.bingo
+        get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
     val lastWorldSwitch: Long
         get() = HypixelData.joinedWorld
