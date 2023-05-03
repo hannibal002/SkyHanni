@@ -16,17 +16,21 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
+
+
 class BingoNextStepHelper {
     private val config get() = SkyHanniMod.feature.bingo.bingoCard
     private var tick = 0
     private var dirty = true
 
+    private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
-    private val itemRequired = mutableMapOf<String, NextStep>()
+    private val itemPreconditions = mutableMapOf<String, NextStep>()
     private val islands = mutableMapOf<IslandType, IslandVisitStep>()
     private val collectionPattern = "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.".toPattern()
     private val crystalPattern = "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.".toPattern()
     private val skillPattern = "Obtain level (?<level>.*) in the (?<skill>.*) Skill.".toPattern()
+    private val rhysTaskName = "30x Enchanted Redstone (for Rhys)"
 
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
@@ -129,17 +133,21 @@ class BingoNextStepHelper {
         if (!config.enabled) return
 
         for (currentStep in currentSteps) {
-            if (currentStep.displayName == "Obtain a Topaz Crystal") {
+            if (currentStep is ObtainCrystalStep) {
                 if (event.message.matchRegex(" *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)")) {
                     nextMessageIsCrystal = true
                     return
                 }
                 if (nextMessageIsCrystal) {
                     nextMessageIsCrystal = false
-                    if (event.message.matchRegex(" *§r§eTopaz Crystal")) {
-                        currentStep.done()
+                    crystalObtainedPattern.matchMatcher(event.message) {
+                        if (group("crystalName") == currentStep.crystalName)
+                            currentStep.done()
                     }
                 }
+            }
+            if (currentStep is PartialProgressItemsStep && currentStep.displayName == rhysTaskName && event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r") {
+                currentStep.amountHavingHidden -= 10
             }
         }
         //TODO add thys message
@@ -221,52 +229,62 @@ class BingoNextStepHelper {
         dirty = false
 
         for (goal in personalGoals) {
-            readDescription(goal.description.removeColor())
+            val bingoCardStep = readDescription(goal.description.removeColor())
+            if (bingoCardStep == null) {
+                println("Warning: Could not find bingo steps for ${goal.description}")
+            } else {
+                finalSteps.add(bingoCardStep)
+            }
         }
 
         updateResult()
     }
 
-    private fun readDescription(description: String) {
+    private fun readDescription(description: String): NextStep? {
         collectionPattern.matchMatcher(description) {
             val amount = group("amount").replace(",", "").toInt()
             val name = group("name")
 
-            val collectionStep = CollectionStep(name, amount).apply { finalSteps.add(this) }
-            createItemIslandRequirement(name, collectionStep)
-            return
+            return CollectionStep(name, amount) withItemIslandRequirement name
         }
 
         if (description == "Craft an Emerald Ring.") {
-            CraftStep("Emerald Ring").apply { finalSteps.add(this) } requires ItemsStep(
-                "32x Enchanted Emerald",
-                "Emerald",
-                160 * 32,
-                mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
-            ).apply { this requires IslandType.DWARVEN_MINES.getStep() }
+            return CraftStep("Emerald Ring") requires (
+                    ItemsStep(
+                        "32x Enchanted Emerald",
+                        "Emerald",
+                        160 * 32,
+                        mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
+                    ) requires IslandType.DWARVEN_MINES.getStep())
         }
 
         if (description == "Obtain a Mathematical Hoe Blueprint.") {
-            CraftStep("Mathematical Hoe Blueprint").apply { finalSteps.add(this) } requires ItemsStep(
-                "32x Jacob's Ticket",
-                "Jacob's Ticket",
-                32,
-                mapOf("Jacob's Ticket" to 1)
-            ).apply { this requires IslandType.GARDEN.getStep() }.addItemRequirements()
+            return CraftStep("Mathematical Hoe Blueprint") requires (
+                    ItemsStep(
+                        "32x Jacob's Ticket",
+                        "Jacob's Ticket",
+                        32,
+                        mapOf("Jacob's Ticket" to 1)
+                    ).addItemRequirements() requires IslandType.GARDEN.getStep())
         }
 
         crystalPattern.matchMatcher(description) {
             val crystal = group("name")
-            ChatMessageStep("Obtain a $crystal Crystal").apply { finalSteps.add(this) } requires IslandType.CRYSTAL_HOLLOWS.getStep()
+            return ObtainCrystalStep(crystal) requires IslandType.CRYSTAL_HOLLOWS.getStep()
         }
 
         skillPattern.matchMatcher(description) {
             val level = group("level").toInt()
             val skill = group("skill")
-            SkillLevelStep(skill, level).apply { finalSteps.add(this) }
+            return SkillLevelStep(skill, level)
         }
 
-        println("No help for goal: '$description'")
+        return null
+    }
+
+    fun <T : NextStep> T.makeFinalStep(): T {
+        finalSteps.add(this)
+        return this
     }
 
     @SubscribeEvent
@@ -285,18 +303,14 @@ class BingoNextStepHelper {
         }
     }
 
-    private fun createItemIslandRequirement(itemName: String, step: NextStep): IslandVisitStep? {
-        val islandReachStep = itemIslandRequired.getOrDefault(itemName, null)
-        if (islandReachStep == null) {
-            println("no island required for item: '$itemName'")
-            return null
-        }
-        step requires islandReachStep
-        return islandReachStep
+    infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
+        itemIslandRequired[itemName]?.let { this requires it }
+        return this
     }
 
-    private infix fun NextStep.requires(other: NextStep) {
+    infix fun <T : NextStep> T.requires(other: NextStep): T {
         requirements.add(other)
+        return this
     }
 
     private fun IslandType.getStep() = islands.getOrPut(this) { IslandVisitStep(this) }
@@ -313,22 +327,24 @@ class BingoNextStepHelper {
 
         IslandType.GOLD_MINES.getStep() requires IslandType.HUB.getStep()
         IslandType.GOLD_MINES.getStep() requires SkillLevelStep("Mining", 1)
-        IslandType.DEEP_CAVERNS.getStep() requires IslandType.GOLD_MINES.getStep()
 
+        IslandType.DEEP_CAVERNS.getStep() requires IslandType.GOLD_MINES.getStep()
         IslandType.DEEP_CAVERNS.getStep() requires SkillLevelStep("Mining", 5)
 
-        val redstoneForThys = ItemsStep(
-            "30x Enchanted Redstone (for Thys)",
+        val redstoneForThys = PartialProgressItemsStep(
+            rhysTaskName,
             "Redstone",
             160 * 10 * 3,
             mapOf("Redstone" to 1, "Enchanted Redstone" to 160)
-        ).apply { createItemIslandRequirement(itemName, this) }
+        )
         redstoneForThys requires IslandType.DEEP_CAVERNS.getStep()
+
         IslandType.DWARVEN_MINES.getStep() requires redstoneForThys
         IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep(
             "Mining",
             12
         ).also { it requires IslandType.THE_FARMING_ISLANDS.getStep() }
+
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
         // TODO add skyblock level requirement
@@ -337,10 +353,10 @@ class BingoNextStepHelper {
 
         val farmingContest = ChatMessageStep("Farming Contest")
         farmingContest requires SkillLevelStep("Farming", 10)
-        itemRequired["Jacob's Ticket"] = farmingContest
+        itemPreconditions["Jacob's Ticket"] = farmingContest
 
-        IslandType.DWARVEN_MINES.getStep().also { finalSteps.add(it) }
-        ChatMessageStep("Get Ender Armor").also { finalSteps.add(it) } requires IslandType.THE_END.getStep()
+        IslandType.DWARVEN_MINES.getStep().makeFinalStep()
+        ChatMessageStep("Get Ender Armor").makeFinalStep() requires IslandType.THE_END.getStep()
         IslandType.THE_END.getStep() requires SkillLevelStep(
             "Combat",
             12
@@ -405,7 +421,7 @@ class BingoNextStepHelper {
     }
 
     private fun ItemsStep.addItemRequirements(): ItemsStep {
-        val step = itemRequired[itemName]
+        val step = itemPreconditions[itemName]
         if (step != null) {
             requirements.add(step)
         }
