@@ -266,6 +266,7 @@ class SkyHanniMod {
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
+        loadModule(GardenRecentTeleportPadsDisplay())
 
         init()
 

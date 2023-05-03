@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -164,6 +165,6 @@ class BingoCardDisplay {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.hideCommunityGoals.whenChanged { _, _ -> update() }
+        config.hideCommunityGoals.onToggle { update() }
     }
 }
