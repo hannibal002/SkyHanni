@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.observer.Property;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
@@ -824,6 +825,33 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 19)
     public boolean teleportPadsInventoryNumbers = false;
+
+    @Expose
+    @ConfigOption(name = "Recent Teleport Pad Display", desc = "")
+    @Accordion
+    @ConfigAccordionId(id = 19)
+    public RecentTeleportPads teleportPadsRecentDisplay = new RecentTeleportPads();
+
+    public static class RecentTeleportPads {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show the recent teleport pads used in a display.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Only Target", desc = "Hide the 'From' part of the display.")
+        @ConfigEditorBoolean
+        public Property<Boolean> onlyTarget = Property.of(false);
+
+        @Expose
+        @ConfigOption(name = "Hide Chat", desc = "Hide teleport pad chat messages.")
+        @ConfigEditorBoolean
+        public boolean hideChat = false;
+
+        @Expose
+        public Position pos = new Position(206, 158, false, true);
+    }
 
     @Expose
     @ConfigOption(name = "Anita Medal Profit", desc = "")

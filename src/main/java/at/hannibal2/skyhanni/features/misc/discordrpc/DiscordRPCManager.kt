@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import com.google.gson.JsonObject
 import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
 import com.jagrosh.discordipc.entities.RichPresence
-import io.github.moulberry.moulconfig.observer.Property
 import kotlinx.coroutines.launch
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -80,15 +80,11 @@ class DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        for (property in listOf(
-            config.firstLine,
+        onToggle(config.firstLine,
             config.secondLine,
-            config.customText,
-        )) {
-            property.whenChangedWithDifference {
-                if (isActive()) {
-                    updatePresence()
-                }
+            config.customText) {
+            if (isActive()) {
+                updatePresence()
             }
         }
         config.enabled.whenChanged { _, new ->
@@ -99,11 +95,6 @@ class DiscordRPCManager : IPCListener {
             }
         }
     }
-
-    fun Property<*>.whenChangedWithDifference(run: () -> (Unit)) {
-        whenChanged { old, new -> if (old != new) run() }
-    }
-
     fun updatePresence() {
         val location = LorenzUtils.skyBlockArea
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)

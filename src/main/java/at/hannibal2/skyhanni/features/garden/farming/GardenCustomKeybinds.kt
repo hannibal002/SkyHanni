@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -37,7 +38,9 @@ object GardenCustomKeybinds {
         if (GardenAPI.toolInHand == null) return false
 
         if (Minecraft.getMinecraft().currentScreen != null) {
-            lastWindowOpenTime = System.currentTimeMillis()
+            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                lastWindowOpenTime = System.currentTimeMillis()
+            }
             return false
         }
 
