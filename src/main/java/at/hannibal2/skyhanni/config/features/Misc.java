@@ -256,8 +256,8 @@ public class Misc {
             "Profile (Fruit)",
             "Slayer",
             "Custom",
-            "Auto",
-            "Garden Crop Milestone",
+            "Dynamic",
+            "Crop Milestone",
             "Current Pet"
         })
         public Property<Integer> firstLine = Property.of(0);
@@ -275,8 +275,8 @@ public class Misc {
             "Profile (Fruit)",
             "Slayer",
             "Custom",
-            "Auto",
-            "Garden Crop Milestone",
+            "Dynamic",
+            "Crop Milestone",
             "Current Pet"
         })
         public Property<Integer> secondLine = Property.of(0);
@@ -287,7 +287,7 @@ public class Misc {
         public Property<String> customText = Property.of("");
 
         @Expose
-        @ConfigOption(name = "Auto", desc = "What should be displayed when not in Garden or doing Slayers.")
+        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone or Slayer progress while doing those, but this if you're doing neither.")
         @ConfigEditorDropdown(values = {
             "Nothing",
             "Location",
@@ -299,7 +299,7 @@ public class Misc {
             "Profile (Fruit)",
             "Slayer",
             "Custom",
-            "Garden Crop Milestone",
+            "Crop Milestone",
             "Current Pet"
         })
         public Property<Integer> auto = Property.of(0);

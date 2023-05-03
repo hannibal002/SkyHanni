@@ -244,4 +244,18 @@ object LorenzUtils {
     fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
 
     fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
+
+    fun colorCodeToRarity(colorCode: Char): String {
+        return when (colorCode) {
+            'f' -> "Common"
+            'a' -> "Uncommon"
+            '9' -> "Rare"
+            '5' -> "Epic"
+            '6' -> "Legendary"
+            'd' -> "Mythic"
+            'b' -> "Divine"
+            '4' -> "Supreme" // legacy items
+            else -> "Special"
+        }
+    }
 }

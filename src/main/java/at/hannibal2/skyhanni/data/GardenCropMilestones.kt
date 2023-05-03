@@ -93,6 +93,14 @@ class GardenCropMilestones {
             return 0
         }
 
+        fun CropType.progressToNextLevel(): Double {
+            val progress = getCounter()
+            val startTier = getTierForCrops(progress)
+            val startCrops = getCropsForTier(startTier)
+            val end = getCropsForTier(startTier + 1).toDouble()
+            return (progress - startCrops) / (end - startCrops)
+        }
+
         // TODO use repo
         private val cropMilestone = listOf(
             100,
