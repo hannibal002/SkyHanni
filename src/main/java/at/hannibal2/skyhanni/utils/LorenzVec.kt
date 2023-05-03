@@ -90,6 +90,8 @@ data class LorenzVec(
         return arrayOf(x, y, z)
     }
 
+    fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180

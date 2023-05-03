@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import moe.nea.libautoupdate.*
@@ -34,8 +35,7 @@ object UpdateManager {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        SkyHanniMod.feature.about.updateStream.whenChanged { oldValue, newValue ->
-            if (oldValue != newValue)
+        SkyHanniMod.feature.about.updateStream.onToggle {
                 reset()
         }
     }

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -64,13 +63,7 @@ class OwnInventoryData {
         lastClose = System.currentTimeMillis()
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
-        lastWorldSwitch = System.currentTimeMillis()
-    }
-
     private var lastClose = 0L
-    private var lastWorldSwitch = 0L
 
     private fun add(item: ItemStack?, add: Int) {
         if (item == null) return
@@ -78,7 +71,7 @@ class OwnInventoryData {
         val diffClose = System.currentTimeMillis() - lastClose
         if (diffClose < 500) return
 
-        val diffWorld = System.currentTimeMillis() - lastWorldSwitch
+        val diffWorld = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
         if (diffWorld < 3_000) return
 
         val internalName = item.getInternalName()

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class Fishing {
 
@@ -95,6 +96,29 @@ public class Fishing {
     )
     @ConfigAccordionId(id = 2)
     public int barnTimerAlertTime = 330;
+
+    @Expose
+    @ConfigOption(name = "Chum Bucket Hider", desc = "")
+    @Accordion
+    public ChumBucketHider chumBucketHider = new ChumBucketHider();
+
+    public static class ChumBucketHider {
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Hide the Chum Bucket name tags for other players.")
+        @ConfigEditorBoolean
+        public Property<Boolean> enabled = Property.of(true);
+
+        @Expose
+        @ConfigOption(name = "Hide Bucket", desc = "Hide the Chum Bucket.")
+        @ConfigEditorBoolean
+        public Property<Boolean> hideBucket = Property.of(false);
+
+        @Expose
+        @ConfigOption(name = "Hide Own", desc = "Hides your own Chum Bucket.")
+        @ConfigEditorBoolean
+        public Property<Boolean> hideOwn = Property.of(false);
+    }
 
     @Expose
     @ConfigOption(
