@@ -262,4 +262,6 @@ object LorenzUtils {
     fun <T> Property<out T>.onToggle(observer: Runnable) {
         whenChanged { _, _ -> observer.run() }
     }
+
+    fun <K, V> makeSyncMap(originalMap: MutableMap<K, V>) = Collections.synchronizedMap(originalMap)
 }
