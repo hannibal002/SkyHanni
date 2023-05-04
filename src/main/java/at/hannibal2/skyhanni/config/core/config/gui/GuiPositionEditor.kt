@@ -57,16 +57,6 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 8f, true, 0xffffff
         )
 
-        RenderUtils.drawStringCentered(
-            "§eTo edit hidden GUI elements set a key in /sh edit",
-            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 20f, true, 0xffffff
-        )
-
-        RenderUtils.drawStringCentered(
-            "§ethen click that key while the GUI element is visible",
-            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 32f, true, 0xffffff
-        )
-
         var displayPos = -1
         if (clickedPos != -1) {
             if (positions[clickedPos].clicked) {
@@ -77,7 +67,19 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             displayPos = hoveredPos
         }
 
-        if (displayPos == -1) return
+        // When the mouse is not currently hovering over an gui element
+        if (displayPos == -1) {
+            RenderUtils.drawStringCentered(
+                "§eTo edit hidden GUI elements set a key in /sh edit",
+                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 20f, true, 0xffffff
+            )
+
+            RenderUtils.drawStringCentered(
+                "§ethen click that key while the GUI element is visible",
+                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 32f, true, 0xffffff
+            )
+            return
+        }
 
         val pos = positions[displayPos]
         RenderUtils.drawStringCentered(
