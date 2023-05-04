@@ -94,7 +94,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.17.Beta.39.1",
+    version = "0.17.Beta.40",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -266,6 +266,7 @@ class SkyHanniMod {
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
+        loadModule(GardenRecentTeleportPadsDisplay())
 
         init()
 

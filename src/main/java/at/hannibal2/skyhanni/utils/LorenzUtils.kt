@@ -256,6 +256,10 @@ object LorenzUtils {
     }
 
     fun <T> onToggle(vararg properties: Property<out T>, observer: Runnable) {
-        onChange(*properties)  { _, _ -> observer.run() }
+        onChange(*properties) { _, _ -> observer.run() }
+    }
+
+    fun <T> Property<out T>.onToggle(observer: Runnable) {
+        whenChanged { _, _ -> observer.run() }
     }
 }

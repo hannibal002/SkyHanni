@@ -119,9 +119,9 @@ class JacobContestFFNeededDisplay {
     private fun calculateAverages(crop: CropType): Pair<Int, Map<ContestRank, Int>> {
         var amount = 0
         val map = mutableMapOf<ContestRank, Int>()
-        for (entry in FarmingContestAPI.getContestsOfType(crop).associateWith { it.time }.sortedDesc().keys) {
+        for (contest in FarmingContestAPI.getContestsOfType(crop).associateWith { it.time }.sortedDesc().keys) {
             amount++
-            for ((rank, count) in entry.ranks) {
+            for ((rank, count) in contest.ranks) {
                 val old = map.getOrDefault(rank, 0)
                 map[rank] = count + old
             }
