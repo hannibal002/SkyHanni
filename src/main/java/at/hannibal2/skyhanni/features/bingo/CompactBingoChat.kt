@@ -123,7 +123,7 @@ class CompactBingoChat {
             }
 
             if (newArea == 2) {
-                if (message.startsWith("§7   ■ §r") || message.startsWith("     §r")) {
+                if (message.startsWith("§7   ■ §r") || message.startsWith("     §r") || message.startsWith("   §r")) {
                     return true
                 } else {
                     newArea = 0
