@@ -32,6 +32,8 @@ class CropAccessoryData {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         loadedAccessoryThisProfile = false
+
+        accessoryPage.clear()
     }
 
     @SubscribeEvent
@@ -48,6 +50,15 @@ class CropAccessoryData {
     // Handle accessory bag detection
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
+
+        // handling accessory bags with only one page
+        if (event.inventoryName == "Accessory Bag") {
+            isLoadingAccessories = true
+            accessoryBagPageCount = 1
+            accessoryBagPageNumber = 1
+            return
+        }
+
         val groups = accessoryBagNamePattern.matchEntire(event.inventoryName)?.groups ?: return
         isLoadingAccessories = true
         accessoryBagPageCount = groups[2]!!.value.toInt()
