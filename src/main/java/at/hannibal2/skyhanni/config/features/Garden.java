@@ -558,7 +558,8 @@ public class Garden {
         @Expose
         @ConfigOption(name = "Cactus", desc = "Suggested farm speed:\n" +
                 "§eNormal§7: §f✦ 400 speed\n" +
-                "§eRacing Helmet§7: §f✦ 500 speed")
+                "§eRacing Helmet§7: §f✦ 464 speed\n" +
+                "§eBlack Cat§7: §f✦ 464 speed")
         @ConfigEditorSlider(minValue = 1, maxValue = 500, minStep = 1)
         public int cactus = 400;
 
