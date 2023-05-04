@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeSyncMap
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -22,7 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class GriffinBurrowHelper {
 
     private var guessLocation: LorenzVec? = null
-    private var particleBurrows = mutableMapOf<LorenzVec, BurrowType>()
+    private val particleBurrows = makeSyncMap(mutableMapOf<LorenzVec, BurrowType>())
     private var animationLocation: LorenzVec? = null
     private var lastDug: LorenzVec? = null
     private var teleportedLocation: LorenzVec? = null
