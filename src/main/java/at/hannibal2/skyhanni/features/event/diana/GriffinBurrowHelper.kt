@@ -23,7 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class GriffinBurrowHelper {
 
     private var guessLocation: LorenzVec? = null
-    private var particleBurrows = makeSyncMap(mutableMapOf<LorenzVec, BurrowType>())
+    private val particleBurrows = makeSyncMap(mutableMapOf<LorenzVec, BurrowType>())
     private var animationLocation: LorenzVec? = null
     private var lastDug: LorenzVec? = null
     private var teleportedLocation: LorenzVec? = null
