@@ -290,19 +290,19 @@ public class Misc {
     public boolean trapperFeatures = false;
 
     @Expose
-    @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs.")
+    @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §cMay not always work as expected.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     public boolean trapperSolver = true;
 
     @Expose
-    @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when your Trapper mob dies.")
+    @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     public boolean trapperMobDiedMessage = true;
 
     @Expose
-    @ConfigOption(name = "Warp to Trapper", desc = "Warps to the trapper.")
+    @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
     public boolean warpToTrapper = false;

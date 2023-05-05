@@ -32,8 +32,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import kotlin.concurrent.fixedRateTimer
 
+
 class TrevorFeatures {
     private val trapperPattern = "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
+    private val talbotPatternAbove = "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!".toPattern()
+    private val talbotPatternBelow = "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
     private val locationPattern = "Zone: (?<zone>.*)".toPattern()
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
@@ -74,38 +77,56 @@ class TrevorFeatures {
             }
         }
 
-        val matcher = trapperPattern.matcher(event.message.removeColor())
+        var matcher = trapperPattern.matcher(event.message.removeColor())
         if (matcher.matches()) {
             timeUntilNextReady = 61
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
         }
+
+        matcher = talbotPatternAbove.matcher(event.message.removeColor())
+        if (matcher.matches()) {
+            val height = matcher.group("height").toInt()
+            TrevorSolver.findMobHeight(height, true)
+        }
+
+        matcher = talbotPatternBelow.matcher(event.message.removeColor())
+        if (matcher.matches()) {
+            val height = matcher.group("height").toInt()
+            TrevorSolver.findMobHeight(height,  false)
+        }
     }
 
     private fun updateTrapper() {
         timeUntilNextReady -= 1
         if (trapperReady && timeUntilNextReady > 0) {
+            currentStatus = TrapperStatus.WAITING
             currentLabel = "§3$timeUntilNextReady seconds left"
         }
 
-        if (timeUntilNextReady == 0 && trapperReady) {
-            TitleUtils.sendTitle("§2Trapper Ready ", 3_000)
-            SoundUtils.playBeepSound()
+        if (timeUntilNextReady <= 0 && trapperReady) {
+            if (timeUntilNextReady == 0) {
+                TitleUtils.sendTitle("§2Trapper Ready ", 3_000)
+                SoundUtils.playBeepSound()
+            }
             currentStatus = TrapperStatus.READY
             currentLabel = "§2Ready"
         }
+
         if (!onFarmingIsland()) return
         var found = false
         var active = false
+        val previousLocation = TrevorSolver.mobLocation
         for (line in TabListData.getTabList()) {
             val formattedLine = line.removeColor().drop(1)
             if (formattedLine.startsWith("Time Left: ")) {
-                    trapperReady = false
-                    currentStatus = TrapperStatus.ACTIVE
-                    currentLabel = "§cActive Quest"
+                trapperReady = false
+                currentStatus = TrapperStatus.ACTIVE
+                currentLabel = "§cActive Quest"
                 active = true
             }
+
             if (TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine } != null) {
                 TrevorSolver.mobLocation =
                     TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine }!!
@@ -122,6 +143,9 @@ class TrevorFeatures {
         if (!found) TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.NONE
         if (!active) {
             trapperReady = true
+        }
+        if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
+            TrevorSolver.mobLocation = previousLocation
         }
     }
 
@@ -148,16 +172,18 @@ class TrevorFeatures {
         if (config.trapperSolver) {
             var location = TrevorSolver.mobLocation.coordinates
             if (TrevorSolver.mobLocation == TrevorSolver.CurrentMobArea.NONE) return
+            if (TrevorSolver.averageHeight != 0.0) {
+                location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
+            }
             if (TrevorSolver.mobLocation == TrevorSolver.CurrentMobArea.FOUND) {
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.add(0, -1, 0), LorenzColor.GREEN.toColor(), true, true)
+                event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 2, 0), TrevorSolver.mobLocation.location, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
             }
         }
-
     }
 
     @SubscribeEvent
@@ -180,7 +206,7 @@ class TrevorFeatures {
 
         if (System.currentTimeMillis() - timeLastWarped < 3000) {
             if (System.currentTimeMillis() - timeLastWarped < 1000) return
-            LorenzUtils.chat("§6Command on cooldown, wait a few seconds!")
+            LorenzUtils.chat("§6Command on cooldown, wait a few seconds!, last warped ${System.currentTimeMillis() - timeLastWarped}ms ago")
             return
         }
         LorenzUtils.sendCommandToServer("warp trapper")
