@@ -267,6 +267,8 @@ class SkyHanniMod {
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(GardenRecentTeleportPadsDisplay())
+        loadModule(TrevorFeatures())
+        loadModule(TrevorSolver)
 
         init()
 
