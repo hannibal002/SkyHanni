@@ -263,5 +263,6 @@ object LorenzUtils {
         whenChanged { _, _ -> observer.run() }
     }
 
-    fun <K, V> makeSyncMap(originalMap: MutableMap<K, V>) = Collections.synchronizedMap(originalMap)
+    fun <K, V> Map<K, V>.editThreadSave(function: MutableMap<K, V>.() -> Unit) =
+        toMutableMap().also { function(it) }.toMap()
 }
