@@ -34,8 +34,6 @@ import kotlin.concurrent.fixedRateTimer
 
 class TrevorFeatures {
     private val trapperPattern = "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
-    private val talbotPatternAbove = "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!".toPattern()
-    private val talbotPatternBelow = "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
     private val locationPattern = "Zone: (?<zone>.*)".toPattern()
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
@@ -64,9 +62,9 @@ class TrevorFeatures {
             if (config.trapperMobDiedMessage) {
                 TitleUtils.sendTitle("§2Mob Died ", 5_000)
                 SoundUtils.playBeepSound()
-                trapperReady = true
-                TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.NONE
             }
+            trapperReady = true
+            TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.NONE
             if (timeUntilNextReady <= 0) {
                 currentStatus = TrapperStatus.READY
                 currentLabel = "§2Ready"
@@ -76,24 +74,12 @@ class TrevorFeatures {
             }
         }
 
-        var matcher = trapperPattern.matcher(event.message.removeColor())
+        val matcher = trapperPattern.matcher(event.message.removeColor())
         if (matcher.matches()) {
             timeUntilNextReady = 61
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
-        }
-
-        matcher = talbotPatternAbove.matcher(event.message.removeColor())
-        if (matcher.matches()) {
-            val height = matcher.group("height").toInt()
-            TrevorSolver.locateMob(height, true)
-        }
-
-        matcher = talbotPatternBelow.matcher(event.message.removeColor())
-        if (matcher.matches()) {
-            val height = matcher.group("height").toInt()
-            TrevorSolver.locateMob(height,  false)
         }
     }
 
@@ -114,23 +100,28 @@ class TrevorFeatures {
         var active = false
         for (line in TabListData.getTabList()) {
             val formattedLine = line.removeColor().drop(1)
-            if (formattedLine.startsWith("Time Left: ")) active = true
+            if (formattedLine.startsWith("Time Left: ")) {
+                    trapperReady = false
+                    currentStatus = TrapperStatus.ACTIVE
+                    currentLabel = "§cActive Quest"
+                active = true
+            }
             if (TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine } != null) {
-                TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine }!!
+                TrevorSolver.mobLocation =
+                    TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine }!!
                 found = true
             }
             val matcher = locationPattern.matcher(formattedLine)
             if (matcher.matches()) {
                 val zone = matcher.group("zone")
-                TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == zone } ?: TrevorSolver.CurrentMobArea.NONE
+                TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == zone }
+                    ?: TrevorSolver.CurrentMobArea.NONE
                 found = true
             }
-            if (!found) TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.NONE
-            if (active) {
-                trapperReady = false
-                currentStatus = TrapperStatus.ACTIVE
-                currentLabel = "§cActive Quest"
-            }
+        }
+        if (!found) TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.NONE
+        if (!active) {
+            trapperReady = true
         }
     }
 

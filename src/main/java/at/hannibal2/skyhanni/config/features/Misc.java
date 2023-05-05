@@ -285,7 +285,7 @@ public class Misc {
     }
 
     @Expose
-    @ConfigOption(name = "Trevor (Trapper) Features", desc = "")
+    @ConfigOption(name = "Trevor The Trapper", desc = "")
     @ConfigEditorAccordion(id = 12)
     public boolean trapperFeatures = false;
 
