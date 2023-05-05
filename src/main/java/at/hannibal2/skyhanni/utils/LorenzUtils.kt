@@ -263,6 +263,6 @@ object LorenzUtils {
         whenChanged { _, _ -> observer.run() }
     }
 
-    fun <K, V> Map<K, V>.editThreadSave(function: MutableMap<K, V>.() -> Unit) =
+    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()
 }
