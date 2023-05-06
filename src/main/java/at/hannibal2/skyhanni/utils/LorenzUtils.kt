@@ -265,4 +265,18 @@ object LorenzUtils {
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()
+
+    fun colorCodeToRarity(colorCode: Char): String {
+        return when (colorCode) {
+            'f' -> "Common"
+            'a' -> "Uncommon"
+            '9' -> "Rare"
+            '5' -> "Epic"
+            '6' -> "Legendary"
+            'd' -> "Mythic"
+            'b' -> "Divine"
+            '4' -> "Supreme" // legacy items
+            else -> "Special"
+        }
+    }
 }
