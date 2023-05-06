@@ -18,8 +18,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.test.command.CopyItemCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
+import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
@@ -46,6 +45,8 @@ object Commands {
         registerCommand("testhanni") { LorenzTest.testCommand(it) }
         registerCommand("copylocation") { LorenzTest.copyLocation() }
         registerCommand("copyentities") { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand("copytablist") { CopyTabListCommand.command(it) }
+        registerCommand("copyscoreboard") { CopyScoreboardCommand.command(it) }
         registerCommand("copyitem") { CopyItemCommand.command(it) }
         registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig("manual-command") }
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
@@ -65,6 +66,7 @@ object Commands {
         registerCommand("shclearcropspeed") { GardenAPI.clearCropSpeed() }
         registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
         registerCommand("shtestbingo") { TestBingo.toggle() }
+        registerCommand("testmessage") { TestChatCommand.command(it) }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
