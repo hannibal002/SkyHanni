@@ -142,11 +142,11 @@ class GardenVisitorFeatures {
                 list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
                     if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                         LorenzUtils.setTextIntoSign("$amount")
-                    } else if (!InventoryUtils.inStorage() && !LorenzUtils.noTradeMode) {
+                    } else if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
                         LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
                         OSUtils.copyToClipboard("$amount")
                     }
-                }) { GardenAPI.inGarden() && !InventoryUtils.inStorage() })
+                }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
