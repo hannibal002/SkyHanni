@@ -2,15 +2,13 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.Garden
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
-import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.*
 
 object GardenCustomKeybinds {
@@ -18,7 +16,7 @@ object GardenCustomKeybinds {
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()
-    private var lastWindowOpenTime = 0L
+    private val cache: MutableMap<Int, Boolean> = mutableMapOf()
 
     init {
         map[mcSettings.keyBindAttack] = { shConfig.keyBindAttack }
@@ -33,47 +31,35 @@ object GardenCustomKeybinds {
 
     private fun isEnabled() = GardenAPI.inGarden() && shConfig.keyBindEnabled
 
-    private fun isActive(): Boolean {
-        if (!isEnabled()) return false
-        if (GardenAPI.toolInHand == null) return false
+    private fun isActive() = isEnabled() && GardenAPI.toolInHand != null
 
-        if (Minecraft.getMinecraft().currentScreen != null) {
-            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                lastWindowOpenTime = System.currentTimeMillis()
-            }
-            return false
+    @SubscribeEvent
+    fun onToolChange(event: GardenToolChangeEvent) {
+        map.forEach { (keyBinding, override) ->
+            keyBinding as AccessorKeyBinding
+            val keyCode = if (isActive()) override() else keyBinding.keyCode
+            keyBinding.pressed_skyhanni = cache[keyCode] ?: false
         }
-
-        // TODO remove workaround
-        if (System.currentTimeMillis() < lastWindowOpenTime + 300) return false
-
-        return true
-    }
-
-    private fun isHeld(keyCode: Int): Boolean {
-        if (keyCode == 0) return false
-        return if (keyCode < 0) {
-            Mouse.isButtonDown(keyCode + 100)
-        } else {
-            Keyboard.isKeyDown(keyCode)
-        }
-    }
-
-    @JvmStatic
-    fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
-        val override = map[keyBinding] ?: return
-        val keyCode = override()
-        cir.returnValue = isHeld(keyCode)
     }
 
     @JvmStatic
     fun onTick(keyCode: Int, ci: CallbackInfo) {
-        if (!isActive()) return
         if (keyCode == 0) return
+        if (!isActive()) return
         val keyBinding = map.entries.firstOrNull { it.value() == keyCode }?.key ?: return
         ci.cancel()
         keyBinding as AccessorKeyBinding
         keyBinding.pressTime_skyhanni++
+    }
+
+    @JvmStatic
+    fun setKeyBindState(keyCode: Int, pressed: Boolean, ci: CallbackInfo) {
+        if (keyCode == 0) return
+        cache[keyCode] = pressed
+        if (!isActive()) return
+        val keyBinding = map.entries.firstOrNull { it.value() == keyCode }?.key ?: return
+        ci.cancel()
+        keyBinding as AccessorKeyBinding
+        keyBinding.pressed_skyhanni = pressed
     }
 }
