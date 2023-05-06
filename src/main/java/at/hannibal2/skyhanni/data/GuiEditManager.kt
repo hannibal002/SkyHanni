@@ -4,11 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems
 import io.github.moulberry.notenoughupdates.NEUOverlay
-import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
-import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -36,9 +34,7 @@ class GuiEditManager {
         if (SkyHanniMod.feature.gui.keyBindOpen != key) return
 
         if (NEUOverlay.searchBarHasFocus) return
-        if (AuctionSearchOverlay.shouldReplace()) return
-        if (BazaarSearchOverlay.shouldReplace()) return
-        if (InventoryUtils.inStorage()) return
+        if (NEUItems.neuHasFocus()) return
 
         if (isInGui()) return
         openGuiEditor()
