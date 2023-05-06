@@ -4,9 +4,14 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
@@ -14,7 +19,6 @@ import java.util.function.Supplier
 import java.util.regex.Pattern
 
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
-    // implements "ButtonSelect:SelectItem". no idea how to translate that into skyhanni
 
     NONE(null),
 
@@ -137,6 +141,43 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     CUSTOM({
         SkyHanniMod.feature.misc.discordRPC.customText.get() // custom field in the config
+    }),
+
+    AUTO({
+        val slayerResult = SLAYER.displayMessageSupplier!!.get()
+        val milestoneResult = try {
+            CROP_MILESTONES.displayMessageSupplier!!.get()
+        } catch (e: Exception) {
+            "Unable to get milestone"
+        }
+        if (slayerResult != "Planning to do a slayer quest") slayerResult
+        else if (milestoneResult != "Unable to get milestone" && milestoneResult != "Unknown Item" && milestoneResult != "") milestoneResult
+        else {
+            val statusNoAuto = DiscordStatus.values().toMutableList()
+            statusNoAuto.remove(AUTO)
+            statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+        }
+    }),
+
+    CROP_MILESTONES({
+        val item = net.minecraft.client.Minecraft.getMinecraft().thePlayer.heldItem
+        val crop = item.getCropType()
+        val cropCounter = crop?.getCounter()
+        val tier = cropCounter?.let { getTierForCrops(it) }
+
+        val progress = tier?.let {
+            LorenzUtils.formatPercentage(crop.progressToNextLevel())
+        } ?: 100 // percentage to next milestone
+
+        tier?.let { "${crop.cropName}: Milestone $it ($progress)" } ?: ""
+    }),
+
+    PETS({
+        val pet = SkyHanniMod.feature.hidden.currentPet
+        val colorCode = pet.substring(1..2).first()
+        val petName = pet.substring(2)
+
+        "${colorCodeToRarity(colorCode)} $petName"
     })
     ;
 
