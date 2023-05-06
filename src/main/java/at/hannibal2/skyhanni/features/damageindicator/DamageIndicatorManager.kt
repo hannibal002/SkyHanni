@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
-import at.hannibal2.skyhanni.test.LorenzTest
+import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
@@ -668,7 +668,7 @@ class DamageIndicatorManager {
                 270_000 / 2, 270_000 -> 1
                 1 -> 0
                 else -> {
-                    LorenzTest.displayLine = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
+                    SkyHanniTestCommand.displayLine = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
                     LorenzUtils.error(
                         "Unexpected health of thorn in m4! (${
                             LorenzUtils.formatDouble(
