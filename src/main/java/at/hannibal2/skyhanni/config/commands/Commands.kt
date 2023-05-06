@@ -15,11 +15,10 @@ import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.test.command.CopyItemCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
+import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
@@ -43,21 +42,23 @@ object Commands {
         registerCommand("skyhanni", openMainMenu)
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
-        registerCommand("testhanni") { LorenzTest.testCommand(it) }
-        registerCommand("copylocation") { LorenzTest.copyLocation() }
-        registerCommand("copyentities") { CopyNearbyEntitiesCommand.command(it) }
-        registerCommand("copyitem") { CopyItemCommand.command(it) }
+        registerCommand("shtest") { SkyHanniTestCommand.testCommand(it) }
+        registerCommand("shcopylocation") { SkyHanniTestCommand.copyLocation() }
+        registerCommand("shcopyentities") { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand("shcopytablist") { CopyTabListCommand.command(it) }
+        registerCommand("shcopyscoreboard") { CopyScoreboardCommand.command(it) }
+        registerCommand("shcopyitem") { CopyItemCommand.command(it) }
         registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig("manual-command") }
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
         registerCommand("shtestpacket") { PacketTest.toggle() }
-        registerCommand("shreloadlisteners") { LorenzTest.reloadListeners() }
-        registerCommand("shstoplisteners") { LorenzTest.stopListeners() }
+        registerCommand("shreloadlisteners") { SkyHanniTestCommand.reloadListeners() }
+        registerCommand("shstoplisteners") { SkyHanniTestCommand.stopListeners() }
         registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
         registerCommand("shtrackcollection") { CollectionCounter.command(it) }
         registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
         registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
         registerCommand("shsetapikey") { ApiDataLoader.command(it) }
-        registerCommand("shtestgardenvisitors") { LorenzTest.testGardenVisitors() }
+        registerCommand("shtestgardenvisitors") { SkyHanniTestCommand.testGardenVisitors() }
         registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
         registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
         registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
@@ -65,6 +66,7 @@ object Commands {
         registerCommand("shclearcropspeed") { GardenAPI.clearCropSpeed() }
         registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
         registerCommand("shtestbingo") { TestBingo.toggle() }
+        registerCommand("shtestmessage") { TestChatCommand.command(it) }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
