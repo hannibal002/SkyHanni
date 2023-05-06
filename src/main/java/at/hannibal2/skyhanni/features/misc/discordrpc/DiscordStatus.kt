@@ -146,7 +146,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     AUTO({
         val slayerResult = SLAYER.displayMessageSupplier!!.get()
         val milestoneResult = try {
-            CROPMILESTONES.displayMessageSupplier!!.get()
+            CROP_MILESTONES.displayMessageSupplier!!.get()
         } catch (e: Exception) {
             "Unable to get milestone"
         }
@@ -154,12 +154,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         else if (milestoneResult != "Unable to get milestone" && milestoneResult != "Unknown Item" && milestoneResult != "") milestoneResult
         else {
             val statusNoAuto = DiscordStatus.values().toMutableList()
-            statusNoAuto.remove<DiscordStatus>(DiscordStatus.AUTO)
+            statusNoAuto.remove(AUTO)
             statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
         }
     }),
 
-    CROPMILESTONES({
+    CROP_MILESTONES({
         val item = net.minecraft.client.Minecraft.getMinecraft().thePlayer.heldItem
         val crop = item.getCropType()
         val cropCounter = crop?.getCounter()
