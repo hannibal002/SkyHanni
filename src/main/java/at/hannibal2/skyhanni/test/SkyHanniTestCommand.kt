@@ -16,7 +16,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 
-class LorenzTest {
+class SkyHanniTestCommand {
 
     companion object {
         var displayLine = ""

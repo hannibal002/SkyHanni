@@ -104,8 +104,12 @@ class SoopyGuessBurrow {
         distance2 = (Math.E / slope) - firstParticlePoint?.distance(pos)!!
 
         if (distance2!! > 1000) {
+            LorenzUtils.debug("Soopy distance2 is $distance2")
             distance2 = null
             guessPoint = null
+
+            // workaround: returning if the distance is too big
+            return
         }
 
         val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!

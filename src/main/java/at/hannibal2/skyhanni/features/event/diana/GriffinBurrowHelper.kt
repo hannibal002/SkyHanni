@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -22,7 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class GriffinBurrowHelper {
 
     private var guessLocation: LorenzVec? = null
-    private var particleBurrows = mutableMapOf<LorenzVec, BurrowType>()
+    private var particleBurrows = mapOf<LorenzVec, BurrowType>()
     private var animationLocation: LorenzVec? = null
     private var lastDug: LorenzVec? = null
     private var teleportedLocation: LorenzVec? = null
@@ -50,7 +51,7 @@ class GriffinBurrowHelper {
     @SubscribeEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
-        particleBurrows[event.burrowLocation] = event.type
+        particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
 
         if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
             checkRemoveGuess(true)
@@ -72,7 +73,7 @@ class GriffinBurrowHelper {
     @SubscribeEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
-        particleBurrows.remove(location)
+        particleBurrows = particleBurrows.editCopy { remove(location) }
         if (particleBurrows.isNotEmpty()) {
             animationLocation = location
         }
@@ -91,7 +92,7 @@ class GriffinBurrowHelper {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
-            particleBurrows.keys.removeIf { particleBurrows[it] == BurrowType.MOB }
+            particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
         }
     }
 
@@ -100,7 +101,7 @@ class GriffinBurrowHelper {
         guessLocation = null
         animationLocation = null
         lastDug = null
-        particleBurrows.clear()
+        particleBurrows = particleBurrows.editCopy { clear() }
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {

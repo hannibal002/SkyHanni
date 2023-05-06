@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -21,7 +22,7 @@ class CollectionCounter {
         private var display = ""
 
         private var itemName = ""
-        private var itemApiName = ""
+        private var internalName = ""
         private var itemAmount = -1L
 
         private var lastAmountInInventory = -1
@@ -31,7 +32,7 @@ class CollectionCounter {
 
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
-                if (itemName == "") {
+                if (internalName == "") {
                     LorenzUtils.chat("§c/shtrackcollection <item name>")
                     return
                 }
@@ -43,18 +44,17 @@ class CollectionCounter {
             val name = args.joinToString(" ")
             val pair = CollectionAPI.getCollectionCounter(name)
             if (pair == null) {
-                LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (API disabled or open the collection inventory)")
+                LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (Maybe the API is disabled or try to open the collection inventory)")
                 return
             }
 
-            itemName = pair.first
-            itemApiName = if (itemName == "Mushroom" || itemName == "Gemstone") {
+            internalName = pair.first
+            if (internalName.contains("MUSHROOM") || internalName.endsWith("_GEM")) {
                 LorenzUtils.chat("§7Mushroom and Gemstone items are not fully supported for the counter!")
-                ""
-            } else {
-                NEUItems.getInternalName(itemName)
+                internalName = ""
+                return
             }
-
+            itemName = NEUItems.getItemStack(internalName).name!!
             itemAmount = pair.second
 
             lastAmountInInventory = countCurrentlyInInventory()
@@ -64,8 +64,7 @@ class CollectionCounter {
 
         private fun resetData() {
             itemAmount = -1
-            itemName = ""
-            itemApiName = ""
+            internalName = ""
 
             lastAmountInInventory = -1
             display = ""
@@ -85,7 +84,7 @@ class CollectionCounter {
         }
 
         private fun countCurrentlyInInventory() =
-            InventoryUtils.countItemsInLowerInventory { it.getInternalName() == itemApiName }
+            InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
     }
 
     @SubscribeEvent

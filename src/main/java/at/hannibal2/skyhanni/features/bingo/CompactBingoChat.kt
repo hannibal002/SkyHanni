@@ -10,12 +10,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class CompactBingoChat {
     private val config get() = SkyHanniMod.feature.bingo.compactChat
 
-    private var blockedSkillLevelUp = false
-    private var blockedSkyblockLevelUp = false
-    private var blockedCollectionLevelUp = false
+    private var inSkillLevelUp = false
+    private var inSkyblockLevelUp = false
+    private var inCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
-    private var blockedBestiarity = false
+    private var inBestiarity = false
     private val healthPattern = "   §r§7§8\\+§a.* §c❤ Health".toPattern()
     private val strengthPattern = "   §r§7§8\\+§a. §c❁ Strength".toPattern()
 
@@ -25,11 +25,15 @@ class CompactBingoChat {
         if (!LorenzUtils.isBingoProfile && !config.outsideBingo) return
 
         val message = event.message
-        if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
-            blockedSkillLevelUp = false
-            blockedSkyblockLevelUp = false
+        if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬" ||
+            message == "§e§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+        ) {
+            inSkillLevelUp = false
+            inSkyblockLevelUp = false
+            inCollectionLevelUp = false
+            inBestiarity = false
             if (config.hideBorder) {
-                event.blockedReason = "compact_skill_or_skyblock_level_up"
+                event.blockedReason = "compact_bingo_border"
             }
             return
         }
@@ -43,11 +47,11 @@ class CompactBingoChat {
 
     private fun onSkillLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§b§lSKILL LEVEL UP ")) {
-            blockedSkillLevelUp = true
+            inSkillLevelUp = true
             return false
         }
 
-        if (blockedSkillLevelUp) {
+        if (inSkillLevelUp) {
             if (!message.contains("Access to") && !message.endsWith(" Enchantment")) {
                 return true
             }
@@ -58,11 +62,11 @@ class CompactBingoChat {
 
     private fun onSkyBlockLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§3§lSKYBLOCK LEVEL UP §bLevel ")) {
-            blockedSkyblockLevelUp = true
+            inSkyblockLevelUp = true
             return false
         }
 
-        if (blockedSkyblockLevelUp) {
+        if (inSkyblockLevelUp) {
             if (message == "  §r§a§lREWARDS") return true
             // We don't care about extra health & strength
             healthPattern.matchMatcher(message) {
@@ -85,17 +89,13 @@ class CompactBingoChat {
 
     private fun onCollectionLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§6§lCOLLECTION LEVEL UP ")) {
-            blockedCollectionLevelUp = true
+            inCollectionLevelUp = true
             return false
         }
-        if (message == "§e§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
-            blockedCollectionLevelUp = config.hideBorder
-            return true
-        }
 
-        if (blockedCollectionLevelUp) {
+        if (inCollectionLevelUp) {
             if (message.contains("Trade") || message.contains("Recipe")) {
-                var text = message.removeColor().replace(" ", "")
+                val text = message.removeColor().replace(" ", "")
                 if (text == "Trade" || text == "Recipe") {
                     collectionLevelUpLastLine?.let { LorenzUtils.chat(it) }
                 }
@@ -123,7 +123,7 @@ class CompactBingoChat {
             }
 
             if (newArea == 2) {
-                if (message.startsWith("§7   ■ §r") || message.startsWith("     §r")) {
+                if (message.startsWith("§7   ■ §r") || message.startsWith("     §r") || message.startsWith("   §r")) {
                     return true
                 } else {
                     newArea = 0
@@ -135,17 +135,13 @@ class CompactBingoChat {
     }
 
     private fun onBestiarityUpgrade(message: String): Boolean {
-        if (message.contains("§r§6§lBESTIARY MILESTONE")) return false
-
         if (message.startsWith("  §r§3§lBESTIARY §b§l")) {
-            blockedBestiarity = true
+            inBestiarity = true
             return false
         }
-        if (message == "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
-            blockedBestiarity = config.hideBorder
-            return true
-        }
 
-        return blockedBestiarity
+        if (message.contains("§r§6§lBESTIARY MILESTONE")) return false
+
+        return inBestiarity
     }
 }
