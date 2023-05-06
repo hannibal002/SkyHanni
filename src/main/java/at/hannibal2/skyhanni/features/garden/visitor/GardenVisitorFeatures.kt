@@ -529,8 +529,7 @@ class GardenVisitorFeatures {
         val old = visitor.status
         if (old == newStatus) return
         visitor.status = newStatus
-        val name = visitor.visitorName.removeColor()
-        logger.log("Visitor status change for '$name': $old -> $newStatus ($reason)")
+        logger.log("Visitor status change for '${visitor.visitorName}': $old -> $newStatus ($reason)")
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
