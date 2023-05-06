@@ -9,13 +9,10 @@ object CopyTabListCommand {
     fun command(args: Array<String>) {
         try {
             val resultList = mutableListOf<String>()
-            var noColor = false
-            if (args.size == 1) {
-                if (args[0] == "true")  noColor = true
-            }
+            val noColor = args.size == 1 && args[0] == "true"
             for (line in TabListData.getTabList()) {
-                val tablistLine = if (noColor) line.removeColor() else line
-                resultList.add("'$tablistLine'")
+                val tabListLine = if (noColor) line.removeColor() else line
+                resultList.add("'$tabListLine'")
             }
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)

@@ -9,10 +9,7 @@ object CopyScoreboardCommand {
     fun command(args: Array<String>) {
         try {
             val resultList = mutableListOf<String>()
-            var noColor = false
-            if (args.size == 1) {
-                if (args[0] == "true")  noColor = true
-            }
+            val noColor = args.size == 1 && args[0] == "true"
             for (line in ScoreboardData.sidebarLinesFormatted) {
                 val scoreboardLine = if (noColor) line.removeColor() else line
                 resultList.add("'$scoreboardLine'")
