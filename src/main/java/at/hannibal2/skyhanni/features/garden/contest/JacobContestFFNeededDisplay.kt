@@ -93,7 +93,7 @@ class JacobContestFFNeededDisplay {
            add(listOf("§cMissing data from above!"))
        } else {
            val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
-           add(listOf("§6Predicted ", crop.icon, "§6score: $predictedScore"))
+           add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
        }
     }
 
