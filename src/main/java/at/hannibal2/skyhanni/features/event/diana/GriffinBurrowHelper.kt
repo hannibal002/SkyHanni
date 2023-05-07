@@ -20,11 +20,13 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GriffinBurrowHelper {
+object GriffinBurrowHelper {
+    private val config get() = SkyHanniMod.feature.diana
 
     private var guessLocation: LorenzVec? = null
+    private var targetLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
-    private var animationLocation: LorenzVec? = null
+    var animationLocation: LorenzVec? = null
     private var lastDug: LorenzVec? = null
     private var teleportedLocation: LorenzVec? = null
     private var lastGuessTime = 0L
@@ -38,12 +40,17 @@ class GriffinBurrowHelper {
         }
         lastGuessTime = System.currentTimeMillis()
 
-        if (SkyHanniMod.feature.diana.burrowNearestWarp) {
-            BurrowWarpHelper.shouldUseWarps(event.guessLocation)
-        }
-
         guessLocation = event.guessLocation
-        if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
+        setTargetLocation(event.guessLocation)
+    }
+
+    fun setTargetLocation(location: LorenzVec) {
+        targetLocation = location
+
+        if (config.burrowNearestWarp) {
+            BurrowWarpHelper.shouldUseWarps(location)
+        }
+        if (config.burrowsNearbyDetection) {
             checkRemoveGuess(false)
         }
     }
@@ -53,7 +60,7 @@ class GriffinBurrowHelper {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
 
-        if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
+        if (config.burrowsNearbyDetection) {
             checkRemoveGuess(true)
         }
     }
@@ -99,6 +106,7 @@ class GriffinBurrowHelper {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         guessLocation = null
+        targetLocation = null
         animationLocation = null
         lastDug = null
         particleBurrows = particleBurrows.editCopy { clear() }
@@ -132,22 +140,38 @@ class GriffinBurrowHelper {
         sendTip(event)
 
         val playerLocation = LocationUtils.playerLocation()
-        if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
+        for ((playerName, location) in InquisitorWaypointShare.waypoints) {
+            event.drawColor(location, LorenzColor.LIGHT_PURPLE)
+            val distance = location.distance(playerLocation)
+            if (distance > 10) {
+                val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
+                event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+            } else {
+                event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor", 1.7)
+            }
+            if (distance < 5) {
+                InquisitorWaypointShare.maybeRemove(playerName)
+            }
+            event.drawDynamicText(location.add(0, 1, 0), "§eFrom §b$playerName", 1.6, yOff = 9f)
+        }
+
+        if (InquisitorWaypointShare.waypoints.isNotEmpty()) {
+            if (SkyHanniMod.feature.diana.inquisitorSharing.focusInquisitor) {
+                return
+            }
+        }
+
+        if (config.burrowsNearbyDetection) {
             for (burrow in particleBurrows) {
                 val location = burrow.key
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
-//                if (distance < 30) {
                 event.drawColor(location, burrowType.color, distance > 10)
-//                }
                 event.drawDynamicText(location.add(0, 1, 0), burrowType.text, 1.5)
-//                if (distance < 10) {
-//                    event.drawString(location.add(0.5, 1.5, 0.5), burrowType.text, true)
-//                }
             }
         }
 
-        if (SkyHanniMod.feature.diana.burrowsSoopyGuess) {
+        if (config.burrowsSoopyGuess) {
             guessLocation?.let {
                 val guessLocation = findBlock(it)
                 val distance = guessLocation.distance(playerLocation)
@@ -167,14 +191,14 @@ class GriffinBurrowHelper {
 
             if (BurrowWarpHelper.currentWarp != null) {
                 BurrowWarpHelper.currentWarp = null
-                if (SkyHanniMod.feature.diana.burrowNearestWarp) {
+                if (config.burrowNearestWarp) {
                     animationLocation = it
                     return
                 }
             }
         }
 
-        if (SkyHanniMod.feature.diana.burrowNearestWarp) {
+        if (config.burrowNearestWarp) {
             BurrowWarpHelper.currentWarp?.let { warp ->
                 animationLocation?.let {
                     event.drawColor(it.add(0.0, 1.0, 0.0), LorenzColor.AQUA)
@@ -185,7 +209,7 @@ class GriffinBurrowHelper {
                 }
             }
         }
-        if (SkyHanniMod.feature.diana.burrowSmoothTransition) {
+        if (config.burrowSmoothTransition) {
             animationLocation?.let {
                 event.drawColor(it, LorenzColor.WHITE)
                 animationLocation = moveAnimation(it, event)
@@ -195,10 +219,10 @@ class GriffinBurrowHelper {
 
     private fun moveAnimation(animation: LorenzVec, event: RenderWorldLastEvent): LorenzVec? {
         val list = mutableListOf<LorenzVec>()
-        if (SkyHanniMod.feature.diana.burrowsNearbyDetection) {
+        if (config.burrowsNearbyDetection) {
             list.addAll(particleBurrows.keys)
         }
-        guessLocation?.let {
+        targetLocation?.let {
             val loc = findBlock(it)
             if (loc.y > 200) {
                 list.add(LorenzVec(loc.x, LocationUtils.playerLocation().y, loc.z))

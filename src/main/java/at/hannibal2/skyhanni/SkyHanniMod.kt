@@ -22,10 +22,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
-import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
-import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
-import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
-import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fishing.*
 import at.hannibal2.skyhanni.features.garden.*
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
@@ -200,7 +197,7 @@ class SkyHanniMod {
         loadModule(StatsTuning())
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
-        loadModule(GriffinBurrowHelper())
+        loadModule(GriffinBurrowHelper)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
         loadModule(CollectionCounter())
@@ -267,6 +264,7 @@ class SkyHanniMod {
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(GardenRecentTeleportPadsDisplay())
+        loadModule(InquisitorWaypointShare)
 
         init()
 
