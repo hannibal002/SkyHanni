@@ -270,6 +270,9 @@ object LorenzUtils {
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()
 
+    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
+        toMutableList().also { function(it) }.toList()
+
     fun colorCodeToRarity(colorCode: Char): String {
         return when (colorCode) {
             'f' -> "Common"

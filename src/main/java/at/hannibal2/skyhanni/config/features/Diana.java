@@ -50,6 +50,11 @@ public class Diana {
         public boolean focusInquisitor = false;
 
         @Expose
+        @ConfigOption(name = "Instant SHare", desc = "Share the waypoint as soon as you find a inquisitor. As alternative, you can share it only via key press")
+        @ConfigEditorBoolean
+        public boolean instantShare = true;
+
+        @Expose
         @ConfigOption(name = "Share Key", desc = "Press this key to share your Inquisitor Waypoint.")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int keyBindShare = Keyboard.KEY_Y;
