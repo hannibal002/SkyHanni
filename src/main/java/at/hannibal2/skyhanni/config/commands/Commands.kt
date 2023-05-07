@@ -68,7 +68,7 @@ object Commands {
         registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
         registerCommand("shtestbingo") { TestBingo.toggle() }
         registerCommand("shtestmessage") { TestChatCommand.command(it) }
-        registerCommand("shshareinquis") { InquisitorWaypointShare.shareWaypoint() }
+        registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

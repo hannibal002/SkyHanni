@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
 public class Diana {
@@ -34,13 +32,27 @@ public class Diana {
     public int keyBindWarp = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Inquisitor Share", desc = "Shares your Inquisitor location to your Party via chat.")
-    @ConfigEditorBoolean
-    public boolean inquisitorWaypointShare = true;
+    @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
+    @Accordion
+    @ConfigAccordionId(id = 9)
+    public InquisitorSharing inquisitorSharing = new InquisitorSharing();
 
-    @Expose
-    @ConfigOption(name = "Share Key", desc = "Press this key to Share your Inquisitor Waypoint.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int keyBindShare = Keyboard.KEY_NONE;
+    public static class InquisitorSharing {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Shares your Inquisitor and receiving other Inquisitors via Party Chat.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Focus", desc = "Hide other waypoints when your party finds a inquisitor.")
+        @ConfigEditorBoolean
+        public boolean focusInquisitor = false;
+
+        @Expose
+        @ConfigOption(name = "Share Key", desc = "Press this key to share your Inquisitor Waypoint.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int keyBindShare = Keyboard.KEY_Y;
+    }
 
 }
