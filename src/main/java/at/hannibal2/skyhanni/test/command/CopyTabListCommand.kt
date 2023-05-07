@@ -12,7 +12,7 @@ object CopyTabListCommand {
             val noColor = args.size == 1 && args[0] == "true"
             for (line in TabListData.getTabList()) {
                 val tabListLine = if (noColor) line.removeColor() else line
-                resultList.add("'$tabListLine'")
+                if (tabListLine != "") resultList.add("'$tabListLine'")
             }
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
