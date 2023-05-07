@@ -78,8 +78,8 @@ dependencies {
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.0")
-    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.0:test")
+    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.2")
+    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.2:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
 }
