@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
@@ -67,6 +68,7 @@ object Commands {
         registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
         registerCommand("shtestbingo") { TestBingo.toggle() }
         registerCommand("shtestmessage") { TestChatCommand.command(it) }
+        registerCommand("shshareinquis") { InquisitorWaypointShare.shareWaypoint() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

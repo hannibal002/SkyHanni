@@ -33,4 +33,14 @@ public class Diana {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindWarp = Keyboard.KEY_NONE;
 
+    @Expose
+    @ConfigOption(name = "Inquisitor Share", desc = "Shares your Inquisitor location to your Party via chat.")
+    @ConfigEditorBoolean
+    public boolean inquisitorWaypointShare = true;
+
+    @Expose
+    @ConfigOption(name = "Share Key", desc = "Press this key to Share your Inquisitor Waypoint.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int keyBindShare = Keyboard.KEY_NONE;
+
 }
