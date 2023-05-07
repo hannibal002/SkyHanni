@@ -48,6 +48,7 @@ object Commands {
         registerCommand("shcopytablist") { CopyTabListCommand.command(it) }
         registerCommand("shcopyscoreboard") { CopyScoreboardCommand.command(it) }
         registerCommand("shcopyitem") { CopyItemCommand.command(it) }
+        registerCommand("shcopyparticles") { CopyNearbyParticlesCommand.command(it) }
         registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig("manual-command") }
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
         registerCommand("shtestpacket") { PacketTest.toggle() }
