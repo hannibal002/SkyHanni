@@ -25,7 +25,7 @@ import org.lwjgl.input.Keyboard
 
 object InquisitorWaypointShare {
     private val config get() = SkyHanniMod.feature.diana.inquisitorSharing
-    private val partyPattern = "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>.*), y: (?<y>.*), z: (?<z>-?\\d+)\\b".toPattern()
+    private val partyPattern = "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b".toPattern()
     private val diedPattern = "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!".toPattern()
 
     private var time = 0L
