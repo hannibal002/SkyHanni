@@ -50,7 +50,7 @@ public class Diana {
         public boolean focusInquisitor = false;
 
         @Expose
-        @ConfigOption(name = "Instant SHare", desc = "Share the waypoint as soon as you find a inquisitor. As alternative, you can share it only via key press")
+        @ConfigOption(name = "Instant Share", desc = "Share the waypoint as soon as you find a inquisitor. As alternative, you can share it only via key press")
         @ConfigEditorBoolean
         public boolean instantShare = true;
 
