@@ -234,13 +234,17 @@ object LorenzUtils {
         return this
     }
 
-    private var lastCommandSent = 0L
+    private var lastMessageSent = 0L
 
     fun sendCommandToServer(command: String) {
-        if (System.currentTimeMillis() > lastCommandSent + 2_000) {
-            lastCommandSent = System.currentTimeMillis()
+        sendMessageToServer("/$command")
+    }
+
+    fun sendMessageToServer(message: String) {
+        if (System.currentTimeMillis() > lastMessageSent + 2_000) {
+            lastMessageSent = System.currentTimeMillis()
             val thePlayer = Minecraft.getMinecraft().thePlayer
-            thePlayer.sendChatMessage("/$command")
+            thePlayer.sendChatMessage(message)
         }
     }
 
