@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -47,24 +48,20 @@ object CopyNearbyParticlesCommand {
 
         val packet = event.packet
         if (packet is S2APacketParticles) {
-            val location = packet.toLorenzVec()
+            val location = packet.toLorenzVec().round(2)
             if (LocationUtils.playerLocation().distance(location) > searchRadius) return
-            val offset = LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset)
+            val offset = LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset).round(2)
             resultList.add("particle type: ${packet.particleType}")
             resultList.add("particle location: $location")
-            resultList.add("distance from player: ${LocationUtils.playerLocation().distance(location)}")
+            resultList.add("distance from player: ${LocationUtils.playerLocation().distance(location).round(2)}")
             resultList.add("particle offset: $offset")
             resultList.add("is long distance: ${packet.isLongDistance}")
             resultList.add("particle count: ${packet.particleCount}")
             resultList.add("particle speed: ${packet.particleSpeed}")
-            resultList.add("particle arguments: ${packet.particleArgs}")
+            resultList.add("particle arguments: ${packet.particleArgs.asList()}")
             resultList.add("")
             resultList.add("")
             counter ++
         }
     }
-}
-
-private fun S2APacketParticles.toLorenzVec(): LorenzVec {
-    return LorenzVec(xCoordinate, yCoordinate, zCoordinate)
 }
