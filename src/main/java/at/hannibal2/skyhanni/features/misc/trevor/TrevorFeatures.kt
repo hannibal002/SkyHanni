@@ -126,9 +126,8 @@ class TrevorFeatures {
                 active = true
             }
 
-            if (CurrentMobArea.values().firstOrNull { it.location == formattedLine } != null) {
-                TrevorSolver.mobLocation =
-                    CurrentMobArea.values().firstOrNull { it.location == formattedLine }!!
+            CurrentMobArea.values().firstOrNull { it.location == formattedLine }?.let {
+                TrevorSolver.mobLocation = it
                 found = true
             }
             locationPattern.matchMatcher(formattedLine) {
