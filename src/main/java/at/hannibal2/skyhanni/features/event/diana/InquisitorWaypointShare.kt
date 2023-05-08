@@ -61,8 +61,7 @@ object InquisitorWaypointShare {
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message
-        // TODO use inquisitor
-//        if (message.endsWith("§r§eYou dug out §r§2a Minotaur§r§e!")) {
+//        if (message.endsWith("§r§eYou dug out §r§2a Minos Champion§r§e!")) {
 
 
         if (message.contains("§eYou dug out")) {
@@ -95,8 +94,7 @@ object InquisitorWaypointShare {
         val entity = event.entity
         if (entity !is EntityOtherPlayerMP) return
         val name = entity.name
-        // TODO change
-        if (name != "Minos Inquisitor" && name != "Minotaur " && name != "Minos Champion") {
+        if (name != "Minos Inquisitor" && name != "Inquisitor " && name != "Minos Champion") {
 //        if (name != "Minos Inquisitor") {
             return
         }
