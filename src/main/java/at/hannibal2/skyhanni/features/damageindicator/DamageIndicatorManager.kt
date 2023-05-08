@@ -343,6 +343,7 @@ class DamageIndicatorManager {
                 val lastHealth = data[entity.uniqueID]!!.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
+
                 BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
             }
             entityData.lastHealth = health
