@@ -70,6 +70,7 @@ object Commands {
         registerCommand("shtestbingo") { TestBingo.toggle() }
         registerCommand("shtestmessage") { TestChatCommand.command(it) }
         registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
+        registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
