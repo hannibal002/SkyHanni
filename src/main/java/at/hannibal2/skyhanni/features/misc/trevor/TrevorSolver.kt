@@ -1,7 +1,9 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.trevor
 
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -17,7 +19,7 @@ object TrevorSolver {
     var averageHeight = (minHeight + maxHeight) / 2
 
     fun findMobHeight(height: Int, above: Boolean) {
-        val playerPosition = Minecraft.getMinecraft().thePlayer.getLorenzVec().toAccurateVec(2)
+        val playerPosition = LocationUtils.playerLocation().round(2)
         val mobHeight = if (above) playerPosition.y + height else playerPosition.y - height
         if (maxHeight == 0.0) {
 
@@ -42,9 +44,9 @@ object TrevorSolver {
             val name = entity.name
             // looking at 2 diff entities rn
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
-            if (intArrayOf(100, 500, 1000, 5000, 10000).any { it == entityHealth } ) {
+            if (intArrayOf(100, 500, 1000, 5000, 10000).any { it == entityHealth }) {
                 if (animalNames.any { it == name }) {
-                    if (LocationUtils.canSee(LocationUtils.playerLocation(), entity.position.toLorenzVec())  ) {
+                    if (LocationUtils.canSee(LocationUtils.playerLocation(), entity.position.toLorenzVec())) {
                         if (entity.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer)) return
 
                         if (foundID == entity.entityId) {
@@ -59,7 +61,7 @@ object TrevorSolver {
             }
 
             if (entity is EntityArmorStand) {
-                for (animal in animalNames){
+                for (animal in animalNames) {
                     if (name.contains(animal)) {
                         if (foundID == entity.entityId) {
                             mobLocation = CurrentMobArea.FOUND

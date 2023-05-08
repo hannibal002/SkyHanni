@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
@@ -13,11 +13,8 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
-import io.github.moulberry.notenoughupdates.NEUOverlay
-import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
-import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -26,17 +23,20 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import kotlin.concurrent.fixedRateTimer
 
 
 class TrevorFeatures {
-    private val trapperPattern = "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
-    private val talbotPatternAbove = "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!".toPattern()
-    private val talbotPatternBelow = "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
+    private val trapperPattern =
+        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
+    private val talbotPatternAbove =
+        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!".toPattern()
+    private val talbotPatternBelow =
+        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!".toPattern()
     private val locationPattern = "Zone: (?<zone>.*)".toPattern()
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
@@ -94,7 +94,7 @@ class TrevorFeatures {
         matcher = talbotPatternBelow.matcher(event.message.removeColor())
         if (matcher.matches()) {
             val height = matcher.group("height").toInt()
-            TrevorSolver.findMobHeight(height,  false)
+            TrevorSolver.findMobHeight(height, false)
         }
     }
 
@@ -114,7 +114,6 @@ class TrevorFeatures {
             currentLabel = "§2Ready"
         }
 
-        if (!onFarmingIsland()) return
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation
@@ -132,9 +131,8 @@ class TrevorFeatures {
                     TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine }!!
                 found = true
             }
-            val matcher = locationPattern.matcher(formattedLine)
-            if (matcher.matches()) {
-                val zone = matcher.group("zone")
+            locationPattern.matchMatcher(formattedLine) {
+                val zone = group("zone")
                 TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == zone }
                     ?: TrevorSolver.CurrentMobArea.NONE
                 found = true
@@ -153,7 +151,8 @@ class TrevorFeatures {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!onFarmingIsland()) return
         var entityTrapper = Minecraft.getMinecraft().theWorld.getEntityByID(trapperID)
-        if (entityTrapper !is EntityLivingBase) entityTrapper = Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
+        if (entityTrapper !is EntityLivingBase) entityTrapper =
+            Minecraft.getMinecraft().theWorld.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase) {
             if (config.trapperTalkCooldown) {
                 RenderLivingEntityHelper.setEntityColor(
@@ -162,8 +161,7 @@ class TrevorFeatures {
                 ) { config.trapperTalkCooldown }
                 entityTrapper.getLorenzVec().let {
                     if (it.distanceToPlayer() < 15) {
-                        val text = currentLabel
-                        event.drawString(it.add(0.0, 2.23, 0.0), text)
+                        event.drawString(it.add(0.0, 2.23, 0.0), currentLabel)
                     }
                 }
             }
@@ -198,22 +196,14 @@ class TrevorFeatures {
         Minecraft.getMinecraft().currentScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
         }
+        if (NEUItems.neuHasFocus()) return
 
-        if (NEUOverlay.searchBarHasFocus) return
-        if (AuctionSearchOverlay.shouldReplace()) return
-        if (BazaarSearchOverlay.shouldReplace()) return
-        if (InventoryUtils.inStorage()) return
-
-        if (System.currentTimeMillis() - timeLastWarped < 3000) {
-            if (System.currentTimeMillis() - timeLastWarped < 1000) return
-            LorenzUtils.chat("§6Command on cooldown, wait a few seconds!, last warped ${System.currentTimeMillis() - timeLastWarped}ms ago")
-            return
-        }
+        if (System.currentTimeMillis() - timeLastWarped < 3000) return
         LorenzUtils.sendCommandToServer("warp trapper")
         timeLastWarped = System.currentTimeMillis()
     }
 
-    @SubscribeEvent (priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!inTrapperDen()) return
         if (!config.trapperTalkCooldown) return
@@ -234,10 +224,12 @@ class TrevorFeatures {
 
     enum class TrapperStatus(val color: Int) {
         READY(LorenzColor.DARK_GREEN.toColor().withAlpha(75)),
-        WAITING( LorenzColor.DARK_AQUA.toColor().withAlpha(75)),
+        WAITING(LorenzColor.DARK_AQUA.toColor().withAlpha(75)),
         ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75)),
     }
 
-    private fun onFarmingIsland() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.THE_FARMING_ISLANDS
+    private fun onFarmingIsland() =
+        LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.THE_FARMING_ISLANDS
+
     private fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
 }

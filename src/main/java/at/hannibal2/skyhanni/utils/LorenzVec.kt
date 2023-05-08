@@ -71,14 +71,6 @@ data class LorenzVec(
         return LorenzVec(x, y, z).toCleanString()
     }
 
-    fun toAccurateVec(accuracy: Int): LorenzVec {
-        val x = (round(x * accuracy) / accuracy)
-        val y = (round(y * accuracy) / accuracy)
-        val z = (round(z * accuracy) / accuracy)
-        return LorenzVec(x, y, z)
-    }
-
-
     private fun toCleanString(): String {
         return "$x $y $z"
     }
