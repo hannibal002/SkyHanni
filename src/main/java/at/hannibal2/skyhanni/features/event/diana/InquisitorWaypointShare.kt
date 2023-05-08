@@ -25,7 +25,8 @@ import org.lwjgl.input.Keyboard
 
 object InquisitorWaypointShare {
     private val config get() = SkyHanniMod.feature.diana.inquisitorSharing
-    private val partyPattern = "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b".toPattern()
+    private val partyPattern =
+        "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b".toPattern()
     private val diedPattern = "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!".toPattern()
 
     private var time = 0L
@@ -40,6 +41,13 @@ object InquisitorWaypointShare {
     private val logger = LorenzLogger("diana/waypoints")
 
     var waypoints = mapOf<String, LorenzVec>()
+
+    private var test = false
+
+    fun test() {
+        test = !test
+        LorenzUtils.chat("§e[SkyHanni] Inquisitor Test " + if (test) "Enabled" else "Disabled")
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -61,10 +69,6 @@ object InquisitorWaypointShare {
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message
-        // TODO use inquisitor
-//        if (message.endsWith("§r§eYou dug out §r§2a Minotaur§r§e!")) {
-
-
         if (message.contains("§eYou dug out")) {
             testTime = System.currentTimeMillis()
             lastInquisitorMessage = message
@@ -95,10 +99,10 @@ object InquisitorWaypointShare {
         val entity = event.entity
         if (entity !is EntityOtherPlayerMP) return
         val name = entity.name
-        // TODO change
-        if (name != "Minos Inquisitor" && name != "Minotaur " && name != "Minos Champion") {
-//        if (name != "Minos Inquisitor") {
-            return
+        if (test) {
+            if (name != "Minos Inquisitor" && name != "Minotaur " && name != "Minos Champion") return
+        } else {
+            if (name != "Minos Inquisitor") return
         }
         logger.log("FOUND: $name")
 
