@@ -237,7 +237,7 @@ class SkyHanniMod {
         loadModule(GardenLevelDisplay())
         loadModule(EliteFarmingWeight())
         loadModule(DicerRngDropCounter())
-        loadModule(CropMoneyDisplay())
+        loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
         loadModule(GardenNextJacobContest())
         loadModule(WrongFungiCutterWarning())

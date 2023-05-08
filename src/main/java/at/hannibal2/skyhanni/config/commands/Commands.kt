@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
+import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
@@ -68,6 +69,7 @@ object Commands {
         registerCommand("shtestgardenvisitors") { SkyHanniTestCommand.testGardenVisitors() }
         registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
         registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
+        registerCommand("shshowcropmoneycalculation") { CropMoneyDisplay.toggleShowCalculation() }
 
         // for developers - coding help
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
