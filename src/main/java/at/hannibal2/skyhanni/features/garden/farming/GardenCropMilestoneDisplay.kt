@@ -121,6 +121,10 @@ object GardenCropMilestoneDisplay {
         mushroomCowPerkDisplay = emptyList()
         bestCropTime.display = emptyList()
         val currentCrop = GardenAPI.getCurrentlyFarmedCrop()
+        if (GardenCropMilestones.cropCounter.isEmpty()) {
+            LorenzUtils.debug("Garden Crop Milestone Display: crop counter data not yet loaded!")
+            return
+        }
         currentCrop?.let {
             progressDisplay = drawProgressDisplay(it, it.getCounter())
         }

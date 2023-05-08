@@ -234,13 +234,17 @@ object LorenzUtils {
         return this
     }
 
-    private var lastCommandSent = 0L
+    private var lastMessageSent = 0L
 
     fun sendCommandToServer(command: String) {
-        if (System.currentTimeMillis() > lastCommandSent + 2_000) {
-            lastCommandSent = System.currentTimeMillis()
+        sendMessageToServer("/$command")
+    }
+
+    fun sendMessageToServer(message: String) {
+        if (System.currentTimeMillis() > lastMessageSent + 2_000) {
+            lastMessageSent = System.currentTimeMillis()
             val thePlayer = Minecraft.getMinecraft().thePlayer
-            thePlayer.sendChatMessage("/$command")
+            thePlayer.sendChatMessage(message)
         }
     }
 
@@ -265,4 +269,21 @@ object LorenzUtils {
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()
+
+    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
+        toMutableList().also { function(it) }.toList()
+
+    fun colorCodeToRarity(colorCode: Char): String {
+        return when (colorCode) {
+            'f' -> "Common"
+            'a' -> "Uncommon"
+            '9' -> "Rare"
+            '5' -> "Epic"
+            '6' -> "Legendary"
+            'd' -> "Mythic"
+            'b' -> "Divine"
+            '4' -> "Supreme" // legacy items
+            else -> "Special"
+        }
+    }
 }

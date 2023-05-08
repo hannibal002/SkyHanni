@@ -3,12 +3,13 @@ package at.hannibal2.skyhanni.features.damageindicator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
-import at.hannibal2.skyhanni.test.LorenzTest
+import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
@@ -342,6 +343,7 @@ class DamageIndicatorManager {
                 val lastHealth = data[entity.uniqueID]!!.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
+
                 BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
             }
             entityData.lastHealth = health
@@ -354,6 +356,7 @@ class DamageIndicatorManager {
             }
             entityData.timeLastTick = System.currentTimeMillis()
             data[entity.uniqueID] = entityData
+
 
         } catch (e: Throwable) {
             e.printStackTrace()
@@ -668,7 +671,7 @@ class DamageIndicatorManager {
                 270_000 / 2, 270_000 -> 1
                 1 -> 0
                 else -> {
-                    LorenzTest.displayLine = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
+                    SkyHanniTestCommand.displayLine = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
                     LorenzUtils.error(
                         "Unexpected health of thorn in m4! (${
                             LorenzUtils.formatDouble(
@@ -710,15 +713,19 @@ class DamageIndicatorManager {
     private fun grabData(entity: EntityLivingBase): EntityData? {
         if (data.contains(entity.uniqueID)) return data[entity.uniqueID]
 
+
         val entityResult = mobFinder?.tryAdd(entity) ?: return null
-        return EntityData(
-            entity,
-            entityResult.ignoreBlocks,
-            entityResult.delayedStart,
-            entityResult.finalDungeonBoss,
-            entityResult.bossType,
-            foundTime = System.currentTimeMillis()
+
+        val entityData = EntityData(
+                entity,
+                entityResult.ignoreBlocks,
+                entityResult.delayedStart,
+                entityResult.finalDungeonBoss,
+                entityResult.bossType,
+                foundTime = System.currentTimeMillis()
         )
+        DamageIndicatorDetectedEvent(entityData).postAndCatch()
+        return entityData
     }
 
     private fun checkFinalBoss(finalBoss: Boolean, id: Int) {

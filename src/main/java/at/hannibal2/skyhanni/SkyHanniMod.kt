@@ -22,10 +22,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
-import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
-import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
-import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
-import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fishing.*
 import at.hannibal2.skyhanni.features.garden.*
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
@@ -66,9 +63,10 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.LorenzTest
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
@@ -94,7 +92,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.17.Beta.41.1",
+    version = "0.17.Beta.42.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -200,7 +198,7 @@ class SkyHanniMod {
         loadModule(StatsTuning())
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
-        loadModule(GriffinBurrowHelper())
+        loadModule(GriffinBurrowHelper)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
         loadModule(CollectionCounter())
@@ -267,12 +265,14 @@ class SkyHanniMod {
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(GardenRecentTeleportPadsDisplay())
+        loadModule(InquisitorWaypointShare)
+        loadModule(CopyNearbyParticlesCommand)
         loadModule(TrevorFeatures())
         loadModule(TrevorSolver)
 
         init()
 
-        loadModule(LorenzTest())
+        loadModule(SkyHanniTestCommand())
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
         loadModule(TestBingo)

@@ -26,6 +26,12 @@ public class DevData {
     public boolean debugEnabled = false;
 
     @Expose
+    @ConfigOption(name = "Command Logging", desc = "Logs stack trace information into the console when a command gets sent to hypixel. (by any mod or the player)")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean commandLogs = false;
+
+    @Expose
     public Position debugPos = new Position(10, 10, false, true);
 
     @Expose
