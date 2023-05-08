@@ -35,6 +35,7 @@ object GardenCustomKeybinds {
 
     @SubscribeEvent
     fun onToolChange(event: GardenToolChangeEvent) {
+        if (!isEnabled()) return
         map.forEach { (keyBinding, override) ->
             keyBinding as AccessorKeyBinding
             val keyCode = if (isActive()) override() else keyBinding.keyCode
