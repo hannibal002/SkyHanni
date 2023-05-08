@@ -46,7 +46,7 @@ class TrevorFeatures {
     private var backupTrapperID: Int = 17
     private var timeLastWarped: Long = 0
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     init {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {

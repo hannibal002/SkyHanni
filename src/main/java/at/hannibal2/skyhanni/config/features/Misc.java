@@ -308,40 +308,38 @@ public class Misc {
         public Property<Integer> auto = Property.of(0);
     }
 
-    @Expose
     @ConfigOption(name = "Trevor The Trapper", desc = "")
-    @ConfigEditorAccordion(id = 12)
-    public boolean trapperFeatures = false;
-
+    @Accordion
     @Expose
-    @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §cMay not always work as expected.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
-    public boolean trapperSolver = true;
+    public TrevorTheTrapper trevorTheTrapper = new TrevorTheTrapper();
 
-    @Expose
-    @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
-    public boolean trapperMobDiedMessage = true;
+    public static class TrevorTheTrapper {
 
-    @Expose
-    @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
-    public boolean warpToTrapper = false;
+        @Expose
+        @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §cMay not always work as expected.")
+        @ConfigEditorBoolean
+        public boolean trapperSolver = true;
 
-    @Expose
-    @ConfigOption(name = "Warp Hotkey", desc = "Press this key to warp to Trevor's Den.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    @ConfigAccordionId(id = 12)
-    public int keyBindWarpTrapper = Keyboard.KEY_NONE;
+        @Expose
+        @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
+        @ConfigEditorBoolean
+        public boolean trapperMobDiedMessage = true;
 
-    @Expose
-    @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 12)
-    public boolean trapperTalkCooldown = true;
+        @Expose
+        @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den.")
+        @ConfigEditorBoolean
+        public boolean warpToTrapper = false;
+
+        @Expose
+        @ConfigOption(name = "Warp Hotkey", desc = "Press this key to warp to Trevor's Den.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int keyBindWarpTrapper = Keyboard.KEY_NONE;
+
+        @Expose
+        @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")
+        @ConfigEditorBoolean
+        public boolean trapperTalkCooldown = true;
+    }
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
