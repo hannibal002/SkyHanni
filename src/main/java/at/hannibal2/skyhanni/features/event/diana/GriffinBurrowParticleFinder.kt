@@ -214,7 +214,3 @@ class GriffinBurrowParticleFinder {
 //        }
     }
 }
-
-private fun S2APacketParticles.toLorenzVec(): LorenzVec {
-    return LorenzVec(xCoordinate, yCoordinate, zCoordinate)
-}

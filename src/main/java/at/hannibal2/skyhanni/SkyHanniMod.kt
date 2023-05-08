@@ -66,6 +66,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
@@ -91,7 +92,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.17.Beta.41.1",
+    version = "0.17.Beta.42",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -265,6 +266,7 @@ class SkyHanniMod {
         loadModule(ChumBucketHider())
         loadModule(GardenRecentTeleportPadsDisplay())
         loadModule(InquisitorWaypointShare)
+        loadModule(CopyNearbyParticlesCommand)
 
         init()
 
