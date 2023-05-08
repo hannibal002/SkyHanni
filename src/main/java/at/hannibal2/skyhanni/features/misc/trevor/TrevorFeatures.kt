@@ -67,7 +67,7 @@ class TrevorFeatures {
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
-            TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.NONE
+            TrevorSolver.mobLocation = CurrentMobArea.NONE
             if (timeUntilNextReady <= 0) {
                 currentStatus = TrapperStatus.READY
                 currentLabel = "§2Ready"
@@ -126,19 +126,19 @@ class TrevorFeatures {
                 active = true
             }
 
-            if (TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine } != null) {
+            if (CurrentMobArea.values().firstOrNull { it.location == formattedLine } != null) {
                 TrevorSolver.mobLocation =
-                    TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == formattedLine }!!
+                    CurrentMobArea.values().firstOrNull { it.location == formattedLine }!!
                 found = true
             }
             locationPattern.matchMatcher(formattedLine) {
                 val zone = group("zone")
-                TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.values().firstOrNull { it.location == zone }
-                    ?: TrevorSolver.CurrentMobArea.NONE
+                TrevorSolver.mobLocation = CurrentMobArea.values().firstOrNull { it.location == zone }
+                    ?: CurrentMobArea.NONE
                 found = true
             }
         }
-        if (!found) TrevorSolver.mobLocation = TrevorSolver.CurrentMobArea.NONE
+        if (!found) TrevorSolver.mobLocation = CurrentMobArea.NONE
         if (!active) {
             trapperReady = true
         }
@@ -169,11 +169,11 @@ class TrevorFeatures {
 
         if (config.trapperSolver) {
             var location = TrevorSolver.mobLocation.coordinates
-            if (TrevorSolver.mobLocation == TrevorSolver.CurrentMobArea.NONE) return
+            if (TrevorSolver.mobLocation == CurrentMobArea.NONE) return
             if (TrevorSolver.averageHeight != 0.0) {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
-            if (TrevorSolver.mobLocation == TrevorSolver.CurrentMobArea.FOUND) {
+            if (TrevorSolver.mobLocation == CurrentMobArea.FOUND) {
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 2, 0), TrevorSolver.mobLocation.location, 1.5)
