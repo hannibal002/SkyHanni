@@ -39,38 +39,49 @@ object Commands {
     }
 
     fun init() {
+
+        // main commands
         registerCommand("sh", openMainMenu)
         registerCommand("skyhanni", openMainMenu)
-        registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
+
+        // for users - regular commands
+        registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
+        registerCommand("shtrackcollection") { CollectionCounter.command(it) }
+        registerCommand("shsetapikey") { ApiDataLoader.command(it) }
+        registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
+        registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
+        registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
+
+        // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
+        registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig("manual-command") }
+        registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
+        registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
+        registerCommand("shclearcropspeed") { GardenAPI.clearCropSpeed() }
+        registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
+
+        // for developers - debug existing features
         registerCommand("shtest") { SkyHanniTestCommand.testCommand(it) }
+        registerCommand("shtestbingo") { TestBingo.toggle() }
+        registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
+        registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
+        registerCommand("shtestgardenvisitors") { SkyHanniTestCommand.testGardenVisitors() }
+        registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
+        registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
+
+        // for developers - coding help
+        registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
+        registerCommand("shstoplisteners") { SkyHanniTestCommand.stopListeners() }
+        registerCommand("shreloadlisteners") { SkyHanniTestCommand.reloadListeners() }
         registerCommand("shcopylocation") { SkyHanniTestCommand.copyLocation() }
         registerCommand("shcopyentities") { CopyNearbyEntitiesCommand.command(it) }
         registerCommand("shcopytablist") { CopyTabListCommand.command(it) }
         registerCommand("shcopyscoreboard") { CopyScoreboardCommand.command(it) }
         registerCommand("shcopyitem") { CopyItemCommand.command(it) }
         registerCommand("shcopyparticles") { CopyNearbyParticlesCommand.command(it) }
-        registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig("manual-command") }
-        registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
         registerCommand("shtestpacket") { PacketTest.toggle() }
-        registerCommand("shreloadlisteners") { SkyHanniTestCommand.reloadListeners() }
-        registerCommand("shstoplisteners") { SkyHanniTestCommand.stopListeners() }
-        registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
-        registerCommand("shtrackcollection") { CollectionCounter.command(it) }
-        registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
-        registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
-        registerCommand("shsetapikey") { ApiDataLoader.command(it) }
-        registerCommand("shtestgardenvisitors") { SkyHanniTestCommand.testGardenVisitors() }
-        registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
-        registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
-        registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
-        registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
-        registerCommand("shclearcropspeed") { GardenAPI.clearCropSpeed() }
-        registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
-        registerCommand("shtestbingo") { TestBingo.toggle() }
         registerCommand("shtestmessage") { TestChatCommand.command(it) }
-        registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
-        registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
+
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
