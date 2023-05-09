@@ -63,8 +63,9 @@ object TrevorSolver {
                 }
 
                 if (entity is EntityArmorStand) {
+
                     for (animal in animalNames) {
-                        if (name.contains(animal)) {
+                        if (name.contains(animal) && name.contains("§c❤")) {
                             if (foundID == entity.entityId) {
                                 mobLocation = CurrentMobArea.FOUND
                                 mobCoordinates = entity.position.toLorenzVec()
