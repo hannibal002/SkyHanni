@@ -68,6 +68,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
@@ -139,6 +140,10 @@ class SkyHanniMod {
         loadModule(GardenAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
+
+        //commands
+        loadModule(CopyErrorCommand)
+        loadModule(CopyNearbyParticlesCommand)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -268,7 +273,6 @@ class SkyHanniMod {
         loadModule(ChumBucketHider())
         loadModule(GardenRecentTeleportPadsDisplay())
         loadModule(InquisitorWaypointShare)
-        loadModule(CopyNearbyParticlesCommand)
         loadModule(TrevorFeatures())
         loadModule(TrevorSolver)
 
