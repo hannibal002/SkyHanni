@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -39,7 +41,13 @@ class GardenVisitorTimer {
 
     init {
         fixedRateTimer(name = "skyhanni-update-visitor-display", period = 1000L) {
-            updateVisitorDisplay()
+            try {
+                updateVisitorDisplay()
+            } catch (error: Throwable) {
+                CopyErrorCommand.errorMessage = error.toString()
+                CopyErrorCommand.errorStackTrace = error.stackTrace.asList()
+                LorenzUtils.chat("§c[SkyHanni] encountered an error when updating visitor display, please run /shcopyerror")
+            }
         }
     }
 

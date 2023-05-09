@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
@@ -42,6 +43,7 @@ object TrevorSolver {
         val world = Minecraft.getMinecraft().theWorld ?: return
         for (entity in world.getLoadedEntityList()) {
             val name = entity.name
+            if (entity is EntityOtherPlayerMP) return
             // looking at 2 diff entities rn
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
             if (intArrayOf(100, 500, 1000, 5000, 10000).any { it == entityHealth }) {
