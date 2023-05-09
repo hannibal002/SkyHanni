@@ -95,7 +95,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.17.Beta.42.1",
+    version = "0.17.Beta.43",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -242,7 +242,7 @@ class SkyHanniMod {
         loadModule(GardenLevelDisplay())
         loadModule(EliteFarmingWeight())
         loadModule(DicerRngDropCounter())
-        loadModule(CropMoneyDisplay())
+        loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
         loadModule(GardenNextJacobContest())
         loadModule(WrongFungiCutterWarning())
