@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BazaarApi {
+    private var loadedNpcPriceData = false
 
     companion object {
         val holder = BazaarDataHolder()
@@ -35,6 +37,17 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inBazaarInventory = checkIfInBazaar(event)
+    }
+
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+
+        if (!loadedNpcPriceData) {
+            loadedNpcPriceData = true
+            holder.start()
+        }
     }
 
     private fun checkIfInBazaar(event: InventoryOpenEvent): Boolean {
@@ -67,9 +80,5 @@ class BazaarApi {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
-    }
-
-    init {
-        holder.start()
     }
 }
