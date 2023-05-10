@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -50,9 +51,15 @@ class TrevorFeatures {
 
     init {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
-            if (onFarmingIsland()) {
-                updateTrapper()
-                TrevorSolver.findMob()
+            try {
+                if (onFarmingIsland()) {
+                    updateTrapper()
+                    TrevorSolver.findMob()
+                }
+            } catch (error: Throwable) {
+                CopyErrorCommand.errorMessage = error.toString()
+                CopyErrorCommand.errorStackTrace = error.stackTrace.asList()
+                LorenzUtils.chat("§c[SkyHanni] encountered an error when updating the trapper solver, please run /shcopyerror")
             }
         }
     }

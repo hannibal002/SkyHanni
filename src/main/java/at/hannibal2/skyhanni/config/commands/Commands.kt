@@ -83,6 +83,7 @@ object Commands {
         registerCommand("shcopyparticles") { CopyNearbyParticlesCommand.command(it) }
         registerCommand("shtestpacket") { PacketTest.toggle() }
         registerCommand("shtestmessage") { TestChatCommand.command(it) }
+        registerCommand("shcopyerror") { CopyErrorCommand.command() }
 
     }
 

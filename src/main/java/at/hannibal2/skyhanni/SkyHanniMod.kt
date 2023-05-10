@@ -268,13 +268,14 @@ class SkyHanniMod {
         loadModule(ChumBucketHider())
         loadModule(GardenRecentTeleportPadsDisplay())
         loadModule(InquisitorWaypointShare)
-        loadModule(CopyNearbyParticlesCommand)
         loadModule(TrevorFeatures())
         loadModule(TrevorSolver)
 
         init()
 
+        // test stuff
         loadModule(SkyHanniTestCommand())
+        loadModule(CopyNearbyParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
         loadModule(TestBingo)

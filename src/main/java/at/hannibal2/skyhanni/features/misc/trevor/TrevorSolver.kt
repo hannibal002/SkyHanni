@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
@@ -42,13 +43,28 @@ object TrevorSolver {
         val world = Minecraft.getMinecraft().theWorld ?: return
         for (entity in world.getLoadedEntityList()) {
             val name = entity.name
-            // looking at 2 diff entities rn
+            if (entity is EntityOtherPlayerMP) continue
+            // looking at 2 diff entities rn - Mostly fixed I think as it returns
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
             if (intArrayOf(100, 500, 1000, 5000, 10000).any { it == entityHealth }) {
                 if (animalNames.any { it == name }) {
                     if (LocationUtils.canSee(LocationUtils.playerLocation(), entity.position.toLorenzVec())) {
-                        if (entity.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer)) return
+                        if (!entity.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer)) {
+                            if (foundID == entity.entityId) {
+                                mobLocation = CurrentMobArea.FOUND
+                                mobCoordinates = entity.position.toLorenzVec()
+                            } else {
+                                foundID = entity.entityId
+                            }
+                            return
+                        }
+                    }
+                }
+            }
 
+            if (entity is EntityArmorStand) {
+                for (animal in animalNames) {
+                    if (name.contains(animal) && name.contains("§c❤")) {
                         if (foundID == entity.entityId) {
                             mobLocation = CurrentMobArea.FOUND
                             mobCoordinates = entity.position.toLorenzVec()
@@ -56,19 +72,6 @@ object TrevorSolver {
                             foundID = entity.entityId
                         }
                         return
-                    }
-                }
-            }
-
-            if (entity is EntityArmorStand) {
-                for (animal in animalNames) {
-                    if (name.contains(animal)) {
-                        if (foundID == entity.entityId) {
-                            mobLocation = CurrentMobArea.FOUND
-                            mobCoordinates = entity.position.toLorenzVec()
-                        } else {
-                            foundID = entity.entityId
-                        }
                     }
                 }
             }
