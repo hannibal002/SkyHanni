@@ -142,9 +142,26 @@ class ComposterOverlay {
     private fun update() {
         if (organicMatterFactors.isEmpty()) {
             organicMatterDisplay =
-                Collections.singletonList(listOf("§cSkyHanni composter error:", "§cRepo data not loaded!"))
+                Collections.singletonList(
+                    listOf(
+                        "§cSkyHanni composter error:", "§cRepo data not loaded!",
+                        "§7(organicMatterFactors is empty)"
+                    )
+                )
             return
         }
+        if (fuelFactors.isEmpty()) {
+            organicMatterDisplay =
+                Collections.singletonList(
+                    listOf(
+                        "§cSkyHanni composter error:", "§cRepo data not loaded!",
+                        "§7(fuelFactors is empty)"
+                    )
+                )
+            return
+        }
+        if (currentOrganicMatterItem.let { it !in organicMatterFactors && it != "" }) currentOrganicMatterItem = ""
+        if (currentFuelItem.let { it !in organicMatterFactors && it != "" }) currentFuelItem = ""
 
         if (inComposter) {
             organicMatterDisplay = drawOrganicMatterDisplay()
