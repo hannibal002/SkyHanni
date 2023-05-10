@@ -157,8 +157,8 @@ public class Inventory {
     public boolean highlightDepletedBonzosMasks = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Missing SkyBlock Level Guide",
-            desc = "Highlight stuff that is missing in the SkyBlock level guide inventory.")
+    @ConfigOption(name = "Missing Tasks",
+            desc = "Highlight missing tasks in the SkyBlock level guide inventory.")
     @ConfigEditorBoolean
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
