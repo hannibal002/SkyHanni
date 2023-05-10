@@ -32,6 +32,15 @@ public class Bingo {
         public Property<Boolean> hideCommunityGoals = Property.of(false);
 
         @Expose
+        @ConfigOption(
+                name = "Show Guide",
+                desc = "Show tips and difficulty for bingo goals inside the bingo card inventory. " +
+                        "§7(§ePowdered by Bingo Splash Community§7)"
+        )
+        @ConfigEditorBoolean
+        public boolean bingoSplashGuide = true;
+
+        @Expose
         public Position bingoCardPos = new Position(10, 10, false, true);
     }
 
