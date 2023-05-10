@@ -41,7 +41,7 @@ class CollectionCounter {
                 return
             }
 
-            val name = args.joinToString(" ")
+            val name = args.joinToString(" ").replace(" ", "_")
             val pair = CollectionAPI.getCollectionCounter(name)
             if (pair == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (Maybe the API is disabled or try to open the collection inventory)")
