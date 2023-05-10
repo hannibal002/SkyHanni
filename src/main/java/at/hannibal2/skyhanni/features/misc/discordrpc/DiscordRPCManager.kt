@@ -39,7 +39,7 @@ class DiscordRPCManager : IPCListener {
 
     private val DiscordLocationKey = DiscordLocationKey()
 
-    private fun start() {
+    fun start(fromCommand: Boolean = false) {
         coroutineScope.launch {
             try {
                 if (isActive()) {
@@ -55,9 +55,11 @@ class DiscordRPCManager : IPCListener {
 
                 try {
                     client?.connect()
+                    if (fromCommand) LorenzUtils.chat("§a[SkyHanni] Successfully started Rich Presence!") // confirm that /rpcstart worked
                 } catch (ex: Exception) {
                     consoleLog("Warn: Failed to connect to RPC!")
                     consoleLog(ex.toString())
+                    LorenzUtils.chat("§e[SkyHanni] Discord Rich Presence was unable to start! This usually happens when you join SkyBlock when Discord is not started. Please run /rpcstart to retry once you have launched Discord.")
                 }
             } catch (ex: Throwable) {
                 consoleLog("Warn: Discord RPC has thrown an unexpected error while trying to start...")
@@ -121,7 +123,7 @@ class DiscordRPCManager : IPCListener {
         }, 0, updatePeriod)
     }
 
-    override fun onClose(client: IPCClient, json: JsonObject) {
+    override fun onClose(client: IPCClient, json: JsonObject?) {
         consoleLog("Discord RPC closed.")
         this.client = null
         connected = false
