@@ -160,8 +160,8 @@ class ComposterOverlay {
                 )
             return
         }
-        if (currentOrganicMatterItem.let { it !in organicMatterFactors && it != "" }) currentOrganicMatterItem = ""
-        if (currentFuelItem.let { it !in organicMatterFactors && it != "" }) currentFuelItem = ""
+        if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != "" }) currentOrganicMatterItem = ""
+        if (currentFuelItem.let { it !in fuelFactors.keys && it != "" }) currentFuelItem = ""
 
         if (inComposter) {
             organicMatterDisplay = drawOrganicMatterDisplay()
