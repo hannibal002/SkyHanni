@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
@@ -86,7 +87,7 @@ class TrevorFeatures {
 
         var matcher = trapperPattern.matcher(event.message.removeColor())
         if (matcher.matches()) {
-            timeUntilNextReady = 61
+            timeUntilNextReady = if (GardenCropSpeed.finneganPerkActive()) 31 else 61
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
