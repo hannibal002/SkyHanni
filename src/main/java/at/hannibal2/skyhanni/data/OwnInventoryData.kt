@@ -75,6 +75,8 @@ class OwnInventoryData {
         if (diffWorld < 3_000) return
 
         val internalName = item.getInternalName()
+        if (internalName.startsWith("MAP-")) return
+
         val (_, amount) = NEUItems.getMultiplier(internalName)
         if (amount > 1) return
 
