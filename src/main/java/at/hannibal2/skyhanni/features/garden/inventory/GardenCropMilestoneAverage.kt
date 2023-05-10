@@ -23,7 +23,7 @@ class GardenCropMilestoneAverage {
             val tier = GardenCropMilestones.getTierForCrops(counter)
             tiers.add(tier.toDouble())
         }
-        average = tiers.average().round(2)
+        average = (tiers.sum() / CropType.values().size).round(2)
     }
 
     @SubscribeEvent
