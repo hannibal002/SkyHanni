@@ -18,13 +18,14 @@ import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import java.util.regex.Pattern
 
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
-    private val turboBookPattern = "§fTurbo-(?<name>.*) (?<level>.)".toPattern()
+    private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
 
     fun getInternalName(itemName: String): String {
         return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
@@ -35,12 +36,11 @@ object NEUItems {
             return itemNameCache[itemName]!!
         }
 
-        var internalName = turboBookPattern.matchMatcher(itemName) {
-            val type = group("name")
-            val level = group("level").romanToDecimal()
-            val name = turboCheck(type).uppercase()
-            "TURBO_$name;$level"
-        } ?: ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+        resolveEnchantmentByName(itemName)?.let {
+            itemNameCache[itemName] = it
+            return it
+        }
+        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
@@ -53,8 +53,8 @@ object NEUItems {
     }
 
     private fun turboCheck(text: String): String {
-        if (text == "Cocoa") return "Coco"
-        if (text == "Cacti") return "Cactus"
+        if (text == "Turbo-Cocoa") return "Turbo-Coco"
+        if (text == "Turbo-Cacti") return "Turbo-Cactus"
         return text
     }
 
@@ -227,5 +227,16 @@ object NEUItems {
         if (NEUOverlay.searchBarHasFocus) return true
 
         return false
+    }
+
+    // Taken and edited from NEU
+    private fun resolveEnchantmentByName(enchantmentName: String): String? {
+        return enchantmentNamePattern.matchMatcher(enchantmentName) {
+            val name = group("name").trim { it <= ' ' }
+            val ultimate = group("format").lowercase().contains("§l")
+            ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
+                    + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                    + ";" + group("level").romanToDecimal())
+        }
     }
 }
