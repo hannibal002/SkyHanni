@@ -13,27 +13,28 @@ class ItemRenderBackground {
     companion object {
 
         private val backgroundColor = mutableMapOf<ItemStack, Int>()
+        private val backgroundTime = mutableMapOf<ItemStack, Long>()
         private val borderLineColor = mutableMapOf<ItemStack, Int>()
-        private val mapTime = mutableMapOf<ItemStack, Long>()
+        private val borderTime = mutableMapOf<ItemStack, Long>()
 
         var ItemStack.background: Int
             get() {
-                if (System.currentTimeMillis() > mapTime.getOrDefault(this, 0) + 60) return -1
+                if (System.currentTimeMillis() > backgroundTime.getOrDefault(this, 0) + 60) return -1
                 return backgroundColor.getOrDefault(this, -1)
             }
             set(value) {
                 backgroundColor[this] = value
-                mapTime[this] = System.currentTimeMillis()
+                backgroundTime[this] = System.currentTimeMillis()
             }
 
         var ItemStack.borderLine: Int
             get() {
-                if (System.currentTimeMillis() > mapTime.getOrDefault(this, 0) + 60) return -1
+                if (System.currentTimeMillis() > borderTime.getOrDefault(this, 0) + 60) return -1
                 return borderLineColor.getOrDefault(this, -1)
             }
             set(value) {
                 borderLineColor[this] = value
-                mapTime[this] = System.currentTimeMillis()
+                borderTime[this] = System.currentTimeMillis()
             }
     }
 

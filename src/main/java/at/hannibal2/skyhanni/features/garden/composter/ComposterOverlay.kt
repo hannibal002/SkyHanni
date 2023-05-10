@@ -32,21 +32,8 @@ class ComposterOverlay {
     private var fuelFactors: Map<String, Double> = emptyMap()
 
     private val config get() = SkyHanniMod.feature.garden
-    private val hidden get() = SkyHanniMod.feature.hidden
     private var organicMatterDisplay = listOf<List<Any>>()
     private var fuelExtraDisplay = listOf<List<Any>>()
-
-    private var currentOrganicMatterItem: String
-        get() = hidden.gardenComposterCurrentOrganicMatterItem
-        set(value) {
-            hidden.gardenComposterCurrentOrganicMatterItem = value
-        }
-
-    private var currentFuelItem: String
-        get() = hidden.gardenComposterCurrentFuelItem
-        set(value) {
-            hidden.gardenComposterCurrentFuelItem = value
-        }
 
     private var currentTimeType = TimeType.HOUR
     private var inComposter = false
@@ -61,7 +48,21 @@ class ComposterOverlay {
     private var lastHovered = 0L
 
     companion object {
+        private val hidden get() = SkyHanniMod.feature.hidden
+        var currentOrganicMatterItem: String
+            get() = hidden.gardenComposterCurrentOrganicMatterItem
+            private set(value) {
+                hidden.gardenComposterCurrentOrganicMatterItem = value
+            }
+
+        var currentFuelItem: String
+            get() = hidden.gardenComposterCurrentFuelItem
+            private set(value) {
+                hidden.gardenComposterCurrentFuelItem = value
+            }
+
         var testOffset = 0
+
         fun onCommand(args: Array<String>) {
             if (args.size != 1) {
                 LorenzUtils.chat("§cUsage: /shtestcomposter <offset>")

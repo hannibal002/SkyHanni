@@ -6,10 +6,12 @@ import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
@@ -166,10 +168,28 @@ class HideNotClickableItems {
             hidePrivateIslandChest(chestName, stack) -> true
             hideAttributeFusion(chestName, stack) -> true
             hideYourEquipment(chestName, stack) -> true
+            hideComposter(chestName, stack) -> true
             else -> {
                 false
             }
         }
+    }
+
+    private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
+        if (!ComposterOverlay.inInventory) return false
+
+        reverseColor = true
+
+        val internalName = stack.getInternalName()
+        if (internalName == ComposterOverlay.currentOrganicMatterItem) {
+            return false
+        }
+        if (internalName == ComposterOverlay.currentFuelItem) {
+            return false
+        }
+
+        hideReason = "Only sell the selected items!"
+        return true
     }
 
     private fun hideYourEquipment(chestName: String, stack: ItemStack): Boolean {
