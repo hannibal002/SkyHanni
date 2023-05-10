@@ -56,7 +56,7 @@ public class Diana {
 
         @Expose
         @ConfigOption(name = "Share Key", desc = "Press this key to share your Inquisitor Waypoint.")
-        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Y)
         public int keyBindShare = Keyboard.KEY_Y;
     }
 
