@@ -161,8 +161,9 @@ class EliteFarmingWeight {
 
         private fun getETA(): String {
             if (weight < 0) return ""
-            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
+            if (nextPlayerName.isEmpty()) return ""
 
+            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
             val totalWeight = (localWeight + weight)
             val weightUntilOvertake = nextPlayerWeight - totalWeight
             if (weightUntilOvertake < 0) {
