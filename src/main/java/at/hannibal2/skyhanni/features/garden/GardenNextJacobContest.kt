@@ -114,24 +114,26 @@ class GardenNextJacobContest {
             }
         }
 
-        for (item in items) {
-            val lore = item.getLore()
-            if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
+        if (contests.size < maxContestsPerYear) {
+            for (item in items) {
+                val lore = item.getLore()
+                if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-            val name = item.name ?: continue
-            val matcherDay = patternDay.matcher(name)
-            if (!matcherDay.matches()) continue
+                val name = item.name ?: continue
+                val matcherDay = patternDay.matcher(name)
+                if (!matcherDay.matches()) continue
 
-            val day = matcherDay.group("day").toInt()
-            val startTime = SkyBlockTime(year, month, day).toMillis()
-            val crops = mutableListOf<CropType>()
-            for (line in lore) {
-                val matcherCrop = patternCrop.matcher(line)
-                if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByName(matcherCrop.group("crop")))
+                val day = matcherDay.group("day").toInt()
+                val startTime = SkyBlockTime(year, month, day).toMillis()
+                val crops = mutableListOf<CropType>()
+                for (line in lore) {
+                    val matcherCrop = patternCrop.matcher(line)
+                    if (!matcherCrop.matches()) continue
+                    crops.add(CropType.getByName(matcherCrop.group("crop")))
+                }
+                val contest = FarmingContest(startTime + contestDuration, crops)
+                contests[startTime] = contest
             }
-            val contest = FarmingContest(startTime + contestDuration, crops)
-            contests[startTime] = contest
         }
 
         update()
