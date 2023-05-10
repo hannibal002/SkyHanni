@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrato
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMasterStars
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTunerCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPiece
@@ -95,14 +96,16 @@ class EstimatedItemValue {
         val internalName = stack.getInternalName()
         if (internalName == "") return listOf()
 
-        //FIX neu item list
+        // FIX neu item list
         if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
-        // we don't need this feature to work on books at all
+        // We don't need this feature to work on books at all
         if (stack.item == Items.enchanted_book) return listOf()
-        // block catacombs items in mort inventory
+        // Block catacombs items in mort inventory
         if (internalName.startsWith("CATACOMBS_PASS_") || internalName.startsWith("MASTER_CATACOMBS_PASS_")) return listOf()
-        // blocks the dungeon map
+        // Blocks the dungeon map
         if (internalName.startsWith("MAP-")) return listOf()
+        // Hides the rune item
+        if (internalName.contains("_RUNE;")) return listOf()
 
 
         if (NEUItems.getItemStackOrNull(internalName) == null) {
@@ -136,6 +139,7 @@ class EstimatedItemValue {
         // cosmetic
         totalPrice += addHelmetSkin(stack, list)
         totalPrice += addArmorDye(stack, list)
+        totalPrice += addRune(stack, list)
 
         // dynamic
         totalPrice += addAbilityScrolls(stack, list)
@@ -376,6 +380,15 @@ class EstimatedItemValue {
         val price = NEUItems.getPrice(internalName)
         val name = NEUItems.getItemStack(internalName).name
         list.add("§7Dye: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
+    private fun addRune(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getRune() ?: return 0.0
+
+        val price = NEUItems.getPrice(internalName)
+        val name = NEUItems.getItemStack(internalName).name
+        list.add("§7Rune: $name §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
 

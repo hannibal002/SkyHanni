@@ -58,6 +58,14 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getArmorDye() = getAttributeString("dye_item")
 
+    fun ItemStack.getRune(): String? {
+        val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
+        val runesList = runesMap.keySet.associateWith { runesMap.getInteger(it) }.toList()
+        if (runesList.isEmpty()) return null
+        val (name, tier) = runesList.first()
+        return "${name.uppercase()}_RUNE;$tier"
+    }
+
     fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let {
         val list = mutableListOf<String>()
         for (attributes in it.keySet) {
