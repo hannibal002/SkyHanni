@@ -11,8 +11,10 @@ object TestChatCommand {
             LorenzUtils.chat("§c[SkyHanni] Specify a chat message to test")
             return
         }
-        val rawMessage = args.toList().joinToString(" ")
-        LorenzUtils.chat("§a[SkyHanni] testing message: §7$rawMessage")
+        val hidden = args.last() == "-s"
+        var rawMessage = args.toList().joinToString(" ")
+        if (!hidden) LorenzUtils.chat("§a[SkyHanni] testing message: §7$rawMessage")
+        if (hidden) rawMessage = rawMessage.replace(" -s", "")
         val formattedMessage = rawMessage.replace("&", "§")
         LorenzUtils.chat(formattedMessage)
         MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(0, ChatComponentText(formattedMessage)))
