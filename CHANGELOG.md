@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.17.BETA
+## Version 0.17 (2023-05-11)
 
 ### Features
 + Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
