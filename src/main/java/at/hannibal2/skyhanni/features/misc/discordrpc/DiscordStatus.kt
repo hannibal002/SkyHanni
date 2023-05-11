@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
 import java.util.regex.Pattern
@@ -76,7 +77,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             when (groups[item]) {
                 "❤" -> statString = "❤${groups[item - 1]} "
                 "❈ Defense" -> statString = "$statString❈${groups[item - 1]} "
-                "✎ Mana" -> statString = "$statString✎${groups[item - 1]} "
+                "✎" -> statString = "$statString✎${groups[item - 1]} "
             }
         }
         statString
@@ -176,8 +177,9 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val pet = SkyHanniMod.feature.hidden.currentPet
         val colorCode = pet.substring(1..2).first()
         val petName = pet.substring(2)
+        val petLevel = getCurrentPet().petLevel.currentLevel
 
-        "${colorCodeToRarity(colorCode)} $petName"
+        "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
     })
     ;
 

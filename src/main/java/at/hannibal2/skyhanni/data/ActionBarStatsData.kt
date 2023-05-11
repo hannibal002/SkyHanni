@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 
 class ActionBarStatsData {
     private val pattern =
-        Pattern.compile("..((?:\\d|,)*)\\/(?:\\d|,)*(.) *..((?:\\d|,)*)..(. \\w*) *..((?:\\d|,)*)\\/(?:\\d|,)*(.*)")
+        Pattern.compile("..((?:\\d|,)*)\\/(?:\\d|,)*(.) *..((?:\\d|,)*)..(. \\w*) *..((?:\\d|,)*)\\/(?:\\d|,)*(✎).*")
 // Sample input: §c2,817/2,817❤     §a703§a❈ Defense     §b3,479/3,479✎ Mana
 // Returns the following groups: 1 = 2,817; 2 = ❤; 3 = 703; 4 = ❈ Defense; 5 = 3,479; 6 = ✎ Mana
 
