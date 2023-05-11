@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BlazeSlayerFirePitsWarning {
+    private val config get() = SkyHanniMod.feature.slayer
 
     companion object {
         private var lastFirePitsWarning = 0L
@@ -31,7 +32,7 @@ class BlazeSlayerFirePitsWarning {
         if (difference > 0) {
             if (difference <= 2_000) {
                 if (nextTickIn++ % 10 == 0) {
-                    if (SkyHanniMod.feature.slayer.firePitsWarning) {
+                    if (config.firePitsWarning) {
                         SoundUtils.createSound("random.orb", 0.8f).playSound()
                     }
                 }
@@ -64,8 +65,8 @@ class BlazeSlayerFirePitsWarning {
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && DamageIndicatorManager.isBossSpawned(
+    private fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.firePitsWarning && DamageIndicatorManager.isBossSpawned(
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,
             BossType.SLAYER_BLAZE_QUAZII_3,
@@ -73,5 +74,4 @@ class BlazeSlayerFirePitsWarning {
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
         )
-    }
 }
