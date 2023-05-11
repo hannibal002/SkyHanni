@@ -48,6 +48,9 @@ class GardenVisitorTimer {
                 CopyErrorCommand.errorStackTrace = error.stackTrace.asList()
                 LorenzUtils.chat("§c[SkyHanni] encountered an error when updating visitor display, please run /shcopyerror")
             }
+            try {
+                GardenVisitorStats.saveAndUpdate()
+            } catch (_: Throwable) {} // no config yet
         }
     }
 

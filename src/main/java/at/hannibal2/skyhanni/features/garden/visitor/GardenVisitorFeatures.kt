@@ -35,6 +35,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlin.math.round
 
 class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
@@ -47,6 +48,7 @@ class GardenVisitorFeatures {
     private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
     private val config get() = SkyHanniMod.feature.garden
     private val logger = LorenzLogger("garden/visitors")
+    private var price = 0.0
 
     companion object {
         var inVisitorInventory = false
@@ -221,12 +223,15 @@ class GardenVisitorFeatures {
             if (event.slot.stack?.name != "§cRefuse Offer") return
             changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             update()
+            GardenVisitorStats.deniedVisitors += 1
+            GardenVisitorStats.saveAndUpdate()
             return
         }
         if (event.slotId == 29) {
             if (event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
                 changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
                 update()
+                GardenVisitorStats.totalCost += round(price).toLong()
                 return
             }
         }
@@ -303,7 +308,7 @@ class GardenVisitorFeatures {
                         LorenzUtils.error(message)
                         return
                     }
-                    val price = NEUItems.getPrice(internalName) * amount
+                    price = NEUItems.getPrice(internalName) * amount
                     totalPrice += price
                     if (config.visitorShowPrice) {
                         val format = NumberUtil.format(price)
