@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
@@ -52,6 +53,7 @@ object Commands {
         registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
         registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
         registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
+        registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
