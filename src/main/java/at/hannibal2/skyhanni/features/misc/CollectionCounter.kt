@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -41,25 +42,59 @@ class CollectionCounter {
                 return
             }
 
-            val name = args.joinToString(" ").replace(" ", "_")
-            val pair = CollectionAPI.getCollectionCounter(name)
-            if (pair == null) {
+            val rawName = fixTypo(args.joinToString(" ").lowercase())
+            if (rawName == "gemstone") {
+                LorenzUtils.chat("§c[SkyHanni] Gemstone collection is not supported!")
+//                setNewCollection("GEMSTONE_COLLECTION", "Gemstone")
+                return
+            } else if (rawName == "mushroom") {
+                LorenzUtils.chat("§c[SkyHanni] Mushroom collection is not supported!")
+//                setNewCollection("MUSHROOM_COLLECTION", "Mushroom")
+                return
+            }
+
+            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName) ?: rawName.replace(" ", "_")
+            val stack = NEUItems.getItemStackOrNull(foundInternalName)
+            if (stack == null) {
+                LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
+                return
+            }
+            setNewCollection(foundInternalName, stack.name!!.removeColor())
+        }
+
+        private fun fixTypo(rawName: String) = when (rawName) {
+            "carrot" -> "carrots"
+            "melons" -> "melon"
+            "seed" -> "seeds"
+            "iron" -> "iron ingot"
+            "gold" -> "gold ingot"
+            "sugar" -> "sugar cane"
+            "cocoa bean", "cocoa" -> "cocoa beans"
+            "lapis" -> "lapis lazuli"
+            "cacti" -> "cactus"
+            "pumpkins" -> "pumpkin"
+            "potatoes" -> "potato"
+            "nether warts", "wart", "warts" -> "nether wart"
+            "stone" -> "cobblestone"
+            "red mushroom", "brown mushroom", "mushrooms" -> "mushroom"
+            "gemstones" -> "gemstone"
+
+            else -> rawName
+        }
+
+        private fun setNewCollection(internalName: String, name: String) {
+            val foundAmount = CollectionAPI.getCollectionCounter(internalName)
+            if (foundAmount == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (Maybe the API is disabled or try to open the collection inventory)")
                 return
             }
-
-            internalName = pair.first
-            if (internalName.contains("MUSHROOM") || internalName.endsWith("_GEM")) {
-                LorenzUtils.chat("§7Mushroom and Gemstone items are not fully supported for the counter!")
-                internalName = ""
-                return
-            }
-            itemName = NEUItems.getItemStack(internalName).name!!
-            itemAmount = pair.second
+            this.internalName = internalName
+            itemName = name
+            itemAmount = foundAmount
 
             lastAmountInInventory = countCurrentlyInInventory()
             updateDisplay()
-            LorenzUtils.chat("§e[SkyHanni] Started tracking $itemName collection.")
+            LorenzUtils.chat("§e[SkyHanni] Started tracking $itemName §ecollection.")
         }
 
         private fun resetData() {

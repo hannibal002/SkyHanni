@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -26,14 +27,42 @@ object NEUItems {
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
+    private var allItemsCache = mapOf<String, String>() // item name -> internal name
 
     fun getInternalName(itemName: String): String {
         return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
     }
 
+    fun getInternalNameOrNullIgnoreCase(itemName: String): String? {
+        val lowercase = itemName.removeColor().lowercase()
+        if (itemNameCache.containsKey(lowercase)) {
+            return itemNameCache[lowercase]!!
+        }
+
+        if (allItemsCache.isEmpty()) {
+            allItemsCache = readAllNeuItems()
+        }
+        allItemsCache[lowercase]?.let {
+            itemNameCache[lowercase] = it
+            return it
+        }
+
+        return null
+    }
+
+    private fun readAllNeuItems(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        for (internalName in manager.itemInformation.keys) {
+            val name = manager.createItem(internalName).displayName.removeColor().lowercase()
+            map[name] = internalName
+        }
+        return map
+    }
+
     fun getInternalNameOrNull(itemName: String): String? {
-        if (itemNameCache.containsKey(itemName)) {
-            return itemNameCache[itemName]!!
+        val lowercase = itemName.lowercase()
+        if (itemNameCache.containsKey(lowercase)) {
+            return itemNameCache[lowercase]!!
         }
 
         resolveEnchantmentByName(itemName)?.let {
@@ -48,7 +77,7 @@ object NEUItems {
             internalName = "HAY_BLOCK"
         }
 
-        itemNameCache[itemName] = internalName
+        itemNameCache[lowercase] = internalName
         return internalName
     }
 

@@ -183,7 +183,7 @@ class BingoNextStepHelper {
                 }
             }
             if (step is CollectionStep) {
-                val counter = CollectionAPI.getCollectionCounter(step.collectionName)?.second ?: 0
+                val counter = CollectionAPI.getCollectionCounter(step.collectionName) ?: 0
                 if (step.amountHaving != counter) {
                     step.amountHaving = counter
                     if (counter >= step.amountNeeded) {

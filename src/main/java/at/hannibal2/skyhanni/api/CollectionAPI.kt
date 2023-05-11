@@ -17,17 +17,6 @@ class CollectionAPI {
     private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
     private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
 
-//    private val hypixelApiHasWrongItems = listOf(
-//        "WOOL",
-//        "CORRUPTED_FRAGMENT",
-//        "EGG",
-//        "POISONOUS_POTATO",
-//        "REDSTONE_BLOCK",
-//        "MUSHROOM_COLLECTION",
-//        "RAW_SOULFLOW",
-//        "GEMSTONE_COLLECTION",
-//    )
-
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
         val profileData = event.profileData
@@ -36,14 +25,10 @@ class CollectionAPI {
         for ((hypixelId, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
             val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
-            val itemName = BazaarApi.getBazaarDataByInternalName(neuItemId)?.displayName
-            // Hypixel moment
-//            if (hypixelApiHasWrongItems.contains(neuItemId)) continue
 
-            if (itemName == null) {
-//                LorenzUtils.debug("collection name is null for '$neuItemId'")
-                continue
-            }
+            // MUSHROOM_COLLECTION, GEMSTONE_COLLECTION
+             BazaarApi.getBazaarDataByInternalName(neuItemId)?.displayName ?: continue
+
             collectionValue[neuItemId] = counter
         }
 
@@ -101,10 +86,10 @@ class CollectionAPI {
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
-        fun getCollectionCounter(searchName: String): Pair<String, Long>? {
+        fun getCollectionCounter(searchName: String): Long? {
             for ((collectionName, counter) in collectionValue) {
                 if (collectionName.equals(searchName, true)) {
-                    return Pair(collectionName, counter)
+                    return counter
                 }
             }
             return null
