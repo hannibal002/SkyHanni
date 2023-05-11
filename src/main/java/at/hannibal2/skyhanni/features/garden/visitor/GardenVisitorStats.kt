@@ -15,8 +15,8 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorStats {
-    private val config get() = SkyHanniMod.feature.garden
-    private val hidden get() = SkyHanniMod.feature.hidden
+    private val config get() = SkyHanniMod.feature.garden.visitorDrops
+    private val hidden get() = SkyHanniMod.feature.hidden.visitorDrops
     private var visitorStats = listOf<List<Any>>()
 
     private var acceptedVisitors = 0

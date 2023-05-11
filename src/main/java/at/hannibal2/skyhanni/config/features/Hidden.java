@@ -90,39 +90,45 @@ public class Hidden {
     @Expose
     public String gardenComposterCurrentFuelItem = "";
 
-    @Expose
-    public int acceptedVisitors = 0;
 
     @Expose
-    public int deniedVisitors = 0;
+    public VisitorDrops visitorDrops = new VisitorDrops();
 
-    @Expose
-    public List<Long> visitorRarities = new ArrayList<>();
+    public static class VisitorDrops {
+        @Expose
+        public int acceptedVisitors = 0;
 
-    @Expose
-    public int totalCopper = 0;
+        @Expose
+        public int deniedVisitors = 0;
 
-    @Expose
-    public long totalEXP = 0;
+        @Expose
+        public List<Long> visitorRarities = new ArrayList<>();
 
-    @Expose
-    public long totalCost = 0;
+        @Expose
+        public int totalCopper = 0;
 
-    @Expose
-    public int bandanaCount = 0;
+        @Expose
+        public long totalEXP = 0;
 
-    @Expose
-    public int grassCount = 0;
+        @Expose
+        public long totalCost = 0;
 
-    @Expose
-    public int bouquetCount = 0;
+        @Expose
+        public int bandanaCount = 0;
 
-    @Expose
-    public int dedicationCount = 0;
+        @Expose
+        public int grassCount = 0;
 
-    @Expose
-    public int musicCount = 0;
+        @Expose
+        public int bouquetCount = 0;
 
-    @Expose
-    public int helmetCount = 0;
+        @Expose
+        public int dedicationCount = 0;
+
+        @Expose
+        public int musicCount = 0;
+
+        @Expose
+        public int helmetCount = 0;
+    }
 }
