@@ -44,7 +44,7 @@ class GardenVisitorFeatures {
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
-    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r§f.*".toPattern()
+    private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
     private val config get() = SkyHanniMod.feature.garden
     private val logger = LorenzLogger("garden/visitors")
 
