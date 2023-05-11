@@ -52,15 +52,17 @@ class TrevorFeatures {
 
     init {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
-            try {
-                if (onFarmingIsland()) {
-                    updateTrapper()
-                    TrevorSolver.findMob()
+            Minecraft.getMinecraft().addScheduledTask {
+                try {
+                    if (onFarmingIsland()) {
+                        updateTrapper()
+                        TrevorSolver.findMob()
+                    }
+                } catch (error: Throwable) {
+                    CopyErrorCommand.errorMessage = error.toString()
+                    CopyErrorCommand.errorStackTrace = error.stackTrace.asList()
+                    LorenzUtils.chat("§c[SkyHanni] encountered an error when updating the trapper solver, please run /shcopyerror")
                 }
-            } catch (error: Throwable) {
-                CopyErrorCommand.errorMessage = error.toString()
-                CopyErrorCommand.errorStackTrace = error.stackTrace.asList()
-                LorenzUtils.chat("§c[SkyHanni] encountered an error when updating the trapper solver, please run /shcopyerror")
             }
         }
     }
