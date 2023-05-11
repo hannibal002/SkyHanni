@@ -39,13 +39,10 @@ object GardenVisitorStats {
     private val bandanaPattern = "[+]1x Green Bandana".toPattern()
     private val grassPattern = "[+]1x Overgrown Grass".toPattern()
     private val bouquetPattern = "[+]1x Flowering Bouquet".toPattern()
-    private val dedicationPattern = "Dedication IV Book".toPattern()
-    // not sure if some mods change the name from IV -> 4 before we can see
-    private val dedicationPattern2 = "Dedication 4 Book".toPattern()
+    private val dedicationPattern = "Dedication (IV|4) Book".toPattern()
     private val spacePattern = "[+]Space Helmet".toPattern()
     // Pretty sure that the symbol is ◆ but not 100%
-    private val musicPattern = "[+]1x ◆ Music Rune I".toPattern()
-    private val musicPattern2 = "[+]1x ◆ Music Rune 1".toPattern()
+    private val musicPattern = "[+]1x ◆ Music Rune [1I]".toPattern()
 
     private fun formatDisplay(map: List<List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
@@ -80,9 +77,7 @@ object GardenVisitorStats {
         else if (grassPattern.matcher(message).matches()) grassCount += 1
         else if (bouquetPattern.matcher(message).matches()) bouquetCount += 1
         else if (dedicationPattern.matcher(message).matches()) dedicationCount += 1
-        else if (dedicationPattern2.matcher(message).matches()) dedicationCount += 1
         else if (musicPattern.matcher(message).matches()) musicCount += 1
-        else if (musicPattern2.matcher(message).matches()) musicCount += 1
         else if (spacePattern.matcher(message).matches()) helmetCount += 1
         // we only need to update if something matched
         else return
