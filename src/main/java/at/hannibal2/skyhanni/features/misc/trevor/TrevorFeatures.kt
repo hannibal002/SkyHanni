@@ -81,6 +81,9 @@ class TrevorFeatures {
             if (timeUntilNextReady <= 0) {
                 currentStatus = TrapperStatus.READY
                 currentLabel = "§2Ready"
+            } else if timeUntilNextReady <= 1 || trapperReady {
+                currentStatus = TrapperStatus.WAITING
+                currentLabel = "§3$timeUntilNextReady second left"
             } else {
                 currentStatus = TrapperStatus.WAITING
                 currentLabel = "§3$timeUntilNextReady seconds left"
