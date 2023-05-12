@@ -9,13 +9,14 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
+import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 class GardenBestCropTime {
     var display = listOf<List<Any>>()
-    private val config get() = SkyHanniMod.feature.garden
 
     companion object {
+        private val config get() = SkyHanniMod.feature.garden
         val timeTillNextCrop = mutableMapOf<CropType, Long>()
 
         fun reset() {
@@ -32,7 +33,7 @@ class GardenBestCropTime {
                 val currentTier = GardenCropMilestones.getTierForCrops(counter)
 
                 val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
-                val nextTier = currentTier + 1
+                val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
                 val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
 
                 val have = counter - cropsForCurrentTier
@@ -89,7 +90,8 @@ class GardenBestCropTime {
         var number = 0
         for (crop in sorted.keys) {
             val millis = timeTillNextCrop[crop]!!
-            val duration = TimeUtils.formatDuration(millis, maxUnits = 2)
+            val biggestUnit = TimeUnit.values()[config.cropMilestoneHighestTimeFormat.get()]
+            val duration = TimeUtils.formatDuration(millis, biggestUnit, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++
             if (number > config.cropMilestoneShowOnlyBest && (!config.cropMilestoneShowCurrent || !isCurrent)) continue
@@ -102,10 +104,12 @@ class GardenBestCropTime {
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val nextTier = GardenCropMilestones.getTierForCrops(crop.getCounter()) + 1
+            val currentTier = GardenCropMilestones.getTierForCrops(crop.getCounter())
+            val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
+
 
             val cropName = if (!config.cropMilestoneBestCompact) crop.cropName + " " else ""
-            val cropNameDisplay = "$color$contestFormat$cropName$nextTier§r"
+            val cropNameDisplay = "$color$contestFormat$cropName$currentTier->$nextTier§r"
             list.add("$cropNameDisplay §b$duration")
 
             if (gardenExp && !config.cropMilestoneBestCompact) {

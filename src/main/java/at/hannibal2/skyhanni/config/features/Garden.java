@@ -229,6 +229,22 @@ public class Garden {
 
     @Expose
     @ConfigOption(
+            name = "Time Format",
+            desc = "Change the highest time unit to show (1h30m vs 90min)")
+    @ConfigEditorDropdown(values = {"Year", "Day", "Hour", "Minute", "Second"})
+    @ConfigAccordionId(id = 6)
+    public Property<Integer> cropMilestoneHighestTimeFormat = Property.of(0);
+
+    @Expose
+    @ConfigOption(
+            name = "Maxed Milestone",
+            desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public Property<Boolean> cropMilestoneBestShowMaxedNeeded = Property.of(false);
+
+    @Expose
+    @ConfigOption(
             name = "Milestone Text",
             desc = "Drag text to change the appearance of the overlay.\n" +
                     "Hold a farming tool to show the overlay."

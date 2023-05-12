@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,6 +40,17 @@ object GardenCropMilestoneDisplay {
         // TODO remove this once hypixel counts 64x pumpkin drops to cultivating
         if (event.message == "§a§lUNCOMMON DROP! §r§eDicer dropped §r§f64x §r§fPumpkin§r§e!") {
             CropType.PUMPKIN.setCounter(CropType.PUMPKIN.getCounter() + 64)
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        LorenzUtils.onToggle(
+            config.cropMilestoneBestShowMaxedNeeded,
+            config.cropMilestoneHighestTimeFormat,
+        ) {
+            GardenBestCropTime.updateTimeTillNextCrop()
+            update()
         }
     }
 
@@ -126,7 +138,7 @@ object GardenCropMilestoneDisplay {
             return
         }
         currentCrop?.let {
-            progressDisplay = drawProgressDisplay(it, it.getCounter())
+            progressDisplay = drawProgressDisplay(it)
         }
 
         if (config.cropMilestoneBestDisplay) {
@@ -136,23 +148,28 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    private fun drawProgressDisplay(crop: CropType, counter: Long): MutableList<List<Any>> {
+    private fun drawProgressDisplay(crop: CropType): MutableList<List<Any>> {
+        val counter = crop.getCounter()
         val lineMap = HashMap<Int, List<Any>>()
         lineMap[0] = Collections.singletonList("§6Crop Milestones")
 
         val currentTier = GardenCropMilestones.getTierForCrops(counter)
-        val nextTier = currentTier + 1
+        val nextTier = if (config.cropMilestoneBestShowMaxedNeeded.get()) 46 else currentTier + 1
 
         val list = mutableListOf<Any>()
         list.addCropIcon(crop)
-        list.add("§7" + crop.cropName + " Tier $nextTier")
+        list.add("§7" + crop.cropName + " $currentTier->$nextTier")
         lineMap[1] = list
 
-        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
-
-        val have = counter - cropsForCurrentTier
-        val need = cropsForNextTier - cropsForCurrentTier
+        val (have, need) = if (config.cropMilestoneBestShowMaxedNeeded.get()) {
+            Pair(counter, cropsForNextTier)
+        } else {
+            val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier)
+            val have = counter - cropsForCurrentTier
+            val need = cropsForNextTier - cropsForCurrentTier
+            Pair(have, need)
+        }
 
         val haveFormat = LorenzUtils.formatInteger(have)
         val needFormat = LorenzUtils.formatInteger(need)
@@ -168,7 +185,8 @@ object GardenCropMilestoneDisplay {
             val missingTimeSeconds = missing / farmingFortuneSpeed
             val millis = missingTimeSeconds * 1000
             GardenBestCropTime.timeTillNextCrop[crop] = millis
-            val duration = TimeUtils.formatDuration(millis)
+            val biggestUnit = TimeUnit.values()[config.cropMilestoneHighestTimeFormat.get()]
+            val duration = TimeUtils.formatDuration(millis, biggestUnit)
             if (config.cropMilestoneWarnClose) {
                 if (millis < 5_900) {
                     if (System.currentTimeMillis() > lastPlaySoundTime + 1_000) {
@@ -252,7 +270,8 @@ object GardenCropMilestoneDisplay {
 
             val missingTimeSeconds = missing / blocksPerSecond
             val millis = missingTimeSeconds * 1000
-            val duration = TimeUtils.formatDuration(millis.toLong())
+            val biggestUnit = TimeUnit.values()[config.cropMilestoneHighestTimeFormat.get()]
+            val duration = TimeUtils.formatDuration(millis.toLong(), biggestUnit)
             lineMap[3] = Collections.singletonList("§7In §b$duration")
         }
 

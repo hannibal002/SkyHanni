@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 
 object TimeUtils {
@@ -27,7 +28,7 @@ object TimeUtils {
         var count = 0
         for ((unit, value) in map.entries) {
             if (value > 0 || builder.isNotEmpty() || unit == TimeUnit.SECOND) {
-                builder.append(value)
+                builder.append(value.addSeparators())
                 val name = if (longName) {
                     " " + unit.longName + if (value > 1) "s" else ""
                 } else {
