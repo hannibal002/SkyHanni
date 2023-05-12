@@ -34,7 +34,8 @@ object GardenAPI {
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
     var mushroomCowPet = false
-    var onBarnPlot = false
+    var inBarn = false
+    val onBarnPlot get() = inBarn && inGarden()
 
     var tick = 0
 
@@ -57,7 +58,7 @@ object GardenAPI {
         if (!inGarden()) return
         tick++
         if (tick % 10 == 0) {
-            onBarnPlot = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §aThe Garden")
+            inBarn = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §aThe Garden")
 
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return

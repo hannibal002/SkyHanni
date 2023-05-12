@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -114,21 +115,6 @@ public class Hidden {
         public long totalCost = 0;
 
         @Expose
-        public int bandanaCount = 0;
-
-        @Expose
-        public int grassCount = 0;
-
-        @Expose
-        public int bouquetCount = 0;
-
-        @Expose
-        public int dedicationCount = 0;
-
-        @Expose
-        public int musicCount = 0;
-
-        @Expose
-        public int helmetCount = 0;
+        public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
     }
 }
