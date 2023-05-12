@@ -1,5 +1,16 @@
 # SkyHanni - Change Log
 
+## Version 0.18.BETA
+
+### New Features
++ Added Visitor Drop Counter to track all the drops from visitors.
+
+### Changes
++ Added Options for displays Crop Milestone and Best Crop Time.
+  + Change the time format/the highest time unit to show. (1h30m vs. 90 min)
+  + Maxed Milestone:  Calculate the progress and ETA until maxed milestone (46) instead of the next milestone.
+
+
 ## Version 0.17 (2023-05-11)
 
 ### Features
