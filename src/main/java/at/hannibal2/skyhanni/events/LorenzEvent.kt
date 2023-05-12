@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
@@ -18,7 +19,7 @@ abstract class LorenzEvent : Event() {
                 LorenzUtils.chat("§c[SkyHanni] You need to use a newer version of NotEnoughUpdates (alpha-11 or newer)! If you need help downloading it, go to the skyhanni discord.")
             } else {
                 it.printStackTrace()
-                LorenzUtils.chat("§cSkyHanni caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}.")
+                LorenzUtils.chat("§cSkyHanni ${SkyHanniMod.version} caught and logged an ${it::class.simpleName ?: "error"} at ${eventName}: ${it.message}")
             }
         }.getOrDefault(isCanceled)
     }
