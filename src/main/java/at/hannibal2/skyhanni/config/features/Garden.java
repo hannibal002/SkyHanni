@@ -174,6 +174,71 @@ public class Garden {
     @ConfigAccordionId(id = 1)
     public boolean visitorHideChat = true;
 
+
+    @Expose
+    @ConfigOption(name = "Visitor Drops Statistics", desc = "")
+    @Accordion
+    public VisitorDrops visitorDropsStatistics = new VisitorDrops();
+
+    public static class VisitorDrops {
+
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Tallies up statistic about visitors and the rewards you have received from them.\n" +
+                        "§eThis feature is in beta please report issues on the discord!"
+        )
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Text Format",
+                desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§e§lVisitor Statistics",
+                        "§e1,636 Total",
+                        "§a1,172§f-§9382§f-§681§f-§c1",
+                        "§21,382 Accepted",
+                        "§c254 Denied",
+                        " ",
+                        "§c62,072 Copper",
+                        "§23.2m Farming EXP",
+                        "§647.2m Coins Spent",
+                        "§b23 §9Flowering Bouquet",
+                        "§b4 §9Overgrown Grass",
+                        "§b2 §9Green Bandana",
+                        "§b1 §9Dedication IV",
+                        "§b6 §9Music Rune",
+                        "§b1 §cSpace Helmet",
+                        " ", // If they want another empty row
+                }
+        )
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
+
+        @Expose
+        @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
+                "§eNote: Will not update the preview above!")
+        @ConfigEditorBoolean
+        public boolean displayNumbersFirst = true;
+
+        @Expose
+        @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
+                "§eNote: Will not update the preview above!")
+        @ConfigEditorBoolean
+        public boolean displayIcons = false;
+
+        @Expose
+        @ConfigOption(name = "Only On Barn Plot", desc = "Only shows the overlay while on the barn plot.")
+        @ConfigEditorBoolean
+        public boolean onlyOnBarn = true;
+
+        @Expose
+        public Position visitorDropPos = new Position(10, 80, false, true);
+    }
+
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
     @ConfigEditorAccordion(id = 5)
@@ -1013,7 +1078,7 @@ public class Garden {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 22)
-    public boolean farmingFortuneDropMultiplier = false;
+    public boolean farmingFortuneDropMultiplier = true;
 
     @Expose
     public Position farmingFortunePos = new Position(-375, -200, false, true);

@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInvento
 import at.hannibal2.skyhanni.features.garden.farming.*
 import at.hannibal2.skyhanni.features.garden.inventory.*
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
 import at.hannibal2.skyhanni.features.inventory.*
@@ -268,6 +269,7 @@ class SkyHanniMod {
         loadModule(TrevorFeatures())
         loadModule(TrevorSolver)
         loadModule(BingoCardTips())
+        loadModule(GardenVisitorDropStatistics)
 
         init()
 

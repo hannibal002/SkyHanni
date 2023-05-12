@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -89,4 +90,31 @@ public class Hidden {
 
     @Expose
     public String gardenComposterCurrentFuelItem = "";
+
+
+    @Expose
+    public VisitorDrops visitorDrops = new VisitorDrops();
+
+    public static class VisitorDrops {
+        @Expose
+        public int acceptedVisitors = 0;
+
+        @Expose
+        public int deniedVisitors = 0;
+
+        @Expose
+        public List<Long> visitorRarities = new ArrayList<>();
+
+        @Expose
+        public int copper = 0;
+
+        @Expose
+        public long farmingExp = 0;
+
+        @Expose
+        public long coinsSpent = 0;
+
+        @Expose
+        public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
+    }
 }
