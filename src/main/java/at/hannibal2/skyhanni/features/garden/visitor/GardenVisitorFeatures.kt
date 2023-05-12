@@ -223,15 +223,15 @@ class GardenVisitorFeatures {
             if (event.slot.stack?.name != "§cRefuse Offer") return
             changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             update()
-            GardenVisitorStats.deniedVisitors += 1
-            GardenVisitorStats.saveAndUpdate()
+            GardenVisitorDropStatistics.deniedVisitors += 1
+            GardenVisitorDropStatistics.saveAndUpdate()
             return
         }
         if (event.slotId == 29) {
             if (event.slot.stack?.getLore()?.any { it == "§eClick to give!" } == true) {
                 changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
                 update()
-                GardenVisitorStats.totalCost += round(price).toLong()
+                GardenVisitorDropStatistics.coinsSpent += round(price).toLong()
                 return
             }
         }

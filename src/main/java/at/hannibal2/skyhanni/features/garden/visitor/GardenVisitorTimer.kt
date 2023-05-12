@@ -49,7 +49,7 @@ class GardenVisitorTimer {
                 LorenzUtils.chat("§c[SkyHanni] encountered an error when updating visitor display, please run /shcopyerror")
             }
             try {
-                GardenVisitorStats.saveAndUpdate()
+                GardenVisitorDropStatistics.saveAndUpdate()
             } catch (_: Throwable) {} // no config yet
         }
     }

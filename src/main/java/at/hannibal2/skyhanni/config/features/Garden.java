@@ -176,21 +176,24 @@ public class Garden {
 
 
     @Expose
-    @ConfigOption(name = "Visitor Drops", desc = "Change the exact speed for every single crop.")
+    @ConfigOption(name = "Visitor Drops Statistics", desc = "")
     @Accordion
-    public VisitorDrops visitorDrops = new VisitorDrops();
+    public VisitorDrops visitorDropsStatistics = new VisitorDrops();
 
     public static class VisitorDrops {
 
         @Expose
-        @ConfigOption(name = "Visitor Drop Summary", desc = "Tallies up statistic about visitors and the rewards you have received from them." +
-                "\n§eThis feature is in beta please report issues on the discord!") // cannot test all the chat messages
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Tallies up statistic about visitors and the rewards you have received from them.\n" +
+                        "§eThis feature is in beta please report issues on the discord!"
+        )
         @ConfigEditorBoolean
-        public boolean visitorDropsDisplay = true;
+        public boolean enabled = false;
 
         @Expose
         @ConfigOption(
-                name = "Milestone Text",
+                name = "Text Format",
                 desc = "Drag text to change the appearance of the overlay."
         )
         @ConfigEditorDraggableList(
@@ -213,7 +216,7 @@ public class Garden {
                         " ", // If they want another empty row
                 }
         )
-        public List<Integer> visitorDropText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
 
         @Expose
         @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
@@ -222,15 +225,15 @@ public class Garden {
         public boolean displayNumbersFirst = true;
 
         @Expose
-        @ConfigOption(name = "Display Icons Instead", desc = "Replaces the drop names with icons. " +
+        @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
                 "§eNote: Will not update the preview above!")
         @ConfigEditorBoolean
         public boolean displayIcons = false;
 
         @Expose
-        @ConfigOption(name = "Only On Bar Plot", desc = "Only shows the overlay while on the barn plot.")
+        @ConfigOption(name = "Only On Barn Plot", desc = "Only shows the overlay while on the barn plot.")
         @ConfigEditorBoolean
-        public boolean onlyOnBarn = false;
+        public boolean onlyOnBarn = true;
 
         @Expose
         public Position visitorDropPos = new Position(10, 80, false, true);

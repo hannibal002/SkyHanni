@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object GardenVisitorStats {
-    private val config get() = SkyHanniMod.feature.garden.visitorDrops
+object GardenVisitorDropStatistics {
+    private val config get() = SkyHanniMod.feature.garden.visitorDropsStatistics
     private val hidden get() = SkyHanniMod.feature.hidden.visitorDrops
     private var display = listOf<List<Any>>()
 
@@ -25,9 +25,9 @@ object GardenVisitorStats {
     var deniedVisitors = 0
     private var totalVisitors = 0
     private var visitorRarities = mutableListOf<Long>()
-    private var totalCopper = 0
-    private var totalEXP = 0L
-    var totalCost = 0L
+    private var copper = 0
+    private var farmingExp = 0L
+    var coinsSpent = 0L
 
     private val acceptPattern = "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]".toPattern()
     private val copperPattern = "[+](?<amount>.*) Copper".toPattern()
@@ -36,7 +36,7 @@ object GardenVisitorStats {
 
     private fun formatDisplay(map: List<List<Any>>): MutableList<List<Any>> {
         val newList = mutableListOf<List<Any>>()
-        for (index in config.visitorDropText) {
+        for (index in config.textFormat) {
             newList.add(map[index])
         }
         return newList
@@ -49,12 +49,12 @@ object GardenVisitorStats {
 
         copperPattern.matchMatcher(message) {
             val amount = group("amount").formatNumber().toInt()
-            totalCopper += amount
+            copper += amount
             saveAndUpdate()
         }
         farmingExpPattern.matchMatcher(message) {
             val amount = group("amount").formatNumber()
-            totalEXP += amount
+            farmingExp += amount
             saveAndUpdate()
         }
         acceptPattern.matchMatcher(message) {
@@ -98,11 +98,11 @@ object GardenVisitorStats {
         //5
         addAsSingletonList("")
         //6
-        addAsSingletonList(format(totalCopper, "Copper", "§c", ""))
+        addAsSingletonList(format(copper, "Copper", "§c", ""))
         //7
-        addAsSingletonList(format(totalEXP, "Farming EXP", "§3", "§7"))
+        addAsSingletonList(format(farmingExp, "Farming EXP", "§3", "§7"))
         //8
-        addAsSingletonList(format(totalCost, "Coins Spent", "§6", ""))
+        addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
         //9 - 14
         for (reward in VisitorReward.values()) {
@@ -136,9 +136,9 @@ object GardenVisitorStats {
         hidden.deniedVisitors = deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
         hidden.visitorRarities = visitorRarities
-        hidden.totalCopper = totalCopper
-        hidden.totalEXP = totalEXP
-        hidden.totalCost = totalCost
+        hidden.copper = copper
+        hidden.farmingExp = farmingExp
+        hidden.coinsSpent = coinsSpent
         hidden.rewardsCount = rewardsCount
         display = formatDisplay(drawVisitorStatsDisplay())
     }
@@ -155,16 +155,16 @@ object GardenVisitorStats {
         deniedVisitors = hidden.deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
         visitorRarities = hidden.visitorRarities
-        totalCopper = hidden.totalCopper
-        totalEXP = hidden.totalEXP
-        totalCost = hidden.totalCost
+        copper = hidden.copper
+        farmingExp = hidden.farmingExp
+        coinsSpent = hidden.coinsSpent
         rewardsCount = hidden.rewardsCount
         saveAndUpdate()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!config.visitorDropsDisplay) return
+        if (!config.enabled) return
         if (!GardenAPI.inGarden()) return
         if (GardenAPI.hideExtraGuis()) return
         if (config.onlyOnBarn && !GardenAPI.onBarnPlot) return

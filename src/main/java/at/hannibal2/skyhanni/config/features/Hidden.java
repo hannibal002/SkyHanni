@@ -106,13 +106,13 @@ public class Hidden {
         public List<Long> visitorRarities = new ArrayList<>();
 
         @Expose
-        public int totalCopper = 0;
+        public int copper = 0;
 
         @Expose
-        public long totalEXP = 0;
+        public long farmingExp = 0;
 
         @Expose
-        public long totalCost = 0;
+        public long coinsSpent = 0;
 
         @Expose
         public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
