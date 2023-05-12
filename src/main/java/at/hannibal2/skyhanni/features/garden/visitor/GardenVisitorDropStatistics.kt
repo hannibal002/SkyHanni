@@ -34,7 +34,7 @@ object GardenVisitorDropStatistics {
     private val farmingExpPattern = "[+](?<amount>.*) Farming XP".toPattern()
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
-    private fun formatDisplay(map: List<List<Any>>): MutableList<List<Any>> {
+    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
         for (index in config.textFormat) {
             newList.add(map[index])
@@ -116,6 +116,8 @@ object GardenVisitorDropStatistics {
                 addAsSingletonList(format(count, reward.displayName, "§b"))
             }
         }
+        //15
+        addAsSingletonList("")
     }
 
     fun format(amount: Number, name: String, color: String, amountColor: String = color) =
