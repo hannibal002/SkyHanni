@@ -9,6 +9,7 @@
 + Added Options for displays Crop Milestone and Best Crop Time.
   + Change the time format/the highest time unit to show. (1h30m vs. 90 min)
   + Maxed Milestone:  Calculate the progress and ETA until maxed milestone (46) instead of the next milestone.
++ Changed 'Warp to Trapper Hotkey' to only work while in the Farming Islands
 
 
 ## Version 0.17 (2023-05-11)

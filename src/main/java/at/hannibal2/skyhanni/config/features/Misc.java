@@ -326,7 +326,7 @@ public class Misc {
         public boolean trapperMobDiedMessage = true;
 
         @Expose
-        @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den.")
+        @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den. Works only inside the Farming Islands.")
         @ConfigEditorBoolean
         public boolean warpToTrapper = false;
 

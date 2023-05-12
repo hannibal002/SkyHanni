@@ -196,6 +196,7 @@ class TrevorFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!config.warpToTrapper) return
+        if (!onFarmingIsland()) return
         if (!Keyboard.getEventKeyState()) return
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
         if (config.keyBindWarpTrapper != key) return
