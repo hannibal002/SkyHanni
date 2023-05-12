@@ -176,7 +176,7 @@ public class Garden {
 
 
     @Expose
-    @ConfigOption(name = "Visitor Drops Statistics", desc = "")
+    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
     @Accordion
     public VisitorDrops visitorDropsStatistics = new VisitorDrops();
 
