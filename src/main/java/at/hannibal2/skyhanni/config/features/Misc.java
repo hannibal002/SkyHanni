@@ -316,7 +316,8 @@ public class Misc {
     public static class TrevorTheTrapper {
 
         @Expose
-        @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §cMay not always work as expected.")
+        @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
+                "§cWill not help find sheep or rabbits in Oasis!")
         @ConfigEditorBoolean
         public boolean trapperSolver = true;
 
