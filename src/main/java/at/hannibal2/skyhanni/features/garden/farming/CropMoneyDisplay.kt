@@ -242,8 +242,7 @@ object CropMoneyDisplay {
                 }
             }
 
-            var speed = crop.getSpeed().toDouble()
-            if (speed == -1.0) continue
+            var speed = crop.getSpeed()?.toDouble() ?: continue
 
             val isCurrent = crop == GardenAPI.getCurrentlyFarmedCrop()
             val debug = isCurrent && showCalculation

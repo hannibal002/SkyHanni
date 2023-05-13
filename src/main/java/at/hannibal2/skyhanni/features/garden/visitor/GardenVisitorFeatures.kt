@@ -320,17 +320,14 @@ class GardenVisitorFeatures {
                         val multiplier = NEUItems.getMultiplier(internalName)
                         val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
                         getByNameOrNull(rawName)?.let {
-                            val speed = it.getSpeed()
                             val cropAmount = multiplier.second.toLong() * amount
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
                             val formatName = "§e$formatAmount§7x ${it.cropName} "
-                            val formatSpeed = if (speed != -1) {
+                            val formatSpeed =  it.getSpeed()?.let { speed ->
                                 val missingTimeSeconds = cropAmount / speed
                                 val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
                                 "in §b$duration"
-                            } else {
-                                "§cno speed data!"
-                            }
+                            } ?: "§cno speed data!"
                             itemsWithSpeedCounter++
                             list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
                         }

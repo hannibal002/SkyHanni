@@ -26,8 +26,7 @@ class GardenBestCropTime {
 
         fun updateTimeTillNextCrop() {
             for (crop in CropType.values()) {
-                val speed = crop.getSpeed()
-                if (speed == -1) continue
+                val speed = crop.getSpeed() ?: continue
 
                 val counter = crop.getCounter()
                 val currentTier = GardenCropMilestones.getTierForCrops(counter)

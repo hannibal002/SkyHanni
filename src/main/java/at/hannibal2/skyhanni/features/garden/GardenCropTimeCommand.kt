@@ -44,7 +44,6 @@ object GardenCropTimeCommand {
                 val (baseId, baseAmount) = NEUItems.getMultiplier(internalName)
                 val baseName = NEUItems.getItemStack(baseId).name!!
                 val crop = CropType.getByName(baseName.removeColor())
-                val speed = crop.getSpeed()
 
                 val fullAmount = baseAmount.toLong() * amount.toLong()
                 val text = if (baseAmount == 1) {
@@ -53,7 +52,8 @@ object GardenCropTimeCommand {
                     "§e${amount.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
                 }
 
-                if (speed == -1) {
+                val speed = crop.getSpeed()
+                if (speed == null) {
                     map["$text §cNo speed data!"] = -1
                 } else {
                     val missingTimeSeconds = fullAmount / speed

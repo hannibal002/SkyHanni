@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
@@ -114,15 +113,10 @@ object GardenCropSpeed {
 
     fun isEnabled() = GardenAPI.inGarden()
 
-    fun CropType.getSpeed(): Int {
+    fun CropType.getSpeed(): Int? {
         val speed = cropsPerSecond[this]
-        if (speed != null) return speed
-
-        val message = "Set speed for $this to -1!"
-        println(message)
-        LorenzUtils.debug(message)
-        setSpeed(-1)
-        return -1
+        if (speed == -1) return null
+        return speed
     }
 
     fun CropType.setSpeed(speed: Int) {
