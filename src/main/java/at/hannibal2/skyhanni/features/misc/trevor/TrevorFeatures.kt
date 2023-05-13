@@ -83,8 +83,9 @@ class TrevorFeatures {
                 currentLabel = "§2Ready"
             } else {
                 currentStatus = TrapperStatus.WAITING
-                currentLabel = "§3$timeUntilNextReady seconds left"
+                currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
             }
+            TrevorSolver.mobLocation = CurrentMobArea.NONE
         }
 
         var matcher = trapperPattern.matcher(event.message.removeColor())
@@ -112,12 +113,12 @@ class TrevorFeatures {
         timeUntilNextReady -= 1
         if (trapperReady && timeUntilNextReady > 0) {
             currentStatus = TrapperStatus.WAITING
-            currentLabel = "§3$timeUntilNextReady seconds left"
+            currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
         }
 
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
-                TitleUtils.sendTitle("§2Trapper Ready ", 3_000)
+                TitleUtils.sendTitle("§2Trapper Ready", 3_000)
                 SoundUtils.playBeepSound()
             }
             currentStatus = TrapperStatus.READY
@@ -185,7 +186,7 @@ class TrevorFeatures {
             if (TrevorSolver.mobLocation == CurrentMobArea.FOUND) {
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
-                event.drawDynamicText(location.add(0, 2, 0), TrevorSolver.mobLocation.location, 1.5)
+                event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
@@ -196,11 +197,10 @@ class TrevorFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!config.warpToTrapper) return
+        if (!onFarmingIsland()) return
         if (!Keyboard.getEventKeyState()) return
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
         if (config.keyBindWarpTrapper != key) return
-
-        if (!LorenzUtils.inSkyBlock || LorenzUtils.inDungeons || LorenzUtils.inKuudraFight) return
 
         Minecraft.getMinecraft().currentScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
