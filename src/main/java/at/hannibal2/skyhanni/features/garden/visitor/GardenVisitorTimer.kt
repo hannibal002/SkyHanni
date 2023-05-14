@@ -24,7 +24,6 @@ class GardenVisitorTimer {
     private val patternVisitors = "§b§lVisitors: §r§f\\((?<amount>\\d)\\)".toPattern()
     private var render = ""
     private var lastMillis = 0L
-    private var lastVisitors: Int = -1
     private var sixthVisitorArrivalTime: Long = 0
     private var visitorJustArrived: Boolean = false
     private var sixthVisitorReady: Boolean = false
@@ -33,6 +32,10 @@ class GardenVisitorTimer {
         set(value) {
             SkyHanniMod.feature.hidden.visitorInterval = value
         }
+
+    companion object {
+        var lastVisitors: Int = -1
+    }
 
     @SubscribeEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {

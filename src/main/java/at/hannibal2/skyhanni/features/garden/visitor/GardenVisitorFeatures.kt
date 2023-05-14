@@ -426,7 +426,7 @@ class GardenVisitorFeatures {
 
         logger.log("New visitor detected: '$name'")
 
-        if (config.visitorNotificationTitle) {
+        if (config.visitorNotificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
             TitleUtils.sendTitle("§eNew Visitor", 5_000)
         }
         if (config.visitorNotificationChat) {
@@ -522,9 +522,8 @@ class GardenVisitorFeatures {
                             entity,
                             color
                         ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
-                    } else {
-                        RenderLivingEntityHelper.removeEntityColor(entity)
                     }
+                    if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity) // Have not gotten either of the known effected visitors (Vex and Leo) so cannot test for sure
                 }
             }
         }

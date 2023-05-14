@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -21,7 +20,7 @@ class ItemDisplayOverlayFeatures {
 
     private val wishingCompassPattern = "§7Remaining Uses: §e(?<amount>.*)§8/§e3".toPattern()
     private val rangerBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
-    private val petLevelPattern = "\\[Lvl (?<level>.*)] (?:.*)".toPattern()
+    private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -152,7 +151,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
-            if (item.getInternalName() == "RANCHERS_BOOTS") {
+            if (itemName.contains("Rancher's Boots")) {
                 for (line in item.getLore()) {
                     rangerBootsSpeedCapPattern.matchMatcher(line) {
                         return group("cap")
