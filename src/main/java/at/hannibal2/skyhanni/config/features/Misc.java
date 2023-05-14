@@ -317,7 +317,7 @@ public class Misc {
 
         @Expose
         @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
-                "§cWill not help find sheep or rabbits in Oasis!")
+                "§cWill not help you to find rabbits or sheep in the Oasis!")
         @ConfigEditorBoolean
         public boolean trapperSolver = true;
 
