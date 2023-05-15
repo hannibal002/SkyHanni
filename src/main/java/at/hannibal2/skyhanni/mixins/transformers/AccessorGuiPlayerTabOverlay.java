@@ -8,5 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(GuiPlayerTabOverlay.class)
 public interface AccessorGuiPlayerTabOverlay {
     @Accessor("footer")
-    IChatComponent getFooter();
+    IChatComponent getFooter_skyhanni();
+    @Accessor("header")
+    IChatComponent getHeader_skyhanni();
 }
