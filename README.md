@@ -1,5 +1,5 @@
 <h1 align = "center">
-	SkyHanni: Mod for hypixel skyblock
+	SkyHanni: Mod for Hypixel SkyBlock
 </h1>
 
 <div align="center">
@@ -11,4 +11,4 @@
 
 SkyHanni is a Minecraft modification that adds new features to Hypixel Skyblock. It is in beta, so expect bugs.
 
-Exhaustive List of all features so far: https://github.com/hannibal002/SkyHanni/blob/master/FEATURES.md
+Exhaustive List of all features so far: https://github.com/hannibal002/SkyHanni/blob/beta/FEATURES.md
