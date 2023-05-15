@@ -11,7 +11,14 @@
   + Change the time format/the highest time unit to show. (1h30m vs. 90 min)
   + Maxed Milestone:  Calculate the progress and ETA until maxed milestone (46) instead of the next milestone.
 + Changed 'Warp to Trapper Hotkey' to only work while in the Farming Islands
++ Changed Trevor Trapper find mods logic (Contributed by CalMWolfs)
+  + Fixed Detection of Oasis Mobs and Horse
+  + Improved detection speed
+  + Derpy double health support
+  + More fair detection logic
 
+### Fixes
+= Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)
 
 ## Version 0.17 (2023-05-11)
 
