@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
-enum class ContestRank(val color: String) {
+enum class ContestBracket(val color: String) {
     GOLD("6"),
     SILVER("f"),
     BRONZE("c"),

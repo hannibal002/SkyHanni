@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class JacobContestTimeNeeded {
     private val config get() = SkyHanniMod.feature.garden
     private var display = listOf<List<Any>>()
-    private var currentBracket = ContestRank.GOLD
+    private var currentBracket = ContestBracket.GOLD
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onLateInventoryOpen(event: LateInventoryOpenEvent) {
@@ -97,7 +97,7 @@ class JacobContestTimeNeeded {
         this.display = buildList {
             addAsSingletonList("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
 
-            addSelector("§7Bracket: ", ContestRank.values(),
+            addSelector("§7Bracket: ", ContestBracket.values(),
                 getName = { type -> type.name.lowercase() },
                 isCurrent = { it == currentBracket },
                 onChange = {

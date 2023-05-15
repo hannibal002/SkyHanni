@@ -59,15 +59,15 @@ class JacobContestFFNeededDisplay {
 
         val crop = contest.crop
         add(listOf("§7For this ", crop.icon, "§7${crop.cropName} contest:"))
-        for (rank in ContestRank.values()) {
-            addAsSingletonList(getLine(rank, contest.ranks, crop))
+        for (bracket in ContestBracket.values()) {
+            addAsSingletonList(getLine(bracket, contest.brackets, crop))
         }
         addAsSingletonList("")
 
         val (size, averages) = FarmingContestAPI.calculateAverages(crop)
         add(listOf("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:"))
-        for (rank in ContestRank.values()) {
-            addAsSingletonList(getLine(rank, averages, crop))
+        for (bracket in ContestBracket.values()) {
+            addAsSingletonList(getLine(bracket, averages, crop))
         }
         addAsSingletonList("")
 
@@ -107,12 +107,12 @@ class JacobContestFFNeededDisplay {
         return ceil(ff).addSeparators()
     }
 
-    private fun getLine(rank: ContestRank, map: Map<ContestRank, Int>, crop: CropType): String {
-        val counter = map[rank]!!
+    private fun getLine(bracket: ContestBracket, map: Map<ContestBracket, Int>, crop: CropType): String {
+        val counter = map[bracket]!!
         val blocksPerSecond = crop.getLatestBlocksPerSecond() ?: 20.0
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
         val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)
-        return " ${rank.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
+        return " ${bracket.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
     }
 
     @SubscribeEvent

@@ -55,29 +55,29 @@ object FarmingContestAPI {
             cropPattern.matchMatcher(it) { CropType.getByName(group("crop")) }
         } ?: error("Crop not found in lore!")
 
-        val ranks = ContestRank.values().associateWith { rank ->
+        val brackets = ContestBracket.values().associateWith { bracket ->
             lore.firstNotNullOfOrNull {
-                rank.pattern.matchMatcher(it) {
+                bracket.pattern.matchMatcher(it) {
                     group("amount").replace(",", "").toInt()
                 }
-            } ?: error("Farming contest rank not found in lore!")
+            } ?: error("Farming contest bracket not found in lore!")
         }
 
-        return FarmingContest(time, crop, ranks)
+        return FarmingContest(time, crop, brackets)
     }
 
     fun getContestAtTime(time: Long) = contests[time]
 
     fun getContestsOfType(crop: CropType) = contests.values.filter { it.crop == crop }
 
-    fun calculateAverages(crop: CropType): Pair<Int, Map<ContestRank, Int>> {
+    fun calculateAverages(crop: CropType): Pair<Int, Map<ContestBracket, Int>> {
         var amount = 0
-        val map = mutableMapOf<ContestRank, Int>()
+        val map = mutableMapOf<ContestBracket, Int>()
         for (contest in getContestsOfType(crop).associateWith { it.time }.sortedDesc().keys) {
             amount++
-            for ((rank, count) in contest.ranks) {
-                val old = map.getOrDefault(rank, 0)
-                map[rank] = count + old
+            for ((bracket, count) in contest.brackets) {
+                val old = map.getOrDefault(bracket, 0)
+                map[bracket] = count + old
             }
             if (amount == 10) break
         }
