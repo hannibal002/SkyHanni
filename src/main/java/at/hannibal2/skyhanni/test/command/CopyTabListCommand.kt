@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -15,14 +16,16 @@ object CopyTabListCommand {
                 val tabListLine = if (noColor) line.removeColor() else line
                 if (tabListLine != "") resultList.add("'$tabListLine'")
             }
-            val tabHeader = Minecraft.getMinecraft().ingameGUI.tabList.header.formattedText
-            val tabFooter = Minecraft.getMinecraft().ingameGUI.tabList.footer.formattedText
-            val string = "Header:\n\n" + tabHeader.toString() + "\n\nBody:\n\n" + resultList.joinToString("\n") + "\nFooter:\n\n" + tabFooter.toString()
+            val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+            val tabHeader = tabList.header_skyhanni.formattedText
+            val tabFooter = tabList.footer_skyhanni.formattedText
+            val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\nFooter:\n\n$tabFooter"
             OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] tablist copied into the clipboard!")
+            LorenzUtils.chat("§e[SkyHanni] Tab list copied into the clipboard!")
         }
         catch (_: Throwable) {
-            LorenzUtils.chat("§c[SkyHanni] Nothing in tablist")
+            // TODO: Note: why are we ignoring this exception? This user facing error message seems out of place to me
+            LorenzUtils.chat("§c[SkyHanni] Nothing in tab list")
         }
     }
 }
