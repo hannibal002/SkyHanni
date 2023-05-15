@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.observer.Observer
 import io.github.moulberry.moulconfig.observer.Property
 import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
@@ -285,5 +286,30 @@ object LorenzUtils {
             '4' -> "Supreme" // legacy items
             else -> "Special"
         }
+    }
+
+    fun <T> MutableList<List<Any>>.addSelector(
+        prefix: String,
+        values: Array<T>,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        onChange: (T) -> Unit,
+    ) {
+        val newList = mutableListOf<Any>()
+        newList.add(prefix)
+        for (entry in values) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                newList.add("§a[$display]")
+            } else {
+                newList.add("§e[")
+                newList.add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                newList.add("§e]")
+            }
+            newList.add(" ")
+        }
+        add(newList)
     }
 }

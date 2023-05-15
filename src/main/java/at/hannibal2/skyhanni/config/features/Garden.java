@@ -1203,6 +1203,17 @@ public class Garden {
     public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
+    @ConfigOption(
+            name = "Contest Time Needed",
+            desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory."
+    )
+    @ConfigEditorBoolean
+    public boolean jacobContextTimes = true;
+
+    @Expose
+    public Position jacobContextTimesPos = new Position(180, 156, false, true);
+
+    @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
     public boolean forcefullyEnabledAlwaysFinnegan = false;

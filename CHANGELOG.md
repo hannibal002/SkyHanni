@@ -4,6 +4,7 @@
 
 ### New Features
 + Added Visitor Drop Counter to track all the drops from visitors.
++ Added **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.

@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
@@ -26,6 +28,11 @@ object FarmingContestAPI {
 
     @SubscribeEvent
     fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+        inInventory = false
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
@@ -62,4 +69,18 @@ object FarmingContestAPI {
     fun getContestAtTime(time: Long) = contests[time]
 
     fun getContestsOfType(crop: CropType) = contests.values.filter { it.crop == crop }
+
+    fun calculateAverages(crop: CropType): Pair<Int, Map<ContestRank, Int>> {
+        var amount = 0
+        val map = mutableMapOf<ContestRank, Int>()
+        for (contest in getContestsOfType(crop).associateWith { it.time }.sortedDesc().keys) {
+            amount++
+            for ((rank, count) in contest.ranks) {
+                val old = map.getOrDefault(rank, 0)
+                map[rank] = count + old
+            }
+            if (amount == 10) break
+        }
+        return Pair(amount, map.mapValues { (_, counter) -> counter / amount })
+    }
 }

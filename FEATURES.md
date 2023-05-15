@@ -221,6 +221,7 @@
 + **FF for Contest** - Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory.
 + **yaw and pitch display** - Shows yaw and pitch with customizable precision while holding a farm tool. Automatically fades out if there is no movement for a customizable duration (Contributed by Sefer)
 + Warning when 6th visitors is ready (Contributed by CalMWolfs)
++ **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

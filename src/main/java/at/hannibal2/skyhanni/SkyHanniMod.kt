@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
+import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
 import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
 import at.hannibal2.skyhanni.features.garden.farming.*
 import at.hannibal2.skyhanni.features.garden.inventory.*
@@ -261,6 +262,7 @@ class SkyHanniMod {
         loadModule(GardenBurrowingSporesNotifier())
         loadModule(WildStrawberryDyeNotification())
         loadModule(JacobContestFFNeededDisplay())
+        loadModule(JacobContestTimeNeeded())
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())

@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
@@ -65,7 +64,7 @@ class JacobContestFFNeededDisplay {
         }
         addAsSingletonList("")
 
-        val (size, averages) = calculateAverages(crop)
+        val (size, averages) = FarmingContestAPI.calculateAverages(crop)
         add(listOf("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:"))
         for (rank in ContestRank.values()) {
             addAsSingletonList(getLine(rank, averages, crop))
@@ -116,26 +115,12 @@ class JacobContestFFNeededDisplay {
         return " ${rank.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
     }
 
-    private fun calculateAverages(crop: CropType): Pair<Int, Map<ContestRank, Int>> {
-        var amount = 0
-        val map = mutableMapOf<ContestRank, Int>()
-        for (contest in FarmingContestAPI.getContestsOfType(crop).associateWith { it.time }.sortedDesc().keys) {
-            amount++
-            for ((rank, count) in contest.ranks) {
-                val old = map.getOrDefault(rank, 0)
-                map[rank] = count + old
-            }
-            if (amount == 10) break
-        }
-        return Pair(amount, map.mapValues { (_, counter) -> counter / amount })
-    }
-
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
-        config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
+        config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Jacob Contest Crop Data")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest

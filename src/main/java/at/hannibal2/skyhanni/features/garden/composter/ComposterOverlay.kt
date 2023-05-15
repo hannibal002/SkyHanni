@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -273,24 +274,13 @@ class ComposterOverlay {
         val fuelItem = currentFuelItem
         if (organicMatterItem == "" || fuelItem == "") return
 
-        val clickableList = mutableListOf<Any>()
-        clickableList.add("§7Per ")
-        for (type in TimeType.values()) {
-            val display = type.display
-            if (type == currentTimeType) {
-                clickableList.add("§a[$display]")
-            } else {
-                clickableList.add("§e[")
-                clickableList.add(Renderable.link("§e$display") {
-                    currentTimeType = type
-                    update()
-                })
-                clickableList.add("§e]")
-            }
-            clickableList.add(" ")
-        }
-        newList.add(clickableList)
-
+        newList.addSelector("§7Per ", TimeType.values(),
+            getName = { type -> type.display },
+            isCurrent = { it == currentTimeType },
+            onChange = {
+                currentTimeType = it
+                update()
+            })
 
         val list = mutableListOf<Any>()
         list.add("§7Using: ")
