@@ -63,16 +63,13 @@ class JacobContestTimeNeeded {
                 val timeInMinutes = amount.toDouble() / speed / 60
                 val formatDuration = TimeUtils.formatDuration((timeInMinutes * 60 * 1000).toLong())
                 val color = if (timeInMinutes < 20) "§b" else "§c"
-                if (bracket == currentBracket) {
-                    sorted[crop] = timeInMinutes
-                }
+                val line: String
                 var bracketText = "${bracket.displayName} $color$formatDuration"
                 if (timeInMinutes < 20) {
-                    showLine = "§9${crop.cropName} §b$formatDuration"
+                    line = "§9${crop.cropName} §b$formatDuration"
                 } else {
-                    showLine =
+                    line =
                         "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!"
-
                     val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
                     val blocksPerSecond = crop.getLatestBlocksPerSecond() ?: 20.0
                     val cropsPerSecond = amount.toDouble() / blocksPerSecond / 60
@@ -81,13 +78,17 @@ class JacobContestTimeNeeded {
                     bracketText += " §7(${missing.addSeparators()} more FF needed!)"
                 }
                 brackets.add(bracketText)
+                if (bracket == currentBracket) {
+                    sorted[crop] = timeInMinutes
+                    showLine = line
+                }
             }
             map[crop] = Renderable.hoverTips(showLine, buildList {
                 add("§7Time Needed for §9${crop.cropName} Medals§7:")
                 addAll(brackets)
                 add("")
-                val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
-                add("§7Current FF: §e${(cropFF).addSeparators()}")
+                val latestFF = crop.getLatestTrueFarmingFortune() ?: 0.0
+                add("§7Latest FF: §e${(latestFF).addSeparators()}")
                 val bps = crop.getLatestBlocksPerSecond()?.round(1) ?: 0
                 add("§7Blocks/Second: §e${bps.addSeparators()}")
 
