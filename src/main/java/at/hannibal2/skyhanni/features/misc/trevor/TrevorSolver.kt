@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -10,8 +12,9 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
 object TrevorSolver {
-    private val animalNames = arrayOf("Cow", "Horse", "Sheep", "Pig", "Rabbit", "Chicken")
+    private val animalHealths = intArrayOf(100, 200, 400, 500, 1000, 2000, 5000, 10000, 20000) //future proofing for Derpy :)
 
+    private var currentMob: TrevorMobs? = null
     private var maxHeight: Double = 0.0
     private var minHeight: Double = 0.0
     private var foundID = -1
@@ -40,41 +43,43 @@ object TrevorSolver {
     }
 
     fun findMob() {
+        var canSee = false
         val world = Minecraft.getMinecraft().theWorld ?: return
         for (entity in world.getLoadedEntityList()) {
-            val name = entity.name
             if (entity is EntityOtherPlayerMP) continue
-            // looking at 2 diff entities rn - Mostly fixed I think as it returns
+            val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
-            if (intArrayOf(100, 500, 1000, 5000, 10000).any { it == entityHealth }) {
-                if (animalNames.any { it == name }) {
-                    if (LocationUtils.canSee(LocationUtils.playerLocation(), entity.position.toLorenzVec())) {
-                        if (!entity.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer)) {
-                            if (foundID == entity.entityId) {
-                                mobLocation = CurrentMobArea.FOUND
-                                mobCoordinates = entity.position.toLorenzVec()
-                            } else {
-                                foundID = entity.entityId
-                            }
-                            return
-                        }
-                    }
-                }
-            }
+            currentMob = TrevorMobs.values().firstOrNull {it.mobName.contains(name)}
+            if (animalHealths.any { it == entityHealth } ) {
+                if (currentMob != null) {
+                    if (foundID == entity.entityId) {
+                        val dist = entity.position.toLorenzVec().distanceToPlayer()
+                        if ((currentMob == TrevorMobs.RABBIT || currentMob == TrevorMobs.SHEEP) && mobLocation == CurrentMobArea.OASIS) {
+                            println("This is unfortunate")
+                        } else canSee = LocationUtils.canSee(LocationUtils.playerEyeLocation(), entity.position.toLorenzVec().add(0.0, 0.5, 0.0)) && dist < currentMob!!.renderDistance
 
-            if (entity is EntityArmorStand) {
-                for (animal in animalNames) {
-                    if (name.contains(animal) && name.contains("§c❤")) {
-                        if (foundID == entity.entityId) {
+                        if (!canSee) {
+                            val nameTagEntity = Minecraft.getMinecraft().theWorld.getEntityByID(foundID + 1)
+                            if (nameTagEntity is EntityArmorStand) canSee = true
+                        }
+                        if (canSee) {
+                            if (mobLocation != CurrentMobArea.FOUND) {
+                                TitleUtils.sendTitle("§2Saw Mob!", 3_000)
+                            }
                             mobLocation = CurrentMobArea.FOUND
                             mobCoordinates = entity.position.toLorenzVec()
-                        } else {
-                            foundID = entity.entityId
                         }
-                        return
+                    } else {
+                        foundID = entity.entityId
                     }
+                    return
                 }
             }
+        }
+        if (foundID != -1) {
+            println("Cannot find mob anymore")
+            mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
+            foundID = -1
         }
     }
 
@@ -85,5 +90,4 @@ object TrevorSolver {
         foundID = -1
         mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
     }
-
 }
