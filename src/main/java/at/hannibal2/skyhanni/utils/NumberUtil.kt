@@ -178,12 +178,8 @@ object NumberUtil {
     }
 
     fun String.formatNumber(): Long {
-        var hasDecimal = false
         var text = replace(",", "")
-        if (text.contains(".")) {
-            text = replace(".", "")
-            hasDecimal = true
-        }
+
         val multiplier = if (text.endsWith("k")) {
             text = text.substring(0, text.length - 1)
             1_000
@@ -191,8 +187,7 @@ object NumberUtil {
             text = text.substring(0, text.length - 1)
             1_000_000
         } else 1
-        var d = text.toDouble()
-        if (hasDecimal) d /= 10
+        val d = text.toDouble()
         return (d * multiplier).toLong()
     }
 }

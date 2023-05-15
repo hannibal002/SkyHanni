@@ -63,12 +63,11 @@ class ConfigManager {
                     Features::class.java
                 )
                 logger.log("Loaded config from file")
-            } catch (e: Exception) {
-                println("config error")
-                e.printStackTrace()
+            } catch (error: Exception) {
+                error.printStackTrace()
                 val backupFile = configFile!!.resolveSibling("config-${System.currentTimeMillis()}-backup.json")
                 logger.log("Exception while reading $configFile. Will load blank config and save backup to $backupFile")
-                e.printStackTrace()
+                logger.log("Exception was $error")
                 try {
                     configFile!!.copyTo(backupFile)
                 } catch (e: Exception) {
