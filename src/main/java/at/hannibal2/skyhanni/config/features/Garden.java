@@ -1211,7 +1211,7 @@ public class Garden {
     public boolean jacobContextTimes = true;
 
     @Expose
-    public Position jacobContextTimesPos = new Position(180, 156, false, true);
+    public Position jacobContextTimesPos = new Position(-359, 149, false, true);
 
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
