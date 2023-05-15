@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft
 object LocationUtils {
 
     fun canSee(a: LorenzVec, b: LorenzVec): Boolean {
-        return Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3()) == null
+        return Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
     }
 
     fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
