@@ -108,7 +108,8 @@ class GardenBestCropTime {
 
 
             val cropName = if (!config.cropMilestoneBestCompact) crop.cropName + " " else ""
-            val cropNameDisplay = "$color$contestFormat$cropName$currentTier->$nextTier§r"
+            val tier = if (!config.cropMilestoneBestCompact) "currentTier->$nextTier" else ""
+            val cropNameDisplay = "$color$contestFormat$cropName$tier§r"
             list.add("$cropNameDisplay §b$duration")
 
             if (gardenExp && !config.cropMilestoneBestCompact) {
