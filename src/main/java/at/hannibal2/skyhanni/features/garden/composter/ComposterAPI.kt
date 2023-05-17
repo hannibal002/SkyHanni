@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlin.time.Duration
@@ -9,9 +9,9 @@ import kotlin.time.Duration.Companion.minutes
 
 object ComposterAPI {
     var tabListData = mapOf<ComposterDisplay.DataType, String>()
-    val composterUpgrades: MutableMap<ComposterUpgrade, Int> get() = SkyHanniMod.feature.hidden.gardenComposterUpgrades
+    val composterUpgrades: MutableMap<ComposterUpgrade, Int>? get() = GardenAPI.config?.composterUpgrades
 
-    fun ComposterUpgrade.getLevel(addOne: ComposterUpgrade?) = (composterUpgrades[this] ?: 0) + if (addOne == this) 1 else 0
+    fun ComposterUpgrade.getLevel(addOne: ComposterUpgrade?) = (composterUpgrades?.get(this) ?: 0) + if (addOne == this) 1 else 0
 
     fun getFuel() = tabListData[ComposterDisplay.DataType.FUEL]?.removeColor()?.formatNumber() ?: 0
 

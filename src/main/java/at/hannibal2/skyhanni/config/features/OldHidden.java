@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Hidden {
+public class OldHidden {
 
     @Expose
     public String apiKey = "";
@@ -20,22 +20,22 @@ public class Hidden {
     public String currentPet = "";
 
     @Expose
-    public Map<String, Long> minionLastClick = new HashMap<>();
+    public Map<String, Long> minionLastClick = new HashMap<>(); // TODO migration needed
 
     @Expose
-    public Map<String, String> minionName = new HashMap<>();
+    public Map<String, String> minionName = new HashMap<>(); // TODO migration needed
 
     @Expose
-    public List<String> crimsonIsleQuests = new ArrayList<>();
+    public List<String> crimsonIsleQuests = new ArrayList<>(); // TODO migration needed
 
     @Expose
-    public int crimsonIsleLatestTrophyFishInInventory = 0;
+    public int crimsonIsleLatestTrophyFishInInventory = 0; // TODO migration needed
 
     @Expose
-    public List<String> crimsonIsleMiniBossesDoneToday = new ArrayList<>();
+    public List<String> crimsonIsleMiniBossesDoneToday = new ArrayList<>(); // TODO migration needed
 
     @Expose
-    public List<String> crimsonIsleKuudraTiersDone = new ArrayList<>();
+    public List<String> crimsonIsleKuudraTiersDone = new ArrayList<>(); // TODO migration needed
 
     @Expose
     public Map<CropType, Long> gardenCropCounter = new HashMap<>();
@@ -117,4 +117,7 @@ public class Hidden {
         @Expose
         public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
     }
+
+    @Expose
+    public boolean isMigrated = false;
 }

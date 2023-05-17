@@ -55,6 +55,12 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        display = emptyList()
+        visitors.clear()
+    }
+
+    @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inVisitorInventory = false
 

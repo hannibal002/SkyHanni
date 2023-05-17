@@ -1,17 +1,20 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
 import java.io.*
 import java.nio.charset.StandardCharsets
+import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
 class ConfigManager {
@@ -20,6 +23,16 @@ class ConfigManager {
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
+            .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
+                override fun write(out: JsonWriter, value: UUID) {
+                    out.value(value.toString())
+                }
+
+                override fun read(reader: JsonReader): UUID {
+                    return UUID.fromString(reader.nextString())
+                }
+            }.nullSafe())
+            .enableComplexMapKeySerialization()
             .create()
     }
 
@@ -83,8 +96,6 @@ class ConfigManager {
             saveConfig("blank config")
         }
 
-        ConfigLoadEvent().postAndCatch()
-
         val features = SkyHanniMod.feature
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
@@ -116,6 +127,7 @@ class ConfigManager {
             file.parentFile.mkdirs()
             file.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
+                // TODO remove old "hidden" area
                 writer.write(gson.toJson(SkyHanniMod.feature))
             }
         } catch (e: IOException) {

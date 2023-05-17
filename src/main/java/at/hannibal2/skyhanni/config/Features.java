@@ -124,5 +124,8 @@ public class Features extends Config {
     public DevData dev = new DevData();
 
     @Expose
-    public Hidden hidden = new Hidden();
+    public OldHidden hidden = new OldHidden();
+
+    @Expose
+    public Storage storage = new Storage();
 }

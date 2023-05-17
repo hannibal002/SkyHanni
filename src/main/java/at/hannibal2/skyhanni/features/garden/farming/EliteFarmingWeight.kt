@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -49,6 +50,15 @@ class EliteFarmingWeight {
         nextPlayerWeight = 0.0
         nextPlayerName = ""
         hasPassedNext = false
+        localCounter.clear()
+    }
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        display = emptyList()
+        profileId = ""
+        weight = -2.0
+
     }
 
     var tick = 0

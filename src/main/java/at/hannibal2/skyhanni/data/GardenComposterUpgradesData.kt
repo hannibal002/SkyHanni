@@ -23,7 +23,7 @@ class GardenComposterUpgradesData {
                 val name = matcher.group("name")
                 val level = matcher.group("level")?.romanToDecimalIfNeeded() ?: 0
                 val composterUpgrade = ComposterUpgrade.getByName(name)!!
-                ComposterAPI.composterUpgrades[composterUpgrade] = level
+                ComposterAPI.composterUpgrades?.put(composterUpgrade, level)
             }
         }
     }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
@@ -47,6 +48,7 @@ class GardenCropMilestoneFix {
     }
 
     private fun check(cropName: String, tier: Int, percentage: Double) {
+        if (!ProfileStorageData.loaded) return
         val baseCrops = GardenCropMilestones.getCropsForTier(tier)
         val next = GardenCropMilestones.getCropsForTier(tier + 1)
         val progressCrops = next - baseCrops

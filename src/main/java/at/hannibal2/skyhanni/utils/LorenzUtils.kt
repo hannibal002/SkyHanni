@@ -24,6 +24,10 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty0
 
 object LorenzUtils {
 
@@ -183,7 +187,9 @@ object LorenzUtils {
         return monthNr
     }
 
-    fun getPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID.toDashlessUUID()
+    fun getPlayerUuid() = getRawPlayerUuid().toDashlessUUID()
+
+    fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
     fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
 
@@ -312,4 +318,32 @@ object LorenzUtils {
         }
         add(newList)
     }
+
+    // TODO nea?
+//    fun <T> dynamic(block: () -> KMutableProperty0<T>?): ReadWriteProperty<Any?, T?> {
+//        return object : ReadWriteProperty<Any?, T?> {
+//            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
+//                return block()?.get()
+//            }
+//
+//            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
+//                if (value != null)
+//                    block()?.set(value)
+//            }
+//        }
+//    }
+
+    fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) =
+        object : ReadWriteProperty<Any?, T?> {
+            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
+                val rootObj = root.get() ?: return null
+                return child.get(rootObj)
+            }
+
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
+                if (value == null) return
+                val rootObj = root.get() ?: return
+                child.set(rootObj, value)
+            }
+        }
 }

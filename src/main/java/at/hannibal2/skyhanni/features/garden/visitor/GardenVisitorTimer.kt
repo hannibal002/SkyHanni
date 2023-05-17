@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.events.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
@@ -25,12 +26,17 @@ class GardenVisitorTimer {
     private var render = ""
     private var lastMillis = 0L
     private var sixthVisitorArrivalTime: Long = 0
-    private var visitorJustArrived: Boolean = false
-    private var sixthVisitorReady: Boolean = false
-    private var visitorInterval
-        get() = SkyHanniMod.feature.hidden.visitorInterval
+    private var visitorJustArrived = false
+    private var sixthVisitorReady = false
+
+    //TODO nea?
+//    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
+    private var visitorInterval: Long?
+        get() = GardenAPI.config?.visitorInterval
         set(value) {
-            SkyHanniMod.feature.hidden.visitorInterval = value
+            value?.let {
+                GardenAPI.config?.visitorInterval = it
+            }
         }
 
     companion object {
@@ -53,14 +59,25 @@ class GardenVisitorTimer {
             }
             try {
                 GardenVisitorDropStatistics.saveAndUpdate()
-            } catch (_: Throwable) {} // no config yet
+            } catch (_: Throwable) {
+            } // no config yet
         }
+    }
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        render = ""
+        lastMillis = 0
+        sixthVisitorArrivalTime = 0
+        visitorJustArrived = false
+        sixthVisitorReady = false
     }
 
     private fun updateVisitorDisplay() {
         if (!isEnabled()) return
 
         var visitorsAmount = 0
+        var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
         for (line in TabListData.getTabList()) {
@@ -95,8 +112,9 @@ class GardenVisitorTimer {
                 sixthVisitorReady = false
             }
             millis = sixthVisitorArrivalTime - System.currentTimeMillis()
-            SkyHanniMod.feature.hidden.nextSixthVisitorArrival = System.currentTimeMillis() + millis + (5 - visitorsAmount) * visitorInterval
-            if (isSixthVisitorEnabled() &&  millis < 0) {
+            GardenAPI.config?.nextSixthVisitorArrival =
+                System.currentTimeMillis() + millis + (5 - visitorsAmount) * visitorInterval
+            if (isSixthVisitorEnabled() && millis < 0) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
                     TitleUtils.sendTitle("§a6th Visitor Ready", 5_000)
@@ -136,7 +154,9 @@ class GardenVisitorTimer {
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         lastVisitors = -1
-        sixthVisitorArrivalTime = SkyHanniMod.feature.hidden.nextSixthVisitorArrival
+        GardenAPI.config?.nextSixthVisitorArrival?.let {
+            sixthVisitorArrivalTime = it
+        }
         sixthVisitorReady = false
         lastMillis = sixthVisitorArrivalTime - System.currentTimeMillis()
     }
@@ -148,7 +168,9 @@ class GardenVisitorTimer {
     }
 
     private fun updateSixthVisitorArrivalTime() {
-        sixthVisitorArrivalTime = System.currentTimeMillis() + visitorInterval
+        visitorInterval?.let {
+            sixthVisitorArrivalTime = System.currentTimeMillis() + it
+        }
     }
 
     private fun isSixthVisitorEnabled() = config.visitorTimerSixthVisitorEnabled

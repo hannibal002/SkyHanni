@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -78,8 +77,10 @@ object GardenCropMilestoneDisplay {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onProfileJoin(event: ProfileJoinEvent) {
-        if (GardenCropMilestones.cropCounter.values.sum() == 0L) {
-            needsInventory = true
+        GardenCropMilestones.cropCounter?.let {
+            if (it.values.sum() == 0L) {
+                needsInventory = true
+            }
         }
     }
 
@@ -102,17 +103,6 @@ object GardenCropMilestoneDisplay {
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
                 val addedCounter = (counter - old).toInt()
-
-                if (GardenCropMilestones.cropCounter.isEmpty()) {
-                    for (innerCrop in CropType.values()) {
-                        innerCrop.setCounter(0)
-                    }
-                }
-                if (isSpeedDataEmpty()) {
-                    for (cropType in CropType.values()) {
-                        cropType.setSpeed(-1)
-                    }
-                }
                 EliteFarmingWeight.addCrop(crop, addedCounter)
                 update()
                 crop.setCounter(
@@ -133,10 +123,6 @@ object GardenCropMilestoneDisplay {
         mushroomCowPerkDisplay = emptyList()
         bestCropTime.display = emptyList()
         val currentCrop = GardenAPI.getCurrentlyFarmedCrop()
-        if (GardenCropMilestones.cropCounter.isEmpty()) {
-            LorenzUtils.debug("Garden Crop Milestone Display: crop counter data not yet loaded!")
-            return
-        }
         currentCrop?.let {
             progressDisplay = drawProgressDisplay(it)
         }

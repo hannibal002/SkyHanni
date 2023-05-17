@@ -7,20 +7,19 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 object GardenCropSpeed {
     private val config get() = SkyHanniMod.feature.garden
-    private val hidden get() = SkyHanniMod.feature.hidden
-    private val cropsPerSecond: MutableMap<CropType, Int> get() = hidden.gardenCropsPerSecond
-    private val latestBlocksPerSecond: MutableMap<CropType, Double> get() = hidden.gardenLatestBlocksPerSecond
+    private val cropsPerSecond: MutableMap<CropType, Int>? get() = GardenAPI.config?.cropsPerSecond
+    private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestBlocksPerSecond
 
     var lastBrokenCrop: CropType? = null
+
     var averageBlocksPerSecond = 0.0
 
     private val blocksSpeedList = mutableListOf<Int>()
@@ -38,6 +37,11 @@ object GardenCropSpeed {
                 update()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        lastBrokenCrop = null
     }
 
     @SubscribeEvent
@@ -85,7 +89,7 @@ object GardenCropSpeed {
                 blocksSpeedList.dropLast(1).average()
             } else 0.0
             GardenAPI.getCurrentlyFarmedCrop()?.let {
-                latestBlocksPerSecond[it] = averageBlocksPerSecond
+                latestBlocksPerSecond?.put(it, averageBlocksPerSecond)
             }
         }
     }
@@ -102,28 +106,15 @@ object GardenCropSpeed {
         return forcefullyEnabledAlwaysFinnegan || perkActive
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        if (cropsPerSecond.isEmpty()) {
-            for (cropType in CropType.values()) {
-                cropType.setSpeed(-1)
-            }
-        }
-    }
-
     fun isEnabled() = GardenAPI.inGarden()
 
-    fun CropType.getSpeed(): Int? {
-        val speed = cropsPerSecond[this]
-        if (speed == -1) return null
-        return speed
-    }
+    fun CropType.getSpeed() = cropsPerSecond?.get(this)
 
     fun CropType.setSpeed(speed: Int) {
-        cropsPerSecond[this] = speed
+        cropsPerSecond?.put(this, speed)
     }
 
-    fun CropType.getLatestBlocksPerSecond() = latestBlocksPerSecond[this]
+    fun CropType.getLatestBlocksPerSecond() = latestBlocksPerSecond?.get(this)
 
-    fun isSpeedDataEmpty() = cropsPerSecond.values.sum() < 0
+    fun isSpeedDataEmpty() = cropsPerSecond?.values?.sum()?.let { it == 0 } ?: true
 }

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,10 +23,6 @@ class ToolTooltipTweaks {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (GardenCropMilestones.cropCounter.isEmpty()) {
-            LorenzUtils.debug("Garden ToolTip Tweaks: crop counter data not yet loaded!")
-            return
-        }
 
         val crop = event.itemStack.getCropType() ?: return
         val toolFortune = FarmingFortuneDisplay.getToolFortune(event.itemStack)

@@ -21,9 +21,9 @@ class GardenLevelDisplay {
     private val overflowPattern = ".*§r §6(?<overflow>.*) XP".toPattern()
     private val namePattern = "Garden Level (?<currentLevel>.*)".toPattern()
     private var gardenExp
-        get() = SkyHanniMod.feature.hidden.gardenExp
+        get() = GardenAPI.config?.experience ?: -1
         set(value) {
-            SkyHanniMod.feature.hidden.gardenExp = value
+            GardenAPI.config?.experience = value
         }
     private var display = ""
     private var visitorRewardPattern = " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience".toPattern()

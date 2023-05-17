@@ -28,7 +28,7 @@ class ApiDataLoader {
         if (nextApiCallTime != -1L && System.currentTimeMillis() > nextApiCallTime) {
             nextApiCallTime = System.currentTimeMillis() + 60_000 * 5
             SkyHanniMod.coroutineScope.launch {
-                val apiKey = SkyHanniMod.feature.hidden.apiKey
+                val apiKey = SkyHanniMod.feature.storage.apiKey
                 val uuid = LorenzUtils.getPlayerUuid()
                 loadProfileData(apiKey, uuid, currentProfileId)
             }
@@ -39,7 +39,7 @@ class ApiDataLoader {
     fun onStatusBar(event: LorenzChatEvent) {
         val message = event.message
         if (message.startsWith("§aYour new API key is §r§b")) {
-            SkyHanniMod.feature.hidden.apiKey = message.substring(26)
+            SkyHanniMod.feature.storage.apiKey = message.substring(26)
             LorenzUtils.chat("§b[SkyHanni] A new API Key has been detected and installed")
 
             if (currentProfileName != "") {
@@ -86,13 +86,13 @@ class ApiDataLoader {
     private fun updateApiData() {
         nextApiCallTime = -1
         SkyHanniMod.coroutineScope.launch {
-            val oldApiKey = SkyHanniMod.feature.hidden.apiKey
+            val oldApiKey = SkyHanniMod.feature.storage.apiKey
             if (oldApiKey.isNotEmpty() && tryUpdateProfileDataAndVerifyKey(oldApiKey)) {
                 return@launch
             }
             findApiCandidatesFromOtherMods().forEach { (modName, newApiKey) ->
                 if (tryUpdateProfileDataAndVerifyKey(newApiKey)) {
-                    SkyHanniMod.feature.hidden.apiKey = newApiKey
+                    SkyHanniMod.feature.storage.apiKey = newApiKey
                     LorenzUtils.chat("§e[SkyHanni] Imported valid new API key from $modName.")
                     return@launch
                 } else {
@@ -149,7 +149,7 @@ class ApiDataLoader {
         private var nextApiCallTime = -1L
 
         fun command(args: Array<String>) {
-            SkyHanniMod.feature.hidden.apiKey = args[0]
+            SkyHanniMod.feature.storage.apiKey = args[0]
             LorenzUtils.chat("§e[SkyHanni] Api key set via command!")
             nextApiCallTime = -1
         }

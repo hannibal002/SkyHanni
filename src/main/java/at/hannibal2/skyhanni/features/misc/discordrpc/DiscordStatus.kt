@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -174,12 +175,13 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     PETS({
-        val pet = SkyHanniMod.feature.hidden.currentPet
-        val colorCode = pet.substring(1..2).first()
-        val petName = pet.substring(2)
-        val petLevel = getCurrentPet().petLevel.currentLevel
+        ProfileStorageData.profileSpecific?.currentPet?.let {
+            val colorCode = it.substring(1..2).first()
+            val petName = it.substring(2)
+            val petLevel = getCurrentPet().petLevel.currentLevel
 
-        "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+            "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+        } ?: ""
     })
     ;
 

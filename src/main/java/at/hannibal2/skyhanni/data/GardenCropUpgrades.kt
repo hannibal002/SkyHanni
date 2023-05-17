@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CropUpgradeUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -32,22 +32,23 @@ class GardenCropUpgrades {
             val crop = item.name?.removeColor()?.let {
                 CropType.getByNameOrNull(it)
             } ?: return@forEach
+            println("finding for '$crop'")
             val level = item.getLore().firstNotNullOfOrNull {
                 tierPattern.matchEntire(it)?.groups?.get(1)?.value?.toIntOrNull()
-            } ?: return@forEach
+            } ?: 0
+            println("found: $level")
             crop.setUpgradeLevel(level)
         }
         CropUpgradeUpdateEvent().postAndCatch()
     }
 
     companion object {
-        private val cropUpgrades: MutableMap<CropType, Int> get() =
-            SkyHanniMod.feature.hidden.gardenCropUpgrades
+        private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.config?.cropUpgrades
 
-        fun CropType.getUpgradeLevel() = cropUpgrades[this]
+        fun CropType.getUpgradeLevel() = cropUpgrades?.get(this)
 
         fun CropType.setUpgradeLevel(level: Int) {
-            cropUpgrades[this] = level
+            cropUpgrades?.put(this, level)
         }
 
     }

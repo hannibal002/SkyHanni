@@ -49,17 +49,16 @@ class ComposterOverlay {
     private var lastHovered = 0L
 
     companion object {
-        private val hidden get() = SkyHanniMod.feature.hidden
-        var currentOrganicMatterItem: String
-            get() = hidden.gardenComposterCurrentOrganicMatterItem
+        var currentOrganicMatterItem: String?
+            get() = GardenAPI.config?.composterCurrentOrganicMatterItem
             private set(value) {
-                hidden.gardenComposterCurrentOrganicMatterItem = value
+                GardenAPI.config?.composterCurrentOrganicMatterItem = value
             }
 
-        var currentFuelItem: String
-            get() = hidden.gardenComposterCurrentFuelItem
+        var currentFuelItem: String?
+            get() = GardenAPI.config?.composterCurrentFuelItem
             private set(value) {
-                hidden.gardenComposterCurrentFuelItem = value
+                GardenAPI.config?.composterCurrentFuelItem = value
             }
 
         var testOffset = 0
@@ -270,8 +269,8 @@ class ComposterOverlay {
     }
 
     private fun addExtraData(newList: MutableList<List<Any>>) {
-        val organicMatterItem = currentOrganicMatterItem
-        val fuelItem = currentFuelItem
+        val organicMatterItem = currentOrganicMatterItem ?: return
+        val fuelItem = currentFuelItem ?: return
         if (organicMatterItem == "" || fuelItem == "") return
 
         newList.addSelector("§7Per ", TimeType.values(),

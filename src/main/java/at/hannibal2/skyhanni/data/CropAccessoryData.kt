@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropAccessory
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -116,9 +116,9 @@ class CropAccessoryData {
         val pagesLoaded get() = accessoryPage.size
 
         var cropAccessory: CropAccessory?
-            get() = SkyHanniMod.feature.hidden.savedCropAccessory
+            get() = GardenAPI.config?.savedCropAccessory
             private set(accessory) {
-                SkyHanniMod.feature.hidden.savedCropAccessory = accessory
+                GardenAPI.config?.savedCropAccessory = accessory
             }
 
         // Derived partially from NotEnoughUpdates/NotEnoughUpdates, ProfileViewer.Profile#getInventoryInfo

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -36,6 +36,7 @@ object GardenAPI {
     var mushroomCowPet = false
     var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
+    val config get() = ProfileStorageData.profileSpecific?.garden
 
     var tick = 0
 
@@ -143,12 +144,15 @@ object GardenAPI {
             SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
 
     fun clearCropSpeed() {
-        for (type in CropType.values()) {
-            type.setSpeed(-1)
-        }
+        config?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
         LorenzUtils.chat("§e[SkyHanni] Manually reset all crop speed data!")
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        GardenBestCropTime.reset()
     }
 
     fun getCurrentlyFarmedCrop(): CropType? {

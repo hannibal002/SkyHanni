@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -20,8 +17,7 @@ class DicerRngDropCounter {
     private val config get() = SkyHanniMod.feature.garden
 
     init {
-        drops[CropType.MELON] = mutableMapOf()
-        drops[CropType.PUMPKIN] = mutableMapOf()
+        initDrops()
 
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.UNCOMMON, "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a1x §r§aEnchanted Melon§r§e!"))
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.RARE, "§9§lRARE DROP! §r§eDicer dropped §r§a5x §r§aEnchanted Melon§r§e!"))
@@ -34,11 +30,23 @@ class DicerRngDropCounter {
         itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.PRAY_TO_RNGESUS, "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§a64x §r§aEnchanted Pumpkin§r§e!"))
     }
 
+    private fun initDrops() {
+        drops[CropType.MELON] = mutableMapOf()
+        drops[CropType.PUMPKIN] = mutableMapOf()
+    }
+
     enum class DropRarity(val displayName: String) {
         UNCOMMON("§a§lUNCOMMON DROP"),
         RARE("§9§lRARE DROP"),
         CRAZY_RARE("§d§lCRAZY RARE DROP"),
         PRAY_TO_RNGESUS("§5§lPRAY TO RNGESUS DROP"),
+    }
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        display = emptyList()
+        drops.clear()
+        initDrops()
     }
 
     @SubscribeEvent
@@ -104,7 +112,7 @@ class DicerRngDropCounter {
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val message: String)
 
     private fun saveConfig() {
-        val map = SkyHanniMod.feature.hidden.gardenDicerRngDrops
+        val map = GardenAPI.config?.dicerRngDrops ?: return
         map.clear()
         for (drop in drops) {
             val crop = drop.key
@@ -116,7 +124,8 @@ class DicerRngDropCounter {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        for ((internalName, amount) in SkyHanniMod.feature.hidden.gardenDicerRngDrops) {
+        val map = GardenAPI.config?.dicerRngDrops ?: return
+        for ((internalName, amount) in map) {
             val split = internalName.split(".")
             val crop = CropType.getByName(split[0])
             val rarityName = split[1]

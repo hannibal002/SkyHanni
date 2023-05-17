@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,6 +26,13 @@ class FarmingArmorDrops {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
         SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
         FERMENTO("§6Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b(Armor Set Bonus)"),
+    }
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        display = emptyList()
+        drops.clear()
+        hasArmor = false
     }
 
     @SubscribeEvent
@@ -62,7 +70,7 @@ class FarmingArmorDrops {
     }
 
     private fun saveConfig() {
-        val map = SkyHanniMod.feature.hidden.gardenFarmingArmorDrops
+        val map = GardenAPI.config?.farmArmorDrops ?: return
         map.clear()
         for ((drop, amount) in drops) {
             map[drop.toString()] = amount
@@ -71,7 +79,8 @@ class FarmingArmorDrops {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        for ((rawName, amount) in SkyHanniMod.feature.hidden.gardenFarmingArmorDrops) {
+        val map = GardenAPI.config?.farmArmorDrops ?: return
+        for ((rawName, amount) in map) {
             drops[ArmorDropType.valueOf(rawName)] = amount
         }
         update()

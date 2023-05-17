@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -17,6 +18,11 @@ class TitleUtils {
             display = "§f$text"
             endTime = System.currentTimeMillis() + duration
         }
+    }
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        sendTitle("", 1)
     }
 
     @SubscribeEvent

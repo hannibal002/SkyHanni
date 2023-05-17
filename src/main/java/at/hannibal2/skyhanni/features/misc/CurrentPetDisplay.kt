@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -10,21 +11,21 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CurrentPetDisplay {
-    private val config get() = SkyHanniMod.feature.hidden
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
-        var blocked = false
-
         val message = event.message
-        if (message.matchRegex("§aYou summoned your §r(.*)§r§a!")) {
-            config.currentPet = message.between("your §r", "§r§a")
-            blocked = true
-        }
+        val config = ProfileStorageData.profileSpecific ?: return
+        var blocked = false
         if (message.matchRegex("§cAutopet §eequipped your §7(.*)§e! §a§lVIEW RULE")) {
             config.currentPet = message.between("] ", "§e!")
+            blocked = true
+        }
+
+        if (!LorenzUtils.inSkyBlock) return
+
+        if (message.matchRegex("§aYou summoned your §r(.*)§r§a!")) {
+            config.currentPet = message.between("your §r", "§r§a")
             blocked = true
         }
         if (message.matchRegex("§aYou despawned your §r(.*)§r§a!")) {
@@ -42,6 +43,7 @@ class CurrentPetDisplay {
         if (!LorenzUtils.inSkyBlock) return
 
         if (!SkyHanniMod.feature.misc.petDisplay) return
+        val config = ProfileStorageData.profileSpecific ?: return
 
         SkyHanniMod.feature.misc.petDisplayPos.renderString(config.currentPet, posLabel = "Current Pet")
     }

@@ -139,7 +139,7 @@ class GardenNextJacobContest {
     }
 
     private fun saveConfig() {
-        val map = SkyHanniMod.feature.hidden.gardenJacobFarmingContestTimes
+        val map = SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes
         map.clear()
         for (contest in contests.values) {
             map[contest.endTime] = contest.crops
@@ -148,7 +148,7 @@ class GardenNextJacobContest {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        for ((time, crops) in SkyHanniMod.feature.hidden.gardenJacobFarmingContestTimes) {
+        for ((time, crops) in SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes) {
             contests[time] = FarmingContest(time, crops)
         }
     }

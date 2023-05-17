@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -13,12 +15,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
     private val config get() = SkyHanniMod.feature.garden.visitorDropsStatistics
-    private val hidden get() = SkyHanniMod.feature.hidden.visitorDrops
     private var display = listOf<List<Any>>()
 
     private var acceptedVisitors = 0
@@ -40,6 +40,11 @@ object GardenVisitorDropStatistics {
             newList.add(map[index])
         }
         return newList
+    }
+
+    @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        display = emptyList()
     }
 
     @SubscribeEvent
@@ -134,6 +139,7 @@ object GardenVisitorDropStatistics {
 
     fun saveAndUpdate() {
         if (!GardenAPI.inGarden()) return
+        val hidden = GardenAPI.config?.visitorDrops ?: return
         hidden.acceptedVisitors = acceptedVisitors
         hidden.deniedVisitors = deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
@@ -146,7 +152,8 @@ object GardenVisitorDropStatistics {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        val hidden = GardenAPI.config?.visitorDrops ?: return
         if (hidden.visitorRarities.size == 0) {
             hidden.visitorRarities.add(0)
             hidden.visitorRarities.add(0)

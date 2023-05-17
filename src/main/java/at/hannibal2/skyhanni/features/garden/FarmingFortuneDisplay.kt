@@ -34,6 +34,12 @@ class FarmingFortuneDisplay {
     private var ticks: Int = 0
 
     @SubscribeEvent
+    fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
+        display = emptyList()
+        accessoryProgressDisplay = ""
+    }
+
+    @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         tabFortune = event.tabList.firstNotNullOfOrNull {
@@ -52,7 +58,6 @@ class FarmingFortuneDisplay {
     fun onBlockBreak(event: CropClickEvent) {
         val cropBroken = event.crop
         if (cropBroken != currentCrop) {
-            currentCrop = cropBroken
             updateToolFortune(event.itemInHand)
         }
     }
@@ -60,9 +65,7 @@ class FarmingFortuneDisplay {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = System.currentTimeMillis()
-        val heldTool = event.toolItem
-        currentCrop = event.crop ?: currentCrop
-        updateToolFortune(heldTool)
+        updateToolFortune(event.toolItem)
     }
 
     @SubscribeEvent
@@ -96,7 +99,7 @@ class FarmingFortuneDisplay {
                 } else "?"
             )
             if (GardenAPI.toolInHand != null) {
-                latestTrueFarmingFortune[displayCrop] = getCurrentFarmingFortune(true)
+                latestFF?.put(displayCrop, getCurrentFarmingFortune(true))
             }
         })
 
@@ -130,10 +133,9 @@ class FarmingFortuneDisplay {
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
-        private val hidden get() = SkyHanniMod.feature.hidden
-        private val latestTrueFarmingFortune: MutableMap<CropType, Double> get() = hidden.gardenLatestTrueFarmingFortune
+        private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestTrueFarmingFortune
 
-        private var currentCrop: CropType? = null
+        private val currentCrop get() = GardenAPI.getCurrentlyFarmedCrop()
 
         private var tabFortune: Double = 0.0
         private var toolFortune: Double = 0.0
@@ -196,6 +198,6 @@ class FarmingFortuneDisplay {
             return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
         }
 
-        fun CropType.getLatestTrueFarmingFortune() = latestTrueFarmingFortune[this]
+        fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
     }
 }

@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropMilestones {
@@ -27,15 +26,6 @@ class GardenCropMilestones {
 //    }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        if (cropCounter.isEmpty()) {
-            for (crop in CropType.values()) {
-                crop.setCounter(0)
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Crop Milestones") return
 
@@ -52,17 +42,17 @@ class GardenCropMilestones {
                 }
             }
         }
-
         CropMilestoneUpdateEvent().postAndCatch()
     }
 
     companion object {
-        val cropCounter: MutableMap<CropType, Long> get() = SkyHanniMod.feature.hidden.gardenCropCounter
+        val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.config?.cropCounter
 
-        fun CropType.getCounter() = cropCounter[this]!!
+        // TODO make nullable
+        fun CropType.getCounter() = cropCounter?.get(this) ?: 0
 
         fun CropType.setCounter(counter: Long) {
-            cropCounter[this] = counter
+            cropCounter?.set(this, counter)
         }
 
         fun getTierForCrops(crops: Long): Int {
@@ -153,6 +143,7 @@ class GardenCropMilestones {
     }
 }
 
+// TODO delete?
 private fun String.formatNumber(): Long {
     var text = replace(",", "")
     val multiplier = if (text.endsWith("k")) {

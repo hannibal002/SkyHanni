@@ -17,7 +17,7 @@ import kotlin.time.DurationUnit
 
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden
-    private val hidden get() = SkyHanniMod.feature.hidden
+    private val hidden get() = GardenAPI.config
     private var display = listOf<List<Any>>()
     private var composterEmptyTime: Duration? = null
 
@@ -33,7 +33,7 @@ class ComposterDisplay {
             NEUItems.getItemStack(icon)
         }
 
-        val pattern by lazy {rawPattern.toPattern()}
+        val pattern by lazy { rawPattern.toPattern() }
 
         fun addToList(map: Map<DataType, String>): List<Any> {
             return listOf(displayItem, map[this]!!)
@@ -57,7 +57,7 @@ class ComposterDisplay {
         val organicMatter = ComposterAPI.getOrganicMatter()
         val fuel = ComposterAPI.getFuel()
 
-        if (ComposterAPI.composterUpgrades.isEmpty()) {
+        if (ComposterAPI.composterUpgrades.isNullOrEmpty()) {
             composterEmptyTime = null
             return
         }
@@ -135,6 +135,7 @@ class ComposterDisplay {
 
     private fun sendNotify() {
         if (!config.composterNotifyLowEnabled) return
+        val hidden = hidden ?: return
 
         if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter) {
             if (System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
