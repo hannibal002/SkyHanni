@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -87,6 +88,15 @@ object ProfileStorageData {
 
         profileSpecific?.let {
             it.currentPet = oldHidden.currentPet
+
+            for ((rawLocation, minionName) in oldHidden.minionName) {
+                val lastClick = oldHidden.minionLastClick[rawLocation] ?: -1
+                val location = LorenzVec.decodeFromString(rawLocation)
+                val minionConfig = Storage.ProfileSpecific.MinionConfig()
+                minionConfig.displayName = minionName
+                minionConfig.lastClicked = lastClick
+                it.minions[location] = minionConfig
+            }
         }
 
         profileSpecific?.garden?.let {

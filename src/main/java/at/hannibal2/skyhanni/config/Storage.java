@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 
 import java.util.*;
@@ -31,6 +32,19 @@ public class Storage {
 
         @Expose
         public String currentPet = "";
+
+        @Expose
+        public Map<LorenzVec, MinionConfig> minions = new HashMap<>();
+
+        public static class MinionConfig {
+
+            @Expose
+            public String displayName = "";
+
+            @Expose
+            public long lastClicked = -1;
+
+        }
 
         @Expose
         public GardenStorage garden = new GardenStorage();

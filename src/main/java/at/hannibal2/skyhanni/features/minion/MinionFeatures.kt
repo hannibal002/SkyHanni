@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
@@ -40,17 +41,6 @@ class MinionFeatures {
     private var lastMinionPickedUp = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        for (minion in SkyHanniMod.feature.hidden.minionLastClick) {
-            val key = minion.key
-            val vec = LorenzVec.decodeFromString(key)
-            val name = SkyHanniMod.feature.hidden.minionName[key] ?: "§cNo name saved!"
-            val data = MinionData(name, minion.value)
-            minions[vec] = data
-        }
-    }
 
     @SubscribeEvent
     fun onClick(event: InputEvent.MouseInputEvent) {
@@ -95,18 +85,20 @@ class MinionFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        val minions = minions ?: return
 
         val openInventory = InventoryUtils.currentlyOpenInventory()
         if (openInventory.contains("Minion")) {
             lastClickedEntity?.let {
                 val name = getMinionName(openInventory)
                 if (!minions.contains(it)) {
-                    minions[it] = MinionData(name, 0)
-                    saveConfig()
+                    minions[it] = Storage.ProfileSpecific.MinionConfig().apply {
+                        displayName = name
+                        lastClicked = 0
+                    }
                 } else {
                     if (minions[it]!!.displayName != name) {
                         minions[it]!!.displayName = name
-                        saveConfig()
                     }
                 }
                 lastMinion = it
@@ -124,7 +116,6 @@ class MinionFeatures {
 
                     if (System.currentTimeMillis() - lastCoinsRecived < 2_000) {
                         minions[location]!!.lastClicked = System.currentTimeMillis()
-                        saveConfig()
                     }
                     if (location !in minions) {
                         minions[location]!!.lastClicked = 0
@@ -132,7 +123,6 @@ class MinionFeatures {
 
                     if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
                         minions.remove(location)
-                        saveConfig()
                     }
                 }
             }
@@ -163,11 +153,13 @@ class MinionFeatures {
 
         if (coinsPerDay != "") return coinsPerDay
 
-        val lastClicked = minions[loc]!!.lastClicked
-        if (lastClicked == 0L) {
-            return "Can't calculate coins/day: No time data available!"
-        }
-        val duration = System.currentTimeMillis() - lastClicked
+        val duration = minions?.get(loc)?.let {
+            val lastClicked = it.lastClicked
+            if (lastClicked == 0L) {
+                return "Can't calculate coins/day: No time data available!"
+            }
+            System.currentTimeMillis() - lastClicked
+        } ?: return "Can't calculate coins/day: No time data available!"
 
         //§7Held Coins: §b151,389
         val coins = line.split(": §b")[1].replace(",", "").toDouble()
@@ -202,10 +194,9 @@ class MinionFeatures {
 
         minionUpgradePattern.matchMatcher(message) {
             val newTier = group("tier").romanToDecimalIfNeeded()
-            minions[lastMinion]?.let {
+            minions?.get(lastMinion)?.let {
                 val minionName = getMinionName(it.displayName, newTier)
                 it.displayName = minionName
-                saveConfig()
             }
         }
     }
@@ -217,6 +208,7 @@ class MinionFeatures {
 
         val playerLocation = LocationUtils.playerLocation()
         val playerEyeLocation = LocationUtils.playerEyeLocation()
+        val minions = minions ?: return
         for (minion in minions) {
             val location = minion.key.add(0.0, 1.0, 0.0)
             if (!LocationUtils.canSee(playerEyeLocation, location)) continue
@@ -253,6 +245,7 @@ class MinionFeatures {
         if (entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
+        val minions = minions ?: return
 
         if (entity.customNameTag.contains("§c❤")) {
             val loc = entity.getLorenzVec()
@@ -270,26 +263,11 @@ class MinionFeatures {
     }
 
     companion object {
-        private val minions = mutableMapOf<LorenzVec, MinionData>()
+        private val minions get() = ProfileStorageData.profileSpecific?.minions
 
         fun clearMinionData() {
-            minions.clear()
-            saveConfig()
+            minions?.clear()
             LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
-        }
-
-        private fun saveConfig() {
-            val minionConfig = SkyHanniMod.feature.hidden.minionLastClick
-            val minionName = SkyHanniMod.feature.hidden.minionName
-
-            minionConfig.clear()
-            minionName.clear()
-            for (minion in minions) {
-                val coordinates = minion.key.encodeToString()
-                val data = minion.value
-                minionConfig[coordinates] = data.lastClicked
-                minionName[coordinates] = data.displayName
-            }
         }
     }
 }

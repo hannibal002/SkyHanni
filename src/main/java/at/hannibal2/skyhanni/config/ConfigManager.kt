@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -30,6 +31,16 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): UUID {
                     return UUID.fromString(reader.nextString())
+                }
+            }.nullSafe())
+            .registerTypeAdapter(LorenzVec::class.java, object : TypeAdapter<LorenzVec>() {
+                override fun write(out: JsonWriter, value: LorenzVec) {
+                    value.run { out.value("$x:$y:$z") }
+                }
+
+                override fun read(reader: JsonReader): LorenzVec {
+                    val (x, y, z) = reader.nextString().split(":").map { it.toDouble() }
+                    return LorenzVec(x, y, z)
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()

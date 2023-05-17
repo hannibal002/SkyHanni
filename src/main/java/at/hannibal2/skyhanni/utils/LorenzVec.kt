@@ -79,11 +79,6 @@ data class LorenzVec(
         return sqrt(x * x + y * y + z * z)
     }
 
-    //TODO make this class json serializable
-    fun encodeToString(): String {
-        return "$x:$y:$z"
-    }
-
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
     fun clone(): LorenzVec = LorenzVec(x, y, z)
@@ -107,12 +102,9 @@ data class LorenzVec(
             return LorenzVec(x, z, y)
         }
 
-        //TODO make this class json serializable
+        // only for migration purposes
         fun decodeFromString(string: String): LorenzVec {
-            val split = string.split(":")
-            val x = split[0].toDouble()
-            val y = split[1].toDouble()
-            val z = split[2].toDouble()
+            val (x, y, z) = string.split(":").map { it.toDouble() }
             return LorenzVec(x, y, z)
         }
     }

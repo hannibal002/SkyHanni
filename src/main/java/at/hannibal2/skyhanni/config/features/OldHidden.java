@@ -20,10 +20,10 @@ public class OldHidden {
     public String currentPet = "";
 
     @Expose
-    public Map<String, Long> minionLastClick = new HashMap<>(); // TODO migration needed
+    public Map<String, Long> minionLastClick = new HashMap<>();
 
     @Expose
-    public Map<String, String> minionName = new HashMap<>(); // TODO migration needed
+    public Map<String, String> minionName = new HashMap<>();
 
     @Expose
     public List<String> crimsonIsleQuests = new ArrayList<>(); // TODO migration needed
