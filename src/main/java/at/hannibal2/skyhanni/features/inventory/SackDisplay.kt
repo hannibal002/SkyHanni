@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -21,7 +22,7 @@ class SackDisplay {
         var isRuneSack = false
     }
 
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.inventory.sackDisplay
     private var display = listOf<List<Any>>()
     private val sackItem = mutableMapOf<Pair<String, String>, Pair<String, String>>()
     private val runeItem = mutableMapOf<Pair<String, String>, String>()
@@ -34,7 +35,7 @@ class SackDisplay {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
-            config.sackDisplayPosition.renderStringsAndItems(
+            config.position.renderStringsAndItems(
                 display,
                 extraSpace = 5,
                 itemScale = 1.3,
@@ -66,14 +67,13 @@ class SackDisplay {
             newDisplay.addAsSingletonList("§7Items in Sacks:")
             for ((name, pair) in sortedPairs) {
                 val list = mutableListOf<Any>()
-                val colorCode = name.first
-                val itemName = name.second;
+                val (colorCode, itemName) = name
                 val internalName = NEUItems.getInternalName(itemName)
-                val itemstack = NEUItems.getItemStack(internalName)
+                val itemStack = NEUItems.getItemStack(internalName)
                 list.add(" §7- ")
-                list.add(itemstack)
+                list.add(itemStack)
                 list.add(" $itemName: ")
-                val item = when (config.showFullNumber) {
+                val item = when (config.numberFormat) {
                     0 -> "$colorCode${pair.first}§7/§b${pair.second}"
                     1 -> "$colorCode${NumberUtil.format(pair.first.formatNumber())}§7/§b${pair.second}"
                     2 -> "$colorCode${pair.first}§7/§b${String.format("%,d", pair.second.formatNumber())}"
@@ -115,13 +115,13 @@ class SackDisplay {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
-        if (isEnabled() && !isRuneDisplayEnabled() && inventoryName == "Runes Sack") return
+        if (!isRuneDisplayEnabled() && inventoryName == "Runes Sack") return
         val match = sackPattern.matcher(inventoryName).matches()
         if (!match) return
         val stacks = event.inventoryItems
-        if (inventoryName == "Runes sacks") isRuneSack = true
+        isRuneSack = inventoryName == "Runes sacks"
         inInventory = true
-        var runeLine = "";
+        var runeLine = ""
         for ((_, stack) in stacks) {
             val name = stack.name ?: continue
             val lore = stack.getLore()
@@ -159,6 +159,6 @@ class SackDisplay {
         update()
     }
 
-    private fun isEnabled() = config.showSackDisplay
-    private fun isRuneDisplayEnabled() = config.showRuneSackDisplay
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isRuneDisplayEnabled() = config.showRunes
 }

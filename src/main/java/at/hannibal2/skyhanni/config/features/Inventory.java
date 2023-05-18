@@ -112,40 +112,39 @@ public class Inventory {
     @ConfigAccordionId(id = 3)
     public boolean jacobFarmingContestRealTime = true;
 
-
+    @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
-    @ConfigEditorAccordion(id = 4)
-    public boolean sackDisplay = false;
+    @Accordion
+    public SackDisplay sackDisplay = new SackDisplay();
 
-    @Expose
-    @ConfigOption(name = "Sack Items Display Enabled", desc = "Show contained items inside a sack inventory.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    public boolean showSackDisplay = true;
+    public static class SackDisplay {
 
-    @Expose
-    @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers." +
-            "§eDefault: §72,240/2.2k\n" +
-            "§eFormatted: §72.2k/2.2k\n" +
-            "§eUnformatted: §72,240/2,200")
-    @ConfigEditorDropdown(values = {"Default", "Formatted", "Unformatted"})
-    @ConfigAccordionId(id = 4)
-    public int showFullNumber = 1;
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show contained items inside a sack inventory.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
 
-    @Expose
-    @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sacks.")
-    @ConfigEditorDropdown(values = {"Descending", "Ascending"})
-    @ConfigAccordionId(id = 4)
-    public int sortingType = 0;
+        @Expose
+        @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers." +
+                "§eDefault: §72,240/2.2k\n" +
+                "§eFormatted: §72.2k/2.2k\n" +
+                "§eUnformatted: §72,240/2,200")
+        @ConfigEditorDropdown(values = {"Default", "Formatted", "Unformatted"})
+        public int numberFormat = 1;
 
-    @Expose
-    @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 4)
-    public boolean showRuneSackDisplay = false;
+        @Expose
+        @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sacks.")
+        @ConfigEditorDropdown(values = {"Descending", "Ascending"})
+        public int sortingType = 0;
 
-    @Expose
-    public Position sackDisplayPosition = new Position(155, -57, false, true);
+        @Expose
+        @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack.")
+        @ConfigEditorBoolean
+        public boolean showRunes = false;
+
+        @Expose
+        public Position position = new Position(155, -57, false, true);
+    }
 
     @Expose
     @ConfigOption(
