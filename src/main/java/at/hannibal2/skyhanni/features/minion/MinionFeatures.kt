@@ -4,7 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -83,50 +86,66 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        val minions = minions ?: return
+        if (!event.inventoryName.contains(" Minion ")) return
 
-        val openInventory = InventoryUtils.currentlyOpenInventory()
-        if (openInventory.contains("Minion")) {
-            lastClickedEntity?.let {
-                val name = getMinionName(openInventory)
-                if (!minions.contains(it)) {
-                    minions[it] = Storage.ProfileSpecific.MinionConfig().apply {
-                        displayName = name
-                        lastClicked = 0
-                    }
-                } else {
-                    if (minions[it]!!.displayName != name) {
-                        minions[it]!!.displayName = name
-                    }
-                }
-                lastMinion = it
-                lastClickedEntity = null
-                minionInventoryOpen = true
-                lastMinionOpened = 0
-            }
-        } else {
-            if (minionInventoryOpen) {
-                minionInventoryOpen = false
-                lastMinionOpened = System.currentTimeMillis()
-
-                val location = lastMinion
-                if (location != null) {
-
-                    if (System.currentTimeMillis() - lastCoinsRecived < 2_000) {
-                        minions[location]!!.lastClicked = System.currentTimeMillis()
-                    }
-                    if (location !in minions) {
-                        minions[location]!!.lastClicked = 0
-                    }
-
-                    if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
-                        minions.remove(location)
-                    }
-                }
+        event.inventoryItems[48]?.let {
+            if ("§aCollect All" == it.name) {
+                MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onMinionOpen(event: MinionOpenEvent) {
+        val minions = minions ?: return
+        val entity = lastClickedEntity ?: return
+
+        val openInventory = event.inventoryName
+        val name = getMinionName(openInventory)
+        if (!minions.contains(entity)) {
+            minions[entity] = Storage.ProfileSpecific.MinionConfig().apply {
+                displayName = name
+                lastClicked = 0
+            }
+        } else {
+            if (minions[entity]!!.displayName != name) {
+                minions[entity]!!.displayName = name
+            }
+        }
+        lastMinion = entity
+        lastClickedEntity = null
+        minionInventoryOpen = true
+        lastMinionOpened = 0
+    }
+
+    @SubscribeEvent
+    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+        if (!minionInventoryOpen) return
+        val minions = minions ?: return
+
+        minionInventoryOpen = false
+        lastMinionOpened = System.currentTimeMillis()
+
+        val location = lastMinion ?: return
+
+        if (System.currentTimeMillis() - lastCoinsRecived < 2_000) {
+            minions[location]!!.lastClicked = System.currentTimeMillis()
+        }
+        if (location !in minions) {
+            minions[location]!!.lastClicked = 0
+        }
+
+        if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
+            minions.remove(location)
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
         if (config.hopperProfitDisplay) {
             coinsPerDay = if (minionInventoryOpen) {

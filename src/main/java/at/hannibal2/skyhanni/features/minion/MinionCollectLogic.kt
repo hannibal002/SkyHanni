@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.api.CollectionAPI
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -15,19 +12,7 @@ class MinionCollectLogic {
     private var oldMap = mapOf<String, Int>()
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (!event.inventoryName.contains(" Minion ")) return
-
-        event.inventoryItems[48]?.let {
-            if ("§aCollect All" == it.name) {
-                openMinion()
-            }
-        }
-    }
-
-    private fun openMinion() {
+    fun onMinionOpen(event: MinionOpenEvent) {
         if (oldMap.isNotEmpty()) return
         oldMap = count()
     }
