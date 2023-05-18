@@ -273,6 +273,7 @@ class SkyHanniMod {
         loadModule(TrevorSolver)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
+        loadModule(SackDisplay())
 
         init()
 
