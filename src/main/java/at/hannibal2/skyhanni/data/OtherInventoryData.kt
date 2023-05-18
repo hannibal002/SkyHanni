@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.*
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
+import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -36,6 +37,10 @@ class OtherInventoryData {
     @SubscribeEvent
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
+
+        if (packet is S2EPacketCloseWindow) {
+            close()
+        }
 
         if (packet is S2DPacketOpenWindow) {
             val windowId = packet.windowId

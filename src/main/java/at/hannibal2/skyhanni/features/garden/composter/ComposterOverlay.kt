@@ -78,7 +78,7 @@ class ComposterOverlay {
     var garden: GardenJson? = null
 
     @SubscribeEvent
-    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
