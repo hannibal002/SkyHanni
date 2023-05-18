@@ -124,8 +124,8 @@ public class Inventory {
     public boolean showSackDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Number Format", desc = "Either show full number or abbreviated. \n" +
-            "§eDefault: §7Same as displayed in sacks\n" +
+    @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers.\n" +
+            "§eDefault: §72,240/2.2k\n" +
             "§eFormatted: §72.2k/2.2k\n" +
             "§eUnformatted: §72,240/2,200")
     @ConfigEditorDropdown(values = {"Default", "Formatted", "Unformatted"})
@@ -133,7 +133,16 @@ public class Inventory {
     public int showFullNumber = 1;
 
     @Expose
-    @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack..")
+    @ConfigOption(name = "Sorting Type", desc = "Either show full number or abbreviated. \n" +
+            "§eDefault: §7Same as displayed in sacks\n" +
+            "§eFormatted: §72.2k/2.2k\n" +
+            "§eUnformatted: §72,240/2,200")
+    @ConfigEditorDropdown(values = {"Descending", "Ascending"})
+    @ConfigAccordionId(id = 4)
+    public int sortingType = 0;
+
+    @Expose
+    @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
     public boolean showRuneSackDisplay = false;

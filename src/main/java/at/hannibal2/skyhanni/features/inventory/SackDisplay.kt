@@ -55,8 +55,15 @@ class SackDisplay {
         val newDisplay = mutableListOf<List<Any>>()
 
         if (sackItem.isNotEmpty()) {
-            val sortedPairs = sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
-            newDisplay.addAsSingletonList("Items in Sacks")
+            val sortedPairs = when (config.sortingType) {
+                0 -> sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
+                1 -> sackItem.entries.sortedBy { it.value.first.formatNumber().toInt() }
+                else -> {
+                    sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
+                }
+            }
+
+            newDisplay.addAsSingletonList("§7Items in Sacks:")
             for ((name, pair) in sortedPairs) {
                 val list = mutableListOf<Any>()
                 val colorCode = name.first
@@ -80,7 +87,7 @@ class SackDisplay {
         }
 
         if (runeItem.isNotEmpty()) {
-            newDisplay.addAsSingletonList("Items in Sacks")
+            newDisplay.addAsSingletonList("§7Items in Sacks:")
             for ((name, runeLine) in runeItem) {
                 val list = mutableListOf<Any>()
                 val colorCode = name.first
