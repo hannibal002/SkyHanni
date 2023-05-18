@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SackDisplay {
@@ -78,7 +80,14 @@ class SackDisplay {
                 val (stored, total, price) = triple
                 list.add(" §7- ")
                 list.add(itemStack)
-                list.add(" $itemName: ")
+
+
+                list.add(Renderable.optionalLink("$itemName: ", {
+                    if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
+                        LorenzUtils.sendCommandToServer("bz ${itemName.removeColor()}")
+                    }
+                }) { !NEUItems.neuHasFocus() })
+
                 val item = when (config.numberFormat) {
                     0 -> "$colorCode${stored}§7/§b${total}"
                     1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
