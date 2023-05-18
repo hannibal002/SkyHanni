@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
+import java.awt.Color
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -71,5 +73,26 @@ object StringUtils {
         } else {
             split[0].removeColor()
         }
+    }
+
+    fun getColor(string: String, default: Int, darker: Boolean = true): Int {
+        val stringPattern = "§[0123456789abcdef].*".toPattern()
+
+        val matcher = stringPattern.matcher(string)
+        if (matcher.matches()) {
+            val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
+            // not to sure if this actually makes it darker
+            return if (darker) {
+                darkenInt(colorInt)
+            } else {
+                "ff${Integer.toHexString(colorInt)}".toLong(radix = 16).toInt()
+            }
+        }
+        return default
+    }
+
+    // There is probably a way to shorten this
+    private fun darkenInt(int: Int): Int {
+        return "ff${String.format("%06x", Color(Integer.toHexString(int).toLong(radix = 16).toInt()).darker().rgb and 0xFFFFFF)}".toLong(radix = 16).toInt()
     }
 }
