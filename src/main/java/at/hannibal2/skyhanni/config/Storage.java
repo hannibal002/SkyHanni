@@ -151,16 +151,16 @@ public class Storage {
 
             public static class Fortune {
                 @Expose
-                public Map<Integer, String> farmingTools = new HashMap<>();
+                public List<String> farmingTools = new ArrayList<>();
 
                 @Expose
-                public Map<Integer, String> farmingArmor = new HashMap<>();
+                public List<String> farmingArmor = new ArrayList<>();
 
                 @Expose
-                public Map<Integer, String> farmingEquipment = new HashMap<>();
+                public List<String> farmingEquipment = new ArrayList<>();
 
                 @Expose
-                public Map<Integer, String> farmingPets = new HashMap<>();
+                public List<String> farmingPets = new ArrayList<>();
             }
         }
     }

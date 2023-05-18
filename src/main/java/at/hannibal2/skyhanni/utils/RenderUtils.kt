@@ -806,8 +806,8 @@ object RenderUtils {
         GL11.glTranslatef(-x2, -y2, 0f)
     }
 
-    fun drawString(str: String, x: Int, y: Int) {
-        Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
+    fun drawString(str: String, x: Float, y: Float) {
+        Minecraft.getMinecraft().fontRendererObj.drawString(str, x, y, 0xffffff, true)
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
@@ -905,7 +905,7 @@ object RenderUtils {
             var tooltipTextWidth = 0f
 
             for (textLine in textLines) {
-                val textLineWidth = fr.getStringWidth(textLine).toFloat()
+                val textLineWidth = fr.getStringWidth(textLine).toFloat() * scale
                 if (textLineWidth > tooltipTextWidth) {
                     tooltipTextWidth = textLineWidth
                 }
@@ -951,7 +951,7 @@ object RenderUtils {
                 fr.drawString(line, tooltipX / scale, tooltipY / scale, 0xffffff, true)
                 tooltipY += if (line == textLines[0]) 12 * scale else 10 * scale
             }
-            GlStateManager.scale(1f, 1f, 1f)
+            GlStateManager.scale(1 / scale, 1 / scale, 1 / scale)
 
             GlStateManager.enableDepth()
             GlStateManager.enableLighting()

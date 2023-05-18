@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.*
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
@@ -32,8 +33,9 @@ open class FFGuideGUI : GuiScreen() {
 
         var tooltipToDisplay = mutableListOf<String>()
 
-        fun renderText(map: MutableMap<Pair<String, String>, Pair<Int, Int>>) {
+        fun renderText(map: MutableMap<Pair<String, String>, Pair<Int, Int>>, scale: Float = .7f) {
             for (line in map) {
+                val inverse = 1 /scale
                 val str = line.key.first
                 val tooltip = line.key.second
                 val x = line.value.first
@@ -41,15 +43,14 @@ open class FFGuideGUI : GuiScreen() {
 
                 val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str) + 6
                 val textHeight = 14
-
-                RenderUtils.drawString(str, x + 3, y + 3)
-                // TODO still don't know if I want it below the stat instead
-                // TODO prob need to add wrapping :/
+                GlStateManager.scale(scale, scale, scale)
+                RenderUtils.drawString(str, (x + 3) * inverse, (y + 2) * inverse)
+                GlStateManager.scale(inverse , inverse, inverse)
                 if (tooltip == "") continue
-                if (FFGuideGUI.mouseX > x && FFGuideGUI.mouseX < x + textWidth && FFGuideGUI.mouseY > y && FFGuideGUI.mouseY < y + textHeight) {
+                if (mouseX > x && mouseX < x + textWidth * scale && mouseY > y && mouseY < y + textHeight) {
                     val split = tooltip.split("\n")
                     for (tooltipLine in split) {
-                        FFGuideGUI.tooltipToDisplay.add(tooltipLine)
+                        tooltipToDisplay.add(tooltipLine)
                     }
                 }
             }
@@ -58,16 +59,16 @@ open class FFGuideGUI : GuiScreen() {
 
     init {
         pages[FortuneGuidePages.OVERVIEW] = OverviewPage()
-        pages[FortuneGuidePages.WHEAT] = CropPageMath()
-        pages[FortuneGuidePages.CARROT] = CropPageMath()
-        pages[FortuneGuidePages.POTATO] = CropPageOther()
-        pages[FortuneGuidePages.PUMPKIN] = CropPageOther()
-        pages[FortuneGuidePages.SUGAR_CANE] = CropPageOther()
-        pages[FortuneGuidePages.MELON] = CropPageOther()
-        pages[FortuneGuidePages.CACTUS] = CropPageOther()
-        pages[FortuneGuidePages.COCOA_BEANS] = CropPageOther()
-        pages[FortuneGuidePages.MUSHROOM] = CropPageOther()
-        pages[FortuneGuidePages.NETHER_WART] = CropPageOther()
+        pages[FortuneGuidePages.WHEAT] = WheatPage()
+        pages[FortuneGuidePages.CARROT] = CarrotPage()
+        pages[FortuneGuidePages.POTATO] = PotatoPage()
+        pages[FortuneGuidePages.PUMPKIN] = PumpkinPage()
+        pages[FortuneGuidePages.SUGAR_CANE] = CanePage()
+        pages[FortuneGuidePages.MELON] = MelonPage()
+        pages[FortuneGuidePages.CACTUS] = CactusPage()
+        pages[FortuneGuidePages.COCOA_BEANS] = CocoaPage()
+        pages[FortuneGuidePages.MUSHROOM] = MushroomPage()
+        pages[FortuneGuidePages.NETHER_WART] = WartPage()
     }
 
 //    override fun onGuiClosed() {
@@ -130,11 +131,13 @@ open class FFGuideGUI : GuiScreen() {
         if (mouseX > guiLeft + 45 && mouseX < guiLeft + 125 && mouseY > guiTop + sizeY && mouseY < guiTop + sizeY + 15) {
             SoundUtils.playClickSound()
             breakdownMode = true
+            pages[selectedPage]?.swapMode()
             return
         }
         if (mouseX > guiLeft + 130 && mouseX < guiLeft + 210 && mouseY > guiTop + sizeY && mouseY < guiTop + sizeY + 15) {
             SoundUtils.playClickSound()
             breakdownMode = false
+            pages[selectedPage]?.swapMode()
             return
         }
     }
@@ -173,6 +176,8 @@ open class FFGuideGUI : GuiScreen() {
         open fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
             return false
         }
+
+        abstract fun swapMode()
     }
 }
 

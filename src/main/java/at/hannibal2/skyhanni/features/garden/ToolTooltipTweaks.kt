@@ -4,49 +4,50 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
-class ToolTooltipTweaks {
+object ToolTooltipTweaks {
+    private var resultList = mutableListOf<String>()
+    private var string = ""
     private val config get() = SkyHanniMod.feature.garden
-    private val tooltipFortunePattern = "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
-    private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
+    private val tooltipFortunePattern = "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
+    private val counterStartLine = setOf("§6Logarithmic Counter", "§6Collection Analysis")
 
-    private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
+    private val reforgeEndLine = setOf("", "§7chance for multiple crops.")
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    fun gardenTooltip(itemStack: ItemStack, tooltip: MutableList<String>, fetching: Boolean = false): MutableList<String> {
+        string = ""
+        val crop = itemStack.getCropType()
+        val toolFortune = FarmingFortuneDisplay.getToolFortune(itemStack)
+        val counterFortune = FarmingFortuneDisplay.getCounterFortune(itemStack)
+        val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(itemStack)
+        val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(itemStack, crop)
+        val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(itemStack, crop)
 
-        val crop = event.itemStack.getCropType() ?: return
-        val toolFortune = FarmingFortuneDisplay.getToolFortune(event.itemStack)
-        val counterFortune = FarmingFortuneDisplay.getCounterFortune(event.itemStack)
-        val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(event.itemStack)
-        val turboCropFortune = FarmingFortuneDisplay.getTurboCropFortune(event.itemStack, crop)
-        val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(event.itemStack, crop)
-
-        val reforgeName = event.itemStack.getReforgeName()?.firstLetterUppercase()
-        val enchantments = event.itemStack.getEnchantments() ?: emptyMap()
+        val reforgeName = itemStack.getReforgeName()?.firstLetterUppercase()
+        val enchantments = itemStack.getEnchantments() ?: emptyMap()
         val sunderFortune = (enchantments["sunder"] ?: 0) * 12.5
         val harvestingFortune = (enchantments["harvesting"] ?: 0) * 12.5
         val cultivatingFortune = (enchantments["cultivating"] ?: 0).toDouble()
 
-        val ffdFortune = event.itemStack.getFarmingForDummiesCount()?.toDouble() ?: 0.0
+        val ffdFortune = itemStack.getFarmingForDummiesCount()?.toDouble() ?: 0.0
         val cropFortune = (toolFortune + counterFortune + collectionFortune + turboCropFortune + dedicationFortune)
-        val iterator = event.toolTip.listIterator()
 
         var removingFarmhandDescription = false
         var removingCounterDescription = false
         var removingReforgeDescription = false
-
-        for (line in iterator) {
-            val match = tooltipFortunePattern.matchEntire(line)?.groups
+        for (line in tooltip) {
+            val newLine = line.replace("§5§o", "")
+            val match = tooltipFortunePattern.matchEntire(newLine)?.groups
             if (match != null) {
                 val displayedFortune = match[1]!!.value.toDouble()
                 val reforgeFortune = match[2]!!.value.toDouble()
@@ -56,63 +57,79 @@ class ToolTooltipTweaks {
                 val reforgeString = if (reforgeFortune != 0.0) " §9(+${reforgeFortune.formatStat()})" else ""
                 val cropString = if (cropFortune != 0.0) " §6[+${cropFortune.roundToInt()}]" else ""
 
-                val fortuneLine = when (config.cropTooltipFortune) {
+                //TODO for fetch
+                val fortuneLine = if (fetching) "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
+                else when (config.cropTooltipFortune) {
                     0 -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
                     1 -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
                     else -> "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
-                iterator.set(fortuneLine)
+                string += fortuneLine + "\n"
 
-                if (Keyboard.isKeyDown(config.fortuneTooltipKeybind)) {
-                    iterator.addStat("  §7Sunder: §a+", sunderFortune)
-                    iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
-                    iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
-                    iterator.addStat("  §7Farming for Dummies: §2+", ffdFortune)
-                    iterator.addStat("  §7$reforgeName: §9+", reforgeFortune)
-                    iterator.addStat("  §7Tool: §6+", toolFortune)
-                    iterator.addStat("  §7Counter: §6+", counterFortune)
-                    iterator.addStat("  §7Collection: §6+", collectionFortune)
-                    iterator.addStat("  §7Dedication: §6+", dedicationFortune)
-                    iterator.addStat("  §7Turbo-Crop: §6+", turboCropFortune)
+                if (Keyboard.isKeyDown(config.fortuneTooltipKeybind) && !fetching) { // don't want to save this data
+                    string += ("  §7Sunder: §a+ $sunderFortune\n")
+                    string += ("  §7Harvesting: §a+ $harvestingFortune\n")
+                    string += ("  §7Cultivating: §a+ $cultivatingFortune\n")
+                    string += ("  §7Farming for Dummies: §2+ $ffdFortune\n")
+                    string += ("  §7$reforgeName: §9+ $reforgeFortune\n")
+                    string += ("  §7Tool: §6+ $toolFortune\n")
+                    string += ("  §7Counter: §6+ $counterFortune\n")
+                    string += ("  §7Collection: §6+ $collectionFortune\n")
+                    string += ("  §7Dedication: §6+ $dedicationFortune\n")
+                    string += ("  §7Turbo-Crop: §6+ $turboCropFortune\n")
                 }
+                continue
             }
             // Beware, dubious control flow beyond these lines
-            if (config.compactToolTooltips) {
-                if (line.startsWith("§5§o§7§8Bonus ")) removingFarmhandDescription = true
+            if (config.compactToolTooltips || fetching) {
+                if (newLine.startsWith("§7§8Bonus ")) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
-                    iterator.remove()
-                    removingFarmhandDescription = line != "§5§o"
+                    removingFarmhandDescription = newLine != ""
+                    continue
                 }
 
-                if (removingCounterDescription && !line.startsWith("§5§o§7You have")) {
-                    iterator.remove()
+                if (removingCounterDescription && !newLine.startsWith("§7You have")) {
+                    continue
                 } else {
                     removingCounterDescription = false
                 }
-                if (counterStartLine.contains(line)) removingCounterDescription = true
+                if (newLine in counterStartLine) removingCounterDescription = true
 
-                if (line == "§5§o§9Blessed Bonus") removingReforgeDescription = true
+                if (newLine == "§9Blessed Bonus") removingReforgeDescription = true
                 if (removingReforgeDescription) {
-                    iterator.remove()
-                    removingReforgeDescription = !reforgeEndLine.contains(line)
+                    removingReforgeDescription = !reforgeEndLine.contains(newLine)
+                    continue
                 }
-                if (line == "§5§o§9Bountiful Bonus") removingReforgeDescription = true
+                if (newLine == "§9Bountiful Bonus") removingReforgeDescription = true
             }
+            string += newLine + "\n"
+        }
+        resultList = string.split("\n").toMutableList()
+        return resultList
+    }
 
+    //TODO this is broken rn
+    @SubscribeEvent
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+
+        val iterator = event.toolTip.listIterator()
+        for (line in iterator) {
+            iterator.remove()
+        }
+        for (line in resultList) {
+            iterator.add(line)
         }
     }
 
-    companion object {
-        private fun Double.formatStat(): String {
-            val formatter = DecimalFormat("0.##")
-            return formatter.format(this)
-        }
+    private fun Double.formatStat(): String {
+        val formatter = DecimalFormat("0.##")
+        return formatter.format(this)
+    }
 
-
-        private fun MutableListIterator<String>.addStat(description: String, value: Double) {
-            if (value != 0.0) {
-                this.add("$description${value.formatStat()}")
-            }
+    private fun MutableListIterator<String>.addStat(description: String, value: Double) {
+        if (value != 0.0) {
+            this.add("$description${value.formatStat()}")
         }
     }
 }

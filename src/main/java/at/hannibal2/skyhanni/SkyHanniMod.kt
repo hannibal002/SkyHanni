@@ -254,7 +254,7 @@ class SkyHanniMod {
         loadModule(EstimatedItemValue())
         loadModule(ComposterInventoryNumbers())
         loadModule(FarmingFortuneDisplay())
-        loadModule(ToolTooltipTweaks())
+        loadModule(ToolTooltipTweaks)
         loadModule(CropSpeedMeter())
         loadModule(AshfangMinisNametagHider())
         loadModule(GardenTeleportPadInventoryNumber())
