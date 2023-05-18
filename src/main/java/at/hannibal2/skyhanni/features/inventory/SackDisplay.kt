@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -24,7 +26,7 @@ class SackDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
     private var display = listOf<List<Any>>()
-    private val sackItem = mutableMapOf<Pair<String, String>, Pair<String, String>>()
+    private val sackItem = mutableMapOf<Pair<String, String>, Triple<String, String, Int>>()
     private val runeItem = mutableMapOf<Pair<String, String>, String>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
 
@@ -54,36 +56,59 @@ class SackDisplay {
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
+        var totalPrice = 0
 
         if (sackItem.isNotEmpty()) {
             val sortedPairs = when (config.sortingType) {
                 0 -> sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
                 1 -> sackItem.entries.sortedBy { it.value.first.formatNumber().toInt() }
+                2 -> sackItem.entries.sortedByDescending { it.value.third }
+                3 -> sackItem.entries.sortedBy { it.value.third }
                 else -> {
                     sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
                 }
             }
 
             newDisplay.addAsSingletonList("§7Items in Sacks:")
-            for ((name, pair) in sortedPairs) {
+            for ((name, triple) in sortedPairs) {
                 val list = mutableListOf<Any>()
                 val (colorCode, itemName) = name
                 val internalName = NEUItems.getInternalName(itemName)
                 val itemStack = NEUItems.getItemStack(internalName)
+                val (stored, total, price) = triple
                 list.add(" §7- ")
                 list.add(itemStack)
                 list.add(" $itemName: ")
                 val item = when (config.numberFormat) {
-                    0 -> "$colorCode${pair.first}§7/§b${pair.second}"
-                    1 -> "$colorCode${NumberUtil.format(pair.first.formatNumber())}§7/§b${pair.second}"
-                    2 -> "$colorCode${pair.first}§7/§b${String.format("%,d", pair.second.formatNumber())}"
-                    else -> "$colorCode${pair.first}§7/§b${pair.second}"
+                    0 -> "$colorCode${stored}§7/§b${total}"
+                    1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                    2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
+                    else -> "$colorCode${stored}§7/§b${total}"
                 }
+
                 list.add(item)
                 if (colorCode == "§a") // §a = Full, §e = Not full, §7 = Empty
                     list.add(" §c§l(Full!)")
+
+                val format: String = when (config.priceFormat) {
+                    0 -> NumberUtil.format(price)
+                    1 -> price.addSeparators()
+                    else -> ""
+                }
+                if (config.showPrice && format.isNotEmpty() && format != "0")
+                    list.add(" §7(§6$format§7)")
+
+                totalPrice += price
                 newDisplay.add(list)
             }
+            val finalPrice: String = when (config.priceFormat) {
+                0 -> NumberUtil.format(totalPrice)
+                1 -> totalPrice.addSeparators()
+                else -> ""
+            }
+            if (config.showPrice && finalPrice.isNotEmpty())
+                newDisplay.addAsSingletonList("§eTotal price: §6$finalPrice")
+
         }
 
         if (runeItem.isNotEmpty()) {
@@ -130,8 +155,16 @@ class SackDisplay {
                     val stored = group("stored")
                     val total = group("total")
                     val color = group("color")
+                    val internalName = NEUItems.getInternalName(name)
+                    val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName) ?: continue@loop
+                    val price: Int = when (config.priceFrom) {
+                        0 -> (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+                        1 -> (bazaarData.npcPrice.toInt() * stored.formatNumber()).toInt()
+                        else -> 0
+                    }
+                    NEUItems.getPrice("", true)
                     val colored = Pair(color, name)
-                    val item = Pair(stored, total)
+                    val item = Triple(stored, total, price)
                     if (group("level") != null) {
                         val level = group("level")
                         if (level == "I") {
