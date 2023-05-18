@@ -9,11 +9,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 object ProfileStorageData {
     var playerSpecific: Storage.PlayerSpecific? = null
     var profileSpecific: Storage.ProfileSpecific? = null
     var loaded = false
+    var noTabListTime = -1L
 
     private var nextProfile: String? = null
 
@@ -38,9 +40,7 @@ object ProfileStorageData {
             LorenzUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
             return
         }
-        profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
-        loaded = true
-        println("profileSpecific loaded after profile swap!")
+        loadProfileSpecific(playerSpecific, profileName, "profile swap (chat message)")
         ConfigLoadEvent().postAndCatch()
     }
 
@@ -54,12 +54,51 @@ object ProfileStorageData {
 
         if (profileSpecific == null) {
             val profileName = event.name
-            profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
-            loaded = true
-            migrateProfileSpecific()
-            println("profileSpecific loaded for first join!")
-            ConfigLoadEvent().postAndCatch()
+            loadProfileSpecific(playerSpecific, profileName, "first join (chat message)")
         }
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (profileSpecific != null) return
+        val playerSpecific = playerSpecific ?: return
+        for (line in event.tabList) {
+            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
+            pattern.matchMatcher(line) {
+                val profileName = group("name").lowercase()
+                loadProfileSpecific(playerSpecific, profileName, "tab list")
+                nextProfile = null
+                return
+            }
+        }
+
+        if (LorenzUtils.inSkyBlock) {
+            noTabListTime = System.currentTimeMillis()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (noTabListTime == -1L) return
+
+        if (System.currentTimeMillis() > noTabListTime + 3_000) {
+            noTabListTime = System.currentTimeMillis()
+            LorenzUtils.chat(
+                "§c[SkyHanni] Extra Information from Tab list not found! " +
+                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
+            )
+        }
+    }
+
+    private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, profileName: String, reason: String) {
+        noTabListTime = -1
+        profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
+        println("Loaded profileSpecific: $reason")
+        tryMigrateProfileSpecific()
+        ConfigLoadEvent().postAndCatch()
+        loaded = true
     }
 
     @SubscribeEvent
@@ -82,7 +121,7 @@ object ProfileStorageData {
         }
     }
 
-    private fun migrateProfileSpecific() {
+    private fun tryMigrateProfileSpecific() {
         val oldHidden = SkyHanniMod.feature.hidden
         if (oldHidden.isMigrated) return
 
@@ -106,7 +145,7 @@ object ProfileStorageData {
             it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
         }
 
-            profileSpecific?.garden?.let {
+        profileSpecific?.garden?.let {
             it.experience = oldHidden.gardenExp
             it.cropCounter = oldHidden.gardenCropCounter
             it.cropUpgrades = oldHidden.gardenCropUpgrades
