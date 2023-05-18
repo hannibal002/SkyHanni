@@ -8,6 +8,7 @@ import net.minecraft.util.ResourceLocation
 
 object SoundUtils {
     private val beepSound by lazy { createSound("random.orb", 1f) }
+    private val clickSound by lazy { createSound("gui.button.press", 1f) }
 
     fun ISound.playSound() {
         val gameSettings = Minecraft.getMinecraft().gameSettings
@@ -45,5 +46,9 @@ object SoundUtils {
 
     fun playBeepSound() {
         beepSound.playSound()
+    }
+
+    fun playClickSound() {
+       clickSound.playSound()
     }
 }

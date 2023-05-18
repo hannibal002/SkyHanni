@@ -9,11 +9,14 @@ import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
@@ -801,5 +804,90 @@ object RenderUtils {
         GL11.glTranslatef(x2, y2, 0f)
         fr.drawString(str, 0f, 0f, colour, shadow)
         GL11.glTranslatef(-x2, -y2, 0f)
+    }
+
+    fun drawString(str: String, x: Int, y: Int) {
+        Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
+    }
+
+    fun drawStringCentered(str: String?, x: Int, y: Int) {
+        drawStringCentered(str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff)
+    }
+
+    fun renderItemStack(item: ItemStack, x: Int, y: Int) {
+        val itemRender = Minecraft.getMinecraft().renderItem
+        RenderHelper.enableGUIStandardItemLighting()
+        itemRender.zLevel = -145f
+        itemRender.renderItemAndEffectIntoGUI(item, x, y)
+        itemRender.zLevel = 0f
+        RenderHelper.disableStandardItemLighting()
+    }
+
+    // TODO NEU credit
+    private fun drawTooltip(
+        textLines: List<String>,
+        mouseX: Int,
+        mouseY: Int,
+        screenHeight: Int,
+        fr: FontRenderer
+    ) {
+        if (textLines.isNotEmpty()) {
+            val borderColor = StringUtils.getColor(textLines[0], 0x505000FF)
+
+            GlStateManager.disableRescaleNormal()
+            RenderHelper.disableStandardItemLighting()
+            GlStateManager.disableLighting()
+            GlStateManager.enableDepth()
+            var tooltipTextWidth = 0
+
+            for (textLine in textLines) {
+                val textLineWidth: Int = fr.getStringWidth(textLine)
+                if (textLineWidth > tooltipTextWidth) {
+                    tooltipTextWidth = textLineWidth
+                }
+            }
+
+            val tooltipX = mouseX + 12
+            var tooltipY = mouseY - 12
+            var tooltipHeight = 8
+
+            if (textLines.size > 1) tooltipHeight += (textLines.size - 1) * 10 + 2
+
+            if (tooltipY + tooltipHeight + 6 > screenHeight) tooltipY = screenHeight - tooltipHeight - 6
+            // main background
+            GuiScreen.drawRect(tooltipX - 3, tooltipY - 3,
+                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0)
+
+            // borders
+            GuiScreen.drawRect(tooltipX - 3, tooltipY - 3 + 1,
+                tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor)
+
+            GuiScreen.drawRect(tooltipX + tooltipTextWidth + 2, tooltipY - 3 + 1,
+                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3 - 1, borderColor)
+
+            GuiScreen.drawRect(tooltipX - 3, tooltipY - 3,
+                tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor)
+
+            GuiScreen.drawRect(tooltipX - 3, tooltipY + tooltipHeight + 2,
+                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColor)
+
+            GlStateManager.disableDepth()
+
+            for (line in textLines) {
+                fr.drawString(line, tooltipX.toFloat(), tooltipY.toFloat(), 0xffffff, true)
+
+                tooltipY += if (line == textLines[0]) 12 else 10
+            }
+
+            GlStateManager.enableDepth()
+            GlStateManager.enableLighting()
+            GlStateManager.enableRescaleNormal()
+            RenderHelper.enableStandardItemLighting()
+        }
+        GlStateManager.disableLighting()
+    }
+
+    fun drawTooltip(textLines: List<String>, mouseX: Int, mouseY: Int, screenHeight: Int) {
+        drawTooltip(textLines, mouseX, mouseY, screenHeight, Minecraft.getMinecraft().fontRendererObj)
     }
 }

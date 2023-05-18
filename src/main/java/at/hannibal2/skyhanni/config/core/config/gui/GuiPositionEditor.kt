@@ -52,10 +52,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     }
 
     private fun renderLabels(hoveredPos: Int) {
-        RenderUtils.drawStringCentered(
-            "§cSkyHanni Position Editor",
-            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 8f, true, 0xffffff
-        )
+        RenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
 
         var displayPos = -1
         if (clickedPos != -1) {
@@ -67,30 +64,17 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             displayPos = hoveredPos
         }
 
-        // When the mouse is not currently hovering over an gui element
+        // When the mouse is not currently hovering over a gui element
         if (displayPos == -1) {
-            RenderUtils.drawStringCentered(
-                "§eTo edit hidden GUI elements set a key in /sh edit",
-                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 20f, true, 0xffffff
-            )
-
-            RenderUtils.drawStringCentered(
-                "§ethen click that key while the GUI element is visible",
-                Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 32f, true, 0xffffff
-            )
+            RenderUtils.drawStringCentered("§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
+            RenderUtils.drawStringCentered("§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
             return
         }
 
         val pos = positions[displayPos]
-        RenderUtils.drawStringCentered(
-            "§b" + pos.internalName,
-            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 18f, true, 0xffffff
-        )
         val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
-        RenderUtils.drawStringCentered(
-            location,
-            Minecraft.getMinecraft().fontRendererObj, (getScaledWidth() / 2).toFloat(), 28f, true, 0xffffff
-        )
+        RenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
+        RenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
     }
 
     private fun renderRectangles(): Int {
