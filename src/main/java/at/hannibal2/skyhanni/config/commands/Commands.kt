@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
+import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -54,6 +56,7 @@ object Commands {
         registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
         registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
+        registerCommand("ff") { openFFGuideGUI() } // This is easier to remember than /shff or a long command
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
@@ -99,4 +102,9 @@ object Commands {
                 function(args.asList().toTypedArray())
             }
         }
+
+    private fun openFFGuideGUI() {
+        SkyHanniMod.screenToOpen = FFGuideGUI()
+    }
+
 }
