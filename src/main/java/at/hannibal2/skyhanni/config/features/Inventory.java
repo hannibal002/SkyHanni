@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -111,6 +112,35 @@ public class Inventory {
     @ConfigAccordionId(id = 3)
     public boolean jacobFarmingContestRealTime = true;
 
+
+    @ConfigOption(name = "Sack Items Display", desc = "")
+    @ConfigEditorAccordion(id = 4)
+    public boolean sackDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Sack Items Display Enabled", desc = "Show contained items inside a sack inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 4)
+    public boolean showSackDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Number Format", desc = "Either show full number or abbreviated. \n" +
+            "§eDefault: §7Same as displayed in sacks\n" +
+            "§eFormatted: §72.2k/2.2k\n" +
+            "§eUnformatted: §72,240/2,200")
+    @ConfigEditorDropdown(values = {"Default", "Formatted", "Unformatted"})
+    @ConfigAccordionId(id = 4)
+    public int showFullNumber = 1;
+
+    @Expose
+    @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack..")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 4)
+    public boolean showRuneSackDisplay = false;
+
+    @Expose
+    public Position sackDisplayPosition = new Position(155, -57, false, true);
+
     @Expose
     @ConfigOption(
             name = "Item number",
@@ -167,4 +197,6 @@ public class Inventory {
             desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
     public boolean highlightAuctions = true;
+
+
 }
