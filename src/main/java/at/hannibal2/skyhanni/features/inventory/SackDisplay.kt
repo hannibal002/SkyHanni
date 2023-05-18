@@ -33,13 +33,12 @@ class SackDisplay {
     private val numPattern =
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
 
-
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,
-                extraSpace = 5,
+                extraSpace = config.extraSpace,
                 itemScale = 1.3,
                 posLabel = "Sacks Items"
             )
@@ -58,7 +57,6 @@ class SackDisplay {
         val newDisplay = mutableListOf<List<Any>>()
         var totalPrice = 0
         var rendered = 0
-
         if (sackItem.isNotEmpty()) {
             val sortedPairs = when (config.sortingType) {
                 0 -> sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
@@ -150,7 +148,6 @@ class SackDisplay {
         isRuneSack = inventoryName == "Runes sacks"
         inInventory = true
         var runeLine = ""
-
         for ((_, stack) in stacks) {
             val name = stack.name ?: continue
             val lore = stack.getLore()
@@ -178,7 +175,6 @@ class SackDisplay {
 
                         else -> 0
                     }
-                    NEUItems.getPrice("", true)
                     val colored = Pair(color, name)
                     val item = Triple(stored, total, price)
                     if (group("level") != null) {

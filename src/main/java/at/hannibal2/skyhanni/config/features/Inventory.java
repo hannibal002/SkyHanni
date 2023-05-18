@@ -133,6 +133,14 @@ public class Inventory {
         public int numberFormat = 1;
 
         @Expose
+        @ConfigOption(name = "Extra space", desc = "Space between each lines of text.")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 10,
+                minStep = 1)
+        public int extraSpace = 1;
+
+        @Expose
         @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sack.")
         @ConfigEditorDropdown(values = {"Descending (Stored)", "Ascending (Stored)", "Descending (Price)", "Ascending (Price)"})
         public int sortingType = 0;
@@ -146,7 +154,6 @@ public class Inventory {
                 minStep = 1
         )
         public int itemToShow = 15;
-
 
         @Expose
         @ConfigOption(name = "Show Price", desc = "Show price for each items in sack.")
