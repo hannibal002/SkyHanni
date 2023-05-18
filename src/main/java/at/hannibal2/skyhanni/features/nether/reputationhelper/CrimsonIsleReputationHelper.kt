@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
@@ -40,11 +42,21 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     fun onRepoReload(event: RepositoryReloadEvent) {
         repoData = event.getConstant("CrimsonIsleReputation")!!
 
-        miniBossHelper.load()
-        kuudraBossHelper.load()
-
-        questHelper.load()
+        tryLoadConfig()
         update()
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        tryLoadConfig()
+    }
+
+    private fun tryLoadConfig() {
+        ProfileStorageData.profileSpecific?.crimsonIsle?.let {
+            miniBossHelper.load(it)
+            kuudraBossHelper.load(it)
+            questHelper.load(it)
+        }
     }
 
     @SubscribeEvent
@@ -100,9 +112,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     fun update() {
-        questHelper.saveConfig()
-        miniBossHelper.saveConfig()
-        kuudraBossHelper.saveConfig()
+        ProfileStorageData.profileSpecific?.crimsonIsle?.let {
+            questHelper.saveConfig(it)
+            miniBossHelper.saveConfig(it)
+            kuudraBossHelper.saveConfig(it)
+        }
 
         dirty = true
     }

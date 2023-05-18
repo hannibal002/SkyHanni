@@ -47,7 +47,25 @@ public class Storage {
         }
 
         @Expose
-        public GardenStorage garden = new GardenStorage();
+        public CrimsonIsleStorage crimsonIsle = new CrimsonIsleStorage();
+
+        public static class CrimsonIsleStorage {
+
+            @Expose
+            public List<String> quests = new ArrayList<>();
+
+            @Expose
+            public int latestTrophyFishInInventory = 0;
+
+            @Expose
+            public List<String> miniBossesDoneToday = new ArrayList<>();
+
+            @Expose
+            public List<String> kuudraTiersDone = new ArrayList<>();
+        }
+
+        @Expose
+        public ProfileSpecific.GardenStorage garden = new ProfileSpecific.GardenStorage();
 
         public static class GardenStorage {
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
@@ -101,14 +102,14 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         }
     }
 
-    fun saveConfig() {
-        SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.clear()
+    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        storage.miniBossesDoneToday.clear()
 
         miniBosses.filter { it.doneToday }
-            .forEach { SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday.add(it.displayName) }
+            .forEach { storage.miniBossesDoneToday.add(it.displayName) }
     }
 
-    fun load() {
+    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         miniBosses.clear()
 
         //Repo
@@ -123,7 +124,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         }
 
         //Config
-        for (name in SkyHanniMod.feature.hidden.crimsonIsleMiniBossesDoneToday) {
+        for (name in storage.miniBossesDoneToday) {
             getByDisplayName(name)!!.doneToday = true
         }
     }

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -138,8 +138,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
-    fun loadConfig() {
-        for (text in SkyHanniMod.feature.hidden.crimsonIsleQuests) {
+    fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        for (text in storage.quests) {
             val split = text.split(":")
             val name = split[0]
             val state = QuestState.valueOf(split[1])

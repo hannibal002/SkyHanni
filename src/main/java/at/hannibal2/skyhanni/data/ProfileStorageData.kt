@@ -99,7 +99,14 @@ object ProfileStorageData {
             }
         }
 
-        profileSpecific?.garden?.let {
+        profileSpecific?.crimsonIsle?.let {
+            it.quests = oldHidden.crimsonIsleQuests
+            it.latestTrophyFishInInventory = oldHidden.crimsonIsleLatestTrophyFishInInventory
+            it.miniBossesDoneToday = oldHidden.crimsonIsleMiniBossesDoneToday
+            it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
+        }
+
+            profileSpecific?.garden?.let {
             it.experience = oldHidden.gardenExp
             it.cropCounter = oldHidden.gardenCropCounter
             it.cropUpgrades = oldHidden.gardenCropUpgrades
