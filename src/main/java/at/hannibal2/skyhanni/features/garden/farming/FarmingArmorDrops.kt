@@ -40,7 +40,7 @@ class FarmingArmorDrops {
         for (dropType in ArmorDropType.values()) {
             if (dropType.chatMessage == event.message) {
                 addDrop(dropType)
-                if (config.farmingArmorDropsEnabled && config.farmingArmorDropsHideChat) {
+                if (config.farmingArmorDropsHideChat) {
                     event.blockedReason = "farming_armor_drops"
                 }
             }
