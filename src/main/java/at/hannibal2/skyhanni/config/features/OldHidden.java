@@ -26,16 +26,16 @@ public class OldHidden {
     public Map<String, String> minionName = new HashMap<>();
 
     @Expose
-    public List<String> crimsonIsleQuests = new ArrayList<>(); // TODO migration needed
+    public List<String> crimsonIsleQuests = new ArrayList<>();
 
     @Expose
-    public int crimsonIsleLatestTrophyFishInInventory = 0; // TODO migration needed
+    public int crimsonIsleLatestTrophyFishInInventory = 0;
 
     @Expose
-    public List<String> crimsonIsleMiniBossesDoneToday = new ArrayList<>(); // TODO migration needed
+    public List<String> crimsonIsleMiniBossesDoneToday = new ArrayList<>();
 
     @Expose
-    public List<String> crimsonIsleKuudraTiersDone = new ArrayList<>(); // TODO migration needed
+    public List<String> crimsonIsleKuudraTiersDone = new ArrayList<>();
 
     @Expose
     public Map<CropType, Long> gardenCropCounter = new HashMap<>();

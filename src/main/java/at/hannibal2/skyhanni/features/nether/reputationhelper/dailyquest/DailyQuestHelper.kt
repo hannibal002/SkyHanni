@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
@@ -319,15 +320,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         latestTrophyFishInInventory = 0
     }
 
-    fun load() {
+    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         reset()
 
-        questLoader.loadConfig()
-        latestTrophyFishInInventory = SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory
+        questLoader.loadConfig(storage)
+        latestTrophyFishInInventory = storage.latestTrophyFishInInventory
+
     }
 
-    fun saveConfig() {
-        SkyHanniMod.feature.hidden.crimsonIsleQuests.clear()
+    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        storage.quests.clear()
         for (quest in quests) {
             val builder = StringBuilder()
             val internalName = quest.internalName
@@ -347,10 +349,10 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             } else {
                 builder.append(":0")
             }
-            SkyHanniMod.feature.hidden.crimsonIsleQuests.add(builder.toString())
+            storage.quests.add(builder.toString())
         }
 
-        SkyHanniMod.feature.hidden.crimsonIsleLatestTrophyFishInInventory = latestTrophyFishInInventory
+        storage.latestTrophyFishInInventory = latestTrophyFishInInventory
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRIMSON_ISLE &&

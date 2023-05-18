@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -93,14 +94,14 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         updateAllKuudraDone()
     }
 
-    fun saveConfig() {
-        SkyHanniMod.feature.hidden.crimsonIsleKuudraTiersDone.clear()
+    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+        storage.kuudraTiersDone.clear()
 
         kuudraTiers.filter { it.doneToday }
-            .forEach { SkyHanniMod.feature.hidden.crimsonIsleKuudraTiersDone.add(it.name) }
+            .forEach { storage.kuudraTiersDone.add(it.name) }
     }
 
-    fun load() {
+    fun load(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
         kuudraTiers.clear()
 
         //Repo
@@ -120,7 +121,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         }
 
         //Config
-        for (name in SkyHanniMod.feature.hidden.crimsonIsleKuudraTiersDone) {
+        for (name in storage.kuudraTiersDone) {
             getByDisplayName(name)!!.doneToday = true
         }
         updateAllKuudraDone()
