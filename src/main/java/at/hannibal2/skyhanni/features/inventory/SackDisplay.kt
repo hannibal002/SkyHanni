@@ -57,6 +57,7 @@ class SackDisplay {
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
         var totalPrice = 0
+        var rendered = 0
 
         if (sackItem.isNotEmpty()) {
             val sortedPairs = when (config.sortingType) {
@@ -69,8 +70,9 @@ class SackDisplay {
                 }
             }
 
-            newDisplay.addAsSingletonList("§7Items in Sacks:")
+            newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering ${if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow} of ${sortedPairs.size} items)")
             for ((name, triple) in sortedPairs) {
+                if (rendered >= config.itemToShow) continue
                 val list = mutableListOf<Any>()
                 val (colorCode, itemName) = name
                 val internalName = NEUItems.getInternalName(itemName)
@@ -99,6 +101,7 @@ class SackDisplay {
                     list.add(" §7(§6$format§7)")
 
                 totalPrice += price
+                rendered++
                 newDisplay.add(list)
             }
             val finalPrice: String = when (config.priceFormat) {
@@ -147,6 +150,7 @@ class SackDisplay {
         isRuneSack = inventoryName == "Runes sacks"
         inInventory = true
         var runeLine = ""
+
         for ((_, stack) in stacks) {
             val name = stack.name ?: continue
             val lore = stack.getLore()

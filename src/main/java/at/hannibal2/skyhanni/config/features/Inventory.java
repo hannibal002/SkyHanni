@@ -137,6 +137,16 @@ public class Inventory {
         @ConfigEditorDropdown(values = {"Descending (Stored)", "Ascending (Stored)", "Descending (Price)", "Ascending (Price)"})
         public int sortingType = 0;
 
+        @Expose
+        @ConfigOption(name = "Item To Show", desc = "Choose how much items are displayed. (Some sacks have too much items to fit\n" +
+                "in larger gui scale, like the nether sack.)")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 45,
+                minStep = 1
+        )
+        public int itemToShow = 15;
+
 
         @Expose
         @ConfigOption(name = "Show Price", desc = "Show price for each items in sack.")
