@@ -156,10 +156,22 @@ class SackDisplay {
                     val total = group("total")
                     val color = group("color")
                     val internalName = NEUItems.getInternalName(name)
-                    val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName) ?: continue@loop
+
                     val price: Int = when (config.priceFrom) {
-                        0 -> (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                        1 -> (bazaarData.npcPrice.toInt() * stored.formatNumber()).toInt()
+                        0 -> {
+                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+                        }
+
+                        1 -> {
+                            try {
+                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
+
+                            } catch (e: Exception) {
+                                0
+                            }
+                        }
+
                         else -> 0
                     }
                     NEUItems.getPrice("", true)
