@@ -133,10 +133,7 @@ public class Inventory {
     public int showFullNumber = 1;
 
     @Expose
-    @ConfigOption(name = "Sorting Type", desc = "Either show full number or abbreviated. \n" +
-            "§eDefault: §7Same as displayed in sacks\n" +
-            "§eFormatted: §72.2k/2.2k\n" +
-            "§eUnformatted: §72,240/2,200")
+    @ConfigOption(name = "Sorting Type", desc = "Either show full number or abbreviated.")
     @ConfigEditorDropdown(values = {"Descending", "Ascending"})
     @ConfigAccordionId(id = 4)
     public int sortingType = 0;
