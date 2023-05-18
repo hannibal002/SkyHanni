@@ -783,7 +783,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "Use Custom",
-            desc = "Use the custom format below instead of classic -> §eSell Offer §7and other profiles -> §eNPC Price.")
+            desc = "Use the custom format below instead of classic ➜ §eSell Offer §7and other profiles ➜ §eNPC Price.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourUseCustomFormat = false;
