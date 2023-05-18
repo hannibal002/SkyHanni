@@ -124,7 +124,7 @@ public class Inventory {
     public boolean showSackDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers.\n" +
+    @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers." +
             "§eDefault: §72,240/2.2k\n" +
             "§eFormatted: §72.2k/2.2k\n" +
             "§eUnformatted: §72,240/2,200")
@@ -133,7 +133,7 @@ public class Inventory {
     public int showFullNumber = 1;
 
     @Expose
-    @ConfigOption(name = "Sorting Type", desc = "Either show full number or abbreviated.")
+    @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sacks.")
     @ConfigEditorDropdown(values = {"Descending", "Ascending"})
     @ConfigAccordionId(id = 4)
     public int sortingType = 0;
