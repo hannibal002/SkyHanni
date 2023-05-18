@@ -19,6 +19,7 @@ object GardenCropSpeed {
     private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenAPI.config?.latestBlocksPerSecond
 
     var lastBrokenCrop: CropType? = null
+    var lastBrokenTime = 0L
 
     var averageBlocksPerSecond = 0.0
 
@@ -62,6 +63,7 @@ object GardenCropSpeed {
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         lastBrokenCrop = event.crop
+        lastBrokenTime = System.currentTimeMillis()
         blocksBroken++
     }
 

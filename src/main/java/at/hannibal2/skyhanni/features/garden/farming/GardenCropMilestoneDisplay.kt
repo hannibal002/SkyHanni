@@ -173,17 +173,7 @@ object GardenCropMilestoneDisplay {
             GardenBestCropTime.timeTillNextCrop[crop] = millis
             val biggestUnit = TimeUnit.values()[config.cropMilestoneHighestTimeFormat.get()]
             val duration = TimeUtils.formatDuration(millis, biggestUnit)
-            if (config.cropMilestoneWarnClose) {
-                if (millis < 5_900) {
-                    if (System.currentTimeMillis() > lastPlaySoundTime + 1_000) {
-                        lastPlaySoundTime = System.currentTimeMillis()
-                        SoundUtils.playBeepSound()
-                    }
-                    if (!needsInventory) {
-                        TitleUtils.sendTitle("§b${crop.cropName} $nextTier in $duration", 1_500)
-                    }
-                }
-            }
+            tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
             val speedText = "§7In §b$duration"
             lineMap[3] = Collections.singletonList(speedText)
             GardenAPI.itemInHand?.let {
@@ -206,6 +196,20 @@ object GardenCropMilestoneDisplay {
         }
 
         return formatDisplay(lineMap)
+    }
+
+    private fun tryWarn(millis: Long, title: String) {
+        if (!config.cropMilestoneWarnClose) return
+        if (GardenCropSpeed.lastBrokenTime + 500 <= System.currentTimeMillis()) return
+        if (millis > 5_900) return
+
+        if (System.currentTimeMillis() > lastPlaySoundTime + 1_000) {
+            lastPlaySoundTime = System.currentTimeMillis()
+            SoundUtils.playBeepSound()
+        }
+        if (!needsInventory) {
+            TitleUtils.sendTitle(title, 1_500)
+        }
     }
 
     private fun formatDisplay(lineMap: HashMap<Int, List<Any>>): MutableList<List<Any>> {
