@@ -77,6 +77,12 @@ public class Chat {
     @ConfigAccordionId(id = 0)
     public boolean watchDog = true;
 
+    @Expose
+    @ConfigOption(name = "Profile Join", desc = "Hide 'You are playing on profile' and 'Profile ID' chat messages")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean profileJoin = true;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")

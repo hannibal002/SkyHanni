@@ -28,8 +28,8 @@ class ChatFilter {
         friendJoin(message) && config.friendJoinLeft -> "friend_join"
         killCombo(message) && config.killCombo -> "kill_combo"
         watchdogAnnouncement(message) && config.watchDog -> "watchdog"
+        profileJoin(message) && config.profileJoin -> "profile_join"
 
-        message.startsWith("§aYou are playing on profile: §e") && config.others -> "profile"//TODO move into own class
         bazaarAndAHMiniMessages(message) && config.others -> "bz_ah_minis"
         slayer(message) && config.others -> "slayer"
         slayerDrop(message) && config.others -> "slayer_drop"
@@ -224,6 +224,13 @@ class ChatFilter {
         message.matchRegex("§fWatchdog has banned §r§c§l(.*)§r§f players in the last 7 days.") -> true
         message.matchRegex("§fStaff have banned an additional §r§c§l(.*)§r§f in the last 7 days.") -> true
         message == "§cBlacklisted modifications are a bannable offense!" -> true
+        else -> false
+    }
+
+    private fun profileJoin(message: String) = when {
+        message.startsWith("§aYou are playing on profile: §e") -> true
+        message.startsWith("§8Profile ID: ") -> true
+
         else -> false
     }
 
