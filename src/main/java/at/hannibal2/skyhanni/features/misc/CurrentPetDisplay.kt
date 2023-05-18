@@ -3,10 +3,13 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -37,6 +40,24 @@ class CurrentPetDisplay {
             event.blockedReason = "pets"
         }
     }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        val config = ProfileStorageData.profileSpecific ?: return
+
+        val inventoryNamePattern = "(?:\\(\\d+/\\d+\\))? Pets".toPattern()
+        if (!inventoryNamePattern.matcher(event.inventoryName).matches()) return
+
+        val lore = event.inventoryItems[4]?.getLore() ?: return
+        val selectedPetPattern = "§7§7Selected pet: (?<pet>.*)".toPattern()
+        for (line in lore) {
+            selectedPetPattern.matchMatcher(line) {
+                val newPet = group("pet")
+                config.currentPet = if (newPet != "§cNone") newPet else ""
+            }
+        }
+    }
+
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
