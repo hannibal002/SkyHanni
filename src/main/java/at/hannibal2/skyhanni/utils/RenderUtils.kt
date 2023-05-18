@@ -887,6 +887,84 @@ object RenderUtils {
         GlStateManager.disableLighting()
     }
 
+    fun drawScaledItem(
+        textLines: List<String>,
+        x: Float,
+        y: Float,
+        screenHeight: Float,
+        fr: FontRenderer,
+        scale: Float
+    ) {
+        if (textLines.isNotEmpty()) {
+            val borderColor = StringUtils.getColor(textLines[0], 0x505000FF)
+
+            GlStateManager.disableRescaleNormal()
+            RenderHelper.disableStandardItemLighting()
+            GlStateManager.disableLighting()
+            GlStateManager.enableDepth()
+            var tooltipTextWidth = 0f
+
+            for (textLine in textLines) {
+                val textLineWidth = fr.getStringWidth(textLine).toFloat()
+                if (textLineWidth > tooltipTextWidth) {
+                    tooltipTextWidth = textLineWidth
+                }
+            }
+
+            val tooltipX = x + 12f
+            var tooltipY = y - 12f
+            var tooltipHeight = 8f
+
+            if (textLines.size > 1) tooltipHeight += (textLines.size - 1) * 10 * scale + 2 * scale
+
+            if (tooltipY + tooltipHeight + 6 * scale > screenHeight) tooltipY = screenHeight - tooltipHeight - 6 * scale
+
+            GuiScreen.drawRect(
+                (tooltipX - 3).toInt(), (tooltipY - 3).toInt(),
+                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY + tooltipHeight + 3).toInt(), -0xfeffff0
+            )
+
+            GuiScreen.drawRect(
+                (tooltipX - 3).toInt(), (tooltipY - 3 + 1).toInt(),
+                (tooltipX - 3 + 1).toInt(), (tooltipY + tooltipHeight + 3 - 1).toInt(), borderColor
+            )
+
+            GuiScreen.drawRect(
+                (tooltipX + tooltipTextWidth + 2).toInt(), (tooltipY - 3 + 1).toInt(),
+                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY + tooltipHeight + 3 - 1).toInt(), borderColor
+            )
+
+            GuiScreen.drawRect(
+                (tooltipX - 3).toInt(), (tooltipY - 3).toInt(),
+                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY - 3 + 1).toInt(), borderColor
+            )
+
+            GuiScreen.drawRect(
+                (tooltipX - 3).toInt(), (tooltipY + tooltipHeight + 2).toInt(),
+                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY + tooltipHeight + 3).toInt(), borderColor
+            )
+
+            GlStateManager.disableDepth()
+
+            GlStateManager.scale(scale, scale, scale)
+            for (line in textLines) {
+                fr.drawString(line, tooltipX / scale, tooltipY / scale, 0xffffff, true)
+                tooltipY += if (line == textLines[0]) 12 * scale else 10 * scale
+            }
+            GlStateManager.scale(1f, 1f, 1f)
+
+            GlStateManager.enableDepth()
+            GlStateManager.enableLighting()
+            GlStateManager.enableRescaleNormal()
+            RenderHelper.enableStandardItemLighting()
+        }
+        GlStateManager.disableLighting()
+    }
+
+    fun drawScaledItem(textLines: List<String>, x: Int, y: Int, screenHeight: Int,) {
+        drawScaledItem(textLines, x.toFloat(), y.toFloat(), screenHeight.toFloat(), Minecraft.getMinecraft().fontRendererObj, 0.5f)
+    }
+
     fun drawTooltip(textLines: List<String>, mouseX: Int, mouseY: Int, screenHeight: Int) {
         drawTooltip(textLines, mouseX, mouseY, screenHeight, Minecraft.getMinecraft().fontRendererObj)
     }

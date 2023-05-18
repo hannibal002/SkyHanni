@@ -145,7 +145,23 @@ public class Storage {
                 @Expose
                 public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
             }
-        }
 
+            @Expose
+            public Fortune fortune = new Fortune();
+
+            public static class Fortune {
+                @Expose
+                public Map<Integer, String> farmingTools = new HashMap<>();
+
+                @Expose
+                public Map<Integer, String> farmingArmor = new HashMap<>();
+
+                @Expose
+                public Map<Integer, String> farmingEquipment = new HashMap<>();
+
+                @Expose
+                public Map<Integer, String> farmingPets = new HashMap<>();
+            }
+        }
     }
 }

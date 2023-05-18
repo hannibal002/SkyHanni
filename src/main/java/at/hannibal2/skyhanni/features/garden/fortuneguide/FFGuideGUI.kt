@@ -14,11 +14,12 @@ import java.io.IOException
 import java.util.*
 
 open class FFGuideGUI : GuiScreen() {
-    private val pages = mutableMapOf<FortuneGuidePages, FFGuidePage>()
-
     companion object {
+        val pages = mutableMapOf<FortuneGuidePages, FFGuidePage>()
+
         var guiLeft = 0
         var guiTop = 0
+        var screenHeight = 0
 
         const val sizeX = 360
         const val sizeY = 180
@@ -30,20 +31,43 @@ open class FFGuideGUI : GuiScreen() {
         var mouseY = 0
 
         var tooltipToDisplay = mutableListOf<String>()
+
+        fun renderText(map: MutableMap<Pair<String, String>, Pair<Int, Int>>) {
+            for (line in map) {
+                val str = line.key.first
+                val tooltip = line.key.second
+                val x = line.value.first
+                val y = line.value.second
+
+                val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str) + 6
+                val textHeight = 14
+
+                RenderUtils.drawString(str, x + 3, y + 3)
+                // TODO still don't know if I want it below the stat instead
+                // TODO prob need to add wrapping :/
+                if (tooltip == "") continue
+                if (FFGuideGUI.mouseX > x && FFGuideGUI.mouseX < x + textWidth && FFGuideGUI.mouseY > y && FFGuideGUI.mouseY < y + textHeight) {
+                    val split = tooltip.split("\n")
+                    for (tooltipLine in split) {
+                        FFGuideGUI.tooltipToDisplay.add(tooltipLine)
+                    }
+                }
+            }
+        }
     }
 
     init {
         pages[FortuneGuidePages.OVERVIEW] = OverviewPage()
-        pages[FortuneGuidePages.WHEAT] = CropPage()
-        pages[FortuneGuidePages.CARROT] = CropPage()
-        pages[FortuneGuidePages.POTATO] = CropPage()
-        pages[FortuneGuidePages.PUMPKIN] = CropPage()
-        pages[FortuneGuidePages.SUGAR_CANE] = CropPage()
-        pages[FortuneGuidePages.MELON] = CropPage()
-        pages[FortuneGuidePages.CACTUS] = CropPage()
-        pages[FortuneGuidePages.COCOA_BEANS] = CropPage()
-        pages[FortuneGuidePages.MUSHROOM] = CropPage()
-        pages[FortuneGuidePages.NETHER_WART] = CropPage()
+        pages[FortuneGuidePages.WHEAT] = CropPageMath()
+        pages[FortuneGuidePages.CARROT] = CropPageMath()
+        pages[FortuneGuidePages.POTATO] = CropPageOther()
+        pages[FortuneGuidePages.PUMPKIN] = CropPageOther()
+        pages[FortuneGuidePages.SUGAR_CANE] = CropPageOther()
+        pages[FortuneGuidePages.MELON] = CropPageOther()
+        pages[FortuneGuidePages.CACTUS] = CropPageOther()
+        pages[FortuneGuidePages.COCOA_BEANS] = CropPageOther()
+        pages[FortuneGuidePages.MUSHROOM] = CropPageOther()
+        pages[FortuneGuidePages.NETHER_WART] = CropPageOther()
     }
 
 //    override fun onGuiClosed() {
@@ -53,7 +77,7 @@ open class FFGuideGUI : GuiScreen() {
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
         super.drawScreen(unusedX, unusedY, partialTicks)
         drawDefaultBackground()
-
+        screenHeight = height
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
 

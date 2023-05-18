@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
 import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
 import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
 import at.hannibal2.skyhanni.features.garden.farming.*
+import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.*
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics

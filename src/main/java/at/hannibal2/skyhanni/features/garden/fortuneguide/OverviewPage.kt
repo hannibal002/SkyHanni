@@ -2,9 +2,6 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.utils.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import java.io.IOException
 
 class OverviewPage: FFGuideGUI.FFGuidePage() {
@@ -46,32 +43,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
                 "§2You have $del equipt\n§2It gains: ${del}FF\n§c$del Minos relic is not good, do not use it")] =
             Pair(FFGuideGUI.guiLeft + 10,  FFGuideGUI.guiTop + 165)
 
-        //TODO render the item tooltips smaller
-
-        renderText()
-    }
-
-    private fun renderText() {
-        for (line in textLinesWithTooltip) {
-            val str = line.key.first
-            val tooltip = line.key.second
-            val x = line.value.first
-            val y = line.value.second
-
-            val textWidth: Int = fr.getStringWidth(str) + 6
-            val textHeight = 14
-
-            RenderUtils.drawString(str, x + 3, y + 3)
-            // TODO still don't know if I want it below the stat instead
-            // TODO prob need to add wrapping :/
-            if (tooltip == "") continue
-            if (FFGuideGUI.mouseX > x && FFGuideGUI.mouseX < x + textWidth && FFGuideGUI.mouseY > y && FFGuideGUI.mouseY < y + textHeight) {
-                val split = tooltip.split("\n")
-                for (tooltipLine in split) {
-                    FFGuideGUI.tooltipToDisplay.add(tooltipLine)
-                }
-            }
-        }
+        FFGuideGUI.renderText(textLinesWithTooltip)
     }
 
     @Throws(IOException::class)
