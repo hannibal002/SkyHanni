@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -23,8 +24,6 @@ class SackDisplay {
     private val config get() = SkyHanniMod.feature.inventory
     private var display = listOf<List<Any>>()
     private val sackItem = mutableMapOf<Pair<String, String>, Pair<String, String>>()
-
-
     private val runeItem = mutableMapOf<Pair<String, String>, String>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
 
@@ -57,6 +56,7 @@ class SackDisplay {
 
         if (sackItem.isNotEmpty()) {
             val sortedPairs = sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
+            newDisplay.addAsSingletonList("Items in Sacks")
             for ((name, pair) in sortedPairs) {
                 val list = mutableListOf<Any>()
                 val colorCode = name.first
@@ -80,15 +80,13 @@ class SackDisplay {
         }
 
         if (runeItem.isNotEmpty()) {
-            for ((name, triple) in runeItem) {
+            newDisplay.addAsSingletonList("Items in Sacks")
+            for ((name, runeLine) in runeItem) {
                 val list = mutableListOf<Any>()
                 val colorCode = name.first
                 val itemName = name.second
-                val internalName = NEUItems.getInternalName("${itemName.replace("◆ ", "")} I")
-                val itemstack = NEUItems.getItemStack(internalName)
                 list.add(" §7- ")
-                list.add(itemstack)
-                list.add(" $itemName $triple")
+                list.add(" $itemName $runeLine")
                 if (colorCode == "§a")
                     list.add(" §c§l(Full!)")
                 newDisplay.add(list)
