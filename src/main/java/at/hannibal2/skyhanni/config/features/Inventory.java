@@ -133,7 +133,7 @@ public class Inventory {
         public int numberFormat = 1;
 
         @Expose
-        @ConfigOption(name = "Extra space", desc = "Space between each lines of text.")
+        @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
         @ConfigEditorSlider(
                 minValue = 0,
                 maxValue = 10,
@@ -146,7 +146,7 @@ public class Inventory {
         public int sortingType = 0;
 
         @Expose
-        @ConfigOption(name = "Item To Show", desc = "Choose how much items are displayed. (Some sacks have too much items to fit\n" +
+        @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed. (Some sacks have too many items to fit\n" +
                 "in larger gui scale, like the nether sack.)")
         @ConfigEditorSlider(
                 minValue = 0,
@@ -156,7 +156,7 @@ public class Inventory {
         public int itemToShow = 15;
 
         @Expose
-        @ConfigOption(name = "Show Price", desc = "Show price for each items in sack.")
+        @ConfigOption(name = "Show Price", desc = "Show price for each item in sack.")
         @ConfigEditorBoolean
         public boolean showPrice = true;
 
