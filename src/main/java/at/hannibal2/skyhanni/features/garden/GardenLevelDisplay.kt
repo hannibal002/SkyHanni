@@ -49,8 +49,7 @@ class GardenLevelDisplay {
         if (newLevel == oldLevel + 1) {
             if (newLevel > 15) {
                 LorenzUtils.chat(
-                    " \n" +
-                            "§b§lGARDEN LEVEL UP §8$oldLevel -> §b$newLevel\n" +
+                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                             " §8+§aRespect from Elite Farmers and SkyHanni members :)\n "
                 )
             }

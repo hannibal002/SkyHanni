@@ -144,7 +144,7 @@ object GardenCropMilestoneDisplay {
 
         val list = mutableListOf<Any>()
         list.addCropIcon(crop)
-        list.add("§7" + crop.cropName + " $currentTier->$nextTier")
+        list.add("§7" + crop.cropName + " $currentTier➜$nextTier")
         lineMap[1] = list
 
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)

@@ -40,7 +40,7 @@ class GardenRecentTeleportPadsDisplay {
                 if (config.onlyTarget.get()) {
                     add(to)
                 } else {
-                    add(" $from §7-> $to")
+                    add(" $from §7➜ $to")
                 }
             }
         }

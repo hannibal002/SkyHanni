@@ -59,9 +59,7 @@ class TrevorFeatures {
                         TrevorSolver.findMob()
                     }
                 } catch (error: Throwable) {
-                    CopyErrorCommand.errorMessage = error.toString()
-                    CopyErrorCommand.errorStackTrace = error.stackTrace.asList()
-                    LorenzUtils.chat("§c[SkyHanni] encountered an error when updating the trapper solver, please run /shcopyerror")
+                    CopyErrorCommand.logError(error, "Encountered an error when updating the trapper solver")
                 }
             }
         }

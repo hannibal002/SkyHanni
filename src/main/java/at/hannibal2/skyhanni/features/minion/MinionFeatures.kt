@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -147,10 +148,10 @@ class MinionFeatures {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
 
-        if (config.hopperProfitDisplay) {
-            coinsPerDay = if (minionInventoryOpen) {
-                updateCoinsPerDay()
-            } else ""
+        if (Minecraft.getMinecraft().currentScreen is GuiChest) {
+            if (config.hopperProfitDisplay) {
+                coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
+            }
         }
     }
 
