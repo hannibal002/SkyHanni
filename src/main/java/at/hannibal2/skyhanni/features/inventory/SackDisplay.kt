@@ -155,11 +155,20 @@ class SackDisplay {
             for (gemstone in gemstoneItem) {
                 val list = mutableListOf<Any>()
                 val (name, gem) = gemstone
-                val (internalName, rough, flawed, fine, flawless) = gem
+                val (internalName, rough, flawed, fine, flawless, roughprice, flawedprice, fineprice, flawlessprice) = gem
+
                 list.add(" §7- ")
                 list.add(NEUItems.getItemStack(internalName))
                 list.add(name)
                 list.add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
+                val price = (roughprice + flawedprice + fineprice + flawlessprice)
+                val finalPrice: String = when (config.priceFormat) {
+                    0 -> NumberUtil.format(price)
+                    1 -> price.addSeparators()
+                    else -> ""
+                }
+                if (config.showPrice && finalPrice.isNotEmpty() && finalPrice != "0")
+                    list.add(" §7(§6$finalPrice§7)")
                 newDisplay.add(list)
             }
         }
@@ -197,18 +206,99 @@ class SackDisplay {
                     gemstonePattern.matchMatcher(line) {
                         val rarity = group("gemrarity")
                         val stored = group("stored")
-
+                        gem.internalName = gemstoneMap[name.removeColor()].toString()
                         if (gemstoneMap.containsKey(name.removeColor())) {
-                            gem.internalName = gemstoneMap[name.removeColor()].toString()
                             when (rarity) {
-                                "Rough" -> gem.rough = stored
-                                "Flawed" -> gem.flawed = stored
-                                "Fine" -> gem.fine = stored
-                                "Flawless" -> gem.flawless = stored
+                                "Rough" -> {
+                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    gem.rough = stored
+                                    gem.roughPrice = when (config.priceFrom) {
+                                        0 -> {
+                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+                                        }
+
+                                        1 -> {
+                                            try {
+                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
+
+                                            } catch (e: Exception) {
+                                                0
+                                            }
+                                        }
+
+                                        else -> 0
+                                    }
+                                }
+
+                                "Flawed" -> {
+                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    gem.flawed = stored
+                                    gem.flawedPrice = when (config.priceFrom) {
+                                        0 -> {
+                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+                                        }
+
+                                        1 -> {
+                                            try {
+                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
+
+                                            } catch (e: Exception) {
+                                                0
+                                            }
+                                        }
+
+                                        else -> 0
+                                    }
+                                }
+
+                                "Fine" -> {
+                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    gem.fine = stored
+                                    gem.finePrice = when (config.priceFrom) {
+                                        0 -> {
+                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+                                        }
+
+                                        1 -> {
+                                            try {
+                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
+
+                                            } catch (e: Exception) {
+                                                0
+                                            }
+                                        }
+
+                                        else -> 0
+                                    }
+                                }
+
+                                "Flawless" -> {
+                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    gem.flawless = stored
+                                    gem.flawlessPrice = when (config.priceFrom) {
+                                        0 -> {
+                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+                                        }
+
+                                        1 -> {
+                                            try {
+                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
+
+                                            } catch (e: Exception) {
+                                                0
+                                            }
+                                        }
+
+                                        else -> 0
+                                    }
+                                }
                             }
                             gemstoneItem[name] = gem
                         }
-
                     }
                 } else {
                     numPattern.matchMatcher(line) {
@@ -266,7 +356,11 @@ class SackDisplay {
         var rough: String = "0",
         var flawed: String = "0",
         var fine: String = "0",
-        var flawless: String = "0"
+        var flawless: String = "0",
+        var roughPrice: Int = 0,
+        var flawedPrice: Int = 0,
+        var finePrice: Int = 0,
+        var flawlessPrice: Int = 0
     )
 
     data class Rune(
