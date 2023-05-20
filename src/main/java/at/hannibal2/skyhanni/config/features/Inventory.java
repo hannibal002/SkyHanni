@@ -178,7 +178,7 @@ public class Inventory {
         public boolean showRunes = false;
 
         @Expose
-        public Position position = new Position(155, -57, false, true);
+        public Position position = new Position(144, 139, false, true);
     }
 
     @Expose
