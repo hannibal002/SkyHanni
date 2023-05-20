@@ -87,8 +87,9 @@ class SackDisplay {
                 else -> sackItem.toList().sortedByDescending { it.second.stored }.toMap().toMutableMap()
             }
 
-            newDisplay.addAsSingletonList("§7Items in Sacks:")
+            newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering ${if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow} of ${sortedPairs.size} items)")
             for ((itemName, item) in sortedPairs) {
+                if (rendered >= config.itemToShow) continue
                 if (rendered >= config.itemToShow) continue
                 val list = mutableListOf<Any>()
                 val (internalName, colorCode, stored, total, price) = item
@@ -136,7 +137,7 @@ class SackDisplay {
         }
 
         if (runeItem.isNotEmpty()) {
-            newDisplay.addAsSingletonList("§7Items in Sacks:")
+            newDisplay.addAsSingletonList("§7Runes:")
             for ((name, rune) in runeItem) {
                 val list = mutableListOf<Any>()
                 val (stack, lv1, lv2, lv3) = rune
