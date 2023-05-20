@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SackDisplay {
@@ -30,7 +31,7 @@ class SackDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
     private var display = listOf<List<Any>>()
-    private val sackItem = mutableMapOf<Pair<String, String>, Triple<String, String, Int>>()
+    private val sackItem = mutableMapOf<String, Item>()
     private val runeItem = mutableMapOf<String, Rune>()
     private val gemstoneItem = mutableMapOf<String, Gemstone>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
@@ -78,24 +79,20 @@ class SackDisplay {
         var totalPrice = 0
         var rendered = 0
         if (sackItem.isNotEmpty()) {
-            val sortedPairs = when (config.sortingType) {
-                0 -> sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
-                1 -> sackItem.entries.sortedBy { it.value.first.formatNumber().toInt() }
-                2 -> sackItem.entries.sortedByDescending { it.value.third }
-                3 -> sackItem.entries.sortedBy { it.value.third }
-                else -> {
-                    sackItem.entries.sortedByDescending { it.value.first.formatNumber().toInt() }
-                }
+            val sortedPairs: MutableMap<String, Item> = when (config.sortingType) {
+                0 -> sackItem.toList().sortedByDescending { it.second.stored }.toMap().toMutableMap()
+                1 -> sackItem.toList().sortedBy { it.second.stored }.toMap().toMutableMap()
+                2 -> sackItem.toList().sortedByDescending { it.second.price }.toMap().toMutableMap()
+                3 -> sackItem.toList().sortedBy { it.second.price }.toMap().toMutableMap()
+                else -> sackItem.toList().sortedByDescending { it.second.stored }.toMap().toMutableMap()
             }
 
-            newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering ${if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow} of ${sortedPairs.size} items)")
-            for ((name, triple) in sortedPairs) {
+            newDisplay.addAsSingletonList("§7Items in Sacks:")
+            for ((itemName, item) in sortedPairs) {
                 if (rendered >= config.itemToShow) continue
                 val list = mutableListOf<Any>()
-                val (colorCode, itemName) = name
-                val internalName = NEUItems.getInternalName(itemName)
+                val (internalName, colorCode, stored, total, price) = item
                 val itemStack = NEUItems.getItemStack(internalName)
-                val (stored, total, price) = triple
                 list.add(" §7- ")
                 list.add(itemStack)
 
@@ -105,14 +102,14 @@ class SackDisplay {
                     }
                 }) { !NEUItems.neuHasFocus() })
 
-                val item = when (config.numberFormat) {
+                val displayItem = when (config.numberFormat) {
                     0 -> "$colorCode${stored}§7/§b${total}"
                     1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
                     2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
                     else -> "$colorCode${stored}§7/§b${total}"
                 }
 
-                list.add(item)
+                list.add(displayItem)
                 if (colorCode == "§a") // §a = Full, §e = Not full, §7 = Empty
                     list.add(" §c§l(Full!)")
 
@@ -142,8 +139,9 @@ class SackDisplay {
             newDisplay.addAsSingletonList("§7Items in Sacks:")
             for ((name, rune) in runeItem) {
                 val list = mutableListOf<Any>()
-                val (lv1, lv2, lv3) = rune
+                val (stack, lv1, lv2, lv3) = rune
                 list.add(" §7- ")
+                stack?.let { list.add(it) }
                 list.add(name)
                 list.add(" §f(§e$lv1§7-§e$lv2§7-§e$lv3§f)")
                 newDisplay.add(list)
@@ -180,9 +178,9 @@ class SackDisplay {
         inInventory = false
         isRuneSack = false
         isGemstoneSack = false
-        sackItem.clear()
         runeItem.clear()
         gemstoneItem.clear()
+        sackItem.clear()
     }
 
     @SubscribeEvent
@@ -201,6 +199,7 @@ class SackDisplay {
             val lore = stack.getLore()
             val gem = Gemstone()
             val rune = Rune()
+            val item = Item()
             loop@ for (line in lore) {
                 if (isGemstoneSack) {
                     gemstonePattern.matchMatcher(line) {
@@ -210,7 +209,8 @@ class SackDisplay {
                         if (gemstoneMap.containsKey(name.removeColor())) {
                             when (rarity) {
                                 "Rough" -> {
-                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    val internalName =
+                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.rough = stored
                                     gem.roughPrice = when (config.priceFrom) {
                                         0 -> {
@@ -232,7 +232,8 @@ class SackDisplay {
                                 }
 
                                 "Flawed" -> {
-                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    val internalName =
+                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.flawed = stored
                                     gem.flawedPrice = when (config.priceFrom) {
                                         0 -> {
@@ -254,7 +255,8 @@ class SackDisplay {
                                 }
 
                                 "Fine" -> {
-                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    val internalName =
+                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.fine = stored
                                     gem.finePrice = when (config.priceFrom) {
                                         0 -> {
@@ -276,7 +278,8 @@ class SackDisplay {
                                 }
 
                                 "Flawless" -> {
-                                    val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    val internalName =
+                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.flawless = stored
                                     gem.flawlessPrice = when (config.priceFrom) {
                                         0 -> {
@@ -304,9 +307,9 @@ class SackDisplay {
                     numPattern.matchMatcher(line) {
                         val stored = group("stored")
                         val total = group("total")
-                        val color = group("color")
-                        val colored = Pair(color, name)
                         val internalName = stack.getInternalName()
+                        item.internalName = internalName
+                        item.colorCode = group("color")
                         val price: Int = when (config.priceFrom) {
                             0 -> {
                                 (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
@@ -324,10 +327,13 @@ class SackDisplay {
 
                             else -> 0
                         }
-                        val item = Triple(stored, total, price)
+                        item.stored = stored
+                        item.total = total
+                        item.price = price
 
                         if (isRuneSack) {
                             val level = group("level")
+                            rune.stack = stack
                             if (level == "I") {
                                 rune.lvl1 = stored
                                 continue@loop
@@ -341,7 +347,7 @@ class SackDisplay {
                             }
                             runeItem.put(name, rune)
                         } else {
-                            sackItem.put(colored, item)
+                            sackItem.put(name, item)
                         }
                     }
                 }
@@ -364,9 +370,18 @@ class SackDisplay {
     )
 
     data class Rune(
+        var stack: ItemStack? = null,
         var lvl1: String = "0",
         var lvl2: String = "0",
         var lvl3: String = "0"
+    )
+
+    data class Item(
+        var internalName: String = "",
+        var colorCode: String = "",
+        var stored: String = "0",
+        var total: String = "0",
+        var price: Int = 0
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
