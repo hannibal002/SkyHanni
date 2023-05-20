@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
@@ -1059,14 +1059,14 @@ public class Garden {
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
-    @ConfigOption(name = "Farming Fortune", desc = "")
+    @ConfigOption(name = "Farming Fortune Display", desc = "")
     @ConfigEditorAccordion(id = 22)
     public boolean farmingFortune = false;
 
     @Expose
     @ConfigOption(
             name = "FF Display",
-            desc = "Displays current farming fortune, including crop-specific bonuses."
+            desc = "Displays current your true farming fortune, including crop-specific bonuses."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 22)
@@ -1082,12 +1082,10 @@ public class Garden {
     @ConfigAccordionId(id = 22)
     public boolean farmingFortuneDropMultiplier = true;
 
-    //TODO command name
-    @ConfigOption(name = "Farming Fortune Guide", desc = "See a guide that breaks down your farming fortune for each tool along with " +
-            "sorting the next best upgrades to get. Can also be opened with /ff")
-    @ConfigEditorButton(buttonText = "Edit")
-    //TODO rename
-    public Runnable positions = GuiEditManager::openGuiEditor;
+    @ConfigOption(name = "Farming Fortune Guide", desc = "See a guide that breaks down your farming fortune along with " +
+            "sorting the next best upgrades for you to get. Can also be opened with /ff")
+    @ConfigEditorButton(buttonText = "Open")
+    public Runnable positions = Commands::openFortuneGuide;
 
     @Expose
     public Position farmingFortunePos = new Position(-375, -200, false, true);

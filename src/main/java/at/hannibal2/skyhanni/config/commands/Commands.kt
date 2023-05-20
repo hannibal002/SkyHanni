@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
-import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
@@ -92,13 +91,12 @@ object Commands {
         registerCommand("shcopyerror") { CopyErrorCommand.command(it) }
 
     }
-
-    private fun openFortuneGuide() {
+    @JvmStatic
+     fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
             LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
-        } else openFFGuideGUI()
+        } else SkyHanniMod.screenToOpen = FFGuideGUI()
     }
-
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
@@ -110,9 +108,4 @@ object Commands {
                 function(args.asList().toTypedArray())
             }
         }
-
-    private fun openFFGuideGUI() {
-        SkyHanniMod.screenToOpen = FFGuideGUI()
-    }
-
 }

@@ -7,9 +7,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
 

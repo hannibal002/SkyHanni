@@ -16,7 +16,6 @@ import java.io.IOException
 import java.util.*
 
 open class FFGuideGUI : GuiScreen() {
-    // todo pet depending on selected pet, assuming elephant for now
     private val pet1 = GardenAPI.config?.fortune?.farmingItems?.get(18)?.let { NEUItems.loadNBTData(it) }
     private val pet2 = GardenAPI.config?.fortune?.farmingItems?.get(19)?.let { NEUItems.loadNBTData(it) }
     private val pet3 = GardenAPI.config?.fortune?.farmingItems?.get(20)?.let { NEUItems.loadNBTData(it) }

@@ -59,7 +59,6 @@ class CaptureFarmingGear {
             if (event.inventoryItems[37]?.getInternalName() == "LOTUS_BRACELET") hidden[17] = event.inventoryItems[37]?.let { NEUItems.saveNBTData(it) }
         }
         if (event.inventoryName.contains("Pets")) {
-            // will not detect pets like rabbit that have a yellow/green bandana currently, not a big priority
             // multiple of the same pet will cause it to be overwritten
             for (slot in event.inventoryItems) {
                 if (slot.value.getInternalName().contains("ELEPHANT")) {
@@ -75,7 +74,6 @@ class CaptureFarmingGear {
         }
     }
 
-    //save event and populate empty
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val hidden = GardenAPI.config?.fortune ?: return
