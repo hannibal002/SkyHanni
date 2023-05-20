@@ -157,7 +157,11 @@ class SackDisplay {
 
                 list.add(" §7- ")
                 list.add(NEUItems.getItemStack(internalName))
-                list.add(name)
+                list.add(Renderable.optionalLink("$name: ", {
+                    if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
+                        LorenzUtils.sendCommandToServer("bz ${name.removeColor().dropLast(1)}")
+                    }
+                }) { !NEUItems.neuHasFocus() })
                 list.add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
                 val price = (roughprice + flawedprice + fineprice + flawlessprice)
                 val finalPrice: String = when (config.priceFormat) {
@@ -168,7 +172,15 @@ class SackDisplay {
                 if (config.showPrice && finalPrice.isNotEmpty() && finalPrice != "0")
                     list.add(" §7(§6$finalPrice§7)")
                 newDisplay.add(list)
+                totalPrice += price
             }
+            val finalPrice: String = when (config.priceFormat) {
+                0 -> NumberUtil.format(totalPrice)
+                1 -> totalPrice.addSeparators()
+                else -> ""
+            }
+            if (config.showPrice && finalPrice.isNotEmpty())
+                newDisplay.addAsSingletonList("§eTotal price: §6$finalPrice")
         }
         return newDisplay
     }
