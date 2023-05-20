@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,16 +25,31 @@ class SackDisplay {
     companion object {
         var inInventory = false
         var isRuneSack = false
+        var isGemstoneSack = false
     }
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
     private var display = listOf<List<Any>>()
     private val sackItem = mutableMapOf<Pair<String, String>, Triple<String, String, Int>>()
-    private val runeItem = mutableMapOf<Pair<String, String>, String>()
+    private val runeItem = mutableMapOf<String, Rune>()
+    private val gemstoneItem = mutableMapOf<String, Gemstone>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
+    private val gemstoneMap = mapOf(
+        "Jade Gemstones" to "ROUGH_JADE_GEM",
+        "Amber Gemstones" to "ROUGH_AMBER_GEM",
+        "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
+        "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
+        "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
+        "Jasper Gemstones" to "ROUGH_JASPER_GEM",
+        "Ruby Gemstones" to "ROUGH_RUBY_GEM",
+        "Opal Gemstones" to "ROUGH_OPAL_GEM"
+    )
 
     private val numPattern =
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
+    private val gemstonePattern =
+        " (?:§[0-9a-f])(?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?) §[0-9a-f]\\((?:\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)\\)".toPattern()
+
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
@@ -51,9 +67,11 @@ class SackDisplay {
         display = drawDisplay()
     }
 
+
     private fun update() {
         updateDisplay()
     }
+
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
@@ -80,7 +98,6 @@ class SackDisplay {
                 val (stored, total, price) = triple
                 list.add(" §7- ")
                 list.add(itemStack)
-
 
                 list.add(Renderable.optionalLink("$itemName: ", {
                     if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
@@ -123,18 +140,29 @@ class SackDisplay {
 
         if (runeItem.isNotEmpty()) {
             newDisplay.addAsSingletonList("§7Items in Sacks:")
-            for ((name, runeLine) in runeItem) {
+            for ((name, rune) in runeItem) {
                 val list = mutableListOf<Any>()
-                val colorCode = name.first
-                val itemName = name.second
+                val (lv1, lv2, lv3) = rune
                 list.add(" §7- ")
-                list.add(" $itemName $runeLine")
-                if (colorCode == "§a")
-                    list.add(" §c§l(Full!)")
+                list.add(name)
+                list.add(" §f(§e$lv1§7-§e$lv2§7-§e$lv3§f)")
                 newDisplay.add(list)
             }
         }
 
+        if (gemstoneItem.isNotEmpty()) {
+            newDisplay.addAsSingletonList("§7Gemstones:")
+            for (gemstone in gemstoneItem) {
+                val list = mutableListOf<Any>()
+                val (name, gem) = gemstone
+                val (internalName, rough, flawed, fine, flawless) = gem
+                list.add(" §7- ")
+                list.add(NEUItems.getItemStack(internalName))
+                list.add(name)
+                list.add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
+                newDisplay.add(list)
+            }
+        }
         return newDisplay
     }
 
@@ -142,8 +170,10 @@ class SackDisplay {
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         isRuneSack = false
+        isGemstoneSack = false
         sackItem.clear()
         runeItem.clear()
+        gemstoneItem.clear()
     }
 
     @SubscribeEvent
@@ -154,64 +184,96 @@ class SackDisplay {
         val match = sackPattern.matcher(inventoryName).matches()
         if (!match) return
         val stacks = event.inventoryItems
-        isRuneSack = inventoryName == "Runes sacks"
+        isRuneSack = inventoryName == "Runes Sack"
+        isGemstoneSack = inventoryName == "Gemstones Sack"
         inInventory = true
-        var runeLine = ""
         for ((_, stack) in stacks) {
             val name = stack.name ?: continue
             val lore = stack.getLore()
+            val gem = Gemstone()
+            val rune = Rune()
             loop@ for (line in lore) {
-                numPattern.matchMatcher(line) {
-                    val stored = group("stored")
-                    val total = group("total")
-                    val color = group("color")
-                    val internalName = NEUItems.getInternalName(name)
+                if (isGemstoneSack) {
+                    gemstonePattern.matchMatcher(line) {
+                        val rarity = group("gemrarity")
+                        val stored = group("stored")
 
-                    val price: Int = when (config.priceFrom) {
-                        0 -> {
-                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                        }
-
-                        1 -> {
-                            try {
-                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
-
-                            } catch (e: Exception) {
-                                0
+                        if (gemstoneMap.containsKey(name.removeColor())) {
+                            gem.internalName = gemstoneMap[name.removeColor()].toString()
+                            when (rarity) {
+                                "Rough" -> gem.rough = stored
+                                "Flawed" -> gem.flawed = stored
+                                "Fine" -> gem.fine = stored
+                                "Flawless" -> gem.flawless = stored
                             }
+                            gemstoneItem[name] = gem
                         }
 
-                        else -> 0
                     }
-                    val colored = Pair(color, name)
-                    val item = Triple(stored, total, price)
-                    if (group("level") != null) {
-                        val level = group("level")
-                        if (level == "I") {
-                            runeLine = "§cI $color$stored§7/§b$total"
-                            continue@loop
-                        }
-                        if (level == "II") {
-                            runeLine += "§7, §cII $color$stored§7/§b$total"
-                            continue@loop
-                        }
-                        if (level == "III") {
-                            runeLine += "§7, §cIII $color$stored§7/§b$total"
-                        }
+                } else {
+                    numPattern.matchMatcher(line) {
+                        val stored = group("stored")
+                        val total = group("total")
+                        val color = group("color")
+                        val colored = Pair(color, name)
+                        val internalName = stack.getInternalName()
+                        val price: Int = when (config.priceFrom) {
+                            0 -> {
+                                (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+                            }
 
-                        runeItem.put(colored, runeLine)
-                    } else {
-                        sackItem.put(colored, item)
+                            1 -> {
+                                try {
+                                    val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+                                    (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
+
+                                } catch (e: Exception) {
+                                    0
+                                }
+                            }
+
+                            else -> 0
+                        }
+                        val item = Triple(stored, total, price)
+
+                        if (isRuneSack) {
+                            val level = group("level")
+                            if (level == "I") {
+                                rune.lvl1 = stored
+                                continue@loop
+                            }
+                            if (level == "II") {
+                                rune.lvl2 = stored
+                                continue@loop
+                            }
+                            if (level == "III") {
+                                rune.lvl3 = stored
+                            }
+                            runeItem.put(name, rune)
+                        } else {
+                            sackItem.put(colored, item)
+                        }
                     }
-
                 }
             }
-
         }
-
         update()
     }
+
+
+    data class Gemstone(
+        var internalName: String = "",
+        var rough: String = "0",
+        var flawed: String = "0",
+        var fine: String = "0",
+        var flawless: String = "0"
+    )
+
+    data class Rune(
+        var lvl1: String = "0",
+        var lvl2: String = "0",
+        var lvl3: String = "0"
+    )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isRuneDisplayEnabled() = config.showRunes
