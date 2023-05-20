@@ -27,11 +27,15 @@ object GardenVisitorDropStatistics {
     private var totalVisitors = 0
     private var visitorRarities = mutableListOf<Long>()
     private var copper = 0
+    private var gardenExp = 0
     private var farmingExp = 0L
     var coinsSpent = 0L
 
+    var lastAccept = 0L
+
     private val acceptPattern = "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]".toPattern()
     private val copperPattern = "[+](?<amount>.*) Copper".toPattern()
+    private val gardenExpPattern = "[+](?<amount>.*) Garden Experience".toPattern()
     private val farmingExpPattern = "[+](?<amount>.*) Farming XP".toPattern()
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
@@ -52,28 +56,35 @@ object GardenVisitorDropStatistics {
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
-        val message = event.message.removeColor().trim()
+        if (lastAccept - System.currentTimeMillis() <= 0 && lastAccept - System.currentTimeMillis() > -1000) {
+            val message = event.message.removeColor().trim()
 
-        copperPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
-            copper += amount
-            saveAndUpdate()
-        }
-        farmingExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber()
-            farmingExp += amount
-            saveAndUpdate()
-        }
-        acceptPattern.matchMatcher(message) {
-            setRarities(group("rarity"))
-            saveAndUpdate()
-        }
-
-        for (reward in VisitorReward.values()) {
-            reward.pattern.matchMatcher(message) {
-                val old = rewardsCount[reward] ?: 0
-                rewardsCount = rewardsCount.editCopy { this[reward] = old + 1 }
+            copperPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                copper += amount
                 saveAndUpdate()
+            }
+            farmingExpPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber()
+                farmingExp += amount
+                saveAndUpdate()
+            }
+            gardenExpPattern.matchMatcher(message) {
+                val amount = group("amount").formatNumber().toInt()
+                gardenExp += amount
+                saveAndUpdate()
+            }
+            acceptPattern.matchMatcher(message) {
+                setRarities(group("rarity"))
+                saveAndUpdate()
+            }
+
+            for (reward in VisitorReward.values()) {
+                reward.pattern.matchMatcher(message) {
+                    val old = rewardsCount[reward] ?: 0
+                    rewardsCount = rewardsCount.editCopy { this[reward] = old + 1 }
+                    saveAndUpdate()
+                }
             }
         }
     }
@@ -108,6 +119,8 @@ object GardenVisitorDropStatistics {
         addAsSingletonList(format(copper, "Copper", "§c", ""))
         //7
         addAsSingletonList(format(farmingExp, "Farming EXP", "§3", "§7"))
+        //16
+        addAsSingletonList(format(gardenExp, "Garden EXP", "§2", "§7"))
         //8
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
@@ -148,6 +161,7 @@ object GardenVisitorDropStatistics {
         hidden.visitorRarities = visitorRarities
         hidden.copper = copper
         hidden.farmingExp = farmingExp
+        hidden.gardenExp = gardenExp
         hidden.coinsSpent = coinsSpent
         hidden.rewardsCount = rewardsCount
         display = formatDisplay(drawVisitorStatsDisplay())
@@ -168,6 +182,7 @@ object GardenVisitorDropStatistics {
         visitorRarities = hidden.visitorRarities
         copper = hidden.copper
         farmingExp = hidden.farmingExp
+        gardenExp = hidden.gardenExp
         coinsSpent = hidden.coinsSpent
         rewardsCount = hidden.rewardsCount
         saveAndUpdate()

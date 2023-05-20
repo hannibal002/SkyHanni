@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -267,5 +269,18 @@ object NEUItems {
                     + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
                     + ";" + group("level").romanToDecimal())
         }
+    }
+
+    //Used from NEU
+    fun saveNBTData(item: ItemStack): JsonObject {
+        val temp = manager.getJsonForItem(item)
+        if (!temp.has("internalname")) {
+            temp.add("internalname", JsonPrimitive("_"))
+        }
+        return temp
+    }
+
+    fun loadNBTData(json: JsonObject): ItemStack {
+        return manager.jsonToStack(json, false)
     }
 }

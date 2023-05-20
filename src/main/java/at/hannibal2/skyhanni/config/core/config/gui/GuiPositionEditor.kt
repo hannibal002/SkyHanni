@@ -98,7 +98,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             elementHeight = position.getDummySize().y
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
-            if (inXY(mouseX, x, mouseY, y, elementWidth, elementHeight)) {
+            if (RenderUtils.isPointInRect(mouseX, mouseY, x - border, y - border, elementWidth + border * 2, elementHeight + border * 2)) {
                 hoveredPos = index
             }
         }
@@ -124,7 +124,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val x = position.getAbsX()
             val y = position.getAbsY()
             if (!position.clicked) {
-                if (inXY(mouseX, x, mouseY, y, elementWidth, elementHeight)) {
+                if (RenderUtils.isPointInRect(mouseX, mouseY, x - border, y - border, elementWidth + border * 2, elementHeight + border * 2)) {
                     clickedPos = i
                     position.clicked = true
                     grabbedX = mouseX
@@ -134,16 +134,6 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             }
         }
     }
-
-    private fun inXY(
-        mouseX: Int,
-        x: Int,
-        mouseY: Int,
-        y: Int,
-        elementWidth: Int,
-        elementHeight: Int,
-    ) =
-        mouseX >= x - border && mouseY >= y - border && mouseX <= x + elementWidth + border * 2 && mouseY <= y + elementHeight + border * 2
 
     @Throws(IOException::class)
     override fun keyTyped(typedChar: Char, keyCode: Int) {

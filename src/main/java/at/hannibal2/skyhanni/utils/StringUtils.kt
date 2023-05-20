@@ -81,7 +81,6 @@ object StringUtils {
         val matcher = stringPattern.matcher(string)
         if (matcher.matches()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
-            // not to sure if this actually makes it darker
             return if (darker) {
                 darkenInt(colorInt)
             } else {
@@ -91,8 +90,8 @@ object StringUtils {
         return default
     }
 
-    // There is probably a way to shorten this
+    // does not work
     private fun darkenInt(int: Int): Int {
-        return "ff${String.format("%06x", Color(Integer.toHexString(int).toLong(radix = 16).toInt()).darker().rgb and 0xFFFFFF)}".toLong(radix = 16).toInt()
+        return "ff${String.format("%06x", Color(Integer.toHexString(int).toLong(radix = 16).toInt()).darker().rgb)}".toLong(radix = 16).toInt()
     }
 }

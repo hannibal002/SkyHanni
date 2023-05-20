@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
@@ -852,7 +853,7 @@ object RenderUtils {
             var tooltipHeight = 8
 
             if (textLines.size > 1) tooltipHeight += (textLines.size - 1) * 10 + 2
-
+            GlStateManager.translate(0f, 0f, 100f)
             if (tooltipY + tooltipHeight + 6 > screenHeight) tooltipY = screenHeight - tooltipHeight - 6
             // main background
             GuiScreen.drawRect(tooltipX - 3, tooltipY - 3,
@@ -870,7 +871,7 @@ object RenderUtils {
 
             GuiScreen.drawRect(tooltipX - 3, tooltipY + tooltipHeight + 2,
                 tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColor)
-
+            GlStateManager.translate(0f, 0f, -100f)
             GlStateManager.disableDepth()
 
             for (line in textLines) {
@@ -887,85 +888,29 @@ object RenderUtils {
         GlStateManager.disableLighting()
     }
 
-    fun drawScaledItem(
-        textLines: List<String>,
-        x: Float,
-        y: Float,
-        screenHeight: Float,
-        fr: FontRenderer,
-        scale: Float
-    ) {
-        if (textLines.isNotEmpty()) {
-            val borderColor = StringUtils.getColor(textLines[0], 0x505000FF)
-
-            GlStateManager.disableRescaleNormal()
-            RenderHelper.disableStandardItemLighting()
-            GlStateManager.disableLighting()
-            GlStateManager.enableDepth()
-            var tooltipTextWidth = 0f
-
-            for (textLine in textLines) {
-                val textLineWidth = fr.getStringWidth(textLine).toFloat() * scale
-                if (textLineWidth > tooltipTextWidth) {
-                    tooltipTextWidth = textLineWidth
-                }
-            }
-
-            val tooltipX = x + 12f
-            var tooltipY = y - 12f
-            var tooltipHeight = 8f
-
-            if (textLines.size > 1) tooltipHeight += (textLines.size - 1) * 10 * scale + 2 * scale
-
-            if (tooltipY + tooltipHeight + 6 * scale > screenHeight) tooltipY = screenHeight - tooltipHeight - 6 * scale
-
-            GuiScreen.drawRect(
-                (tooltipX - 3).toInt(), (tooltipY - 3).toInt(),
-                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY + tooltipHeight + 3).toInt(), -0xfeffff0
-            )
-
-            GuiScreen.drawRect(
-                (tooltipX - 3).toInt(), (tooltipY - 3 + 1).toInt(),
-                (tooltipX - 3 + 1).toInt(), (tooltipY + tooltipHeight + 3 - 1).toInt(), borderColor
-            )
-
-            GuiScreen.drawRect(
-                (tooltipX + tooltipTextWidth + 2).toInt(), (tooltipY - 3 + 1).toInt(),
-                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY + tooltipHeight + 3 - 1).toInt(), borderColor
-            )
-
-            GuiScreen.drawRect(
-                (tooltipX - 3).toInt(), (tooltipY - 3).toInt(),
-                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY - 3 + 1).toInt(), borderColor
-            )
-
-            GuiScreen.drawRect(
-                (tooltipX - 3).toInt(), (tooltipY + tooltipHeight + 2).toInt(),
-                (tooltipX + tooltipTextWidth + 3).toInt(), (tooltipY + tooltipHeight + 3).toInt(), borderColor
-            )
-
-            GlStateManager.disableDepth()
-
-            GlStateManager.scale(scale, scale, scale)
-            for (line in textLines) {
-                fr.drawString(line, tooltipX / scale, tooltipY / scale, 0xffffff, true)
-                tooltipY += if (line == textLines[0]) 12 * scale else 10 * scale
-            }
-            GlStateManager.scale(1 / scale, 1 / scale, 1 / scale)
-
-            GlStateManager.enableDepth()
-            GlStateManager.enableLighting()
-            GlStateManager.enableRescaleNormal()
-            RenderHelper.enableStandardItemLighting()
-        }
-        GlStateManager.disableLighting()
-    }
-
-    fun drawScaledItem(textLines: List<String>, x: Int, y: Int, screenHeight: Int,) {
-        drawScaledItem(textLines, x.toFloat(), y.toFloat(), screenHeight.toFloat(), Minecraft.getMinecraft().fontRendererObj, 0.5f)
-    }
-
     fun drawTooltip(textLines: List<String>, mouseX: Int, mouseY: Int, screenHeight: Int) {
         drawTooltip(textLines, mouseX, mouseY, screenHeight, Minecraft.getMinecraft().fontRendererObj)
+    }
+
+    fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int): Boolean {
+        return left <= x && x < left + width && top <= y && y < top + height
+    }
+
+    fun drawProgressBar(x: Int, y: Int, barWidth: Int, progress: Float) {
+        GuiScreen.drawRect(x, y, x + barWidth, y + 6, 0xFF43464B.toInt())
+        val width = barWidth * progress
+        GuiScreen.drawRect(x + 1, y + 1, (x + width).toInt() + 1, y + 5, 0xFF00FF00.toInt())
+        if (progress != 1f) GuiScreen.drawRect((x + width).toInt() + 1, y + 1, x + barWidth - 1, y + 5, 0xFF013220.toInt())
+    }
+
+    fun renderItemAndTip(item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
+        GuiScreen.drawRect(x, y, x + 16, y + 16, color)
+        if (item?.displayName != "Painting" && item != null) {
+            renderItemStack(item, x, y)
+            if (isPointInRect(mouseX, mouseY, x, y, 16, 16)) {
+                val tt: List<String> = item.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+                FFGuideGUI.tooltipToDisplay.addAll(tt)
+            }
+        }
     }
 }

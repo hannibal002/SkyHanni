@@ -206,7 +206,7 @@ public class Garden {
                         "§c254 Denied",
                         " ",
                         "§c62,072 Copper",
-                        "§23.2m Farming EXP",
+                        "§33.2m Farming EXP",
                         "§647.2m Coins Spent",
                         "§b23 §9Flowering Bouquet",
                         "§b4 §9Overgrown Grass",
@@ -215,6 +215,7 @@ public class Garden {
                         "§b6 §9Music Rune",
                         "§b1 §cSpace Helmet",
                         " ", // If they want another empty row
+                        "§212,735 Garden EXP",
                 }
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -17,15 +16,15 @@ import kotlin.math.roundToInt
 
 object ToolTooltipTweaks {
     private var resultList = mutableListOf<String>()
-    private var string = ""
     private val config get() = SkyHanniMod.feature.garden
     private val tooltipFortunePattern = "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
     private val counterStartLine = setOf("§6Logarithmic Counter", "§6Collection Analysis")
 
     private val reforgeEndLine = setOf("", "§7chance for multiple crops.")
 
-    fun gardenTooltip(itemStack: ItemStack, tooltip: MutableList<String>, fetching: Boolean = false): MutableList<String> {
-        string = ""
+     private fun gardenTooltip(itemStack: ItemStack, tooltip: MutableList<String>, fetching: Boolean = false): MutableList<String> {
+        var string = ""
+        resultList.clear()
         val crop = itemStack.getCropType()
         val toolFortune = FarmingFortuneDisplay.getToolFortune(itemStack)
         val counterFortune = FarmingFortuneDisplay.getCounterFortune(itemStack)
@@ -104,15 +103,15 @@ object ToolTooltipTweaks {
             }
             string += newLine + "\n"
         }
-        resultList = string.split("\n").toMutableList()
-        return resultList
+         resultList = string.split("\n").toMutableList()
+         resultList.removeLast()
+         return resultList
     }
-
-    //TODO this is broken rn
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
+        gardenTooltip(event.itemStack, event.toolTip)
         val iterator = event.toolTip.listIterator()
         for (line in iterator) {
             iterator.remove()

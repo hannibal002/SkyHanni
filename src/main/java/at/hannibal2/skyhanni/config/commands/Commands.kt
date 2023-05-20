@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -56,7 +57,7 @@ object Commands {
         registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
         registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
-        registerCommand("ff") { openFFGuideGUI() } // This is easier to remember than /shff or a long command
+        registerCommand("ff") { openFortuneGuide() } // This is easier to remember than /shff or a long command
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
@@ -91,6 +92,13 @@ object Commands {
         registerCommand("shcopyerror") { CopyErrorCommand.command(it) }
 
     }
+
+    private fun openFortuneGuide() {
+        if (!LorenzUtils.inSkyBlock) {
+            LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
+        } else openFFGuideGUI()
+    }
+
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))

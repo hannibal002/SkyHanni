@@ -5,7 +5,11 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.utils.LorenzVec;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
 
@@ -140,6 +144,9 @@ public class Storage {
                 public long farmingExp = 0;
 
                 @Expose
+                public int gardenExp = 0;
+
+                @Expose
                 public long coinsSpent = 0;
 
                 @Expose
@@ -150,17 +157,9 @@ public class Storage {
             public Fortune fortune = new Fortune();
 
             public static class Fortune {
-                @Expose
-                public List<String> farmingTools = new ArrayList<>();
 
                 @Expose
-                public List<String> farmingArmor = new ArrayList<>();
-
-                @Expose
-                public List<String> farmingEquipment = new ArrayList<>();
-
-                @Expose
-                public List<String> farmingPets = new ArrayList<>();
+                public List<JsonObject> farmingItems = new ArrayList<>();
             }
         }
     }
