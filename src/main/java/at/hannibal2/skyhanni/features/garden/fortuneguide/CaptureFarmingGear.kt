@@ -1,20 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage.PlayerSpecific
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -31,11 +28,10 @@ class CaptureFarmingGear {
     //need to add the lower tiers of farming armor eg. pumpkin or whatever
 
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
-    // will not capture the user levelling up to Farming 1 but also they cannot use garden at this level so doesnt matter
+    // will not capture the user levelling up to Farming 1
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
-
-    //todo anita buff
-    //todo finish cakes, currently don't add the 48 hrs yet
+    private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
+    private val anitaMenuPattern = "§7You have: §a[+](?<level>.*)%".toPattern()
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
@@ -66,7 +62,7 @@ class CaptureFarmingGear {
         if (!LorenzUtils.inSkyBlock) return
         val hidden = GardenAPI.config?.fortune ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
-            // will not update if they equip something new, also won't
+            // will not update if they equip something new
             if (event.inventoryItems[10]?.getInternalName() == "LOTUS_NECKLACE") hidden.farmingItems[14] = event.inventoryItems[10]?.let { NEUItems.saveNBTData(it) }
             if (event.inventoryItems[19]?.getInternalName() == "LOTUS_CLOAK") hidden.farmingItems[15] = event.inventoryItems[19]?.let { NEUItems.saveNBTData(it) }
             if (event.inventoryItems[28]?.getInternalName() == "LOTUS_BELT") hidden.farmingItems[16] = event.inventoryItems[28]?.let { NEUItems.saveNBTData(it) }
@@ -114,18 +110,30 @@ class CaptureFarmingGear {
             }
             hidden.plotsUnlocked = plots
         }
+        if (event.inventoryName.contains("Anita")) {
+            for (slot in event.inventoryItems) {
+                if (slot.value.displayName.contains("§eExtra Farming Drops")) {
+                    for (line in slot.value.getLore()) {
+                        val matcher = anitaMenuPattern.matcher(line)
+                        if (matcher.matches()) {
+                            hidden.anitaUpgrade = matcher.group("level").toInt() / 2
+                        }
+                    }
+                }
+            }
+        }
 
-//        println(event.inventoryName)
-//        for (item in event.inventoryItems) {
-//            println("at: ${item.key}, name: ${item.value.displayName}, internal name: ${item.value.getInternalName()}, lore: ${item.value.getLore()}")
-//        }
+        println(event.inventoryName)
+        for (item in event.inventoryItems) {
+            println("at: ${item.key}, name: ${item.value.displayName}, internal name: ${item.value.getInternalName()}, lore: ${item.value.getLore()}")
+        }
     }
 
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val hidden = GardenAPI.config?.fortune ?: return
         val msg = event.message.removeColor().trim()
-        println(event.message)
         var matcher = fortuneUpgradePattern.matcher(msg)
         if (matcher.matches()) {
             SkyHanniMod.feature.storage.gardenCommunityUpgrade = matcher.group("level").romanToDecimal()
@@ -134,11 +142,14 @@ class CaptureFarmingGear {
         if (matcher.matches()) {
             hidden.farmingLevel = matcher.group("level").romanToDecimal()
         }
+        matcher = anitaBuffPattern.matcher(msg)
+        if (matcher.matches()) {
+            hidden.anitaUpgrade = matcher.group("level").toInt() / 2
+        }
         if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
-            hidden.lastCakeTime = System.currentTimeMillis()
+            hidden.cakeExpiring = System.currentTimeMillis() + 172800000
         }
     }
-
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {

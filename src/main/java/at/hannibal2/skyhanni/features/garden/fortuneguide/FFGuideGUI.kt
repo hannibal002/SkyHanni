@@ -17,21 +17,8 @@ import java.io.IOException
 import java.util.*
 
 open class FFGuideGUI : GuiScreen() {
-    private val pet1 = GardenAPI.config?.fortune?.farmingItems?.get(18)?.let { NEUItems.loadNBTData(it) }
-    private val pet2 = GardenAPI.config?.fortune?.farmingItems?.get(19)?.let { NEUItems.loadNBTData(it) }
-    private val pet3 = GardenAPI.config?.fortune?.farmingItems?.get(20)?.let { NEUItems.loadNBTData(it) }
-    private val helmet = GardenAPI.config?.fortune?.farmingItems?.get(13)?.let { NEUItems.loadNBTData(it) }
-    private val chestplate = GardenAPI.config?.fortune?.farmingItems?.get(12)?.let { NEUItems.loadNBTData(it) }
-    private val leggings = GardenAPI.config?.fortune?.farmingItems?.get(11)?.let { NEUItems.loadNBTData(it) }
-    private val boots = GardenAPI.config?.fortune?.farmingItems?.get(10)?.let { NEUItems.loadNBTData(it) }
-    private val necklace = GardenAPI.config?.fortune?.farmingItems?.get(14)?.let { NEUItems.loadNBTData(it) }
-    private val cloak = GardenAPI.config?.fortune?.farmingItems?.get(15)?.let { NEUItems.loadNBTData(it) }
-    private val belt = GardenAPI.config?.fortune?.farmingItems?.get(16)?.let { NEUItems.loadNBTData(it) }
-    private val bracelet = GardenAPI.config?.fortune?.farmingItems?.get(17)?.let { NEUItems.loadNBTData(it) }
-
     companion object {
         val pages = mutableMapOf<FortuneGuidePages, FFGuidePage>()
-
 
         var guiLeft = 0
         var guiTop = 0
@@ -43,20 +30,23 @@ open class FFGuideGUI : GuiScreen() {
         var selectedPage = FortuneGuidePages.OVERVIEW
         var breakdownMode = true
         var currentPet = 0
+        var currentArmor = 0
+        var currentEquipment = 0
 
         var mouseX = 0
         var mouseY = 0
 
         var tooltipToDisplay = mutableListOf<String>()
         val textLinesWithTooltip = mutableMapOf<Pair<String, String>, Pair<Int, Int>>()
+        var items = mutableListOf<ItemStack>()
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
-
-        var farmingLevel = 0
+        var farmingLevel = -1
         var plotsUnlocked = 0
-        var communityUpgradeLevel = 0
-        var cakeBuffTime = 0L
+        var communityUpgradeLevel = -1
+        var cakeBuffTime = -1L
+        var anitaBuff = -1
     }
 
     init {
@@ -72,15 +62,16 @@ open class FFGuideGUI : GuiScreen() {
         pages[FortuneGuidePages.MUSHROOM] = MushroomPage()
         pages[FortuneGuidePages.NETHER_WART] = WartPage()
 
-        farmingLevel = GardenAPI.config?.fortune?.farmingLevel ?: 0
+        farmingLevel = GardenAPI.config?.fortune?.farmingLevel ?: -1
         communityUpgradeLevel = SkyHanniMod.feature.storage.gardenCommunityUpgrade
-        plotsUnlocked = GardenAPI.config?.fortune?.plotsUnlocked ?: 0
-        cakeBuffTime = GardenAPI.config?.fortune?.lastCakeTime ?: 0L
-    }
+        plotsUnlocked = GardenAPI.config?.fortune?.plotsUnlocked ?: -1
+        anitaBuff = GardenAPI.config?.fortune?.anitaUpgrade ?: -1
+        cakeBuffTime = GardenAPI.config?.fortune?.cakeExpiring ?: -1L
 
-//    override fun onGuiClosed() {
-//        super.onGuiClosed()
-//    }
+        for (item in GardenAPI.config?.fortune?.farmingItems!!) {
+            items.add(NEUItems.loadNBTData(item))
+        }
+    }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
         super.drawScreen(unusedX, unusedY, partialTicks)
@@ -96,7 +87,7 @@ open class FFGuideGUI : GuiScreen() {
         drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
         renderTabs()
 
-        //TODO these look bad, but i'm not sure if I want to make a dropdown instead, or have items as that would be harder to understand
+        //these buttons could be improved
         drawRect(guiLeft, guiTop + sizeY + 3, guiLeft + 40,
             guiTop + sizeY + 15, 0x50000000)
         RenderUtils.drawStringCentered("§6Mode:", guiLeft + 20, guiTop + sizeY + 9)
@@ -111,37 +102,46 @@ open class FFGuideGUI : GuiScreen() {
 
         if (breakdownMode) {
             if (selectedPage != FortuneGuidePages.OVERVIEW) {
-                RenderUtils.renderItemAndTip(pet1, guiLeft + 152, guiTop + 160, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(items[18], guiLeft + 152, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(pet2, guiLeft + 172, guiTop + 160, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(items[19], guiLeft + 172, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(pet3, guiLeft + 192, guiTop + 160, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(items[20], guiLeft + 192, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
 
-                RenderUtils.renderItemAndTip(helmet, guiLeft + 162, guiTop + 80, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(chestplate, guiLeft + 162, guiTop + 100, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(leggings, guiLeft + 162, guiTop + 120, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(boots, guiLeft + 162, guiTop + 140, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(necklace, guiLeft + 182, guiTop + 80, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(cloak, guiLeft + 182, guiTop + 100, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(belt, guiLeft + 182, guiTop + 120, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(bracelet, guiLeft + 182, guiTop + 140, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[13], guiLeft + 162, guiTop + 80, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[12], guiLeft + 162, guiTop + 100, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[11], guiLeft + 162, guiTop + 120, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[10], guiLeft + 162, guiTop + 140, mouseX, mouseY)
+
+                RenderUtils.renderItemAndTip(items[14], guiLeft + 182, guiTop + 80, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[15], guiLeft + 182, guiTop + 100, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[16], guiLeft + 182, guiTop + 120, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[17], guiLeft + 182, guiTop + 140, mouseX, mouseY)
             } else {
-                RenderUtils.renderItemAndTip(helmet, guiLeft + 142, guiTop + 5, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(chestplate, guiLeft + 162, guiTop + 5, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(leggings, guiLeft + 182, guiTop + 5, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(boots, guiLeft + 202, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[13], guiLeft + 142, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(items[12], guiLeft + 162, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(items[11], guiLeft + 182, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 3) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(items[10], guiLeft + 202, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 4) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
 
-                RenderUtils.renderItemAndTip(necklace, guiLeft + 262, guiTop + 5, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(cloak, guiLeft + 282, guiTop + 5, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(belt, guiLeft + 302, guiTop + 5, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(bracelet, guiLeft + 322, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(items[14], guiLeft + 262, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(items[15], guiLeft + 282, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(items[16], guiLeft + 302, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 3) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(items[17], guiLeft + 322, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 4) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
 
-                RenderUtils.renderItemAndTip(pet1, guiLeft + 152, guiTop + 130, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(items[18], guiLeft + 152, guiTop + 130, mouseX, mouseY,
                     if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(pet2, guiLeft + 172, guiTop + 130, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(items[19], guiLeft + 172, guiTop + 130, mouseX, mouseY,
                     if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(pet3, guiLeft + 192, guiTop + 130, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(items[20], guiLeft + 192, guiTop + 130, mouseX, mouseY,
                     if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
             }
         }
@@ -222,6 +222,35 @@ open class FFGuideGUI : GuiScreen() {
                 SoundUtils.playClickSound()
                 currentPet = 2
             }
+
+            else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
+                SoundUtils.playClickSound()
+                currentArmor = if (currentArmor == 1) 0 else 1
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 5, 16, 16)) {
+                SoundUtils.playClickSound()
+                currentArmor = if (currentArmor == 2) 0 else 2
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 5, 16, 16)) {
+                SoundUtils.playClickSound()
+                currentArmor = if (currentArmor == 3) 0 else 3
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16)) {
+            SoundUtils.playClickSound()
+                currentArmor = if (currentArmor == 4) 0 else 4
+            }
+
+            else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16)) {
+                SoundUtils.playClickSound()
+                currentEquipment = if (currentEquipment == 1) 0 else 1
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 282, guiTop + 5, 16, 16)) {
+                SoundUtils.playClickSound()
+                currentEquipment = if (currentEquipment == 2) 0 else 2
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 302, guiTop + 5, 16, 16)) {
+                SoundUtils.playClickSound()
+                currentEquipment = if (currentEquipment == 3) 0 else 3
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 322, guiTop + 5, 16, 16)) {
+                SoundUtils.playClickSound()
+                currentEquipment = if (currentEquipment == 4) 0 else 4
+            }
+
         } else {
             if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()

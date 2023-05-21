@@ -20,7 +20,7 @@ public class Storage {
 
 //todo could not work out how to access the player specific part :/
     @Expose
-    public Integer gardenCommunityUpgrade = 0;
+    public Integer gardenCommunityUpgrade = -1;
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
@@ -160,14 +160,17 @@ public class Storage {
             public static class Fortune {
 
                 @Expose
-                public int farmingLevel = 0;
+                public int anitaUpgrade = -1;
 
                 @Expose
-                public int plotsUnlocked = 0;
+                public int farmingLevel = -1;
 
                 @Expose
-                public long lastCakeTime = 17000000000000L; // will be normal once they can eat cake for the first time
-                //future-proofing until 2508
+                public int plotsUnlocked = -1;
+
+                @Expose
+                public long cakeExpiring = -1L;
+
                 @Expose
                 public List<JsonObject> farmingItems = new ArrayList<>();
             }

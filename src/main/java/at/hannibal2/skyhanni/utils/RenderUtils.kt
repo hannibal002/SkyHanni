@@ -919,8 +919,8 @@ object RenderUtils {
     fun drawFarmingBar(
         label: String,
         tooltip: String,
-        currentValue: Int,
-        maxValue: Int,
+        currentValue: Number,
+        maxValue: Number,
         xPos: Int,
         yPos: Int,
         width: Int,
@@ -929,7 +929,10 @@ object RenderUtils {
         output: MutableList<String>,
         textScale: Float = .7f
     ) {
-        val barProgress = currentValue.toFloat() / maxValue.toFloat()
+        var currentVal = currentValue.toDouble()
+        currentVal = if (currentVal < 0) 0.0 else currentVal
+
+        val barProgress = currentVal / maxValue.toFloat()
         val filledWidth = (width * barProgress).toInt()
         val progressPercentage = (barProgress * 10000).roundToInt() / 100
         val inverseScale = 1 / textScale
@@ -938,7 +941,7 @@ object RenderUtils {
 
         GlStateManager.scale(textScale, textScale, textScale)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
-        drawString("§2$currentValue / $maxValue☘", xPos * inverseScale, (yPos + 8) * inverseScale)
+        drawString("§2${String.format("%.0f", currentVal)} / $maxValue☘", xPos * inverseScale, (yPos + 8) * inverseScale)
         drawString("§2$progressPercentage%", (xPos + width - textWidth * textScale) * inverseScale, (yPos + 8) * inverseScale)
         GlStateManager.scale(inverseScale, inverseScale, inverseScale)
 
@@ -957,7 +960,11 @@ object RenderUtils {
         }
     }
 
-    private fun colorGradient(float: Float): Int {
-        return Color((255 * (1 - float)).toInt(), (255 * float).toInt(), 0).rgb
+    private fun colorGradient(float: Double): Int {
+        return try {//prevent possible crashes if float is < 1 or > 1
+            Color((255 * (1 - float)).toInt(), (255 * float).toInt(), 0).rgb
+        } catch (_: Throwable) {
+            1
+        }
     }
 }
