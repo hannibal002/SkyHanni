@@ -43,7 +43,7 @@ open class FFGuideGUI : GuiScreen() {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
         var farmingLevel = -1
-        var plotsUnlocked = 0
+        var plotsUnlocked = -1
         var communityUpgradeLevel = -1
         var cakeBuffTime = -1L
         var anitaBuff = -1
@@ -62,14 +62,16 @@ open class FFGuideGUI : GuiScreen() {
         pages[FortuneGuidePages.MUSHROOM] = MushroomPage()
         pages[FortuneGuidePages.NETHER_WART] = WartPage()
 
-        farmingLevel = GardenAPI.config?.fortune?.farmingLevel ?: -1
         communityUpgradeLevel = ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1
-        plotsUnlocked = GardenAPI.config?.fortune?.plotsUnlocked ?: -1
-        anitaBuff = GardenAPI.config?.fortune?.anitaUpgrade ?: -1
-        cakeBuffTime = GardenAPI.config?.fortune?.cakeExpiring ?: -1L
+        GardenAPI.config?.fortune?.let {
+            farmingLevel = it.farmingLevel
+            plotsUnlocked = it.plotsUnlocked
+            anitaBuff = it.anitaUpgrade
+            cakeBuffTime = it.cakeExpiring
 
-        for (item in GardenAPI.config?.fortune?.farmingItems!!) {
-            items.add(NEUItems.loadNBTData(item))
+            for (item in it.farmingItems) {
+                items.add(NEUItems.loadNBTData(item))
+            }
         }
     }
 
@@ -162,7 +164,7 @@ open class FFGuideGUI : GuiScreen() {
 
     fun renderText(output: MutableList<String>, scale: Float = .7f) {
         for (line in textLinesWithTooltip) {
-            val inverse = 1 /scale
+            val inverse = 1 / scale
             val str = line.key.first
             val tooltip = line.key.second
             val x = line.value.first
@@ -172,7 +174,7 @@ open class FFGuideGUI : GuiScreen() {
             val textHeight = 14
             GlStateManager.scale(scale, scale, scale)
             RenderUtils.drawString(str, (x + 3) * inverse, (y + 2) * inverse)
-            GlStateManager.scale(inverse , inverse, inverse)
+            GlStateManager.scale(inverse, inverse, inverse)
             if (tooltip == "") continue
             if (RenderUtils.isPointInRect(mouseX, mouseY, x, y, (textWidth * scale).toInt(), textHeight)) {
                 val split = tooltip.split("\n")
@@ -233,7 +235,7 @@ open class FFGuideGUI : GuiScreen() {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 3) 0 else 3
             } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16)) {
-            SoundUtils.playClickSound()
+                SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 4) 0 else 4
             }
 
