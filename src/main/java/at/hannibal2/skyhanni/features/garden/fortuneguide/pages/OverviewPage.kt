@@ -2,93 +2,86 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.RenderUtils
-import net.minecraft.client.gui.GuiScreen
 
 class OverviewPage: FFGuideGUI.FFGuidePage() {
-    private val textLinesWithTooltip = mutableMapOf<Pair<String, String>, Pair<Int, Int>>()
     private val del = "TODO"
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //TODO fix up how this looks
-        if (FFGuideGUI.breakdownMode && FFGuideGUI.currentMode == 0) {
-            textLinesWithTooltip[Pair("§6Universal Farming Fortune", "§7§2Farming fortune in general\n" +
-                    "§2Most of this shows in the tablist")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
-            textLinesWithTooltip[Pair("§2$del / 1270☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
+        //todo calculate time until runs out, and a warning if it hasn't been discovered yet
+        val cakeBuffActive = FFGuideGUI.cakeBuffTime - System.currentTimeMillis() > 0
+        println(cakeBuffActive)
+        if (FFGuideGUI.breakdownMode) {
+            RenderUtils.drawFarmingBar("§6Universal Farming Fortune", "§7§2Farming fortune in that is\n" +
+                    "§2applied to every crop", 0, 1270, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Base Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 5)
-            textLinesWithTooltip[Pair("§2100☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 15)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 25, 90, 1f)
+            RenderUtils.drawFarmingBar("§2Anita Buff", "§7§Farming fortune from upgrading your\n" +
+                    "§2drops at the Anita NPC", 0, 30, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Farming Level", "§7§2Fortune for levelling your farming skill\n" +
-                    "§2You get 4☘ per farming level\n§2Your farming level: $del")] = Pair(FFGuideGUI.guiLeft + 255,  FFGuideGUI.guiTop + 5)
-            textLinesWithTooltip[Pair("§2$del / 240☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 255,  FFGuideGUI.guiTop + 15)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 25, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Farming Level", "§7§2Fortune for levelling your farming skill\n" +
+                    "§2You get 4☘ per farming level\n§2Your farming level: ${FFGuideGUI.farmingLevel}", FFGuideGUI.farmingLevel * 4, 240, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Community upgrades", "§7§2Fortune for community shop upgrades\n" +
-                    "§2You get 4☘ per talisman tier\n§2Your community upgrade level: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 35)
-            textLinesWithTooltip[Pair("§2$del / 40☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 45)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 55, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Community upgrades", "§7§2Fortune for community shop upgrades\n" +
+                    "§2You get 4☘ per talisman tier\n§2Your community upgrade level: ${FFGuideGUI.communityUpgradeLevel}", FFGuideGUI.communityUpgradeLevel * 4, 40, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Garden Plots", "§7§2Fortune for unlocking garden plots\n" +
-                    "§2You get 3☘ per plot unlocked\n§2Plots unlocked: $del")] = Pair(FFGuideGUI.guiLeft + 255,  FFGuideGUI.guiTop + 35)
-            textLinesWithTooltip[Pair("§2$del / 72☘     $del%", "")] = Pair(FFGuideGUI.guiLeft + 255,  FFGuideGUI.guiTop + 45)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 55, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Garden Plots", "§7§2Fortune for unlocking garden plots\n" +
+                    "§2You get 3☘ per plot unlocked\n§2Plots unlocked: ${FFGuideGUI.plotsUnlocked}", FFGuideGUI.plotsUnlocked * 3, 72, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Cake Buff", "§7§2Fortune for eating cake\n" +
-                    "§2You get 5☘ for eating cake\n§2Time until cake runs out: $del")] = Pair(FFGuideGUI.guiLeft + 145,  FFGuideGUI.guiTop + 35)
-            textLinesWithTooltip[Pair("§2$del / 5☘     $del%", "")] = Pair(FFGuideGUI.guiLeft + 145,  FFGuideGUI.guiTop + 45)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 55, 80, 0f)
-            // prompt to select a pet if they haven't
-            RenderUtils.drawStringCentered("§9§nPets", FFGuideGUI.guiLeft + 180, FFGuideGUI.guiTop + 75)
+            RenderUtils.drawFarmingBar("§2Cake Buff", "§7§2Fortune for eating cake\n" +
+                    "§2You get 5☘ for eating cake\n§2Time until cake runs out: $del", 0, 5, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Total Pet Fortune", "§7§2Total fortune from your pet\n" +
-                    "§2Your pet without an item grants $del☘")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 105)
-            textLinesWithTooltip[Pair("§2$del / $del☘  $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 115)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 140, FFGuideGUI.guiTop + 125, 80, 0f)
 
-            textLinesWithTooltip[Pair("§2Pet Item", "§7§2Fortune from your pet's item\n" +
-                    // $del% stat boost, 30☘  : Minos relic effect = $del☘   :  If they are using relic say its bad and to sell
-                    "§2Grants 4☘ per garden level\n§2Your garden level: $del")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 135)
-            textLinesWithTooltip[Pair("§2$del / 60☘     $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 145)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 140, FFGuideGUI.guiTop + 155, 80, 0f)
+            //If one piece is selected show that ones stats, otherwise a total
+            RenderUtils.drawFarmingBar("§2Total Armor Fortune", "§7§2Total fortune from your armor\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
+                FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+            // ranchers boots bonus will be included as base fortune, and not an ability
+            RenderUtils.drawFarmingBar("§2Base Armor Fortune", "§7§2The base fortune from your armor\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
+                FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+            //If one singular peice is selected, show the full ability
+            RenderUtils.drawFarmingBar("§2Armor Ability", "§7§2The fortune from your armor's ability\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
+                FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+            // display what it could be at better reforges when a single piece is selected
+            RenderUtils.drawFarmingBar("§2Armor Reforge", "§7§2The fortune from your armor's reforge\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
+                FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            RenderUtils.drawStringCentered("§9§nArmor", FFGuideGUI.guiLeft + 60, FFGuideGUI.guiTop + 75)
 
-            textLinesWithTooltip[Pair("§2Total Armor Fortune", "§7§2Total fortune from your armor\n" +
-                    "§2Click for more info")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 105)
-            textLinesWithTooltip[Pair("§2$del / $del☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 115)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 125, 90, 0f)
-            //todo these buttons don't fit
-            GuiScreen.drawRect(FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 130, FFGuideGUI.guiLeft + 85,
-                FFGuideGUI.guiTop + 150, 0x50000000)
-            RenderUtils.drawStringCentered("§6More Armor Stats", FFGuideGUI.guiLeft + 60, FFGuideGUI.guiTop + 140)
+            RenderUtils.drawFarmingBar("§2Total Pet Fortune", "§7§2The total fortune from your pet and its item",
+                0, 10000, FFGuideGUI.guiLeft + 75,
+                FFGuideGUI.guiTop + 155, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            RenderUtils.drawStringCentered("§9§nEquipment", FFGuideGUI.guiLeft + 295, FFGuideGUI.guiTop + 75)
+            RenderUtils.drawFarmingBar("§2Pet Item", "§7§2The fortune from your pet's item\n" +
+                    "§2Grants 4☘ per garden level\n§2Your garden level: $del", 0, 60, FFGuideGUI.guiLeft + 195,
+                FFGuideGUI.guiTop + 155, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Total Equipment Fortune", "§7§2Total fortune from your equipment\n" +
-                    "§2Click for more info")] = Pair(FFGuideGUI.guiLeft + 255,  FFGuideGUI.guiTop + 105)
-            textLinesWithTooltip[Pair("§2$del / $del☘    $del%", "")] = Pair(FFGuideGUI.guiLeft + 255,  FFGuideGUI.guiTop + 115)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 125, 90, 0f)
 
-            GuiScreen.drawRect(FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, FFGuideGUI.guiLeft + 325,
-                FFGuideGUI.guiTop + 150, 0x50000000)
-            RenderUtils.drawStringCentered("§6More Equipment Stats", FFGuideGUI.guiLeft + 290, FFGuideGUI.guiTop + 140)
-        } // not implemented yet
-        else if (FFGuideGUI.breakdownMode && FFGuideGUI.currentMode == 1) {
-            textLinesWithTooltip[Pair("§6Total Armor Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
-            textLinesWithTooltip[Pair("§2$del / $del☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
-        } else if (FFGuideGUI.breakdownMode && FFGuideGUI.currentMode == 2) {
-            textLinesWithTooltip[Pair("§6Total Equipment Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
-            textLinesWithTooltip[Pair("§2$del / $del☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
+            RenderUtils.drawFarmingBar("§2Total Equipment Fortune", "§7§2Total fortune from your equipment\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            RenderUtils.drawFarmingBar("§2Equipment Base Fortune", "§7§2The base fortune from your equipment\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            RenderUtils.drawFarmingBar("§2Equipment Ability", "§7§2The fortune from your equipment's ability\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            RenderUtils.drawFarmingBar("§2Equipment Reforge", "§7§2The fortune from your equipment's reforge\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            RenderUtils.drawFarmingBar("§2Equipment Enchantment", "§7§2The fortune from your equipment's enchantment\n" +
+                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
         }
-
-        FFGuideGUI.renderText(textLinesWithTooltip)
-    }
-
-    override fun swapMode() {
-        textLinesWithTooltip.clear()
     }
 }

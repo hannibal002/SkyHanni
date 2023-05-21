@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.*
@@ -31,6 +32,7 @@ open class FFGuideGUI : GuiScreen() {
     companion object {
         val pages = mutableMapOf<FortuneGuidePages, FFGuidePage>()
 
+
         var guiLeft = 0
         var guiTop = 0
         var screenHeight = 0
@@ -41,37 +43,20 @@ open class FFGuideGUI : GuiScreen() {
         var selectedPage = FortuneGuidePages.OVERVIEW
         var breakdownMode = true
         var currentPet = 0
-        var currentMode = 0 // 0 = reg, 1 = armor, 2 = equipment
 
         var mouseX = 0
         var mouseY = 0
 
         var tooltipToDisplay = mutableListOf<String>()
-
-        fun renderText(map: MutableMap<Pair<String, String>, Pair<Int, Int>>, scale: Float = .7f) {
-            for (line in map) {
-                val inverse = 1 /scale
-                val str = line.key.first
-                val tooltip = line.key.second
-                val x = line.value.first
-                val y = line.value.second
-
-                val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str) + 6
-                val textHeight = 14
-                GlStateManager.scale(scale, scale, scale)
-                RenderUtils.drawString(str, (x + 3) * inverse, (y + 2) * inverse)
-                GlStateManager.scale(inverse , inverse, inverse)
-                if (tooltip == "") continue
-                if (RenderUtils.isPointInRect(mouseX, mouseY, x, y, (textWidth * scale).toInt(), textHeight)) {
-                    val split = tooltip.split("\n")
-                    for (tooltipLine in split) {
-                        tooltipToDisplay.add(tooltipLine)
-                    }
-                }
-            }
-        }
+        val textLinesWithTooltip = mutableMapOf<Pair<String, String>, Pair<Int, Int>>()
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
+
+
+        var farmingLevel = 0
+        var plotsUnlocked = 0
+        var communityUpgradeLevel = 0
+        var cakeBuffTime = 0L
     }
 
     init {
@@ -86,6 +71,11 @@ open class FFGuideGUI : GuiScreen() {
         pages[FortuneGuidePages.COCOA_BEANS] = CocoaPage()
         pages[FortuneGuidePages.MUSHROOM] = MushroomPage()
         pages[FortuneGuidePages.NETHER_WART] = WartPage()
+
+        farmingLevel = GardenAPI.config?.fortune?.farmingLevel ?: 0
+        communityUpgradeLevel = SkyHanniMod.feature.storage.gardenCommunityUpgrade
+        plotsUnlocked = GardenAPI.config?.fortune?.plotsUnlocked ?: 0
+        cakeBuffTime = GardenAPI.config?.fortune?.lastCakeTime ?: 0L
     }
 
 //    override fun onGuiClosed() {
@@ -119,39 +109,40 @@ open class FFGuideGUI : GuiScreen() {
             guiTop + sizeY + 15, if (!breakdownMode) 0x50555555 else 0x50000000)
         RenderUtils.drawStringCentered("§6Improvements", guiLeft + 170, guiTop + sizeY + 9)
 
-        if (selectedPage != FortuneGuidePages.OVERVIEW) {
-            when (currentPet) {
-                0 ->  RenderUtils.renderItemAndTip(pet1, guiLeft + 172, guiTop + 160, mouseX, mouseY)
-                1 ->  RenderUtils.renderItemAndTip(pet2, guiLeft + 172, guiTop + 160, mouseX, mouseY)
-                2 ->  RenderUtils.renderItemAndTip(pet3, guiLeft + 172, guiTop + 160, mouseX, mouseY)
-            }
-
-            RenderUtils.renderItemAndTip(helmet, guiLeft + 162, guiTop + 80, mouseX, mouseY)
-            RenderUtils.renderItemAndTip(chestplate, guiLeft + 162, guiTop + 100, mouseX, mouseY)
-            RenderUtils.renderItemAndTip(leggings, guiLeft + 162, guiTop + 120, mouseX, mouseY)
-            RenderUtils.renderItemAndTip(boots, guiLeft + 162, guiTop + 140, mouseX, mouseY)
-            RenderUtils.renderItemAndTip(necklace, guiLeft + 182, guiTop + 80, mouseX, mouseY)
-            RenderUtils.renderItemAndTip(cloak, guiLeft + 182, guiTop + 100, mouseX, mouseY)
-            RenderUtils.renderItemAndTip(belt, guiLeft + 182, guiTop + 120, mouseX, mouseY)
-            RenderUtils.renderItemAndTip(bracelet, guiLeft + 182, guiTop + 140, mouseX, mouseY)
-        } else {
-            if (currentMode == 0) {
-                RenderUtils.renderItemAndTip(pet1, guiLeft + 152, guiTop + 85, mouseX, mouseY,
+        if (breakdownMode) {
+            if (selectedPage != FortuneGuidePages.OVERVIEW) {
+                RenderUtils.renderItemAndTip(pet1, guiLeft + 152, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(pet2, guiLeft + 172, guiTop + 85, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(pet2, guiLeft + 172, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(pet3, guiLeft + 192, guiTop + 85, mouseX, mouseY,
+                RenderUtils.renderItemAndTip(pet3, guiLeft + 192, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
 
-                RenderUtils.renderItemAndTip(helmet, guiLeft + 25, guiTop + 85, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(chestplate, guiLeft + 45, guiTop + 85, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(leggings, guiLeft + 65, guiTop + 85, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(boots, guiLeft + 85, guiTop + 85, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(helmet, guiLeft + 162, guiTop + 80, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(chestplate, guiLeft + 162, guiTop + 100, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(leggings, guiLeft + 162, guiTop + 120, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(boots, guiLeft + 162, guiTop + 140, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(necklace, guiLeft + 182, guiTop + 80, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(cloak, guiLeft + 182, guiTop + 100, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(belt, guiLeft + 182, guiTop + 120, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(bracelet, guiLeft + 182, guiTop + 140, mouseX, mouseY)
+            } else {
+                RenderUtils.renderItemAndTip(helmet, guiLeft + 142, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(chestplate, guiLeft + 162, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(leggings, guiLeft + 182, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(boots, guiLeft + 202, guiTop + 5, mouseX, mouseY)
 
-                RenderUtils.renderItemAndTip(necklace, guiLeft + 260, guiTop + 85, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(cloak, guiLeft + 280, guiTop + 85, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(belt, guiLeft + 300, guiTop + 85, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(bracelet, guiLeft + 320, guiTop + 85, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(necklace, guiLeft + 262, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(cloak, guiLeft + 282, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(belt, guiLeft + 302, guiTop + 5, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(bracelet, guiLeft + 322, guiTop + 5, mouseX, mouseY)
+
+                RenderUtils.renderItemAndTip(pet1, guiLeft + 152, guiTop + 130, mouseX, mouseY,
+                    if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(pet2, guiLeft + 172, guiTop + 130, mouseX, mouseY,
+                    if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(pet3, guiLeft + 192, guiTop + 130, mouseX, mouseY,
+                    if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
             }
         }
 
@@ -159,11 +150,37 @@ open class FFGuideGUI : GuiScreen() {
 
         pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)
 
+        renderText(tooltipToDisplay)
+
         GlStateManager.popMatrix()
 
         if (tooltipToDisplay.isNotEmpty()) {
             RenderUtils.drawTooltip(tooltipToDisplay, mouseX, mouseY, height)
             tooltipToDisplay.clear()
+        }
+    }
+
+    fun renderText(output: MutableList<String>, scale: Float = .7f) {
+        for (line in textLinesWithTooltip) {
+            val inverse = 1 /scale
+            val str = line.key.first
+            val tooltip = line.key.second
+            val x = line.value.first
+            val y = line.value.second
+
+            val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(str) + 6
+            val textHeight = 14
+            GlStateManager.scale(scale, scale, scale)
+            RenderUtils.drawString(str, (x + 3) * inverse, (y + 2) * inverse)
+            GlStateManager.scale(inverse , inverse, inverse)
+            if (tooltip == "") continue
+            if (RenderUtils.isPointInRect(mouseX, mouseY, x, y, (textWidth * scale).toInt(), textHeight)) {
+                val split = tooltip.split("\n")
+                for (tooltipLine in split) {
+//                    tooltipToDisplay.add(tooltipLine)
+                    output.add(tooltipLine)
+                }
+            }
         }
     }
 
@@ -178,35 +195,44 @@ open class FFGuideGUI : GuiScreen() {
             if (RenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
                 if (selectedPage != page) {
                     SoundUtils.playClickSound()
+                    swapMode()
                     selectedPage = page
+                    swapMode()
                 }
             }
         }
         if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 45, guiTop + sizeY, 80, 15) && !breakdownMode) {
             SoundUtils.playClickSound()
             breakdownMode = true
-            pages[selectedPage]?.swapMode()
+            swapMode()
         }
         if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 130, guiTop + sizeY, 80, 15) && breakdownMode) {
             SoundUtils.playClickSound()
             breakdownMode = false
-            pages[selectedPage]?.swapMode()
+            swapMode()
         }
         if (selectedPage == FortuneGuidePages.OVERVIEW) {
-            if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 85, 16, 16) && currentPet != 0) {
+            if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
                 currentPet = 0
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 85, 16, 16) && currentPet != 1) {
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 130, 16, 16) && currentPet != 1) {
                 SoundUtils.playClickSound()
                 currentPet = 1
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 85, 16, 16) && currentPet != 2) {
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 130, 16, 16) && currentPet != 2) {
                 SoundUtils.playClickSound()
                 currentPet = 2
             }
-
-
-
-
+        } else {
+            if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160, 16, 16) && currentPet != 0) {
+                SoundUtils.playClickSound()
+                currentPet = 0
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 160, 16, 16) && currentPet != 1) {
+                SoundUtils.playClickSound()
+                currentPet = 1
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 160, 16, 16) && currentPet != 2) {
+                SoundUtils.playClickSound()
+                currentPet = 2
+            }
         }
     }
 
@@ -226,6 +252,10 @@ open class FFGuideGUI : GuiScreen() {
         }
     }
 
+    fun swapMode() {
+        textLinesWithTooltip.clear()
+    }
+
     enum class FortuneGuidePages(val pageName: String, val crop: CropType?) {
         OVERVIEW("§eOverview", null),
         WHEAT("§eWheat", CropType.WHEAT),
@@ -242,8 +272,6 @@ open class FFGuideGUI : GuiScreen() {
 
     abstract class FFGuidePage {
         abstract fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float)
-
-        abstract fun swapMode()
     }
 }
 

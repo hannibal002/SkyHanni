@@ -25,6 +25,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -912,5 +913,51 @@ object RenderUtils {
                 FFGuideGUI.tooltipToDisplay.addAll(tt)
             }
         }
+    }
+
+    // assuming 70% font size
+    fun drawFarmingBar(
+        label: String,
+        tooltip: String,
+        currentValue: Int,
+        maxValue: Int,
+        xPos: Int,
+        yPos: Int,
+        width: Int,
+        mouseX: Int,
+        mouseY: Int,
+        output: MutableList<String>,
+        textScale: Float = .7f
+    ) {
+        val barProgress = currentValue.toFloat() / maxValue.toFloat()
+        val filledWidth = (width * barProgress).toInt()
+        val progressPercentage = (barProgress * 10000).roundToInt() / 100
+        val inverseScale = 1 / textScale
+        val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth("$progressPercentage%")
+        val barColor = colorGradient(barProgress)
+
+        GlStateManager.scale(textScale, textScale, textScale)
+        drawString(label, xPos * inverseScale, yPos * inverseScale)
+        drawString("§2$currentValue / $maxValue☘", xPos * inverseScale, (yPos + 8) * inverseScale)
+        drawString("§2$progressPercentage%", (xPos + width - textWidth * textScale) * inverseScale, (yPos + 8) * inverseScale)
+        GlStateManager.scale(inverseScale, inverseScale, inverseScale)
+
+        GuiScreen.drawRect(xPos, yPos + 16, xPos + width, yPos + 20, 0xFF43464B.toInt())
+        GuiScreen.drawRect(xPos + 1, yPos + 17, xPos + width - 1, yPos + 19, 0xFF02210C.toInt())
+        GuiScreen.drawRect(xPos + 1, yPos + 17,
+             if (filledWidth < 2) xPos + 1 else xPos + filledWidth - 1, yPos + 19, barColor)
+
+        if (tooltip != "") {
+            if (isPointInRect(mouseX, mouseY, xPos - 2, yPos - 2, width + 4, 20 + 4)) {
+                val split = tooltip.split("\n")
+                for (line in split) {
+                    output.add(line)
+                }
+            }
+        }
+    }
+
+    private fun colorGradient(float: Float): Int {
+        return Color((255 * (1 - float)).toInt(), (255 * float).toInt(), 0).rgb
     }
 }

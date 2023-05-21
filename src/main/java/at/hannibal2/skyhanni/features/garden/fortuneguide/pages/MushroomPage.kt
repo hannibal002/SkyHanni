@@ -13,9 +13,8 @@ class MushroomPage: FFGuideGUI.FFGuidePage() {
     private val del = "TODO"
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
-
         if (FFGuideGUI.breakdownMode) {
+            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
             // if mushroom cow pet add 100
             textLinesWithTooltip[Pair("§6Mushroom Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
             textLinesWithTooltip[Pair("§2$del / 1595☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
@@ -70,10 +69,5 @@ class MushroomPage: FFGuideGUI.FFGuidePage() {
         } else {
 
         }
-        FFGuideGUI.renderText(textLinesWithTooltip)
-    }
-
-    override fun swapMode() {
-        textLinesWithTooltip.clear()
     }
 }

@@ -13,9 +13,8 @@ class CocoaPage: FFGuideGUI.FFGuidePage() {
     private val del = "TODO"
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
-
         if (FFGuideGUI.breakdownMode) {
+            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
             textLinesWithTooltip[Pair("§6Cocoa Bean Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
             textLinesWithTooltip[Pair("§2$del / 1575.5☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
             RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
@@ -69,10 +68,5 @@ class CocoaPage: FFGuideGUI.FFGuidePage() {
         } else {
 
         }
-        FFGuideGUI.renderText(textLinesWithTooltip)
-    }
-
-    override fun swapMode() {
-        textLinesWithTooltip.clear()
     }
 }

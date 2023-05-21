@@ -2,32 +2,41 @@ todo list for this display
 
 more todo notes on WartsPage.kt
 
+Work out how to access the data, load it all when the gui is opened then access through a single method as it won't change while gui is open
+
+Deal with pets
+Deal with mushroom cow and strength
+
+Render an item like a barrier, with lore saying that you don't have it
+Change lore on equipment to reflect visitors served
+Track pet level ups
+Message if stat hasn't been checked yet
+
+
+
 GUI:
 Only show pets that are saved, and move the display around to fit how many are being displayed
 Remove click to spawn/despawn from pets
-Display pet item next to pet
-Change colour of numbers and progress bars to reflect progress: red < 50%, orange < 65%, yellow < 80%, light green < 90% dark green > 90%
-Warning when no item is selected, like an ! mark in the frame
-Make the progress bars rounded
+Display pet item somewhere
 Layout some stuff a bit better
 Wrapping tooltip text to left when its near the right edge of screen
-On all of the overview parts of the pages, show a progress bar that has a gradient representing the user's progress to maxing that aspect
 Reposition stuff so it actually looks good
 Make the darken colour work
 Add a border around the edge of the display
 - If not too hard, wrap it around the selected button as well like neu - low priority
 Check all turbo-crop enchants are named correctly
-Full progress bars go over the edge on the right
+Change colour of percentage text to reflect completed percentage
 
 !!!!
 Buges:
+Major:
+Will overwrite the saved pet of each type if there is more than one of it in pets menu. e.g. uncommon ele will overwrite leg one
+Fix crash if ff is somehow more than max
 Minor:
-Shows unique tool as achieved all the time
-Stop /ff from being used when not on skyblock
+Cakes will not appear as missing until they are eaten once so the mod knows when it runs out
+Shows unique tool stat as achieved all the time
 Taking off or putting equipment on inside the menu won't update it until you reopen the inventory
     - also if they sell the peice of equipment, it will always think they still have it
-Will not detect pets that are not either mooshroom or elephant even if they have something like a bandana applied
-Will overwrite the saved pet of each type if there is more than one of it in pets menu. e.g. uncommon ele will overwrite leg one
 !!!!
 
 Add:
@@ -37,9 +46,10 @@ Way to switch pets that the menu is displayed for + won't prompt you to get the 
 Work out when to save strength. Maybe when switching to tool
 Save selected pet to config
 Where it says tool reforge, say the ff for current rarity and the one above if it can be that
-Can change pet on any page
 
 Other:
 Maybe remove unnecessary information in item tooltips eg:
     - enchant descriptions apart from cultivating, dedication and green thumb
     - ability descriptions like on the farming tools
+
+Purchasing a garden plot sends you back to that menu so it should count that new plot, but I cannot test it

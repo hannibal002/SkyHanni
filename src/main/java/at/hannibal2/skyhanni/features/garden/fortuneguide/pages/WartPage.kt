@@ -1,93 +1,99 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils
-import java.io.IOException
 
 
 class WartPage: FFGuideGUI.FFGuidePage() {
     private val tool = GardenAPI.config?.fortune?.farmingItems?.get(3)?.let { NEUItems.loadNBTData(it) }
     private val textLinesWithTooltip = mutableMapOf<Pair<String, String>, Pair<Int, Int>>()
-    private val del = "TODO"
+    private val del = "TODO" // use for names/changing text
+    private val del2 = 2 // use for numbers
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
-
         if (FFGuideGUI.breakdownMode) {
-            // change max if they have cow pet on or bountiful hoe
-            textLinesWithTooltip[Pair("§6Nether Wart Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
-            textLinesWithTooltip[Pair("§2$del / 1766☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
 
-            // maybe a click here sends you to the overview page
-            // change max if they have cow pet on
-            textLinesWithTooltip[Pair("§2Base Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop)
-            textLinesWithTooltip[Pair("§2$del / 1270☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 10)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 20, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
+                    "§2You get 10☘ per talisman tier\n§2Your unlocked tier: $del", 0, 30,
+                FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop +10, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
-                    "§2You get 10☘ per talisman tier\n§2Your unlocked tier: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 30)
-            textLinesWithTooltip[Pair("§2$del / 30☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 40)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 50, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
+                    "§2You get 10☘ per talisman tier\n§2Your unlocked tier: $del", 15, 30,
+                FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop +35, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n" +
-                    "§2You get 5☘ per level\n§2Your unlocked level: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 60)
-            textLinesWithTooltip[Pair("§2$del / 45☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 70)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 80, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
+                    "§2You get 10☘ per talisman tier\n§2Your unlocked tier: $del", 30, 30,
+                FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop +60, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Base tool fortune", "§7§2Fortune depending on your tools rarity")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 90)
-            textLinesWithTooltip[Pair("§2$del / 50☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 100)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 110, 90, 0f)
-            // change max if they have bountiful to be lower
-            textLinesWithTooltip[Pair("§2Tool reforge", "§7§2Fortune from reforging your tool")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 120)
-            textLinesWithTooltip[Pair("§2$del / 20☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 130)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 140, 90, 0f)
-
-            textLinesWithTooltip[Pair("§2Farming for Dummies", "§7§2Fortune for applied farming for dummies books\n" +
-                    "§2You get 1☘ per applied book\n§2Your applied books: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 150)
-            textLinesWithTooltip[Pair("§2$del / 5☘    $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 160)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 170, 90, 0f)
-
-            // not sure how much i like "You get 16☘ per digit - 4" as a description
-            textLinesWithTooltip[Pair("§2Logarithmic Counter", "§7§2Fortune from increasing crop counter\n" +
-                    "§2You get 16☘ per digit - 4\n§2Your counter value: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop)
-            textLinesWithTooltip[Pair("§2$del / 96☘    $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 10)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 20, 90, 0f)
-
-            textLinesWithTooltip[Pair("§2Collection Analysts", "§7§2Fortune from increasing crop counter\n" +
-                    "§2You get 8☘ per digit - 4\n§2Your counter and digits: $del, $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 30)
-            textLinesWithTooltip[Pair("§2$del / 48☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 40)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 50, 90, 0f)
-
-            textLinesWithTooltip[Pair("§2Harvesting Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get 12.5☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 60)
-            textLinesWithTooltip[Pair("§2$del / 75☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 70)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 80, 90, 0f)
-            //remove the "farm crops to level up" once it is maxed
-            textLinesWithTooltip[Pair("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get 1☘ per level\n§2Your enchantment level: $del\n§2Farm crops to level up")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 90)
-            textLinesWithTooltip[Pair("§2$del / 10☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 100)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 110, 90, 0f)
-
-            textLinesWithTooltip[Pair("§2Turbo-Warts Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get 5☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 120)
-            textLinesWithTooltip[Pair("§2$del / 25☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 130)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 140, 90, 0f)
-            //Make sure to change for each different crop
-            textLinesWithTooltip[Pair("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get $del☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 150)
-            textLinesWithTooltip[Pair("§2$del / 92☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 160)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 170, 90, 0f)
+//            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
+//            // change max if they have cow pet on or bountiful hoe
+//            textLinesWithTooltip[Pair("§6Nether Wart Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
+//            textLinesWithTooltip[Pair("§2$del / 1766☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
+//
+//            // maybe a click here sends you to the overview page
+//            // change max if they have cow pet on
+//            textLinesWithTooltip[Pair("§2Base Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop)
+//            textLinesWithTooltip[Pair("§2$del / 1270☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 10)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 20, 90, 0f)
+//
+//            textLinesWithTooltip[Pair("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
+//                    "§2You get 10☘ per talisman tier\n§2Your unlocked tier: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 30)
+//            textLinesWithTooltip[Pair("§2$del / 30☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 40)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 50, 90, 0f)
+//
+//            textLinesWithTooltip[Pair("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n" +
+//                    "§2You get 5☘ per level\n§2Your unlocked level: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 60)
+//            textLinesWithTooltip[Pair("§2$del / 45☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 70)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 80, 90, 0f)
+//
+//            textLinesWithTooltip[Pair("§2Base tool fortune", "§7§2Fortune depending on your tools rarity")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 90)
+//            textLinesWithTooltip[Pair("§2$del / 50☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 100)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 110, 90, 0f)
+//            // change max if they have bountiful to be lower
+//            textLinesWithTooltip[Pair("§2Tool reforge", "§7§2Fortune from reforging your tool")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 120)
+//            textLinesWithTooltip[Pair("§2$del / 20☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 130)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 140, 90, 0f)
+//
+//            textLinesWithTooltip[Pair("§2Farming for Dummies", "§7§2Fortune for applied farming for dummies books\n" +
+//                    "§2You get 1☘ per applied book\n§2Your applied books: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 150)
+//            textLinesWithTooltip[Pair("§2$del / 5☘    $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 160)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 170, 90, 0f)
+//
+//            // not sure how much i like "You get 16☘ per digit - 4" as a description
+//            textLinesWithTooltip[Pair("§2Logarithmic Counter", "§7§2Fortune from increasing crop counter\n" +
+//                    "§2You get 16☘ per digit - 4\n§2Your counter value: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop)
+//            textLinesWithTooltip[Pair("§2$del / 96☘    $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 10)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 20, 90, 0f)
+//
+//            textLinesWithTooltip[Pair("§2Collection Analysts", "§7§2Fortune from increasing crop counter\n" +
+//                    "§2You get 8☘ per digit - 4\n§2Your counter and digits: $del, $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 30)
+//            textLinesWithTooltip[Pair("§2$del / 48☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 40)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 50, 90, 0f)
+//
+//            textLinesWithTooltip[Pair("§2Harvesting Enchantment", "§7§2Fortune for each enchantment level\n" +
+//                    "§2You get 12.5☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 60)
+//            textLinesWithTooltip[Pair("§2$del / 75☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 70)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 80, 90, 0f)
+//            //remove the "farm crops to level up" once it is maxed
+//            textLinesWithTooltip[Pair("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n" +
+//                    "§2You get 1☘ per level\n§2Your enchantment level: $del\n§2Farm crops to level up")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 90)
+//            textLinesWithTooltip[Pair("§2$del / 10☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 100)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 110, 90, 0f)
+//
+//            textLinesWithTooltip[Pair("§2Turbo-Warts Enchantment", "§7§2Fortune for each enchantment level\n" +
+//                    "§2You get 5☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 120)
+//            textLinesWithTooltip[Pair("§2$del / 25☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 130)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 140, 90, 0f)
+//            //Make sure to change for each different crop
+//            textLinesWithTooltip[Pair("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n" +
+//                    "§2You get $del☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 150)
+//            textLinesWithTooltip[Pair("§2$del / 92☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 160)
+//            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 170, 90, 0f)
         } else {
 
         }
-        FFGuideGUI.renderText(textLinesWithTooltip)
-    }
-
-    override fun swapMode() {
-        textLinesWithTooltip.clear()
     }
 }
