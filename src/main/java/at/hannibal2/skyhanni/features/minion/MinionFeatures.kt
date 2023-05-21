@@ -176,10 +176,10 @@ class MinionFeatures {
         val duration = minions?.get(loc)?.let {
             val lastClicked = it.lastClicked
             if (lastClicked == 0L) {
-                return "Can't calculate coins/day: No time data available!"
+                return "§cCan't calculate coins/day: No time data available!"
             }
             System.currentTimeMillis() - lastClicked
-        } ?: return "Can't calculate coins/day: No time data available!"
+        } ?: return "§cCan't calculate coins/day: No time data available!"
 
         //§7Held Coins: §b151,389
         val coins = line.split(": §b")[1].replace(",", "").toDouble()
@@ -277,6 +277,9 @@ class MinionFeatures {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!minionInventoryOpen) return
+
         if (config.hopperProfitDisplay) {
             config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
