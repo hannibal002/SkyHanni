@@ -10,23 +10,25 @@ object SoundUtils {
     private val beepSound by lazy { createSound("random.orb", 1f) }
 
     fun ISound.playSound() {
-        val gameSettings = Minecraft.getMinecraft().gameSettings
-        val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
-        gameSettings.setSoundLevel(SoundCategory.PLAYERS, 1f)
-        try {
-            Minecraft.getMinecraft().soundHandler.playSound(this)
-        } catch (e: Exception) {
-            if (e is IllegalArgumentException) {
-                e.message?.let {
-                    if (it.startsWith("value already present:")) {
-                        println("SkyHanni Sound error: $it")
-                        return
+        Minecraft.getMinecraft().addScheduledTask {
+            val gameSettings = Minecraft.getMinecraft().gameSettings
+            val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
+            gameSettings.setSoundLevel(SoundCategory.PLAYERS, 1f)
+            try {
+                Minecraft.getMinecraft().soundHandler.playSound(this)
+            } catch (e: Exception) {
+                if (e is IllegalArgumentException) {
+                    e.message?.let {
+                        if (it.startsWith("value already present:")) {
+                            println("SkyHanni Sound error: $it")
+                            return@addScheduledTask
+                        }
                     }
                 }
+                e.printStackTrace()
+            } finally {
+                gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
             }
-            e.printStackTrace()
-        } finally {
-            gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
         }
     }
 
