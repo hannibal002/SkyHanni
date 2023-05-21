@@ -82,10 +82,18 @@ class ConfigManager {
 
 
                 logger.log("load-config-now")
+                var noMigrationNeeded = false
+                if (!gson.toJsonTree(builder.toString()).asJsonObject.has("hidden")) {
+                    println("no hidden area, migration not necessary!")
+                    noMigrationNeeded = true
+                }
                 features = gson.fromJson(
                     builder.toString(),
                     Features::class.java
                 )
+                if (noMigrationNeeded) {
+                    features.hidden.isMigrated = true
+                }
                 logger.log("Loaded config from file")
             } catch (error: Exception) {
                 error.printStackTrace()
@@ -139,7 +147,10 @@ class ConfigManager {
             file.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
                 // TODO remove old "hidden" area
-                writer.write(gson.toJson(SkyHanniMod.feature))
+                val jsonObject = gson.toJsonTree(SkyHanniMod.feature).asJsonObject
+                jsonObject.remove("hidden")
+                jsonObject?.getAsJsonObject("storage")?.remove("gardenJacobFarmingContestTimes")
+                writer.write(gson.toJson(jsonObject))
             }
         } catch (e: IOException) {
             logger.log("Could not save config file to $file")
