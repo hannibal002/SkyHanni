@@ -18,10 +18,6 @@ public class Storage {
     @Expose
     public String apiKey = "";
 
-//todo could not work out how to access the player specific part :/
-    @Expose
-    public Integer gardenCommunityUpgrade = -1;
-
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
 
@@ -30,7 +26,9 @@ public class Storage {
         @Expose
         public Map<String, ProfileSpecific> profiles = new HashMap<>(); // profile name
 
-        // TODO save community shop account upgrades here
+        @Expose
+        public Integer gardenCommunityUpgrade = -1;
+
     }
 
     public static class ProfileSpecific {

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -94,9 +94,10 @@ class CaptureFarmingGear {
                 if (slot.value.displayName.contains("Garden Farming Fortune")) {
                     if (slot.value.getLore().contains("§aMaxed out!")) {
                         //todo, move to player specific
-                        SkyHanniMod.feature.storage.gardenCommunityUpgrade = slot.value.displayName.split(" ").last().romanToDecimal()
+
+                        ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = slot.value.displayName.split(" ").last().romanToDecimal()
                     } else {
-                        SkyHanniMod.feature.storage.gardenCommunityUpgrade = slot.value.displayName.split(" ").last().romanToDecimal() - 1
+                        ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = slot.value.displayName.split(" ").last().romanToDecimal() - 1
                     }
                 }
             }
@@ -136,7 +137,7 @@ class CaptureFarmingGear {
         val msg = event.message.removeColor().trim()
         var matcher = fortuneUpgradePattern.matcher(msg)
         if (matcher.matches()) {
-            SkyHanniMod.feature.storage.gardenCommunityUpgrade = matcher.group("level").romanToDecimal()
+            ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = matcher.group("level").romanToDecimal()
         }
         matcher = farmingLevelUpPattern.matcher(msg)
         if (matcher.matches()) {

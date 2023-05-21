@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.*
@@ -63,7 +63,7 @@ open class FFGuideGUI : GuiScreen() {
         pages[FortuneGuidePages.NETHER_WART] = WartPage()
 
         farmingLevel = GardenAPI.config?.fortune?.farmingLevel ?: -1
-        communityUpgradeLevel = SkyHanniMod.feature.storage.gardenCommunityUpgrade
+        communityUpgradeLevel = ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1
         plotsUnlocked = GardenAPI.config?.fortune?.plotsUnlocked ?: -1
         anitaBuff = GardenAPI.config?.fortune?.anitaUpgrade ?: -1
         cakeBuffTime = GardenAPI.config?.fortune?.cakeExpiring ?: -1L
