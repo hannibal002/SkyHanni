@@ -18,7 +18,7 @@ import java.util.*
 
 open class FFGuideGUI : GuiScreen() {
     companion object {
-        val pages = mutableMapOf<FortuneGuidePages, FFGuidePage>()
+        val pages = mutableMapOf<FortuneGuidePage, FFGuidePage>()
 
         var guiLeft = 0
         var guiTop = 0
@@ -27,7 +27,7 @@ open class FFGuideGUI : GuiScreen() {
         const val sizeX = 360
         const val sizeY = 180
 
-        var selectedPage = FortuneGuidePages.OVERVIEW
+        var selectedPage = FortuneGuidePage.OVERVIEW
         var breakdownMode = true
         var currentPet = 0
         var currentArmor = 0
@@ -50,17 +50,17 @@ open class FFGuideGUI : GuiScreen() {
     }
 
     init {
-        pages[FortuneGuidePages.OVERVIEW] = OverviewPage()
-        pages[FortuneGuidePages.WHEAT] = WheatPage()
-        pages[FortuneGuidePages.CARROT] = CarrotPage()
-        pages[FortuneGuidePages.POTATO] = PotatoPage()
-        pages[FortuneGuidePages.PUMPKIN] = PumpkinPage()
-        pages[FortuneGuidePages.SUGAR_CANE] = CanePage()
-        pages[FortuneGuidePages.MELON] = MelonPage()
-        pages[FortuneGuidePages.CACTUS] = CactusPage()
-        pages[FortuneGuidePages.COCOA_BEANS] = CocoaPage()
-        pages[FortuneGuidePages.MUSHROOM] = MushroomPage()
-        pages[FortuneGuidePages.NETHER_WART] = WartPage()
+        pages[FortuneGuidePage.OVERVIEW] = OverviewPage()
+        pages[FortuneGuidePage.WHEAT] = WheatPage()
+        pages[FortuneGuidePage.CARROT] = CarrotPage()
+        pages[FortuneGuidePage.POTATO] = PotatoPage()
+        pages[FortuneGuidePage.PUMPKIN] = PumpkinPage()
+        pages[FortuneGuidePage.SUGAR_CANE] = CanePage()
+        pages[FortuneGuidePage.MELON] = MelonPage()
+        pages[FortuneGuidePage.CACTUS] = CactusPage()
+        pages[FortuneGuidePage.COCOA_BEANS] = CocoaPage()
+        pages[FortuneGuidePage.MUSHROOM] = MushroomPage()
+        pages[FortuneGuidePage.NETHER_WART] = WartPage()
 
         communityUpgradeLevel = ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1
         GardenAPI.config?.fortune?.let {
@@ -90,26 +90,38 @@ open class FFGuideGUI : GuiScreen() {
         renderTabs()
 
         //these buttons could be improved
-        drawRect(guiLeft, guiTop + sizeY + 3, guiLeft + 40,
-            guiTop + sizeY + 15, 0x50000000)
+        drawRect(
+            guiLeft, guiTop + sizeY + 3, guiLeft + 40,
+            guiTop + sizeY + 15, 0x50000000
+        )
         RenderUtils.drawStringCentered("§6Mode:", guiLeft + 20, guiTop + sizeY + 9)
 
-        drawRect(guiLeft + 45, guiTop + sizeY + 3, guiLeft + 125,
-            guiTop + sizeY + 15, if (breakdownMode) 0x50555555 else 0x50000000)
+        drawRect(
+            guiLeft + 45, guiTop + sizeY + 3, guiLeft + 125,
+            guiTop + sizeY + 15, if (breakdownMode) 0x50555555 else 0x50000000
+        )
         RenderUtils.drawStringCentered("§6Breakdown", guiLeft + 85, guiTop + sizeY + 9)
 
-        drawRect(guiLeft + 130, guiTop + sizeY + 3, guiLeft + 210,
-            guiTop + sizeY + 15, if (!breakdownMode) 0x50555555 else 0x50000000)
+        drawRect(
+            guiLeft + 130, guiTop + sizeY + 3, guiLeft + 210,
+            guiTop + sizeY + 15, if (!breakdownMode) 0x50555555 else 0x50000000
+        )
         RenderUtils.drawStringCentered("§6Improvements", guiLeft + 170, guiTop + sizeY + 9)
 
         if (breakdownMode) {
-            if (selectedPage != FortuneGuidePages.OVERVIEW) {
-                RenderUtils.renderItemAndTip(items[18], guiLeft + 152, guiTop + 160, mouseX, mouseY,
-                    if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[19], guiLeft + 172, guiTop + 160, mouseX, mouseY,
-                    if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[20], guiLeft + 192, guiTop + 160, mouseX, mouseY,
-                    if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+            if (selectedPage != FortuneGuidePage.OVERVIEW) {
+                RenderUtils.renderItemAndTip(
+                    items[18], guiLeft + 152, guiTop + 160, mouseX, mouseY,
+                    if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[19], guiLeft + 172, guiTop + 160, mouseX, mouseY,
+                    if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[20], guiLeft + 192, guiTop + 160, mouseX, mouseY,
+                    if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
 
                 RenderUtils.renderItemAndTip(items[13], guiLeft + 162, guiTop + 80, mouseX, mouseY)
                 RenderUtils.renderItemAndTip(items[12], guiLeft + 162, guiTop + 100, mouseX, mouseY)
@@ -121,30 +133,52 @@ open class FFGuideGUI : GuiScreen() {
                 RenderUtils.renderItemAndTip(items[16], guiLeft + 182, guiTop + 120, mouseX, mouseY)
                 RenderUtils.renderItemAndTip(items[17], guiLeft + 182, guiTop + 140, mouseX, mouseY)
             } else {
-                RenderUtils.renderItemAndTip(items[13], guiLeft + 142, guiTop + 5, mouseX, mouseY,
-                    if (currentArmor == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[12], guiLeft + 162, guiTop + 5, mouseX, mouseY,
-                    if (currentArmor == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[11], guiLeft + 182, guiTop + 5, mouseX, mouseY,
-                    if (currentArmor == 3) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[10], guiLeft + 202, guiTop + 5, mouseX, mouseY,
-                    if (currentArmor == 4) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(
+                    items[13], guiLeft + 142, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[12], guiLeft + 162, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[11], guiLeft + 182, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 3) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[10], guiLeft + 202, guiTop + 5, mouseX, mouseY,
+                    if (currentArmor == 4) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
 
-                RenderUtils.renderItemAndTip(items[14], guiLeft + 262, guiTop + 5, mouseX, mouseY,
-                    if (currentEquipment == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[15], guiLeft + 282, guiTop + 5, mouseX, mouseY,
-                    if (currentEquipment == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[16], guiLeft + 302, guiTop + 5, mouseX, mouseY,
-                    if (currentEquipment == 3) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[17], guiLeft + 322, guiTop + 5, mouseX, mouseY,
-                    if (currentEquipment == 4) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(
+                    items[14], guiLeft + 262, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[15], guiLeft + 282, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[16], guiLeft + 302, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 3) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[17], guiLeft + 322, guiTop + 5, mouseX, mouseY,
+                    if (currentEquipment == 4) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
 
-                RenderUtils.renderItemAndTip(items[18], guiLeft + 152, guiTop + 130, mouseX, mouseY,
-                    if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[19], guiLeft + 172, guiTop + 130, mouseX, mouseY,
-                    if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
-                RenderUtils.renderItemAndTip(items[20], guiLeft + 192, guiTop + 130, mouseX, mouseY,
-                    if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt())
+                RenderUtils.renderItemAndTip(
+                    items[18], guiLeft + 152, guiTop + 130, mouseX, mouseY,
+                    if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[19], guiLeft + 172, guiTop + 130, mouseX, mouseY,
+                    if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    items[20], guiLeft + 192, guiTop + 130, mouseX, mouseY,
+                    if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
             }
         }
 
@@ -190,7 +224,7 @@ open class FFGuideGUI : GuiScreen() {
     override fun mouseClicked(originalX: Int, originalY: Int, mouseButton: Int) {
         super.mouseClicked(originalX, originalY, mouseButton)
 
-        for (page in FortuneGuidePages.values()) {
+        for (page in FortuneGuidePage.values()) {
             val x = guiLeft + (page.ordinal) * 30 + 15
             val y = guiTop - 28
 
@@ -213,19 +247,33 @@ open class FFGuideGUI : GuiScreen() {
             breakdownMode = false
             swapMode()
         }
-        if (selectedPage == FortuneGuidePages.OVERVIEW) {
+        if (selectedPage == FortuneGuidePage.OVERVIEW) {
             if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
                 currentPet = 0
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 130, 16, 16) && currentPet != 1) {
+            } else if (RenderUtils.isPointInRect(
+                    mouseX,
+                    mouseY,
+                    guiLeft + 172,
+                    guiTop + 130,
+                    16,
+                    16
+                ) && currentPet != 1
+            ) {
                 SoundUtils.playClickSound()
                 currentPet = 1
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 130, 16, 16) && currentPet != 2) {
+            } else if (RenderUtils.isPointInRect(
+                    mouseX,
+                    mouseY,
+                    guiLeft + 192,
+                    guiTop + 130,
+                    16,
+                    16
+                ) && currentPet != 2
+            ) {
                 SoundUtils.playClickSound()
                 currentPet = 2
-            }
-
-            else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 1) 0 else 1
             } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 5, 16, 16)) {
@@ -237,9 +285,7 @@ open class FFGuideGUI : GuiScreen() {
             } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 4) 0 else 4
-            }
-
-            else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16)) {
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentEquipment = if (currentEquipment == 1) 0 else 1
             } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 282, guiTop + 5, 16, 16)) {
@@ -257,10 +303,26 @@ open class FFGuideGUI : GuiScreen() {
             if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
                 currentPet = 0
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 160, 16, 16) && currentPet != 1) {
+            } else if (RenderUtils.isPointInRect(
+                    mouseX,
+                    mouseY,
+                    guiLeft + 172,
+                    guiTop + 160,
+                    16,
+                    16
+                ) && currentPet != 1
+            ) {
                 SoundUtils.playClickSound()
                 currentPet = 1
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 160, 16, 16) && currentPet != 2) {
+            } else if (RenderUtils.isPointInRect(
+                    mouseX,
+                    mouseY,
+                    guiLeft + 192,
+                    guiTop + 160,
+                    16,
+                    16
+                ) && currentPet != 2
+            ) {
                 SoundUtils.playClickSound()
                 currentPet = 2
             }
@@ -268,7 +330,7 @@ open class FFGuideGUI : GuiScreen() {
     }
 
     private fun renderTabs() {
-        for (page in FortuneGuidePages.values()) {
+        for (page in FortuneGuidePage.values()) {
             val x = guiLeft + (page.ordinal) * 30 + 15
             val y = guiTop - 28
             drawRect(x, y, x + 25, y + 28, if (page == selectedPage) 0x50555555 else 0x50000000)
@@ -287,18 +349,21 @@ open class FFGuideGUI : GuiScreen() {
         textLinesWithTooltip.clear()
     }
 
-    enum class FortuneGuidePages(val pageName: String, val crop: CropType?) {
-        OVERVIEW("§eOverview", null),
-        WHEAT("§eWheat", CropType.WHEAT),
-        CARROT("§eCarrot", CropType.CARROT),
-        POTATO("§ePotato", CropType.POTATO),
-        NETHER_WART("§eNether Wart", CropType.NETHER_WART),
-        PUMPKIN("§ePumpkin", CropType.PUMPKIN),
-        MELON("§eMelon", CropType.MELON),
-        COCOA_BEANS("§eCocoa Beans", CropType.COCOA_BEANS),
-        SUGAR_CANE("§eSugar Cane", CropType.SUGAR_CANE),
-        CACTUS("§eCactus", CropType.CACTUS),
-        MUSHROOM("§eMushroom", CropType.MUSHROOM),
+    enum class FortuneGuidePage(val crop: CropType?) {
+        OVERVIEW(null),
+        WHEAT(CropType.WHEAT),
+        CARROT(CropType.CARROT),
+        POTATO(CropType.POTATO),
+        NETHER_WART(CropType.NETHER_WART),
+        PUMPKIN(CropType.PUMPKIN),
+        MELON(CropType.MELON),
+        COCOA_BEANS(CropType.COCOA_BEANS),
+        SUGAR_CANE(CropType.SUGAR_CANE),
+        CACTUS(CropType.CACTUS),
+        MUSHROOM(CropType.MUSHROOM),
+        ;
+
+        val pageName = crop?.let { "§e" + crop.cropName } ?: "§eOverview"
     }
 
     abstract class FFGuidePage {
