@@ -43,7 +43,7 @@ object InventoryUtils {
         } else ""
         return chestName
     }
-    
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getItemsInOwnInventory(): MutableList<ItemStack> {
@@ -57,11 +57,16 @@ object InventoryUtils {
         return list
     }
 
-    fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
-        getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
+    fun countItemsInLowerInventory(ignoreStackSize: Boolean = false, predicate: (ItemStack) -> Boolean) =
+        getItemsInOwnInventory().filter { predicate(it) }.sumOf { if (!ignoreStackSize) it.stackSize else 1 }
+
+    fun countItemsInOpenChest(ignoreStackSize: Boolean = false, predicate: (ItemStack) -> Boolean) =
+        getItemsInOpenChest().mapNotNull { it.stack }.filter { predicate(it) }
+            .sumOf { if (!ignoreStackSize) it.stackSize else 1 }
 
     fun getArmor(): Array<ItemStack?> =
         Minecraft.getMinecraft().thePlayer.inventory.armorInventory
 
-    fun inStorage() = openInventoryName().let { it.contains("Storage") || it.contains("Ender Chest") || it.contains("Backpack") }
+    fun inStorage() =
+        openInventoryName().let { it.contains("Storage") || it.contains("Ender Chest") || it.contains("Backpack") }
 }
