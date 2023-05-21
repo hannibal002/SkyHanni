@@ -164,7 +164,7 @@ class EstimatedItemValue {
         for ((internalName, values) in Constants.REFORGESTONES.entrySet()) {
             val stone = values.asJsonObject
             val reforgeName = stone.get("reforgeName").asString
-            if (rawReforgeName == reforgeName.lowercase()) {
+            if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == internalName.lowercase()) {
                 val price = NEUItems.getPrice(internalName)
                 val name = NEUItems.getItemStack(internalName).name
                 list.add("§7Reforge: §9$reforgeName")
