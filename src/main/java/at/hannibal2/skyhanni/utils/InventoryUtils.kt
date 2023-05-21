@@ -64,8 +64,7 @@ object InventoryUtils {
         getItemsInOpenChest().mapNotNull { it.stack }.filter { predicate(it) }
             .sumOf { if (!ignoreStackSize) it.stackSize else 1 }
 
-    fun getArmor(): Array<ItemStack?> =
-        Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
 
     fun inStorage() =
         openInventoryName().let { it.contains("Storage") || it.contains("Ender Chest") || it.contains("Backpack") }

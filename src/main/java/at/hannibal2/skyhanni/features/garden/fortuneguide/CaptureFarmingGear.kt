@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -48,14 +48,14 @@ class CaptureFarmingGear {
         resultList.add(itemStack.displayName.toString())
         resultList.add(itemID)
 
-        val currentCrop = CropType.values().firstOrNull { itemID.startsWith(it.toolName) }
+        val currentCrop = itemStack.getCropType()
         if (currentCrop == null) {
             // could save a generic tool here e.g. If they don't have a wheat hoe, use advanced garden hoe or rookie hoe
         } else {
             hidden[currentCrop.ordinal] = NEUItems.saveNBTData(itemStack)
         }
         var i = 0
-        for (item in Minecraft.getMinecraft().thePlayer.inventory.armorInventory) {
+        for (item in InventoryUtils.getArmor()) {
             i += 1
             if (item == null) continue
             if (item.getInternalName() in farmingArmor) hidden[9 + i] = NEUItems.saveNBTData(item)
