@@ -125,7 +125,7 @@ public class Inventory {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers." +
+        @ConfigOption(name = "Number Format", desc = "Either show Default, Formatted or Unformatted numbers.\n" +
                 "§eDefault: §72,240/2.2k\n" +
                 "§eFormatted: §72.2k/2.2k\n" +
                 "§eUnformatted: §72,240/2,200")
@@ -133,9 +133,49 @@ public class Inventory {
         public int numberFormat = 1;
 
         @Expose
-        @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sacks.")
-        @ConfigEditorDropdown(values = {"Descending", "Ascending"})
+        @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 10,
+                minStep = 1)
+        public int extraSpace = 1;
+
+        @Expose
+        @ConfigOption(name = "Sorting Type", desc = "Sorting type of items in sack.")
+        @ConfigEditorDropdown(values = {"Descending (Stored)", "Ascending (Stored)", "Descending (Price)", "Ascending (Price)"})
         public int sortingType = 0;
+
+        @Expose
+        @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed. (Some sacks have too many items to fit\n" +
+                "in larger gui scale, like the nether sack.)")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 45,
+                minStep = 1
+        )
+        public int itemToShow = 15;
+
+        @Expose
+        @ConfigOption(name = "Show Empty Item", desc = "Show empty item quantity in the display.")
+        @ConfigEditorBoolean
+        public boolean showEmpty = true;
+
+        @Expose
+        @ConfigOption(name = "Show Price", desc = "Show price for each item in sack.")
+        @ConfigEditorBoolean
+        public boolean showPrice = true;
+
+        @Expose
+        @ConfigOption(name = "Price Format", desc = "Format of the price displayed.\n" +
+                "§eFormatted: §7(12k)\n" +
+                "§eUnformatted: §7(12,421)")
+        @ConfigEditorDropdown(values = {"Formatted", "Unformatted"})
+        public int priceFormat = 0;
+
+        @Expose
+        @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+        @ConfigEditorDropdown(values = {"Bazaar", "NPC"})
+        public int priceFrom = 1;
 
         @Expose
         @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack.")
@@ -143,7 +183,7 @@ public class Inventory {
         public boolean showRunes = false;
 
         @Expose
-        public Position position = new Position(155, -57, false, true);
+        public Position position = new Position(144, 139, false, true);
     }
 
     @Expose
