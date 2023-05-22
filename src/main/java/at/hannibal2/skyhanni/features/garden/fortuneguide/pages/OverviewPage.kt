@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 
@@ -66,36 +67,42 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
 
 
             RenderUtils.drawFarmingBar("§2Total Pet Fortune", "§7§2The total fortune from your pet and its item",
-                0, 10000, FFGuideGUI.guiLeft + 75,
+                0, 10000, FFGuideGUI.guiLeft + 80,
                 FFGuideGUI.guiTop + 155, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             RenderUtils.drawFarmingBar("§2Pet Item", "§7§2The fortune from your pet's item\n" +
-                    "§2Grants 4☘ per garden level\n§2Your garden level: $del", 0, 60, FFGuideGUI.guiLeft + 195,
+                    "§2Grants 4☘ per garden level\n§2Your garden level: $del", 0, 60, FFGuideGUI.guiLeft + 190,
                 FFGuideGUI.guiTop + 155, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
+            val equipmentItem = when (FFGuideGUI.currentEquipment) {
+                1 -> FarmingItems.NECKLACE
+                2 -> FarmingItems.CLOAK
+                3 -> FarmingItems.BELT
+                else -> FarmingItems.BRACELET
+            }
 
             line = if (FFGuideGUI.currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
-            else "§7§2Total fortune from your\n${FFGuideGUI.items[13 + FFGuideGUI.currentEquipment].displayName}"
+            else "§7§2Total fortune from your\n${FFGuideGUI.items[equipmentItem]?.displayName}"
             RenderUtils.drawFarmingBar("§2Total Equipment Fortune", line, 0, if (FFGuideGUI.currentEquipment == 0) 198 else 49.5,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             line = if (FFGuideGUI.currentEquipment == 0) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
-            else "§7§2Total base fortune from your\n${FFGuideGUI.items[13 + FFGuideGUI.currentEquipment].displayName}"
+            else "§7§2Total base fortune from your\n${FFGuideGUI.items[equipmentItem]?.displayName}"
             RenderUtils.drawFarmingBar("§2Equipment Base Fortune", line, 0, if (FFGuideGUI.currentEquipment == 0) 20 else 5,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             line = if (FFGuideGUI.currentEquipment == 0) "§7§2The fortune from all of your equipment's abilities\n§2Select a piece for more info"
-            else "§7§2Total ability fortune from your\n${FFGuideGUI.items[13 + FFGuideGUI.currentEquipment].displayName}"
+            else "§7§2Total ability fortune from your\n${FFGuideGUI.items[equipmentItem]?.displayName}"
             RenderUtils.drawFarmingBar("§2Equipment Ability", line, 0, if (FFGuideGUI.currentEquipment == 0) 60 else 15,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             line = if (FFGuideGUI.currentEquipment == 0) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
-            else "§7§2Total reforge fortune from your\n${FFGuideGUI.items[13 + FFGuideGUI.currentEquipment].displayName}"
+            else "§7§2Total reforge fortune from your\n${FFGuideGUI.items[equipmentItem]?.displayName}"
             RenderUtils.drawFarmingBar("§2Equipment Reforge", line, 0, if (FFGuideGUI.currentEquipment == 0) 40 else 10,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             line = if (FFGuideGUI.currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
-            else "§7§2Total enchantment fortune from your\n${FFGuideGUI.items[13 + FFGuideGUI.currentEquipment].displayName}"
+            else "§7§2Total enchantment fortune from your\n${FFGuideGUI.items[equipmentItem]?.displayName}"
             RenderUtils.drawFarmingBar("§2Equipment Enchantment", line, 0, if (FFGuideGUI.currentEquipment == 0) 78 else 19.5,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
         }

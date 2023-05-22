@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 
 
 class WartPage: FFGuideGUI.FFGuidePage() {
-    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(3)?.let { NEUItems.loadNBTData(it) }
+//    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(3)?.let { NEUItems.loadNBTData(it) }
     private val textLinesWithTooltip = mutableMapOf<Pair<String, String>, Pair<Int, Int>>()
     private val del = "TODO" // use for names/changing text
     private val del2 = 2 // use for numbers
@@ -68,7 +68,7 @@ class WartPage: FFGuideGUI.FFGuidePage() {
 //            textLinesWithTooltip[Pair("§2$del / 96☘    $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 10)
 //            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 20, 90, 0f)
 //
-//            textLinesWithTooltip[Pair("§2Collection Analysts", "§7§2Fortune from increasing crop counter\n" +
+//            textLinesWithTooltip[Pair("§2Collection Analyst", "§7§2Fortune from increasing crop counter\n" +
 //                    "§2You get 8☘ per digit - 4\n§2Your counter and digits: $del, $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 30)
 //            textLinesWithTooltip[Pair("§2$del / 48☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 40)
 //            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 50, 90, 0f)

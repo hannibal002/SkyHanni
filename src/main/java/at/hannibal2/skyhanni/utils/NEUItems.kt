@@ -272,10 +272,17 @@ object NEUItems {
     }
 
     //Used from NEU
-    fun saveNBTData(item: ItemStack): JsonObject {
+    fun saveNBTData(item: ItemStack, removeLore: Boolean = true): JsonObject {
+        if (removeLore) {
+            val json = JsonObject()
+            if (json.has("lore")) json.remove("lore")
+        }
         val temp = manager.getJsonForItem(item)
         if (!temp.has("internalname")) {
             temp.add("internalname", JsonPrimitive("_"))
+        }
+        if (removeLore) {
+            if (temp.has("lore")) temp.remove("lore")
         }
         return temp
     }

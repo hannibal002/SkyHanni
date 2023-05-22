@@ -15,32 +15,31 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
 class CaptureFarmingGear {
+    private var farmingItems = mutableMapOf<FarmingItems, JsonObject>()
+
     private val farmingArmor = arrayListOf(
         "FERMENTO_BOOTS", "FERMENTO_CHESTPLATE", "FERMENTO_HELMET",
         "FERMENTO_LEGGINGS", "RANCHERS_BOOTS", "PUMPKIN_BOOTS", "SQUASH_BOOTS", "SQUASH_CHESTPLATE",
         "SQUASH_HELMET", "SQUASH_LEGGINGS", "CROPIE_BOOTS", "CROPIE_CHESTPLATE", "CROPIE_HELMET",
-        "CROPIE_LEGGINGS", "MELON_BOOTS", "MELON_CHESTPLATE", "MELON_HELMET", "MELON_LEGGINGS",
-        "ENCHANTED_JACK_O_LANTERN"
-    )
-    //need to add the lower tiers of farming armor eg. pumpkin or whatever
-
-    private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
+        "CROPIE_LEGGINGS", "MELON_BOOTS", "MELON_CHESTPLATE", "MELON_HELMET", "MELON_LEGGINGS"
+    )       //not adding any more armor, unless requested
+    private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON")
+    private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "PUMPKIN_BOOTS")
 
     // will not capture the user levelling up to Farming 1
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
+    private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
     private val anitaMenuPattern = "§7You have: §a[+](?<level>.*)%".toPattern()
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        val hidden = GardenAPI.config?.fortune?.farmingItems ?: return
         val resultList = mutableListOf<String>()
 
         val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
@@ -49,17 +48,31 @@ class CaptureFarmingGear {
         resultList.add(itemID)
 
         val currentCrop = itemStack.getCropType()
+
         if (currentCrop == null) {
             // could save a generic tool here e.g. If they don't have a wheat hoe, use advanced garden hoe or rookie hoe
         } else {
-            hidden[currentCrop.ordinal] = NEUItems.saveNBTData(itemStack)
+            for (item in FarmingItems.values()) {
+                if (item.name == currentCrop.name) {
+                    farmingItems[item] = NEUItems.saveNBTData(itemStack)
+                }
+            }
         }
-        var i = 0
-        for (item in InventoryUtils.getArmor()) {
-            i += 1
-            if (item == null) continue
-            if (item.getInternalName() in farmingArmor) hidden[9 + i] = NEUItems.saveNBTData(item)
+        for (armor in InventoryUtils.getArmor()) {
+            if (armor == null) continue
+            val split = armor.getInternalName().split("_")
+            if (split.first() in farmingSets) {
+                for (item in FarmingItems.values()) {
+                    if (item.name == split.last()) {
+                        farmingItems[item] = NEUItems.saveNBTData(armor)
+                    }
+                }
+            }
+            if (armor.getInternalName() in farmingBoots) {
+                farmingItems[FarmingItems.OTHER_BOOTS] = NEUItems.saveNBTData(armor)
+            }
         }
+        GardenAPI.config?.fortune?.farmingItems = farmingItems
     }
 
     @SubscribeEvent
@@ -67,26 +80,34 @@ class CaptureFarmingGear {
         if (!LorenzUtils.inSkyBlock) return
         val hidden = GardenAPI.config?.fortune ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
-            // will not update if they equip something new
-            if (event.inventoryItems[10]?.getInternalName() == "LOTUS_NECKLACE") hidden.farmingItems[14] = event.inventoryItems[10]?.let { NEUItems.saveNBTData(it) }
-            if (event.inventoryItems[19]?.getInternalName() == "LOTUS_CLOAK") hidden.farmingItems[15] = event.inventoryItems[19]?.let { NEUItems.saveNBTData(it) }
-            if (event.inventoryItems[28]?.getInternalName() == "LOTUS_BELT") hidden.farmingItems[16] = event.inventoryItems[28]?.let { NEUItems.saveNBTData(it) }
-            if (event.inventoryItems[37]?.getInternalName() == "LOTUS_BRACELET") hidden.farmingItems[17] = event.inventoryItems[37]?.let { NEUItems.saveNBTData(it) }
-        }
-        if (event.inventoryName.contains("Pets")) {
-            // multiple of the same pet will cause it to be overwritten
-            for ((_, item) in event.inventoryItems) {
-                if (item.getInternalName().contains("ELEPHANT")) {
-                    hidden.farmingItems[18] = NEUItems.saveNBTData(item)
-                }
-                if (item.getInternalName().contains("MOOSHROOM_COW")) {
-                    hidden.farmingItems[19] = NEUItems.saveNBTData(item)
-                }
-                if (item.getInternalName().contains("RABBIT")) {
-                    hidden.farmingItems[20] = NEUItems.saveNBTData(item)
+            for ((_, slot) in event.inventoryItems) {
+                val split = slot.getInternalName().split("_")
+                if (split.first() == "LOTUS") {
+                    for (item in FarmingItems.values()) {
+                        if (item.name == split.last()) {
+                            farmingItems[item] = NEUItems.saveNBTData(slot)
+                        }
+                    }
                 }
             }
         }
+        if (event.inventoryName.contains("Pets")) {
+            //todo fix multiple of the same pet will cause it to be overwritten
+            for ((_, item) in event.inventoryItems) {
+                val split = item.getInternalName().split(";")
+                if (split.first() == "ELEPHANT") {
+                    farmingItems[FarmingItems.ELEPHANT] = NEUItems.saveNBTData(item)
+                }
+                if (split.first() == "MOOSHROOM_COW") {
+                    farmingItems[FarmingItems.MOOSHROOM_COW] = NEUItems.saveNBTData(item)
+                }
+                if (split.first() == "RABBIT") {
+                    farmingItems[FarmingItems.RABBIT] = NEUItems.saveNBTData(item)
+                }
+            }
+        }
+        GardenAPI.config?.fortune?.farmingItems = farmingItems
+
         if (event.inventoryName.contains("Your Skills")) {
             for ((_, item) in event.inventoryItems) {
                 if (item.displayName.contains("Farming ")) {
@@ -121,11 +142,6 @@ class CaptureFarmingGear {
                 }
             }
         }
-
-        println(event.inventoryName)
-        for (item in event.inventoryItems) {
-            println("at: ${item.key}, name: ${item.value.displayName}, internal name: ${item.value.getInternalName()}, lore: ${item.value.getLore()}")
-        }
     }
 
     @SubscribeEvent
@@ -149,11 +165,6 @@ class CaptureFarmingGear {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val hidden = GardenAPI.config?.fortune ?: return
-        while (hidden.farmingItems.size < 21) { // 10 tools, 4 armor, 4 equipment, 3 pets
-
-            hidden.farmingItems.add(NEUItems.saveNBTData(ItemStack(Items.painting, 1, 10)))
-        }
+        farmingItems = GardenAPI.config?.fortune?.farmingItems ?: return
     }
 }
-

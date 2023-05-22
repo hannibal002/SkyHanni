@@ -8,12 +8,12 @@ import java.io.IOException
 
 
 class CarrotPage: FFGuideGUI.FFGuidePage() {
-    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(1)?.let { NEUItems.loadNBTData(it) }
+//    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(1)?.let { NEUItems.loadNBTData(it) }
     private val del = "TODO"
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {
-            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
+//            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
             FFGuideGUI.textLinesWithTooltip[Pair("§6Carrot Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
             FFGuideGUI.textLinesWithTooltip[Pair("§2$del / 1766☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
             RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
@@ -52,7 +52,7 @@ class CarrotPage: FFGuideGUI.FFGuidePage() {
             FFGuideGUI.textLinesWithTooltip[Pair("§2$del / 96☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 10)
             RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 20, 90, 0f)
 
-            FFGuideGUI.textLinesWithTooltip[Pair("§2Collection Analysts", "§7§2Fortune from increasing crop counter\n" +
+            FFGuideGUI.textLinesWithTooltip[Pair("§2Collection Analyst", "§7§2Fortune from increasing crop counter\n" +
                     "§2You get 8☘ per digit - 4\n§2Your counter and digits: $del, $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 30)
             FFGuideGUI.textLinesWithTooltip[Pair("§2$del / 48☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 40)
             RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 50, 90, 0f)

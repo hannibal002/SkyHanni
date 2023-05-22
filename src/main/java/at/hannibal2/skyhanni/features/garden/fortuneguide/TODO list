@@ -4,13 +4,14 @@ todo list for this display
 
 more todo notes on WartsPage.kt
 
-Work out how to access the data, load it all when the gui is opened then access through a single method as it won't change while gui is open
-Use items list for tools instead of loading on individual pages
+
+Deal with the two boots types
 
 Deal with pets
 Deal with mushroom cow and strength
 
-Render an item like a barrier, with lore saying that you don't have it
+More info on the lore of missing items
+
 Change lore on equipment to reflect visitors served
 Track pet level ups
 Message if stat hasn't been checked yet
@@ -35,12 +36,16 @@ Change colour of percentage text to reflect completed percentage
 !!!!
 Buges:
 Major:
+Crash if fortune is more than max for slider or less than 0
 Will overwrite the saved pet of each type if there is more than one of it in pets menu. e.g. uncommon ele will overwrite leg one
+If they sell their equipment or pets, they will be saved until a new one is bought and their stats counted : fix, don't liquidize your stuff lol
+- can fix pets, equipment is more difficult
 Minor:
+If you change tool but don't swap to it since you changed it, these won't be updated
 Cakes will not appear as missing until they are eaten once so the mod knows when it runs out
 Shows unique tool stat as achieved all the time
 Taking off or putting equipment on inside the menu won't update it until you reopen the inventory
-    - also if they sell the peice of equipment, it will always think they still have it
+    - also if they sell the piece of equipment, it will always think they still have it
 !!!!
 
 Add:

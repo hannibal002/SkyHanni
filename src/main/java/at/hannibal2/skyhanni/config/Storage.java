@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.JsonObject;
@@ -170,7 +171,7 @@ public class Storage {
                 public long cakeExpiring = -1L;
 
                 @Expose
-                public List<JsonObject> farmingItems = new ArrayList<>();
+                public Map<FarmingItems, JsonObject> farmingItems = new HashMap<>();
             }
         }
     }
