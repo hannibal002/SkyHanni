@@ -342,7 +342,7 @@ public class Misc {
         public boolean trapperTalkCooldown = true;
     }
 
-    @ConfigOption(name = "Teleport Pads", desc = "")
+    @ConfigOption(name = "Teleport Pads On Private Island", desc = "")
     @Accordion
     @Expose
     public TeleportPad teleportPad = new TeleportPad();
