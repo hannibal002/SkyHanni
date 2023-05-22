@@ -44,7 +44,10 @@
 - Visual highlight chests that have not yet been opened in the Croesus inventory.
 
 ## Inventory
-- Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement. (in NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
+- Not Clickable Items 
+  - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement.
+  - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI
+  - Option to allow/block clicks
 - Option to change the gray-out opacity for 'Not Clickable Items'.
 - Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and collection level)
 - Sack name (show short name of sacks)

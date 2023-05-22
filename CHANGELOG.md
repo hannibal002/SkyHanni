@@ -24,6 +24,7 @@
   + Improved detection speed
   + Derpy double health support
   + More fair detection logic
++ Added extra setting to allow/block clicks for the 'hide not clickable' feature
 
 ### Fixes
 = Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)
