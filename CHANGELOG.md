@@ -9,6 +9,10 @@
   + Show the start waypoint for your farm with the currently holding tool.
   + Auto-detects the start of the farm when farming for the first time
   + Option to manually set the waypoint with /shcropstartlocation
++ Added **price display next to sack items** (Contributed by HiZe)
+  + Can be disabled
+  + Sortable by price or items stored (both desc/asc)
+  + Option to show prices from Bazaar or NPC
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
