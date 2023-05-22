@@ -156,6 +156,11 @@ public class Inventory {
         public int itemToShow = 15;
 
         @Expose
+        @ConfigOption(name = "Show Empty Item", desc = "Show empty item quantity in the display.")
+        @ConfigEditorBoolean
+        public boolean showEmpty = true;
+
+        @Expose
         @ConfigOption(name = "Show Price", desc = "Show price for each item in sack.")
         @ConfigEditorBoolean
         public boolean showPrice = true;

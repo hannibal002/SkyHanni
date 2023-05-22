@@ -36,30 +36,30 @@ class SackDisplay {
     private val gemstoneItem = mutableMapOf<String, Gemstone>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
     private val gemstoneMap = mapOf(
-        "Jade Gemstones" to "ROUGH_JADE_GEM",
-        "Amber Gemstones" to "ROUGH_AMBER_GEM",
-        "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
-        "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
-        "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
-        "Jasper Gemstones" to "ROUGH_JASPER_GEM",
-        "Ruby Gemstones" to "ROUGH_RUBY_GEM",
-        "Opal Gemstones" to "ROUGH_OPAL_GEM"
+            "Jade Gemstones" to "ROUGH_JADE_GEM",
+            "Amber Gemstones" to "ROUGH_AMBER_GEM",
+            "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
+            "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
+            "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
+            "Jasper Gemstones" to "ROUGH_JASPER_GEM",
+            "Ruby Gemstones" to "ROUGH_RUBY_GEM",
+            "Opal Gemstones" to "ROUGH_OPAL_GEM"
     )
 
     private val numPattern =
-        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
+            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val gemstonePattern =
-        " (?:§[0-9a-f])(?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?) §[0-9a-f]\\((?:\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)\\)".toPattern()
+            " (?:§[0-9a-f])(?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?) §[0-9a-f]\\((?:\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)\\)".toPattern()
 
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
             config.position.renderStringsAndItems(
-                display,
-                extraSpace = config.extraSpace,
-                itemScale = 1.3,
-                posLabel = "Sacks Items"
+                    display,
+                    extraSpace = config.extraSpace,
+                    itemScale = 1.3,
+                    posLabel = "Sacks Items"
             )
         }
     }
@@ -87,12 +87,18 @@ class SackDisplay {
                 else -> sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
             }
 
+            sortedPairs.toList().forEach() {
+                if (it.second.stored == "0" && !config.showEmpty) {
+                    sortedPairs.remove(it.first)
+                }
+            }
+
             newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering ${if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow} of ${sortedPairs.size} items)")
             for ((itemName, item) in sortedPairs) {
                 if (rendered >= config.itemToShow) continue
                 val list = mutableListOf<Any>()
                 val (internalName, colorCode, stored, total, price) = item
-                println(stored)
+                if (stored == "0" && !config.showEmpty) continue
                 val itemStack = NEUItems.getItemStack(internalName)
                 list.add(" §7- ")
                 list.add(itemStack)
@@ -131,9 +137,41 @@ class SackDisplay {
                 1 -> totalPrice.addSeparators()
                 else -> ""
             }
+
+            val sortList = mutableListOf<Any>()
+
+            val storedDesc = Renderable.optionalLink("§7[§bDESC§7] ", {
+                config.sortingType = 0
+                update()
+            }) { !NEUItems.neuHasFocus() }
+
+            val storedAsc = Renderable.optionalLink("§7[§bASC§7] ", {
+                config.sortingType = 1
+                update()
+            }) { !NEUItems.neuHasFocus() }
+
+            sortList.add("§eSort by: §6Stored ")
+            sortList.add(storedDesc)
+            sortList.add(storedAsc)
+
+            if (config.showPrice) {
+                val priceDesc = Renderable.optionalLink("§7[§bDESC§7] ", {
+                    config.sortingType = 2
+                    update()
+                }) { !NEUItems.neuHasFocus() }
+
+                val priceAsc = Renderable.optionalLink("§7[§bASC§7]", {
+                    config.sortingType = 3
+                    update()
+                }) { !NEUItems.neuHasFocus() }
+                sortList.add("§6Price ")
+                sortList.add(priceDesc)
+                sortList.add(priceAsc)
+            }
+            newDisplay.add(sortList)
+
             if (config.showPrice && finalPrice.isNotEmpty())
                 newDisplay.addAsSingletonList("§eTotal price: §6$finalPrice")
-
         }
 
         if (runeItem.isNotEmpty()) {
@@ -220,97 +258,27 @@ class SackDisplay {
                         val stored = group("stored")
                         gem.internalName = gemstoneMap[name.removeColor()].toString()
                         if (gemstoneMap.containsKey(name.removeColor())) {
+                            val internalName = "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+
                             when (rarity) {
                                 "Rough" -> {
-                                    val internalName =
-                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.rough = stored
-                                    gem.roughPrice = when (config.priceFrom) {
-                                        0 -> {
-                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                                        }
-
-                                        1 -> {
-                                            try {
-                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
-
-                                            } catch (e: Exception) {
-                                                0
-                                            }
-                                        }
-
-                                        else -> 0
-                                    }
+                                    gem.roughPrice = calculatePrice(internalName, stored)
                                 }
 
                                 "Flawed" -> {
-                                    val internalName =
-                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.flawed = stored
-                                    gem.flawedPrice = when (config.priceFrom) {
-                                        0 -> {
-                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                                        }
-
-                                        1 -> {
-                                            try {
-                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
-
-                                            } catch (e: Exception) {
-                                                0
-                                            }
-                                        }
-
-                                        else -> 0
-                                    }
+                                    gem.flawedPrice = calculatePrice(internalName, stored)
                                 }
 
                                 "Fine" -> {
-                                    val internalName =
-                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.fine = stored
-                                    gem.finePrice = when (config.priceFrom) {
-                                        0 -> {
-                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                                        }
-
-                                        1 -> {
-                                            try {
-                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
-
-                                            } catch (e: Exception) {
-                                                0
-                                            }
-                                        }
-
-                                        else -> 0
-                                    }
+                                    gem.finePrice = calculatePrice(internalName, stored)
                                 }
 
                                 "Flawless" -> {
-                                    val internalName =
-                                        "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
                                     gem.flawless = stored
-                                    gem.flawlessPrice = when (config.priceFrom) {
-                                        0 -> {
-                                            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                                        }
-
-                                        1 -> {
-                                            try {
-                                                val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-                                                (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
-
-                                            } catch (e: Exception) {
-                                                0
-                                            }
-                                        }
-
-                                        else -> 0
-                                    }
+                                    gem.flawlessPrice = calculatePrice(internalName, stored)
                                 }
                             }
                             gemstoneItem[name] = gem
@@ -371,32 +339,51 @@ class SackDisplay {
 
 
     data class Gemstone(
-        var internalName: String = "",
-        var rough: String = "0",
-        var flawed: String = "0",
-        var fine: String = "0",
-        var flawless: String = "0",
-        var roughPrice: Int = 0,
-        var flawedPrice: Int = 0,
-        var finePrice: Int = 0,
-        var flawlessPrice: Int = 0
+            var internalName: String = "",
+            var rough: String = "0",
+            var flawed: String = "0",
+            var fine: String = "0",
+            var flawless: String = "0",
+            var roughPrice: Int = 0,
+            var flawedPrice: Int = 0,
+            var finePrice: Int = 0,
+            var flawlessPrice: Int = 0
     )
 
     data class Rune(
-        var stack: ItemStack? = null,
-        var lvl1: String = "0",
-        var lvl2: String = "0",
-        var lvl3: String = "0"
+            var stack: ItemStack? = null,
+            var lvl1: String = "0",
+            var lvl2: String = "0",
+            var lvl3: String = "0"
     )
 
     data class Item(
-        var internalName: String = "",
-        var colorCode: String = "",
-        var stored: String = "0",
-        var total: String = "0",
-        var price: Int = 0
+            var internalName: String = "",
+            var colorCode: String = "",
+            var stored: String = "0",
+            var total: String = "0",
+            var price: Int = 0
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isRuneDisplayEnabled() = config.showRunes
+
+    private fun calculatePrice(internalName: String, stored: String): Int {
+        return when (config.priceFrom) {
+            0 -> {
+                (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+            }
+
+            1 -> {
+                try {
+                    val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+                    (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
+                } catch (e: Exception) {
+                    0
+                }
+            }
+
+            else -> 0
+        }
+    }
 }
