@@ -60,7 +60,7 @@ object GardenStartLocation {
         if (!isEnabled()) return
         val startLocations = GardenAPI.config?.cropStartLocations ?: return
         val crop = GardenAPI.cropInHand ?: return
-        val location = startLocations[crop] ?: return
+        val location = startLocations[crop]?.add(-0.5, 0.5, -0.5) ?: return
 
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, crop.cropName, 1.5)
