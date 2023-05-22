@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -41,7 +42,7 @@ class OdgerWaypoint {
     }
 
     private fun isLavaFishingRod(): Boolean {
-        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return false
+        val heldItem = InventoryUtils.getItemInHand() ?: return false
         val isRod = heldItem.name?.contains("Rod") ?: return false
         if (!isRod) return false
 

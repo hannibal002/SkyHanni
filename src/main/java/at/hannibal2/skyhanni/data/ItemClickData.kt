@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -24,13 +25,11 @@ class ItemClickData {
             BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
         }
         if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
-            val itemInHand = Minecraft.getMinecraft().thePlayer.heldItem
             val position = packet.position.toLorenzVec()
-            BlockClickEvent(ClickType.LEFT_CLICK, position, itemInHand).postAndCatch()
+            BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
         }
         if (packet is C0APacketAnimation) {
-            val itemInHand = Minecraft.getMinecraft().thePlayer.heldItem
-            ItemClickEvent(itemInHand).postAndCatch()
+            ItemClickEvent(InventoryUtils.getItemInHand()).postAndCatch()
         }
     }
 
