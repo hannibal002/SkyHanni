@@ -342,6 +342,24 @@ public class Misc {
         public boolean trapperTalkCooldown = true;
     }
 
+    @ConfigOption(name = "Teleport Pads", desc = "")
+    @Accordion
+    @Expose
+    public TeleportPad teleportPad = new TeleportPad();
+
+    public static class TeleportPad {
+
+        @Expose
+        @ConfigOption(name = "Compact Name", desc = "Hide the 'Warp to' and 'No Destination' texts over teleport pads.")
+        @ConfigEditorBoolean
+        public boolean compactName = false;
+
+        @Expose
+        @ConfigOption(name = "Inventory Numbers", desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.")
+        @ConfigEditorBoolean
+        public boolean inventoryNumbers = false;
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean

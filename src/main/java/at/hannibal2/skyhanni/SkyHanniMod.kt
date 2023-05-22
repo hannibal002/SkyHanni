@@ -43,6 +43,8 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
+import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
@@ -244,7 +246,7 @@ class SkyHanniMod {
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
         loadModule(GardenVisitorColorNames())
-        loadModule(GardenTeleportPadCompactName())
+        loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
         loadModule(ComposterDisplay())
         loadModule(GardenComposterInventoryFeatures())
@@ -256,7 +258,7 @@ class SkyHanniMod {
         loadModule(ToolTooltipTweaks())
         loadModule(CropSpeedMeter())
         loadModule(AshfangMinisNametagHider())
-        loadModule(GardenTeleportPadInventoryNumber())
+        loadModule(TeleportPadInventoryNumber())
         loadModule(ComposterOverlay())
         loadModule(DiscordRPCManager)
         loadModule(GardenCropMilestoneFix())
@@ -267,7 +269,6 @@ class SkyHanniMod {
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
-        loadModule(GardenRecentTeleportPadsDisplay())
         loadModule(InquisitorWaypointShare)
         loadModule(TrevorFeatures())
         loadModule(TrevorSolver)
