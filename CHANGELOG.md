@@ -5,6 +5,10 @@
 ### New Features
 + Added Visitor Drop Counter to track all the drops from visitors.
 + Added **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
++ Added **Garden Start Location**
+  + Show the start waypoint for your farm with the currently holding tool.
+  + Auto-detects the start of the farm when farming for the first time
+  + Option to manually set the waypoint with /shcropstartlocation
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.

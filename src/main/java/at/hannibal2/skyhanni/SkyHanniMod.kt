@@ -275,6 +275,7 @@ class SkyHanniMod {
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(SackDisplay())
+        loadModule(GardenStartLocation)
 
         init()
 

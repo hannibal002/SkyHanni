@@ -1122,6 +1122,20 @@ public class Garden {
     }
 
     @Expose
+    @ConfigOption(name = "Crop Start Location", desc = "")
+    @Accordion
+    public CropStartLocation cropStartLocation = new CropStartLocation();
+
+    public static class CropStartLocation {
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Show the start waypoint for your farm with the currently holding tool.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+    }
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
