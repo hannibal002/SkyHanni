@@ -80,11 +80,11 @@ class SackDisplay {
         var rendered = 0
         if (sackItem.isNotEmpty()) {
             val sortedPairs: MutableMap<String, Item> = when (config.sortingType) {
-                0 -> sackItem.toList().sortedByDescending { it.second.stored }.toMap().toMutableMap()
-                1 -> sackItem.toList().sortedBy { it.second.stored }.toMap().toMutableMap()
+                0 -> sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
+                1 -> sackItem.toList().sortedBy { it.second.stored.formatNumber() }.toMap().toMutableMap()
                 2 -> sackItem.toList().sortedByDescending { it.second.price }.toMap().toMutableMap()
                 3 -> sackItem.toList().sortedBy { it.second.price }.toMap().toMutableMap()
-                else -> sackItem.toList().sortedByDescending { it.second.stored }.toMap().toMutableMap()
+                else -> sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
             }
 
             newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering ${if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow} of ${sortedPairs.size} items)")
@@ -92,6 +92,7 @@ class SackDisplay {
                 if (rendered >= config.itemToShow) continue
                 val list = mutableListOf<Any>()
                 val (internalName, colorCode, stored, total, price) = item
+                println(stored)
                 val itemStack = NEUItems.getItemStack(internalName)
                 list.add(" §7- ")
                 list.add(itemStack)
