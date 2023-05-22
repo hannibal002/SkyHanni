@@ -90,7 +90,6 @@ class SackDisplay {
             newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering ${if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow} of ${sortedPairs.size} items)")
             for ((itemName, item) in sortedPairs) {
                 if (rendered >= config.itemToShow) continue
-                if (rendered >= config.itemToShow) continue
                 val list = mutableListOf<Any>()
                 val (internalName, colorCode, stored, total, price) = item
                 val itemStack = NEUItems.getItemStack(internalName)
