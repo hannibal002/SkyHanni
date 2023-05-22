@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -272,22 +273,25 @@ object NEUItems {
     }
 
     //Used from NEU
-    fun saveNBTData(item: ItemStack, removeLore: Boolean = true): JsonObject {
+    fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         if (removeLore) {
             val json = JsonObject()
             if (json.has("lore")) json.remove("lore")
         }
-        val temp = manager.getJsonForItem(item)
-        if (!temp.has("internalname")) {
-            temp.add("internalname", JsonPrimitive("_"))
+        val jsonObject = manager.getJsonForItem(item)
+        if (!jsonObject.has("internalname")) {
+            jsonObject.add("internalname", JsonPrimitive("_"))
         }
         if (removeLore) {
-            if (temp.has("lore")) temp.remove("lore")
+            if (jsonObject.has("lore")) jsonObject.remove("lore")
         }
-        return temp
+        val jsonString = jsonObject.toString()
+        return StringUtils.encodeBase64(jsonString)
     }
 
-    fun loadNBTData(json: JsonObject): ItemStack {
-        return manager.jsonToStack(json, false)
+    fun loadNBTData(encoded: String): ItemStack {
+        val jsonString = StringUtils.decodeBase64(encoded)
+        val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
+        return manager.jsonToStack(jsonObject, false)
     }
 }

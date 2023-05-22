@@ -1,19 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils
-import java.io.IOException
 
 
 class CactusPage: FFGuideGUI.FFGuidePage() {
-    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(8)?.let { NEUItems.loadNBTData(it) }
+//    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(8)
     private val del = "TODO"
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {
-            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
+//            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
             FFGuideGUI.textLinesWithTooltip[Pair("§6Cactus Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
             FFGuideGUI.textLinesWithTooltip[Pair("§2$del / 1568☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
             RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)

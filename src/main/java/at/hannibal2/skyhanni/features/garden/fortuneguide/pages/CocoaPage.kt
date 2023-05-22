@@ -1,20 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils
-import java.io.IOException
 
 
 class CocoaPage: FFGuideGUI.FFGuidePage() {
-    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(9)?.let { NEUItems.loadNBTData(it) }
+//    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(9)
     private val textLinesWithTooltip = mutableMapOf<Pair<String, String>, Pair<Int, Int>>()
     private val del = "TODO"
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {
-            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
+//            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
             textLinesWithTooltip[Pair("§6Cocoa Bean Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
             textLinesWithTooltip[Pair("§2$del / 1575.5☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
             RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)

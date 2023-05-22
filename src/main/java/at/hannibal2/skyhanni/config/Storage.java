@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.utils.LorenzVec;
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
+import net.minecraft.item.ItemStack;
 
 import java.util.*;
 
@@ -171,7 +171,7 @@ public class Storage {
                 public long cakeExpiring = -1L;
 
                 @Expose
-                public Map<FarmingItems, JsonObject> farmingItems = new HashMap<>();
+                public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
         }
     }

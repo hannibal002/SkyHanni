@@ -1,12 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils
-import java.io.IOException
 
 
 class WheatPage: FFGuideGUI.FFGuidePage() {
@@ -14,7 +11,7 @@ class WheatPage: FFGuideGUI.FFGuidePage() {
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {
-            RenderUtils.renderItemAndTip(FFGuideGUI.items[FarmingItems.WHEAT],
+            RenderUtils.renderItemAndTip(FarmingItems.WHEAT.getItem(),
                 FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
 
 

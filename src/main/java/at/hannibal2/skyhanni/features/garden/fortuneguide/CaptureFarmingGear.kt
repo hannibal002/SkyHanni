@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -11,17 +10,15 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
 class CaptureFarmingGear {
-    private var farmingItems = mutableMapOf<FarmingItems, JsonObject>()
+    private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
     private val farmingArmor = arrayListOf(
         "FERMENTO_BOOTS", "FERMENTO_CHESTPLATE", "FERMENTO_HELMET",
@@ -40,6 +37,7 @@ class CaptureFarmingGear {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
+        val farmingItems = farmingItems ?: return
         val resultList = mutableListOf<String>()
 
         val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
@@ -54,7 +52,7 @@ class CaptureFarmingGear {
         } else {
             for (item in FarmingItems.values()) {
                 if (item.name == currentCrop.name) {
-                    farmingItems[item] = NEUItems.saveNBTData(itemStack)
+                    farmingItems[item] = itemStack
                 }
             }
         }
@@ -64,28 +62,28 @@ class CaptureFarmingGear {
             if (split.first() in farmingSets) {
                 for (item in FarmingItems.values()) {
                     if (item.name == split.last()) {
-                        farmingItems[item] = NEUItems.saveNBTData(armor)
+                        farmingItems[item] = armor
                     }
                 }
             }
             if (armor.getInternalName() in farmingBoots) {
-                farmingItems[FarmingItems.OTHER_BOOTS] = NEUItems.saveNBTData(armor)
+                farmingItems[FarmingItems.OTHER_BOOTS] = armor
             }
         }
-        GardenAPI.config?.fortune?.farmingItems = farmingItems
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val hidden = GardenAPI.config?.fortune ?: return
+        val farmingItems = farmingItems ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
             for ((_, slot) in event.inventoryItems) {
                 val split = slot.getInternalName().split("_")
                 if (split.first() == "LOTUS") {
                     for (item in FarmingItems.values()) {
                         if (item.name == split.last()) {
-                            farmingItems[item] = NEUItems.saveNBTData(slot)
+                            farmingItems[item] = slot
                         }
                     }
                 }
@@ -96,17 +94,16 @@ class CaptureFarmingGear {
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName().split(";")
                 if (split.first() == "ELEPHANT") {
-                    farmingItems[FarmingItems.ELEPHANT] = NEUItems.saveNBTData(item)
+                    farmingItems[FarmingItems.ELEPHANT] = item
                 }
                 if (split.first() == "MOOSHROOM_COW") {
-                    farmingItems[FarmingItems.MOOSHROOM_COW] = NEUItems.saveNBTData(item)
+                    farmingItems[FarmingItems.MOOSHROOM_COW] = item
                 }
                 if (split.first() == "RABBIT") {
-                    farmingItems[FarmingItems.RABBIT] = NEUItems.saveNBTData(item)
+                    farmingItems[FarmingItems.RABBIT] = item
                 }
             }
         }
-        GardenAPI.config?.fortune?.farmingItems = farmingItems
 
         if (event.inventoryName.contains("Your Skills")) {
             for ((_, item) in event.inventoryItems) {
@@ -161,10 +158,5 @@ class CaptureFarmingGear {
         if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
             hidden.cakeExpiring = System.currentTimeMillis() + 172800000
         }
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        farmingItems = GardenAPI.config?.fortune?.farmingItems ?: return
     }
 }

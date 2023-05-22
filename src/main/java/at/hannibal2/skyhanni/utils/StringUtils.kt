@@ -94,4 +94,8 @@ object StringUtils {
     private fun darkenInt(int: Int): Int {
         return "ff${String.format("%06x", Color(Integer.toHexString(int).toLong(radix = 16).toInt()).darker().rgb)}".toLong(radix = 16).toInt()
     }
+
+    fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
+
+    fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
 }
