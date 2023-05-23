@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.RenderUtils.darkenColor
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
 import java.awt.Color
@@ -82,17 +83,12 @@ object StringUtils {
         if (matcher.matches()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
             return if (darker) {
-                darkenInt(colorInt)
+                "ff${Integer.toHexString(colorInt.darkenColor())}".toLong(radix = 16).toInt() //todo broken
             } else {
                 "ff${Integer.toHexString(colorInt)}".toLong(radix = 16).toInt()
             }
         }
         return default
-    }
-
-    // does not work
-    private fun darkenInt(int: Int): Int {
-        return "ff${String.format("%06x", Color(Integer.toHexString(int).toLong(radix = 16).toInt()).darker().rgb)}".toLong(radix = 16).toInt()
     }
 
     fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())

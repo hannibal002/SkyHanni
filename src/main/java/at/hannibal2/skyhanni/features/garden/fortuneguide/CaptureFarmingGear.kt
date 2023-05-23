@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -20,13 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
-    private val farmingArmor = arrayListOf(
-        "FERMENTO_BOOTS", "FERMENTO_CHESTPLATE", "FERMENTO_HELMET",
-        "FERMENTO_LEGGINGS", "RANCHERS_BOOTS", "PUMPKIN_BOOTS", "SQUASH_BOOTS", "SQUASH_CHESTPLATE",
-        "SQUASH_HELMET", "SQUASH_LEGGINGS", "CROPIE_BOOTS", "CROPIE_CHESTPLATE", "CROPIE_HELMET",
-        "CROPIE_LEGGINGS", "MELON_BOOTS", "MELON_CHESTPLATE", "MELON_HELMET", "MELON_LEGGINGS"
-    )       //not adding any more armor, unless requested
-    private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON")
+    private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM") // not adding any more armor, unless requested
     private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "PUMPKIN_BOOTS")
 
     // will not capture the user levelling up to Farming 1
@@ -108,7 +103,7 @@ class CaptureFarmingGear {
         if (event.inventoryName.contains("Your Skills")) {
             for ((_, item) in event.inventoryItems) {
                 if (item.displayName.contains("Farming ")) {
-                    hidden.farmingLevel = item.displayName.split(" ").last().romanToDecimal()
+                    hidden.farmingLevel = item.displayName.split(" ").last().romanToDecimalIfNeeded()
                 }
             }
         }
@@ -129,14 +124,20 @@ class CaptureFarmingGear {
             hidden.plotsUnlocked = 24 - InventoryUtils.countItemsInOpenChest(true) { it.getLore().contains("§7Cost:") }
         }
         if (event.inventoryName.contains("Anita")) {
+            var level = -1
             for ((_, item) in event.inventoryItems) {
                 if (item.displayName.contains("§eExtra Farming Drops")) {
                     for (line in item.getLore()) {
-                        hidden.anitaUpgrade = anitaMenuPattern.matchMatcher(line) {
+                        level = anitaMenuPattern.matchMatcher(line) {
                             group("level").toInt() / 2
                         } ?: -1
                     }
                 }
+            }
+            if (level == -1) {
+                hidden.anitaUpgrade = 15
+            } else {
+                hidden.anitaUpgrade = level
             }
         }
     }
@@ -150,7 +151,7 @@ class CaptureFarmingGear {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
         }
         farmingLevelUpPattern.matchMatcher(msg) {
-            hidden.farmingLevel = group("level").romanToDecimal()
+            hidden.farmingLevel = group("level").romanToDecimalIfNeeded()
         }
         anitaBuffPattern.matchMatcher(msg) {
             hidden.anitaUpgrade = group("level").toInt() / 2

@@ -56,7 +56,7 @@ object Commands {
         registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
         registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
-        registerCommand("ff") { openFortuneGuide() } // This is easier to remember than /shff or a long command
+        registerCommand("ff") { openFortuneGuide() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
@@ -95,7 +95,7 @@ object Commands {
      fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
             LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
-        } else SkyHanniMod.screenToOpen = FFGuideGUI()
+        } else SkyHanniMod.screenToOpen = FFGuideGUI() // make it send you to the crop you are holding a tool for
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

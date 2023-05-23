@@ -211,7 +211,7 @@ open class FFGuideGUI : GuiScreen() {
         }
     }
 
-    fun renderText(output: MutableList<String>, scale: Float = .7f) {
+    private fun renderText(output: MutableList<String>, scale: Float = .7f) {
         for (line in textLinesWithTooltip) {
             val inverse = 1 / scale
             val str = line.key.first
@@ -228,7 +228,6 @@ open class FFGuideGUI : GuiScreen() {
             if (RenderUtils.isPointInRect(mouseX, mouseY, x, y, (textWidth * scale).toInt(), textHeight)) {
                 val split = tooltip.split("\n")
                 for (tooltipLine in split) {
-//                    tooltipToDisplay.add(tooltipLine)
                     output.add(tooltipLine)
                 }
             }
@@ -363,7 +362,7 @@ open class FFGuideGUI : GuiScreen() {
         }
     }
 
-    fun swapMode() {
+    private fun swapMode() {
         textLinesWithTooltip.clear()
     }
 

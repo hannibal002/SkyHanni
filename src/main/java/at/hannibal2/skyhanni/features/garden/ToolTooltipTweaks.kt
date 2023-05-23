@@ -22,7 +22,7 @@ object ToolTooltipTweaks {
 
     private val reforgeEndLine = setOf("", "§7chance for multiple crops.")
 
-     private fun gardenTooltip(itemStack: ItemStack, tooltip: MutableList<String>, fetching: Boolean = false): MutableList<String> {
+     private fun farmingTooltip(itemStack: ItemStack, tooltip: MutableList<String>): MutableList<String> {
         var string = ""
         resultList.clear()
         val crop = itemStack.getCropType()
@@ -57,15 +57,14 @@ object ToolTooltipTweaks {
                 val cropString = if (cropFortune != 0.0) " §6[+${cropFortune.roundToInt()}]" else ""
 
                 //TODO for fetch
-                val fortuneLine = if (fetching) "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
-                else when (config.cropTooltipFortune) {
+                val fortuneLine = when (config.cropTooltipFortune) {
                     0 -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
                     1 -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
                     else -> "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
                 string += fortuneLine + "\n"
 
-                if (Keyboard.isKeyDown(config.fortuneTooltipKeybind) && !fetching) { // don't want to save this data
+                if (Keyboard.isKeyDown(config.fortuneTooltipKeybind)) {
                     string += ("  §7Sunder: §a+ $sunderFortune\n")
                     string += ("  §7Harvesting: §a+ $harvestingFortune\n")
                     string += ("  §7Cultivating: §a+ $cultivatingFortune\n")
@@ -80,7 +79,7 @@ object ToolTooltipTweaks {
                 continue
             }
             // Beware, dubious control flow beyond these lines
-            if (config.compactToolTooltips || fetching) {
+            if (config.compactToolTooltips) {
                 if (newLine.startsWith("§7§8Bonus ")) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
                     removingFarmhandDescription = newLine != ""
@@ -111,7 +110,7 @@ object ToolTooltipTweaks {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        gardenTooltip(event.itemStack, event.toolTip)
+        farmingTooltip(event.itemStack, event.toolTip)
         val iterator = event.toolTip.listIterator()
         for (line in iterator) {
             iterator.remove()

@@ -932,12 +932,18 @@ object RenderUtils {
         var currentVal = currentValue.toDouble()
         currentVal = if (currentVal < 0) 0.0 else currentVal
 
-        val barProgress = currentVal / maxValue.toFloat()
+        var barProgress = currentVal / maxValue.toFloat()
+        barProgress = when {
+            barProgress > 1 -> 1.0
+            barProgress < 0 -> 0.0
+            else -> barProgress
+        }
+
         val filledWidth = (width * barProgress).toInt()
         val progressPercentage = (barProgress * 10000).roundToInt() / 100
         val inverseScale = 1 / textScale
         val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth("$progressPercentage%")
-        val barColor = colorGradient(barProgress)
+        val barColor = barColorGradient(barProgress)
 
         GlStateManager.scale(textScale, textScale, textScale)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
@@ -946,7 +952,7 @@ object RenderUtils {
         GlStateManager.scale(inverseScale, inverseScale, inverseScale)
 
         GuiScreen.drawRect(xPos, yPos + 16, xPos + width, yPos + 20, 0xFF43464B.toInt())
-        GuiScreen.drawRect(xPos + 1, yPos + 17, xPos + width - 1, yPos + 19, 0xFF02210C.toInt())
+        GuiScreen.drawRect(xPos + 1, yPos + 17, xPos + width - 1, yPos + 19, barColor.darkenColor())
         GuiScreen.drawRect(xPos + 1, yPos + 17,
              if (filledWidth < 2) xPos + 1 else xPos + filledWidth - 1, yPos + 19, barColor)
 
@@ -960,11 +966,15 @@ object RenderUtils {
         }
     }
 
-    private fun colorGradient(float: Double): Int {
-        return try {//prevent possible crashes if float is < 1 or > 1
-            Color((255 * (1 - float)).toInt(), (255 * float).toInt(), 0).rgb
-        } catch (_: Throwable) {
-            1
-        }
+    private fun barColorGradient(double: Double): Int {
+        var newDouble = (double - .5) * 2
+        if (newDouble < 0) newDouble = 0.0
+        return Color((255 * (1 - newDouble)).toInt(), (255 * newDouble).toInt(), 0).rgb
     }
+
+    fun Int.darkenColor(): Int {
+        val color = Color(this)
+        return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
+    }
+
 }

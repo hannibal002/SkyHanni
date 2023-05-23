@@ -1066,7 +1066,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "FF Display",
-            desc = "Displays current your true farming fortune, including crop-specific bonuses."
+            desc = "Displays the current crop's true farming fortune, including crop-specific bonuses."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 22)
@@ -1082,8 +1082,8 @@ public class Garden {
     @ConfigAccordionId(id = 22)
     public boolean farmingFortuneDropMultiplier = true;
 
-    @ConfigOption(name = "Farming Fortune Guide", desc = "See a guide that breaks down your farming fortune along with " +
-            "sorting the next best upgrades for you to get. Can also be opened with /ff")
+    @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your farming fortune " +
+            "for every crop along with sorting the next best upgrades for you to get. §eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")
     public Runnable positions = Commands::openFortuneGuide;
 
