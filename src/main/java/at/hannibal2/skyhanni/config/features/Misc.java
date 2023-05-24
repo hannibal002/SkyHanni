@@ -412,6 +412,11 @@ public class Misc {
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
+    @ConfigOption(name = "Pet Candy Used", desc = "Show numbers of pet candies used on a pet.")
+    @ConfigEditorBoolean
+    public boolean petCandyUsed = true;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
