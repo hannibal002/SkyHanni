@@ -43,6 +43,8 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
@@ -252,7 +254,8 @@ class SkyHanniMod {
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())
         loadModule(PasteIntoSigns())
-        loadModule(EstimatedItemValue())
+        loadModule(EstimatedItemValue)
+        loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
         loadModule(FarmingFortuneDisplay())
         loadModule(ToolTooltipTweaks())

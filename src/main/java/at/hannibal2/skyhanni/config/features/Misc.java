@@ -232,6 +232,12 @@ public class Misc {
     public boolean estimatedIemValueAlwaysEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor in the wardrobe inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean estimatedIemValueArmor = true;
+
+    @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @ConfigOption(name = "Discord Rich Presence", desc = "")
