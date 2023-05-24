@@ -83,7 +83,7 @@ object StringUtils {
         if (matcher.matches()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
             return if (darker) {
-                "ff${Integer.toHexString(colorInt.darkenColor())}".toLong(radix = 16).toInt() //todo broken
+                colorInt.darkenColor()
             } else {
                 "ff${Integer.toHexString(colorInt)}".toLong(radix = 16).toInt()
             }

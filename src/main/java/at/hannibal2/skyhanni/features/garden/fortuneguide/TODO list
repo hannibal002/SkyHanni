@@ -4,8 +4,10 @@ todo list for this display
 
 more todo notes on WartsPage.kt
 
+Show fortune for armor ability
 
-Deal with the two boots types
+
+Deal with the two boot types
 
 Deal with pets
 Deal with mushroom cow and strength
@@ -14,43 +16,39 @@ More info on the lore of missing items
 
 Change lore on equipment to reflect visitors served
 Track pet level ups
-Click commands for things they are missing
--> farming level -> /skills etc.
 
-
+/farming gear, to remove stuff i guess
 
 GUI:
 Only show pets that are saved, and move the display around to fit how many are being displayed
-Display pet item somewhere
 Wrapping tooltip text to left when its near the right edge of screen
-Make the darken colour work, still broken after attempted fixes
+Custom tooltips, like NEU to change the colours around it maybe
 Add a border around the edge of the display
 - If not too hard, wrap it around the selected button as well like neu - low priority
-Check all turbo-crop enchants are named correctly
-Change colour of percentage text to reflect completed percentage
+Remove the text saying dyed at the top of leather armor descriptions
+Shorten the description on ranchers boots
 
 !!!!
 Buges:
 Major:
+Sometimes the ff breakdown for equipment and armor does not work in the gui?
 Does not count plots correctly, works sometimes not others
 Will overwrite the saved pet of each type if there is more than one of it in pets menu. e.g. uncommon ele will overwrite leg one
 If they sell their equipment or pets, they will be saved until a new one is bought and their stats counted : fix, don't liquidize your stuff lol
 - can fix pets, equipment is more difficult
 Minor:
-Cake buff thing doesn't work again
-If you change tool but don't swap to it since you changed it, these won't be updated
-- Update tool when the command is run + strength eventually
+Boots speed display is not working in /ff idk if i want it there though
+Update strength when the command is run
 Taking off or putting equipment on inside the menu won't update it until you reopen the inventory
     - also if they sell the piece of equipment, it will always think they still have it
 !!!!
 
 Add:
-Scrollable tooltips in the menu
-- Test with regular forge to see if other mods already scroll the tooltips
 Daedalus axe for mushroom and cocoa??
 Way to switch pets that the menu is displayed for + won't prompt you to get the other pet
-Work out when to save strength. Maybe when switching to tool
+Work out when to save strength.
 Save selected pet to config
+    - use the already saved one
 Where it says tool reforge, say the ff for current rarity and the one above if it can be that
 
 Other:

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
@@ -95,7 +96,10 @@ object Commands {
      fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
             LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
-        } else SkyHanniMod.screenToOpen = FFGuideGUI() // make it send you to the crop you are holding a tool for
+        } else {
+            CaptureFarmingGear.captureFarmingGear()
+            SkyHanniMod.screenToOpen = FFGuideGUI()
+        }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

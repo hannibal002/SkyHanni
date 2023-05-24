@@ -39,10 +39,10 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
                 FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             line = when (FFGuideGUI.cakeBuffTime) {
-                -1L -> "§eYou have not eaten a cake since\n§egetting this feature, assuming you have\n§ethe buff active!"
+                -1L -> "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
                 else -> "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n§2Time until cake buff runs out: $timeUntilCakes"
             }
-            if (FFGuideGUI.cakeBuffTime - System.currentTimeMillis() < 0) {
+            if (FFGuideGUI.cakeBuffTime - System.currentTimeMillis() < 0 && FFGuideGUI.cakeBuffTime != -1L) {
                 line = "§cYour cake buff has run out\nGo eat some cake!"
             }
             RenderUtils.drawFarmingBar("§2Cake Buff", line, if (cakeActive) 5 else 0, 5, FFGuideGUI.guiLeft + 15,

@@ -21,8 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
-    private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM") // not adding any more armor, unless requested
-    private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "PUMPKIN_BOOTS")
+
 
     // will not capture the user levelling up to Farming 1
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
@@ -30,41 +29,53 @@ class CaptureFarmingGear {
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
     private val anitaMenuPattern = "§7You have: §a[+](?<level>.*)%".toPattern()
 
-    @SubscribeEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
-        val farmingItems = farmingItems ?: return
-        val resultList = mutableListOf<String>()
+    companion object {
+        private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM") // not adding any more armor, unless requested
+        private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "PUMPKIN_BOOTS")
+        private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
-        val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
-        val itemID = itemStack.getInternalName()
-        resultList.add(itemStack.displayName.toString())
-        resultList.add(itemID)
+        fun captureFarmingGear() {
+            val farmingItems = farmingItems ?: return
+            val resultList = mutableListOf<String>()
 
-        val currentCrop = itemStack.getCropType()
+            val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
+            val itemID = itemStack.getInternalName()
+            resultList.add(itemStack.displayName.toString())
+            resultList.add(itemID)
 
-        if (currentCrop == null) {
-            // could save a generic tool here e.g. If they don't have a wheat hoe, use advanced garden hoe or rookie hoe
-        } else {
-            for (item in FarmingItems.values()) {
-                if (item.name == currentCrop.name) {
-                    farmingItems[item] = itemStack
-                }
-            }
-        }
-        for (armor in InventoryUtils.getArmor()) {
-            if (armor == null) continue
-            val split = armor.getInternalName().split("_")
-            if (split.first() in farmingSets) {
+            val currentCrop = itemStack.getCropType()
+
+            if (currentCrop == null) {
+                // could save a generic tool here e.g. If they don't have a wheat hoe, use advanced garden hoe or rookie hoe
+            } else {
                 for (item in FarmingItems.values()) {
-                    if (item.name == split.last()) {
-                        farmingItems[item] = armor
+                    if (item.name == currentCrop.name) {
+                        farmingItems[item] = itemStack
                     }
                 }
             }
-            if (armor.getInternalName() in farmingBoots) {
-                farmingItems[FarmingItems.OTHER_BOOTS] = armor
+            for (armor in InventoryUtils.getArmor()) {
+                if (armor == null) continue
+                val split = armor.getInternalName().split("_")
+                if (split.first() in farmingSets) {
+                    for (item in FarmingItems.values()) {
+                        if (item.name == split.last()) {
+                            farmingItems[item] = armor
+                        }
+                    }
+                }
+                if (armor.getInternalName() in farmingBoots) {
+                    farmingItems[FarmingItems.OTHER_BOOTS] = armor
+                }
             }
         }
+
+    }
+
+
+    @SubscribeEvent
+    fun onGardenToolChange(event: GardenToolChangeEvent) {
+        captureFarmingGear()
     }
 
     @SubscribeEvent
