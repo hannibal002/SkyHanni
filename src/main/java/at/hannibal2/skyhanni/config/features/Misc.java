@@ -36,28 +36,26 @@ public class Misc {
     @Expose
     public Position realTimePos = new Position(10, 10, false, true);
 
-    @Expose
     @ConfigOption(name = "Hide Armor", desc = "")
-    @ConfigEditorAccordion(id = 3)
-    public boolean hideArmor = false;
-
+    @Accordion
     @Expose
-    @ConfigOption(name = "Hide Armor", desc = "Hide other players' armor.")
-    @ConfigEditorBoolean()
-    @ConfigAccordionId(id = 3)
-    public Property<Boolean> hideArmorEnabled = Property.of(false);
+    public HideArmor hideArmor2 = new HideArmor();
 
-    @Expose
-    @ConfigOption(name = "Own Armor", desc = "Hide your own armor.")
-    @ConfigEditorBoolean()
-    @ConfigAccordionId(id = 3)
-    public Property<Boolean> hideArmorOwn = Property.of(true);
+    public static class HideArmor {
 
-    @Expose
-    @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
-    @ConfigEditorBoolean()
-    @ConfigAccordionId(id = 3)
-    public Property<Boolean> hideArmorOnlyHelmet = Property.of(false);
+        @Expose
+        @ConfigOption(name = "Mode", desc = "Hide the armor of players.")
+        @ConfigEditorDropdown(values = {"All", "Own Armor", "Other's Armor", "Off"})
+        @ConfigAccordionId(id = 1)
+        public int mode = 3;
+
+        @Expose
+        @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
+        @ConfigEditorBoolean()
+        @ConfigAccordionId(id = 3)
+        public Boolean onlyHelmet = false;
+
+    }
 
     @Expose
     @ConfigOption(name = "Damage Splash", desc = "")
