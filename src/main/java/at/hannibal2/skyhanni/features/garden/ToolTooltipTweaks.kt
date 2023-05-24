@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -17,14 +18,13 @@ class ToolTooltipTweaks {
     private val config get() = SkyHanniMod.feature.garden
     private val tooltipFortunePattern = "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
-
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        val crop = event.itemStack.getCropType() ?: return
+        val crop = event.itemStack.getCropType()
         val toolFortune = FarmingFortuneDisplay.getToolFortune(event.itemStack)
         val counterFortune = FarmingFortuneDisplay.getCounterFortune(event.itemStack)
         val collectionFortune = FarmingFortuneDisplay.getCollectionFortune(event.itemStack)
@@ -32,13 +32,14 @@ class ToolTooltipTweaks {
         val dedicationFortune = FarmingFortuneDisplay.getDedicationFortune(event.itemStack, crop)
 
         val reforgeName = event.itemStack.getReforgeName()?.firstLetterUppercase()
-        val enchantments = event.itemStack.getEnchantments() ?: emptyMap()
-        val sunderFortune = (enchantments["sunder"] ?: 0) * 12.5
-        val harvestingFortune = (enchantments["harvesting"] ?: 0) * 12.5
-        val cultivatingFortune = (enchantments["cultivating"] ?: 0).toDouble()
+
+        val sunderFortune = FarmingFortuneDisplay.getSunderFortune(event.itemStack)
+        val harvestingFortune = FarmingFortuneDisplay.getHarvestingFortune(event.itemStack)
+        val cultivatingFortune = FarmingFortuneDisplay.getCultivatingFortune(event.itemStack)
+        val abilityFortune = getAbilityFortune(event.itemStack)
 
         val ffdFortune = event.itemStack.getFarmingForDummiesCount()?.toDouble() ?: 0.0
-        val cropFortune = (toolFortune + counterFortune + collectionFortune + turboCropFortune + dedicationFortune)
+        val hiddenFortune = (toolFortune + counterFortune + collectionFortune + turboCropFortune + dedicationFortune + abilityFortune)
         val iterator = event.toolTip.listIterator()
 
         var removingFarmhandDescription = false
@@ -46,15 +47,27 @@ class ToolTooltipTweaks {
         var removingReforgeDescription = false
 
         for (line in iterator) {
+            if (line.contains("Kills:") && event.itemStack.getInternalName().contains("LOTUS")) {
+                iterator.set(line.replace("Kills:", "Visitors:"))
+            } // cannot test that this works
+
             val match = tooltipFortunePattern.matchEntire(line)?.groups
             if (match != null) {
-                val displayedFortune = match[1]!!.value.toDouble()
-                val reforgeFortune = match[2]!!.value.toDouble()
-                val totalFortune = displayedFortune + cropFortune
+                val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
+
+                FarmingFortuneDisplay.loadFortuneLineData(event.itemStack, enchantmentFortune, match)
+
+                val displayedFortune = FarmingFortuneDisplay.displayedFortune
+                val reforgeFortune = FarmingFortuneDisplay.reforgeFortune
+                val baseFortune = FarmingFortuneDisplay.itemBaseFortune
+                val greenThumbFortune = FarmingFortuneDisplay.greenThumbFortune
+
+                val totalFortune = displayedFortune + hiddenFortune
+
 
                 val ffdString = if (ffdFortune != 0.0) " §2(+${ffdFortune.formatStat()})" else ""
                 val reforgeString = if (reforgeFortune != 0.0) " §9(+${reforgeFortune.formatStat()})" else ""
-                val cropString = if (cropFortune != 0.0) " §6[+${cropFortune.roundToInt()}]" else ""
+                val cropString = if (hiddenFortune != 0.0) " §6[+${hiddenFortune.roundToInt()}]" else ""
 
                 val fortuneLine = when (config.cropTooltipFortune) {
                     0 -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
@@ -64,12 +77,15 @@ class ToolTooltipTweaks {
                 iterator.set(fortuneLine)
 
                 if (Keyboard.isKeyDown(config.fortuneTooltipKeybind)) {
+                    iterator.addStat("  §7Base: §a+", baseFortune)
+                    iterator.addStat("  §7Tool: §6+", toolFortune)
+                    iterator.addStat("  $reforgeName: §9+", reforgeFortune)
+                    iterator.addStat("  §7Ability: §a+", abilityFortune)
+                    iterator.addStat("  §7Green Thumb: §a+", greenThumbFortune)
                     iterator.addStat("  §7Sunder: §a+", sunderFortune)
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
                     iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
                     iterator.addStat("  §7Farming for Dummies: §2+", ffdFortune)
-                    iterator.addStat("  §7$reforgeName: §9+", reforgeFortune)
-                    iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7Counter: §6+", counterFortune)
                     iterator.addStat("  §7Collection: §6+", collectionFortune)
                     iterator.addStat("  §7Dedication: §6+", dedicationFortune)
@@ -102,17 +118,14 @@ class ToolTooltipTweaks {
         }
     }
 
-    companion object {
-        private fun Double.formatStat(): String {
-            val formatter = DecimalFormat("0.##")
-            return formatter.format(this)
-        }
+    private fun Double.formatStat(): String {
+        val formatter = DecimalFormat("0.##")
+        return formatter.format(this)
+    }
 
-
-        private fun MutableListIterator<String>.addStat(description: String, value: Double) {
-            if (value != 0.0) {
-                this.add("$description${value.formatStat()}")
-            }
+    private fun MutableListIterator<String>.addStat(description: String, value: Double) {
+        if (value != 0.0) {
+            this.add("$description${value.formatStat()}")
         }
     }
 }
