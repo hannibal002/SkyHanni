@@ -36,7 +36,7 @@ class EstimatedWardrobePrice {
             val price = EstimatedItemValue.getEstimatedItemPrice(item, mutableListOf()).first
             totalPrice += price
 
-            toolTip.add(index++, "  §7-$name: §6${NumberUtil.format(price)}")
+            toolTip.add(index++, "  §7- $name: §6${NumberUtil.format(price)}")
         }
         toolTip.add(index++, " §aTotal Value: §6§l${NumberUtil.format(totalPrice)}")
     }

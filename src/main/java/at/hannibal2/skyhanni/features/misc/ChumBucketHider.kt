@@ -76,7 +76,7 @@ class ChumBucketHider {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.enabled, config.hideBucket, config.hideOwn) { HideArmor.updateArmor() }
+        onToggle(config.enabled, config.hideBucket, config.hideOwn) { reset() }
     }
 
     private fun reset() {
