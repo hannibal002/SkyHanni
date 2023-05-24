@@ -13,6 +13,9 @@
   + Can be disabled
   + Sortable by price or items stored (both desc/asc)
   + Option to show prices from Bazaar or NPC
++ Added Farming Fortune Breakdown for Armor and Equipment (Contributed by CalMWolfs)
+  + Works with: Base Stats, Reforge Bonus, Ability Fortune and Green Thumb
++ Fixed Hypixel bug that the equipment lore talks about "kills" instead of "visitors" (Contributed by CalMWolfs) 
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
