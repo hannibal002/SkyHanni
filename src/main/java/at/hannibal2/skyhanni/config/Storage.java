@@ -155,7 +155,6 @@ public class Storage {
 
             @Expose
             public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
-        }
 
             @Expose
             public Fortune fortune = new Fortune();

@@ -17,13 +17,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-
 class CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
-
-
-    // will not capture the user levelling up to Farming 1
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
@@ -71,7 +67,6 @@ class CaptureFarmingGear {
         }
 
     }
-
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
@@ -132,7 +127,13 @@ class CaptureFarmingGear {
             }
         }
         if (event.inventoryName.contains("Configure Plots")) {
-            hidden.plotsUnlocked = 24 - InventoryUtils.countItemsInOpenChest(true) { it.getLore().contains("§7Cost:") }
+            var plotsUnlocked = 24
+            for (slot in event.inventoryItems) {
+                if (slot.value.getLore().contains("§7Cost:")) {
+                    plotsUnlocked -= 1
+                }
+            }
+            hidden.plotsUnlocked = plotsUnlocked
         }
         if (event.inventoryName.contains("Anita")) {
             var level = -1
