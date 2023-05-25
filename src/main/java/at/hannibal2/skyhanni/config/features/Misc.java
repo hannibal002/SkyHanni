@@ -421,6 +421,11 @@ public class Misc {
     public boolean petCandyUsed = true;
 
     @Expose
+    @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Aame Update or Sheduled Restart.")
+    @ConfigEditorBoolean
+    public boolean serverRestartTitle = true;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
