@@ -45,7 +45,8 @@ class JacobContestStatsSummary {
                 LorenzUtils.chat("§e[SkyHanni] Stats for $cropName Contest:")
                 val time = TimeUtils.formatDuration(duration)
                 LorenzUtils.chat("§e[SkyHanni] §7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
-                LorenzUtils.chat("§e[SkyHanni] §7Average Blocks Per Second: §c$blocksPerSecond")
+                val color = getBlocksPerSecondColor(blocksPerSecond)
+                LorenzUtils.chat("§e[SkyHanni] §7Average Blocks Per Second: $color$blocksPerSecond")
                 LorenzUtils.chat("§e[SkyHanni] §7Participated for §b$time")
             }
             FarmingContestPhase.CHANGE -> {
@@ -55,6 +56,8 @@ class JacobContestStatsSummary {
         }
         blocksBroken = 0
     }
+
+    private fun getBlocksPerSecondColor(blocksPerSecond: Double) = if (blocksPerSecond > 19) "§c" else "§a"
 
     fun isEnabled() = GardenAPI.inGarden() && config.jacobContestSummary
 }
