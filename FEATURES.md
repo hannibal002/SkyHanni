@@ -229,6 +229,8 @@
   + Show the start waypoint for your farm with the currently holding tool.
   + Auto-detects the start of the farm when farming for the first time
   + Option to manually set the waypoint with /shcropstartlocation
++ Jacob Contest Stats Summary
+  + Showing Blocks per Second and total Blocks clicked after a farming contest in chat
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
