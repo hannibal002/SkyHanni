@@ -49,7 +49,7 @@ class SackDisplay {
     private val numPattern =
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val gemstonePattern =
-        " (?:§[0-9a-f])(?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?) §[0-9a-f]\\((?:\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)\\)".toPattern()
+        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\d+(?:\.\d+)?(?:,\d+)?[kKmM]?)(?: §[0-9a-f]\(\d+(?:\.\d+)?(?:(?:,\d+)?)+[kKmM]?\))?".toPattern()
 
 
     @SubscribeEvent
