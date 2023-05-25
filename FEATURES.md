@@ -261,3 +261,4 @@
 + **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
 + **Estimated Item Value** - Displays an estimated item value for the item you hover over.
 + **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
++ Server Restart Title

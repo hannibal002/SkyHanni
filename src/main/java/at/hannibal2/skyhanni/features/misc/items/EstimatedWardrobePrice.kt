@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,6 +19,7 @@ class EstimatedWardrobePrice {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueArmor) return
+        if (!InventoryUtils.openInventoryName().contains("Wardrobe")) return
 
         val slot = event.slot.slotNumber
         val id = slot % 9
@@ -38,7 +40,7 @@ class EstimatedWardrobePrice {
 
             toolTip.add(index++, "  §7- $name: §6${NumberUtil.format(price)}")
         }
-        toolTip.add(index++, " §aTotal Value: §6§l${NumberUtil.format(totalPrice)}")
+        toolTip.add(index, " §aTotal Value: §6§l${NumberUtil.format(totalPrice)}")
     }
 
     @SubscribeEvent
