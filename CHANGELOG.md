@@ -5,6 +5,17 @@
 ### New Features
 + Added Visitor Drop Counter to track all the drops from visitors.
 + Added **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
++ Added **Garden Start Location**
+  + Show the start waypoint for your farm with the currently holding tool.
+  + Auto-detects the start of the farm when farming for the first time
+  + Option to manually set the waypoint with /shcropstartlocation
++ Added **price display next to sack items** (Contributed by HiZe)
+  + Can be disabled
+  + Sortable by price or items stored (both desc/asc)
+  + Option to show prices from Bazaar or NPC
++ Added Farming Fortune Breakdown for Armor and Equipment (Contributed by CalMWolfs)
+  + Works with: Base Stats, Reforge Bonus, Ability Fortune and Green Thumb
++ Fixed Hypixel bug that the equipment lore talks about "kills" instead of "visitors" (Contributed by CalMWolfs) 
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
@@ -16,6 +27,7 @@
   + Improved detection speed
   + Derpy double health support
   + More fair detection logic
++ Added extra setting to allow/block clicks for the 'hide not clickable' feature
 
 ### Fixes
 = Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)

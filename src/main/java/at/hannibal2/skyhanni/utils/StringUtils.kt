@@ -12,7 +12,7 @@ object StringUtils {
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
 
-        val lowercase = this.lowercase()
+        val lowercase = lowercase()
         val first = lowercase[0].uppercase()
         return first + lowercase.substring(1)
     }

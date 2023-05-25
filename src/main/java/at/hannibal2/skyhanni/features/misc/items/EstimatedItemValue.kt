@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -42,7 +42,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EstimatedItemValue {
+object EstimatedItemValue {
     private val config get() = SkyHanniMod.feature.misc
     private var display = listOf<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
@@ -90,9 +90,6 @@ class EstimatedItemValue {
     }
 
     private fun draw(stack: ItemStack): List<List<Any>> {
-        val list = mutableListOf<String>()
-        list.add("§aEstimated Item Value:")
-
         val internalName = stack.getInternalName()
         if (internalName == "") return listOf()
 
@@ -113,6 +110,23 @@ class EstimatedItemValue {
             return listOf()
         }
 
+        val list = mutableListOf<String>()
+        list.add("§aEstimated Item Value:")
+        val pair = getEstimatedItemPrice(stack, list)
+        val (totalPrice, basePrice) = pair
+
+        if (basePrice == totalPrice) return listOf()
+
+        list.add("§aTotal: §6§l" + NumberUtil.format(totalPrice))
+
+        val newDisplay = mutableListOf<List<Any>>()
+        for (line in list) {
+            newDisplay.addAsSingletonList(line)
+        }
+        return newDisplay
+    }
+
+    fun getEstimatedItemPrice(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         var totalPrice = 0.0
         val basePrice = addBaseItem(stack, list)
         totalPrice += basePrice
@@ -146,16 +160,7 @@ class EstimatedItemValue {
         totalPrice += addDrillUpgrades(stack, list)
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
-
-        if (basePrice == totalPrice) return listOf()
-
-        list.add("§aTotal: §6§l" + NumberUtil.format(totalPrice))
-
-        val newDisplay = mutableListOf<List<Any>>()
-        for (line in list) {
-            newDisplay.addAsSingletonList(line)
-        }
-        return newDisplay
+        return Pair(totalPrice, basePrice)
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
@@ -164,7 +169,7 @@ class EstimatedItemValue {
         for ((internalName, values) in Constants.REFORGESTONES.entrySet()) {
             val stone = values.asJsonObject
             val reforgeName = stone.get("reforgeName").asString
-            if (rawReforgeName == reforgeName.lowercase()) {
+            if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == internalName.lowercase()) {
                 val price = NEUItems.getPrice(internalName)
                 val name = NEUItems.getItemStack(internalName).name
                 list.add("§7Reforge: §9$reforgeName")

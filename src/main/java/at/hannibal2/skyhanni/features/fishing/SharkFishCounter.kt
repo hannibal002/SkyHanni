@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -43,7 +43,7 @@ class SharkFishCounter {
     }
 
     private fun isWaterFishingRod(): Boolean {
-        val heldItem = Minecraft.getMinecraft().thePlayer.heldItem ?: return false
+        val heldItem = InventoryUtils.getItemInHand() ?: return false
         val isRod = heldItem.name?.contains("Rod") ?: return false
         if (!isRod) return false
 

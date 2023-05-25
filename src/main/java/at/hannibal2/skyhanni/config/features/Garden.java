@@ -894,50 +894,6 @@ public class Garden {
     public Position farmingArmorDropsPos = new Position(16, -232, false, true);
 
     @Expose
-    @ConfigOption(name = "Teleport Pads", desc = "")
-    @ConfigEditorAccordion(id = 19)
-    public boolean teleportPads = false;
-
-    @Expose
-    @ConfigOption(name = "Compact Name", desc = "Hide the 'Warp to' and 'No Destination' texts over teleport pads.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 19)
-    public boolean teleportPadsCompactName = false;
-
-    @Expose
-    @ConfigOption(name = "Inventory Numbers", desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 19)
-    public boolean teleportPadsInventoryNumbers = false;
-
-    @Expose
-    @ConfigOption(name = "Recent Teleport Pad Display", desc = "")
-    @Accordion
-    @ConfigAccordionId(id = 19)
-    public RecentTeleportPads teleportPadsRecentDisplay = new RecentTeleportPads();
-
-    public static class RecentTeleportPads {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Show the recent teleport pads used in a display.")
-        @ConfigEditorBoolean
-        public boolean enabled = false;
-
-        @Expose
-        @ConfigOption(name = "Only Target", desc = "Hide the 'From' part of the display.")
-        @ConfigEditorBoolean
-        public Property<Boolean> onlyTarget = Property.of(false);
-
-        @Expose
-        @ConfigOption(name = "Hide Chat", desc = "Hide teleport pad chat messages.")
-        @ConfigEditorBoolean
-        public boolean hideChat = false;
-
-        @Expose
-        public Position pos = new Position(206, 158, false, true);
-    }
-
-    @Expose
     @ConfigOption(name = "Anita Medal Profit", desc = "")
     @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
@@ -1170,6 +1126,20 @@ public class Garden {
 
         @Expose
         public Position pos = new Position(445, 225, false, true);
+    }
+
+    @Expose
+    @ConfigOption(name = "Crop Start Location", desc = "")
+    @Accordion
+    public CropStartLocation cropStartLocation = new CropStartLocation();
+
+    public static class CropStartLocation {
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Show the start waypoint for your farm with the currently holding tool.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
     }
 
     @Expose

@@ -125,6 +125,7 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (isDisabled()) return
+        if (!SkyHanniMod.feature.inventory.hideNotClickableItemsBlockClicks) return
         if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
 

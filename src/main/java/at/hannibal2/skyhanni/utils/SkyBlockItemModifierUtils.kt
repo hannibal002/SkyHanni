@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 
 object SkyBlockItemModifierUtils {
@@ -22,6 +24,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getTransmissionTunerCount() = getAttributeInt("tuned_transmission")
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
+
+    fun ItemStack.getPetCandyUsed() = ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)?.get("candyUsed")?.asInt
 
     fun ItemStack.getMasterStars(): Int {
         val stars = mapOf(

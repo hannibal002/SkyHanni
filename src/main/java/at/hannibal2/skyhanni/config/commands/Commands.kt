@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -48,6 +49,8 @@ object Commands {
         // main commands
         registerCommand("sh", openMainMenu)
         registerCommand("skyhanni", openMainMenu)
+        
+        registerCommand("ff") { openFortuneGuide() }
 
         // for users - regular commands
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
@@ -57,7 +60,7 @@ object Commands {
         registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
         registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
-        registerCommand("ff") { openFortuneGuide() }
+        registerCommand("shcropstartlocation") { GardenStartLocation.setLocationCommand() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }

@@ -44,7 +44,10 @@
 - Visual highlight chests that have not yet been opened in the Croesus inventory.
 
 ## Inventory
-- Not Clickable Items: Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement. (in NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI)
+- Not Clickable Items 
+  - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement.
+  - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI
+  - Option to allow/block clicks
 - Option to change the gray-out opacity for 'Not Clickable Items'.
 - Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and collection level)
 - Sack name (show short name of sacks)
@@ -222,6 +225,10 @@
 + **yaw and pitch display** - Shows yaw and pitch with customizable precision while holding a farm tool. Automatically fades out if there is no movement for a customizable duration (Contributed by Sefer)
 + Warning when 6th visitors is ready (Contributed by CalMWolfs)
 + **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
++ **Garden Start Location**
+  + Show the start waypoint for your farm with the currently holding tool.
+  + Auto-detects the start of the farm when farming for the first time
+  + Option to manually set the waypoint with /shcropstartlocation
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
