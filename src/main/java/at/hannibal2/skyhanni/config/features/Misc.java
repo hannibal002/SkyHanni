@@ -421,7 +421,7 @@ public class Misc {
     public boolean petCandyUsed = true;
 
     @Expose
-    @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Aame Update or Sheduled Restart.")
+    @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     public boolean serverRestartTitle = true;
 
