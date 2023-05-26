@@ -21,7 +21,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CityProjectMaterialHelper {
+class CityProjectFeatures {
     private val config get() = SkyHanniMod.feature.misc.cityProject
     private var display = listOf<List<Any>>()
     private var inInventory = false
