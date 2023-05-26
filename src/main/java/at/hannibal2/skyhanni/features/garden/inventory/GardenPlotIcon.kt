@@ -43,7 +43,6 @@ class GardenPlotIcon {
     fun onInventoryClose(event: InventoryCloseEvent) {
         showItem = false
         editMode = 0
-        copyStack = null
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -70,14 +69,15 @@ class GardenPlotIcon {
             }
 
             if (plotList.isNotEmpty() && plotList.contains(event.slotNumber)) {
-                val stack = originalStack[event.slotNumber]
-                val name = stack?.displayName ?: "§cError getting item name"
-                val lore = stack?.getLore()?.toTypedArray() ?: arrayOf("§cError getting item lore")
+                val old = originalStack[event.slotNumber]?: return
+                val new = event.slotNumber.getItem()?: return
+                val name = old.displayName
+                val lore = old.getLore().toTypedArray()
                 if (lastClickedSlotId == event.slotNumber) {
                     lastClickedSlotId = -1
                     return
                 }
-                val replaceStack = Utils.editItemStackInfo(event.slotNumber.getItem(), name, true, *lore)
+                val replaceStack = Utils.editItemStackInfo(new, name, true, *lore)
                 event.replaceWith(replaceStack)
             }
         }
@@ -121,17 +121,14 @@ class GardenPlotIcon {
     private fun Int.setItem(stack: ItemStack?) {
         val gardenPlot = GardenAPI.config?.plotIcon ?: return
         val plotList = gardenPlot.plotList
-
         plotList[this] = stack
         return
     }
 
     private fun Int.getItem(): ItemStack? {
         val gardenPlot = GardenAPI.config?.plotIcon ?: return null
-
         val plotList = gardenPlot.plotList
         plotList[this]?.let { return it }
-
         plotList[this] = null
         return null
     }
