@@ -57,22 +57,19 @@ open class FFGuideGUI : GuiScreen() {
             ItemStack(Blocks.barrier).setStackDisplayName("§cNo saved ${item.name.lowercase().replace("_", " ")}")
     }
 
-    //todo fix up display of crop pages
-    //todo lore changes for farming armor, equipment and pets
-
     init {
         FFStats.loadFFData()
         pages[FortuneGuidePage.OVERVIEW] = OverviewPage()
         pages[FortuneGuidePage.WHEAT] = WheatPage()
-//        pages[FortuneGuidePage.CARROT] = CarrotPage()
-//        pages[FortuneGuidePage.POTATO] = PotatoPage()
+        pages[FortuneGuidePage.CARROT] = CarrotPage()
+        pages[FortuneGuidePage.POTATO] = PotatoPage()
 //        pages[FortuneGuidePage.PUMPKIN] = PumpkinPage()
-//        pages[FortuneGuidePage.SUGAR_CANE] = CanePage()
+        pages[FortuneGuidePage.SUGAR_CANE] = CanePage()
 //        pages[FortuneGuidePage.MELON] = MelonPage()
 //        pages[FortuneGuidePage.CACTUS] = CactusPage()
 //        pages[FortuneGuidePage.COCOA_BEANS] = CocoaPage()
 //        pages[FortuneGuidePage.MUSHROOM] = MushroomPage()
-//        pages[FortuneGuidePage.NETHER_WART] = WartPage()
+        pages[FortuneGuidePage.NETHER_WART] = WartPage()
 
         GardenAPI.config?.fortune?.let {
             cakeBuffTime = it.cakeExpiring
@@ -114,28 +111,37 @@ open class FFGuideGUI : GuiScreen() {
 
         if (breakdownMode) {
             if (selectedPage != FortuneGuidePage.OVERVIEW) {
-//                RenderUtils.renderItemAndTip(
-//                    items[18], guiLeft + 152, guiTop + 160, mouseX, mouseY,
-//                    if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
-//                )
-//                RenderUtils.renderItemAndTip(
-//                    items[19], guiLeft + 172, guiTop + 160, mouseX, mouseY,
-//                    if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
-//                )
-//                RenderUtils.renderItemAndTip(
-//                    items[20], guiLeft + 192, guiTop + 160, mouseX, mouseY,
-//                    if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
-//                )
-//
-//                RenderUtils.renderItemAndTip(items[13], guiLeft + 162, guiTop + 80, mouseX, mouseY)
-//                RenderUtils.renderItemAndTip(items[12], guiLeft + 162, guiTop + 100, mouseX, mouseY)
-//                RenderUtils.renderItemAndTip(items[11], guiLeft + 162, guiTop + 120, mouseX, mouseY)
-//                RenderUtils.renderItemAndTip(items[10], guiLeft + 162, guiTop + 140, mouseX, mouseY)
-//
-//                RenderUtils.renderItemAndTip(items[14], guiLeft + 182, guiTop + 80, mouseX, mouseY)
-//                RenderUtils.renderItemAndTip(items[15], guiLeft + 182, guiTop + 100, mouseX, mouseY)
-//                RenderUtils.renderItemAndTip(items[16], guiLeft + 182, guiTop + 120, mouseX, mouseY)
-//                RenderUtils.renderItemAndTip(items[17], guiLeft + 182, guiTop + 140, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.ELEPHANT.getItem(), guiLeft + 152, guiTop + 160, mouseX, mouseY,
+                    if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 172, guiTop + 160, mouseX, mouseY,
+                    if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.RABBIT.getItem(), guiLeft + 192, guiTop + 160, mouseX, mouseY,
+                    if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
+                )
+
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.HELMET.getItem(), guiLeft + 162, guiTop + 80, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 100, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.LEGGINGS.getItem(), guiLeft + 162, guiTop + 120, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.BOOTS.getItem(), guiLeft + 162, guiTop + 140, mouseX, mouseY)
+
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.NECKLACE.getItem(), guiLeft + 182, guiTop + 80, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.CLOAK.getItem(), guiLeft + 182, guiTop + 100, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.BELT.getItem(), guiLeft + 182, guiTop + 120, mouseX, mouseY)
+                RenderUtils.renderItemAndTip(
+                    FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140, mouseX, mouseY)
+
             } else {
                 RenderUtils.renderItemAndTip(
                     FarmingItems.HELMET.getItem(), guiLeft + 142, guiTop + 5, mouseX, mouseY,

@@ -183,25 +183,24 @@ object GardenAPI {
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {
-        var totalCrops = 0L
+        var totalExp = 0L
         var tier = 0
-        for (tierCrops in gardenExperience) {
-            totalCrops += tierCrops
+        for (tierExp in gardenExperience) {
+            totalExp += tierExp
             tier++
             if (tier == requestedLevel) {
-                return totalCrops
+                return totalExp
             }
         }
-
         return 0
     }
 
     fun getLevelForExp(gardenExp: Long): Int {
         var tier = 0
-        var totalCrops = 0L
-        for (tierCrops in gardenExperience) {
-            totalCrops += tierCrops
-            if (totalCrops > gardenExp) {
+        var totalExp = 0L
+        for (tierExp in gardenExperience) {
+            totalExp += tierExp
+            if (totalExp > gardenExp) {
                 return tier
             }
             tier++
@@ -210,7 +209,6 @@ object GardenAPI {
         return tier
     }
 
-    // TODO use repo
     private val gardenExperience = listOf(
         0,
         70,

@@ -38,6 +38,10 @@ object FFStats {
     var totalBaseFF = mutableMapOf<FFTypes, Double>()
 
     val wheatFF = mutableMapOf<FFTypes, Double>()
+    val carrotFF = mutableMapOf<FFTypes, Double>()
+    val potatoFF = mutableMapOf<FFTypes, Double>()
+    val caneFF = mutableMapOf<FFTypes, Double>()
+    val wartFF = mutableMapOf<FFTypes, Double>()
 
     fun loadFFData() {
         getEquipmentFFData(FarmingItems.NECKLACE.getItem(), necklaceFF)
@@ -69,6 +73,10 @@ object FFStats {
 
         getGenericFF(baseFF)
         getToolFF(FarmingItems.WHEAT.getItem(), wheatFF)
+        getToolFF(FarmingItems.CARROT.getItem(), carrotFF)
+        getToolFF(FarmingItems.POTATO.getItem(), potatoFF)
+        getToolFF(FarmingItems.CANE.getItem(), caneFF)
+        getToolFF(FarmingItems.NETHER_WART.getItem(), wartFF)
 
         totalFF(elephantFF)
         currentPetItem = FarmingItems.ELEPHANT.getItem().getPetItem().toString()
@@ -99,7 +107,7 @@ object FFStats {
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = getPetFF(item)
         out[FFTypes.PET_ITEM] = when (item.getPetItem()) {
-            "GREEN_BANDANA" -> 4.0 * gardenLvl
+            "GREEN_BANDANA" -> (4.0 * gardenLvl).coerceAtMost(60.0)
             "YELLOW_BANDANA" -> 30.0
             "MINOS_RELIC" -> 33.0 //todo
             else -> 0.0
@@ -132,7 +140,7 @@ object FFStats {
             CropAccessoryData.cropAccessory?.getFortune(it)
         }
 
-        out[FFTypes.CROP_UPGRADE] = crop?.getUpgradeLevel()!! * 5.0
+        out[FFTypes.CROP_UPGRADE] = (crop?.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0
         out[FFTypes.ACCESSORY] = accessoryFortune ?: 0.0
 
         out[FFTypes.BASE] = FarmingFortuneDisplay.getToolFortune(tool)

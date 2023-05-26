@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 
 
 class WheatPage: FFGuideGUI.FFGuidePage() {
-    private val del = "TODO"
-
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {
             RenderUtils.renderItemAndTip(FarmingItems.WHEAT.getItem(),
