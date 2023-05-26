@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.data.CropAccessoryData
+import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -125,6 +127,14 @@ object FFStats {
     private fun getToolFF(tool: ItemStack, out: MutableMap<FFTypes, Double>) {
         out[FFTypes.TOTAL] = 0.0
         val crop = tool.getCropType()
+
+        val accessoryFortune= crop?.let {
+            CropAccessoryData.cropAccessory?.getFortune(it)
+        }
+
+        out[FFTypes.CROP_UPGRADE] = crop?.getUpgradeLevel()!! * 5.0
+        out[FFTypes.ACCESSORY] = accessoryFortune ?: 0.0
+
         out[FFTypes.BASE] = FarmingFortuneDisplay.getToolFortune(tool)
         out[FFTypes.COUNTER] = FarmingFortuneDisplay.getCounterFortune(tool)
         out[FFTypes.COLLECTION] = FarmingFortuneDisplay.getCollectionFortune(tool)

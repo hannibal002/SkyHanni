@@ -25,19 +25,19 @@ class WheatPage: FFGuideGUI.FFGuidePage() {
             RenderUtils.drawFarmingBar("§2Universal Farming Fortune", "§7§2Farming fortune in that is\n" +
                     "§2applied to every crop", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1250, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-//todo
+
             RenderUtils.drawFarmingBar("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
-                    "§2You get 10☘ per talisman tier\n§2Your unlocked tier: $del", 0, 30, FFGuideGUI.guiLeft + 15,
+                    "§2You get 10☘ per talisman tier", FFStats.wheatFF[FFTypes.ACCESSORY] ?: 0, 30, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-//todo
+
             RenderUtils.drawFarmingBar("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n" +
-                    "§2You get 5☘ per level\n§2Your unlocked level: $del", 0, 45, FFGuideGUI.guiLeft + 15,
+                    "§2You get 5☘ per level", FFStats.wheatFF[FFTypes.CROP_UPGRADE] ?: 0, 45, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             RenderUtils.drawFarmingBar("§2Base tool fortune", "§7§2Depends on your tools tier",
                 FFStats.wheatFF[FFTypes.BASE] ?: 0, 50, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-
+//todo change based on reforge
             RenderUtils.drawFarmingBar("§2Tool reforge", "§7§2Fortune from reforging your tool",
                 FFStats.wheatFF[FFTypes.REFORGE] ?: 0, 20, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
