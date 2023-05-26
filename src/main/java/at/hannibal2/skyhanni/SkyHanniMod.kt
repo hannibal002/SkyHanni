@@ -279,6 +279,7 @@ class SkyHanniMod {
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
         loadModule(ServerRestartTitle())
+        loadModule(CityProjectMaterialHelper())
 
         init()
 
