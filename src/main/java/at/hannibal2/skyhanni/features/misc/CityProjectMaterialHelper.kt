@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -25,11 +24,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class CityProjectMaterialHelper {
     private val config get() = SkyHanniMod.feature.misc.cityProject
     private var display = listOf<List<Any>>()
-    private var inCityProjectInventory = false
+    private var inInventory = false
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        AnitaMedalProfit.inInventory = false
+        inInventory = false
     }
 
     @SubscribeEvent
@@ -40,7 +39,7 @@ class CityProjectMaterialHelper {
         val lore = event.inventoryItems[4]?.getLore() ?: return
         if (lore.isEmpty()) return
         if (lore[0] != "§8City Project") return
-        inCityProjectInventory = true
+        inInventory = true
 
         // internal name -> amount
         val materials = mutableMapOf<String, Int>()
@@ -77,7 +76,7 @@ class CityProjectMaterialHelper {
                     LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
                     OSUtils.copyToClipboard("$amount")
                 }
-            }) { inCityProjectInventory && !NEUItems.neuHasFocus() })
+            }) { inInventory && !NEUItems.neuHasFocus() })
 
             val price = NEUItems.getPrice(internalName) * amount
             val format = NumberUtil.format(price)
@@ -114,7 +113,7 @@ class CityProjectMaterialHelper {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showMaterials) return
-        if (!inCityProjectInventory) return
+        if (!inInventory) return
 
         config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
     }
@@ -123,7 +122,7 @@ class CityProjectMaterialHelper {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showReady) return
-        if (!inCityProjectInventory) return
+        if (!inInventory) return
 
 
         if (event.gui !is GuiChest) return
