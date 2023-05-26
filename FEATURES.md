@@ -264,3 +264,7 @@
 + **Estimated Item Value** - Displays an estimated item value for the item you hover over.
 + **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
 + Server Restart Title
++ Added City Project Features
+  + Show missing items to contribute inside the inventory
+    + Click on the item name to open the bazaar
+  + Highlight a component in the inventory that can be contributed
