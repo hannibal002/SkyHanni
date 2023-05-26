@@ -382,7 +382,7 @@ public class Misc {
         public boolean showReady = true;
 
         @Expose
-        public Position pos = new Position(394, 124, false, true);
+        public Position pos = new Position(150, 150, false, true);
     }
 
     @Expose
