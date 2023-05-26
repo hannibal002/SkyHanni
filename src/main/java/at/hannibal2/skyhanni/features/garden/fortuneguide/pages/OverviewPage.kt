@@ -1,41 +1,49 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentArmor
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentEquipment
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 class OverviewPage: FFGuideGUI.FFGuidePage() {
     private val del = "TODO"
+    private var equipmentFF = mutableMapOf<FFTypes, Double>()
+    private var armorFF = mutableMapOf<FFTypes, Double>()
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        val cakeActive = FFGuideGUI.cakeBuffTime - System.currentTimeMillis() > 0 || FFGuideGUI.cakeBuffTime == -1L
+        //todo migrate
         val timeUntilCakes = TimeUtils.formatDuration(FFGuideGUI.cakeBuffTime - System.currentTimeMillis())
 
+        //todo change based on pet, later
         if (FFGuideGUI.breakdownMode) {
             RenderUtils.drawFarmingBar("§6Universal Farming Fortune", "§7§2Farming fortune in that is\n" +
-                    "§2applied to every crop", 0, 1270, FFGuideGUI.guiLeft + 15,
+                    "§2applied to every crop", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1250, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            var line = if (FFGuideGUI.anitaBuff == -1) "§cAnita buff not saved\n§eVisit Anita to set it!"
-            else "§7§2Fortune for levelling your Anita extra crops\n§2You get 2☘ per buff level\n§2Your upgrade level: ${FFGuideGUI.anitaBuff}"
-            RenderUtils.drawFarmingBar("§2Anita Buff", line, FFGuideGUI.anitaBuff * 2, 30, FFGuideGUI.guiLeft + 15,
+            var line = if (FFStats.baseFF[FFTypes.ANITA]!! < 0.0) "§cAnita buff not saved\n§eVisit Anita to set it!"
+            else "§7§2Fortune for levelling your Anita extra crops\n§2You get 2☘ per buff level"
+            RenderUtils.drawFarmingBar("§2Anita Buff", line, FFStats.baseFF[FFTypes.ANITA] ?: 0.0, 30, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = if (FFGuideGUI.farmingLevel == -1) "§cFarming level not saved\n§eOpen /skills to set it!"
-            else "§7§2Fortune for levelling your farming skill\n§2You get 4☘ per farming level\n§2Your farming level: ${FFGuideGUI.farmingLevel}"
-            RenderUtils.drawFarmingBar("§2Farming Level", line, FFGuideGUI.farmingLevel * 4, 240, FFGuideGUI.guiLeft + 15,
+            line = if (FFStats.baseFF[FFTypes.FARMING_LVL]!! < 0.0) "§cFarming level not saved\n§eOpen /skills to set it!"
+            else "§7§2Fortune for levelling your farming skill\n§2You get 4☘ per farming level"
+            RenderUtils.drawFarmingBar("§2Farming Level", line, FFStats.baseFF[FFTypes.FARMING_LVL] ?: 0.0, 240, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = if (FFGuideGUI.communityUpgradeLevel == -1) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
-            else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier\n§2Your community upgrade level: ${FFGuideGUI.communityUpgradeLevel}"
-            RenderUtils.drawFarmingBar("§2Community upgrades", line, FFGuideGUI.communityUpgradeLevel * 4, 40, FFGuideGUI.guiLeft + 15,
-                FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+            line = if (FFStats.baseFF[FFTypes.COMMUNITY_SHOP]!! < 0.0) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
+            else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier"
+            RenderUtils.drawFarmingBar("§2Community upgrades", line, FFStats.baseFF[FFTypes.COMMUNITY_SHOP] ?: 0.0,
+                40, FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = if (FFGuideGUI.plotsUnlocked == -1) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
-            else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked\n§2Plots unlocked: ${FFGuideGUI.plotsUnlocked}"
-            RenderUtils.drawFarmingBar("§2Garden Plots", line, FFGuideGUI.plotsUnlocked * 3, 72, FFGuideGUI.guiLeft + 15,
+            line = if (FFStats.baseFF[FFTypes.PLOTS]!! < 0.0) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
+            else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked"
+            RenderUtils.drawFarmingBar("§2Garden Plots", line, FFStats.baseFF[FFTypes.PLOTS] ?: 0.0, 72, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             line = when (FFGuideGUI.cakeBuffTime) {
@@ -45,66 +53,162 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             if (FFGuideGUI.cakeBuffTime - System.currentTimeMillis() < 0 && FFGuideGUI.cakeBuffTime != -1L) {
                 line = "§cYour cake buff has run out\nGo eat some cake!"
             }
-            RenderUtils.drawFarmingBar("§2Cake Buff", line, if (cakeActive) 5 else 0, 5, FFGuideGUI.guiLeft + 15,
+            RenderUtils.drawFarmingBar("§2Cake Buff", line, FFStats.baseFF[FFTypes.CAKE] ?: 0.0, 5, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
+            val armorItem = when (currentArmor) {
+                1 -> FarmingItems.HELMET
+                2 -> FarmingItems.CHESTPLATE
+                3 -> FarmingItems.LEGGINGS
+                else -> FarmingItems.BOOTS
+            }
 
-            //If one piece is selected show that ones stats, otherwise a total
-            RenderUtils.drawFarmingBar("§2Total Armor Fortune", "§7§2Total fortune from your armor\n" +
-                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
-                FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-            // ranchers boots bonus will be included as base fortune, and not an ability
-            RenderUtils.drawFarmingBar("§2Base Armor Fortune", "§7§2The base fortune from your armor\n" +
-                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
+            armorFF = when (currentArmor) {
+                1 -> FFStats.helmetFF
+                2 -> FFStats.chestplateFF
+                3 -> FFStats.leggingsFF
+                4 -> FFStats.bootsFF
+                else -> FFStats.armorTotalFF
+            }
+
+            line = if (currentArmor == 0) "§7§2Total fortune from your armor\n§2Select a piece for more info"
+            else "§7§2Total fortune from your\n${armorItem.getItem().displayName}"
+            var value = if (currentArmor == 0) {
+                325
+            } else if (FFStats.usingSpeedBoots) {
+                when (currentArmor) {
+                    1 -> 76.67
+                    2 -> 81.67
+                    3 -> 81.67
+                    else -> 85
+                }
+            } else {
+                when (currentArmor) {
+                    1 -> 78.75
+                    2 -> 83.75
+                    3 -> 83.75
+                    else -> 78.75
+                }
+            }
+            RenderUtils.drawFarmingBar("§2Total Armor Fortune", line, armorFF[FFTypes.TOTAL] ?: 0, value,
+                FFGuideGUI.guiLeft + 135, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            line = if (currentArmor == 0) "§7§2The base fortune from your armor\n§2Select a piece for more info"
+            else "§7§2Base fortune from your\n${armorItem.getItem().displayName}"
+            value = if (currentArmor == 0) {
+                if (FFStats.usingSpeedBoots) 160 else 130
+            } else if (currentArmor == 1) 30
+            else if (currentArmor == 2) 35
+            else if (currentArmor == 3) 35
+            else {
+                if (FFStats.usingSpeedBoots) 60 else 30
+            }
+            RenderUtils.drawFarmingBar("§2Base Armor Fortune", line, armorFF[FFTypes.BASE] ?: 0,
+                value, FFGuideGUI.guiLeft + 135,
                 FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-            //If one singular peice is selected, show the full ability
-            RenderUtils.drawFarmingBar("§2Armor Ability", "§7§2The fortune from your armor's ability\n" +
-                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
+
+            line = if (currentArmor == 0) "§7§2The fortune from your armor's ability\n§2Select a piece for more info"
+            else "§7§2Ability fortune from your\n${armorItem.getItem().displayName}"
+            value = if (FFStats.usingSpeedBoots) {
+                when (currentArmor) {
+                    0 -> 50
+                    1 -> 16.67
+                    2 -> 16.67
+                    3 -> 16.67
+                    else -> 0
+                }
+            } else {
+                when (currentArmor) {
+                    0 -> 75
+                    1 -> 18.75
+                    2 -> 18.75
+                    3 -> 18.75
+                    else -> 18.75
+                }
+            }
+
+            RenderUtils.drawFarmingBar("§2Armor Ability", line, armorFF[FFTypes.ABILITY] ?: 0,
+                value, FFGuideGUI.guiLeft + 135,
                 FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-            // display what it could be at better reforges when a single piece is selected
-            RenderUtils.drawFarmingBar("§2Armor Reforge", "§7§2The fortune from your armor's reforge\n" +
-                    "§2Select a piece for more info", 0, 10000, FFGuideGUI.guiLeft + 135,
+
+            line = if (currentArmor == 0) "§7§2The fortune from your armor's reforge\n§2Select a piece for more info"
+            else "§7§2Total fortune from your\n${armorItem.getItem().displayName}"
+            value = if (currentArmor == 0) {
+                if (FFStats.usingSpeedBoots) 115 else 120
+            } else if (currentArmor == 4) {
+                if (FFStats.usingSpeedBoots) 25 else 30
+            } else 30
+            RenderUtils.drawFarmingBar("§2Armor Reforge", line, armorFF[FFTypes.REFORGE] ?: 0,
+                value, FFGuideGUI.guiLeft + 135,
                 FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
+            val currentPet = when (FFGuideGUI.currentPet) {
+                0 -> FFStats.elephantFF
+                1 -> FFStats.mooshroomFF
+                else -> FFStats.rabbitFF
+            }
 
+            //todo change based on cow
             RenderUtils.drawFarmingBar("§2Total Pet Fortune", "§7§2The total fortune from your pet and its item",
-                0, 10000, FFGuideGUI.guiLeft + 80,
-                FFGuideGUI.guiTop + 155, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+                currentPet[FFTypes.TOTAL] ?: 0, 240, FFGuideGUI.guiLeft + 135,
+                FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+            //todo
+//            RenderUtils.drawFarmingBar("§2Mooshroom Strength FF", "§7§2The fortune from mooshroom cow\n§2due to your strength", 0, 60,
+//                FFGuideGUI.guiLeft + 50, FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            RenderUtils.drawFarmingBar("§2Pet Item", "§7§2The fortune from your pet's item\n" +
-                    "§2Grants 4☘ per garden level\n§2Your garden level: $del", 0, 60, FFGuideGUI.guiLeft + 190,
-                FFGuideGUI.guiTop + 155, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+            line = when (FFStats.currentPetItem) {
+                "GREEN_BANDANA" -> "§7§2The fortune from your pet's item\n§2Grants 4☘ per garden level"
+                "YELLOW_BANDANA" -> "§7§2The fortune from your pet's item"
+                "MINOS_RELIC" -> "§cGreen Bandana is better than relic!"
+                else -> "No fortune boosting pet item"
+            }
+            RenderUtils.drawFarmingBar("§2Pet Item", line, currentPet[FFTypes.PET_ITEM] ?: 0, 60, FFGuideGUI.guiLeft + 220,
+                FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            val equipmentItem = when (FFGuideGUI.currentEquipment) {
+
+            val equipmentItem = when (currentEquipment) {
                 1 -> FarmingItems.NECKLACE
                 2 -> FarmingItems.CLOAK
                 3 -> FarmingItems.BELT
                 else -> FarmingItems.BRACELET
             }
 
-            line = if (FFGuideGUI.currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
+            equipmentFF = when (currentEquipment) {
+                1 -> FFStats.necklaceFF
+                2 -> FFStats.cloakFF
+                3 -> FFStats.beltFF
+                4 -> FFStats.braceletFF
+                else -> FFStats.equipmentTotalFF
+            }
+
+            line = if (currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
             else "§7§2Total fortune from your\n${equipmentItem.getItem().displayName}"
-            RenderUtils.drawFarmingBar("§2Total Equipment Fortune", line, 0, if (FFGuideGUI.currentEquipment == 0) 198 else 49.5,
+            RenderUtils.drawFarmingBar("§2Total Equipment Fortune", line, equipmentFF[FFTypes.TOTAL] ?: 0,
+                if (currentEquipment == 0) 198 else 49.5,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = if (FFGuideGUI.currentEquipment == 0) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
+            line = if (currentEquipment == 0) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
             else "§7§2Total base fortune from your\n${equipmentItem.getItem().displayName}"
-            RenderUtils.drawFarmingBar("§2Equipment Base Fortune", line, 0, if (FFGuideGUI.currentEquipment == 0) 20 else 5,
+            RenderUtils.drawFarmingBar("§2Equipment Base Fortune", line, equipmentFF[FFTypes.BASE] ?: 0,
+                if (currentEquipment == 0) 20 else 5,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = if (FFGuideGUI.currentEquipment == 0) "§7§2The fortune from all of your equipment's abilities\n§2Select a piece for more info"
+            line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's abilities\n§2Select a piece for more info"
             else "§7§2Total ability fortune from your\n${equipmentItem.getItem().displayName}"
-            RenderUtils.drawFarmingBar("§2Equipment Ability", line, 0, if (FFGuideGUI.currentEquipment == 0) 60 else 15,
+            RenderUtils.drawFarmingBar("§2Equipment Ability", line, equipmentFF[FFTypes.ABILITY] ?: 0,
+                if (currentEquipment == 0) 60 else 15,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = if (FFGuideGUI.currentEquipment == 0) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
+            line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
             else "§7§2Total reforge fortune from your\n${equipmentItem.getItem().displayName}"
-            RenderUtils.drawFarmingBar("§2Equipment Reforge", line, 0, if (FFGuideGUI.currentEquipment == 0) 40 else 10,
+            RenderUtils.drawFarmingBar("§2Equipment Reforge", line, equipmentFF[FFTypes.REFORGE] ?: 0,
+                if (currentEquipment == 0) 40 else 10,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = if (FFGuideGUI.currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
+            line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
             else "§7§2Total enchantment fortune from your\n${equipmentItem.getItem().displayName}"
-            RenderUtils.drawFarmingBar("§2Equipment Enchantment", line, 0, if (FFGuideGUI.currentEquipment == 0) 78 else 19.5,
+            RenderUtils.drawFarmingBar("§2Equipment Enchantment", line, equipmentFF[FFTypes.GREEN_THUMB] ?: 0,
+                if (currentEquipment == 0) 78 else 19.5,
                 FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
         }
     }

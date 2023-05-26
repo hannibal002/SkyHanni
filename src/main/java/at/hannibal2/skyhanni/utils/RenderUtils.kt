@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
@@ -24,10 +25,8 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
-import kotlin.math.sqrt
+import java.text.DecimalFormat
+import kotlin.math.*
 
 object RenderUtils {
 
@@ -933,6 +932,7 @@ object RenderUtils {
         currentVal = if (currentVal < 0) 0.0 else currentVal
 
         var barProgress = currentVal / maxValue.toFloat()
+        if (maxValue == 0) barProgress = 1.0
         barProgress = when {
             barProgress > 1 -> 1.0
             barProgress < 0 -> 0.0
@@ -940,6 +940,7 @@ object RenderUtils {
         }
 
         val filledWidth = (width * barProgress).toInt()
+        val current = DecimalFormat("0.##").format(currentVal.round(2))
         val progressPercentage = (barProgress * 10000).roundToInt() / 100
         val inverseScale = 1 / textScale
         val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth("$progressPercentage%")
@@ -947,7 +948,7 @@ object RenderUtils {
 
         GlStateManager.scale(textScale, textScale, textScale)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
-        drawString("§2${String.format("%.0f", currentVal)} / $maxValue☘", xPos * inverseScale, (yPos + 8) * inverseScale)
+        drawString("§2$current / $maxValue☘", xPos * inverseScale, (yPos + 8) * inverseScale)
         drawString("§2$progressPercentage%", (xPos + width - textWidth * textScale) * inverseScale, (yPos + 8) * inverseScale)
         GlStateManager.scale(inverseScale, inverseScale, inverseScale)
 
@@ -976,5 +977,4 @@ object RenderUtils {
         val color = Color(this)
         return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
     }
-
 }

@@ -23,7 +23,7 @@ class CaptureFarmingGear {
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
-    private val anitaMenuPattern = "§7You have: §a[+](?<level>.*)%".toPattern()
+    private val anitaMenuPattern = "You have: [+](?<level>.*)%".toPattern()
 
     companion object {
         private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM") // not adding any more armor, unless requested
@@ -61,7 +61,7 @@ class CaptureFarmingGear {
                     }
                 }
                 if (armor.getInternalName() in farmingBoots) {
-                    farmingItems[FarmingItems.OTHER_BOOTS] = armor
+                    farmingItems[FarmingItems.BOOTS] = armor
                 }
             }
         }
@@ -91,17 +91,33 @@ class CaptureFarmingGear {
             }
         }
         if (event.inventoryName.contains("Pets")) {
-            //todo fix multiple of the same pet will cause it to be overwritten
+            // should only save the highest rarity pet, if they have more than 1 leg, they can remove 1 from menu
+            farmingItems[FarmingItems.ELEPHANT] = FFGuideGUI.getFallbackItem(FarmingItems.ELEPHANT)
+            farmingItems[FarmingItems.MOOSHROOM_COW] = FFGuideGUI.getFallbackItem(FarmingItems.MOOSHROOM_COW)
+            farmingItems[FarmingItems.RABBIT] = FFGuideGUI.getFallbackItem(FarmingItems.RABBIT)
+            var highestElephantLvl = -1
+            var highestMooshroomLvl = -1
+            var highestRabbitLvl = -1
+
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName().split(";")
                 if (split.first() == "ELEPHANT") {
-                    farmingItems[FarmingItems.ELEPHANT] = item
+                    if (split.last().toInt() > highestElephantLvl) {
+                        farmingItems[FarmingItems.ELEPHANT] = item
+                        highestElephantLvl = split.last().toInt()
+                    }
                 }
                 if (split.first() == "MOOSHROOM_COW") {
-                    farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                    if (split.last().toInt() > highestMooshroomLvl) {
+                        farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                        highestMooshroomLvl = split.last().toInt()
+                    }
                 }
                 if (split.first() == "RABBIT") {
-                    farmingItems[FarmingItems.RABBIT] = item
+                    if (split.last().toInt() > highestRabbitLvl) {
+                        farmingItems[FarmingItems.RABBIT] = item
+                        highestRabbitLvl = split.last().toInt()
+                    }
                 }
             }
         }
@@ -138,11 +154,12 @@ class CaptureFarmingGear {
         if (event.inventoryName.contains("Anita")) {
             var level = -1
             for ((_, item) in event.inventoryItems) {
-                if (item.displayName.contains("§eExtra Farming Drops")) {
+                if (item.displayName.contains("Extra Farming Drops")) {
+                    level = 0 // catching when they have not upgraded it before
                     for (line in item.getLore()) {
-                        level = anitaMenuPattern.matchMatcher(line) {
-                            group("level").toInt() / 2
-                        } ?: -1
+                        anitaMenuPattern.matchMatcher(line.removeColor()) {
+                            level = group("level").toInt() / 2
+                        }
                     }
                 }
             }

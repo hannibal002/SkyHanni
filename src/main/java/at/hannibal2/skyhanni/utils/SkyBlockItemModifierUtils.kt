@@ -27,6 +27,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPetCandyUsed() = ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)?.get("candyUsed")?.asInt
 
+    fun ItemStack.getPetItem() = ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)?.get("heldItem")?.asString
+
     fun ItemStack.getMasterStars(): Int {
         val stars = mapOf(
             "➊" to 1,

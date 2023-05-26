@@ -6,6 +6,7 @@ more todo notes on WartsPage.kt
 
 Show fortune for armor ability
 
+//todo check if max fortune stats are right
 
 Deal with the two boot types
 
@@ -13,6 +14,8 @@ Deal with pets
 Deal with mushroom cow and strength
 
 More info on the lore of missing items
+
+update cake ff in the display if it runs out
 
 Change lore on equipment to reflect visitors served
 Track pet level ups
@@ -31,13 +34,13 @@ Shorten the description on ranchers boots
 !!!!
 Buges:
 Major:
+lvl 0 anita buff counts as lvl 15
 Sometimes the ff breakdown for equipment and armor does not work in the gui?
-Does not count plots correctly, works sometimes not others
-Will overwrite the saved pet of each type if there is more than one of it in pets menu. e.g. uncommon ele will overwrite leg one
+    - fixes by holding shift over an item in the inventory then going back into the gui
 If they sell their equipment or pets, they will be saved until a new one is bought and their stats counted : fix, don't liquidize your stuff lol
 - can fix pets, equipment is more difficult
 Minor:
-Boots speed display is not working in /ff idk if i want it there though
+User
 Update strength when the command is run
 Taking off or putting equipment on inside the menu won't update it until you reopen the inventory
     - also if they sell the piece of equipment, it will always think they still have it

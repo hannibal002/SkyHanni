@@ -71,6 +71,7 @@ object GardenVisitorDropStatistics {
             }
             gardenExpPattern.matchMatcher(message) {
                 val amount = group("amount").formatNumber().toInt()
+                if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
                 gardenExp += amount
                 saveAndUpdate()
             }

@@ -40,11 +40,7 @@ open class FFGuideGUI : GuiScreen() {
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
-        var farmingLevel = -1
-        var plotsUnlocked = -1
-        var communityUpgradeLevel = -1
         var cakeBuffTime = -1L
-        var anitaBuff = -1
 
         fun FarmingItems.getItem(): ItemStack {
             val fortune = GardenAPI.config?.fortune ?: return getFallbackItem(this)
@@ -57,7 +53,7 @@ open class FFGuideGUI : GuiScreen() {
             return fallbackItem
         }
 
-        private fun getFallbackItem(item: FarmingItems) =
+        fun getFallbackItem(item: FarmingItems): ItemStack =
             ItemStack(Blocks.barrier).setStackDisplayName("§cNo saved ${item.name.lowercase().replace("_", " ")}")
     }
 
@@ -65,6 +61,7 @@ open class FFGuideGUI : GuiScreen() {
     //todo lore changes for farming armor, equipment and pets
 
     init {
+        FFStats.loadFFData()
         pages[FortuneGuidePage.OVERVIEW] = OverviewPage()
         pages[FortuneGuidePage.WHEAT] = WheatPage()
 //        pages[FortuneGuidePage.CARROT] = CarrotPage()
@@ -77,11 +74,7 @@ open class FFGuideGUI : GuiScreen() {
 //        pages[FortuneGuidePage.MUSHROOM] = MushroomPage()
 //        pages[FortuneGuidePage.NETHER_WART] = WartPage()
 
-        communityUpgradeLevel = ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1
         GardenAPI.config?.fortune?.let {
-            farmingLevel = it.farmingLevel
-            plotsUnlocked = it.plotsUnlocked
-            anitaBuff = it.anitaUpgrade
             cakeBuffTime = it.cakeExpiring
         }
     }
@@ -145,24 +138,20 @@ open class FFGuideGUI : GuiScreen() {
 //                RenderUtils.renderItemAndTip(items[17], guiLeft + 182, guiTop + 140, mouseX, mouseY)
             } else {
                 RenderUtils.renderItemAndTip(
-                    FarmingItems.HELMET.getItem(), guiLeft + 132, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.HELMET.getItem(), guiLeft + 142, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
                 )
                 RenderUtils.renderItemAndTip(
-                    FarmingItems.CHESTPLATE.getItem(), guiLeft + 152, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
                 )
                 RenderUtils.renderItemAndTip(
-                    FarmingItems.LEGGINGS.getItem(), guiLeft + 172, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.LEGGINGS.getItem(), guiLeft + 182, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 3) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
                 )
                 RenderUtils.renderItemAndTip(
-                    FarmingItems.BOOTS.getItem(), guiLeft + 192, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.BOOTS.getItem(), guiLeft + 202, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 4) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
-                )
-                RenderUtils.renderItemAndTip(
-                    FarmingItems.OTHER_BOOTS.getItem(), guiLeft + 212, guiTop + 5, mouseX, mouseY,
-                    if (currentArmor == 5) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
                 )
 
                 RenderUtils.renderItemAndTip(
@@ -265,43 +254,29 @@ open class FFGuideGUI : GuiScreen() {
             if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
                 currentPet = 0
-            } else if (RenderUtils.isPointInRect(
-                    mouseX,
-                    mouseY,
-                    guiLeft + 172,
-                    guiTop + 130,
-                    16,
-                    16
-                ) && currentPet != 1
+                FFStats.totalFF(FFStats.elephantFF)
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 130, 16, 16) && currentPet != 1
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 1
-            } else if (RenderUtils.isPointInRect(
-                    mouseX,
-                    mouseY,
-                    guiLeft + 192,
-                    guiTop + 130,
-                    16,
-                    16
-                ) && currentPet != 2
+                FFStats.totalFF(FFStats.mooshroomFF)
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 130, 16, 16) && currentPet != 2
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 2
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 132, guiTop + 5, 16, 16)) {
+                FFStats.totalFF(FFStats.rabbitFF)
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 1) 0 else 1
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 5, 16, 16)) {
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 2) 0 else 2
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 5, 16, 16)) {
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 3) 0 else 3
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 5, 16, 16)) {
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 4) 0 else 4
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 212, guiTop + 5, 16, 16)) {
-                SoundUtils.playClickSound()
-                currentArmor = if (currentArmor == 5) 0 else 5
             } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentEquipment = if (currentEquipment == 1) 0 else 1
@@ -320,28 +295,17 @@ open class FFGuideGUI : GuiScreen() {
             if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
                 currentPet = 0
-            } else if (RenderUtils.isPointInRect(
-                    mouseX,
-                    mouseY,
-                    guiLeft + 172,
-                    guiTop + 160,
-                    16,
-                    16
-                ) && currentPet != 1
+                FFStats.totalFF(FFStats.elephantFF)
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 160, 16, 16) && currentPet != 1
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 1
-            } else if (RenderUtils.isPointInRect(
-                    mouseX,
-                    mouseY,
-                    guiLeft + 192,
-                    guiTop + 160,
-                    16,
-                    16
-                ) && currentPet != 2
+                FFStats.totalFF(FFStats.mooshroomFF)
+            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 160, 16, 16) && currentPet != 2
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 2
+                FFStats.totalFF(FFStats.rabbitFF)
             }
         }
     }

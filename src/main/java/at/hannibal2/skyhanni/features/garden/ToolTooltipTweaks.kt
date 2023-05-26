@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.text.DecimalFormat
@@ -55,7 +56,7 @@ class ToolTooltipTweaks {
             if (match != null) {
                 val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
 
-                FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune, match)
+                FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
 
                 val displayedFortune = FarmingFortuneDisplay.displayedFortune
                 val reforgeFortune = FarmingFortuneDisplay.reforgeFortune
@@ -77,10 +78,10 @@ class ToolTooltipTweaks {
                 iterator.set(fortuneLine)
 
                 if (Keyboard.isKeyDown(config.fortuneTooltipKeybind)) {
-                    iterator.addStat("  §7Base: §a+", baseFortune)
+                    iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
-                    iterator.addStat("  $reforgeName: §9+", reforgeFortune)
-                    iterator.addStat("  §7Ability: §a+", abilityFortune)
+                    iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
+                    iterator.addStat("  §7Ability: §2+", abilityFortune)
                     iterator.addStat("  §7Green Thumb: §a+", greenThumbFortune)
                     iterator.addStat("  §7Sunder: §a+", sunderFortune)
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)

@@ -181,4 +181,78 @@ object GardenAPI {
         lastLocation = position
         CropClickEvent(cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
     }
+
+    fun getExpForLevel(requestedLevel: Int): Long {
+        var totalCrops = 0L
+        var tier = 0
+        for (tierCrops in gardenExperience) {
+            totalCrops += tierCrops
+            tier++
+            if (tier == requestedLevel) {
+                return totalCrops
+            }
+        }
+
+        return 0
+    }
+
+    fun getLevelForExp(gardenExp: Long): Int {
+        var tier = 0
+        var totalCrops = 0L
+        for (tierCrops in gardenExperience) {
+            totalCrops += tierCrops
+            if (totalCrops > gardenExp) {
+                return tier
+            }
+            tier++
+        }
+
+        return tier
+    }
+
+    // TODO use repo
+    private val gardenExperience = listOf(
+        0,
+        70,
+        100,
+        140,
+        240,
+        600,
+        1500,
+        2000,
+        2500,
+        3000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000, // level 15
+
+        // overflow levels till 40 for now, in 10k steps
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+        10_000,
+    )
 }

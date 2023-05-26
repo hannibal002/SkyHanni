@@ -148,6 +148,9 @@ class FarmingFortuneDisplay {
             }
 
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
+        private val tooltipFortunePattern =
+            "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
+        private val armorAbilityPattern = "§6Tiered Bonus: (?<abilityName>.*) [(](?<pieces>.*)/4[)]".toPattern() //todo later
 
         var displayedFortune = 0.0
         var reforgeFortune = 0.0
@@ -200,28 +203,40 @@ class FarmingFortuneDisplay {
         fun getHarvestingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5 }
         fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0).toDouble()}
 
-        fun getAbilityFortune(tool: ItemStack?):  Double  { // add armor ability stuff here
+        fun getAbilityFortune(tool: ItemStack?):  Double  {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
-            if (tool?.getInternalName()?.contains("LOTUS") == true) {
-                for (line in tool.getLore()) {
+            val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()// has not been tested on melon or cropie, but from wiki this should work
+            var pieces = 0.0
+            for (line in tool?.getLore()!!) {
+                if (tool.getInternalName().contains("LOTUS")) {
                     lotusAbilityPattern.matchMatcher(line) {
                         return group("bonus").toDouble()
                     }
+                }
+                armorAbilityPattern.matchMatcher(line) {
+                    pieces = group("pieces").toDouble()
+                }
+
+                armorAbilityFortune.matchMatcher(line) {
+                    return group("bonus").toDouble() / pieces
                 }
             }
             return 0.0
         }
 
-        // todo can't use match, as need from non-tooltips
-        fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double, match: MatchGroupCollection) {
-            displayedFortune = match[1]!!.value.toDouble()
-            reforgeFortune = match[2]!!.value.toDouble()
-            if (tool != null) {
-                itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
-                else displayedFortune - reforgeFortune - enchantmentFortune
-                greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
-                    displayedFortune - reforgeFortune - itemBaseFortune
-                } else 0.0
+        fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
+            for (line in tool?.getLore()!!) {
+                val match = tooltipFortunePattern.matchEntire(line)?.groups
+                if (match != null) {
+                    displayedFortune = match[1]!!.value.toDouble()
+                    reforgeFortune = match[2]!!.value.toDouble()
+
+                    itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
+                    else displayedFortune - reforgeFortune - enchantmentFortune
+                    greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
+                        displayedFortune - reforgeFortune - itemBaseFortune
+                    } else 0.0
+                }
             }
         }
 
