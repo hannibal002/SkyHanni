@@ -18,8 +18,15 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
     fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
-        it - 5 - if (getInternalName() == "STONK_PICKAXE") 1 else 0
+        it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
+
+    private fun ItemStack.getBaseSilexCount() = when (getInternalName()) {
+        "STONK_PICKAXE" -> 1
+        "PROMISING_SPADE" -> 5
+
+        else -> 0
+    }
 
     fun ItemStack.getTransmissionTunerCount() = getAttributeInt("tuned_transmission")
 

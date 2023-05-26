@@ -16,6 +16,8 @@
 + Added Farming Fortune Breakdown for Armor and Equipment (Contributed by CalMWolfs)
   + Works with: Base Stats, Reforge Bonus, Ability Fortune and Green Thumb
 + Added Server Restart Title
++ Added Jacob Contest Stats Summary
+  + Showing Blocks per Second and total Blocks clicked after a farming contest in chat
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.

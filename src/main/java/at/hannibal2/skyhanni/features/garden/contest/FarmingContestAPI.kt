@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
@@ -11,13 +14,67 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 object FarmingContestAPI {
     private val timePattern = "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)".toPattern()
     private val contests = mutableMapOf<Long, FarmingContest>()
     private val cropPattern = "§8(?<crop>.*) Contest".toPattern()
+    private var tick = 0
+    var inContest = false
+    var contestCrop: CropType? = null
+    private val sidebarCropPattern = "§e○ §f(?<crop>.*) §a.*".toPattern()
 
     var inInventory = false
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        tick++
+
+        if (tick % 20 == 0) {
+            if (!LorenzUtils.inSkyBlock) return
+            if (!GardenAPI.inGarden()) return
+
+            checkActiveContest()
+        }
+    }
+
+    private fun checkActiveContest() {
+        val currentCrop = readCurrentCrop()
+        val currentContest = currentCrop != null
+
+        if (inContest != currentContest) {
+            if (currentContest) {
+                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).postAndCatch()
+            } else {
+                FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+            }
+            inContest = currentContest
+        } else {
+            if (currentCrop != contestCrop) {
+                FarmingContestEvent(currentCrop!!, FarmingContestPhase.CHANGE).postAndCatch()
+            }
+        }
+        contestCrop = currentCrop
+    }
+
+    private fun readCurrentCrop(): CropType? {
+        var next = false
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            if (line == "§eJacob's Contest") {
+                next = true
+                continue
+            }
+            if (next) {
+                sidebarCropPattern.matchMatcher(line) {
+                    return CropType.getByName(group("crop"))
+                }
+            }
+        }
+
+        return null
+    }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {

@@ -1191,6 +1191,14 @@ public class Garden {
     public Position jacobContextTimesPos = new Position(-359, 149, false, true);
 
     @Expose
+    @ConfigOption(
+            name = "Contest Summary",
+            desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
+    )
+    @ConfigEditorBoolean
+    public boolean jacobContestSummary = true;
+
+    @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
     @ConfigEditorBoolean
     public boolean forcefullyEnabledAlwaysFinnegan = false;

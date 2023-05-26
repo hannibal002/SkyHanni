@@ -26,10 +26,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
-import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
-import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
-import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
+import at.hannibal2.skyhanni.features.garden.contest.*
 import at.hannibal2.skyhanni.features.garden.farming.*
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.*
@@ -98,7 +95,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.7",
+    version = "0.18.Beta.8",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -270,6 +267,7 @@ class SkyHanniMod {
         loadModule(WildStrawberryDyeNotification())
         loadModule(JacobContestFFNeededDisplay())
         loadModule(JacobContestTimeNeeded())
+        loadModule(JacobContestStatsSummary())
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
