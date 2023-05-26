@@ -118,9 +118,6 @@ class GardenPlotIcon {
         }
     }
 
-    private fun getFallbackItem() =
-            ItemStack(Blocks.barrier).setStackDisplayName("§cError loading item")
-
     private fun Int.setItem(stack: ItemStack?) {
         val gardenPlot = GardenAPI.config?.plotIcon ?: return
         val plotList = gardenPlot.plotList
