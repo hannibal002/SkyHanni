@@ -72,4 +72,8 @@ object StringUtils {
             split[0].removeColor()
         }
     }
+    fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
+
+    fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
+
 }

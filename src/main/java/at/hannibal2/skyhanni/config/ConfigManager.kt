@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -13,6 +14,7 @@ import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
 import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
+import net.minecraft.item.ItemStack
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -43,6 +45,15 @@ class ConfigManager {
                     return LorenzVec(x, y, z)
                 }
             }.nullSafe())
+                .registerTypeAdapter(ItemStack::class.java, object : TypeAdapter<ItemStack>() {
+                    override fun write(out: JsonWriter, value: ItemStack) {
+                        out.value(NEUItems.saveNBTData(value))
+                    }
+
+                    override fun read(reader: JsonReader): ItemStack {
+                        return NEUItems.loadNBTData(reader.nextString())
+                    }
+                }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
     }

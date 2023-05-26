@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.data.GuiEditManager;
+import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
+import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
@@ -173,7 +176,6 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean visitorHideChat = true;
-
 
     @Expose
     @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
@@ -1136,6 +1138,25 @@ public class Garden {
     }
 
     @Expose
+    @ConfigOption(name = "Garden Plot Icon", desc = "")
+    @Accordion
+    public PlotIcon plotIcon = new PlotIcon();
+
+    public static class PlotIcon {
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Enable icon replacement in the Configure Plots menu.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @ConfigOption(name = "Hard Reset", desc = "Reset every slot to it's original item.")
+        @ConfigEditorButton
+        public Runnable hardReset = () -> {
+            GardenPlotIcon.Companion.setHardReset(true);
+            LorenzUtils.INSTANCE.sendCommandToServer("desk");
+        };
+    }
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     public boolean plotPrice = true;
@@ -1182,14 +1203,6 @@ public class Garden {
 
     @Expose
     public Position jacobContextTimesPos = new Position(-359, 149, false, true);
-
-    @Expose
-    @ConfigOption(
-            name = "Contest Summary",
-            desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
-    )
-    @ConfigEditorBoolean
-    public boolean jacobContestSummary = true;
 
     @Expose
     @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")

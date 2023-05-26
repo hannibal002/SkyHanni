@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.config;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
+import net.minecraft.item.ItemStack;
 
 import java.util.*;
 
@@ -144,6 +146,13 @@ public class Storage {
 
                 @Expose
                 public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
+            }
+
+            @Expose
+            public PlotIcon plotIcon = new PlotIcon();
+            public static class PlotIcon {
+                @Expose
+                public Map<Integer, ItemStack> plotList = new HashMap<>();
             }
 
             @Expose
