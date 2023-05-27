@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -107,6 +108,7 @@ class GardenPlotIcon {
                     return
                 }
                 if (event.slotId != 53) {
+                    if (!event.slot.stack.displayName.removeColor().startsWith("Plot")) return
                     event.isCanceled = true
                     if (editMode == 2) {
                         plotList.remove(event.slotId)
