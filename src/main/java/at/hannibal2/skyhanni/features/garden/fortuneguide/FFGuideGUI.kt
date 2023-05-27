@@ -193,6 +193,7 @@ open class FFGuideGUI : GuiScreen() {
         }
 
         RenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
+        RenderUtils.drawStringCentered("§cIn beta! Report issues and suggestions on the discord", guiLeft + 10, guiTop + sizeY + 10)
 
         pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)
 
