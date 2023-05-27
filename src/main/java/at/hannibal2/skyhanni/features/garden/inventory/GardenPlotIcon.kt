@@ -4,14 +4,15 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -33,7 +34,7 @@ class GardenPlotIcon {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        for ((index, stack) in event.inventoryItems){
+        for ((index, stack) in event.inventoryItems) {
             originalStack[index] = stack
         }
         showItem = GardenAPI.inGarden() && event.inventoryName == "Configure Plots"
@@ -69,8 +70,8 @@ class GardenPlotIcon {
             }
 
             if (plotList.isNotEmpty() && plotList.contains(event.slotNumber)) {
-                val old = originalStack[event.slotNumber]?: return
-                val new = event.slotNumber.getItem()?: return
+                val old = originalStack[event.slotNumber] ?: return
+                val new = event.slotNumber.getItem() ?: return
                 val name = old.displayName
                 val lore = old.getLore().toTypedArray()
                 if (lastClickedSlotId == event.slotNumber) {
@@ -118,6 +119,18 @@ class GardenPlotIcon {
         }
     }
 
+    @SubscribeEvent
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (InventoryUtils.openInventoryName() != "Configure Plots" && !showItem) return
+        val plotList = GardenPlotIcon.plotList ?: return
+        val list = event.toolTip
+        val index = event.slot.slotIndex
+        if (plotList.contains(index)) {
+            val stack = originalStack[index] ?: return
+            list[0] = stack.displayName // Needed if using patcher
+        }
+    }
+
     private fun Int.setItem(stack: ItemStack?) {
         val gardenPlot = GardenAPI.config?.plotIcon ?: return
         val plotList = gardenPlot.plotList
@@ -132,5 +145,4 @@ class GardenPlotIcon {
         plotList[this] = null
         return null
     }
-
 }
