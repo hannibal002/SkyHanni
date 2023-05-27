@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 class CanePage: FFGuideGUI.FFGuidePage() {
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {
-            RenderUtils.renderItemAndTip(FarmingItems.CANE.getItem(),
+            RenderUtils.renderItemAndTip(FarmingItems.SUGAR_CANE.getItem(),
                 FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
 
 //todo update dynamically

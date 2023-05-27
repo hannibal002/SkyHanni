@@ -3,14 +3,10 @@ todo list for this display
 Deal with mushroom cow and strength
 Deal with pets leveling up
 
-update cake ff in the display if it runs out
-
 Change lore on equipment to reflect visitors served
 
 GUI:
-Only show pets that are saved, and move the display around to fit how many are being displayed
 Wrapping tooltip text to left when its near the right edge of screen
-Custom tooltips, like NEU to change the colours around it maybe
 Add a border around the edge of the display
 - If not too hard, wrap it around the selected button as well like neu - low priority
 Remove the text saying dyed at the top of leather armor descriptions
@@ -20,6 +16,7 @@ Remove click to summon and active from pets
 !!!!
 Buges:
 Major:
+When opening the gui, uses elephant stats instead of selected pet
 Tool reforge fortune even though no tool saved
 Sometimes the ff breakdown for equipment and armor does not work in the gui?
     - fixes by holding shift over an item in the inventory then going back into the gui

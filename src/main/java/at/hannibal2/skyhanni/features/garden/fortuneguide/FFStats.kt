@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.g
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import net.minecraft.item.ItemStack
 
 object FFStats {
@@ -42,6 +42,11 @@ object FFStats {
     val potatoFF = mutableMapOf<FFTypes, Double>()
     val caneFF = mutableMapOf<FFTypes, Double>()
     val wartFF = mutableMapOf<FFTypes, Double>()
+    val pumpkinFF = mutableMapOf<FFTypes, Double>()
+    val melonFF = mutableMapOf<FFTypes, Double>()
+    val mushroomFF = mutableMapOf<FFTypes, Double>()
+    val cocoaFF = mutableMapOf<FFTypes, Double>()
+    val cactusFF = mutableMapOf<FFTypes, Double>()
 
     fun loadFFData() {
         getEquipmentFFData(FarmingItems.NECKLACE.getItem(), necklaceFF)
@@ -75,8 +80,13 @@ object FFStats {
         getToolFF(FarmingItems.WHEAT.getItem(), wheatFF)
         getToolFF(FarmingItems.CARROT.getItem(), carrotFF)
         getToolFF(FarmingItems.POTATO.getItem(), potatoFF)
-        getToolFF(FarmingItems.CANE.getItem(), caneFF)
+        getToolFF(FarmingItems.SUGAR_CANE.getItem(), caneFF)
         getToolFF(FarmingItems.NETHER_WART.getItem(), wartFF)
+        getToolFF(FarmingItems.PUMPKIN.getItem(), pumpkinFF)
+        getToolFF(FarmingItems.MELON.getItem(), melonFF)
+        getToolFF(FarmingItems.MUSHROOM.getItem(), mushroomFF)
+        getToolFF(FarmingItems.COCOA_BEANS.getItem(), cocoaFF)
+        getToolFF(FarmingItems.CACTUS.getItem(), cactusFF)
 
         totalFF(elephantFF)
         currentPetItem = FarmingItems.ELEPHANT.getItem().getPetItem().toString()
@@ -109,7 +119,7 @@ object FFStats {
         out[FFTypes.PET_ITEM] = when (item.getPetItem()) {
             "GREEN_BANDANA" -> (4.0 * gardenLvl).coerceAtMost(60.0)
             "YELLOW_BANDANA" -> 30.0
-            "MINOS_RELIC" -> 33.0 //todo
+            "MINOS_RELIC" -> (out[FFTypes.BASE] ?: 0.0) * .33
             else -> 0.0
         }
         out[FFTypes.TOTAL] = out.values.sum()
@@ -131,7 +141,6 @@ object FFStats {
         out[FFTypes.TOTAL] = out.values.sum()
     }
 
-    // todo need to add crop upgrades
     private fun getToolFF(tool: ItemStack, out: MutableMap<FFTypes, Double>) {
         out[FFTypes.TOTAL] = 0.0
         val crop = tool.getCropType()
@@ -162,7 +171,6 @@ object FFStats {
         out[FFTypes.TOTAL] = out.values.sum()
     }
 
-//todo update the specific crop being looked at
     fun totalFF(petList: MutableMap<FFTypes, Double>) {
         totalBaseFF =
             (baseFF.toList() + armorTotalFF.toList() + equipmentTotalFF.toList() + petList.toList()).groupBy({ it.first },
@@ -176,12 +184,7 @@ object FFStats {
     }
 
     private fun getPetFF (pet: ItemStack): Double {
-        val petLevelPattern = "§7\\[Lvl (?<level>.*)\\] .*".toPattern()
-        var petLevel = 0
-        petLevelPattern.matchMatcher(pet.displayName) {
-            petLevel = group("level").toInt()
-        }
-
+        val petLevel = pet.getPetLevel()
         return if (pet.getInternalName().contains("ELEPHANT;4")) {
             1.8 * petLevel
         } else if (pet.getInternalName().contains("MOOSHROOM")) {

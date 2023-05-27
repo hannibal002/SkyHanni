@@ -1,70 +1,74 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 
-
+//todo Daedalus axe
+//todo add mooshroom cow pet
 class MushroomPage: FFGuideGUI.FFGuidePage() {
-//    private val tool = GardenAPI.config?.fortune?.farmingItems?.get(9)
-    private val textLinesWithTooltip = mutableMapOf<Pair<String, String>, Pair<Int, Int>>()
-    private val del = "TODO"
-
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {
-//            RenderUtils.renderItemAndTip(tool, FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
-            // if mushroom cow pet add 100
-            textLinesWithTooltip[Pair("§6Mushroom Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 5)
-            textLinesWithTooltip[Pair("§2$del / 1595☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 140,  FFGuideGUI.guiTop + 15)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 145, FFGuideGUI.guiTop + 30, 80, 0f)
-            // if mushroom cow pet add 100
-            textLinesWithTooltip[Pair("§2Base Farming Fortune", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop)
-            textLinesWithTooltip[Pair("§2$del / 1270☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 10)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 20, 90, 0f)
+            RenderUtils.renderItemAndTip(FarmingItems.MUSHROOM.getItem(),
+                FFGuideGUI.guiLeft + 172, FFGuideGUI.guiTop + 60, mouseX, mouseY)
 
-            textLinesWithTooltip[Pair("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
-                    "§2You get 10☘ per talisman tier\n§2Your unlocked tier: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 30)
-            textLinesWithTooltip[Pair("§2$del / 30☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 40)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 50, 90, 0f)
+            val totalCropFF = FFStats.totalBaseFF[FFTypes.TOTAL]!! + FFStats.mushroomFF[FFTypes.TOTAL]!!
+            RenderUtils.drawFarmingBar("§6Mushroom Farming Fortune", "§7§2Farming fortune for mushroom",
+                totalCropFF, 1575, FFGuideGUI.guiLeft + 135,
+                FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n" +
-                    "§2You get 5☘ per level\n§2Your unlocked level: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 60)
-            textLinesWithTooltip[Pair("§2$del / 45☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 70)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 80, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Universal Farming Fortune", "§7§2Farming fortune in that is\n" +
+                    "§2applied to every crop", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1250, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Tool reforge", "§7§2Fortune from reforging your tool")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 90)
-            textLinesWithTooltip[Pair("§2$del / 13☘   $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 100)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 110, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Talisman Bonus", "§7§2Fortune from your talisman\n" +
+                    "§2You get 10☘ per talisman tier", FFStats.mushroomFF[FFTypes.ACCESSORY] ?: 0, 30, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Farming for Dummies", "§7§2Fortune for applied farming for dummies books\n" +
-                    "§2You get 1☘ per applied book\n§2Your applied books: $del")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 120)
-            textLinesWithTooltip[Pair("§2$del / 5☘    $del%", "")] = Pair(FFGuideGUI.guiLeft + 15,  FFGuideGUI.guiTop + 130)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 20, FFGuideGUI.guiTop + 140, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n" +
+                    "§2You get 5☘ per level", FFStats.mushroomFF[FFTypes.CROP_UPGRADE] ?: 0, 45, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Tool bonus", "§7§2Bonus 30☘ for using the correct tool mode")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop)
-            textLinesWithTooltip[Pair("§2$del / 30☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 10)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 20, 90, 1f)
+            RenderUtils.drawFarmingBar("§2Tool reforge", "§7§2Fortune from reforging your tool",
+                FFStats.mushroomFF[FFTypes.REFORGE] ?: 0, 13, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Harvesting Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get 12.5☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 30)
-            textLinesWithTooltip[Pair("§2$del / 75☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 40)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 50, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Farming for Dummies", "§7§2Fortune for each applied book\n" +
+                    "§2You get 1☘ per applied book", FFStats.mushroomFF[FFTypes.FFD] ?: 0, 5, FFGuideGUI.guiLeft + 15,
+                FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get 1☘ per level\n§2Your enchantment level: $del\n§2Farm crops to level up")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 60)
-            textLinesWithTooltip[Pair("§2$del / 10☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 70)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 80, 90, 0f)
+            if (FFGuideGUI.currentPet == 1) {
+                RenderUtils.drawFarmingBar("§2Mooshroom Cow Pet", "§7§2The bonus mushrooms that the cow drops\n"
+                    + "§2You get 1 mushroom per crop broken", FarmingItems.MOOSHROOM_COW.getItem().getPetLevel(),
+            100, FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+            }
 
-            textLinesWithTooltip[Pair("§2Turbo-Mushrooms Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get 5☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 90)
-            textLinesWithTooltip[Pair("§2$del / 25☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 100)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 110, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Base tool fortune", "§7§2You get 30☘ for farming the right mushroom",
+                FFStats.mushroomFF[FFTypes.BASE] ?: 0, 30, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            textLinesWithTooltip[Pair("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n" +
-                    "§2You get $del☘ per level\n§2Your enchantment level: $del")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 120)
-            textLinesWithTooltip[Pair("§2$del / 92☘      $del%", "")] = Pair(FFGuideGUI.guiLeft + 245,  FFGuideGUI.guiTop + 130)
-            RenderUtils.drawProgressBar(FFGuideGUI.guiLeft + 245, FFGuideGUI.guiTop + 140, 90, 0f)
+            RenderUtils.drawFarmingBar("§2Harvesting Enchantment", "§7§2Fortune for each enchantment level\n" +
+                    "§2You get 12.5☘ per level", FFStats.mushroomFF[FFTypes.HARVESTING] ?: 0, 75, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            RenderUtils.drawFarmingBar("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n" +
+                    "§2You get 1☘ per level", FFStats.mushroomFF[FFTypes.CULTIVATING] ?: 0, 10, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            RenderUtils.drawFarmingBar("§2Turbo-Mushroom Enchant", "§7§2Fortune for each enchantment level\n" +
+                    "§2You get 5☘ per level", FFStats.mushroomFF[FFTypes.TURBO] ?: 0, 25, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+
+            RenderUtils.drawFarmingBar("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n" +
+                    "§2and crop milestone", FFStats.mushroomFF[FFTypes.DEDICATION] ?: 0, 92, FFGuideGUI.guiLeft + 255,
+                FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
         } else {
-
+            return
         }
     }
 }

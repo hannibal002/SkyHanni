@@ -63,12 +63,12 @@ open class FFGuideGUI : GuiScreen() {
         pages[FortuneGuidePage.WHEAT] = WheatPage()
         pages[FortuneGuidePage.CARROT] = CarrotPage()
         pages[FortuneGuidePage.POTATO] = PotatoPage()
-//        pages[FortuneGuidePage.PUMPKIN] = PumpkinPage()
+        pages[FortuneGuidePage.PUMPKIN] = PumpkinPage()
         pages[FortuneGuidePage.SUGAR_CANE] = CanePage()
-//        pages[FortuneGuidePage.MELON] = MelonPage()
-//        pages[FortuneGuidePage.CACTUS] = CactusPage()
-//        pages[FortuneGuidePage.COCOA_BEANS] = CocoaPage()
-//        pages[FortuneGuidePage.MUSHROOM] = MushroomPage()
+        pages[FortuneGuidePage.MELON] = MelonPage()
+        pages[FortuneGuidePage.CACTUS] = CactusPage()
+        pages[FortuneGuidePage.COCOA_BEANS] = CocoaPage()
+        pages[FortuneGuidePage.MUSHROOM] = MushroomPage()
         pages[FortuneGuidePage.NETHER_WART] = WartPage()
 
         GardenAPI.config?.fortune?.let {
@@ -90,24 +90,24 @@ open class FFGuideGUI : GuiScreen() {
         drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
         renderTabs()
 
-        //these buttons could be improved
-        drawRect(
-            guiLeft, guiTop + sizeY + 3, guiLeft + 40,
-            guiTop + sizeY + 15, 0x50000000
-        )
-        RenderUtils.drawStringCentered("§6Mode:", guiLeft + 20, guiTop + sizeY + 9)
-
-        drawRect(
-            guiLeft + 45, guiTop + sizeY + 3, guiLeft + 125,
-            guiTop + sizeY + 15, if (breakdownMode) 0x50555555 else 0x50000000
-        )
-        RenderUtils.drawStringCentered("§6Breakdown", guiLeft + 85, guiTop + sizeY + 9)
-
-        drawRect(
-            guiLeft + 130, guiTop + sizeY + 3, guiLeft + 210,
-            guiTop + sizeY + 15, if (!breakdownMode) 0x50555555 else 0x50000000
-        )
-        RenderUtils.drawStringCentered("§6Improvements", guiLeft + 170, guiTop + sizeY + 9)
+        //todo fix this up
+//        drawRect(
+//            guiLeft, guiTop + sizeY + 3, guiLeft + 40,
+//            guiTop + sizeY + 15, 0x50000000
+//        )
+//        RenderUtils.drawStringCentered("§6Mode:", guiLeft + 20, guiTop + sizeY + 9)
+//
+//        drawRect(
+//            guiLeft + 45, guiTop + sizeY + 3, guiLeft + 125,
+//            guiTop + sizeY + 15, if (breakdownMode) 0x50555555 else 0x50000000
+//        )
+//        RenderUtils.drawStringCentered("§6Breakdown", guiLeft + 85, guiTop + sizeY + 9)
+//
+//        drawRect(
+//            guiLeft + 130, guiTop + sizeY + 3, guiLeft + 210,
+//            guiTop + sizeY + 15, if (!breakdownMode) 0x50555555 else 0x50000000
+//        )
+//        RenderUtils.drawStringCentered("§6Improvements", guiLeft + 170, guiTop + sizeY + 9)
 
         if (breakdownMode) {
             if (selectedPage != FortuneGuidePage.OVERVIEW) {
@@ -246,16 +246,16 @@ open class FFGuideGUI : GuiScreen() {
                 }
             }
         }
-        if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 45, guiTop + sizeY, 80, 15) && !breakdownMode) {
-            SoundUtils.playClickSound()
-            breakdownMode = true
-            swapMode()
-        }
-        if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 130, guiTop + sizeY, 80, 15) && breakdownMode) {
-            SoundUtils.playClickSound()
-            breakdownMode = false
-            swapMode()
-        }
+//        if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 45, guiTop + sizeY, 80, 15) && !breakdownMode) {
+//            SoundUtils.playClickSound()
+//            breakdownMode = true
+//            swapMode()
+//        }
+//        if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 130, guiTop + sizeY, 80, 15) && breakdownMode) {
+//            SoundUtils.playClickSound()
+//            breakdownMode = false
+//            swapMode()
+//        }
         if (selectedPage == FortuneGuidePage.OVERVIEW) {
             if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
