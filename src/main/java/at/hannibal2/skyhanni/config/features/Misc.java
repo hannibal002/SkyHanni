@@ -364,6 +364,27 @@ public class Misc {
         public boolean inventoryNumbers = false;
     }
 
+    @ConfigOption(name = "City Project", desc = "")
+    @Accordion
+    @Expose
+    public CityProject cityProject = new CityProject();
+
+    public static class CityProject {
+
+        @Expose
+        @ConfigOption(name = "Show Materials", desc = "Show materials needed for contributing to the City Project.")
+        @ConfigEditorBoolean
+        public boolean showMaterials = true;
+
+        @Expose
+        @ConfigOption(name = "Show Ready", desc = "Mark Contributions that are ready to participate.")
+        @ConfigEditorBoolean
+        public boolean showReady = true;
+
+        @Expose
+        public Position pos = new Position(150, 150, false, true);
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean

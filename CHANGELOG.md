@@ -18,6 +18,10 @@
 + Added Server Restart Title
 + Added Jacob Contest Stats Summary
   + Showing Blocks per Second and total Blocks clicked after a farming contest in chat
++ Added City Project Features
+  + Show missing items to contribute inside the inventory
+    + Click on the item name to open the bazaar
+  + Highlight a component in the inventory that can be contributed
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
