@@ -88,14 +88,20 @@ object FFStats {
         getToolFF(FarmingItems.COCOA_BEANS.getItem(), cocoaFF)
         getToolFF(FarmingItems.CACTUS.getItem(), cactusFF)
 
-        totalFF(elephantFF)
         currentPetItem = FarmingItems.ELEPHANT.getItem().getPetItem().toString()
+
+        when (FFGuideGUI.currentPet) {
+            0 -> totalFF(elephantFF)
+            1 -> totalFF(mooshroomFF)
+            2 -> totalFF(rabbitFF)
+        }
     }
 
     private fun getEquipmentFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
+        println("${item.getInternalName()}: Base FF: ${FarmingFortuneDisplay.itemBaseFortune}")
         out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
         out[FFTypes.GREEN_THUMB] = FarmingFortuneDisplay.greenThumbFortune
         out[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
@@ -111,7 +117,6 @@ object FFStats {
         out[FFTypes.TOTAL] = out.values.sum()
     }
 
-    //todo mooshroom cow perk
     private fun getPetFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
         val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
         out[FFTypes.TOTAL] = 0.0
@@ -185,10 +190,17 @@ object FFStats {
 
     private fun getPetFF (pet: ItemStack): Double {
         val petLevel = pet.getPetLevel()
-        return if (pet.getInternalName().contains("ELEPHANT;4")) {
-            1.8 * petLevel
-        } else if (pet.getInternalName().contains("MOOSHROOM")) {
-            (10 + petLevel).toDouble()
-        } else 0.0
+        val strength = (GardenAPI.config?.fortune?.farmingStrength)
+        if (strength != null) {
+            return if (pet.getInternalName().contains("ELEPHANT;4")) {
+                1.8 * petLevel
+            } else if (pet.getInternalName().contains("MOOSHROOM_COW;4")) {
+                println("doing cow calc: ${(10 + petLevel).toDouble() + strength / (40 - petLevel * .2)}ff")
+                (10 + petLevel).toDouble() + strength / (40 - petLevel * .2)
+            } else if (pet.getInternalName().contains("MOOSHROOM")) {
+                (10 + petLevel).toDouble()
+            } else 0.0
+        }
+        return 0.0
     }
 }

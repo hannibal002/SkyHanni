@@ -824,7 +824,7 @@ object RenderUtils {
         RenderHelper.disableStandardItemLighting()
     }
 
-    // TODO NEU credit
+    // Code taken and edited from NEU
     private fun drawTooltip(
         textLines: List<String>,
         mouseX: Int,
@@ -905,7 +905,7 @@ object RenderUtils {
 
     fun renderItemAndTip(item: ItemStack?, x: Int, y: Int, mouseX: Int, mouseY: Int, color: Int = 0xFF43464B.toInt()) {
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
-        if (item?.displayName != "Painting" && item != null) {
+        if (item != null) {
             renderItemStack(item, x, y)
             if (isPointInRect(mouseX, mouseY, x, y, 16, 16)) {
                 val tt: List<String> = item.getTooltip(Minecraft.getMinecraft().thePlayer, false)

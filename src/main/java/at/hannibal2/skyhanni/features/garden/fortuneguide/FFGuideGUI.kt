@@ -192,7 +192,7 @@ open class FFGuideGUI : GuiScreen() {
             }
         }
 
-        RenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 335, guiTop + 160)
+        RenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
 
         pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)
 

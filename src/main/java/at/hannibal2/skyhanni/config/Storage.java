@@ -165,6 +165,9 @@ public class Storage {
                 public int anitaUpgrade = -1;
 
                 @Expose
+                public int farmingStrength = -1;
+
+                @Expose
                 public int farmingLevel = -1;
 
                 @Expose

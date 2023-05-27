@@ -1,35 +1,28 @@
 todo list for this display
 
-Deal with mushroom cow and strength
 Deal with pets leveling up
 
 Change lore on equipment to reflect visitors served
 
 GUI:
-Wrapping tooltip text to left when its near the right edge of screen
 Add a border around the edge of the display
 - If not too hard, wrap it around the selected button as well like neu - low priority
 Remove the text saying dyed at the top of leather armor descriptions
 Shorten the description on ranchers boots
-Remove click to summon and active from pets
 
 !!!!
 Buges:
 Major:
-When opening the gui, uses elephant stats instead of selected pet
-Tool reforge fortune even though no tool saved
 Sometimes the ff breakdown for equipment and armor does not work in the gui?
     - fixes by holding shift over an item in the inventory then going back into the gui
 If they sell their equipment or pets, they will be saved until a new one is bought and their stats counted : fix, don't liquidize your stuff lol
 - can fix pets, equipment is more difficult
 Minor:
-Update strength when the command is run
 Taking off or putting equipment on inside the menu won't update it until you reopen the inventory
     - also if they sell the piece of equipment, it will always think they still have it
 !!!!
 
 Add:
 Daedalus axe for mushroom and cocoa??
-Work out when to save strength.
 Save selected pet to config
     - use the already saved one

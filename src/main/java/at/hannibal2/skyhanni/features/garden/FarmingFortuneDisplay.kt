@@ -149,7 +149,7 @@ class FarmingFortuneDisplay {
 
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
         private val tooltipFortunePattern =
-            "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
+            "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
         private val armorAbilityPattern = "§6Tiered Bonus: (?<abilityName>.*) [(](?<pieces>.*)/4[)]".toPattern() //todo later
 
         var displayedFortune = 0.0
@@ -159,6 +159,9 @@ class FarmingFortuneDisplay {
 
         fun getToolFortune(tool: ItemStack?): Double {
             val internalName = tool?.getInternalName() ?: return 0.0
+            if (internalName == "THEORETICAL_HOE") {
+                return 0.0
+            }
             return if (internalName.startsWith("THEORETICAL_HOE")) {
                 listOf(10.0, 25.0, 50.0)[internalName.last().digitToInt() - 1]
             } else when (internalName) {
@@ -225,11 +228,15 @@ class FarmingFortuneDisplay {
         }
 
         fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
+            displayedFortune = 0.0
+            reforgeFortune = 0.0
+            itemBaseFortune = 0.0
+            greenThumbFortune = 0.0
             for (line in tool?.getLore()!!) {
                 val match = tooltipFortunePattern.matchEntire(line)?.groups
                 if (match != null) {
                     displayedFortune = match[1]!!.value.toDouble()
-                    reforgeFortune = match[2]!!.value.toDouble()
+                    reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
 
                     itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
                     else displayedFortune - reforgeFortune - enchantmentFortune

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -25,7 +26,9 @@ class CaptureFarmingGear {
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
     private val anitaMenuPattern = "You have: [+](?<level>.*)%".toPattern()
 
+
     companion object {
+        private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
         private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM") // not adding any more armor, unless requested
         private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "PUMPKIN_BOOTS")
         private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
@@ -64,8 +67,12 @@ class CaptureFarmingGear {
                     farmingItems[FarmingItems.BOOTS] = armor
                 }
             }
+            for (line in TabListData.getTabList()) {
+                strengthPattern.matchMatcher(line) {
+                    GardenAPI.config?.fortune?.farmingStrength = group("strength").toInt()
+                }
+            }
         }
-
     }
 
     @SubscribeEvent

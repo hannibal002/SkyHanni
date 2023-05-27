@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 class OverviewPage: FFGuideGUI.FFGuidePage() {
@@ -148,13 +147,9 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
                 else -> FFStats.rabbitFF
             }
 
-            //todo change based on cow
             RenderUtils.drawFarmingBar("§2Total Pet Fortune", "§7§2The total fortune from your pet and its item",
-                currentPet[FFTypes.TOTAL] ?: 0, 240, FFGuideGUI.guiLeft + 135,
+                currentPet[FFTypes.TOTAL] ?: 0, 240, FFGuideGUI.guiLeft + 105,
                 FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-            //todo
-//            RenderUtils.drawFarmingBar("§2Mooshroom Strength FF", "§7§2The fortune from mooshroom cow\n§2due to your strength", 0, 60,
-//                FFGuideGUI.guiLeft + 50, FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             line = when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> "§7§2The fortune from your pet's item\n§2Grants 4☘ per garden level"
@@ -162,9 +157,8 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
                 "MINOS_RELIC" -> "§cGreen Bandana is better than relic!"
                 else -> "No fortune boosting pet item"
             }
-            RenderUtils.drawFarmingBar("§2Pet Item", line, currentPet[FFTypes.PET_ITEM] ?: 0, 60, FFGuideGUI.guiLeft + 220,
+            RenderUtils.drawFarmingBar("§2Pet Item", line, currentPet[FFTypes.PET_ITEM] ?: 0, 60, FFGuideGUI.guiLeft + 185,
                 FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
-
 
             val equipmentItem = when (currentEquipment) {
                 1 -> FarmingItems.NECKLACE

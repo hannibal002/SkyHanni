@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -18,7 +19,7 @@ import kotlin.math.roundToInt
 class ToolTooltipTweaks {
     private val config get() = SkyHanniMod.feature.garden
     private val tooltipFortunePattern =
-        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
+        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
     private val statFormatter = DecimalFormat("0.##")
@@ -94,7 +95,7 @@ class ToolTooltipTweaks {
                 }
             }
             // Beware, dubious control flow beyond these lines
-            if (config.compactToolTooltips) {
+            if (config.compactToolTooltips || FFGuideGUI.isInGui()) {
                 if (line.startsWith("§5§o§7§8Bonus ")) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
                     iterator.remove()
@@ -114,6 +115,12 @@ class ToolTooltipTweaks {
                     removingReforgeDescription = !reforgeEndLine.contains(line)
                 }
                 if (line == "§5§o§9Bountiful Bonus") removingReforgeDescription = true
+
+                if (FFGuideGUI.isInGui()) {
+                    if (line.contains("Click to ") || line.contains("§7§8This item can be reforged!") || line.contains("Dyed")) {
+                        iterator.remove()
+                    }
+                }
             }
         }
 
