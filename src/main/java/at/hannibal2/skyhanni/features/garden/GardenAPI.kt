@@ -205,7 +205,6 @@ object GardenAPI {
             }
             tier++
         }
-
         return tier
     }
 

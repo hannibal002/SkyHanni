@@ -150,7 +150,7 @@ class FarmingFortuneDisplay {
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
         private val tooltipFortunePattern =
             "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
-        private val armorAbilityPattern = "§6Tiered Bonus: (?<abilityName>.*) [(](?<pieces>.*)/4[)]".toPattern() //todo later
+        private val armorAbilityPattern = "§6Tiered Bonus: .* [(](?<pieces>.*)/4[)]".toPattern()
 
         var displayedFortune = 0.0
         var reforgeFortune = 0.0
@@ -208,7 +208,8 @@ class FarmingFortuneDisplay {
 
         fun getAbilityFortune(tool: ItemStack?):  Double  {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
-            val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()// has not been tested on melon or cropie, but from wiki this should work
+            // todo confirm it works on Melon and Cropie armor
+            val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()
             var pieces = 0.0
             for (line in tool?.getLore()!!) {
                 if (tool.getInternalName().contains("LOTUS")) {

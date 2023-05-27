@@ -29,7 +29,6 @@ public class Storage {
 
         @Expose
         public Integer gardenCommunityUpgrade = -1;
-
     }
 
     public static class ProfileSpecific {

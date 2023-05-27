@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 
 //todo Daedalus axe
-//todo add mooshroom cow pet
 class MushroomPage: FFGuideGUI.FFGuidePage() {
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (FFGuideGUI.breakdownMode) {

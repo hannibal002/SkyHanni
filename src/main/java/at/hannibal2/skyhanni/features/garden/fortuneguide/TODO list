@@ -6,9 +6,7 @@ Change lore on equipment to reflect visitors served
 
 GUI:
 Add a border around the edge of the display
-- If not too hard, wrap it around the selected button as well like neu - low priority
-Remove the text saying dyed at the top of leather armor descriptions
-Shorten the description on ranchers boots
+Make this adjust based on the selected page
 
 !!!!
 Buges:

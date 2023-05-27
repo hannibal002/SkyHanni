@@ -1022,7 +1022,7 @@ public class Garden {
     @Expose
     @ConfigOption(
             name = "FF Display",
-            desc = "Displays the current crop's true farming fortune, including crop-specific bonuses."
+            desc = "Displays the true farming fortune for the current crop, including all crop-specific and hidden bonuses."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 22)

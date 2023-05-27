@@ -29,8 +29,8 @@ class CaptureFarmingGear {
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
-        private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM") // not adding any more armor, unless requested
-        private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "PUMPKIN_BOOTS")
+        private val farmingSets = arrayListOf("FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
+            "RANCHERS", "FARMER", "RABBIT")
         private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
 
         fun captureFarmingGear() {
@@ -45,7 +45,8 @@ class CaptureFarmingGear {
             val currentCrop = itemStack.getCropType()
 
             if (currentCrop == null) {
-                // could save a generic tool here e.g. If they don't have a wheat hoe, use advanced garden hoe or rookie hoe
+                //todo generic tool as fallback item
+                //todo Daedalus axe
             } else {
                 for (item in FarmingItems.values()) {
                     if (item.name == currentCrop.name) {
@@ -62,9 +63,6 @@ class CaptureFarmingGear {
                             farmingItems[item] = armor
                         }
                     }
-                }
-                if (armor.getInternalName() in farmingBoots) {
-                    farmingItems[FarmingItems.BOOTS] = armor
                 }
             }
             for (line in TabListData.getTabList()) {
@@ -98,7 +96,7 @@ class CaptureFarmingGear {
             }
         }
         if (event.inventoryName.contains("Pets")) {
-            // should only save the highest rarity pet, if they have more than 1 leg, they can remove 1 from menu
+            // If they have 2 of same pet, one will be overwritten
             farmingItems[FarmingItems.ELEPHANT] = FFGuideGUI.getFallbackItem(FarmingItems.ELEPHANT)
             farmingItems[FarmingItems.MOOSHROOM_COW] = FFGuideGUI.getFallbackItem(FarmingItems.MOOSHROOM_COW)
             farmingItems[FarmingItems.RABBIT] = FFGuideGUI.getFallbackItem(FarmingItems.RABBIT)
@@ -162,7 +160,7 @@ class CaptureFarmingGear {
             var level = -1
             for ((_, item) in event.inventoryItems) {
                 if (item.displayName.contains("Extra Farming Drops")) {
-                    level = 0 // catching when they have not upgraded it before
+                    level = 0
                     for (line in item.getLore()) {
                         anitaMenuPattern.matchMatcher(line.removeColor()) {
                             level = group("level").toInt() / 2
@@ -178,6 +176,7 @@ class CaptureFarmingGear {
         }
     }
 
+    //todo pet level up
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return

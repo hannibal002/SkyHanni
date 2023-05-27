@@ -22,6 +22,9 @@ class ToolTooltipTweaks {
         "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
+    private val abilityDescriptionStart = "§5§o§7These boots gain §a+2❈ Defense"
+    private val abilityDescriptionEnd = "§5§o§7Skill level."
+
     private val statFormatter = DecimalFormat("0.##")
 
     @SubscribeEvent
@@ -51,6 +54,7 @@ class ToolTooltipTweaks {
         var removingFarmhandDescription = false
         var removingCounterDescription = false
         var removingReforgeDescription = false
+        var removingAbilityDescription = false
 
         for (line in iterator) {
             val match = tooltipFortunePattern.matchEntire(line)?.groups
@@ -119,6 +123,16 @@ class ToolTooltipTweaks {
                 if (FFGuideGUI.isInGui()) {
                     if (line.contains("Click to ") || line.contains("§7§8This item can be reforged!") || line.contains("Dyed")) {
                         iterator.remove()
+                    }
+
+                    if (line == abilityDescriptionStart) {
+                        removingAbilityDescription = true
+                    }
+                    if (removingAbilityDescription) {
+                        iterator.remove()
+                        if (line == abilityDescriptionEnd) {
+                            removingAbilityDescription = false
+                        }
                     }
                 }
             }

@@ -11,15 +11,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 class OverviewPage: FFGuideGUI.FFGuidePage() {
-    private val del = "TODO"
     private var equipmentFF = mutableMapOf<FFTypes, Double>()
     private var armorFF = mutableMapOf<FFTypes, Double>()
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //todo migrate
+        //todo migrate to stats page
         val timeUntilCakes = TimeUtils.formatDuration(FFGuideGUI.cakeBuffTime - System.currentTimeMillis())
 
-        //todo change based on pet, later
+        //todo change based on pet
         if (FFGuideGUI.breakdownMode) {
             RenderUtils.drawFarmingBar("§6Universal Farming Fortune", "§7§2Farming fortune in that is\n" +
                     "§2applied to every crop", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1250, FFGuideGUI.guiLeft + 15,

@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import net.minecraft.item.ItemStack
 
 object FFStats {
-    private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "PUMPKIN_BOOTS")
+    private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
     val necklaceFF = mutableMapOf<FFTypes, Double>()
     val cloakFF = mutableMapOf<FFTypes, Double>()
     val beltFF = mutableMapOf<FFTypes, Double>()
@@ -71,7 +71,6 @@ object FFStats {
 
         usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName() in farmingBoots
 
-
         getPetFFData(FarmingItems.ELEPHANT.getItem(), elephantFF)
         getPetFFData(FarmingItems.MOOSHROOM_COW.getItem(), mooshroomFF)
         getPetFFData(FarmingItems.RABBIT.getItem(), rabbitFF)
@@ -101,7 +100,6 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
-        println("${item.getInternalName()}: Base FF: ${FarmingFortuneDisplay.itemBaseFortune}")
         out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
         out[FFTypes.GREEN_THUMB] = FarmingFortuneDisplay.greenThumbFortune
         out[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
