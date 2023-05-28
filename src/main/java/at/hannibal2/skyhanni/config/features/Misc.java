@@ -36,28 +36,26 @@ public class Misc {
     @Expose
     public Position realTimePos = new Position(10, 10, false, true);
 
-    @Expose
     @ConfigOption(name = "Hide Armor", desc = "")
-    @ConfigEditorAccordion(id = 3)
-    public boolean hideArmor = false;
-
+    @Accordion
     @Expose
-    @ConfigOption(name = "Hide Armor", desc = "Hide other players' armor.")
-    @ConfigEditorBoolean()
-    @ConfigAccordionId(id = 3)
-    public Property<Boolean> hideArmorEnabled = Property.of(false);
+    public HideArmor hideArmor2 = new HideArmor();
 
-    @Expose
-    @ConfigOption(name = "Own Armor", desc = "Hide your own armor.")
-    @ConfigEditorBoolean()
-    @ConfigAccordionId(id = 3)
-    public Property<Boolean> hideArmorOwn = Property.of(true);
+    public static class HideArmor {
 
-    @Expose
-    @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
-    @ConfigEditorBoolean()
-    @ConfigAccordionId(id = 3)
-    public Property<Boolean> hideArmorOnlyHelmet = Property.of(false);
+        @Expose
+        @ConfigOption(name = "Mode", desc = "Hide the armor of players.")
+        @ConfigEditorDropdown(values = {"All", "Own Armor", "Other's Armor", "Off"})
+        @ConfigAccordionId(id = 1)
+        public int mode = 3;
+
+        @Expose
+        @ConfigOption(name = "Only Helmet", desc = "Only hide the helmet.")
+        @ConfigEditorBoolean()
+        @ConfigAccordionId(id = 3)
+        public Boolean onlyHelmet = false;
+
+    }
 
     @Expose
     @ConfigOption(name = "Damage Splash", desc = "")
@@ -232,6 +230,12 @@ public class Misc {
     public boolean estimatedIemValueAlwaysEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor in the wardrobe inventory.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean estimatedIemValueArmor = true;
+
+    @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @ConfigOption(name = "Discord Rich Presence", desc = "")
@@ -342,6 +346,45 @@ public class Misc {
         public boolean trapperTalkCooldown = true;
     }
 
+    @ConfigOption(name = "Teleport Pads On Private Island", desc = "")
+    @Accordion
+    @Expose
+    public TeleportPad teleportPad = new TeleportPad();
+
+    public static class TeleportPad {
+
+        @Expose
+        @ConfigOption(name = "Compact Name", desc = "Hide the 'Warp to' and 'No Destination' texts over teleport pads.")
+        @ConfigEditorBoolean
+        public boolean compactName = false;
+
+        @Expose
+        @ConfigOption(name = "Inventory Numbers", desc = "Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.")
+        @ConfigEditorBoolean
+        public boolean inventoryNumbers = false;
+    }
+
+    @ConfigOption(name = "City Project", desc = "")
+    @Accordion
+    @Expose
+    public CityProject cityProject = new CityProject();
+
+    public static class CityProject {
+
+        @Expose
+        @ConfigOption(name = "Show Materials", desc = "Show materials needed for contributing to the City Project.")
+        @ConfigEditorBoolean
+        public boolean showMaterials = true;
+
+        @Expose
+        @ConfigOption(name = "Show Ready", desc = "Mark Contributions that are ready to participate.")
+        @ConfigEditorBoolean
+        public boolean showReady = true;
+
+        @Expose
+        public Position pos = new Position(150, 150, false, true);
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
@@ -392,6 +435,16 @@ public class Misc {
 
     @Expose
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
+
+    @Expose
+    @ConfigOption(name = "Pet Candy Used", desc = "Show numbers of pet candies used on a pet.")
+    @ConfigEditorBoolean
+    public boolean petCandyUsed = true;
+
+    @Expose
+    @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
+    @ConfigEditorBoolean
+    public boolean serverRestartTitle = true;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

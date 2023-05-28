@@ -145,6 +145,9 @@ public class Storage {
                 @Expose
                 public Map<VisitorReward, Integer> rewardsCount = new HashMap<>();
             }
+
+            @Expose
+            public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
         }
 
     }

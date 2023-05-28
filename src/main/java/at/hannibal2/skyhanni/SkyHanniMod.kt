@@ -26,10 +26,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
-import at.hannibal2.skyhanni.features.garden.contest.JacobContestFFNeededDisplay
-import at.hannibal2.skyhanni.features.garden.contest.JacobContestTimeNeeded
-import at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory
+import at.hannibal2.skyhanni.features.garden.contest.*
 import at.hannibal2.skyhanni.features.garden.farming.*
 import at.hannibal2.skyhanni.features.garden.inventory.*
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
@@ -43,6 +40,10 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
+import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
@@ -93,7 +94,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.5",
+    version = "0.18.Beta.10",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -244,19 +245,20 @@ class SkyHanniMod {
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
         loadModule(GardenVisitorColorNames())
-        loadModule(GardenTeleportPadCompactName())
+        loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
         loadModule(ComposterDisplay())
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())
         loadModule(PasteIntoSigns())
-        loadModule(EstimatedItemValue())
+        loadModule(EstimatedItemValue)
+        loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
         loadModule(FarmingFortuneDisplay())
         loadModule(ToolTooltipTweaks())
         loadModule(CropSpeedMeter())
         loadModule(AshfangMinisNametagHider())
-        loadModule(GardenTeleportPadInventoryNumber())
+        loadModule(TeleportPadInventoryNumber())
         loadModule(ComposterOverlay())
         loadModule(DiscordRPCManager)
         loadModule(GardenCropMilestoneFix())
@@ -264,16 +266,20 @@ class SkyHanniMod {
         loadModule(WildStrawberryDyeNotification())
         loadModule(JacobContestFFNeededDisplay())
         loadModule(JacobContestTimeNeeded())
+        loadModule(JacobContestStatsSummary())
         loadModule(GardenYawAndPitch())
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
-        loadModule(GardenRecentTeleportPadsDisplay())
         loadModule(InquisitorWaypointShare)
         loadModule(TrevorFeatures())
         loadModule(TrevorSolver)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
         loadModule(SackDisplay())
+        loadModule(GardenStartLocation)
+        loadModule(PetCandyUsedDisplay())
+        loadModule(ServerRestartTitle())
+        loadModule(CityProjectFeatures())
 
         init()
 

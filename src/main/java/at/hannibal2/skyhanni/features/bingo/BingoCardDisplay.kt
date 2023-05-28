@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.bingo.card.CommunityGoal
 import at.hannibal2.skyhanni.features.bingo.card.PersonalGoal
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -123,8 +124,7 @@ class BingoCardDisplay {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
-        val stack = Minecraft.getMinecraft().thePlayer.heldItem //TODO into ItemUtils or InventoryUtils
-        if (ItemUtils.isSkyBlockMenuItem(stack)) {
+        if (ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
             val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
             if (lastSneak != sneaking) {
                 lastSneak = sneaking

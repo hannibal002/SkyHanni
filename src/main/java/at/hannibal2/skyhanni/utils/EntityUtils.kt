@@ -8,6 +8,8 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.ItemStack
+import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 
 object EntityUtils {
@@ -118,4 +120,10 @@ object EntityUtils {
         if (inventory == null) return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
+
+    fun EntityPlayer.isNPC() = uniqueID == null || uniqueID.version() != 4
+
+    fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
+
+    fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? = if (this is EntityPlayer) inventory.armorInventory else null
 }

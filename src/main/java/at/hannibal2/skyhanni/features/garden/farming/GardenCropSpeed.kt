@@ -59,7 +59,6 @@ object GardenCropSpeed {
 
     @SubscribeEvent
     fun onBlockClick(event: CropClickEvent) {
-        if (!GardenAPI.inGarden()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         lastBrokenCrop = event.crop

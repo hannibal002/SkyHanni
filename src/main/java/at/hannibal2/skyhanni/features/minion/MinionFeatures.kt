@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
@@ -41,7 +41,7 @@ class MinionFeatures {
     private var lastMinionOpened = 0L
     private var minionInventoryOpen = false
 
-    private var lastCoinsRecived = 0L
+    private var lastInventoryClosed = 0L
     private var lastMinionPickedUp = 0L
     private var coinsPerDay = ""
     private val minionUpgradePattern = "§aYou have upgraded your Minion to Tier (?<tier>.*)".toPattern()
@@ -123,18 +123,17 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!minionInventoryOpen) return
         val minions = minions ?: return
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
+        coinsPerDay = ""
+        lastInventoryClosed = System.currentTimeMillis()
 
         val location = lastMinion ?: return
 
-        if (System.currentTimeMillis() - lastCoinsRecived < 2_000) {
-            minions[location]!!.lastClicked = System.currentTimeMillis()
-        }
         if (location !in minions) {
             minions[location]!!.lastClicked = 0
         }
@@ -147,6 +146,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
+        if (coinsPerDay != "") return
 
         if (Minecraft.getMinecraft().currentScreen is GuiChest) {
             if (config.hopperProfitDisplay) {
@@ -171,15 +171,13 @@ class MinionFeatures {
         val stack = slot.stack
         val line = stack.getLore().find { it.contains("Held Coins") } ?: return ""
 
-        if (coinsPerDay != "") return coinsPerDay
-
         val duration = minions?.get(loc)?.let {
             val lastClicked = it.lastClicked
             if (lastClicked == 0L) {
-                return "Can't calculate coins/day: No time data available!"
+                return "§cCan't calculate coins/day: No time data available!"
             }
             System.currentTimeMillis() - lastClicked
-        } ?: return "Can't calculate coins/day: No time data available!"
+        } ?: return "§cCan't calculate coins/day: No time data available!"
 
         //§7Held Coins: §b151,389
         val coins = line.split(": §b")[1].replace(",", "").toDouble()
@@ -206,7 +204,12 @@ class MinionFeatures {
 
         val message = event.message
         if (message.matchRegex("§aYou received §r§6(.*) coins§r§a!")) {
-            lastCoinsRecived = System.currentTimeMillis()
+            if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+                minions?.get(lastMinion)?.let {
+                    it.lastClicked = System.currentTimeMillis()
+                }
+            }
+
         }
         if (message.startsWith("§aYou picked up a minion!")) {
             lastMinionPickedUp = System.currentTimeMillis()
@@ -277,6 +280,9 @@ class MinionFeatures {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!minionInventoryOpen) return
+
         if (config.hopperProfitDisplay) {
             config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }

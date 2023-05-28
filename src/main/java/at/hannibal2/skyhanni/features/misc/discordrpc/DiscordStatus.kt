@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -85,12 +86,9 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     ITEM({
-        val player: net.minecraft.client.entity.EntityPlayerSP = net.minecraft.client.Minecraft.getMinecraft().thePlayer
-        if (player.heldItem != null) {
-            String.format("Holding ${player.heldItem.displayName.removeColor()}")
-        } else {
-            "No item in hand"
-        }
+        InventoryUtils.getItemInHand()?.let {
+            String.format("Holding ${it.displayName.removeColor()}")
+        } ?: "No item in hand"
     }),
 
     TIME({
@@ -162,8 +160,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     CROP_MILESTONES({
-        val item = net.minecraft.client.Minecraft.getMinecraft().thePlayer.heldItem
-        val crop = item.getCropType()
+        val crop = InventoryUtils.getItemInHand()?.getCropType()
         val cropCounter = crop?.getCounter()
         val tier = cropCounter?.let { getTierForCrops(it) }
 

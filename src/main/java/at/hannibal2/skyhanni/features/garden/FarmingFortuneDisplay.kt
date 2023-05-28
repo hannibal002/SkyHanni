@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -148,6 +149,11 @@ class FarmingFortuneDisplay {
 
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
 
+        var displayedFortune = 0.0
+        var reforgeFortune = 0.0
+        var itemBaseFortune = 0.0
+        var greenThumbFortune = 0.0
+
         fun getToolFortune(tool: ItemStack?): Double {
             val internalName = tool?.getInternalName() ?: return 0.0
             return if (internalName.startsWith("THEORETICAL_HOE")) {
@@ -188,6 +194,34 @@ class FarmingFortuneDisplay {
                 cropType?.getCounter() ?: 0
             )
             return dedicationMultiplier * cropMilestone
+        }
+
+        fun getSunderFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5 }
+        fun getHarvestingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5 }
+        fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0).toDouble()}
+
+        fun getAbilityFortune(tool: ItemStack?):  Double  { // add armor ability stuff here
+            val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
+            if (tool?.getInternalName()?.contains("LOTUS") == true) {
+                for (line in tool.getLore()) {
+                    lotusAbilityPattern.matchMatcher(line) {
+                        return group("bonus").toDouble()
+                    }
+                }
+            }
+            return 0.0
+        }
+
+        fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double, match: MatchGroupCollection) {
+            displayedFortune = match[1]!!.value.toDouble()
+            reforgeFortune = match[2]!!.value.toDouble()
+            if (tool != null) {
+                itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
+                else displayedFortune - reforgeFortune - enchantmentFortune
+                greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
+                    displayedFortune - reforgeFortune - itemBaseFortune
+                } else 0.0
+            }
         }
 
         fun getCurrentFarmingFortune(alwaysBaseFortune: Boolean = false): Double {

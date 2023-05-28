@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 
 object SkyBlockItemModifierUtils {
@@ -16,12 +18,21 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
     fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
-        it - 5 - if (getInternalName() == "STONK_PICKAXE") 1 else 0
+        it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
+
+    private fun ItemStack.getBaseSilexCount() = when (getInternalName()) {
+        "STONK_PICKAXE" -> 1
+        "PROMISING_SPADE" -> 5
+
+        else -> 0
+    }
 
     fun ItemStack.getTransmissionTunerCount() = getAttributeInt("tuned_transmission")
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
+
+    fun ItemStack.getPetCandyUsed() = ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)?.get("candyUsed")?.asInt
 
     fun ItemStack.getMasterStars(): Int {
         val stars = mapOf(

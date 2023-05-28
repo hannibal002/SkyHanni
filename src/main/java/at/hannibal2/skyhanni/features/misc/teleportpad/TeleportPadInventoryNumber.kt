@@ -1,14 +1,15 @@
-package at.hannibal2.skyhanni.features.garden.inventory
+package at.hannibal2.skyhanni.features.misc.teleportpad
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenTeleportPadInventoryNumber {
+class TeleportPadInventoryNumber {
     private val numbers: Map<String, Int> by lazy {
         val baseNumber = mapOf(
             "one" to 1,
@@ -63,12 +64,12 @@ class GardenTeleportPadInventoryNumber {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inTeleportPad =
-            event.inventoryName == "Set Destination" && SkyHanniMod.feature.garden.teleportPadsInventoryNumbers
+            event.inventoryName == "Set Destination" && SkyHanniMod.feature.misc.teleportPad.inventoryNumbers
     }
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (!inTeleportPad) return
 
         val name = event.stack.name?.lowercase() ?: return
