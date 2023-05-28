@@ -34,9 +34,12 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
-    fun ItemStack.getPetCandyUsed() = ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)?.get("candyUsed")?.asInt
+    fun ItemStack.getPetCandyUsed() = getPetInfo()?.get("candyUsed")?.asInt
 
-    fun ItemStack.getPetItem() = ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)?.get("heldItem")?.asString
+    fun ItemStack.getPetItem() = getPetInfo()?.get("heldItem")?.asString
+
+    private fun ItemStack.getPetInfo() =
+        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
 
     fun ItemStack.getPetLevel(): Int {
         petLevelPattern.matchMatcher(this.displayName) {
