@@ -139,6 +139,31 @@ public class Garden {
     public boolean visitorExperiencePrice = false;
 
     @Expose
+    @ConfigOption(name = "Visitor Reward Warning", desc = "")
+    @ConfigAccordionId(id = 1)
+    @Accordion
+    public VisitorRewardWarning visitorRewardWarning = new VisitorRewardWarning();
+
+    public static class VisitorRewardWarning {
+
+        @Expose
+        @ConfigOption(name = "Notify in Chat", desc = "Send a Chat message once you talk to a visitor with reward.")
+        @ConfigEditorBoolean
+        public boolean notifyInChat = true;
+
+        @Expose
+        @ConfigOption(name = "Show over Name", desc = "Show the reward name above the visitor name.")
+        @ConfigEditorBoolean
+        public boolean showOverName = true;
+
+        @Expose
+        @ConfigOption(name = "Prevent Refusing", desc = "Prevent the refusal of a visitor with reward.")
+        @ConfigEditorBoolean
+        public boolean preventRefusing = true;
+
+    }
+
+    @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
@@ -173,7 +198,6 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean visitorHideChat = true;
-
 
     @Expose
     @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")

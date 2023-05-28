@@ -27,6 +27,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -101,6 +102,16 @@ class GardenVisitorFeatures {
             val internalName = NEUItems.getInternalName(itemName)
             visitor.items[internalName] = amount
         }
+
+        readReward(offerItem)?.let {
+            if (visitor.reward == it) return@let
+
+            visitor.reward = it
+            if (config.visitorRewardWarning.notifyInChat) {
+                LorenzUtils.chat("§e[SkyHanni] Fount Visitor Reward ${it.displayName}§e!")
+            }
+        }
+
         if (visitor.status == VisitorStatus.NEW) {
             val alreadyReady = event.inventoryItems[29]?.getLore()?.any { it == "§eClick to give!" } == true
             if (alreadyReady) {
@@ -113,6 +124,17 @@ class GardenVisitorFeatures {
             }
             update()
         }
+    }
+
+    private fun readReward(offerItem: ItemStack): VisitorReward? {
+        for (line in offerItem.getLore()) {
+            for (reward in VisitorReward.values()) {
+                if (line.contains(reward.displayName)) {
+                    return reward
+                }
+            }
+        }
+        return null
     }
 
     private fun updateDisplay() {
@@ -227,6 +249,16 @@ class GardenVisitorFeatures {
 
         if (event.slotId == 33) {
             if (event.slot.stack?.name != "§cRefuse Offer") return
+
+            visitor.reward?.let {
+                if (config.visitorRewardWarning.preventRefusing) {
+                    event.isCanceled = true
+                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    Minecraft.getMinecraft().thePlayer.closeScreen()
+                    return
+                }
+            }
+
             changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             update()
             GardenVisitorDropStatistics.deniedVisitors += 1
@@ -270,6 +302,12 @@ class GardenVisitorFeatures {
                 if (it.distanceToPlayer() < 15) {
                     val text = visitor.status.displayName
                     event.drawString(it.add(0.0, 2.23, 0.0), text)
+                    if (config.visitorRewardWarning.showOverName) {
+                        visitor.reward?.let { reward ->
+                            val name = reward.displayName
+                            event.drawString(it.add(0.0, 2.73, 0.0), "§c!$name§c!")
+                        }
+                    }
                 }
             }
         }
@@ -329,7 +367,7 @@ class GardenVisitorFeatures {
                             val cropAmount = multiplier.second.toLong() * amount
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
                             val formatName = "§e$formatAmount§7x ${it.cropName} "
-                            val formatSpeed =  it.getSpeed()?.let { speed ->
+                            val formatSpeed = it.getSpeed()?.let { speed ->
                                 val missingTimeSeconds = cropAmount / speed
                                 val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
                                 "in §b$duration"
@@ -488,12 +526,12 @@ class GardenVisitorFeatures {
     }
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
-         val name = group("name")
-         if (name == "Spaceman") return false
-         if (name == "Beth") return false
+        val name = group("name")
+        if (name == "Spaceman") return false
+        if (name == "Beth") return false
 
-         return visitors.keys.any { it.removeColor() == name }
-     } ?: false
+        return visitors.keys.any { it.removeColor() == name }
+    } ?: false
 
     private fun update() {
         checkVisitorsReady()
@@ -659,6 +697,7 @@ class GardenVisitorFeatures {
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
         var inSacks: Boolean = false,
+        var reward: VisitorReward? = null,
         val items: MutableMap<String, Int> = mutableMapOf(),
     ) {
         fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
