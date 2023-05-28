@@ -1151,7 +1151,7 @@ public class Garden {
         @ConfigOption(name = "Hard Reset", desc = "Reset every slot to it's original item.")
         @ConfigEditorButton
         public Runnable hardReset = () -> {
-            GardenPlotIcon.Companion.setHardReset(true);
+            GardenPlotIcon.INSTANCE.setHardReset(true);
             LorenzUtils.INSTANCE.sendCommandToServer("desk");
         };
     }

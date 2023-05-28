@@ -280,7 +280,7 @@ class SkyHanniMod {
         loadModule(PetCandyUsedDisplay())
         loadModule(ServerRestartTitle())
         loadModule(CityProjectFeatures())
-        loadModule(GardenPlotIcon())
+        loadModule(GardenPlotIcon)
 
         init()
 

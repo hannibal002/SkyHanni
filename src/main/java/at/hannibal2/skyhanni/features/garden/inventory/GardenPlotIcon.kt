@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
@@ -19,25 +21,32 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenPlotIcon {
+object GardenPlotIcon {
 
     private val config get() = SkyHanniMod.feature.garden.plotIcon
+    private val plotList get() = GardenAPI.config?.plotIcon?.plotList
     private var showItem = false
     private var copyStack: ItemStack? = null
     private var editMode = 0 // 0 = off, 1 = on, 2 = reset
     private var lastClickedSlotId = -1
     private var originalStack = mutableMapOf<Int, ItemStack>()
+    private var cachedStack = mutableMapOf<Int, ItemStack>()
+    private val editStack = ItemStack(Items.wooden_axe)
 
-    companion object {
-        var hardReset = false
-        private val plotList get() = GardenAPI.config?.plotIcon?.plotList
-    }
+    var hardReset = false
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         for ((index, stack) in event.inventoryItems) {
             originalStack[index] = stack
         }
+        for ((index, internalName) in plotList!!) {
+            val old = originalStack[index]!!
+            val new = NEUItems.getItemStack(internalName)
+            cachedStack[index] = Utils.editItemStackInfo(new, old.displayName, true, *old.getLore().toTypedArray())
+        }
+
         showItem = GardenAPI.inGarden() && event.inventoryName == "Configure Plots"
     }
 
@@ -49,10 +58,10 @@ class GardenPlotIcon {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun replaceItem(event: ReplaceItemEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!showItem) return
-        val plotList = GardenPlotIcon.plotList ?: return
-
+        val plotList = plotList ?: return
         if (hardReset) {
             plotList.clear()
             hardReset = false
@@ -61,90 +70,88 @@ class GardenPlotIcon {
 
         if (event.inventory is ContainerLocalMenu) {
             if (event.slotNumber == 53) {
-                val mode: String = when (editMode) {
-                    0 -> "§cOFF"
-                    1 -> "§aON"
-                    2 -> "§9RESET"
-                    else -> ""
-                }
-                event.replaceWith(Utils.createItemStack(ItemStack(Items.wooden_axe).item, "§6Edit Mode [$mode§6]", "", "§bSwitch Edit Mode"))
+                event.replaceWith(editStack)
             }
-
             if (plotList.isNotEmpty() && plotList.contains(event.slotNumber)) {
-                val old = originalStack[event.slotNumber] ?: return
-                val new = event.slotNumber.getItem() ?: return
-                val name = old.displayName
-                val lore = old.getLore().toTypedArray()
                 if (lastClickedSlotId == event.slotNumber) {
                     lastClickedSlotId = -1
                     return
                 }
-                val replaceStack = Utils.editItemStackInfo(new, name, true, *lore)
-                event.replaceWith(replaceStack)
+                event.replaceWith(cachedStack[event.slotNumber])
             }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        val plotList = GardenPlotIcon.plotList ?: return
+        if (!showItem) return
         lastClickedSlotId = event.slotId
-        if (showItem) {
-            if (event.slotId == 53) {
-                event.isCanceled = true
+        if (event.slotId == 53) {
+            event.isCanceled = true
+            if (event.clickedButton == 0) {
                 if (editMode == 2)
                     editMode = 0
                 else
                     editMode++
+            } else if (event.clickedButton == 1) {
+                if (editMode == 0)
+                    editMode = 2
+                else
+                    editMode--
+            }
+            return
+        }
+        if (editMode != 0) {
+            if (event.slotId in 54..89) {
+                event.isCanceled = true
+                if (event.slot.stack == null) return
+                copyStack = event.slot.stack
+                chat("§6§lClick an item in the desk menu to replace it with that item!")
                 return
             }
-            if (editMode != 0) {
-                if (event.slotId in 54..89) {
-                    event.isCanceled = true
-                    if (event.slot.stack == null) return
-                    copyStack = event.slot.stack
-                    chat("§6§lClick an item in the desk menu to replace it with that item!")
+            if (event.slotId != 53) {
+                if (!event.slot.stack.displayName.removeColor().startsWith("Plot")) return
+                event.isCanceled = true
+                if (editMode == 2) {
+                    plotList!!.remove(event.slotId)
                     return
                 }
-                if (event.slotId != 53) {
-                    if (!event.slot.stack.displayName.removeColor().startsWith("Plot")) return
-                    event.isCanceled = true
-                    if (editMode == 2) {
-                        plotList.remove(event.slotId)
-                        return
-                    }
-                    event.slotId.setItem(copyStack)
-                    return
-                }
+                plotList!![event.slotId] = copyStack?.getInternalName()
+                cachedStack[event.slotId] = copyStack!!
+                return
             }
         }
     }
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
-        if (InventoryUtils.openInventoryName() != "Configure Plots" && !showItem) return
-        val plotList = GardenPlotIcon.plotList ?: return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!showItem) return
+        val plotList = plotList ?: return
         val list = event.toolTip
-        val index = event.slot.slotIndex
+        val index = event.slot.slotNumber
+        if (index == 53) {
+            list.clear()
+            list.add("§6Edit Mode")
+            list.add("")
+            list.add("${if (editMode == 0) "§6► " else ""}§cOFF§7: §bNothing change, behave like normal.")
+            list.add("${if (editMode == 1) "§6► " else ""}§aON§7: §bClick an item in your inventory then click again")
+            list.add("${if (editMode == 1) "§6► " else ""}§bin the plot menu to change it to that item.")
+            list.add("${if (editMode == 2) "§6► " else ""}§9RESET§7: §bClick an item in the menu to reset it to default.")
+            list.add("")
+            list.add("§eClick to switch Edit Mode !")
+            list.add("")
+        }
         if (plotList.contains(index)) {
             val stack = originalStack[index] ?: return
-            list[0] = stack.displayName // Needed if using patcher
+            val lore = stack.getLore()
+            list.clear()
+            list.add(0, stack.displayName)
+            for (i in lore.indices) {
+                list.add(i + 1, stack.getLore()[i])
+            }
         }
-    }
-
-    private fun Int.setItem(stack: ItemStack?) {
-        val gardenPlot = GardenAPI.config?.plotIcon ?: return
-        val plotList = gardenPlot.plotList
-        plotList[this] = stack
-        return
-    }
-
-    private fun Int.getItem(): ItemStack? {
-        val gardenPlot = GardenAPI.config?.plotIcon ?: return null
-        val plotList = gardenPlot.plotList
-        plotList[this]?.let { return it }
-        plotList[this] = null
-        return null
     }
 }

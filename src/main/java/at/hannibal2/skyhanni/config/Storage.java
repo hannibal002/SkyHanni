@@ -152,7 +152,7 @@ public class Storage {
             public PlotIcon plotIcon = new PlotIcon();
             public static class PlotIcon {
                 @Expose
-                public Map<Integer, ItemStack> plotList = new HashMap<>();
+                public Map<Integer, String> plotList = new HashMap<>();
             }
 
             @Expose
