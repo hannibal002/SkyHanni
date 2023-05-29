@@ -167,7 +167,7 @@ object GuiRenderUtils {
         }
 
         val filledWidth = (width * barProgress).toInt()
-        val current = DecimalFormat("0.##").format(currentVal.round(2))
+        val current = DecimalFormat("0.##").format(currentVal)
         val progressPercentage = (barProgress * 10000).roundToInt() / 100
         val inverseScale = 1 / textScale
         val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth("$progressPercentage%")
@@ -175,7 +175,7 @@ object GuiRenderUtils {
 
         GlStateManager.scale(textScale, textScale, textScale)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
-        drawString("§2$current / $maxValue☘", xPos * inverseScale, (yPos + 8) * inverseScale)
+        drawString("§2$current / ${DecimalFormat("0.#").format(maxValue)}☘", xPos * inverseScale, (yPos + 8) * inverseScale)
         drawString("§2$progressPercentage%", (xPos + width - textWidth * textScale) * inverseScale, (yPos + 8) * inverseScale)
         GlStateManager.scale(inverseScale, inverseScale, inverseScale)
 

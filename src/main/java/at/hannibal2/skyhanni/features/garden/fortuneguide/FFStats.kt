@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -14,7 +14,15 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import net.minecraft.item.ItemStack
 
 object FFStats {
+    private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
+
+    private val mathCrops = listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
+    private val dicerCrops = listOf(CropType.PUMPKIN, CropType.MELON)
+
     private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
+
+    var cakeExpireTime = 0L
+
     val necklaceFF = mutableMapOf<FFTypes, Double>()
     val cloakFF = mutableMapOf<FFTypes, Double>()
     val beltFF = mutableMapOf<FFTypes, Double>()
@@ -37,18 +45,11 @@ object FFStats {
 
     var totalBaseFF = mutableMapOf<FFTypes, Double>()
 
-    val wheatFF = mutableMapOf<FFTypes, Double>()
-    val carrotFF = mutableMapOf<FFTypes, Double>()
-    val potatoFF = mutableMapOf<FFTypes, Double>()
-    val caneFF = mutableMapOf<FFTypes, Double>()
-    val wartFF = mutableMapOf<FFTypes, Double>()
-    val pumpkinFF = mutableMapOf<FFTypes, Double>()
-    val melonFF = mutableMapOf<FFTypes, Double>()
-    val mushroomFF = mutableMapOf<FFTypes, Double>()
-    val cocoaFF = mutableMapOf<FFTypes, Double>()
-    val cactusFF = mutableMapOf<FFTypes, Double>()
+    val cropPage = mutableMapOf<FortuneStats, Pair<Double, Double>>()
 
     fun loadFFData() {
+        cakeExpireTime =  GardenAPI.config?.fortune?.cakeExpiring ?: -1L
+
         getEquipmentFFData(FarmingItems.NECKLACE.getItem(), necklaceFF)
         getEquipmentFFData(FarmingItems.CLOAK.getItem(), cloakFF)
         getEquipmentFFData(FarmingItems.BELT.getItem(), beltFF)
@@ -76,23 +77,76 @@ object FFStats {
         getPetFFData(FarmingItems.RABBIT.getItem(), rabbitFF)
 
         getGenericFF(baseFF)
-        getToolFF(FarmingItems.WHEAT.getItem(), wheatFF)
-        getToolFF(FarmingItems.CARROT.getItem(), carrotFF)
-        getToolFF(FarmingItems.POTATO.getItem(), potatoFF)
-        getToolFF(FarmingItems.SUGAR_CANE.getItem(), caneFF)
-        getToolFF(FarmingItems.NETHER_WART.getItem(), wartFF)
-        getToolFF(FarmingItems.PUMPKIN.getItem(), pumpkinFF)
-        getToolFF(FarmingItems.MELON.getItem(), melonFF)
-        getToolFF(FarmingItems.MUSHROOM.getItem(), mushroomFF)
-        getToolFF(FarmingItems.COCOA_BEANS.getItem(), cocoaFF)
-        getToolFF(FarmingItems.CACTUS.getItem(), cactusFF)
 
-        currentPetItem = FarmingItems.ELEPHANT.getItem().getPetItem().toString()
+        getTotalFF()
+    }
+    fun getCropStats(crop: CropType, tool: ItemStack) {
+        cropPage.clear()
+        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1250.0)
+        cropPage[FortuneStats.CROP_UPGRADE] = Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
+        cropPage[FortuneStats.ACCESSORY] = Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
+        cropPage[FortuneStats.FFD] = Pair((tool.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
+        cropPage[FortuneStats.TURBO] = Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
+        cropPage[FortuneStats.DEDICATION] = Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 96.0)
+        cropPage[FortuneStats.CULTIVATING] = Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 10.0)
 
-        when (FFGuideGUI.currentPet) {
-            0 -> totalFF(elephantFF)
-            1 -> totalFF(mooshroomFF)
-            2 -> totalFF(rabbitFF)
+        FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
+
+        when (crop) {
+            in mathCrops -> {
+                cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
+                cropPage[FortuneStats.COUNTER] = Pair(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
+                cropPage[FortuneStats.COLLECTION] = Pair(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0)
+                cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
+                if (toolHasBountiful?.get(crop) == true) {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 10.0)
+                } else {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                }
+            }
+            in dicerCrops -> {
+                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 62.5)
+                if (toolHasBountiful?.get(crop) == true) {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 10.0)
+                } else {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                }
+            }
+            CropType.MUSHROOM -> {
+                cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 30.0)
+                cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
+                if (toolHasBountiful?.get(crop) == true) {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 5.0)
+                } else {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 13.0)
+                }
+            }
+            CropType.COCOA_BEANS -> {
+                cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
+                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 62.5)
+                if (toolHasBountiful?.get(crop) == true) {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 7.0)
+                } else {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                }
+            }
+            CropType.CACTUS -> {
+                cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
+                if (toolHasBountiful?.get(crop) == true) {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 7.0)
+                } else {
+                    cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                }
+            }
+            else -> {}
+        }
+
+        cropPage[FortuneStats.CROP_TOTAL] = Pair(
+            cropPage.toList().sumOf { it.second.first },
+            cropPage.toList().sumOf { it.second.second })
+
+        if (tool.getInternalName().contains("DICER")){
+            cropPage[FortuneStats.DICER] = Pair(33.0, 33.0)
         }
     }
 
@@ -136,7 +190,7 @@ object FFStats {
         out[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
         out[FFTypes.PLOTS] = savedStats.plotsUnlocked.toDouble() * 3
         out[FFTypes.ANITA] = savedStats.anitaUpgrade.toDouble() * 2
-        if (savedStats.cakeExpiring - System.currentTimeMillis() > 0 || savedStats.cakeExpiring == -1L) {
+        if (cakeExpireTime - System.currentTimeMillis() > 0 || cakeExpireTime == -1L) {
             out[FFTypes.CAKE] = 5.0
         } else {
             out[FFTypes.CAKE] = 0.0
@@ -144,46 +198,25 @@ object FFStats {
         out[FFTypes.TOTAL] = out.values.sum()
     }
 
-    private fun getToolFF(tool: ItemStack, out: MutableMap<FFTypes, Double>) {
-        out[FFTypes.TOTAL] = 0.0
-        val crop = tool.getCropType()
-
-        val accessoryFortune= crop?.let {
-            CropAccessoryData.cropAccessory?.getFortune(it)
+    fun getTotalFF() {
+        var petList = mutableMapOf<FFTypes, Double>()
+        when (FFGuideGUI.currentPet) {
+            0 -> {
+                petList = elephantFF
+                currentPetItem = FarmingItems.ELEPHANT.getItem().getPetItem().toString()
+            } 1 -> {
+            petList = mooshroomFF
+            currentPetItem = FarmingItems.MOOSHROOM_COW.getItem().getPetItem().toString()
+        } 2 -> {
+            petList = rabbitFF
+            currentPetItem = FarmingItems.RABBIT.getItem().getPetItem().toString()
+        }
         }
 
-        out[FFTypes.CROP_UPGRADE] = (crop?.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0
-        out[FFTypes.ACCESSORY] = accessoryFortune ?: 0.0
-
-        out[FFTypes.BASE] = FarmingFortuneDisplay.getToolFortune(tool)
-        out[FFTypes.COUNTER] = FarmingFortuneDisplay.getCounterFortune(tool)
-        out[FFTypes.COLLECTION] = FarmingFortuneDisplay.getCollectionFortune(tool)
-        out[FFTypes.TURBO] = FarmingFortuneDisplay.getTurboCropFortune(tool, crop)
-        out[FFTypes.DEDICATION] = FarmingFortuneDisplay.getDedicationFortune(tool, crop)
-        out[FFTypes.SUNDER] = FarmingFortuneDisplay.getSunderFortune(tool)
-        out[FFTypes.HARVESTING] = FarmingFortuneDisplay.getHarvestingFortune(tool)
-        out[FFTypes.CULTIVATING] = FarmingFortuneDisplay.getCultivatingFortune(tool)
-        out[FFTypes.FFD] = (tool.getFarmingForDummiesCount() ?: 0).toDouble()
-
-        val enchantmentFortune = out[FFTypes.SUNDER]!! + out[FFTypes.HARVESTING]!! + out[FFTypes.CULTIVATING]!!
-
-        FarmingFortuneDisplay.loadFortuneLineData(tool, enchantmentFortune)
-
-        out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
-
-        out[FFTypes.TOTAL] = out.values.sum()
-    }
-
-    fun totalFF(petList: MutableMap<FFTypes, Double>) {
         totalBaseFF =
             (baseFF.toList() + armorTotalFF.toList() + equipmentTotalFF.toList() + petList.toList()).groupBy({ it.first },
                 { it.second }).map { (key, values) -> key to values.sum() }
                 .toMap() as MutableMap<FFTypes, Double>
-        currentPetItem = when (FFGuideGUI.currentPet) {
-            0 -> FarmingItems.ELEPHANT.getItem().getPetItem().toString()
-            1 -> FarmingItems.MOOSHROOM_COW.getItem().getPetItem().toString()
-            else -> FarmingItems.RABBIT.getItem().getPetItem().toString()
-        }
     }
 
     private fun getPetFF (pet: ItemStack): Double {

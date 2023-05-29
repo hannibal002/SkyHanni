@@ -4,6 +4,11 @@ Indicator when gear stats are outdated
     - Symbol that is like a refresh symbol
     - The following items are outdated: Lotus Belt, Elephant... Please open their menu to update them
 
+Reformat the order of items on crop pages
+Change base ff bar to reflect selected pet and have this update for all other pages as well
+
+Clean up overview page maybe
+
 GUI:
 Add a border around the edge of the display
 Make this adjust based on the selected page

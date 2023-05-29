@@ -15,8 +15,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
     private var armorFF = mutableMapOf<FFTypes, Double>()
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //todo migrate to stats page
-        val timeUntilCakes = TimeUtils.formatDuration(FFGuideGUI.cakeBuffTime - System.currentTimeMillis())
+        val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
         //todo change based on pet
         if (FFGuideGUI.breakdownMode) {
@@ -44,11 +43,11 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             GuiRenderUtils.drawFarmingBar("§2Garden Plots", line, FFStats.baseFF[FFTypes.PLOTS] ?: 0.0, 72, FFGuideGUI.guiLeft + 15,
                 FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-            line = when (FFGuideGUI.cakeBuffTime) {
+            line = when (FFStats.cakeExpireTime) {
                 -1L -> "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
                 else -> "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n§2Time until cake buff runs out: $timeUntilCakes"
             }
-            if (FFGuideGUI.cakeBuffTime - System.currentTimeMillis() < 0 && FFGuideGUI.cakeBuffTime != -1L) {
+            if (FFStats.cakeExpireTime - System.currentTimeMillis() < 0 && FFStats.cakeExpireTime != -1L) {
                 line = "§cYour cake buff has run out\nGo eat some cake!"
             }
             GuiRenderUtils.drawFarmingBar("§2Cake Buff", line, FFStats.baseFF[FFTypes.CAKE] ?: 0.0, 5, FFGuideGUI.guiLeft + 15,
@@ -76,15 +75,13 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             } else if (FFStats.usingSpeedBoots) {
                 when (currentArmor) {
                     1 -> 76.67
-                    2 -> 81.67
-                    3 -> 81.67
+                    2, 3 -> 81.67
                     else -> 85
                 }
             } else {
                 when (currentArmor) {
                     1 -> 78.75
-                    2 -> 83.75
-                    3 -> 83.75
+                    2, 3 -> 83.75
                     else -> 78.75
                 }
             }
@@ -110,17 +107,11 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             value = if (FFStats.usingSpeedBoots) {
                 when (currentArmor) {
                     0 -> 50
-                    1 -> 16.67
-                    2 -> 16.67
-                    3 -> 16.67
-                    else -> 0
+                    else -> 16.67
                 }
             } else {
                 when (currentArmor) {
                     0 -> 75
-                    1 -> 18.75
-                    2 -> 18.75
-                    3 -> 18.75
                     else -> 18.75
                 }
             }
@@ -153,7 +144,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             line = when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> "§7§2The fortune from your pet's item\n§2Grants 4☘ per garden level"
                 "YELLOW_BANDANA" -> "§7§2The fortune from your pet's item"
-                "MINOS_RELIC" -> "§cGreen Bandana is better than relic!"
+                "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
                 else -> "No fortune boosting pet item"
             }
             GuiRenderUtils.drawFarmingBar("§2Pet Item", line, currentPet[FFTypes.PET_ITEM] ?: 0, 60, FFGuideGUI.guiLeft + 185,
