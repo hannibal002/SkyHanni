@@ -1,8 +1,8 @@
 todo list for this display
 
-Deal with pets leveling up
-
-Change lore on equipment to reflect visitors served
+Indicator when gear stats are outdated
+    - Symbol that is like a refresh symbol
+    - The following items are outdated: Lotus Belt, Elephant... Please open their menu to update them
 
 GUI:
 Add a border around the edge of the display
@@ -22,5 +22,4 @@ Taking off or putting equipment on inside the menu won't update it until you reo
 
 Add:
 Daedalus axe for mushroom and cocoa??
-Save selected pet to config
-    - use the already saved one
+Open menu to currently equip pet if possible

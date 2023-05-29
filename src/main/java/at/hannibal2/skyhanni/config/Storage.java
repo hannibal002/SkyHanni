@@ -161,6 +161,9 @@ public class Storage {
             public static class Fortune {
 
                 @Expose
+                public Map<FarmingItems, Boolean> outdatedItems = new HashMap<>();
+
+                @Expose
                 public int anitaUpgrade = -1;
 
                 @Expose

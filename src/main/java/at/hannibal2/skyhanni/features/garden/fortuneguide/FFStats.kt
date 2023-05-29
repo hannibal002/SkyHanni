@@ -193,7 +193,6 @@ object FFStats {
             return if (pet.getInternalName().contains("ELEPHANT;4")) {
                 1.8 * petLevel
             } else if (pet.getInternalName().contains("MOOSHROOM_COW;4")) {
-                println("doing cow calc: ${(10 + petLevel).toDouble() + strength / (40 - petLevel * .2)}ff")
                 (10 + petLevel).toDouble() + strength / (40 - petLevel * .2)
             } else if (pet.getInternalName().contains("MOOSHROOM")) {
                 (10 + petLevel).toDouble()
