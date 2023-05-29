@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -52,7 +52,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     }
 
     private fun renderLabels(hoveredPos: Int) {
-        RenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
+        GuiRenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
 
         var displayPos = -1
         if (clickedPos != -1) {
@@ -66,15 +66,15 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
 
         // When the mouse is not currently hovering over a gui element
         if (displayPos == -1) {
-            RenderUtils.drawStringCentered("§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
-            RenderUtils.drawStringCentered("§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
+            GuiRenderUtils.drawStringCentered("§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
+            GuiRenderUtils.drawStringCentered("§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
             return
         }
 
         val pos = positions[displayPos]
         val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}"
-        RenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
-        RenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
+        GuiRenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
+        GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
     }
 
     private fun renderRectangles(): Int {
@@ -98,7 +98,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             elementHeight = position.getDummySize().y
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
-            if (RenderUtils.isPointInRect(mouseX, mouseY, x - border, y - border, elementWidth + border * 2, elementHeight + border * 2)) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - border, y - border, elementWidth + border * 2, elementHeight + border * 2)) {
                 hoveredPos = index
             }
         }
@@ -124,7 +124,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val x = position.getAbsX()
             val y = position.getAbsY()
             if (!position.clicked) {
-                if (RenderUtils.isPointInRect(mouseX, mouseY, x - border, y - border, elementWidth + border * 2, elementHeight + border * 2)) {
+                if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x - border, y - border, elementWidth + border * 2, elementHeight + border * 2)) {
                     clickedPos = i
                     position.clicked = true
                     grabbedX = mouseX

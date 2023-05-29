@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.*
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -91,96 +90,96 @@ open class FFGuideGUI : GuiScreen() {
 
         if (breakdownMode) {
             if (selectedPage != FortuneGuidePage.OVERVIEW) {
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.ELEPHANT.getItem(), guiLeft + 152, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 0) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 172, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 1) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.RABBIT.getItem(), guiLeft + 192, guiTop + 160, mouseX, mouseY,
                     if (currentPet == 2) 0xFF00FF00.toInt() else 0xFF43464B.toInt()
                 )
 
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.HELMET.getItem(), guiLeft + 162, guiTop + 80, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 100, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.LEGGINGS.getItem(), guiLeft + 162, guiTop + 120, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.BOOTS.getItem(), guiLeft + 162, guiTop + 140, mouseX, mouseY)
 
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.NECKLACE.getItem(), guiLeft + 182, guiTop + 80, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.CLOAK.getItem(), guiLeft + 182, guiTop + 100, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.BELT.getItem(), guiLeft + 182, guiTop + 120, mouseX, mouseY)
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140, mouseX, mouseY)
 
             } else {
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.HELMET.getItem(), guiLeft + 142, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.LEGGINGS.getItem(), guiLeft + 182, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 3) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.BOOTS.getItem(), guiLeft + 202, guiTop + 5, mouseX, mouseY,
                     if (currentArmor == 4) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.NECKLACE.getItem(), guiLeft + 262, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.CLOAK.getItem(), guiLeft + 282, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.BELT.getItem(), guiLeft + 302, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 3) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.BRACELET.getItem(), guiLeft + 322, guiTop + 5, mouseX, mouseY,
                     if (currentEquipment == 4) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.ELEPHANT.getItem(), guiLeft + 152, guiTop + 130, mouseX, mouseY,
                     if (currentPet == 0) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 172, guiTop + 130, mouseX, mouseY,
                     if (currentPet == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
-                RenderUtils.renderItemAndTip(
+                GuiRenderUtils.renderItemAndTip(
                     FarmingItems.RABBIT.getItem(), guiLeft + 192, guiTop + 130, mouseX, mouseY,
                     if (currentPet == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
             }
         }
 
-        RenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
-        RenderUtils.drawStringCentered("§cIn beta! Report issues and suggestions on the discord", guiLeft + sizeX / 2, guiTop + sizeY + 10)
+        GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
+        GuiRenderUtils.drawStringCentered("§cIn beta! Report issues and suggestions on the discord", guiLeft + sizeX / 2, guiTop + sizeY + 10)
 
         pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)
 
         GlStateManager.popMatrix()
 
         if (tooltipToDisplay.isNotEmpty()) {
-            RenderUtils.drawTooltip(tooltipToDisplay, mouseX, mouseY, height)
+            GuiRenderUtils.drawTooltip(tooltipToDisplay, mouseX, mouseY, height)
             tooltipToDisplay.clear()
         }
     }
@@ -193,7 +192,7 @@ open class FFGuideGUI : GuiScreen() {
             val x = guiLeft + (page.ordinal) * 30 + 15
             val y = guiTop - 28
 
-            if (RenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
                 if (selectedPage != page) {
                     SoundUtils.playClickSound()
                     selectedPage = page
@@ -201,57 +200,57 @@ open class FFGuideGUI : GuiScreen() {
             }
         }
         if (selectedPage == FortuneGuidePage.OVERVIEW) {
-            if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130, 16, 16) && currentPet != 0) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
                 currentPet = 0
                 FFStats.totalFF(FFStats.elephantFF)
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 130, 16, 16) && currentPet != 1
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 130, 16, 16) && currentPet != 1
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 1
                 FFStats.totalFF(FFStats.mooshroomFF)
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 130, 16, 16) && currentPet != 2
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 130, 16, 16) && currentPet != 2
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 2
                 FFStats.totalFF(FFStats.rabbitFF)
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 1) 0 else 1
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 162, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 2) 0 else 2
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 182, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 3) 0 else 3
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 202, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentArmor = if (currentArmor == 4) 0 else 4
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 262, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentEquipment = if (currentEquipment == 1) 0 else 1
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 282, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 282, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentEquipment = if (currentEquipment == 2) 0 else 2
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 302, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 302, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentEquipment = if (currentEquipment == 3) 0 else 3
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 322, guiTop + 5, 16, 16)) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 322, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
                 currentEquipment = if (currentEquipment == 4) 0 else 4
             }
 
         } else {
-            if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160, 16, 16) && currentPet != 0) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160, 16, 16) && currentPet != 0) {
                 SoundUtils.playClickSound()
                 currentPet = 0
                 FFStats.totalFF(FFStats.elephantFF)
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 160, 16, 16) && currentPet != 1
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 160, 16, 16) && currentPet != 1
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 1
                 FFStats.totalFF(FFStats.mooshroomFF)
-            } else if (RenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 160, 16, 16) && currentPet != 2
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 160, 16, 16) && currentPet != 2
             ) {
                 SoundUtils.playClickSound()
                 currentPet = 2
@@ -267,10 +266,10 @@ open class FFGuideGUI : GuiScreen() {
             drawRect(x, y, x + 25, y + 28, if (page == selectedPage) 0x50555555 else 0x50000000)
 
             if (page.crop != null) {
-                RenderUtils.renderItemStack(page.crop.icon, x + 5, y + 5)
-            } else RenderUtils.renderItemStack(ItemStack(Blocks.grass), x + 5, y + 5)
+                GuiRenderUtils.renderItemStack(page.crop.icon, x + 5, y + 5)
+            } else GuiRenderUtils.renderItemStack(ItemStack(Blocks.grass), x + 5, y + 5)
 
-            if (RenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 25)) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 25)) {
                 tooltipToDisplay.add(page.pageName)
             }
         }

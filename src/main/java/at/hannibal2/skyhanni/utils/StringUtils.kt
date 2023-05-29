@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.RenderUtils.darkenColor
+import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
 import java.util.*
