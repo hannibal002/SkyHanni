@@ -238,6 +238,7 @@ class GardenVisitorFeatures {
                 changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
                 update()
                 GardenVisitorDropStatistics.coinsSpent += round(price).toLong()
+                GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
                 return
             }
         }
