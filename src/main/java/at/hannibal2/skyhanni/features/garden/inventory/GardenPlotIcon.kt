@@ -38,6 +38,9 @@ object GardenPlotIcon {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        showItem = GardenAPI.inGarden() && event.inventoryName == "Configure Plots"
+        if (!showItem) return
         for ((index, stack) in event.inventoryItems) {
             originalStack[index] = stack
         }
@@ -46,8 +49,6 @@ object GardenPlotIcon {
             val new = NEUItems.getItemStack(internalName)
             cachedStack[index] = Utils.editItemStackInfo(new, old.displayName, true, *old.getLore().toTypedArray())
         }
-
-        showItem = GardenAPI.inGarden() && event.inventoryName == "Configure Plots"
     }
 
     @SubscribeEvent
