@@ -58,6 +58,14 @@ open class FFGuideGUI : GuiScreen() {
         FFStats.loadFFData()
         pages[FortuneGuidePage.OVERVIEW] = OverviewPage()
         pages[FortuneGuidePage.CROP] = CropPage()
+
+        if (currentCrop != null) {
+            for (item in FarmingItems.values()) {
+                if (item.name == currentCrop?.name) {
+                    FFStats.getCropStats(currentCrop!!, item.getItem())
+                }
+            }
+        }
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {

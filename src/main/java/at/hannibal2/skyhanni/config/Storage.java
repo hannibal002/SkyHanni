@@ -164,6 +164,9 @@ public class Storage {
                 public Map<FarmingItems, Boolean> outdatedItems = new HashMap<>();
 
                 @Expose
+                public int uniqueVisitors = 0;
+
+                @Expose
                 public int anitaUpgrade = -1;
 
                 @Expose

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -97,6 +99,10 @@ class CaptureFarmingGear {
                             outdatedItems[item] = false
                         }
                     }
+                    FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
+                    val enchantments = slot.getEnchantments() ?: emptyMap()
+                    val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
+                    GardenAPI.config?.fortune?.uniqueVisitors = (FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)).toInt()
                 }
             }
         }
