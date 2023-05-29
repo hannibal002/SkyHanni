@@ -8,6 +8,7 @@
     "MixinEntityBlaze",
     "MixinEntityFireball",
     "MixinEntityPlayerSP",
+    "MixinItemStack",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
     "MixinRenderItem",
