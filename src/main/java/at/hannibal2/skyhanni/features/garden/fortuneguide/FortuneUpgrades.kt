@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -94,7 +96,7 @@ object FortuneUpgrades {
                 }
                 "bustling" -> {
                     if (!item.isRecombobulated()) {
-                        recombobulateItem(item, 5.0)
+                        recombobulateItem(item, 2.0)
                         reforgeItem(item, "mossy", "OVERGROWN_GRASS", 17.0)
                     } else {
                         reforgeItem(item, "mossy", "OVERGROWN_GRASS", 20.0)
@@ -111,20 +113,37 @@ object FortuneUpgrades {
         }
     }
 
+    //todo needs to be called when switching pets
     private fun getPetUpgrades() {
-        //todo add new pets or higher rarity pets here
-        when (FFStats.currentPetItem) {
-            "GREEN_BANDANA" -> {}
-            "YELLOW_BANDANA" -> {
-                genericUpgrades.add(FortuneUpgrade("Give your /////// a greenn bandana",
-                    null, "GREEN_BANDANA", -1, 30.0))
-            }
-            else -> {
-                //todo get current pet name
-                genericUpgrades.add(FortuneUpgrade("Give your /////// a yellow bandana",
-                    300, null, null, 30.0))
+        val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
+
+        if (currentPet.getItem().getInternalName().contains(";")) {
+            when (FFStats.currentPetItem) {
+                "GREEN_BANDANA" -> {}
+                "YELLOW_BANDANA" -> {
+                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} a green bandana",
+                        null, "GREEN_BANDANA", -1, (4.0 * gardenLvl).coerceAtMost(60.0)))
+                }
+                else -> {
+                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} a yellow bandana",
+                        300, null, null, 30.0))
+                }
             }
         }
+        // not ironman or stranded friendly
+        // assuming stats for having a lvl 100 pet
+        if (currentPet == FarmingItems.ELEPHANT && currentPet.getItem().getInternalName() != "ELEPHANT;4") {
+            genericUpgrades.add(FortuneUpgrade("Purchase a legendary elephant pet",
+                null, "ELEPHANT;4", -1, 180.0))
+        }
+        else if (currentPet == FarmingItems.MOOSHROOM_COW && currentPet.getItem().getInternalName() != "MOOSHROOM_COW;4") {
+            val strength = (GardenAPI.config?.fortune?.farmingStrength)?.toDouble() ?: 0.0
+            // using their current strength
+            genericUpgrades.add(FortuneUpgrade("Purchase a legendary mooshroom cow pet",
+                null, "MOOSHROOM_COW;4", -1, 110.0 + strength / 20.0))
+        }
+
+
     }
 
     private fun recombobulateItem(item: ItemStack, increase: Double) {

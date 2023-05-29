@@ -201,17 +201,19 @@ object FFStats {
     fun getTotalFF() {
         var petList = mutableMapOf<FFTypes, Double>()
         when (FFGuideGUI.currentPet) {
-            0 -> {
+            FarmingItems.ELEPHANT -> {
                 petList = elephantFF
-                currentPetItem = FarmingItems.ELEPHANT.getItem().getPetItem().toString()
-            } 1 -> {
-            petList = mooshroomFF
-            currentPetItem = FarmingItems.MOOSHROOM_COW.getItem().getPetItem().toString()
-        } 2 -> {
-            petList = rabbitFF
-            currentPetItem = FarmingItems.RABBIT.getItem().getPetItem().toString()
+            }
+            FarmingItems.MOOSHROOM_COW -> {
+                petList = mooshroomFF
+            }
+            FarmingItems.RABBIT -> {
+                petList = rabbitFF
+            }
+            else -> {}
         }
-        }
+        println(FFGuideGUI.currentPet.getItem().getPetItem())
+        currentPetItem = FFGuideGUI.currentPet.getItem().getPetItem().toString()
 
         totalBaseFF =
             (baseFF.toList() + armorTotalFF.toList() + equipmentTotalFF.toList() + petList.toList()).groupBy({ it.first },

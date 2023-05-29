@@ -132,8 +132,8 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
                 FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
             val currentPet = when (FFGuideGUI.currentPet) {
-                0 -> FFStats.elephantFF
-                1 -> FFStats.mooshroomFF
+                FarmingItems.ELEPHANT -> FFStats.elephantFF
+                FarmingItems.MOOSHROOM_COW -> FFStats.mooshroomFF
                 else -> FFStats.rabbitFF
             }
 

@@ -28,7 +28,8 @@ open class FFGuideGUI : GuiScreen() {
         var selectedPage = FortuneGuidePage.OVERVIEW
         var breakdownMode = true
         var currentCrop: CropType? = null
-        var currentPet = 0
+        //todo set this to what they have equip
+        var currentPet = FarmingItems.ELEPHANT
         var currentArmor = 0
         var currentEquipment = 0
 
@@ -56,6 +57,8 @@ open class FFGuideGUI : GuiScreen() {
 
     init {
         FFStats.loadFFData()
+        FortuneUpgrades.generateGenericUpgrades()
+
         pages[FortuneGuidePage.OVERVIEW] = OverviewPage()
         pages[FortuneGuidePage.CROP] = CropPage()
 
@@ -85,15 +88,15 @@ open class FFGuideGUI : GuiScreen() {
         if (selectedPage != FortuneGuidePage.OVERVIEW) {
             GuiRenderUtils.renderItemAndTip(
                 FarmingItems.ELEPHANT.getItem(), guiLeft + 152, guiTop + 160, mouseX, mouseY,
-                if (currentPet == 0) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (currentPet == FarmingItems.ELEPHANT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
             )
             GuiRenderUtils.renderItemAndTip(
                 FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 172, guiTop + 160, mouseX, mouseY,
-                if (currentPet == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (currentPet == FarmingItems.MOOSHROOM_COW) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
             )
             GuiRenderUtils.renderItemAndTip(
                 FarmingItems.RABBIT.getItem(), guiLeft + 192, guiTop + 160, mouseX, mouseY,
-                if (currentPet == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (currentPet == FarmingItems.RABBIT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
             )
 
             GuiRenderUtils.renderItemAndTip(
@@ -151,15 +154,15 @@ open class FFGuideGUI : GuiScreen() {
 
             GuiRenderUtils.renderItemAndTip(
                 FarmingItems.ELEPHANT.getItem(), guiLeft + 152, guiTop + 130, mouseX, mouseY,
-                if (currentPet == 0) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (currentPet == FarmingItems.ELEPHANT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
             )
             GuiRenderUtils.renderItemAndTip(
                 FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 172, guiTop + 130, mouseX, mouseY,
-                if (currentPet == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (currentPet == FarmingItems.MOOSHROOM_COW) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
             )
             GuiRenderUtils.renderItemAndTip(
                 FarmingItems.RABBIT.getItem(), guiLeft + 192, guiTop + 130, mouseX, mouseY,
-                if (currentPet == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (currentPet == FarmingItems.RABBIT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
             )
         }
 
@@ -207,19 +210,20 @@ open class FFGuideGUI : GuiScreen() {
         }
 
         if (selectedPage == FortuneGuidePage.OVERVIEW) {
-            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130, 16, 16) && currentPet != 0) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130,
+                    16, 16) && currentPet != FarmingItems.ELEPHANT) {
                 SoundUtils.playClickSound()
-                currentPet = 0
+                currentPet = FarmingItems.ELEPHANT
                 FFStats.getTotalFF()
-            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 130, 16, 16) && currentPet != 1
-            ) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 130,
+                    16, 16) && currentPet != FarmingItems.MOOSHROOM_COW) {
                 SoundUtils.playClickSound()
-                currentPet = 1
+                currentPet = FarmingItems.MOOSHROOM_COW
                 FFStats.getTotalFF()
-            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 130, 16, 16) && currentPet != 2
-            ) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 130,
+                    16, 16) && currentPet != FarmingItems.RABBIT) {
                 SoundUtils.playClickSound()
-                currentPet = 2
+                currentPet = FarmingItems.RABBIT
                 FFStats.getTotalFF()
             } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 142, guiTop + 5, 16, 16)) {
                 SoundUtils.playClickSound()
@@ -248,19 +252,20 @@ open class FFGuideGUI : GuiScreen() {
             }
 
         } else {
-            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160, 16, 16) && currentPet != 0) {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 160,
+                    16, 16) && currentPet != FarmingItems.ELEPHANT) {
                 SoundUtils.playClickSound()
-                currentPet = 0
+                currentPet = FarmingItems.ELEPHANT
                 FFStats.getTotalFF()
-            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 160, 16, 16) && currentPet != 1
-            ) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 172, guiTop + 160,
+                    16, 16) && currentPet != FarmingItems.MOOSHROOM_COW) {
                 SoundUtils.playClickSound()
-                currentPet = 1
+                currentPet = FarmingItems.MOOSHROOM_COW
                 FFStats.getTotalFF()
-            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 160, 16, 16) && currentPet != 2
-            ) {
+            } else if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 192, guiTop + 160,
+                    16, 16) && currentPet != FarmingItems.RABBIT) {
                 SoundUtils.playClickSound()
-                currentPet = 2
+                currentPet = FarmingItems.RABBIT
                 FFStats.getTotalFF()
             }
         }
