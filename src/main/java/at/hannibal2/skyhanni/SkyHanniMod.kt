@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures
 import at.hannibal2.skyhanni.features.garden.contest.*
 import at.hannibal2.skyhanni.features.garden.farming.*
+import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.*
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
@@ -275,6 +276,7 @@ class SkyHanniMod {
         loadModule(TrevorSolver)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
+        loadModule(CaptureFarmingGear())
         loadModule(SackDisplay())
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
@@ -207,7 +208,7 @@ public class Garden {
                         "§c254 Denied",
                         " ",
                         "§c62,072 Copper",
-                        "§23.2m Farming EXP",
+                        "§33.2m Farming EXP",
                         "§647.2m Coins Spent",
                         "§b23 §9Flowering Bouquet",
                         "§b4 §9Overgrown Grass",
@@ -216,6 +217,7 @@ public class Garden {
                         "§b6 §9Music Rune",
                         "§b1 §cSpace Helmet",
                         " ", // If they want another empty row
+                        "§212,735 Garden EXP",
                 }
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
@@ -1015,14 +1017,14 @@ public class Garden {
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
-    @ConfigOption(name = "True Farming Fortune", desc = "")
+    @ConfigOption(name = "Farming Fortune Display", desc = "")
     @ConfigEditorAccordion(id = 22)
     public boolean farmingFortune = false;
 
     @Expose
     @ConfigOption(
             name = "FF Display",
-            desc = "Displays current farming fortune, including crop-specific bonuses."
+            desc = "Displays the true farming fortune for the current crop, including all crop-specific and hidden bonuses."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 22)
@@ -1037,6 +1039,10 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 22)
     public boolean farmingFortuneDropMultiplier = true;
+
+    @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your farming fortune.\n§eCommand: /ff")
+    @ConfigEditorButton(buttonText = "§2Open")
+    public Runnable positions = Commands::openFortuneGuide;
 
     @Expose
     public Position farmingFortunePos = new Position(-375, -200, false, true);

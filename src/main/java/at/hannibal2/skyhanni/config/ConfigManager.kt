@@ -54,8 +54,8 @@ class ConfigManager {
                         return NEUItems.loadNBTData(reader.nextString())
                     }
                 }.nullSafe())
-            .enableComplexMapKeySerialization()
-            .create()
+                .enableComplexMapKeySerialization()
+                .create()
     }
 
     lateinit var features: Features
