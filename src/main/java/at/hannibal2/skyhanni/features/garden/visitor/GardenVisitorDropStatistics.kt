@@ -120,8 +120,6 @@ object GardenVisitorDropStatistics {
         addAsSingletonList(format(copper, "Copper", "§c", ""))
         //7
         addAsSingletonList(format(farmingExp, "Farming EXP", "§3", "§7"))
-        //16
-        addAsSingletonList(format(gardenExp, "Garden EXP", "§2", "§7"))
         //8
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
@@ -139,6 +137,8 @@ object GardenVisitorDropStatistics {
         }
         //15
         addAsSingletonList("")
+        //16
+        addAsSingletonList(format(gardenExp, "Garden EXP", "§2", "§7"))
     }
 
     fun format(amount: Number, name: String, color: String, amountColor: String = color) =
