@@ -97,6 +97,7 @@ class GardenVisitorTimer {
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
                 visitorInterval = ((millis - 1) / 60_000L + 1) * 60_000L
+                GardenAPI.config?.visitorInterval = visitorInterval
             } else {
                 updateSixthVisitorArrivalTime()
             }

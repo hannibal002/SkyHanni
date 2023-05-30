@@ -8,6 +8,6 @@ enum class VisitorReward(val displayName: String, val internalName: String, val 
     GREEN_BANDANA("§9Green Bandana", "GREEN_BANDANA", "[+]1x Green Bandana".toPattern()),
     DEDICATION("§9Dedication IV", "DEDICATION;4", "Dedication (IV|4) Book".toPattern()),
     MUSIC_RUNE("§9Music Rune", "MUSIC_RUNE;1", "[+]1x ◆ Music Rune [1I]".toPattern()),
-    SPACE_HELMET("§cSpace Helmet", "DCTR_SPACE_HELM", "[+]Space Helmet".toPattern()),
+    SPACE_HELMET("§cSpace Helmet", "DCTR_SPACE_HELM", "[+]1x Space Helmet".toPattern()),
     // Pretty sure that the symbol is ◆ but not 100%
 }

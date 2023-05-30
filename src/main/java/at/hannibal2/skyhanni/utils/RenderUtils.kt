@@ -791,15 +791,5 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    /**
-     * Taken from NotEnoughUpdates
-     */
-    fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, colour: Int) {
-        val strLen = fr.getStringWidth(str)
-        val x2 = x - strLen / 2f
-        val y2 = y - fr.FONT_HEIGHT / 2f
-        GL11.glTranslatef(x2, y2, 0f)
-        fr.drawString(str, 0f, 0f, colour, shadow)
-        GL11.glTranslatef(-x2, -y2, 0f)
-    }
+
 }

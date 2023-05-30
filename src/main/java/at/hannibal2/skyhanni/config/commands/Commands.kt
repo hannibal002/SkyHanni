@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
@@ -24,6 +26,7 @@ import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.command.ICommandSender
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -46,6 +49,8 @@ object Commands {
         // main commands
         registerCommand("sh", openMainMenu)
         registerCommand("skyhanni", openMainMenu)
+        
+        registerCommand("ff") { openFortuneGuide() }
 
         // for users - regular commands
         registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
@@ -89,6 +94,15 @@ object Commands {
         registerCommand("shtestmessage") { TestChatCommand.command(it) }
         registerCommand("shcopyerror") { CopyErrorCommand.command(it) }
 
+    }
+    @JvmStatic
+     fun openFortuneGuide() {
+        if (!LorenzUtils.inSkyBlock) {
+            LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
+        } else {
+            CaptureFarmingGear.captureFarmingGear()
+            SkyHanniMod.screenToOpen = FFGuideGUI()
+        }
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
