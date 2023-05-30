@@ -197,6 +197,7 @@ open class FFGuideGUI : GuiScreen() {
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
                 if (currentCrop != crop) {
                     currentCrop = crop
+                    SoundUtils.playClickSound()
                     if (selectedPage != FortuneGuidePage.CROP) {
                         selectedPage = FortuneGuidePage.CROP
                     }
@@ -299,4 +300,3 @@ open class FFGuideGUI : GuiScreen() {
         abstract fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float)
     }
 }
-

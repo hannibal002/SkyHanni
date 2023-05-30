@@ -130,6 +130,11 @@ object ItemUtils {
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
 
+    fun ItemStack.getRarity() {
+        //todo
+    }
+
+
     //extra method for shorter name and kotlin nullability logic
     var ItemStack.name: String?
         get() = this.displayName

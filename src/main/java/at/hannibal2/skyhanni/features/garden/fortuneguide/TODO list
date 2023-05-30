@@ -1,13 +1,44 @@
-todo list for this display
+V2 Plans
 
-Indicator when gear stats are outdated
-    - Symbol that is like a refresh symbol
-    - The following items are outdated: Lotus Belt, Elephant... Please open their menu to update them
+Guide for cheapest upgrades:
+    - Anita buff
+    - Garden plots
+    - Pet Item
+    - Equipment
+        - Green thumb
+        - Reforges
+        - Recombs
+    - Armor
+        - Reforges
+        - Recombs
+    - Talisman
+    - Tools
+        - Farming for dummies
+        - Harvesting 6
+        - Reforge
+        - Recomb
+        - Sunder
+        - Dedication
+        - Crop upgrade
+        - Turbo crop
 
-Reformat the order of items on crop pages
-Change base ff bar to reflect selected pet and have this update for all other pages as well
+Indicator when some of your gear is outdated
+    - Little sign telling you
+    - Line in the tooltip of the item
 
-Clean up overview page maybe
+Changing lore on items inside the menu to reflect changes
+    - Changing the amount of visitors served to reflect the real amount
+    - Changing the pet level to reflect the pets actual level
+
+Max value on bars will update depending on chosen pet
+    - Will be visible on all pages
+
+When opening the menu it will open to the tool you are currently holding
+It will also auto select the current pet you have out if that is a farming pet
+
+
+
+Later on:
 
 GUI:
 Add a border around the edge of the display
@@ -26,5 +57,4 @@ Taking off or putting equipment on inside the menu won't update it until you reo
 !!!!
 
 Add:
-Daedalus axe for mushroom and cocoa??
-Open menu to currently equip pet if possible
+Daedalus axe for mushroom

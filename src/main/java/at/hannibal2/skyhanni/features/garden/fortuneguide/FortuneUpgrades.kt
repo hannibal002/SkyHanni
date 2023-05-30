@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import net.minecraft.item.ItemStack
 
 object FortuneUpgrades {
@@ -17,6 +19,7 @@ object FortuneUpgrades {
     //todo -1 as item count means ah
     val genericUpgrades = mutableListOf<FortuneUpgrade>()
 
+    //todo right now when being told to purchase from ah, it doesnt take into account the coins you get from selling current stuff
     //todo ironman mode & stranded mode
     // symbol when this is activated, set by default
     // toggle to show upgrades that cannot be bought. Stranded still no recomb or gold ball etc.
@@ -32,14 +35,14 @@ object FortuneUpgrades {
             null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 3.0))
 
         getEquipmentUpgrades()
-        getArmorUpgrades()
         getPetUpgrades()
+        getArmorUpgrades()
 
 // test message for now
 
-        for (a in genericUpgrades) {
-            println(a)
-        }
+//        for (a in genericUpgrades) {
+//            println(a)
+//        }
     }
 
     private fun getEquipmentUpgrades() {
@@ -80,38 +83,18 @@ object FortuneUpgrades {
         }
     }
 
+    //todo adding armor tier upgrades later
+
     private fun getArmorUpgrades() {
-        // todo add upgrading armor sets
-        // for reforge can do rarity index * multiplier
-        // will be linear scale (melon -> cropie -> squash -> fermento)
-        // if it is farming boots will keep that line and vice versa
-        // will use ah price not material cost
         for (piece in armor) {
             val item = piece.getItem()
-            when (item.getReforgeName()) {
-                "mossy" -> {
-                    if (!item.isRecombobulated()) {
-                        recombobulateItem(item, 5.0)
-                    }
-                }
-                "bustling" -> {
-                    if (!item.isRecombobulated()) {
-                        recombobulateItem(item, 2.0)
-                        reforgeItem(item, "mossy", "OVERGROWN_GRASS", 17.0)
-                    } else {
-                        reforgeItem(item, "mossy", "OVERGROWN_GRASS", 20.0)
-                    }
-                }
-                else -> {
-                    if (!item.isRecombobulated()) {
-                        reforgeItem(item, "bustling", "SKYMART_BROCHURE", 8.0)
-                    } else {
-                        reforgeItem(item, "bustling", "SKYMART_BROCHURE", 10.0)
-                    }
-                }
-            }
+
+
+            reforgeItem(item, "mossy", "OVERGROWN_GRASS", 20.0)
+            reforgeItem(item, "bustling", "SKYMART_BROCHURE", 10.0)
         }
     }
+
 
     //todo needs to be called when switching pets
     private fun getPetUpgrades() {
@@ -130,20 +113,19 @@ object FortuneUpgrades {
                 }
             }
         }
+
+        //todo add later
         // not ironman or stranded friendly
         // assuming stats for having a lvl 100 pet
-        if (currentPet == FarmingItems.ELEPHANT && currentPet.getItem().getInternalName() != "ELEPHANT;4") {
-            genericUpgrades.add(FortuneUpgrade("Purchase a legendary elephant pet",
-                null, "ELEPHANT;4", -1, 180.0))
-        }
-        else if (currentPet == FarmingItems.MOOSHROOM_COW && currentPet.getItem().getInternalName() != "MOOSHROOM_COW;4") {
-            val strength = (GardenAPI.config?.fortune?.farmingStrength)?.toDouble() ?: 0.0
-            // using their current strength
-            genericUpgrades.add(FortuneUpgrade("Purchase a legendary mooshroom cow pet",
-                null, "MOOSHROOM_COW;4", -1, 110.0 + strength / 20.0))
-        }
-
-
+//        if (currentPet == FarmingItems.ELEPHANT && currentPet.getItem().getInternalName() != "ELEPHANT;4") {
+//            genericUpgrades.add(FortuneUpgrade("Purchase a legendary elephant pet",
+//                null, "ELEPHANT;4", -1, 180.0))
+//        }
+//        else if (currentPet == FarmingItems.MOOSHROOM_COW && currentPet.getItem().getInternalName() != "MOOSHROOM_COW;4") {
+//            val strength = (GardenAPI.config?.fortune?.farmingStrength)?.toDouble() ?: 0.0
+//            genericUpgrades.add(FortuneUpgrade("Purchase a legendary mooshroom cow pet",
+//                null, "MOOSHROOM_COW;4", -1, 110.0 + strength / 20.0))
+//        }
     }
 
     private fun recombobulateItem(item: ItemStack, increase: Double) {
@@ -156,6 +138,11 @@ object FortuneUpgrades {
             copperPrice, reforgeItem, 1, increase))
     }
 
+    private fun purchaseArmor(armorPiece: String, armorName: String, increase: Double) {
+        genericUpgrades.add(FortuneUpgrade("Purchase ${armorName.firstLetterUppercase()}" +
+        armorPiece.firstLetterUppercase(), null, "${armorName}_${armorPiece}", -1, increase))
+    }
+
     private fun getNeededBooks(currentLvl: Int): Int {
         return when (currentLvl) {
             0 -> 1
@@ -165,6 +152,8 @@ object FortuneUpgrades {
             else -> 8
         }
     }
+
+    private val cropUpgrades = listOf(5, 10, 20, 50, 100, 500, 1000, 5000, 10000)
 
     // If they unlock in a weird order e.g. getting a corner before a cheaper one won't work properly
     private val compostNeeded = listOf(1, 2, 4, 8, 16, 24, 32, 48, 64, 96, 128, 160, 160,

@@ -212,7 +212,6 @@ object FFStats {
             }
             else -> {}
         }
-        println(FFGuideGUI.currentPet.getItem().getPetItem())
         currentPetItem = FFGuideGUI.currentPet.getItem().getPetItem().toString()
 
         totalBaseFF =

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneStats
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 class CropPage: FFGuideGUI.FFGuidePage() {
 
@@ -20,7 +21,8 @@ class CropPage: FFGuideGUI.FFGuidePage() {
         var i = 0
         FFStats.cropPage.forEach { (key, value) ->
             if (key == FortuneStats.CROP_TOTAL) {
-                GuiRenderUtils.drawFarmingBar(key.label, key.tooltip, value.first, value.second, FFGuideGUI.guiLeft + 135,
+                val newLine = key.label.replace("Crop", FFGuideGUI.currentCrop?.name?.replace("_", " ")?.firstLetterUppercase()!!)
+                GuiRenderUtils.drawFarmingBar(newLine, key.tooltip, value.first, value.second, FFGuideGUI.guiLeft + 135,
                     FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
             } else {
                 if (i % 2 == 0) {
