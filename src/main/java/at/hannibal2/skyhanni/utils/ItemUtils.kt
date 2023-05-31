@@ -130,8 +130,20 @@ object ItemUtils {
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
 
-    fun ItemStack.getRarity() {
-        //todo
+    fun ItemStack.getItemRarity(): Int {
+
+        return when (this.getLore().lastOrNull()?.take(4)) {
+            "§f§l" -> 0     // common
+            "§a§l" -> 1     // uncommon
+            "§9§l" -> 2     // rare
+            "§5§l" -> 3     // epic
+            "§6§l" -> 4     // legendary
+            "§d§l" -> 5     // mythic
+            "§b§l" -> 6     // divine
+            "§4§l" -> 7     // supreme
+            "§c§l" -> 8     // special/very special
+            else -> -1      // unknown
+        }
     }
 
 

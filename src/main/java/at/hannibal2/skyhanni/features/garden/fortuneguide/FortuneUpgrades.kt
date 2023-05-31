@@ -1,54 +1,81 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getRarity
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import net.minecraft.item.ItemStack
 
 object FortuneUpgrades {
     private val equipment = listOf(FarmingItems.NECKLACE, FarmingItems.CLOAK, FarmingItems.BELT, FarmingItems.BRACELET)
     private val armor = listOf(FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS, FarmingItems.BOOTS)
 
-    //todo -1 as item count means ah
-    val genericUpgrades = mutableListOf<FortuneUpgrade>()
+    private val genericUpgrades = mutableListOf<FortuneUpgrade>()
 
-    //todo right now when being told to purchase from ah, it doesnt take into account the coins you get from selling current stuff
     //todo ironman mode & stranded mode
     // symbol when this is activated, set by default
     // toggle to show upgrades that cannot be bought. Stranded still no recomb or gold ball etc.
-    // set visitors served by checking it on equipment
     // not sure if i want to use copper price or bz price for stuff like green thumb
 
     //todo worry about sorting later, as this may even be in the menu
     fun generateGenericUpgrades() {
         val hidden = GardenAPI.config?.fortune ?: return
-        genericUpgrades.add(FortuneUpgrade("Unlock your ${(hidden.plotsUnlocked + 1).addSuffix()} plot",
-            null, "COMPOST", compostNeeded[hidden.plotsUnlocked], 3.0))
-        genericUpgrades.add(FortuneUpgrade("Upgrade anita bonus to level ${hidden.anitaUpgrade + 1}",
-            null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 3.0))
+        genericUpgrades.clear()
+
+        if (hidden.plotsUnlocked != -1 && hidden.plotsUnlocked != 24) {
+            genericUpgrades.add(FortuneUpgrade("Unlock your ${(hidden.plotsUnlocked + 1).addSuffix()} plot",
+                null, "COMPOST", compostNeeded[hidden.plotsUnlocked], 3.0))
+        }
+        if (hidden.anitaUpgrade != -1 && hidden.anitaUpgrade != 15) {
+            genericUpgrades.add(FortuneUpgrade("Upgrade anita bonus to level ${hidden.anitaUpgrade + 1}",
+                null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 3.0))
+        }
 
         getEquipmentUpgrades()
         getPetUpgrades()
         getArmorUpgrades()
 
+        genericUpgrades.populateAndSort(0)
+
 // test message for now
 
-//        for (a in genericUpgrades) {
-//            println(a)
-//        }
+        for (a in genericUpgrades) {
+            println(a)
+        }
+    }
+
+    //todo fix NEU price data not being loaded if run too early
+    private fun MutableList<FortuneUpgrade>.populateAndSort(type: Int) {
+        this.map { upgrade ->
+            val cost = (NEUItems.getPrice(upgrade.requiredItem ?: "") * (upgrade.itemQuantity ?: 1)).toInt()
+            upgrade.cost = cost
+            upgrade.costPerFF = (cost / upgrade.fortuneIncrease).toInt()
+        }
+        when (type) {
+            0 -> this.sortBy { it.costPerFF }
+            1 -> this.sortByDescending { it.costPerFF }
+            2 -> this.sortBy { it.cost }
+            3 -> this.sortByDescending { it.cost }
+            4 -> this.sortBy { it.fortuneIncrease }
+            5 -> this.sortByDescending { it.fortuneIncrease }
+            else -> {}
+        }
     }
 
     private fun getEquipmentUpgrades() {
         val visitors = GardenAPI.config?.fortune?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in equipment) {
             val item = piece.getItem()
+            //todo tell them to purchase the missing item
+            if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getEnchantments() ?: emptyMap()
             val greenThumbLvl = (enchantments["green_thumb"] ?: 0)
             if (greenThumbLvl != 5) {
@@ -57,27 +84,14 @@ object FortuneUpgrades {
                 genericUpgrades.add(FortuneUpgrade("Upgrade your ${item.displayName} to green thumb ${greenThumbLvl + 1}",
                     1500, "GREEN_THUMB;1", getNeededBooks(greenThumbLvl), visitors * 0.05))
             }
-
+            recombobulateItem(item)
             when (item.getReforgeName()) {
-                "rooted" -> {
-                    if (!item.isRecombobulated()) {
-                        recombobulateItem(item, 2.0)
-                    }
-                }
+                "rooted" -> {}
                 "blooming" -> {
-                    if (!item.isRecombobulated()) {
-                        recombobulateItem(item, 1.0)
-                        reforgeItem(item, "rooted", "BURROWING_SPORES", 5.0)
-                    } else {
-                        reforgeItem(item, "rooted", "BURROWING_SPORES", 6.0)
-                    }
+                    reforgeItem(item, FarmingReforges.ROOTED)
                 }
                 else -> {
-                    if (!item.isRecombobulated()) {
-                        reforgeItem(item, "blooming", "FLOWERING_BOUQUET", 3.0)
-                    } else {
-                        reforgeItem(item, "blooming", "FLOWERING_BOUQUET", 4.0)
-                    }
+                    reforgeItem(item, FarmingReforges.BLOOMING)
                 }
             }
         }
@@ -88,24 +102,32 @@ object FortuneUpgrades {
     private fun getArmorUpgrades() {
         for (piece in armor) {
             val item = piece.getItem()
+            //todo skip if it doesnt exist -> tell them to buy it later
 
-
-            reforgeItem(item, "mossy", "OVERGROWN_GRASS", 20.0)
-            reforgeItem(item, "bustling", "SKYMART_BROCHURE", 10.0)
+            recombobulateItem(item)
+            when (item.getReforgeName()) {
+                "mossy" -> {}
+                "bustling" -> {
+                    reforgeItem(item, FarmingReforges.MOSSY)
+                }
+                else -> {
+                    reforgeItem(item, FarmingReforges.BUSTLING, 100)
+                }
+            }
         }
     }
 
-
     //todo needs to be called when switching pets
     private fun getPetUpgrades() {
-        val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
+//        val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
 
         if (currentPet.getItem().getInternalName().contains(";")) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {
-                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} a green bandana",
-                        null, "GREEN_BANDANA", -1, (4.0 * gardenLvl).coerceAtMost(60.0)))
+                    //todo once auction stuff is done
+//                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} a green bandana",
+//                        null, "GREEN_BANDANA", -1, (4.0 * gardenLvl).coerceAtMost(60.0)))
                 }
                 else -> {
                     genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} a yellow bandana",
@@ -128,19 +150,22 @@ object FortuneUpgrades {
 //        }
     }
 
-    private fun recombobulateItem(item: ItemStack, increase: Double) {
+    private fun recombobulateItem(item: ItemStack) {
+        if (item.isRecombobulated()) return
+        val reforge = item.getReforgeName()?.let { FarmingReforges.valueOf(it.uppercase()) } ?: return
+
+        FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
+        val increase = reforge[item.getItemRarity() + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
         genericUpgrades.add(FortuneUpgrade("Recombobulate your ${item.displayName}",
             null, "RECOMBOBULATOR_3000", 1, increase))
     }
 
-    private fun reforgeItem(item: ItemStack, reforgeName: String, reforgeItem: String, increase: Double, copperPrice: Int? = null) {
-        genericUpgrades.add(FortuneUpgrade("Reforge your ${item.displayName} to $reforgeName",
-            copperPrice, reforgeItem, 1, increase))
-    }
+    private fun reforgeItem(item: ItemStack, reforge: FarmingReforges, copperPrice: Int? = null) {
+        FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
 
-    private fun purchaseArmor(armorPiece: String, armorName: String, increase: Double) {
-        genericUpgrades.add(FortuneUpgrade("Purchase ${armorName.firstLetterUppercase()}" +
-        armorPiece.firstLetterUppercase(), null, "${armorName}_${armorPiece}", -1, increase))
+        val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
+        genericUpgrades.add(FortuneUpgrade("Reforge your ${item.displayName} to ${reforge.reforgeName}",
+            copperPrice, reforge.reforgeItem, 1, increase))
     }
 
     private fun getNeededBooks(currentLvl: Int): Int {

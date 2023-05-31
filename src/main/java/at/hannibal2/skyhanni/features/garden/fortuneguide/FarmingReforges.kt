@@ -1,0 +1,31 @@
+package at.hannibal2.skyhanni.features.garden.fortuneguide
+
+enum class FarmingReforges(
+    val reforgeName: String,
+    val reforgeItem: String,
+    val common: Int,
+    val uncommon: Int,
+    val rare: Int,
+    val epic: Int,
+    val legendary: Int,
+    val mythic: Int
+) {
+    BLESSED("blessed", "BLESSED_FRUIT", 5, 7, 9, 13, 16, 20),
+    BOUNTIFUL("bountiful", "GOLDEN_BALL", 1, 2, 3, 5, 7, 10),
+    BLOOMING("blooming", "FLOWERING_BOUQUET", 1, 2, 3, 4, 5, 6),
+    ROOTED("rooted", "BURROWING_SPORES", 4, 6, 8, 10, 12, 14),
+    BUSTLING("bustling", "SKYMART_BROCHURE", 1, 2, 4, 6, 8, 10),
+    MOSSY("mossy", "OVERGROWN_GRASS", 5, 10, 15, 20, 25, 30)
+}
+
+operator fun FarmingReforges.get(index: Int, current: Double = 0.0): Double? {
+    return when (index) {
+        0 -> common - current
+        1 -> uncommon - current
+        2 -> rare - current
+        3 -> epic - current
+        4 -> legendary - current
+        5 -> mythic - current
+        else -> null
+    }
+}
