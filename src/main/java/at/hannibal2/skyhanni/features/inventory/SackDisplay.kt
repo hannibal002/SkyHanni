@@ -363,7 +363,7 @@ class SackDisplay {
 
     private fun calculatePrice(internalName: String, stored: String) = when (config.priceFrom) {
         0 -> {
-            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+            (NEUItems.getPrice(internalName, true) * stored.formatNumber()).toInt()
         }
 
         1 -> try {
