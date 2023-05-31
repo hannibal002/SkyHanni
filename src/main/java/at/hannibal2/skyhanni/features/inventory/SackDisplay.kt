@@ -27,6 +27,7 @@ class SackDisplay {
         var inInventory = false
         var isRuneSack = false
         var isGemstoneSack = false
+        var isTrophySack = false
     }
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
@@ -36,30 +37,30 @@ class SackDisplay {
     private val gemstoneItem = mutableMapOf<String, Gemstone>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
     private val gemstoneMap = mapOf(
-        "Jade Gemstones" to "ROUGH_JADE_GEM",
-        "Amber Gemstones" to "ROUGH_AMBER_GEM",
-        "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
-        "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
-        "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
-        "Jasper Gemstones" to "ROUGH_JASPER_GEM",
-        "Ruby Gemstones" to "ROUGH_RUBY_GEM",
-        "Opal Gemstones" to "ROUGH_OPAL_GEM"
+            "Jade Gemstones" to "ROUGH_JADE_GEM",
+            "Amber Gemstones" to "ROUGH_AMBER_GEM",
+            "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
+            "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
+            "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
+            "Jasper Gemstones" to "ROUGH_JASPER_GEM",
+            "Ruby Gemstones" to "ROUGH_RUBY_GEM",
+            "Opal Gemstones" to "ROUGH_OPAL_GEM"
     )
 
     private val numPattern =
-        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
+            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val gemstonePattern =
-        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
+            " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
 
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
             config.position.renderStringsAndItems(
-                display,
-                extraSpace = config.extraSpace,
-                itemScale = 1.3,
-                posLabel = "Sacks Items"
+                    display,
+                    extraSpace = config.extraSpace,
+                    itemScale = 1.3,
+                    posLabel = "Sacks Items"
             )
         }
     }
@@ -101,8 +102,7 @@ class SackDisplay {
                 val itemStack = NEUItems.getItemStack(internalName)
                 list.add(" §7- ")
                 list.add(itemStack)
-
-                list.add(Renderable.optionalLink("$itemName: ", {
+                list.add(Renderable.optionalLink("${itemName.replace("§k", "")}: ", {
                     if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
                         LorenzUtils.sendCommandToServer("bz ${itemName.removeColor()}")
                     }
@@ -214,6 +214,8 @@ class SackDisplay {
         val stacks = event.inventoryItems
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
+        isTrophySack = inventoryName.contains("Trophy Fishing Sack")
+        val sackRarity = if (inventoryName.startsWith("Bronze")) TrophyRarity.BRONZE else if (inventoryName.startsWith("Silver")) TrophyRarity.SILVER else TrophyRarity.NONE
         inInventory = true
         for ((_, stack) in stacks) {
             val name = stack.name ?: continue
@@ -229,7 +231,7 @@ class SackDisplay {
                         gem.internalName = gemstoneMap[name.removeColor()].toString()
                         if (gemstoneMap.containsKey(name.removeColor())) {
                             val internalName =
-                                "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                    "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
 
                             when (rarity) {
                                 "Rough" -> {
@@ -262,26 +264,13 @@ class SackDisplay {
                         val internalName = stack.getInternalName()
                         item.internalName = internalName
                         item.colorCode = group("color")
-                        val price: Int = when (config.priceFrom) {
-                            0 -> {
-                                (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                            }
-
-                            1 -> {
-                                try {
-                                    val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-                                    (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
-
-                                } catch (e: Exception) {
-                                    0
-                                }
-                            }
-
-                            else -> 0
-                        }
                         item.stored = stored
                         item.total = total
-                        item.price = price
+                        if (isTrophySack) {
+                            val trophyName = name.removeColor().uppercase().replace(" ", "_").replace("-", "_")
+                            item.price = calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
+                        } else
+                            item.price = calculatePrice(internalName, stored)
 
                         if (isRuneSack) {
                             val level = group("level")
@@ -310,37 +299,72 @@ class SackDisplay {
 
 
     data class Gemstone(
-        var internalName: String = "",
-        var rough: String = "0",
-        var flawed: String = "0",
-        var fine: String = "0",
-        var flawless: String = "0",
-        var roughPrice: Int = 0,
-        var flawedPrice: Int = 0,
-        var finePrice: Int = 0,
-        var flawlessPrice: Int = 0,
+            var internalName: String = "",
+            var rough: String = "0",
+            var flawed: String = "0",
+            var fine: String = "0",
+            var flawless: String = "0",
+            var roughPrice: Int = 0,
+            var flawedPrice: Int = 0,
+            var finePrice: Int = 0,
+            var flawlessPrice: Int = 0,
     )
 
     data class Rune(
-        var stack: ItemStack? = null,
-        var lvl1: String = "0",
-        var lvl2: String = "0",
-        var lvl3: String = "0",
+            var stack: ItemStack? = null,
+            var lvl1: String = "0",
+            var lvl2: String = "0",
+            var lvl3: String = "0",
     )
 
     data class Item(
-        var internalName: String = "",
-        var colorCode: String = "",
-        var stored: String = "0",
-        var total: String = "0",
-        var price: Int = 0,
+            var internalName: String = "",
+            var colorCode: String = "",
+            var stored: String = "0",
+            var total: String = "0",
+            var price: Int = 0,
     )
+
+    enum class Trophy(private val bronzeValue: Int, private val silverValue: Int) {
+        BLOBFISH(4, 5),
+        FLYFISH(32, 48),
+        GOLDEN_FISH(400, 700),
+        GUSHER(32, 48),
+        KARATE_FISH(40, 60),
+        LAVAHORSE(12, 16),
+        MANA_RAY(40, 60),
+        MOLDFIN(32, 48),
+        SKELETON_FISH(32, 48),
+        SLUGFISH(40, 60),
+        SOUL_FISH(32, 48),
+        STEAMING_HOT_FLOUNDER(20, 28),
+        SULPHUR_SKITTER(40, 60),
+        VANILLE(80, 120),
+        VOLCANIC_STONEFISH(20, 28),
+        OBFUSCATED_1(16, 24),
+        OBFUSCATED_2(40, 60),
+        OBFUSCATED_3(400, 700);
+
+        fun convert(rarity: TrophyRarity, stored: String): String {
+            return when (rarity) {
+                TrophyRarity.BRONZE -> (this.bronzeValue * stored.formatNumber().toInt()).toString()
+                TrophyRarity.SILVER -> (this.silverValue * stored.formatNumber().toInt()).toString()
+                else -> "0"
+            }
+        }
+    }
+
+    enum class TrophyRarity {
+        NONE, BRONZE, SILVER
+    }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isRuneDisplayEnabled() = config.showRunes
 
     private fun calculatePrice(internalName: String, stored: String) = when (config.priceFrom) {
-        0 -> (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+        0 -> {
+            (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+        }
 
         1 -> try {
             val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
