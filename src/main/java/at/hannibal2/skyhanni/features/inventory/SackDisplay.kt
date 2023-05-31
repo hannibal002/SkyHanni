@@ -37,30 +37,30 @@ class SackDisplay {
     private val gemstoneItem = mutableMapOf<String, Gemstone>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
     private val gemstoneMap = mapOf(
-            "Jade Gemstones" to "ROUGH_JADE_GEM",
-            "Amber Gemstones" to "ROUGH_AMBER_GEM",
-            "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
-            "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
-            "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
-            "Jasper Gemstones" to "ROUGH_JASPER_GEM",
-            "Ruby Gemstones" to "ROUGH_RUBY_GEM",
-            "Opal Gemstones" to "ROUGH_OPAL_GEM"
+        "Jade Gemstones" to "ROUGH_JADE_GEM",
+        "Amber Gemstones" to "ROUGH_AMBER_GEM",
+        "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
+        "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
+        "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
+        "Jasper Gemstones" to "ROUGH_JASPER_GEM",
+        "Ruby Gemstones" to "ROUGH_RUBY_GEM",
+        "Opal Gemstones" to "ROUGH_OPAL_GEM"
     )
 
     private val numPattern =
-            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
+        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val gemstonePattern =
-            " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
+        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
 
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
             config.position.renderStringsAndItems(
-                    display,
-                    extraSpace = config.extraSpace,
-                    itemScale = 1.3,
-                    posLabel = "Sacks Items"
+                display,
+                extraSpace = config.extraSpace,
+                itemScale = 1.3,
+                posLabel = "Sacks Items"
             )
         }
     }
@@ -231,7 +231,7 @@ class SackDisplay {
                         gem.internalName = gemstoneMap[name.removeColor()].toString()
                         if (gemstoneMap.containsKey(name.removeColor())) {
                             val internalName =
-                                    "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                                "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
 
                             when (rarity) {
                                 "Rough" -> {
@@ -299,30 +299,30 @@ class SackDisplay {
 
 
     data class Gemstone(
-            var internalName: String = "",
-            var rough: String = "0",
-            var flawed: String = "0",
-            var fine: String = "0",
-            var flawless: String = "0",
-            var roughPrice: Int = 0,
-            var flawedPrice: Int = 0,
-            var finePrice: Int = 0,
-            var flawlessPrice: Int = 0,
+        var internalName: String = "",
+        var rough: String = "0",
+        var flawed: String = "0",
+        var fine: String = "0",
+        var flawless: String = "0",
+        var roughPrice: Int = 0,
+        var flawedPrice: Int = 0,
+        var finePrice: Int = 0,
+        var flawlessPrice: Int = 0,
     )
 
     data class Rune(
-            var stack: ItemStack? = null,
-            var lvl1: String = "0",
-            var lvl2: String = "0",
-            var lvl3: String = "0",
+        var stack: ItemStack? = null,
+        var lvl1: String = "0",
+        var lvl2: String = "0",
+        var lvl3: String = "0",
     )
 
     data class Item(
-            var internalName: String = "",
-            var colorCode: String = "",
-            var stored: String = "0",
-            var total: String = "0",
-            var price: Int = 0,
+        var internalName: String = "",
+        var colorCode: String = "",
+        var stored: String = "0",
+        var total: String = "0",
+        var price: Int = 0,
     )
 
     enum class Trophy(private val bronzeValue: Int, private val silverValue: Int) {
