@@ -130,7 +130,7 @@ public class Fishing {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show the fished item name above the item when fishing.")
         @ConfigEditorBoolean
-        public boolean enabled = false;
+        public boolean enabled = true;
 
         @Expose
         @ConfigOption(name = "Show Bait", desc = "Also how the name of the consumed bait.")
