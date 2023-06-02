@@ -24,6 +24,9 @@ import java.util.regex.Pattern
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
 
+val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
+val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
+
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
 
     NONE(null),
@@ -49,8 +52,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     PURSE({
         val scoreboard = ScoreboardData.sidebarLinesFormatted
-        val purseRegex =
-            Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""") // Matches coins amount in purse or piggy, with optional decimal points
+        // Matches coins amount in purse or piggy, with optional decimal points
         val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
             purseRegex.find(it.removeColor())?.groupValues?.get(1)
         }
@@ -64,7 +66,6 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     BITS({
         val scoreboard = ScoreboardData.sidebarLinesFormatted
-        val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
         val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
             bitsRegex.find(it.removeColor())?.groupValues?.get(1)
         }
