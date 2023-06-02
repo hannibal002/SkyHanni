@@ -194,8 +194,4 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             if (currentEquipment == 0) 78 else 19.5,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
     }
-
-    override fun handleMouseInput() {
-        return
-    }
 }

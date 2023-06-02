@@ -2,46 +2,41 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.MathHelper
-import org.lwjgl.input.Mouse
+import java.text.DecimalFormat
 
 class UpgradePage: FFGuideGUI.FFGuidePage() {
     private var pageScroll = 0
     private var scrollVelocity = 0.0
-    private var noInputFrames = 0
-    private val maxNoInputFrames = 30
-    private val baseY = FFGuideGUI.guiTop + 20
+    private val maxNoInputFrames = 100
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-//        for ((index, upgrade) in FortuneUpgrades.generateGenericUpgrades()) {
-//
-//        }
-        return
+        val adjustedY = FFGuideGUI.guiTop + 20 + pageScroll
+        val inverseScale = 1 / 0.7f
 
+        GlStateManager.scale(0.7f, 0.7f, 0.7f)
+        for ((index, upgrade) in FortuneUpgrades.genericUpgrades.withIndex()) {
+            // should never be null
+            GuiRenderUtils.drawString(upgrade.description, (FFGuideGUI.guiLeft + 15)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(DecimalFormat("0.##").format(upgrade.fortuneIncrease), (FFGuideGUI.guiLeft + 220)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(upgrade.cost?.addSeparators() ?: "unknown", (FFGuideGUI.guiLeft + 250)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+        }
+        GlStateManager.scale(inverseScale, inverseScale, inverseScale)
+        scrollScreen()
     }
 
-
-
-
-    // works well need to add max scroll, and stop things from rendering if they go above/below a certain point
-    //todo add a scroll bar?, test on trackpad, if it works then no
-    override fun handleMouseInput() {
-        var scrollDelta = 0
-
-        while (Mouse.next()) {
-            if (Mouse.getEventDWheel() != 0) {
-                scrollDelta += Mouse.getEventDWheel()
-                noInputFrames = 0
-            }
-        }
-        scrollVelocity += scrollDelta / 48.0
+    private fun scrollScreen() {
+        scrollVelocity += FFGuideGUI.lastMouseScroll / 48.0
         scrollVelocity *= 0.95
-        pageScroll += scrollVelocity.toInt() + scrollDelta / 24
+        pageScroll += scrollVelocity.toInt() + FFGuideGUI.lastMouseScroll / 24
 
-        noInputFrames++
+        FFGuideGUI.noMouseScrollFrames++
 
-        if (noInputFrames >= maxNoInputFrames) {
-            scrollVelocity *= 0.5
+        if (FFGuideGUI.noMouseScrollFrames >= maxNoInputFrames) {
+            scrollVelocity *= 0.75
         }
 
         if (pageScroll > 0) {
@@ -49,10 +44,10 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
         }
 
         // todo
-//        pageScroll = MathHelper.clamp_int(pageScroll, -100, 0)
-
-
-        // if over or under either max for scrolling stop them. Maybe let it scroll 1/2 a length more downwards.
-        //Make sure this works if there is only a small amount of recommendations
+        // pageScroll = MathHelper.clamp_int(pageScroll, -100, 0)
+        FFGuideGUI.lastMouseScroll = 0
     }
+
+    // works well need to add max scroll, and stop things from rendering if they go above/below a certain point
+    //todo add a scroll bar?, test on trackpad, if it works then no
 }

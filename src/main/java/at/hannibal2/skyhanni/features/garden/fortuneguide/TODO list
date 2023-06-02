@@ -22,6 +22,8 @@ Guide for cheapest upgrades:
         - Crop upgrade
         - Turbo crop
 
+Big warning for missing data (pets, armor, equipment) (if it has to generate a fallback item)
+Big warnign for misisng skill level, anita, plots
 Indicator when some of your gear is outdated
     - Little sign telling you
     - Line in the tooltip of the item
@@ -33,6 +35,7 @@ Changing lore on items inside the menu to reflect changes
 Max value on bars will update depending on chosen pet
     - Will be visible on all pages
 
+If you have show as drop multiplier off -100ff
 When opening the menu it will open to the tool you are currently holding
 It will also auto select the current pet you have out if that is a farming pet
 

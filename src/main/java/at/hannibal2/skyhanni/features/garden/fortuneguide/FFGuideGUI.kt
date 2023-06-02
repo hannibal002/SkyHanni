@@ -35,6 +35,8 @@ open class FFGuideGUI : GuiScreen() {
 
         var mouseX = 0
         var mouseY = 0
+        var lastMouseScroll = 0
+        var noMouseScrollFrames = 0
 
         var tooltipToDisplay = mutableListOf<String>()
 
@@ -175,10 +177,6 @@ open class FFGuideGUI : GuiScreen() {
 
         pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)
 
-        if (selectedPage == FortuneGuidePage.UPGRADES) {
-            pages[selectedPage]?.handleMouseInput()
-        }
-
         GlStateManager.popMatrix()
 
         if (tooltipToDisplay.isNotEmpty()) {
@@ -187,10 +185,23 @@ open class FFGuideGUI : GuiScreen() {
         }
     }
 
-    @Throws(IOException::class)
-    override fun mouseClicked(originalX: Int, originalY: Int, mouseButton: Int) {
-        super.mouseClicked(originalX, originalY, mouseButton)
+    override fun handleMouseInput() {
+        super.handleMouseInput()
 
+        if (Mouse.getEventButtonState()) {
+            mouseClickEvent()
+        }
+        if (!Mouse.getEventButtonState()) {
+            if (Mouse.getEventDWheel() != 0) {
+                lastMouseScroll = Mouse.getEventDWheel()
+                noMouseScrollFrames = 0
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    fun mouseClickEvent() {
+        println("X: $mouseX, Y: $mouseY")
         var x = guiLeft + 15
         var y = guiTop - 28
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
@@ -240,9 +251,7 @@ open class FFGuideGUI : GuiScreen() {
             }
         }
 
-        if (selectedPage == FortuneGuidePage.UPGRADES) {
-            return
-        } else {
+        if (selectedPage != FortuneGuidePage.UPGRADES) {
             if (currentCrop == null) {
                 if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft + 152, guiTop + 130,
                         16, 16) && currentPet != FarmingItems.ELEPHANT) {
@@ -323,7 +332,6 @@ open class FFGuideGUI : GuiScreen() {
             }
         }
 
-        //todo get icons for these
         x = guiLeft - 28
         y = guiTop + 15
 
@@ -348,7 +356,5 @@ open class FFGuideGUI : GuiScreen() {
 
     abstract class FFGuidePage {
         abstract fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float)
-
-        abstract fun handleMouseInput()
     }
 }

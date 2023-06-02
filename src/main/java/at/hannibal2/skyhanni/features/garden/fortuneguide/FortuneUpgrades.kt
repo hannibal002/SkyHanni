@@ -18,7 +18,7 @@ object FortuneUpgrades {
     private val equipment = listOf(FarmingItems.NECKLACE, FarmingItems.CLOAK, FarmingItems.BELT, FarmingItems.BRACELET)
     private val armor = listOf(FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS, FarmingItems.BOOTS)
 
-    private val genericUpgrades = mutableListOf<FortuneUpgrade>()
+    val genericUpgrades = mutableListOf<FortuneUpgrade>()
 
     //todo ironman mode & stranded mode
     // symbol when this is activated, set by default
@@ -81,7 +81,7 @@ object FortuneUpgrades {
             if (greenThumbLvl != 5) {
                 //todo maybe suggest higher tier books instead of all t1
                 // if do this make sure there is ironman/stranded support
-                genericUpgrades.add(FortuneUpgrade("Upgrade your ${item.displayName} to green thumb ${greenThumbLvl + 1}",
+                genericUpgrades.add(FortuneUpgrade("Upgrade your ${item.displayName} §fto green thumb ${greenThumbLvl + 1}",
                     1500, "GREEN_THUMB;1", getNeededBooks(greenThumbLvl), visitors * 0.05))
             }
             recombobulateItem(item)
@@ -130,7 +130,7 @@ object FortuneUpgrades {
 //                        null, "GREEN_BANDANA", -1, (4.0 * gardenLvl).coerceAtMost(60.0)))
                 }
                 else -> {
-                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} a yellow bandana",
+                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} §fa yellow bandana",
                         300, null, null, 30.0))
                 }
             }
@@ -164,7 +164,7 @@ object FortuneUpgrades {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
 
         val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
-        genericUpgrades.add(FortuneUpgrade("Reforge your ${item.displayName} to ${reforge.reforgeName}",
+        genericUpgrades.add(FortuneUpgrade("Reforge your ${item.displayName}§f to ${reforge.reforgeName}",
             copperPrice, reforge.reforgeItem, 1, increase))
     }
 
