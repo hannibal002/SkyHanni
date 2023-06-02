@@ -21,53 +21,57 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
 import java.util.regex.Pattern
 
+var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
+    mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
+
+val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
+val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
+
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
 
     NONE(null),
 
     LOCATION({
-        val location = LorenzUtils.skyBlockArea
-        if (location == "Your Island") {
-            "Private Island"
-        } else {
-            location
-            /**
-             * looks slightly weird if visiting someone else's island,
-             *    I was thinking of using LorenzUtils . skyblockIsland to determine if they're visiting,
-             *    but it takes too long to load, so we 'd have to put in some sort of artificial delay
-             *    like what I did in DiscordRPCManager.onWorldChange.
-             *    after that, use the tab-list "Owner:" line to get the person we're visiting, but I don't know if
-             *    that'll work with coops, and you'd have to deal with color codes as well
-             *    as again, I'm pretty sure sba had "'s Island" without the name filled in this entire time,
-             *    so I 'd rather have [RANK] NameThatGetsCutOff for example than 's Island
-             */
+        var location = LorenzUtils.skyBlockArea
+        if (location == "Your Island") location = "Private Island"
+        if (location != "None" && location != "invalid") {
+            lastKnownDisplayStrings[LOCATION] = location
         }
+        lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
+        /**
+         *    looks slightly weird if visiting someone else's island,
+         *    I was thinking of using LorenzUtils.skyblockIsland to determine if they're visiting,
+         *    but it takes too long to load, so we 'd have to put in some sort of artificial delay
+         *    like what I did in DiscordRPCManager.onWorldChange.
+         *    after that, use the tab-list "Owner:" line to get the person we're visiting, but I don't know
+         *    if that'll work with coops, and you'd have to deal with color codes as well
+         *    anyway, I'm pretty sure sba had "'s Island" without the name filled in this entire time,
+         *    so I'd rather have [RANK] NameThatGetsCutOff for example than 's Island
+         */
     }),
 
     PURSE({
         val scoreboard = ScoreboardData.sidebarLinesFormatted
-        var coins = ""
-
-        for (line in scoreboard) {
-            if (line.startsWith("Purse: ") || line.startsWith("Piggy: ")) {
-                coins = line.subSequence(9 until line.length).toString()
-            }
+        // Matches coins amount in purse or piggy, with optional decimal points
+        val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
+            purseRegex.find(it.removeColor())?.groupValues?.get(1)
         }
-
-        if (coins == "1") "1 Coin" else "$coins Coins"
+        if (coins == "1") {
+            lastKnownDisplayStrings[PURSE] = "1 Coin"
+        } else if (coins != "") {
+            lastKnownDisplayStrings[PURSE] = "$coins Coins"
+        }
+        lastKnownDisplayStrings[PURSE] ?: ""
     }),
 
     BITS({
-        var bits = ""
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (line.startsWith("Bits: ")) {
-                bits = line.subSequence(8 until line.length).toString()
-            }
+        val scoreboard = ScoreboardData.sidebarLinesFormatted
+        val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
+            bitsRegex.find(it.removeColor())?.groupValues?.get(1)
         }
-
         when (bits) {
             "1" -> "1 Bit"
-            "" -> "0 Bits"
+            null -> "0 Bits"
             else -> "$bits Bits"
         }
     }),
@@ -82,7 +86,10 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                 "✎" -> statString = "$statString✎${groups[item - 1]} "
             }
         }
-        statString
+        if (groups.isNotEmpty()) {
+            lastKnownDisplayStrings[STATS] = statString
+        }
+        lastKnownDisplayStrings[STATS] ?: ""
     }),
 
     ITEM({
@@ -168,7 +175,10 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             LorenzUtils.formatPercentage(crop.progressToNextLevel())
         } ?: 100 // percentage to next milestone
 
-        tier?.let { "${crop.cropName}: Milestone $it ($progress)" } ?: ""
+        if (tier != null) {
+            lastKnownDisplayStrings[CROP_MILESTONES] = tier.let { "${crop.cropName}: Milestone $it ($progress)" }
+        }
+        lastKnownDisplayStrings[CROP_MILESTONES] ?: ""
     }),
 
     PETS({
@@ -178,7 +188,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             val petLevel = getCurrentPet().petLevel.currentLevel
 
             "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
-        } ?: ""
+        } ?: "No pet equipped"
     })
     ;
 
