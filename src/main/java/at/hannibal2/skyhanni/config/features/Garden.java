@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
@@ -1155,7 +1154,7 @@ public class Garden {
         public boolean enabled = true;
 
         @ConfigOption(name = "Hard Reset", desc = "Reset every slot to it's original item.")
-        @ConfigEditorButton
+        @ConfigEditorButton(buttonText = "Reset")
         public Runnable hardReset = () -> {
             GardenPlotIcon.INSTANCE.setHardReset(true);
             LorenzUtils.INSTANCE.sendCommandToServer("desk");
