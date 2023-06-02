@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.item.ItemStack
@@ -240,7 +241,7 @@ class FarmingFortuneDisplay {
                     reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
 
                     itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
-                    else displayedFortune - reforgeFortune - enchantmentFortune
+                    else displayedFortune - reforgeFortune - enchantmentFortune - (tool.getFarmingForDummiesCount() ?: 0 ) * 1.0
                     greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
                         displayedFortune - reforgeFortune - itemBaseFortune
                     } else 0.0

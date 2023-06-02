@@ -1040,7 +1040,7 @@ public class Garden {
     public boolean farmingFortuneDropMultiplier = true;
 
     @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your farming fortune.\n§eCommand: /ff")
-    @ConfigEditorButton(buttonText = "§2Open")
+    @ConfigEditorButton(buttonText = "Open")
     public Runnable positions = Commands::openFortuneGuide;
 
     @Expose
