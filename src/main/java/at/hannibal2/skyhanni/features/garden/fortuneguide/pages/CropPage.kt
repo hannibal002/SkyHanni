@@ -37,4 +37,8 @@ class CropPage: FFGuideGUI.FFGuidePage() {
             }
         }
     }
+
+    override fun handleMouseInput() {
+        return
+    }
 }
