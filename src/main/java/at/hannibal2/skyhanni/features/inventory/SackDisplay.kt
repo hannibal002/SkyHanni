@@ -97,33 +97,33 @@ class SackDisplay {
                 val (internalName, colorCode, stored, total, price) = item
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
-                val list = mutableListOf<Any>()
                 if (stored == "0" && !config.showEmpty) continue
                 val itemStack = NEUItems.getItemStack(internalName)
-                list.add(" §7- ")
-                list.add(itemStack)
-                list.add(Renderable.optionalLink("${itemName.replace("§k", "")}: ", {
-                    if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
-                        LorenzUtils.sendCommandToServer("bz ${itemName.removeColor()}")
-                    }
-                }) { !NEUItems.neuHasFocus() })
+                newDisplay.add(buildList {
+                    add(" §7- ")
+                    add(itemStack)
+                    if (!isTrophySack)
+                        add(Renderable.optionalLink("${itemName.replace("§k", "")}: ", {
+                            if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
+                                LorenzUtils.sendCommandToServer("bz ${itemName.removeColor()}")
+                            }
+                        }) { !NEUItems.neuHasFocus() })
+                    else
+                        add("${itemName.replace("§k", "")}: ")
 
-                val displayItem = when (config.numberFormat) {
-                    0 -> "$colorCode${stored}§7/§b${total}"
-                    1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
-                    2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
-                    else -> "$colorCode${stored}§7/§b${total}"
-                }
+                    add(when (config.numberFormat) {
+                        0 -> "$colorCode${stored}§7/§b${total}"
+                        1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                        2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
+                        else -> "$colorCode${stored}§7/§b${total}"
+                    })
 
-                list.add(displayItem)
-                if (colorCode == "§a") // §a = Full, §e = Not full, §7 = Empty
-                    list.add(" §c§l(Full!)")
-
-                if (config.showPrice && price != 0)
-                    list.add(" §7(§6${format(price)}§7)")
-
+                    if (colorCode == "§a")
+                        add(" §c§l(Full!)")
+                    if (config.showPrice && price != 0)
+                        add(" §7(§6${format(price)}§7)")
+                })
                 rendered++
-                newDisplay.add(list)
             }
 
             newDisplay.add(buildList {
@@ -149,7 +149,6 @@ class SackDisplay {
                     }) { !NEUItems.neuHasFocus() })
                 }
             })
-
             if (config.showPrice)
                 newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
         }
@@ -199,6 +198,7 @@ class SackDisplay {
         inInventory = false
         isRuneSack = false
         isGemstoneSack = false
+        isTrophySack = false
         runeItem.clear()
         gemstoneItem.clear()
         sackItem.clear()
