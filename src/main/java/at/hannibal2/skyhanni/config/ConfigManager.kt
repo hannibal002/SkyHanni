@@ -45,17 +45,17 @@ class ConfigManager {
                     return LorenzVec(x, y, z)
                 }
             }.nullSafe())
-                .registerTypeAdapter(ItemStack::class.java, object : TypeAdapter<ItemStack>() {
-                    override fun write(out: JsonWriter, value: ItemStack) {
-                        out.value(NEUItems.saveNBTData(value))
-                    }
+            .registerTypeAdapter(ItemStack::class.java, object : TypeAdapter<ItemStack>() {
+                override fun write(out: JsonWriter, value: ItemStack) {
+                    out.value(NEUItems.saveNBTData(value))
+                }
 
-                    override fun read(reader: JsonReader): ItemStack {
-                        return NEUItems.loadNBTData(reader.nextString())
-                    }
-                }.nullSafe())
-                .enableComplexMapKeySerialization()
-                .create()
+                override fun read(reader: JsonReader): ItemStack {
+                    return NEUItems.loadNBTData(reader.nextString())
+                }
+            }.nullSafe())
+            .enableComplexMapKeySerialization()
+            .create()
     }
 
     lateinit var features: Features
