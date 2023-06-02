@@ -153,6 +153,13 @@ public class Storage {
             }
 
             @Expose
+            public PlotIcon plotIcon = new PlotIcon();
+            public static class PlotIcon {
+                @Expose
+                public Map<Integer, String> plotList = new HashMap<>();
+            }
+
+            @Expose
             public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
 
             @Expose
