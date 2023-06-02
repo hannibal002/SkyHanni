@@ -447,6 +447,11 @@ public class Misc {
     public boolean serverRestartTitle = true;
 
     @Expose
+    @ConfigOption(name = "Pocket Sack-In-A-Sack Applied", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack.")
+    @ConfigEditorBoolean
+    public boolean sackInASackApplied = true;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
