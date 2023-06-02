@@ -27,6 +27,7 @@ class SackDisplay {
         var inInventory = false
         var isRuneSack = false
         var isGemstoneSack = false
+        var isTrophySack = false
     }
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
@@ -96,34 +97,33 @@ class SackDisplay {
                 val (internalName, colorCode, stored, total, price) = item
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
-                val list = mutableListOf<Any>()
                 if (stored == "0" && !config.showEmpty) continue
                 val itemStack = NEUItems.getItemStack(internalName)
-                list.add(" §7- ")
-                list.add(itemStack)
+                newDisplay.add(buildList {
+                    add(" §7- ")
+                    add(itemStack)
+                    if (!isTrophySack)
+                        add(Renderable.optionalLink("${itemName.replace("§k", "")}: ", {
+                            if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
+                                LorenzUtils.sendCommandToServer("bz ${itemName.removeColor()}")
+                            }
+                        }) { !NEUItems.neuHasFocus() })
+                    else
+                        add("${itemName.replace("§k", "")}: ")
 
-                list.add(Renderable.optionalLink("$itemName: ", {
-                    if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
-                        LorenzUtils.sendCommandToServer("bz ${itemName.removeColor()}")
-                    }
-                }) { !NEUItems.neuHasFocus() })
+                    add(when (config.numberFormat) {
+                        0 -> "$colorCode${stored}§7/§b${total}"
+                        1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                        2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
+                        else -> "$colorCode${stored}§7/§b${total}"
+                    })
 
-                val displayItem = when (config.numberFormat) {
-                    0 -> "$colorCode${stored}§7/§b${total}"
-                    1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
-                    2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
-                    else -> "$colorCode${stored}§7/§b${total}"
-                }
-
-                list.add(displayItem)
-                if (colorCode == "§a") // §a = Full, §e = Not full, §7 = Empty
-                    list.add(" §c§l(Full!)")
-
-                if (config.showPrice && price != 0)
-                    list.add(" §7(§6${format(price)}§7)")
-
+                    if (colorCode == "§a")
+                        add(" §c§l(Full!)")
+                    if (config.showPrice && price != 0)
+                        add(" §7(§6${format(price)}§7)")
+                })
                 rendered++
-                newDisplay.add(list)
             }
 
             newDisplay.add(buildList {
@@ -149,7 +149,6 @@ class SackDisplay {
                     }) { !NEUItems.neuHasFocus() })
                 }
             })
-
             if (config.showPrice)
                 newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
         }
@@ -199,6 +198,7 @@ class SackDisplay {
         inInventory = false
         isRuneSack = false
         isGemstoneSack = false
+        isTrophySack = false
         runeItem.clear()
         gemstoneItem.clear()
         sackItem.clear()
@@ -214,6 +214,8 @@ class SackDisplay {
         val stacks = event.inventoryItems
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
+        isTrophySack = inventoryName.contains("Trophy Fishing Sack")
+        val sackRarity = if (inventoryName.startsWith("Bronze")) TrophyRarity.BRONZE else if (inventoryName.startsWith("Silver")) TrophyRarity.SILVER else TrophyRarity.NONE
         inInventory = true
         for ((_, stack) in stacks) {
             val name = stack.name ?: continue
@@ -262,26 +264,13 @@ class SackDisplay {
                         val internalName = stack.getInternalName()
                         item.internalName = internalName
                         item.colorCode = group("color")
-                        val price: Int = when (config.priceFrom) {
-                            0 -> {
-                                (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
-                            }
-
-                            1 -> {
-                                try {
-                                    val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-                                    (((bazaarData?.npcPrice?.toInt() ?: 0) * stored.formatNumber())).toInt()
-
-                                } catch (e: Exception) {
-                                    0
-                                }
-                            }
-
-                            else -> 0
-                        }
                         item.stored = stored
                         item.total = total
-                        item.price = price
+                        if (isTrophySack) {
+                            val trophyName = name.removeColor().uppercase().replace(" ", "_").replace("-", "_")
+                            item.price = calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
+                        } else
+                            item.price = calculatePrice(internalName, stored)
 
                         if (isRuneSack) {
                             val level = group("level")
@@ -336,11 +325,46 @@ class SackDisplay {
         var price: Int = 0,
     )
 
+    enum class Trophy(private val bronzeValue: Int, private val silverValue: Int) {
+        BLOBFISH(4, 5),
+        FLYFISH(32, 48),
+        GOLDEN_FISH(400, 700),
+        GUSHER(32, 48),
+        KARATE_FISH(40, 60),
+        LAVAHORSE(12, 16),
+        MANA_RAY(40, 60),
+        MOLDFIN(32, 48),
+        SKELETON_FISH(32, 48),
+        SLUGFISH(40, 60),
+        SOUL_FISH(32, 48),
+        STEAMING_HOT_FLOUNDER(20, 28),
+        SULPHUR_SKITTER(40, 60),
+        VANILLE(80, 120),
+        VOLCANIC_STONEFISH(20, 28),
+        OBFUSCATED_1(16, 24),
+        OBFUSCATED_2(40, 60),
+        OBFUSCATED_3(400, 700);
+
+        fun convert(rarity: TrophyRarity, stored: String): String {
+            return when (rarity) {
+                TrophyRarity.BRONZE -> (this.bronzeValue * stored.formatNumber().toInt()).toString()
+                TrophyRarity.SILVER -> (this.silverValue * stored.formatNumber().toInt()).toString()
+                else -> "0"
+            }
+        }
+    }
+
+    enum class TrophyRarity {
+        NONE, BRONZE, SILVER
+    }
+
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isRuneDisplayEnabled() = config.showRunes
 
     private fun calculatePrice(internalName: String, stored: String) = when (config.priceFrom) {
-        0 -> (NEUItems.getPrice(internalName) * stored.formatNumber()).toInt()
+        0 -> {
+            (NEUItems.getPrice(internalName, true) * stored.formatNumber()).toInt()
+        }
 
         1 -> try {
             val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
