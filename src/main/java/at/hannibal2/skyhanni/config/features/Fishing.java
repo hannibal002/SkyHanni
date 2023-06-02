@@ -121,6 +121,25 @@ public class Fishing {
     }
 
     @Expose
+    @ConfigOption(name = "Fished Item Name", desc = "")
+    @Accordion
+    public FishedItemName fishedItemName = new FishedItemName();
+
+    public static class FishedItemName {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show the fished item name above the item when fishing.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Show Bait", desc = "Also how the name of the consumed bait.")
+        @ConfigEditorBoolean
+        public boolean showBaits = false;
+
+    }
+
+    @Expose
     @ConfigOption(
             name = "Shark Fish Counter",
             desc = "Counts how many sharks have been caught."

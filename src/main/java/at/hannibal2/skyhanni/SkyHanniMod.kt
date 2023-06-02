@@ -95,7 +95,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.10",
+    version = "0.18.Beta.11",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -284,6 +284,7 @@ class SkyHanniMod {
         loadModule(CityProjectFeatures())
         loadModule(GardenPlotIcon)
         loadModule(PocketSackInASackDisplay())
+        loadModule(ShowFishingItemName())
 
         init()
 
