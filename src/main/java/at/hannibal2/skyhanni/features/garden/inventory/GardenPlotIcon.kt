@@ -31,6 +31,7 @@ object GardenPlotIcon {
     private var originalStack = mutableMapOf<Int, ItemStack>()
     private var cachedStack = mutableMapOf<Int, ItemStack>()
     private val editStack = ItemStack(Items.wooden_axe)
+    private val whitelistedSlot = listOf(2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)
 
     var hardReset = false
 
@@ -48,6 +49,7 @@ object GardenPlotIcon {
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
             val new = NEUItems.getItemStack(internalName)
+
             cachedStack[index] = Utils.editItemStackInfo(new, old.displayName, true, *old.getLore().toTypedArray())
         }
     }
@@ -58,7 +60,7 @@ object GardenPlotIcon {
         editMode = 0
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return
@@ -82,7 +84,7 @@ object GardenPlotIcon {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onStackClick(event: SlotClickEvent) {
         if (!isEnabled()) return
         lastClickedSlotId = event.slotId
@@ -106,12 +108,11 @@ object GardenPlotIcon {
                 event.isCanceled = true
                 if (event.slot.stack == null) return
                 copyStack = event.slot.stack
-                chat("§6§lClick an item in the desk menu to replace it with that item!")
                 return
             }
             if (event.slotId != 53) {
                 val plotList = plotList ?: return
-                if (!event.slot.stack.displayName.removeColor().startsWith("Plot")) return
+                if (!whitelistedSlot.contains(event.slotId)) return
                 event.isCanceled = true
                 if (editMode == 2) {
                     plotList.remove(event.slotId)
