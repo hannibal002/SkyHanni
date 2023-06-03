@@ -49,7 +49,6 @@ object GardenPlotIcon {
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
             val new = NEUItems.getItemStack(internalName)
-
             cachedStack[index] = Utils.editItemStackInfo(new, old.displayName, true, *old.getLore().toTypedArray())
         }
     }
@@ -60,7 +59,7 @@ object GardenPlotIcon {
         editMode = 0
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return
@@ -84,7 +83,7 @@ object GardenPlotIcon {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (!isEnabled()) return
         lastClickedSlotId = event.slotId
@@ -108,6 +107,7 @@ object GardenPlotIcon {
                 event.isCanceled = true
                 if (event.slot.stack == null) return
                 copyStack = event.slot.stack
+                chat("§6§lClick an item in the desk menu to replace it with that item!")
                 return
             }
             if (event.slotId != 53) {
