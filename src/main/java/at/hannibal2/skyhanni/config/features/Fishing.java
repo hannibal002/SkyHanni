@@ -133,7 +133,7 @@ public class Fishing {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Show Bait", desc = "Also how the name of the consumed bait.")
+        @ConfigOption(name = "Show Bait", desc = "Also show the name of the consumed bait.")
         @ConfigEditorBoolean
         public boolean showBaits = false;
 
