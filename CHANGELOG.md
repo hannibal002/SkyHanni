@@ -22,6 +22,8 @@
   + Show missing items to contribute inside the inventory
     + Click on the item name to open the bazaar
   + Highlight a component in the inventory that can be contributed
++ Added `/pt <player>` alias for `/party transfer <player>`
+  + SkyBlock Command `/tp` to check the play time still works
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
