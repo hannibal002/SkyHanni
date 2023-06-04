@@ -423,6 +423,24 @@ public class Misc {
         public boolean vipVisits = true;
     }
 
+    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
+    @Accordion
+    @Expose
+    public PocketSackInASack pocketSackInASack = new PocketSackInASack();
+
+    public static class PocketSackInASack {
+
+        @Expose
+        @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack.")
+        @ConfigEditorBoolean
+        public boolean showApplied = false;
+
+        @Expose
+        @ConfigOption(name = "Replace In Lore", desc = "Replace how text is displayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
+        @ConfigEditorBoolean
+        public boolean replaceLore = false;
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
@@ -483,11 +501,6 @@ public class Misc {
     @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     public boolean serverRestartTitle = true;
-
-    @Expose
-    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack.")
-    @ConfigEditorBoolean
-    public boolean sackInASackApplied = false;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
