@@ -10,7 +10,7 @@ object TabComplete {
             if (command.startsWith("/")) {
                 command = command.substring(1)
                 customTabComplete(command, originalArray)?.let {
-                    return buildResponse(splits, it).toTypedArray()
+                    return buildResponse(splits, it).toSet().toTypedArray()
                 }
             }
         }
