@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -40,6 +41,7 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     override fun onGuiClosed() {
         super.onGuiClosed()
         clickedPos = -1
+        OtherInventoryData.close()
     }
 
     override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
