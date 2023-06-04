@@ -436,7 +436,7 @@ public class Misc {
         public boolean showApplied = false;
 
         @Expose
-        @ConfigOption(name = "Replace In Lore", desc = "Replace how text is dislayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
+        @ConfigOption(name = "Replace In Lore", desc = "Replace how text is displayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
         @ConfigEditorBoolean
         public boolean replaceLore = false;
     }
