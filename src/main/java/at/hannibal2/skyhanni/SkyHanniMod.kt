@@ -288,6 +288,7 @@ class SkyHanniMod {
         loadModule(ServerRestartTitle())
         loadModule(CityProjectFeatures())
         loadModule(GardenPlotIcon)
+        loadModule(PocketSackInASackDisplay())
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
 
