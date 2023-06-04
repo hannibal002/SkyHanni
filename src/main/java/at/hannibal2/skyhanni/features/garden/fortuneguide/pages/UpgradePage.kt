@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.MathHelper
@@ -15,14 +16,22 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         val adjustedY = FFGuideGUI.guiTop + 20 + pageScroll
-        val inverseScale = 1 / 0.7f
+        val inverseScale = 1 / 0.5f
 
-        GlStateManager.scale(0.7f, 0.7f, 0.7f)
+        GlStateManager.scale(0.5f, 0.5f, 0.5f)
+        GuiRenderUtils.drawString("Upgrade", (FFGuideGUI.guiLeft + 80)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+        GuiRenderUtils.drawString("FF increase", (FFGuideGUI.guiLeft + 190)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+        GuiRenderUtils.drawString("Cost per FF", (FFGuideGUI.guiLeft + 225)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+        GuiRenderUtils.drawString("Total cost", (FFGuideGUI.guiLeft + 260)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+        GuiRenderUtils.drawString("Time to earn back", (FFGuideGUI.guiLeft + 295)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+
         for ((index, upgrade) in FortuneUpgrades.genericUpgrades.withIndex()) {
-            // should never be null
+            if (adjustedY + 15 * index < FFGuideGUI.guiTop + 20) continue
+            if (adjustedY + 15 * index > FFGuideGUI.guiTop + 170) continue
             GuiRenderUtils.drawString(upgrade.description, (FFGuideGUI.guiLeft + 15)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(DecimalFormat("0.##").format(upgrade.fortuneIncrease), (FFGuideGUI.guiLeft + 220)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(upgrade.cost?.addSeparators() ?: "unknown", (FFGuideGUI.guiLeft + 250)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(DecimalFormat("0.##").format(upgrade.fortuneIncrease), (FFGuideGUI.guiLeft + 200)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(upgrade.costPerFF?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 235)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(upgrade.cost?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 270)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
         }
         GlStateManager.scale(inverseScale, inverseScale, inverseScale)
         scrollScreen()

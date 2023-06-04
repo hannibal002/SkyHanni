@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -151,7 +152,7 @@ class FarmingFortuneDisplay {
         private val collectionPattern = "§7You have §6\\+([\\d]{1,3})☘ Farming Fortune".toRegex()
         private val tooltipFortunePattern =
             "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
-        private val armorAbilityPattern = "§6Tiered Bonus: .* [(](?<pieces>.*)/4[)]".toPattern()
+        private val armorAbilityPattern = "Tiered Bonus: .* [(](?<pieces>.*)/4[)]".toPattern()
 
         var displayedFortune = 0.0
         var reforgeFortune = 0.0
@@ -209,21 +210,21 @@ class FarmingFortuneDisplay {
 
         fun getAbilityFortune(tool: ItemStack?):  Double  {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
-            // todo confirm it works on Melon and Cropie armor
+            // todo make it work on cropie and fermento
             val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()
-            var pieces = 0.0
+            var pieces = 0
             for (line in tool?.getLore()!!) {
                 if (tool.getInternalName().contains("LOTUS")) {
                     lotusAbilityPattern.matchMatcher(line) {
                         return group("bonus").toDouble()
                     }
                 }
-                armorAbilityPattern.matchMatcher(line) {
-                    pieces = group("pieces").toDouble()
+                armorAbilityPattern.matchMatcher(line.removeColor()) {
+                    pieces = group("pieces").toInt()
                 }
 
                 armorAbilityFortune.matchMatcher(line) {
-                    return group("bonus").toDouble() / pieces
+                    return if (pieces == 1 || pieces == 0) 0.0 else group("bonus").toDouble() / pieces
                 }
             }
             return 0.0

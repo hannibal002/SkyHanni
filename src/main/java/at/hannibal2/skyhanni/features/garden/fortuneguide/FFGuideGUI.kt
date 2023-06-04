@@ -201,7 +201,6 @@ open class FFGuideGUI : GuiScreen() {
 
     @Throws(IOException::class)
     fun mouseClickEvent() {
-        println("X: $mouseX, Y: $mouseY")
         var x = guiLeft + 15
         var y = guiTop - 28
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {

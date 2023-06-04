@@ -44,12 +44,6 @@ object FortuneUpgrades {
         getArmorUpgrades()
 
         genericUpgrades.populateAndSort(0)
-
-// test message for now
-
-        for (a in genericUpgrades) {
-            println(a)
-        }
     }
 
     //todo fix NEU price data not being loaded if run too early

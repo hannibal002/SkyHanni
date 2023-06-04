@@ -39,18 +39,20 @@ If you have show as drop multiplier off -100ff
 When opening the menu it will open to the tool you are currently holding
 It will also auto select the current pet you have out if that is a farming pet
 
+Add colours to the text
+
 Maybe:
 Clicking on the already selected crop up top will cycle between overview and upgrades
 
 Later on:
-
 GUI:
 Add a border around the edge of the display
 Make this adjust based on the selected page
 
 !!!!
-Buges:
+Bugs:
 Major:
+Sometimes the greenthumb visitor counter breaks?
 Sometimes the ff breakdown for equipment and armor does not work in the gui?
     - fixes by holding shift over an item in the inventory then going back into the gui
 If they sell their equipment or pets, they will be saved until a new one is bought and their stats counted : fix, don't liquidize your stuff lol
