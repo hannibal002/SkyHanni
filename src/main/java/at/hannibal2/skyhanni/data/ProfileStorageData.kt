@@ -102,7 +102,7 @@ object ProfileStorageData {
     }
 
     @SubscribeEvent
-    fun onConfigLoad(event: HypixelJoinEvent) {
+    fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
         migratePlayerSpecific()
