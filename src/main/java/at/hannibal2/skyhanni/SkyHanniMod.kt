@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
@@ -291,6 +292,7 @@ class SkyHanniMod {
         loadModule(PocketSackInASackDisplay())
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
+        loadModule(PlayerTabComplete)
 
         init()
 

@@ -418,7 +418,7 @@ public class Misc {
         public boolean party = true;
 
         @Expose
-        @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users like PortalHub or prtlhub")
+        @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users with cake souls on it.")
         @ConfigEditorBoolean
         public boolean vipVisits = true;
     }
