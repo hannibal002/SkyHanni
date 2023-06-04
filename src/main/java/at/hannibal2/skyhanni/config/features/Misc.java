@@ -385,6 +385,44 @@ public class Misc {
         public Position pos = new Position(150, 150, false, true);
     }
 
+    @ConfigOption(name = "Tab Complete Commands", desc = "")
+    @Accordion
+    @Expose
+    public TabCompleteCommands tabCompleteCommands = new TabCompleteCommands();
+
+    public static class TabCompleteCommands {
+
+        @Expose
+        @ConfigOption(name = "Warps", desc = "Tab complete the warp-point names when typing §e/warp <TAB>§7.")
+        @ConfigEditorBoolean
+        public boolean warps = true;
+
+        @Expose
+        @ConfigOption(name = "Island Players", desc = "Tab complete other players on the same island.")
+        @ConfigEditorBoolean
+        public boolean islandPlayers = true;
+
+        @Expose
+        @ConfigOption(name = "Friends", desc = "Tab complete friends from your friends list.")
+        @ConfigEditorBoolean
+        public boolean friends = true;
+
+        @Expose
+        @ConfigOption(name = "Only Best Friends", desc = "Only Tab Complete best friends.")
+        @ConfigEditorBoolean
+        public boolean onlyBestFriends = false;
+
+        @Expose
+        @ConfigOption(name = "Party", desc = "Tab complete party members.")
+        @ConfigEditorBoolean
+        public boolean party = true;
+
+        @Expose
+        @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users like PortalHub or prtlhub")
+        @ConfigEditorBoolean
+        public boolean vipVisits = true;
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
