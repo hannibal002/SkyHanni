@@ -19,7 +19,7 @@ class PocketSackInASackDisplay {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
-        if (!config.showApplied) return
+        if (!config.showOverlay) return
         val pocketSackInASackApplied = stack.getAppliedPocketSackInASack() ?: return
 
         val stackTip = "§a$pocketSackInASackApplied"
@@ -46,19 +46,20 @@ class PocketSackInASackDisplay {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent){
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.replaceLore) return
         if (!ItemUtils.isSack(event.itemStack.displayName)) return
         val it = event.toolTip.listIterator()
-        for (line in it){
-            valPattern.matchMatcher(line){
-                val replace = when (group("number")){
+        for (line in it) {
+            valPattern.matchMatcher(line) {
+                val replace = when (group("number")) {
                     "a" -> "§c1"
                     "two" -> "§62"
                     "three" -> "§a3"
                     else -> "0"
                 }
-                it.set(line.replace(Regex("\\b${group("number")}\\b"),  "$replace§7/§b3"))
+                it.set(line.replace(Regex("\\b${group("number")}\\b"), "$replace§7/§b3"))
             }
         }
     }

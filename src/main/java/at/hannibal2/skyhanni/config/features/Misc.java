@@ -431,14 +431,14 @@ public class Misc {
     public static class PocketSackInASack {
 
         @Expose
-        @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack.")
+        @ConfigOption(name = "Show in Overlay", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack icon as overlay.")
         @ConfigEditorBoolean
-        public boolean showApplied = false;
+        public boolean showOverlay = false;
 
         @Expose
         @ConfigOption(name = "Replace In Lore", desc = "Replace how text is displayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
         @ConfigEditorBoolean
-        public boolean replaceLore = false;
+        public boolean replaceLore = true;
     }
 
     @Expose
