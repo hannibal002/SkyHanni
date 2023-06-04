@@ -185,7 +185,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         ProfileStorageData.profileSpecific?.currentPet?.let {
             val colorCode = it.substring(1..2).first()
             val petName = it.substring(2)
-            val petLevel = getCurrentPet().petLevel.currentLevel
+            val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
 
             "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
         } ?: "No pet equipped"
