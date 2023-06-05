@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class Garden {
 
     @Expose
@@ -164,6 +165,28 @@ public class Garden {
         @ConfigEditorBoolean
         public boolean preventRefusing = true;
 
+
+        /**
+         * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
+         */
+        @Expose
+        @ConfigOption(
+                name = "Items",
+                desc = "Warn for these reward items."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§9Flowering Bouquet",
+                        "§9Overgrown Grass",
+                        "§9Green Bandana",
+                        "§9Dedication IV",
+                        "§9Music Rune",
+                        "§cSpace Helmet",
+                }
+        )
+        public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+
+
     }
 
     @Expose
@@ -245,6 +268,7 @@ public class Garden {
                 }
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
+
 
         @Expose
         @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +

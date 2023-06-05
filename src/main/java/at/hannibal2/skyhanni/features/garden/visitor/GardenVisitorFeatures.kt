@@ -38,6 +38,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.round
 
+private val config get() = SkyHanniMod.feature.garden
+
 class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
     private var display = listOf<List<Any>>()
@@ -47,7 +49,7 @@ class GardenVisitorFeatures {
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
     private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
-    private val config get() = SkyHanniMod.feature.garden
+
     private val logger = LorenzLogger("garden/visitors")
     private var price = 0.0
 
@@ -103,12 +105,13 @@ class GardenVisitorFeatures {
             visitor.items[internalName] = amount
         }
 
-        readReward(offerItem)?.let {
-            if (visitor.reward == it) return@let
-
-            visitor.reward = it
-            if (config.visitorRewardWarning.notifyInChat) {
-                LorenzUtils.chat("§e[SkyHanni] Fount Visitor Reward ${it.displayName}§e!")
+        readReward(offerItem)?.let { reward ->
+            if (visitor.reward == reward) return@let
+            visitor.reward = reward
+            visitor.hasReward()?.let {
+                if (config.visitorRewardWarning.notifyInChat) {
+                    LorenzUtils.chat("§e[SkyHanni] Found Visitor Reward ${it.displayName}§e!")
+                }
             }
         }
 
@@ -256,7 +259,7 @@ class GardenVisitorFeatures {
         if (event.slotId == 33) {
             if (event.slot.stack?.name != "§cRefuse Offer") return
 
-            visitor.reward?.let {
+            visitor.hasReward()?.let {
                 if (config.visitorRewardWarning.preventRefusing) {
                     event.isCanceled = true
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
@@ -310,7 +313,7 @@ class GardenVisitorFeatures {
                     val text = visitor.status.displayName
                     event.drawString(it.add(0.0, 2.23, 0.0), text)
                     if (config.visitorRewardWarning.showOverName) {
-                        visitor.reward?.let { reward ->
+                        visitor.hasReward()?.let { reward ->
                             val name = reward.displayName
                             event.drawString(it.add(0.0, 2.73, 0.0), "§c!$name§c!")
                         }
@@ -710,6 +713,8 @@ class GardenVisitorFeatures {
         fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
 
         fun getNameTagEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
+
+        fun hasReward() = reward?.let { if (config.visitorRewardWarning.drops.contains(it.ordinal)) it else null }
     }
 
     enum class VisitorStatus(val displayName: String, val color: Int) {
