@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -65,12 +66,8 @@ class SackDisplay {
         }
     }
 
-    private fun updateDisplay() {
-        display = drawDisplay()
-    }
-
     private fun update() {
-        updateDisplay()
+        display = drawDisplay()
     }
 
     private fun drawDisplay(): List<List<Any>> {
@@ -92,7 +89,8 @@ class SackDisplay {
                 }
             }
 
-            newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering ${if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow} of ${sortedPairs.size} items)")
+            val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
+            newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
             for ((itemName, item) in sortedPairs) {
                 val (internalName, colorCode, stored, total, price) = item
                 totalPrice += price
@@ -111,12 +109,14 @@ class SackDisplay {
                     else
                         add("${itemName.replace("§k", "")}: ")
 
-                    add(when (config.numberFormat) {
-                        0 -> "$colorCode${stored}§7/§b${total}"
-                        1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
-                        2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
-                        else -> "$colorCode${stored}§7/§b${total}"
-                    })
+                    add(
+                        when (config.numberFormat) {
+                            0 -> "$colorCode${stored}§7/§b${total}"
+                            1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                            2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
+                            else -> "$colorCode${stored}§7/§b${total}"
+                        }
+                    )
 
                     if (colorCode == "§a")
                         add(" §c§l(Full!)")
@@ -126,31 +126,27 @@ class SackDisplay {
                 rendered++
             }
 
-            newDisplay.add(buildList {
-                add("§eSort by: §6Stored ")
-                add(Renderable.optionalLink("§7[§bDESC§7] ", {
-                    config.sortingType = 0
-                    update()
-                }) { !NEUItems.neuHasFocus() })
-                add(Renderable.optionalLink("§7[§bASC§7] ", {
-                    config.sortingType = 1
-                    update()
-                }) { !NEUItems.neuHasFocus() })
+            val name = SortType.values()[config.sortingType].longName
+            newDisplay.addAsSingletonList("§7Sorted By: §c$name")
 
-                if (config.showPrice) {
-                    add("§6Price ")
-                    add(Renderable.optionalLink("§7[§bDESC§7] ", {
-                        config.sortingType = 2
+            newDisplay.addSelector(" ", SortType.values(),
+                getName = { type -> type.shortName },
+                isCurrent = { it.ordinal == config.sortingType },
+                onChange = {
+                    config.sortingType = it.ordinal
+                    update()
+                })
+
+            if (config.showPrice) {
+                newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
+                newDisplay.addSelector(" ", PriceFrom.values(),
+                    getName = { type -> type.displayName },
+                    isCurrent = { it.ordinal == config.priceFrom },
+                    onChange = {
+                        config.priceFrom = it.ordinal
                         update()
-                    }) { !NEUItems.neuHasFocus() })
-                    add(Renderable.optionalLink("§7[§bASC§7]", {
-                        config.sortingType = 3
-                        update()
-                    }) { !NEUItems.neuHasFocus() })
-                }
-            })
-            if (config.showPrice)
-                newDisplay.addAsSingletonList("§eTotal price: §6${format(totalPrice)}")
+                    })
+            }
         }
 
         if (runeItem.isNotEmpty()) {
@@ -215,7 +211,8 @@ class SackDisplay {
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
-        val sackRarity = if (inventoryName.startsWith("Bronze")) TrophyRarity.BRONZE else if (inventoryName.startsWith("Silver")) TrophyRarity.SILVER else TrophyRarity.NONE
+        val sackRarity =
+            if (inventoryName.startsWith("Bronze")) TrophyRarity.BRONZE else if (inventoryName.startsWith("Silver")) TrophyRarity.SILVER else TrophyRarity.NONE
         inInventory = true
         for ((_, stack) in stacks) {
             val name = stack.name ?: continue
@@ -268,7 +265,8 @@ class SackDisplay {
                         item.total = total
                         if (isTrophySack) {
                             val trophyName = name.removeColor().uppercase().replace(" ", "_").replace("-", "_")
-                            item.price = calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
+                            item.price =
+                                calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
                         } else
                             item.price = calculatePrice(internalName, stored)
 
@@ -374,5 +372,19 @@ class SackDisplay {
         }
 
         else -> 0
+    }
+
+    enum class SortType(val shortName: String, val longName: String) {
+        STORED_DESC("Stored D", "Stored Descending"),
+        STORED_ASC("Stored A", "Stored Ascending"),
+        PRICE_DESC("Price D", "Price Descending"),
+        PRICE_ASC("Price A", "Price Ascending"),
+        ;
+    }
+
+    enum class PriceFrom(val displayName: String) {
+        NPC("Npc Price"),
+        BAZAAR("Bazaar Price"),
+        ;
     }
 }
