@@ -238,6 +238,8 @@
 + **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
 + **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 + **/shcroptime <amount> <item>** Displays the estimated time it will take to gather the requested quantity of a particular item based on the current crop speed.
++ `/pt <player>` as alias for `/party transfer <player>`
+  + SkyBlock Command `/tp` to check the play time still works
 
 ## Misc
 - Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
@@ -268,3 +270,8 @@
   + Show missing items to contribute inside the inventory
     + Click on the item name to open the bazaar
   + Highlight a component in the inventory that can be contributed
++ **Command Autocomplete**
+  + Supports tab completing for warp points when typing /warp
+  + Supports party members, friends (need to visit all friend list pages), player on the same server
+  + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
+  + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)

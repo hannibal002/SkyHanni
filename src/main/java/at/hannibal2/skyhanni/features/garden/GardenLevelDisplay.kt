@@ -35,7 +35,7 @@ class GardenLevelDisplay {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
 
         visitorRewardPattern.matchMatcher(event.message) {
             addExp(group("exp").toInt())
@@ -43,9 +43,9 @@ class GardenLevelDisplay {
     }
 
     private fun addExp(moreExp: Int) {
-        val oldLevel = getLevelForExp(gardenExp.toLong())
+        val oldLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
         gardenExp += moreExp
-        val newLevel = getLevelForExp(gardenExp.toLong())
+        val newLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
         if (newLevel == oldLevel + 1) {
             if (newLevel > 15) {
                 LorenzUtils.chat(
@@ -59,7 +59,7 @@ class GardenLevelDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Desk") return
         val item = event.inventoryItems[4]!!
 
@@ -77,7 +77,7 @@ class GardenLevelDisplay {
                     return
                 }
             }
-            val expForLevel = getExpForLevel(currentLevel).toInt()
+            val expForLevel = GardenAPI.getExpForLevel(currentLevel).toInt()
             gardenExp = expForLevel + nextLevelExp
             update()
         }
@@ -89,10 +89,10 @@ class GardenLevelDisplay {
 
     private fun drawDisplay(): String {
         if (gardenExp == -1) return "§aGarden Level ? §cOpen the desk!"
-        val currentLevel = getLevelForExp(gardenExp.toLong())
-        val needForLevel = getExpForLevel(currentLevel).toInt()
+        val currentLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
+        val needForLevel = GardenAPI.getExpForLevel(currentLevel).toInt()
         val nextLevel = currentLevel + 1
-        val needForNextLevel = getExpForLevel(nextLevel).toInt()
+        val needForNextLevel = GardenAPI.getExpForLevel(nextLevel).toInt()
 
         return "§aGarden Level $currentLevel" + if (needForNextLevel != 0) {
             val overflow = gardenExp - needForLevel
@@ -104,35 +104,6 @@ class GardenLevelDisplay {
         } else ""
     }
 
-    private fun getLevelForExp(gardenExp: Long): Int {
-        var tier = 0
-        var totalCrops = 0L
-        for (tierCrops in gardenExperience) {
-            totalCrops += tierCrops
-            if (totalCrops > gardenExp) {
-                return tier
-            }
-            tier++
-        }
-
-        return tier
-    }
-
-    // TODO make table utils method
-    private fun getExpForLevel(requestedLevel: Int): Long {
-        var totalCrops = 0L
-        var tier = 0
-        for (tierCrops in gardenExperience) {
-            totalCrops += tierCrops
-            tier++
-            if (tier == requestedLevel) {
-                return totalCrops
-            }
-        }
-
-        return 0
-    }
-
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -141,50 +112,4 @@ class GardenLevelDisplay {
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.gardenLevelDisplay
-
-    // TODO use repo
-    private val gardenExperience = listOf(
-        0,
-        70,
-        100,
-        140,
-        240,
-        600,
-        1500,
-        2000,
-        2500,
-        3000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000, // level 15
-
-        // overflow levels till 40 for now, in 10k steps
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-    )
 }

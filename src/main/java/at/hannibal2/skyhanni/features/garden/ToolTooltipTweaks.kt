@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.text.DecimalFormat
@@ -17,9 +19,12 @@ import kotlin.math.roundToInt
 class ToolTooltipTweaks {
     private val config get() = SkyHanniMod.feature.garden
     private val tooltipFortunePattern =
-        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))\$".toRegex()
+        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
+    private val abilityDescriptionStart = "§5§o§7These boots gain §a+2❈ Defense"
+    private val abilityDescriptionEnd = "§5§o§7Skill level."
+
     private val statFormatter = DecimalFormat("0.##")
 
     @SubscribeEvent
@@ -49,13 +54,14 @@ class ToolTooltipTweaks {
         var removingFarmhandDescription = false
         var removingCounterDescription = false
         var removingReforgeDescription = false
+        var removingAbilityDescription = false
 
         for (line in iterator) {
             val match = tooltipFortunePattern.matchEntire(line)?.groups
             if (match != null) {
                 val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
 
-                FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune, match)
+                FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
 
                 val displayedFortune = FarmingFortuneDisplay.displayedFortune
                 val reforgeFortune = FarmingFortuneDisplay.reforgeFortune
@@ -77,10 +83,10 @@ class ToolTooltipTweaks {
                 iterator.set(fortuneLine)
 
                 if (Keyboard.isKeyDown(config.fortuneTooltipKeybind)) {
-                    iterator.addStat("  §7Base: §a+", baseFortune)
+                    iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
-                    iterator.addStat("  $reforgeName: §9+", reforgeFortune)
-                    iterator.addStat("  §7Ability: §a+", abilityFortune)
+                    iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
+                    iterator.addStat("  §7Ability: §2+", abilityFortune)
                     iterator.addStat("  §7Green Thumb: §a+", greenThumbFortune)
                     iterator.addStat("  §7Sunder: §a+", sunderFortune)
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
@@ -93,7 +99,7 @@ class ToolTooltipTweaks {
                 }
             }
             // Beware, dubious control flow beyond these lines
-            if (config.compactToolTooltips) {
+            if (config.compactToolTooltips || FFGuideGUI.isInGui()) {
                 if (line.startsWith("§5§o§7§8Bonus ")) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
                     iterator.remove()
@@ -113,6 +119,22 @@ class ToolTooltipTweaks {
                     removingReforgeDescription = !reforgeEndLine.contains(line)
                 }
                 if (line == "§5§o§9Bountiful Bonus") removingReforgeDescription = true
+
+                if (FFGuideGUI.isInGui()) {
+                    if (line.contains("Click to ") || line.contains("§7§8This item can be reforged!") || line.contains("Dyed")) {
+                        iterator.remove()
+                    }
+
+                    if (line == abilityDescriptionStart) {
+                        removingAbilityDescription = true
+                    }
+                    if (removingAbilityDescription) {
+                        iterator.remove()
+                        if (line == abilityDescriptionEnd) {
+                            removingAbilityDescription = false
+                        }
+                    }
+                }
             }
         }
 

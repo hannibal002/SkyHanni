@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
+import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
 import java.util.*
 import java.util.regex.Matcher
@@ -72,4 +74,23 @@ object StringUtils {
             split[0].removeColor()
         }
     }
+
+    fun getColor(string: String, default: Int, darker: Boolean = true): Int {
+        val stringPattern = "§[0123456789abcdef].*".toPattern()
+
+        val matcher = stringPattern.matcher(string)
+        if (matcher.matches()) {
+            val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
+            return if (darker) {
+                colorInt.darkenColor()
+            } else {
+                "ff${Integer.toHexString(colorInt)}".toLong(radix = 16).toInt()
+            }
+        }
+        return default
+    }
+
+    fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
+
+    fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
 }

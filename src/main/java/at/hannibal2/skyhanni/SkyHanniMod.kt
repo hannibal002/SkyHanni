@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
+import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.composter.GardenComposterInventoryFeatures
 import at.hannibal2.skyhanni.features.garden.contest.*
 import at.hannibal2.skyhanni.features.garden.farming.*
+import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.*
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
@@ -42,6 +44,8 @@ import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
+import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.tiarelay.TiaRelayHelper
@@ -94,7 +98,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.10",
+    version = "0.18.Beta.13",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -118,7 +122,7 @@ class SkyHanniMod {
         loadModule(ItemTipHelper())
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
-        loadModule(OtherInventoryData())
+        loadModule(OtherInventoryData)
         loadModule(TabListData())
         loadModule(RenderGuiData())
         loadModule(GardenCropMilestones())
@@ -140,6 +144,8 @@ class SkyHanniMod {
         loadModule(GardenAPI)
         loadModule(CollectionAPI())
         loadModule(FarmingContestAPI)
+        loadModule(FriendAPI())
+        loadModule(PartyAPI())
 
         // features
         loadModule(BazaarOrderHelper())
@@ -177,6 +183,7 @@ class SkyHanniMod {
         loadModule(RealTime())
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
+        loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
@@ -275,11 +282,17 @@ class SkyHanniMod {
         loadModule(TrevorSolver)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)
+        loadModule(CaptureFarmingGear())
         loadModule(SackDisplay())
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
         loadModule(ServerRestartTitle())
         loadModule(CityProjectFeatures())
+        loadModule(GardenPlotIcon)
+        loadModule(PocketSackInASackDisplay())
+        loadModule(ShowFishingItemName())
+        loadModule(WarpTabComplete)
+        loadModule(PlayerTabComplete)
 
         init()
 

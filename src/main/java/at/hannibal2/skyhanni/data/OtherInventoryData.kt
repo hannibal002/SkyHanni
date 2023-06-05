@@ -8,7 +8,7 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class OtherInventoryData {
+object OtherInventoryData {
     private var currentInventory: Inventory? = null
     private var acceptItems = false
     private var lateEvent: LateInventoryOpenEvent? = null
@@ -18,7 +18,7 @@ class OtherInventoryData {
         close()
     }
 
-    private fun close() {
+    fun close() {
         currentInventory?.let {
             InventoryCloseEvent(it).postAndCatch()
             currentInventory = null

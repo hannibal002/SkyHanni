@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.config;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
+import net.minecraft.item.ItemStack;
 
 import java.util.*;
 
@@ -25,7 +27,8 @@ public class Storage {
         @Expose
         public Map<String, ProfileSpecific> profiles = new HashMap<>(); // profile name
 
-        // TODO save community shop account upgrades here
+        @Expose
+        public Integer gardenCommunityUpgrade = -1;
     }
 
     public static class ProfileSpecific {
@@ -140,6 +143,9 @@ public class Storage {
                 public long farmingExp = 0;
 
                 @Expose
+                public int gardenExp = 0;
+
+                @Expose
                 public long coinsSpent = 0;
 
                 @Expose
@@ -147,8 +153,38 @@ public class Storage {
             }
 
             @Expose
-            public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
-        }
+            public PlotIcon plotIcon = new PlotIcon();
+            public static class PlotIcon {
+                @Expose
+                public Map<Integer, String> plotList = new HashMap<>();
+            }
 
+            @Expose
+            public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
+
+            @Expose
+            public Fortune fortune = new Fortune();
+
+            public static class Fortune {
+
+                @Expose
+                public int anitaUpgrade = -1;
+
+                @Expose
+                public int farmingStrength = -1;
+
+                @Expose
+                public int farmingLevel = -1;
+
+                @Expose
+                public int plotsUnlocked = -1;
+
+                @Expose
+                public long cakeExpiring = -1L;
+
+                @Expose
+                public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
+            }
+        }
     }
 }

@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 
 object SkyBlockItemModifierUtils {
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
+    private val petLevelPattern = "§7\\[Lvl (?<level>.*)\\] .*".toPattern()
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
 
@@ -32,7 +35,34 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
-    fun ItemStack.getPetCandyUsed() = ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)?.get("candyUsed")?.asInt
+    fun ItemStack.getPetCandyUsed(): Int? {
+        val data = cachedData
+        if (data.petCandies == -1) {
+            data.petCandies = getPetInfo()?.get("candyUsed")?.asInt
+        }
+        return data.petCandies
+    }
+
+    fun ItemStack.getPetItem(): String? {
+        val data = cachedData
+        if (data.heldItem == "") {
+            data.heldItem = getPetInfo()?.get("heldItem")?.asString
+        }
+        return data.heldItem
+    }
+
+    private fun ItemStack.getPetInfo() =
+        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
+
+    @Suppress("CAST_NEVER_SUCCEEDS")
+    inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
+
+    fun ItemStack.getPetLevel(): Int {
+        petLevelPattern.matchMatcher(this.displayName) {
+            return group("level").toInt()
+        }
+        return 0
+    }
 
     fun ItemStack.getMasterStars(): Int {
         val stars = mapOf(
@@ -113,6 +143,14 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
         enchantments.keySet.associateWith { enchantments.getInteger(it) }
+    }
+
+    fun ItemStack.getAppliedPocketSackInASack(): Int?{
+        val data = cachedData
+        if (data.sackInASack == -1) {
+            data.sackInASack = getAttributeInt("sack_pss")
+        }
+        return data.sackInASack
     }
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

@@ -22,6 +22,13 @@
   + Show missing items to contribute inside the inventory
     + Click on the item name to open the bazaar
   + Highlight a component in the inventory that can be contributed
++ Added `/pt <player>` alias for `/party transfer <player>`
+  + SkyBlock Command `/tp` to check the play time still works
++ Added **Command Autocomplete**
+  + Supports tab completing for warp points when typing /warp
+  + Supports party members, friends (need to visit all friend list pages), player on the same server
+  + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
+  + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.

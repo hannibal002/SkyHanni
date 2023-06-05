@@ -8,6 +8,7 @@
     "MixinEntityBlaze",
     "MixinEntityFireball",
     "MixinEntityPlayerSP",
+    "MixinItemStack",
     "MixinNetHandlerPlayClient",
     "MixinNetworkManager",
     "MixinRenderItem",
@@ -20,6 +21,7 @@
   "client": [
     "AccessorKeyBinding",
     "MixinEntityRenderer",
+    "MixinGuiChat",
     "MixinGuiIngame",
     "MixinGuiPlayerTabOverlay",
     "MixinKeyBinding",

@@ -160,6 +160,7 @@ class GardenVisitorFeatures {
             }
         }
         if (requiredItems.isNotEmpty()) {
+            var totalPrice = 0.0
             newDisplay.addAsSingletonList("§7Visitor items needed:")
             for ((internalName, amount) in requiredItems) {
                 val name = NEUItems.getItemStack(internalName).name!!
@@ -180,11 +181,16 @@ class GardenVisitorFeatures {
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
+                    totalPrice += price
                     val format = NumberUtil.format(price)
                     list.add(" §7(§6$format§7)")
                 }
 
                 newDisplay.add(list)
+            }
+            if (totalPrice > 0) {
+                val format = NumberUtil.format(totalPrice)
+                newDisplay[0] = listOf("§7Visitor items needed: §7(§6$format§7)")
             }
         }
         if (newVisitors.isNotEmpty()) {
@@ -270,6 +276,7 @@ class GardenVisitorFeatures {
                 changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
                 update()
                 GardenVisitorDropStatistics.coinsSpent += round(price).toLong()
+                GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
                 return
             }
         }

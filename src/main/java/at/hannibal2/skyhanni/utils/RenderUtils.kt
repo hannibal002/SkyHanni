@@ -85,13 +85,7 @@ object RenderUtils {
     }
 
 
-    fun getViewerPos(partialTicks: Float): LorenzVec {
-        val viewer = Minecraft.getMinecraft().renderViewEntity
-        val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-        val viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        return LorenzVec(viewerX, viewerY, viewerZ)
-    }
+    fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -791,15 +785,14 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    /**
-     * Taken from NotEnoughUpdates
-     */
-    fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, colour: Int) {
-        val strLen = fr.getStringWidth(str)
-        val x2 = x - strLen / 2f
-        val y2 = y - fr.FONT_HEIGHT / 2f
-        GL11.glTranslatef(x2, y2, 0f)
-        fr.drawString(str, 0f, 0f, colour, shadow)
-        GL11.glTranslatef(-x2, -y2, 0f)
+    fun RenderWorldLastEvent.exactLocation(entity: Entity): LorenzVec {
+        return exactLocation(entity, partialTicks)
+    }
+
+    fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
+        val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
+        val y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
+        val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
+        return LorenzVec(x, y, z)
     }
 }
