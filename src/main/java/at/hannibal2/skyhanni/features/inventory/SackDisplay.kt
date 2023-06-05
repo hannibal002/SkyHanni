@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -37,6 +38,7 @@ class SackDisplay {
     private val runeItem = mutableMapOf<String, Rune>()
     private val gemstoneItem = mutableMapOf<String, Gemstone>()
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
+    private val stackList = mutableMapOf<Int, ItemStack>()
     private val gemstoneMap = mapOf(
             "Jade Gemstones" to "ROUGH_JADE_GEM",
             "Amber Gemstones" to "ROUGH_AMBER_GEM",
@@ -70,10 +72,96 @@ class SackDisplay {
         display = drawDisplay()
     }
 
+    private fun init(){
+        val inventoryName = InventoryUtils.openInventoryName()
+        val sackRarity =
+                if (inventoryName.startsWith("Bronze")) TrophyRarity.BRONZE else if (inventoryName.startsWith("Silver")) TrophyRarity.SILVER else TrophyRarity.NONE
+        for ((_, stack) in stackList) {
+            val name = stack.name ?: continue
+            val lore = stack.getLore()
+            val gem = Gemstone()
+            val rune = Rune()
+            val item = Item()
+            loop@ for (line in lore) {
+                if (isGemstoneSack) {
+                    gemstonePattern.matchMatcher(line) {
+                        val rarity = group("gemrarity")
+                        val stored = group("stored")
+                        gem.internalName = gemstoneMap[name.removeColor()].toString()
+                        if (gemstoneMap.containsKey(name.removeColor())) {
+                            val internalName =
+                                    "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+
+                            when (rarity) {
+                                "Rough" -> {
+                                    gem.rough = stored
+                                    gem.roughPrice = calculatePrice(internalName, stored)
+                                }
+
+                                "Flawed" -> {
+                                    gem.flawed = stored
+                                    gem.flawedPrice = calculatePrice(internalName, stored)
+                                }
+
+                                "Fine" -> {
+                                    gem.fine = stored
+                                    gem.finePrice = calculatePrice(internalName, stored)
+                                }
+
+                                "Flawless" -> {
+                                    gem.flawless = stored
+                                    gem.flawlessPrice = calculatePrice(internalName, stored)
+                                }
+                            }
+                            gemstoneItem[name] = gem
+                        }
+                    }
+                } else {
+                    numPattern.matchMatcher(line) {
+                        val stored = group("stored")
+                        val total = group("total")
+                        val internalName = stack.getInternalName()
+                        item.internalName = internalName
+                        item.colorCode = group("color")
+                        item.stored = stored
+                        item.total = total
+                        if (isTrophySack) {
+                            val trophyName = name.removeColor().uppercase().replace(" ", "_").replace("-", "_")
+                            item.trophyName = trophyName
+                            item.sackRarity = sackRarity
+                            item.price = calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
+                        } else {
+                            item.price = if (calculatePrice(internalName, stored) < 0) 0 else calculatePrice(internalName, stored)
+                        }
+                        if (isRuneSack) {
+                            val level = group("level")
+                            rune.stack = stack
+                            if (level == "I") {
+                                rune.lvl1 = stored
+                                continue@loop
+                            }
+                            if (level == "II") {
+                                rune.lvl2 = stored
+                                continue@loop
+                            }
+                            if (level == "III") {
+                                rune.lvl3 = stored
+                            }
+                            runeItem.put(name, rune)
+                        } else {
+                            sackItem.put(name, item)
+                        }
+                    }
+                }
+            }
+        }
+    }
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
         var totalPrice = 0
         var rendered = 0
+        init()
+
         if (sackItem.isNotEmpty()) {
             val sortedPairs: MutableMap<String, Item> = when (config.sortingType) {
                 0 -> sackItem.toList().sortedByDescending { it.second.stored.formatNumber() }.toMap().toMutableMap()
@@ -203,6 +291,8 @@ class SackDisplay {
         runeItem.clear()
         gemstoneItem.clear()
         sackItem.clear()
+
+        //moved everything in init() to call the function at the start of drawDisplay() so everything can update correctly
     }
 
     @SubscribeEvent
@@ -216,90 +306,8 @@ class SackDisplay {
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
-        val sackRarity =
-                if (inventoryName.startsWith("Bronze")) TrophyRarity.BRONZE else if (inventoryName.startsWith("Silver")) TrophyRarity.SILVER else TrophyRarity.NONE
         inInventory = true
-        for ((_, stack) in stacks) {
-            val name = stack.name ?: continue
-            val lore = stack.getLore()
-            val gem = Gemstone()
-            val rune = Rune()
-            val item = Item()
-            loop@ for (line in lore) {
-                if (isGemstoneSack) {
-                    gemstonePattern.matchMatcher(line) {
-                        val rarity = group("gemrarity")
-                        val stored = group("stored")
-                        gem.internalName = gemstoneMap[name.removeColor()].toString()
-                        if (gemstoneMap.containsKey(name.removeColor())) {
-                            val internalName =
-                                    "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
-
-                            when (rarity) {
-                                "Rough" -> {
-                                    gem.rough = stored
-                                    gem.roughPrice = calculatePrice(internalName, stored)
-                                }
-
-                                "Flawed" -> {
-                                    gem.flawed = stored
-                                    gem.flawedPrice = calculatePrice(internalName, stored)
-                                }
-
-                                "Fine" -> {
-                                    gem.fine = stored
-                                    gem.finePrice = calculatePrice(internalName, stored)
-                                }
-
-                                "Flawless" -> {
-                                    gem.flawless = stored
-                                    gem.flawlessPrice = calculatePrice(internalName, stored)
-                                }
-                            }
-                            gemstoneItem[name] = gem
-                        }
-                    }
-                } else {
-                    numPattern.matchMatcher(line) {
-                        val stored = group("stored")
-                        val total = group("total")
-                        val internalName = stack.getInternalName()
-                        item.internalName = internalName
-                        item.colorCode = group("color")
-                        item.stored = stored
-                        item.total = total
-                        if (isTrophySack) {
-                            val trophyName = name.removeColor().uppercase().replace(" ", "_").replace("-", "_")
-                            item.trophyName = trophyName
-                            item.sackRarity = sackRarity
-                            item.price = calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
-                        } else {
-                             item.price = calculatePrice(internalName, stored)
-                        }
-
-
-                        if (isRuneSack) {
-                            val level = group("level")
-                            rune.stack = stack
-                            if (level == "I") {
-                                rune.lvl1 = stored
-                                continue@loop
-                            }
-                            if (level == "II") {
-                                rune.lvl2 = stored
-                                continue@loop
-                            }
-                            if (level == "III") {
-                                rune.lvl3 = stored
-                            }
-                            runeItem.put(name, rune)
-                        } else {
-                            sackItem.put(name, item)
-                        }
-                    }
-                }
-            }
-        }
+        stackList.putAll(stacks)
         update()
     }
 
@@ -371,7 +379,11 @@ class SackDisplay {
 
     private fun calculatePrice(internalName: String, stored: String) = when (config.priceFrom) {
         0 -> {
-            (NEUItems.getPrice(internalName, true) * stored.formatNumber()).toInt()
+            (NEUItems.getPrice(internalName, true) * stored.formatNumber()).toInt().let {
+                if (it < 0)
+                    0
+                else it
+            }
         }
 
         1 -> try {
