@@ -127,8 +127,6 @@ class SackDisplay {
                         item.total = total
                         if (isTrophySack) {
                             val trophyName = name.removeColor().uppercase().replace(" ", "_").replace("-", "_")
-                            item.trophyName = trophyName
-                            item.sackRarity = sackRarity
                             item.price = calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
                         } else {
                             item.price = if (calculatePrice(internalName, stored) < 0) 0 else calculatePrice(internalName, stored)
@@ -180,13 +178,8 @@ class SackDisplay {
             val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
             newDisplay.addAsSingletonList("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
             for ((itemName, item) in sortedPairs) {
-                val (internalName, colorCode, stored, total, _, trophyName, sackRarity) = item
-                val updatePrice: Int = if (isTrophySack) {
-                    calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
-                } else {
-                    calculatePrice(internalName, stored)
-                }
-                totalPrice += updatePrice
+                val (internalName, colorCode, stored, total, price) = item
+                totalPrice += price
                 if (rendered >= config.itemToShow) continue
                 if (stored == "0" && !config.showEmpty) continue
                 val itemStack = NEUItems.getItemStack(internalName)
@@ -213,8 +206,8 @@ class SackDisplay {
 
                     if (colorCode == "§a")
                         add(" §c§l(Full!)")
-                    if (config.showPrice && updatePrice != 0)
-                        add(" §7(§6${format(updatePrice)}§7)")
+                    if (config.showPrice && price != 0)
+                        add(" §7(§6${format(price)}§7)")
                 })
                 rendered++
             }
@@ -291,8 +284,7 @@ class SackDisplay {
         runeItem.clear()
         gemstoneItem.clear()
         sackItem.clear()
-
-        //moved everything in init() to call the function at the start of drawDisplay() so everything can update correctly
+        stackList.clear()
     }
 
     @SubscribeEvent
@@ -337,8 +329,6 @@ class SackDisplay {
             var stored: String = "0",
             var total: String = "0",
             var price: Int = 0,
-            var trophyName: String = "",
-            var sackRarity: TrophyRarity = TrophyRarity.NONE
     )
 
     enum class Trophy(private val bronzeValue: Int, private val silverValue: Int) {
