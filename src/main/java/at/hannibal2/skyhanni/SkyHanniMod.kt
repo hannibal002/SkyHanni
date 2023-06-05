@@ -293,7 +293,7 @@ class SkyHanniMod {
         loadModule(WarpTabComplete)
 
         //test
-        loadModule(GhostCounter())
+        loadModule(GhostCounter)
 
         init()
 

@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.Storage;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
+import at.hannibal2.skyhanni.features.misc.GhostCounter;
+import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
@@ -430,9 +434,9 @@ public class Misc {
     @ConfigOption(name = "Ghost Counter", desc = "")
     @Accordion
     @Expose
-    public GhostCounter ghostCounter = new GhostCounter();
+    public GhostCounterStorage ghostCounter = new GhostCounterStorage();
 
-    public static class GhostCounter {
+    public static class GhostCounterStorage {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Enable ghost counter.")
@@ -448,20 +452,31 @@ public class Misc {
             exampleText = {
                 "§6Ghosts Counter",
                 "  §bGhost Killed: 0",
+                "  §bGhost since Sorrow: 0",
                 "  §bSorrow: 0",
                 "  §bVolta: 0",
                 "  §bPlasma: 0",
-                "  §bGhosty Boots: 0",
+                "  §bGhostly Boots: 0",
                 "  §bBag Of Cash: 0",
                 "  §bGhosts/Sorrow: 0",
+                "  §bAvg Magic Find: 0",
             }
         )
         public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 5));
 
         @Expose
+        @ConfigOption(name = "Display Icons", desc = "Show Icons before text.")
+        @ConfigEditorBoolean
+        public boolean showIcon = false;
+
+        @Expose
         @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
         @ConfigEditorBoolean
         public boolean onlyOnMist = false;
+
+        @ConfigOption(name = "Reset", desc = "Reset the counter.")
+        @ConfigEditorButton(buttonText = "Reset")
+        public Runnable resetCounter = GhostCounter.INSTANCE::reset;
 
         @Expose
         public Position position = new Position(50, 50, false, true);

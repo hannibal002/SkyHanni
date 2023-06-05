@@ -193,16 +193,13 @@ public class Storage {
         public static class GhostCounter {
 
             @Expose
-            public int ghostKills = 0; // kills since last sorrow
+            public int ghostKills = 0;
 
             @Expose
             public int sorrowCount = 0;
 
             @Expose
             public int ghostSinceSorrow = 0;
-
-            @Expose
-            public int avgMagicFind = 0;
 
             @Expose
             public int totalDrops = 0;
@@ -219,7 +216,9 @@ public class Storage {
             @Expose
             public int plasmaCount = 0;
 
-        }
+            @Expose
+            public int totalMF = 0;
 
+        }
     }
 }
