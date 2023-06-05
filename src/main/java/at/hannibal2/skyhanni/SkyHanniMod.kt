@@ -292,6 +292,9 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
 
+        //test
+        loadModule(GhostCounter())
+
         init()
 
         // test stuff

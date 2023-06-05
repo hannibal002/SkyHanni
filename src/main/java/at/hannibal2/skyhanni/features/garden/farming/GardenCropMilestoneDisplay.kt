@@ -55,6 +55,7 @@ object GardenCropMilestoneDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+       // println(config.cropMilestoneText)
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
 

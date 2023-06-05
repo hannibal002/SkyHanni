@@ -154,6 +154,7 @@ public class Storage {
 
             @Expose
             public PlotIcon plotIcon = new PlotIcon();
+
             public static class PlotIcon {
                 @Expose
                 public Map<Integer, String> plotList = new HashMap<>();
@@ -186,5 +187,39 @@ public class Storage {
                 public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
         }
+
+        @Expose
+        public GhostCounter ghostCounter = new GhostCounter();
+        public static class GhostCounter {
+
+            @Expose
+            public int ghostKills = 0; // kills since last sorrow
+
+            @Expose
+            public int sorrowCount = 0;
+
+            @Expose
+            public int ghostSinceSorrow = 0;
+
+            @Expose
+            public int avgMagicFind = 0;
+
+            @Expose
+            public int totalDrops = 0;
+
+            @Expose
+            public int ghoostlyBootsCount = 0;
+
+            @Expose
+            public int bagOfCashCount = 0;
+
+            @Expose
+            public int voltaCount = 0;
+
+            @Expose
+            public int plasmaCount = 0;
+
+        }
+
     }
 }

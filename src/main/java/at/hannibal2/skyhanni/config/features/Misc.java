@@ -6,6 +6,10 @@ import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Misc {
 
     @Expose
@@ -321,7 +325,7 @@ public class Misc {
 
         @Expose
         @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
-                "§cWill not help you to find rabbits or sheep in the Oasis!")
+            "§cWill not help you to find rabbits or sheep in the Oasis!")
         @ConfigEditorBoolean
         public boolean trapperSolver = true;
 
@@ -421,6 +425,46 @@ public class Misc {
         @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users like PortalHub or prtlhub")
         @ConfigEditorBoolean
         public boolean vipVisits = true;
+    }
+
+    @ConfigOption(name = "Ghost Counter", desc = "")
+    @Accordion
+    @Expose
+    public GhostCounter ghostCounter = new GhostCounter();
+
+    public static class GhostCounter {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enable ghost counter.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(
+            name = "Display Text",
+            desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+            exampleText = {
+                "§6Ghosts Counter",
+                "  §bGhost Killed: 0",
+                "  §bSorrow: 0",
+                "  §bVolta: 0",
+                "  §bPlasma: 0",
+                "  §bGhosty Boots: 0",
+                "  §bBag Of Cash: 0",
+                "  §bGhosts/Sorrow: 0",
+            }
+        )
+        public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 5));
+
+        @Expose
+        @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
+        @ConfigEditorBoolean
+        public boolean onlyOnMist = false;
+
+        @Expose
+        public Position position = new Position(50, 50, false, true);
     }
 
     @Expose
