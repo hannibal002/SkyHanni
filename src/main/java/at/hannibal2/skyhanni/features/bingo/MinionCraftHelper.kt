@@ -90,7 +90,7 @@ class MinionCraftHelper {
         tierOneMinionsDone.clear()
     }
 
-    private fun loadFromInventory(mainInventory: Array<ItemStack>): Pair<MutableMap<String, String>, MutableMap<String, Int>> {
+    private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, String>, MutableMap<String, Int>> {
         init()
 
         val minions = mutableMapOf<String, String>()
@@ -277,7 +277,7 @@ class MinionCraftHelper {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
 
-            val internalName = NEUItems.getInternalName("$name I")
+            val internalName = NEUItems.getInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
             if (!tierOneMinionsDone.contains(internalName)) {
                 tierOneMinionsDone.add(internalName)
             }
