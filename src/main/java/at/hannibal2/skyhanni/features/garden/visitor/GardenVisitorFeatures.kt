@@ -27,6 +27,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -37,6 +38,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.round
 
+private val config get() = SkyHanniMod.feature.garden
+
 class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
     private var display = listOf<List<Any>>()
@@ -46,7 +49,7 @@ class GardenVisitorFeatures {
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
     private val visitorChatMessagePattern = "§e\\[NPC] (§.)?(?<name>.*)§f: §r.*".toPattern()
-    private val config get() = SkyHanniMod.feature.garden
+
     private val logger = LorenzLogger("garden/visitors")
     private var price = 0.0
 
@@ -101,6 +104,17 @@ class GardenVisitorFeatures {
             val internalName = NEUItems.getInternalName(itemName)
             visitor.items[internalName] = amount
         }
+
+        readReward(offerItem)?.let { reward ->
+            if (visitor.reward == reward) return@let
+            visitor.reward = reward
+            visitor.hasReward()?.let {
+                if (config.visitorRewardWarning.notifyInChat) {
+                    LorenzUtils.chat("§e[SkyHanni] Found Visitor Reward ${it.displayName}§e!")
+                }
+            }
+        }
+
         if (visitor.status == VisitorStatus.NEW) {
             val alreadyReady = event.inventoryItems[29]?.getLore()?.any { it == "§eClick to give!" } == true
             if (alreadyReady) {
@@ -113,6 +127,17 @@ class GardenVisitorFeatures {
             }
             update()
         }
+    }
+
+    private fun readReward(offerItem: ItemStack): VisitorReward? {
+        for (line in offerItem.getLore()) {
+            for (reward in VisitorReward.values()) {
+                if (line.contains(reward.displayName)) {
+                    return reward
+                }
+            }
+        }
+        return null
     }
 
     private fun updateDisplay() {
@@ -138,6 +163,7 @@ class GardenVisitorFeatures {
             }
         }
         if (requiredItems.isNotEmpty()) {
+            var totalPrice = 0.0
             newDisplay.addAsSingletonList("§7Visitor items needed:")
             for ((internalName, amount) in requiredItems) {
                 val name = NEUItems.getItemStack(internalName).name!!
@@ -158,11 +184,16 @@ class GardenVisitorFeatures {
 
                 if (config.visitorNeedsShowPrice) {
                     val price = NEUItems.getPrice(internalName) * amount
+                    totalPrice += price
                     val format = NumberUtil.format(price)
                     list.add(" §7(§6$format§7)")
                 }
 
                 newDisplay.add(list)
+            }
+            if (totalPrice > 0) {
+                val format = NumberUtil.format(totalPrice)
+                newDisplay[0] = listOf("§7Visitor items needed: §7(§6$format§7)")
             }
         }
         if (newVisitors.isNotEmpty()) {
@@ -227,6 +258,16 @@ class GardenVisitorFeatures {
 
         if (event.slotId == 33) {
             if (event.slot.stack?.name != "§cRefuse Offer") return
+
+            visitor.hasReward()?.let {
+                if (config.visitorRewardWarning.preventRefusing) {
+                    event.isCanceled = true
+                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    Minecraft.getMinecraft().thePlayer.closeScreen()
+                    return
+                }
+            }
+
             changeStatus(visitor, VisitorStatus.REFUSED, "refused")
             update()
             GardenVisitorDropStatistics.deniedVisitors += 1
@@ -271,6 +312,12 @@ class GardenVisitorFeatures {
                 if (it.distanceToPlayer() < 15) {
                     val text = visitor.status.displayName
                     event.drawString(it.add(0.0, 2.23, 0.0), text)
+                    if (config.visitorRewardWarning.showOverName) {
+                        visitor.hasReward()?.let { reward ->
+                            val name = reward.displayName
+                            event.drawString(it.add(0.0, 2.73, 0.0), "§c!$name§c!")
+                        }
+                    }
                 }
             }
         }
@@ -330,7 +377,7 @@ class GardenVisitorFeatures {
                             val cropAmount = multiplier.second.toLong() * amount
                             val formatAmount = LorenzUtils.formatInteger(cropAmount)
                             val formatName = "§e$formatAmount§7x ${it.cropName} "
-                            val formatSpeed =  it.getSpeed()?.let { speed ->
+                            val formatSpeed = it.getSpeed()?.let { speed ->
                                 val missingTimeSeconds = cropAmount / speed
                                 val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
                                 "in §b$duration"
@@ -489,12 +536,12 @@ class GardenVisitorFeatures {
     }
 
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
-         val name = group("name")
-         if (name == "Spaceman") return false
-         if (name == "Beth") return false
+        val name = group("name")
+        if (name == "Spaceman") return false
+        if (name == "Beth") return false
 
-         return visitors.keys.any { it.removeColor() == name }
-     } ?: false
+        return visitors.keys.any { it.removeColor() == name }
+    } ?: false
 
     private fun update() {
         checkVisitorsReady()
@@ -660,11 +707,14 @@ class GardenVisitorFeatures {
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
         var inSacks: Boolean = false,
+        var reward: VisitorReward? = null,
         val items: MutableMap<String, Int> = mutableMapOf(),
     ) {
         fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
 
         fun getNameTagEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(nameTagEntityId)
+
+        fun hasReward() = reward?.let { if (config.visitorRewardWarning.drops.contains(it.ordinal)) it else null }
     }
 
     enum class VisitorStatus(val displayName: String, val color: Int) {

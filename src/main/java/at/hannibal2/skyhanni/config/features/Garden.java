@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class Garden {
 
     @Expose
@@ -142,6 +143,53 @@ public class Garden {
     public boolean visitorExperiencePrice = false;
 
     @Expose
+    @ConfigOption(name = "Visitor Reward Warning", desc = "")
+    @ConfigAccordionId(id = 1)
+    @Accordion
+    public VisitorRewardWarning visitorRewardWarning = new VisitorRewardWarning();
+
+    public static class VisitorRewardWarning {
+
+        @Expose
+        @ConfigOption(name = "Notify in Chat", desc = "Send a Chat message once you talk to a visitor with reward.")
+        @ConfigEditorBoolean
+        public boolean notifyInChat = true;
+
+        @Expose
+        @ConfigOption(name = "Show over Name", desc = "Show the reward name above the visitor name.")
+        @ConfigEditorBoolean
+        public boolean showOverName = true;
+
+        @Expose
+        @ConfigOption(name = "Prevent Refusing", desc = "Prevent the refusal of a visitor with reward.")
+        @ConfigEditorBoolean
+        public boolean preventRefusing = true;
+
+
+        /**
+         * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
+         */
+        @Expose
+        @ConfigOption(
+                name = "Items",
+                desc = "Warn for these reward items."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§9Flowering Bouquet",
+                        "§9Overgrown Grass",
+                        "§9Green Bandana",
+                        "§9Dedication IV",
+                        "§9Music Rune",
+                        "§cSpace Helmet",
+                }
+        )
+        public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
+
+
+    }
+
+    @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
@@ -220,6 +268,7 @@ public class Garden {
                 }
         )
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12));
+
 
         @Expose
         @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
