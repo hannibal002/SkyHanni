@@ -426,7 +426,7 @@ public class Misc {
         public boolean party = true;
 
         @Expose
-        @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users like PortalHub or prtlhub")
+        @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users with cake souls on it.")
         @ConfigEditorBoolean
         public boolean vipVisits = true;
     }
@@ -445,24 +445,24 @@ public class Misc {
 
         @Expose
         @ConfigOption(
-            name = "Display Text",
-            desc = "Drag text to change the appearance of the overlay."
+                name = "Display Text",
+                desc = "Drag text to change the appearance of the overlay."
         )
         @ConfigEditorDraggableList(
-            exampleText = {
-                "§6Ghosts Counter",
-                "  §bGhost Killed: 0",
-                "  §bGhost since Sorrow: 0",
-                "  §bSorrow: 0",
-                "  §bVolta: 0",
-                "  §bPlasma: 0",
-                "  §bGhostly Boots: 0",
-                "  §bBag Of Cash: 0",
-                "  §bGhosts/Sorrow: 0",
-                "  §bAvg Magic Find: 0",
-                "  §bScavenger Coins: 0",
-                "  §bKill Combo: 0"
-            }
+                exampleText = {
+                        "§6Ghosts Counter",
+                        "  §bGhost Killed: 0",
+                        "  §bGhost since Sorrow: 0",
+                        "  §bSorrow: 0",
+                        "  §bVolta: 0",
+                        "  §bPlasma: 0",
+                        "  §bGhostly Boots: 0",
+                        "  §bBag Of Cash: 0",
+                        "  §bGhosts/Sorrow: 0",
+                        "  §bAvg Magic Find: 0",
+                        "  §bScavenger Coins: 0",
+                        "  §bKill Combo: 0"
+                }
         )
         public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 8, 9, 10));
 
@@ -487,6 +487,23 @@ public class Misc {
 
         @Expose
         public Position position = new Position(50, 50, false, true);
+    }
+    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
+    @Accordion
+    @Expose
+    public PocketSackInASack pocketSackInASack = new PocketSackInASack();
+
+    public static class PocketSackInASack {
+
+        @Expose
+        @ConfigOption(name = "Show in Overlay", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack icon as overlay.")
+        @ConfigEditorBoolean
+        public boolean showOverlay = false;
+
+        @Expose
+        @ConfigOption(name = "Replace In Lore", desc = "Replace how text is displayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
+        @ConfigEditorBoolean
+        public boolean replaceLore = true;
     }
 
     @Expose
@@ -549,11 +566,6 @@ public class Misc {
     @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     public boolean serverRestartTitle = true;
-
-    @Expose
-    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack.")
-    @ConfigEditorBoolean
-    public boolean sackInASackApplied = false;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

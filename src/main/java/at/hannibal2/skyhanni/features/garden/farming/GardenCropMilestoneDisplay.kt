@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
@@ -145,7 +146,11 @@ object GardenCropMilestoneDisplay {
 
         val list = mutableListOf<Any>()
         list.addCropIcon(crop)
-        list.add("§7" + crop.cropName + " $currentTier➜$nextTier")
+        if (crop.isMaxed()) {
+            list.add("§7" + crop.cropName + " §eMAXED")
+        } else {
+            list.add("§7" + crop.cropName + " $currentTier➜$nextTier")
+        }
         lineMap[1] = list
 
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier)
@@ -158,9 +163,14 @@ object GardenCropMilestoneDisplay {
             Pair(have, need)
         }
 
-        val haveFormat = LorenzUtils.formatInteger(have)
-        val needFormat = LorenzUtils.formatInteger(need)
-        lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
+        lineMap[2] = if (crop.isMaxed()) {
+            val haveFormat = LorenzUtils.formatInteger(counter)
+            Collections.singletonList("§7Counter: §e$haveFormat")
+        } else {
+            val haveFormat = LorenzUtils.formatInteger(have)
+            val needFormat = LorenzUtils.formatInteger(need)
+            Collections.singletonList("§e$haveFormat§8/§e$needFormat")
+        }
 
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
         val speed = GardenCropSpeed.averageBlocksPerSecond
@@ -168,18 +178,22 @@ object GardenCropMilestoneDisplay {
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
-            val missing = need - have
-            val missingTimeSeconds = missing / farmingFortuneSpeed
-            val millis = missingTimeSeconds * 1000
-            GardenBestCropTime.timeTillNextCrop[crop] = millis
-            val biggestUnit = TimeUnit.values()[config.cropMilestoneHighestTimeFormat.get()]
-            val duration = TimeUtils.formatDuration(millis, biggestUnit)
-            tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
-            val speedText = "§7In §b$duration"
-            lineMap[3] = Collections.singletonList(speedText)
-            GardenAPI.itemInHand?.let {
-                if (GardenAPI.readCounter(it) == -1L) {
-                    lineMap[3] = listOf(speedText, " §7Inaccurate!")
+            if (crop.isMaxed()) {
+                lineMap[3] = listOf("§7In §bMaxed")
+            } else {
+                val missing = need - have
+                val missingTimeSeconds = missing / farmingFortuneSpeed
+                val millis = missingTimeSeconds * 1000
+                GardenBestCropTime.timeTillNextCrop[crop] = millis
+                val biggestUnit = TimeUnit.values()[config.cropMilestoneHighestTimeFormat.get()]
+                val duration = TimeUtils.formatDuration(millis, biggestUnit)
+                tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
+                val speedText = "§7In §b$duration"
+                lineMap[3] = Collections.singletonList(speedText)
+                GardenAPI.itemInHand?.let {
+                    if (GardenAPI.readCounter(it) == -1L) {
+                        lineMap[3] = listOf(speedText, " §7Inaccurate!")
+                    }
                 }
             }
 
@@ -190,7 +204,11 @@ object GardenCropMilestoneDisplay {
         }
 
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
-        lineMap[6] = Collections.singletonList("§7Percentage: §e$percentageFormat")
+        lineMap[6] = if (crop.isMaxed()) {
+            Collections.singletonList("§7Percentage: §e100%")
+        } else {
+            Collections.singletonList("§7Percentage: §e$percentageFormat")
+        }
 
         if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
             addMushroomCowData()

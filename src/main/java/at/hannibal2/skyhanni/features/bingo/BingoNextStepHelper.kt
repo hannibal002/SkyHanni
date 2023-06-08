@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.bingo.nextstep.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -34,7 +35,7 @@ class BingoNextStepHelper {
 
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
-        private val currentSteps = mutableListOf<NextStep>()
+        private var currentSteps = listOf<NextStep>()
         var currentHelp = listOf<String>()
 
         fun command() {
@@ -43,7 +44,7 @@ class BingoNextStepHelper {
 
         private fun updateResult(print: Boolean = false) {
             if (print) println()
-            currentSteps.clear()
+            currentSteps = listOf()
             for (step in finalSteps) {
                 printRequirements(step, print)
                 if (print) println()
@@ -81,7 +82,7 @@ class BingoNextStepHelper {
             if (!step.done && !parentDone) {
                 if (requirementsToDo == 0) {
                     if (!currentSteps.contains(step)) {
-                        currentSteps.add(step)
+                        currentSteps = currentSteps.editCopy { add(step) }
                     }
                 }
             }

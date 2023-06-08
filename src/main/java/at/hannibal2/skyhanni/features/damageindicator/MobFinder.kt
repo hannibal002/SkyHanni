@@ -382,19 +382,21 @@ class MobFinder {
         return null
     }
 
+    private val arachneBossHighlighter get() = SkyHanniMod.feature.mobs.arachneBossHighlighter
+
     private fun markArachneMinis(entity: EntityLivingBase) {
-        if (SkyHanniMod.feature.mobs.arachneBossHighlighter) {
+        if (arachneBossHighlighter) {
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.GOLD.toColor().withAlpha(50))
-            { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
+            { arachneBossHighlighter }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { arachneBossHighlighter }
         }
     }
 
     private fun markArachne(entity: EntityLivingBase) {
-        if (SkyHanniMod.feature.mobs.arachneBossHighlighter) {
+        if (arachneBossHighlighter) {
             RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
-            { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { SkyHanniMod.feature.slayer.slayerMinibossHighlight }
+            { arachneBossHighlighter }
+            RenderLivingEntityHelper.setNoHurtTime(entity) { arachneBossHighlighter }
         }
     }
 

@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
@@ -97,7 +98,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.12",
+    version = "0.18.Beta.14",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -121,7 +122,7 @@ class SkyHanniMod {
         loadModule(ItemTipHelper())
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
-        loadModule(OtherInventoryData())
+        loadModule(OtherInventoryData)
         loadModule(TabListData())
         loadModule(RenderGuiData())
         loadModule(GardenCropMilestones())
@@ -291,6 +292,7 @@ class SkyHanniMod {
         loadModule(PocketSackInASackDisplay())
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
+        loadModule(PlayerTabComplete)
 
         //test
         loadModule(GhostCounter)

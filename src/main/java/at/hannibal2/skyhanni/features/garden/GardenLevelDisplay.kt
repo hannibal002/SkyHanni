@@ -35,7 +35,7 @@ class GardenLevelDisplay {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
 
         visitorRewardPattern.matchMatcher(event.message) {
             addExp(group("exp").toInt())
@@ -59,7 +59,7 @@ class GardenLevelDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Desk") return
         val item = event.inventoryItems[4]!!
 
