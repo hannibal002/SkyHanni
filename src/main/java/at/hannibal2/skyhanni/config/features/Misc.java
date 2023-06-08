@@ -461,15 +461,11 @@ public class Misc {
                         "  §bGhosts/Sorrow: 0",
                         "  §bAvg Magic Find: 0",
                         "  §bScavenger Coins: 0",
-                        "  §bKill Combo: 0"
+                        "  §bKill Combo: 0",
+                        "  §bHighest Kill Combo: 0"
                 }
         )
         public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 8, 9, 10));
-
-        @Expose
-        @ConfigOption(name = "Display Icons", desc = "Show Icons before text.")
-        @ConfigEditorBoolean
-        public boolean showIcon = false;
 
         @Expose
         @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
@@ -480,6 +476,14 @@ public class Misc {
         @ConfigOption(name = "Force Scavenger Talisman", desc = "Enable this to always use Scavenger talisman in the coins calculation..")
         @ConfigEditorBoolean
         public boolean forceScavengerTalisman = false;
+
+        @Expose
+        @ConfigOption(name = "Custom Format", desc = "§c§lDo not touch if you don't know what you are doing!!\n" +
+                "§e%text% - Default text. Ex: Ghost Killed, Sorrows\n" +
+                "§e%value% - Value for that text\n" +
+                "%session% - Same as value but for current session")
+        @ConfigEditorText
+        public String formatText = "  §6%text%: §b%value%";
 
         @ConfigOption(name = "Reset", desc = "Reset the counter.")
         @ConfigEditorButton(buttonText = "Reset")

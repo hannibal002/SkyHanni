@@ -3,27 +3,22 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.GhostCounter.Option.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.entity.Entity
-import net.minecraft.entity.monster.EntityCreeper
-import net.minecraftforge.event.entity.living.LivingDeathEvent
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 object GhostCounter {
 
@@ -50,6 +45,17 @@ object GhostCounter {
     private var num: Double = 0.0
     private var inMist = false
     private var hasScavengerTalisman = false
+    private val session = Session(
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+    )
 
     val map: MutableMap<Option, Double> = mutableMapOf(
             KILLS to 0.0,
@@ -91,6 +97,18 @@ object GhostCounter {
         display = formatDisplay(drawDisplay())
     }
 
+    data class Session(
+            var kills: Double,
+            var sorrow: Double,
+            var volta: Double,
+            var plasma: Double,
+            var boots: Double,
+            var bag: Double,
+            var totaldrops: Double,
+            var scavenger: Double,
+            var maxcombo: Double
+    )
+
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val counter = hidden?.ghostCounter ?: return
@@ -121,30 +139,27 @@ object GhostCounter {
         }
 
         addAsSingletonList("§6Ghosts counter")
-        if (config.showIcon) {
-            add(listOf(NEUItems.getItemStack("DIAMOND_SWORD"), "§6Ghosts Killed: §b${KILLS.getInt()}"))
-            add(listOf(NEUItems.getItemStack("SORROW"), "§6Ghosts Since Sorrow: §b${GHOSTSINCESORROW.getInt()}"))
-            add(listOf(NEUItems.getItemStack("SORROW"), "§6Sorrows: §b${SORROWCOUNT.getInt()}"))
-            add(listOf(NEUItems.getItemStack("VOLTA"), "§6Volta: §b${VOLTACOUNT.getInt()}"))
-            add(listOf(NEUItems.getItemStack("PLASMA"), "§6Plasma: §b${PLASMACOUNT.getInt()}"))
-            add(listOf(NEUItems.getItemStack("GHOST_BOOTS"), "§6Ghostly Boots: §b${GHOSTLYBOOTS.getInt()}"))
-            add(listOf(NEUItems.getItemStack("BAG_OF_CASH"), "§6Bag Of Cash: §b${BAGOFCASH.getInt()}"))
-            add(listOf(NEUItems.getItemStack("SORROW"), "§6Ghosts/sorrow: §b$value"))
-            add(listOf(NEUItems.getItemStack("PET_ITEM_LUCKY_CLOVER"), "§6Avg Magic Find: §b$mgc"))
-            add(listOf(NEUItems.getItemStack("COIN_TALISMAN"), "§6Scavenger Coins: §b${SCAVENGERCOINS.getInt()}"))
-            add(listOf(NEUItems.getItemStack("DIAMOND_SWORD"), "§6Kill Combo: ${KILLCOMBO.getInt()} §9MAX: §e${MAXKILLCOMBO.getInt()}"))
-        } else {
-            addAsSingletonList("  §6Ghosts Killed: §b${KILLS.getInt()}")
-            addAsSingletonList("  §6Ghosts Since Sorrow: §b${GHOSTSINCESORROW.getInt()}")
-            addAsSingletonList("  §6Sorrows: §b${SORROWCOUNT.getInt()}")
-            addAsSingletonList("  §6Volta: §b${VOLTACOUNT.getInt()}")
-            addAsSingletonList("  §6Plasma: §b${PLASMACOUNT.getInt()}")
-            addAsSingletonList("  §6Ghostly Boots: §b${GHOSTLYBOOTS.getInt()}")
-            addAsSingletonList("  §6Bag Of Cash: §b${BAGOFCASH.getInt()}")
-            addAsSingletonList("  §6Ghosts/sorrow: §b$value")
-            addAsSingletonList("  §6Avg Magic Find: §b$mgc")
-            addAsSingletonList("  §6Scavenger Coins: §b${SCAVENGERCOINS.getInt()}")
-            addAsSingletonList("  §6Kill Combo: ${KILLCOMBO.getInt()} §9MAX: §e${MAXKILLCOMBO.getInt()}")
+        val list = mapOf(
+                "Gosts Killed" to Pair(KILLS.getInt(), session.kills.roundToInt()),
+                "Ghost Since Sorrow" to Pair(GHOSTSINCESORROW.getInt(), ""),
+                "Sorrows" to Pair(SORROWCOUNT.getInt(), session.sorrow.roundToInt()),
+                "Volta" to Pair(VOLTACOUNT.getInt(), session.volta.roundToInt()),
+                "Plasma" to Pair(PLASMACOUNT.getInt(), session.plasma.roundToInt()),
+                "Ghostly Boots" to Pair(GHOSTLYBOOTS.getInt(), session.boots.roundToInt()),
+                "Bag Of Cash" to Pair(BAGOFCASH.getInt(), session.bag.roundToInt()),
+                "Ghosts/Sorrow" to Pair(value, ""),
+                "Avg Magic Find" to Pair(mgc, ""),
+                "Scavenger Coins" to Pair(SCAVENGERCOINS.getInt(), session.scavenger.roundToInt()),
+                "Kill Combo" to Pair(KILLCOMBO.getInt(), ""),
+                "Highest Kill Combo" to Pair(MAXKILLCOMBO.getInt(), session.maxcombo.roundToInt()),
+        )
+
+        for ((t, v) in list) {
+            val rep = if(v.second == "") "" else "(${v.second})"
+            addAsSingletonList(config.formatText.replace("&", "§")
+                    .replace("%text%", t)
+                    .replace("%value%", "${v.first}")
+                    .replace("%session%", rep))
         }
     }
 
@@ -157,7 +172,7 @@ object GhostCounter {
                 posLabel = "Ghost Counter")
     }
 
-    // Taken from GhostCounterV3 CT module
+    // Part of this was taken from GhostCounterV3 CT module
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
@@ -180,9 +195,12 @@ object GhostCounter {
                                 if (hasScavengerTalisman || config.forceScavengerTalisman)
                                     baseValue += (250 * 0.5)
                                 baseValue += KILLCOMBOCOINS.getInt() * num
-                                SCAVENGERCOINS.add((baseValue * num.roundToInt()).roundToInt().toDouble())
+                                val scav = (baseValue * num.roundToInt()).roundToInt().toDouble()
+                                SCAVENGERCOINS.add(scav)
                                 KILLCOMBO.add(num)
 
+                                session.kills += num
+                                session.scavenger+= scav
                             }
                         }
                     }
@@ -225,14 +243,14 @@ object GhostCounter {
             BAGOFCASH.add(1.0)
             update()
         }
-        killComboExpiredPattern.matchMatcher(event.message){
-            if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt()){
+        killComboExpiredPattern.matchMatcher(event.message) {
+            if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt()) {
                 MAXKILLCOMBO.set(group("combo").toDouble())
             }
             KILLCOMBOCOINS.set(0.0)
             KILLCOMBO.set(0.0)
         }
-        killComboPattern.matchMatcher(event.message.removeColor()){
+        killComboPattern.matchMatcher(event.message.removeColor()) {
             KILLCOMBOCOINS.set(group("coin").toDouble())
         }
     }
@@ -267,7 +285,7 @@ object GhostCounter {
     }
 
     fun Option.get(): Double {
-        return map[this]?: 0.0
+        return map[this] ?: 0.0
     }
 
     fun Option.set(i: Double) {
