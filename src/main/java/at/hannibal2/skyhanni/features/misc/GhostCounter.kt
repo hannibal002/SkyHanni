@@ -23,6 +23,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 object GhostCounter {
 
@@ -47,7 +48,6 @@ object GhostCounter {
     private var lastXp: String = "0"
     private var gain: Int = 0
     private var num: Double = 0.0
-    private var killComboCoins = 0
     private var inMist = false
     private var hasScavengerTalisman = false
 
@@ -113,7 +113,7 @@ object GhostCounter {
     private fun drawDisplay() = buildList<List<Any>> {
         val value = when (SORROWCOUNT.get()) {
             0.0 -> "0"
-            else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
+            else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}"
         }
         val mgc = when (TOTALDROPS.get()) {
             0.0 -> "0"
@@ -179,9 +179,10 @@ object GhostCounter {
                                 baseValue += (scavengerMap.getOrDefault(scavengerLevel, 0).toDouble() * 250)
                                 if (hasScavengerTalisman || config.forceScavengerTalisman)
                                     baseValue += (250 * 0.5)
-                                baseValue += killComboCoins * num
-                                SCAVENGERCOINS.add(baseValue * num)
+                                baseValue += KILLCOMBOCOINS.getInt() * num
+                                SCAVENGERCOINS.add((baseValue * num.roundToInt()).roundToInt().toDouble())
                                 KILLCOMBO.add(num)
+
                             }
                         }
                     }
@@ -232,7 +233,7 @@ object GhostCounter {
             KILLCOMBO.set(0.0)
         }
         killComboPattern.matchMatcher(event.message.removeColor()){
-            killComboCoins += group("coin").toInt()
+            KILLCOMBOCOINS.set(group("coin").toDouble())
         }
     }
 
@@ -257,12 +258,12 @@ object GhostCounter {
 
     enum class Option {
         KILLS, SORROWCOUNT, VOLTACOUNT, PLASMACOUNT, GHOSTLYBOOTS, BAGOFCASH, TOTALDROPS,
-        GHOSTSINCESORROW, TOTALMF, SCAVENGERCOINS, COINS, COINSPERCENT, MAXKILLCOMBO,
+        GHOSTSINCESORROW, TOTALMF, SCAVENGERCOINS, MAXKILLCOMBO,
         KILLCOMBO, KILLCOMBOCOINS
     }
 
-    fun Option.getInt(): Int {
-        return map[this]?.toInt() ?: 0
+    private fun Option.getInt(): Int {
+        return map[this]?.roundToInt() ?: 0
     }
 
     fun Option.get(): Double {
@@ -275,6 +276,10 @@ object GhostCounter {
 
     fun Option.add(i: Double) {
         map[this] = map.getOrDefault(this, 0.0) + i
+    }
+
+    fun Option.add(i: Int) {
+        map[this] = map.getOrDefault(this, 0.0) + i.toDouble()
     }
 
     @SubscribeEvent
