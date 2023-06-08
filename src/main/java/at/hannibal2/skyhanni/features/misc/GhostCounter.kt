@@ -113,11 +113,11 @@ object GhostCounter {
     private fun drawDisplay() = buildList<List<Any>> {
         val value = when (SORROWCOUNT.get()) {
             0.0 -> "0"
-            else -> "${(((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)).toInt() * 100) / 100}"
+            else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
         val mgc = when (TOTALDROPS.get()) {
             0.0 -> "0"
-            else -> "${(((TOTALMF.get() / TOTALDROPS.get()) + Math.ulp(1.0)).toInt() * 100) / 100}"
+            else -> "${((((TOTALMF.get() / TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
 
         addAsSingletonList("§6Ghosts counter")
