@@ -30,6 +30,7 @@ class SackDisplay {
         var isRuneSack = false
         var isGemstoneSack = false
         var isTrophySack = false
+        var sackRarity = TrophyRarity.NONE
     }
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
@@ -72,10 +73,7 @@ class SackDisplay {
         display = drawDisplay()
     }
 
-    private fun init(){
-        val inventoryName = InventoryUtils.openInventoryName()
-        val sackRarity =
-                if (inventoryName.startsWith("Bronze")) TrophyRarity.BRONZE else if (inventoryName.startsWith("Silver")) TrophyRarity.SILVER else TrophyRarity.NONE
+    private fun init() {
         for ((_, stack) in stackList) {
             val name = stack.name ?: continue
             val lore = stack.getLore()
@@ -154,6 +152,7 @@ class SackDisplay {
             }
         }
     }
+
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
         var totalPrice = 0
@@ -298,6 +297,7 @@ class SackDisplay {
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
+        sackRarity = inventoryName.getTrophyRarity()
         inInventory = true
         stackList.putAll(stacks)
         update()
@@ -355,13 +355,13 @@ class SackDisplay {
             return when (rarity) {
                 TrophyRarity.BRONZE -> (this.bronzeValue * stored.formatNumber().toInt()).toString()
                 TrophyRarity.SILVER -> (this.silverValue * stored.formatNumber().toInt()).toString()
-                else -> "0"
+                TrophyRarity.NONE -> "0"
             }
         }
     }
 
     enum class TrophyRarity {
-        NONE, BRONZE, SILVER
+        BRONZE, SILVER, NONE
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
@@ -398,5 +398,15 @@ class SackDisplay {
         NPC("Npc Price"),
         BAZAAR("Bazaar Price"),
         ;
+    }
+
+    private fun String.getTrophyRarity(): TrophyRarity {
+        return if (this.startsWith("Bronze"))
+            TrophyRarity.BRONZE
+        else
+            if (this.startsWith("Silver"))
+                TrophyRarity.SILVER
+            else
+                TrophyRarity.NONE
     }
 }
