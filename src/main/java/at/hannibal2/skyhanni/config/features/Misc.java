@@ -460,9 +460,11 @@ public class Misc {
                 "  §bBag Of Cash: 0",
                 "  §bGhosts/Sorrow: 0",
                 "  §bAvg Magic Find: 0",
+                "  §bScavenger Coins: 0",
+                "  §bKill Combo: 0"
             }
         )
-        public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 5));
+        public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 8, 9, 10));
 
         @Expose
         @ConfigOption(name = "Display Icons", desc = "Show Icons before text.")
@@ -473,6 +475,11 @@ public class Misc {
         @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
         @ConfigEditorBoolean
         public boolean onlyOnMist = false;
+
+        @Expose
+        @ConfigOption(name = "Force Scavenger Talisman", desc = "Enable this to always use Scavenger talisman in the coins calculation..")
+        @ConfigEditorBoolean
+        public boolean forceScavengerTalisman = false;
 
         @ConfigOption(name = "Reset", desc = "Reset the counter.")
         @ConfigEditorButton(buttonText = "Reset")

@@ -193,32 +193,40 @@ public class Storage {
         public static class GhostCounter {
 
             @Expose
-            public int ghostKills = 0;
+            public Double ghostKills = 0.0;
 
             @Expose
-            public int sorrowCount = 0;
+            public Double sorrowCount = 0.0;
 
             @Expose
-            public int ghostSinceSorrow = 0;
+            public Double ghostSinceSorrow = 0.0;
 
             @Expose
-            public int totalDrops = 0;
+            public Double totalDrops = 0.0;
 
             @Expose
-            public int ghoostlyBootsCount = 0;
+            public Double ghoostlyBootsCount = 0.0;
 
             @Expose
-            public int bagOfCashCount = 0;
+            public Double bagOfCashCount = 0.0;
 
             @Expose
-            public int voltaCount = 0;
+            public Double voltaCount = 0.0;
 
             @Expose
-            public int plasmaCount = 0;
+            public Double plasmaCount = 0.0;
 
             @Expose
-            public int totalMF = 0;
+            public Double totalMF = 0.0;
 
+            @Expose
+            public Double scavengerCoins = 0.0;
+
+            @Expose
+            public boolean hasScavengerTalisman = false;
+
+            @Expose
+            public Double maxKillCombo = 0.0;
         }
     }
 }
