@@ -334,17 +334,17 @@ class GardenVisitorFeatures {
         val iterator = event.toolTip.listIterator()
         for (line in iterator) {
             val formattedLine = line.substring(4)
-            if (totalPrice == 0.0) {
-                val (cropName, amount) = ItemUtils.readItemAmount(formattedLine)
-                if (cropName != null) {
-                    val internalName = NEUItems.getInternalNameOrNull(cropName) ?: continue
-                    price = NEUItems.getPrice(internalName) * amount
-                    totalPrice = price
-                    if (config.visitorShowPrice) {
-                        val format = NumberUtil.format(price)
-                        iterator.set("$formattedLine §7(§6$format§7)")
-                    }
+            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
+            if (itemName != null) {
+                val internalName = NEUItems.getInternalNameOrNull(itemName) ?: continue
+                price = NEUItems.getPrice(internalName) * amount
 
+                if (config.visitorShowPrice) {
+                    val format = NumberUtil.format(price)
+                    iterator.set("$formattedLine §7(§6$format§7)")
+                }
+                if (totalPrice == 0.0) {
+                    totalPrice = price
                     val multiplier = NEUItems.getMultiplier(internalName)
                     val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
                     getByNameOrNull(rawName)?.let {
@@ -360,6 +360,9 @@ class GardenVisitorFeatures {
                             iterator.add("§7- $formattedName($formattedSpeed§7)")
                         }
                     }
+                } else {
+                    val format = NumberUtil.format(price)
+                    iterator.set("$formattedLine §7(§6$format§7)")
                 }
             }
 
