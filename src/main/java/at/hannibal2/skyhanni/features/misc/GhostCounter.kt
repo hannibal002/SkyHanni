@@ -247,8 +247,12 @@ object GhostCounter {
             if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt()) {
                 MAXKILLCOMBO.set(group("combo").toDouble())
             }
+            if(KILLCOMBO.getInt() > session.maxcombo){
+                session.maxcombo = group("combo").toDouble()
+            }
             KILLCOMBOCOINS.set(0.0)
             KILLCOMBO.set(0.0)
+
         }
         killComboPattern.matchMatcher(event.message.removeColor()) {
             KILLCOMBOCOINS.set(group("coin").toDouble())
