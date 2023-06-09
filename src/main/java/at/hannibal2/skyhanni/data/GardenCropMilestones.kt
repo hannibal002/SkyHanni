@@ -55,6 +55,8 @@ class GardenCropMilestones {
             cropCounter?.set(this, counter)
         }
 
+        fun CropType.isMaxed() = getCounter() >= 1_000_000_000
+
         fun getTierForCrops(crops: Long): Int {
             var tier = 0
             var totalCrops = 0L
