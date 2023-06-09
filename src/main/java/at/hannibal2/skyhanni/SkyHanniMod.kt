@@ -58,10 +58,7 @@ import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.slayer.EndermanSlayerBeacon
-import at.hannibal2.skyhanni.features.slayer.HideMobNames
-import at.hannibal2.skyhanni.features.slayer.HighlightSlayerMiniBoss
-import at.hannibal2.skyhanni.features.slayer.SlayerQuestWarning
+import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
@@ -146,6 +143,8 @@ class SkyHanniMod {
         loadModule(FarmingContestAPI)
         loadModule(FriendAPI())
         loadModule(PartyAPI())
+        loadModule(SlayerAPI)
+        loadModule(PurseAPI())
 
         // features
         loadModule(BazaarOrderHelper())
@@ -293,6 +292,9 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
+        loadModule(SlayerItemProfitTracker())
+        loadModule(SlayerItemsOnGround())
+        loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
 
         init()

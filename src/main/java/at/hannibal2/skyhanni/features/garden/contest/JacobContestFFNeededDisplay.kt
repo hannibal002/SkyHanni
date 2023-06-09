@@ -77,6 +77,10 @@ class JacobContestFFNeededDisplay {
             addAsSingletonList("§cassuming 20.")
         } else {
             add(listOf("§7Using latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.round(2)}"))
+            if (blocksPerSecond < 1) {
+                addAsSingletonList("§cLow blocks per second!")
+                addAsSingletonList("§cFarm this crop for couple more seconds!")
+            }
         }
         addAsSingletonList("")
 
