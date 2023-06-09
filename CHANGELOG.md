@@ -29,6 +29,14 @@
   + Supports party members, friends (need to visit all friend list pages), player on the same server
   + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
   + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)
++ Added Item Profit Tracker (Slayer only)
+  + Count items collected and how much you pay while doing slayer, calculates final profit
+  + Shows the price of the item collected in chat (default disabled)
++ Added Items on Ground (Slayer only)
+  + Show item name and price over items laying on ground (only in slayer areas)
++ Added Broken Hyperion Warning (Slayer only)
+  + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
+  (Kill a mob with melee-hits to fix this hypixel bug)
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
