@@ -161,7 +161,7 @@ object NEUItems {
             translateY = y - diff
         }
 
-        GlStateManager.pushMatrix();
+        GlStateManager.pushMatrix()
 
         GlStateManager.translate(translateX, translateY, 1F)
         GlStateManager.scale(finalScale, finalScale, 1.0)

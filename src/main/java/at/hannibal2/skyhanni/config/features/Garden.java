@@ -137,6 +137,12 @@ public class Garden {
     public boolean visitorCopperPrice = true;
 
     @Expose
+    @ConfigOption(name = "Copper Time", desc = "Show the time required per copper inside the visitor gui.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 4)
+    public boolean visitorCopperTime = false;
+
+    @Expose
     @ConfigOption(name = "Garden Exp Price", desc = "Show the price per garden experience inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
