@@ -65,14 +65,14 @@ object NEUItems {
     fun getInternalNameOrNull(itemName: String): String? {
         val lowercase = itemName.lowercase()
         if (itemNameCache.containsKey(lowercase)) {
-            return itemNameCache[lowercase]
+            return itemNameCache[lowercase]!!
         }
 
         resolveEnchantmentByName(itemName)?.let {
             itemNameCache[itemName] = it
             return it
         }
-        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false)
+        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
