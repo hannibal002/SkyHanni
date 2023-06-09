@@ -37,6 +37,7 @@
 + Added Broken Hyperion Warning (Slayer only)
   + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
   (Kill a mob with melee-hits to fix this hypixel bug)
++ Added Piece of Wizard Portal show earned by player name (Contributed by HiZe)
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.

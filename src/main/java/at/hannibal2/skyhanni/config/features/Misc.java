@@ -503,14 +503,14 @@ public class Misc {
     public boolean serverRestartTitle = true;
 
     @Expose
-    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
-    @ConfigEditorBoolean
-    public boolean configButtonOnPause = true;
-
-    @Expose
     @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
     @ConfigEditorBoolean
     public boolean restorePieceOfWizardPortalLore = true;
+
+    @Expose
+    @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
+    @ConfigEditorBoolean
+    public boolean configButtonOnPause = true;
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);

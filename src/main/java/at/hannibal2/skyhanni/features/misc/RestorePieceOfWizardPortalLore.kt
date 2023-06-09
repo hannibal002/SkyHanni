@@ -15,8 +15,8 @@ class RestorePieceOfWizardPortalLore {
         if (!config.restorePieceOfWizardPortalLore) return
         val stack = event.itemStack
         if (stack.getInternalName() != "WIZARD_PORTAL_MEMENTO") return
-        val recipient = stack.getRecipientName()
-        if (!event.toolTip[5].contains(recipient!!)) {
+        val recipient = stack.getRecipientName() ?: return
+        if (!event.toolTip[5].contains(recipient)) {
             event.toolTip.add(5, "§7Earned by: $recipient")
         }
     }
