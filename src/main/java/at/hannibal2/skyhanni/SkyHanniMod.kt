@@ -295,6 +295,7 @@ class SkyHanniMod {
         loadModule(SlayerItemProfitTracker())
         loadModule(SlayerItemsOnGround())
         loadModule(DetectBrokenHyperion())
+        loadModule(RestorePieceOfWizardPortalLore())
 
         init()
 
