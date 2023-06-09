@@ -508,5 +508,10 @@ public class Misc {
     public boolean configButtonOnPause = true;
 
     @Expose
+    @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
+    @ConfigEditorBoolean
+    public boolean restorePieceOfWizardPortalLore = true;
+
+    @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 }

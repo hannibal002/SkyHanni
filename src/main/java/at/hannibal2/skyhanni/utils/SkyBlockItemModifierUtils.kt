@@ -153,6 +153,8 @@ object SkyBlockItemModifierUtils {
         return data.sackInASack
     }
 
+    fun ItemStack.getRecipientName() = getAttributeString("recipient_name")
+
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
         for (attributes in it.keySet) {

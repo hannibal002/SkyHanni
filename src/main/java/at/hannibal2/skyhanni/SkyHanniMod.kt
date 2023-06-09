@@ -293,6 +293,7 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
+        loadModule(RestorePieceOfWizardPortalLore())
 
         init()
 
