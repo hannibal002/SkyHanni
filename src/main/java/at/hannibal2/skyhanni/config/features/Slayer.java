@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -93,6 +94,9 @@ public class Slayer {
                 "keep track of how much you pay for starting slayers and calculating the overall profit.")
         @ConfigEditorBoolean
         public boolean enabled = true;
+
+        @Expose
+        public Position pos = new Position(20, 20, false, true);
 
         @Expose
         @ConfigOption(name = "Price in Chat", desc = "Show an extra chat message when you pick up an item. " +

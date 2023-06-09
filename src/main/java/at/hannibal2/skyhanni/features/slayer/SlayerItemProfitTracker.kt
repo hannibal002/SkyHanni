@@ -171,7 +171,8 @@ class SlayerItemProfitTracker {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInSlayerArea) return
-        SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(display, posLabel = "Slayer Item Profit Tracker")
+
+        config.pos.renderStringsAndItems(display, posLabel = "Slayer Item Profit Tracker")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
