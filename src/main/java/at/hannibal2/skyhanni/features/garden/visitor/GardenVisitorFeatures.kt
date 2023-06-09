@@ -52,7 +52,7 @@ class GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var price = 0.0
-    private var offerCache: MutableListIterator<String>? = null
+    private val offerCache = mutableListOf<String>()
 
     companion object {
         var inVisitorInventory = false
@@ -328,7 +328,7 @@ class GardenVisitorFeatures {
         if (!inVisitorInventory) return
         if (event.itemStack.name != "§aAccept Offer") return
 
-        if (offerCache == null) {
+        if (offerCache.isEmpty()) {
             var totalPrice = 0.0
             var timeRequired = -1L
             val iterator = event.toolTip.listIterator()
@@ -336,33 +336,32 @@ class GardenVisitorFeatures {
                 val formattedLine = line.substring(4)
                 val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
                 if (itemName != null) {
-                    val internalName = NEUItems.getInternalNameOrNull(itemName) ?: continue
-                    price = NEUItems.getPrice(internalName) * amount
+                    val internalName = NEUItems.getInternalNameOrNull(itemName)
+                    if (internalName != null) {
+                        price = NEUItems.getPrice(internalName) * amount
 
-                    if (config.visitorShowPrice) {
-                        val format = NumberUtil.format(price)
-                        iterator.set("$formattedLine §7(§6$format§7)")
-                    }
-                    if (totalPrice == 0.0) {
-                        totalPrice = price
-                        val multiplier = NEUItems.getMultiplier(internalName)
-                        val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
-                        getByNameOrNull(rawName)?.let {
-                            val cropAmount = multiplier.second.toLong() * amount
-                            val formattedAmount = LorenzUtils.formatInteger(cropAmount)
-                            val formattedName = "§e$formattedAmount§7x ${it.cropName} "
-                            val formattedSpeed = it.getSpeed()?.let { speed ->
-                                timeRequired = cropAmount / speed
-                                val duration = TimeUtils.formatDuration(timeRequired * 1000)
-                                "in §b$duration"
-                            } ?: "§cno speed data!"
-                            if (config.visitorExactAmountAndTime) {
-                                iterator.add("§7- $formattedName($formattedSpeed§7)")
+                        if (config.visitorShowPrice) {
+                            val format = NumberUtil.format(price)
+                            iterator.set("$formattedLine §7(§6$format§7)")
+                        }
+                        if (totalPrice == 0.0) {
+                            totalPrice = price
+                            val multiplier = NEUItems.getMultiplier(internalName)
+                            val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
+                            getByNameOrNull(rawName)?.let {
+                                val cropAmount = multiplier.second.toLong() * amount
+                                val formattedAmount = LorenzUtils.formatInteger(cropAmount)
+                                val formattedName = "§e$formattedAmount§7x ${it.cropName} "
+                                val formattedSpeed = it.getSpeed()?.let { speed ->
+                                    timeRequired = cropAmount / speed
+                                    val duration = TimeUtils.formatDuration(timeRequired * 1000)
+                                    "in §b$duration"
+                                } ?: "§cno speed data!"
+                                if (config.visitorExactAmountAndTime) {
+                                    iterator.add("§7- $formattedName($formattedSpeed§7)")
+                                }
                             }
                         }
-                    } else {
-                        val format = NumberUtil.format(price)
-                        iterator.set("$formattedLine §7(§6$format§7)")
                     }
                 }
 
@@ -386,15 +385,20 @@ class GardenVisitorFeatures {
                     iterator.set(copperLine)
                 }
             }
-            offerCache = iterator
+            val temp = event.toolTip.listIterator()
+                for (line in temp) {
+                    offerCache.add(line)
+                }
         } else {
-            val tooltip = mutableListOf<String>()
-            while (offerCache!!.hasNext()) {
-                tooltip.add(offerCache!!.next())
-            } // it says unused but it works
-            var iterator = event.toolTip.listIterator()
-            iterator = tooltip.listIterator()
+            val iterator = event.toolTip.listIterator()
+            for (i in iterator) {
+                iterator.remove()
+            }
+            for (line in offerCache) {
+                iterator.add(line)
+            }
         }
+
     }
 
     @SubscribeEvent
@@ -412,7 +416,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inVisitorInventory = false
-        offerCache = null
+        offerCache.clear()
     }
 
     @SubscribeEvent
@@ -437,7 +441,6 @@ class GardenVisitorFeatures {
                     logger.log("Ignore wrong red name: '$name'")
                     continue
                 }
-
 
                 //hide own player name
                 if (name.contains(LorenzUtils.getPlayerName())) {
