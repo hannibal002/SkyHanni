@@ -346,4 +346,21 @@ object LorenzUtils {
                 child.set(rootObj, value)
             }
         }
+
+    fun List<String>.nextAfter(after: String, skip: Int = 1): String? {
+        var missing = -1
+        for (line in this) {
+            if (line == after) {
+                missing = skip - 1
+                continue
+            }
+            if (missing == 0) {
+                return line
+            }
+            if (missing != -1) {
+                missing--
+            }
+        }
+        return null
+    }
 }

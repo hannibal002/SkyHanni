@@ -142,6 +142,14 @@
 + Hide particles and fireballs near blaze slayer bosses and demons.
 + Option to remove the wrong dagger messages from chat.
 + Warning when wrong slayer quest is selected, or killing mobs for the wrong slayer.
++ **Item Profit Tracker**
+  + Count items collected and how much you pay while doing slayer, calculates final profit
+  + Shows the price of the item collected in chat (default disabled)
++ **Items on Ground**
+  + Show item name and price over items laying on ground (only in slayer areas)
++ **Broken Hyperion Warning**
+  + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
+    (Kill a mob with melee-hits to fix this hypixel bug)
 
 ### Diana
 + Show burrows near you.
