@@ -181,7 +181,7 @@ public class Inventory {
         @Expose
         @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
         @ConfigEditorDropdown(values = {"Bazaar", "NPC"})
-        public int priceFrom = 1;
+        public int priceFrom = 0;
 
         @Expose
         @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack.")
