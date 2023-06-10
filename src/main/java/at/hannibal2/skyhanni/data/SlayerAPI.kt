@@ -66,7 +66,7 @@ object SlayerAPI {
         }
 
         val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-        val displayName = NEUItems.getItemStack(internalName).nameWithEnchantment
+        val displayName = getNameWithEnchantmentFor(internalName)
 
         val price = NEUItems.getPrice(internalName)
         val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
@@ -79,6 +79,13 @@ object SlayerAPI {
         val result = "$amountFormat$displayName$priceFormat" to totalPrice
         nameCache.put(key, result)
         return result
+    }
+
+    fun getNameWithEnchantmentFor(internalName: String): String? {
+        if (internalName == "WISP_POTION") {
+            return "§fWisp's Ice-Flavored Water"
+        }
+        return NEUItems.getItemStack(internalName).nameWithEnchantment
     }
 
     @SubscribeEvent

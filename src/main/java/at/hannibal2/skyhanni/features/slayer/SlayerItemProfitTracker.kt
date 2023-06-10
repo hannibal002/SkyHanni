@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
@@ -147,13 +146,12 @@ class SlayerItemProfitTracker {
         for ((internalName, itemProfit) in itemLog.items) {
             val amount = itemProfit.totalAmount
 
-            val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName) ?: continue
-            val price = (getPrice(bazaarData) * amount).toLong()
-            var name = NEUItems.getItemStack(internalName).nameWithEnchantment ?: internalName
+            val price = (getPrice(internalName) * amount).toLong()
+
+            var name = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             if (hidden) {
-//                text += " §c(hidden)"
                 name = StringUtils.addFormat(name, "§m")
             }
             val text = " §7${amount.addSeparators()}x $name§7: §6$priceFormat"
@@ -185,16 +183,22 @@ class SlayerItemProfitTracker {
         val mobKillCoins = itemLog.mobKillCoins
         if (mobKillCoins != 0L) {
             val mobKillCoinsFormat = NumberUtil.format(mobKillCoins)
-            map[Renderable.hoverTips(" §7Mob kill coins: §6$mobKillCoinsFormat",
-                listOf("§7Killing mobs gives you coins (more with scavenger)",
-                    "§7You got §e$mobKillCoinsFormat §7coins in total this way"))] = mobKillCoins
+            map[Renderable.hoverTips(
+                " §7Mob kill coins: §6$mobKillCoinsFormat",
+                listOf(
+                    "§7Killing mobs gives you coins (more with scavenger)",
+                    "§7You got §e$mobKillCoinsFormat §7coins in total this way"
+                )
+            )] = mobKillCoins
             profit += mobKillCoins
         }
         val slayerSpawnCost = itemLog.slayerSpawnCost
         if (slayerSpawnCost != 0L) {
             val mobKillCoinsFormat = NumberUtil.format(slayerSpawnCost)
-            map[Renderable.hoverTips(" §7Slayer Spawn Costs: §c$mobKillCoinsFormat",
-                listOf("§7You paid §c$mobKillCoinsFormat §7in total", "§7for starting the slayer quests."))] = slayerSpawnCost
+            map[Renderable.hoverTips(
+                " §7Slayer Spawn Costs: §c$mobKillCoinsFormat",
+                listOf("§7You paid §c$mobKillCoinsFormat §7in total", "§7for starting the slayer quests.")
+            )] = slayerSpawnCost
             profit += slayerSpawnCost
         }
 
@@ -203,8 +207,12 @@ class SlayerItemProfitTracker {
         }
 
         val slayerCompletedCount = itemLog.slayerCompletedCount
-        addAsSingletonList(Renderable.hoverTips("§7Bosses killed: §e$slayerCompletedCount",
-            listOf("§7You killed the $itemLogCategory boss", "§e$slayerCompletedCount §7times.")))
+        addAsSingletonList(
+            Renderable.hoverTips(
+                "§7Bosses killed: §e$slayerCompletedCount",
+                listOf("§7You killed the $itemLogCategory boss", "§e$slayerCompletedCount §7times.")
+            )
+        )
 
         profit += mobKillCoins
         val profitFormat = NumberUtil.format(profit)
@@ -225,6 +233,11 @@ class SlayerItemProfitTracker {
                     update()
                 })
         }
+    }
+
+    private fun getPrice(internalName: String): Double {
+        val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
+        return bazaarData?.let { getPrice(it) } ?: NEUItems.getPrice(internalName)
     }
 
     private fun getPrice(bazaarData: BazaarData): Double {
