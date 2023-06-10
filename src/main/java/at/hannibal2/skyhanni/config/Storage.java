@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
@@ -194,40 +195,8 @@ public class Storage {
         public static class GhostCounter {
 
             @Expose
-            public Double ghostKills = 0.0;
+            public Map<Option, Double> data = new HashMap<>();
 
-            @Expose
-            public Double sorrowCount = 0.0;
-
-            @Expose
-            public Double ghostSinceSorrow = 0.0;
-
-            @Expose
-            public Double totalDrops = 0.0;
-
-            @Expose
-            public Double ghoostlyBootsCount = 0.0;
-
-            @Expose
-            public Double bagOfCashCount = 0.0;
-
-            @Expose
-            public Double voltaCount = 0.0;
-
-            @Expose
-            public Double plasmaCount = 0.0;
-
-            @Expose
-            public Double totalMF = 0.0;
-
-            @Expose
-            public Double scavengerCoins = 0.0;
-
-            @Expose
-            public boolean hasScavengerTalisman = false;
-
-            @Expose
-            public Double maxKillCombo = 0.0;
         }
 
         public long nextCityProjectParticipationTime = 0L;

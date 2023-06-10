@@ -296,8 +296,6 @@ class SkyHanniMod {
         loadModule(SlayerItemsOnGround())
         loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
-
-        //test
         loadModule(GhostCounter)
 
         init()

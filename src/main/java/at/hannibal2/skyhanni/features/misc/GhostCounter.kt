@@ -5,27 +5,20 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.GhostCounter.Option.*
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
-import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.awt.Color
 import kotlin.math.roundToInt
 
 object GhostCounter {
 
     private val config get() = SkyHanniMod.feature.misc.ghostCounter
-    private val hidden get() = ProfileStorageData.profileSpecific
+    private val counter get() = ProfileStorageData.profileSpecific?.ghostCounter?.data ?: mutableMapOf()
     private var display = listOf<List<Any>>()
     private val sorrowPattern = "§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
     private val plasmaPattern = "§6§lRARE DROP! §r§9Plasma §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
@@ -35,42 +28,21 @@ object GhostCounter {
     private val skillXPPattern = ".*§3\\+(?<gained>.*) .* \\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
     private val killComboPattern = "[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
-    private val scavengerMap = mapOf(
-            1 to 0.3,
-            2 to 0.6,
-            3 to 0.9,
-            4 to 1.2,
-            5 to 1.5,
-    )
+    private var tick = 0
     private var lastXp: String = "0"
     private var gain: Int = 0
     private var num: Double = 0.0
     private var inMist = false
-    private var hasScavengerTalisman = false
-    private val session = Session(
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-    )
-
-    val map: MutableMap<Option, Double> = mutableMapOf(
-            KILLS to 0.0,
-            SORROWCOUNT to 0.0,
-            VOLTACOUNT to 0.0,
-            PLASMACOUNT to 0.0,
-            GHOSTLYBOOTS to 0.0,
-            BAGOFCASH to 0.0,
-            TOTALDROPS to 0.0,
-            GHOSTSINCESORROW to 0.0,
-            TOTALMF to 0.0,
-            SCAVENGERCOINS to 0.0,
-            MAXKILLCOMBO to 0.0
+    private var session = mutableMapOf(
+            SESSION_KILLS to 0.0,
+            SESSION_SORROWCOUNT to 0.0,
+            SESSION_VOLTACOUNT to 0.0,
+            SESSION_PLASMACOUNT to 0.0,
+            SESSION_GHOSTLYBOOTS to 0.0,
+            SESSION_BAGOFCASH to 0.0,
+            SESSION_TOTALDROPS to 0.0,
+            SESSION_SCAVENGERCOINS to 0.0,
+            SESSION_MAXKILLCOMBO to 0.0
     )
 
     @SubscribeEvent
@@ -91,39 +63,7 @@ object GhostCounter {
     }
 
     fun update() {
-        if (!isEnabled()) return
-        val counter = hidden?.ghostCounter ?: return
-        counter.ghostKills = KILLS.get()
-        counter.sorrowCount = SORROWCOUNT.get()
-        counter.voltaCount = VOLTACOUNT.get()
-        counter.plasmaCount = PLASMACOUNT.get()
-        counter.ghoostlyBootsCount = GHOSTLYBOOTS.get()
-        counter.bagOfCashCount = BAGOFCASH.get()
-        counter.totalDrops = TOTALDROPS.get()
-        counter.ghostSinceSorrow = GHOSTSINCESORROW.get()
-        counter.totalMF = TOTALMF.get()
-        counter.scavengerCoins = SCAVENGERCOINS.get()
-        counter.hasScavengerTalisman = hasScavengerTalisman
-        counter.maxKillCombo = MAXKILLCOMBO.get()
         display = formatDisplay(drawDisplay())
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        val counter = hidden?.ghostCounter ?: return
-        KILLS.set(counter.ghostKills)
-        SORROWCOUNT.set(counter.sorrowCount)
-        VOLTACOUNT.set(counter.voltaCount)
-        PLASMACOUNT.set(counter.plasmaCount)
-        GHOSTLYBOOTS.set(counter.ghoostlyBootsCount)
-        BAGOFCASH.set(counter.bagOfCashCount)
-        TOTALDROPS.set(counter.totalDrops)
-        GHOSTSINCESORROW.set(counter.ghostSinceSorrow)
-        TOTALMF.set(counter.totalMF)
-        SCAVENGERCOINS.set(counter.scavengerCoins)
-        MAXKILLCOMBO.set(counter.maxKillCombo)
-        hasScavengerTalisman = counter.hasScavengerTalisman
-        update()
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
@@ -138,42 +78,27 @@ object GhostCounter {
 
         addAsSingletonList("§6Ghosts counter")
         val list = mapOf(
-                "Gosts Killed" to Pair(KILLS.getInt(), session.kills.roundToInt()),
-                "Sorrows" to Pair(SORROWCOUNT.getInt(), session.sorrow.roundToInt()),
+                "Gosts Killed" to Pair(KILLS.getInt(), SESSION_KILLS.getInt(true)),
+                "Sorrows" to Pair(SORROWCOUNT.getInt(), SESSION_SORROWCOUNT.getInt(true)),
                 "Ghost Since Sorrow" to Pair(GHOSTSINCESORROW.getInt(), ""),
                 "Ghosts/Sorrow" to Pair(value, ""),
-                "Volta" to Pair(VOLTACOUNT.getInt(), session.volta.roundToInt()),
-                "Plasma" to Pair(PLASMACOUNT.getInt(), session.plasma.roundToInt()),
-                "Ghostly Boots" to Pair(GHOSTLYBOOTS.getInt(), session.boots.roundToInt()),
-                "Bag Of Cash" to Pair(BAGOFCASH.getInt(), session.bag.roundToInt()),
+                "Volta" to Pair(VOLTACOUNT.getInt(), SESSION_VOLTACOUNT.getInt(true)),
+                "Plasma" to Pair(PLASMACOUNT.getInt(), SESSION_PLASMACOUNT.getInt(true)),
+                "Ghostly Boots" to Pair(GHOSTLYBOOTS.getInt(), SESSION_GHOSTLYBOOTS.getInt(true)),
+                "Bag Of Cash" to Pair(BAGOFCASH.getInt(), SESSION_BAGOFCASH.getInt(true)),
                 "Avg Magic Find" to Pair(mgc, ""),
-                "Scavenger Coins" to Pair(SCAVENGERCOINS.getInt(), session.scavenger.roundToInt()),
+                "Scavenger Coins" to Pair(SCAVENGERCOINS.getInt(), SESSION_SCAVENGERCOINS.getInt(true)),
                 "Kill Combo" to Pair(KILLCOMBO.getInt(), ""),
-                "Highest Kill Combo" to Pair(MAXKILLCOMBO.getInt(), session.maxcombo.roundToInt()),
+                "Highest Kill Combo" to Pair(MAXKILLCOMBO.getInt(), SESSION_MAXKILLCOMBO.getInt(true)),
         )
 
-        for ((text, value) in list) {
-            val (total, session) = value
-            val se = if(session == "") "" else "($session)"
+        for ((text, v) in list) {
+            val (total, session) = v
+            val se = if (session == "") "" else "($session)"
             addAsSingletonList(config.formatText.replace("&", "§")
                     .replace("%text%", text)
                     .replace("%value%", "$total")
                     .replace("%session%", se))
-        }
-    }
-
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
-        val inventoryName = event.inventoryName
-        if (inventoryName.startsWith("Accessory Bag")) {
-            val stacks = event.inventoryItems
-            for ((_, stack) in stacks) {
-                val name = stack.name ?: return
-                if (name.removeColor().contains("Scavenger Talisman")) {
-                    hasScavengerTalisman = true
-                }
-            }
         }
     }
 
@@ -192,21 +117,9 @@ object GhostCounter {
                     if (lastXp != "0") {
                         if (num >= 0) {
                             KILLS.add(num)
+                            SESSION_KILLS.add(num, true)
                             GHOSTSINCESORROW.add(num)
-                            InventoryUtils.getItemInHand()?.let {
-                                val scavengerLevel = it.getEnchantments()?.get("scavenger") ?: 0
-                                var baseValue = 0.0
-                                baseValue += (scavengerMap.getOrDefault(scavengerLevel, 0).toDouble() * 250)
-                                if (hasScavengerTalisman || config.forceScavengerTalisman)
-                                    baseValue += (250 * 0.5)
-                                baseValue += KILLCOMBOCOINS.getInt() * num
-                                val scav = (baseValue * num.roundToInt()).roundToInt().toDouble()
-                                SCAVENGERCOINS.add(scav)
-                                KILLCOMBO.add(num)
-
-                                session.kills += num
-                                session.scavenger+= scav
-                            }
+                            KILLCOMBO.add(num)
                         }
                     }
                 }
@@ -224,41 +137,41 @@ object GhostCounter {
             TOTALMF.add(group("mf").substring(4).toDouble())
             GHOSTSINCESORROW.set(0.0)
             TOTALDROPS.add(1.0)
-            session.sorrow += 1
+            SESSION_SORROWCOUNT.add(1.0, true)
             update()
         }
         voltaPattern.matchMatcher(event.message) {
             VOLTACOUNT.add(1.0)
             TOTALMF.add(group("mf").substring(4).toDouble())
             TOTALDROPS.add(1.0)
-            session.volta += 1
+            SESSION_VOLTACOUNT.add(1.0, true)
             update()
         }
         plasmaPattern.matchMatcher(event.message) {
             PLASMACOUNT.add(1.0)
             TOTALMF.add(group("mf").substring(4).toDouble())
             TOTALDROPS.add(1.0)
-            session.plasma += 1
+            SESSION_PLASMACOUNT.add(1.0, true)
             update()
         }
         ghostlybootPattern.matchMatcher(event.message) {
             GHOSTLYBOOTS.add(1.0)
             TOTALMF.add(group("mf").substring(4).toDouble())
             TOTALDROPS.add(1.0)
-            session.boots += 1
+            SESSION_GHOSTLYBOOTS.add(1.0, true)
             update()
         }
         coinsPattern.matchMatcher(event.message) {
             BAGOFCASH.add(1.0)
-            session.bag += 1
+            SESSION_BAGOFCASH.add(1.0, true)
             update()
         }
         killComboExpiredPattern.matchMatcher(event.message) {
             if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt()) {
                 MAXKILLCOMBO.set(group("combo").toDouble())
             }
-            if(KILLCOMBO.getInt() > session.maxcombo){
-                session.maxcombo = group("combo").toDouble()
+            if (KILLCOMBO.getInt() > SESSION_MAXKILLCOMBO.getInt(true)) {
+                SESSION_MAXKILLCOMBO.set(group("combo").toDouble(), true)
             }
             KILLCOMBOCOINS.set(0.0)
             KILLCOMBO.set(0.0)
@@ -270,57 +183,87 @@ object GhostCounter {
         }
     }
 
+    @SubscribeEvent
+    fun onPurseChange(event: PurseChangeEvent) {
+        if (!isEnabled()) return
+        if (LorenzUtils.skyBlockArea != "The Mist") return
+        if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
+        SESSION_SCAVENGERCOINS.add(event.coins, true)
+        SCAVENGERCOINS.add(event.coins)
+    }
+
     fun reset() {
         for (opt in Option.values()) {
-            opt.set(0.0)
+            if (opt.save)
+                opt.set(0.0)
         }
-        session.volta = 0.0
-        session.sorrow = 0.0
         update()
     }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
-        inMist = LorenzUtils.skyBlockArea == "The Mist"
-        update()
+        if (tick++ % 20 == 0) {
+            inMist = LorenzUtils.skyBlockArea == "The Mist"
+            update()
+        }
     }
 
     fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
     }
 
-    enum class Option {
-        KILLS, SORROWCOUNT, VOLTACOUNT, PLASMACOUNT, GHOSTLYBOOTS, BAGOFCASH, TOTALDROPS,
-        GHOSTSINCESORROW, TOTALMF, SCAVENGERCOINS, MAXKILLCOMBO,
-        KILLCOMBO, KILLCOMBOCOINS
-    }
+    enum class Option(val save: Boolean = true) {
+        KILLS,
+        SORROWCOUNT,
+        VOLTACOUNT,
+        PLASMACOUNT,
+        GHOSTLYBOOTS,
+        BAGOFCASH,
+        KILLCOMBOCOINS,
+        TOTALDROPS,
+        GHOSTSINCESORROW,
+        TOTALMF,
+        SCAVENGERCOINS,
+        MAXKILLCOMBO,
+        KILLCOMBO,
+        SESSION_KILLS(false),
+        SESSION_SORROWCOUNT(false),
+        SESSION_VOLTACOUNT(false),
+        SESSION_PLASMACOUNT(false),
+        SESSION_GHOSTLYBOOTS(false),
+        SESSION_BAGOFCASH(false),
+        SESSION_TOTALDROPS(false),
+        SESSION_SCAVENGERCOINS(false),
+        SESSION_MAXKILLCOMBO(false);
 
-    private fun Option.getInt(): Int {
-        return map[this]?.roundToInt() ?: 0
-    }
+        fun add(i: Double, s: Boolean = false) {
+            if (s)
+                session[this] = session[this]?.plus(i) ?: i
+            else
+                counter[this] = counter[this]?.plus(i) ?: i
+        }
 
-    fun Option.get(): Double {
-        return map[this] ?: 0.0
-    }
+        fun set(i: Double, s: Boolean = false) {
+            if (s)
+                session[this] = i
+            else
+                counter[this] = i
+        }
 
-    fun Option.set(i: Double) {
-        map[this] = i
-    }
+        fun getInt(s: Boolean = false): Int {
+            return if (s)
+                session[this]?.roundToInt() ?: 0
+            else
+                counter[this]?.roundToInt() ?: 0
+        }
 
-    fun Option.add(i: Double) {
-        map[this] = map.getOrDefault(this, 0.0) + i
-    }
+        fun get(s: Boolean = false): Double {
+            return if (s)
+                session[this] ?: 0.0
+            else
+                counter[this] ?: 0.0
+        }
 
-    data class Session(
-            var kills: Double,
-            var sorrow: Double,
-            var volta: Double,
-            var plasma: Double,
-            var boots: Double,
-            var bag: Double,
-            var totaldrops: Double,
-            var scavenger: Double,
-            var maxcombo: Double
-    )
+    }
 }
