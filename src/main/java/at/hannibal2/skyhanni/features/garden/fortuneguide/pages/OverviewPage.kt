@@ -17,7 +17,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
-        //todo change based on pet
+        //todo change based on pet and based on setting
         GuiRenderUtils.drawFarmingBar("§6Universal Farming Fortune", "§7§2Farming fortune in that is\n" +
                 "§2applied to every crop\n§eNot the same as tab FF", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1250, FFGuideGUI.guiLeft + 15,
             FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)

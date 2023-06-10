@@ -224,6 +224,7 @@ open class FFGuideGUI : GuiScreen() {
                     for (item in FarmingItems.values()) {
                         if (item.name == crop.name) {
                             FFStats.getCropStats(crop, item.getItem())
+                            FortuneUpgrades.getCropSpecific(item.getItem())
                         }
                     }
                 }

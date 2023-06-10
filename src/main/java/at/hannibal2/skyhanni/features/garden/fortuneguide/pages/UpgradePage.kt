@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.MathHelper
 import java.text.DecimalFormat
 
 class UpgradePage: FFGuideGUI.FFGuidePage() {
@@ -25,7 +23,9 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
         GuiRenderUtils.drawString("Total cost", (FFGuideGUI.guiLeft + 260)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
         GuiRenderUtils.drawString("Time to earn back", (FFGuideGUI.guiLeft + 295)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
 
-        for ((index, upgrade) in FortuneUpgrades.genericUpgrades.withIndex()) {
+        val upgradeList = if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
+
+        for ((index, upgrade) in upgradeList.withIndex()) {
             if (adjustedY + 15 * index < FFGuideGUI.guiTop + 20) continue
             if (adjustedY + 15 * index > FFGuideGUI.guiTop + 170) continue
             GuiRenderUtils.drawString(upgrade.description, (FFGuideGUI.guiLeft + 15)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
