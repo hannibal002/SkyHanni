@@ -382,6 +382,11 @@ public class Misc {
         public boolean showReady = true;
 
         @Expose
+        @ConfigOption(name = "Daily Reminder", desc = "Remind every 24 hours to participate.")
+        @ConfigEditorBoolean
+        public boolean dailyReminder = true;
+
+        @Expose
         public Position pos = new Position(150, 150, false, true);
     }
 

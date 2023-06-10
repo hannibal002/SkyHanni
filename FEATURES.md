@@ -274,10 +274,11 @@
 + **Estimated Item Value** - Displays an estimated item value for the item you hover over.
 + **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
 + Server Restart Title
-+ Added City Project Features
++ **City Project Features**
   + Show missing items to contribute inside the inventory
     + Click on the item name to open the bazaar
   + Highlight a component in the inventory that can be contributed
+  + City Project Daily Reminder - Remind every 24 hours to participate
 + **Command Autocomplete**
   + Supports tab completing for warp points when typing /warp
   + Supports party members, friends (need to visit all friend list pages), player on the same server

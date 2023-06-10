@@ -186,5 +186,8 @@ public class Storage {
                 public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
         }
+
+        @Expose
+        public long nextCityProjectParticipationTime = 0L;
     }
 }
