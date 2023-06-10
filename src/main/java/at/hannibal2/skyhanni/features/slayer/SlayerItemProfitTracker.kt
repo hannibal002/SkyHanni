@@ -152,6 +152,9 @@ class SlayerItemProfitTracker {
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             if (hidden) {
+                while (name.startsWith("§f")) {
+                    name = name.substring(2)
+                }
                 name = StringUtils.addFormat(name, "§m")
             }
             val text = " §7${amount.addSeparators()}x $name§7: §6$priceFormat"
