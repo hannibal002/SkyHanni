@@ -48,6 +48,10 @@ interface Renderable {
             return clickable(hoverable(underlined(renderable), renderable, condition), onClick, 0, condition)
         }
 
+        fun clickAndHover(text: String, tips: List<String>, onClick: () -> Unit): Renderable {
+            return clickable(hoverTips(text, tips), onClick)
+        }
+
         fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0, condition: () -> Boolean = { true }) =
             object : Renderable {
                 override val width: Int

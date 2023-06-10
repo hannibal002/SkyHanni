@@ -105,6 +105,11 @@ public class Slayer {
         public boolean priceInChat = false;
 
         @Expose
+        @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+        @ConfigEditorDropdown(values = {"Instant Sell", "Sell Offer", "NPC"})
+        public int priceFrom = 0;
+
+        @Expose
         @ConfigOption(name = "Minimum Price", desc = "Items below this price will not show up in chat.")
         @ConfigEditorSlider(minValue = 1, maxValue = 5_000_000, minStep = 1)
         public int minimumPrice = 100_000;

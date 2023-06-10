@@ -189,5 +189,35 @@ public class Storage {
 
         @Expose
         public long nextCityProjectParticipationTime = 0L;
+
+        @Expose
+        public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
+
+        public static class SlayerProfitList {
+
+            @Expose
+            public Map<String, SlayerItemProfit> items = new HashMap<>();
+
+            @Expose
+            public long mobKillCoins = 0;
+
+            @Expose
+            public long slayerSpawnCost = 0;
+
+            @Expose
+            public int slayerCompletedCount = 0;
+
+            public static class SlayerItemProfit {
+                @Expose
+                public String internalName;
+                @Expose
+                public long timesDropped;
+                @Expose
+                public long totalAmount;
+                @Expose
+                public boolean hidden;
+            }
+        }
+
     }
 }
