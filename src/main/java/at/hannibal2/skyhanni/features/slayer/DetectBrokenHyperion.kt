@@ -50,8 +50,6 @@ class DetectBrokenHyperion {
                         "Kill a mob with meele-hits to fix this hypixel bug"
             )
         }
-
-        LorenzUtils.debug("diff: $diff")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.brokenHyperion

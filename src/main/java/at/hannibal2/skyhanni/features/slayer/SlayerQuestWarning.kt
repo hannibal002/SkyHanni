@@ -161,7 +161,6 @@ class SlayerQuestWarning {
                 val activeSlayerName = activeSlayer.displayName
                 val slayerName = slayerType.displayName
                 SlayerAPI.latestWrongAreaWarning = System.currentTimeMillis()
-                LorenzUtils.debug("set latestWrongAreaWarning!")
                 warn(
                     "Wrong Slayer!",
                     "Wrong slayer selected! You have $activeSlayerName selected and are in the $slayerName area!"
