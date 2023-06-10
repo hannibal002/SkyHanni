@@ -208,13 +208,13 @@ class FarmingFortuneDisplay {
         fun getHarvestingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5 }
         fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0).toDouble()}
 
-        fun getAbilityFortune(tool: ItemStack?):  Double  {
+        fun getAbilityFortune(item: ItemStack?):  Double  {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
-            // todo make it work on cropie and fermento
+            // todo make it work on Melon and Cropie armor
             val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()
             var pieces = 0
-            for (line in tool?.getLore()!!) {
-                if (tool.getInternalName().contains("LOTUS")) {
+            for (line in item?.getLore()!!) {
+                if (item.getInternalName().contains("LOTUS")) {
                     lotusAbilityPattern.matchMatcher(line) {
                         return group("bonus").toDouble()
                     }
@@ -224,7 +224,7 @@ class FarmingFortuneDisplay {
                 }
 
                 armorAbilityFortune.matchMatcher(line) {
-                    return if (pieces == 1 || pieces == 0) 0.0 else group("bonus").toDouble() / pieces
+                    return if (pieces < 2) 0.0 else group("bonus").toDouble() / pieces
                 }
             }
             return 0.0

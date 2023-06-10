@@ -21,6 +21,7 @@
   "client": [
     "AccessorKeyBinding",
     "MixinEntityRenderer",
+    "MixinGuiChat",
     "MixinGuiIngame",
     "MixinGuiPlayerTabOverlay",
     "MixinKeyBinding",

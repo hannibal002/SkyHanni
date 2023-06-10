@@ -385,6 +385,62 @@ public class Misc {
         public Position pos = new Position(150, 150, false, true);
     }
 
+    @ConfigOption(name = "Tab Complete Commands", desc = "")
+    @Accordion
+    @Expose
+    public TabCompleteCommands tabCompleteCommands = new TabCompleteCommands();
+
+    public static class TabCompleteCommands {
+
+        @Expose
+        @ConfigOption(name = "Warps", desc = "Tab complete the warp-point names when typing §e/warp <TAB>§7.")
+        @ConfigEditorBoolean
+        public boolean warps = true;
+
+        @Expose
+        @ConfigOption(name = "Island Players", desc = "Tab complete other players on the same island.")
+        @ConfigEditorBoolean
+        public boolean islandPlayers = true;
+
+        @Expose
+        @ConfigOption(name = "Friends", desc = "Tab complete friends from your friends list.")
+        @ConfigEditorBoolean
+        public boolean friends = true;
+
+        @Expose
+        @ConfigOption(name = "Only Best Friends", desc = "Only Tab Complete best friends.")
+        @ConfigEditorBoolean
+        public boolean onlyBestFriends = false;
+
+        @Expose
+        @ConfigOption(name = "Party", desc = "Tab complete party members.")
+        @ConfigEditorBoolean
+        public boolean party = true;
+
+        @Expose
+        @ConfigOption(name = "VIP Visits", desc = "Tab complete the visit to special users with cake souls on it.")
+        @ConfigEditorBoolean
+        public boolean vipVisits = true;
+    }
+
+    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
+    @Accordion
+    @Expose
+    public PocketSackInASack pocketSackInASack = new PocketSackInASack();
+
+    public static class PocketSackInASack {
+
+        @Expose
+        @ConfigOption(name = "Show in Overlay", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack icon as overlay.")
+        @ConfigEditorBoolean
+        public boolean showOverlay = false;
+
+        @Expose
+        @ConfigOption(name = "Replace In Lore", desc = "Replace how text is displayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
+        @ConfigEditorBoolean
+        public boolean replaceLore = true;
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
@@ -445,6 +501,11 @@ public class Misc {
     @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     public boolean serverRestartTitle = true;
+
+    @Expose
+    @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
+    @ConfigEditorBoolean
+    public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

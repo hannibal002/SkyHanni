@@ -31,6 +31,7 @@ object GardenPlotIcon {
     private var originalStack = mutableMapOf<Int, ItemStack>()
     private var cachedStack = mutableMapOf<Int, ItemStack>()
     private val editStack = ItemStack(Items.wooden_axe)
+    private val whitelistedSlot = listOf(2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)
 
     var hardReset = false
 
@@ -111,7 +112,7 @@ object GardenPlotIcon {
             }
             if (event.slotId != 53) {
                 val plotList = plotList ?: return
-                if (!event.slot.stack.displayName.removeColor().startsWith("Plot")) return
+                if (!whitelistedSlot.contains(event.slotId)) return
                 event.isCanceled = true
                 if (editMode == 2) {
                     plotList.remove(event.slotId)

@@ -145,6 +145,16 @@ object SkyBlockItemModifierUtils {
         enchantments.keySet.associateWith { enchantments.getInteger(it) }
     }
 
+    fun ItemStack.getAppliedPocketSackInASack(): Int?{
+        val data = cachedData
+        if (data.sackInASack == -1) {
+            data.sackInASack = getAttributeInt("sack_pss")
+        }
+        return data.sackInASack
+    }
+
+    fun ItemStack.getRecipientName() = getAttributeString("recipient_name")
+
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
         for (attributes in it.keySet) {
