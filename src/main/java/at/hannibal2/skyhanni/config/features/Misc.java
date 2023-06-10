@@ -452,20 +452,28 @@ public class Misc {
                 exampleText = {
                         "§6Ghosts Counter",
                         "  §bGhost Killed: 0",
-                        "  §bGhost since Sorrow: 0",
                         "  §bSorrow: 0",
+                        "  §bGhost since Sorrow: 0",
+                        "  §bGhosts/Sorrow: 0",
                         "  §bVolta: 0",
                         "  §bPlasma: 0",
                         "  §bGhostly Boots: 0",
                         "  §bBag Of Cash: 0",
-                        "  §bGhosts/Sorrow: 0",
                         "  §bAvg Magic Find: 0",
                         "  §bScavenger Coins: 0",
                         "  §bKill Combo: 0",
                         "  §bHighest Kill Combo: 0"
                 }
         )
-        public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 8, 9, 10));
+        public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
+
+        @Expose
+        @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 10,
+                minStep = 1)
+        public int extraSpace = 1;
 
         @Expose
         @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
