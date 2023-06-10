@@ -28,6 +28,7 @@ object SlayerAPI {
     var isInSlayerArea = false
     private var latestSlayerCategory = ""
     private var latestProgressChangeTime = 0L
+    var latestWrongAreaWarning = 0L
     private var latestSlayerProgress = ""
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
