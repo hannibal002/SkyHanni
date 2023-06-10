@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -395,8 +394,8 @@ class SackDisplay {
     }
 
     enum class PriceFrom(val displayName: String) {
-        NPC("Npc Price"),
         BAZAAR("Bazaar Price"),
+        NPC("Npc Price"),
         ;
     }
 
