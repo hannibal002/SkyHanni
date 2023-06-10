@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -28,7 +29,7 @@ class SlayerQuestWarning {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!(LorenzUtils.inSkyBlock)) return
 
         val message = event.message
 
@@ -53,8 +54,6 @@ class SlayerQuestWarning {
             needSlayerQuest = false
         }
 
-        //TODO hyp does no damage anymore
-
         //TODO auto slayer disabled bc of no more money in bank or purse
     }
 
@@ -65,7 +64,7 @@ class SlayerQuestWarning {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!isEnabled()) return
+        if (!(LorenzUtils.inSkyBlock)) return
 
         if (dirtySidebar) {
             if (tick++ % 60 == 0) {
@@ -118,8 +117,6 @@ class SlayerQuestWarning {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        if (!config.questWarning) return
-
         if (!needSlayerQuest) {
             dirtySidebar = true
         }
@@ -131,6 +128,7 @@ class SlayerQuestWarning {
     }
 
     private fun warn(titleMessage: String, chatMessage: String) {
+        if (!config.questWarning) return
         if (lastWarning + 10_000 > System.currentTimeMillis()) return
 
         lastWarning = System.currentTimeMillis()
@@ -143,10 +141,10 @@ class SlayerQuestWarning {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!isEnabled()) return
+        if (!(LorenzUtils.inSkyBlock)) return
 
         val entity = event.entity
-        if (entity.getLorenzVec().distanceToPlayer() < 5) {
+        if (entity.getLorenzVec().distanceToPlayer() < 6) {
             if (isSlayerMob(entity)) {
                 tryWarn()
             }
@@ -162,6 +160,7 @@ class SlayerQuestWarning {
             if (slayerType != activeSlayer) {
                 val activeSlayerName = activeSlayer.displayName
                 val slayerName = slayerType.displayName
+                SlayerAPI.latestWrongAreaWarning = System.currentTimeMillis()
                 warn(
                     "Wrong Slayer!",
                     "Wrong slayer selected! You have $activeSlayerName selected and are in the $slayerName area!"
@@ -172,7 +171,4 @@ class SlayerQuestWarning {
         return slayerType.clazz.isInstance(entity)
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.questWarning
-    }
 }

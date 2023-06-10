@@ -93,4 +93,16 @@ object StringUtils {
     fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
 
     fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
+
+    fun addFormat(text: String, format: String): String {
+        if (text.length < 2) return text
+
+        val rawText = text.substring(2)
+        return if (rawText == text.removeColor()) {
+            val originalColor = text.substring(0, 2)
+            "$originalColor$format$rawText"
+        } else {
+            "$format$text"
+        }
+    }
 }

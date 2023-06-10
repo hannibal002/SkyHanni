@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -80,6 +81,65 @@ public class Slayer {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean blazeClearView = false;
+
+    @Expose
+    @ConfigOption(name = "Item Profit Tracker", desc = "")
+    @Accordion
+    public ItemProfitTracker itemProfitTracker = new ItemProfitTracker();
+
+    public static class ItemProfitTracker {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Count all items you pick up while doing slayer, " +
+                "keep track of how much you pay for starting slayers and calculating the overall profit.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        public Position pos = new Position(20, 20, false, true);
+
+        @Expose
+        @ConfigOption(name = "Price in Chat", desc = "Show an extra chat message when you pick up an item. " +
+                "(This contains name, amount and price)")
+        @ConfigEditorBoolean
+        public boolean priceInChat = false;
+
+        @Expose
+        @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+        @ConfigEditorDropdown(values = {"Instant Sell", "Sell Offer", "NPC"})
+        public int priceFrom = 1;
+
+        @Expose
+        @ConfigOption(name = "Minimum Price", desc = "Items below this price will not show up in chat.")
+        @ConfigEditorSlider(minValue = 1, maxValue = 5_000_000, minStep = 1)
+        public int minimumPrice = 100_000;
+    }
+
+    @Expose
+    @ConfigOption(name = "Items on Ground", desc = "")
+    @Accordion
+    public ItemsOnGround itemsOnGround = new ItemsOnGround();
+
+    public static class ItemsOnGround {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show the name and price of items laying on the ground. §cOnly in slayer areas!")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Minimum Price", desc = "Items below this price will be ignored.")
+        @ConfigEditorSlider(minValue = 1, maxValue = 1_000_000, minStep = 1)
+        public int minimumPrice = 50_000;
+    }
+
+    @Expose
+    @ConfigOption(name = "Broken Wither Impact",
+            desc = "Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp. " +
+            "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
+    )
+    @ConfigEditorBoolean
+    public boolean brokenHyperion = true;
 
     @Expose
     @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color.")

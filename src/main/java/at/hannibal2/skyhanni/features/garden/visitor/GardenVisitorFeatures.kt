@@ -52,6 +52,7 @@ class GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var price = 0.0
+    private val offerCache = mutableListOf<String>()
 
     companion object {
         var inVisitorInventory = false
@@ -65,8 +66,6 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inVisitorInventory = false
-
         if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[13] ?: return
         val lore = npcItem.getLore()
@@ -323,87 +322,84 @@ class GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenAPI.inBarn) return
         if (!inVisitorInventory) return
-        val name = event.itemStack.name ?: return
-        if (name != "§aAccept Offer") return
+        if (event.itemStack.name != "§aAccept Offer") return
 
-        val list = event.toolTip
-        var totalPrice = 0.0
-        var itemsCounter = 0
-        var itemsWithSpeedCounter = 0
-        var endReached = false
-        for ((i, l) in list.toMutableList().withIndex()) {
-            if (l.length < 4) continue
-
-            val line = l.substring(4)
-            if (line == "") {
-                if (!endReached) {
-                    if (config.visitorShowPrice) {
-                        if (itemsCounter > 1) {
-                            val format = NumberUtil.format(totalPrice)
-                            list[1] = list[1] + "$line §7(§6Total §6$format§7)"
-                        }
-                    }
-                    endReached = true
-                }
+        if (offerCache.isEmpty()) {
+            drawToolTip(event.toolTip.listIterator())
+            val temp = event.toolTip.listIterator()
+            for (line in temp) {
+                offerCache.add(line)
             }
+        } else {
+            val iterator = event.toolTip.listIterator()
+            for (i in iterator) {
+                iterator.remove()
+            }
+            for (line in offerCache) {
+                iterator.add(line)
+            }
+        }
 
-            // Items Required
-            if (i > 1 && !endReached) {
-                val (itemName, amount) = ItemUtils.readItemAmount(line)
-                if (itemName != null) {
-                    val internalName = NEUItems.getInternalNameOrNull(itemName)
-                    if (internalName == null) {
-                        val message = "internal name is null: '$itemName'"
-                        println(message)
-                        LorenzUtils.error(message)
-                        return
-                    }
+    }
+
+    private fun drawToolTip(iterator: MutableListIterator<String>) {
+        var totalPrice = 0.0
+        var timeRequired = -1L
+        for (line in iterator) {
+            val formattedLine = line.substring(4)
+            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
+            if (itemName != null) {
+                val internalName = NEUItems.getInternalNameOrNull(itemName)
+                if (internalName != null) {
                     price = NEUItems.getPrice(internalName) * amount
-                    totalPrice += price
+
                     if (config.visitorShowPrice) {
                         val format = NumberUtil.format(price)
-                        list[i + itemsWithSpeedCounter] = "$line §7(§6$format§7)"
+                        iterator.set("$formattedLine §7(§6$format§7)")
                     }
-                    itemsCounter++
-
-                    if (config.visitorExactAmountAndTime) {
+                    if (totalPrice == 0.0) {
+                        totalPrice = price
                         val multiplier = NEUItems.getMultiplier(internalName)
-                        val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
+                        val rawName = NEUItems.getItemStackOrNull(multiplier.first)?.name?.removeColor() ?: continue
                         getByNameOrNull(rawName)?.let {
                             val cropAmount = multiplier.second.toLong() * amount
-                            val formatAmount = LorenzUtils.formatInteger(cropAmount)
-                            val formatName = "§e$formatAmount§7x ${it.cropName} "
-                            val formatSpeed = it.getSpeed()?.let { speed ->
-                                val missingTimeSeconds = cropAmount / speed
-                                val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
+                            val formattedAmount = LorenzUtils.formatInteger(cropAmount)
+                            val formattedName = "§e$formattedAmount§7x ${it.cropName} "
+                            val formattedSpeed = it.getSpeed()?.let { speed ->
+                                timeRequired = cropAmount / speed
+                                val duration = TimeUtils.formatDuration(timeRequired * 1000)
                                 "in §b$duration"
                             } ?: "§cno speed data!"
-                            itemsWithSpeedCounter++
-                            list.add(i + itemsWithSpeedCounter, " §7- $formatName($formatSpeed§7)")
+                            if (config.visitorExactAmountAndTime) {
+                                iterator.add("§7- $formattedName($formattedSpeed§7)")
+                            }
                         }
                     }
-                } else {
-                    LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                 }
             }
 
-            if (config.visitorCopperPrice) {
-                copperPattern.matchMatcher(line) {
-                    val coppers = group("amount").replace(",", "").toInt()
-                    val pricePerCopper = NumberUtil.format((totalPrice / coppers).toInt())
-                    list[i + itemsWithSpeedCounter] = "$line §7(price per §6$pricePerCopper§7)"
-                }
-            }
             if (config.visitorExperiencePrice) {
-                gardenExperiencePattern.matchMatcher(line) {
+                gardenExperiencePattern.matchMatcher(formattedLine) {
                     val gardenExp = group("amount").replace(",", "").toInt()
                     val pricePerCopper = NumberUtil.format((totalPrice / gardenExp).toInt())
-                    list[i + itemsWithSpeedCounter] = "$line §7(price per §6$pricePerCopper§7)"
+                    iterator.set("$formattedLine §7(§6$pricePerCopper §7per)")
                 }
+            }
+
+            copperPattern.matchMatcher(formattedLine) {
+                val copper = group("amount").replace(",", "").toInt()
+                val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
+                val timePerCopper = TimeUtils.formatDuration((timeRequired / copper) * 1000)
+                var copperLine = formattedLine
+                if (config.visitorCopperPrice) copperLine += " §7(§6$pricePerCopper §7per)"
+                if (config.visitorCopperTime) {
+                    copperLine += if (timeRequired != -1L) " §7(§b$timePerCopper §7per)" else " §7(§cno speed data!§7)"
+                }
+                iterator.set(copperLine)
             }
         }
     }
@@ -418,6 +414,12 @@ class GardenVisitorFeatures {
         if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
             checkVisitorsReady()
         }
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inVisitorInventory = false
+        offerCache.clear()
     }
 
     @SubscribeEvent
@@ -442,7 +444,6 @@ class GardenVisitorFeatures {
                     logger.log("Ignore wrong red name: '$name'")
                     continue
                 }
-
 
                 //hide own player name
                 if (name.contains(LorenzUtils.getPlayerName())) {

@@ -23,7 +23,6 @@ object ProfileStorageData {
     fun onChat(event: LorenzChatEvent) {
         "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern().matchMatcher(event.message) {
             nextProfile = group("name").lowercase()
-            println("switching to profile: '$nextProfile'")
             loaded = false
             PreProfileSwitchEvent().postAndCatch()
         }
@@ -33,7 +32,6 @@ object ProfileStorageData {
     fun onWorldChange(event: WorldEvent.Load) {
         val profileName = nextProfile ?: return
         nextProfile = null
-        println("new world after profile swap.")
 
         val playerSpecific = playerSpecific
         if (playerSpecific == null) {
@@ -95,7 +93,6 @@ object ProfileStorageData {
     private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, profileName: String, reason: String) {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
-        println("Loaded profileSpecific: $reason")
         tryMigrateProfileSpecific()
         ConfigLoadEvent().postAndCatch()
         loaded = true
@@ -106,7 +103,6 @@ object ProfileStorageData {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
         migratePlayerSpecific()
-        println("loaded playerSpecific because of HypixelJoinEvent!")
         ConfigLoadEvent().postAndCatch()
     }
 

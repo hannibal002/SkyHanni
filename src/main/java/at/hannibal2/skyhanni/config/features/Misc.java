@@ -390,6 +390,11 @@ public class Misc {
         public boolean showReady = true;
 
         @Expose
+        @ConfigOption(name = "Daily Reminder", desc = "Remind every 24 hours to participate.")
+        @ConfigEditorBoolean
+        public boolean dailyReminder = true;
+
+        @Expose
         public Position pos = new Position(150, 150, false, true);
     }
 
@@ -578,6 +583,11 @@ public class Misc {
     @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     public boolean serverRestartTitle = true;
+
+    @Expose
+    @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
+    @ConfigEditorBoolean
+    public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

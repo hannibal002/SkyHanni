@@ -107,6 +107,9 @@ object NEUItems {
     }
 
     fun getPrice(internalName: String): Double {
+        if (internalName == "WISP_POTION") {
+            return 20_000.0
+        }
         return getPrice(internalName, false)
     }
 
@@ -161,7 +164,7 @@ object NEUItems {
             translateY = y - diff
         }
 
-        GlStateManager.pushMatrix();
+        GlStateManager.pushMatrix()
 
         GlStateManager.translate(translateX, translateY, 1F)
         GlStateManager.scale(finalScale, finalScale, 1.0)

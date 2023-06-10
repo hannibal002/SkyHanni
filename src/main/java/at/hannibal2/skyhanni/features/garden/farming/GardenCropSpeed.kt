@@ -90,7 +90,9 @@ object GardenCropSpeed {
                 blocksSpeedList.dropLast(1).average()
             } else 0.0
             GardenAPI.getCurrentlyFarmedCrop()?.let {
-                latestBlocksPerSecond?.put(it, averageBlocksPerSecond)
+                if (averageBlocksPerSecond > 1) {
+                    latestBlocksPerSecond?.put(it, averageBlocksPerSecond)
+                }
             }
         }
     }

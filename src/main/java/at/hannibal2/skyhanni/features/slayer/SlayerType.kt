@@ -21,7 +21,9 @@ enum class SlayerType(val displayName: String, val clazz: Class<*>) {
                 "Coal Mine",
                 -> REVENANT
 
-                "Spiders Den",
+                "Spider Mound",
+                "Arachne's Burrow",
+                "Arachne's Sanctuary",
                 -> TARANTULA
 
                 "Ruins",
@@ -30,6 +32,7 @@ enum class SlayerType(val displayName: String, val clazz: Class<*>) {
 
                 "The End",
                 "Void Sepulture",
+                "Zealot Bruiser Hideout",
                 -> VOID
 
                 "Stronghold",

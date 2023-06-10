@@ -72,6 +72,8 @@ class BazaarDataHolder {
         if (internalName == "JACOBS_TICKET") return true
         if (internalName == "RAW_SOULFLOW") return true
 
+        if (internalName.contains(";")) return true
+
         return false
     }
 }

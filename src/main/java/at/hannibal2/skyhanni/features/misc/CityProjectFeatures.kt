@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -20,11 +23,53 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CityProjectFeatures {
-    private val config get() = SkyHanniMod.feature.misc.cityProject
     private var display = listOf<List<Any>>()
     private var inInventory = false
+    private var tick = 0
+    private var lastReminderSend = 0L
+    private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
+
+    companion object {
+        private val config get() = SkyHanniMod.feature.misc.cityProject
+        fun disable() {
+            config.showReady = false
+            LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (event.phase != TickEvent.Phase.START) return
+        tick++
+        if (tick % 20 == 0) {
+            checkDailyReminder()
+        }
+    }
+
+    private fun checkDailyReminder() {
+        if (!config.dailyReminder) return
+        val profileSpecific = ProfileStorageData.profileSpecific ?: return
+        if (LorenzUtils.inDungeons) return
+        if (LorenzUtils.inKuudraFight) return
+        if (FarmingContestAPI.inContest) return
+
+        if (LorenzUtils.skyBlockArea == "Community Center") return
+
+        if (profileSpecific.nextCityProjectParticipationTime == 0L) return
+        if (System.currentTimeMillis() <= profileSpecific.nextCityProjectParticipationTime) return
+
+        if (lastReminderSend + 10_000 > System.currentTimeMillis()) return
+        lastReminderSend = System.currentTimeMillis()
+
+        LorenzUtils.clickableChat(
+            "§e[SkyHanni] Daily City Project Reminder! (Click here to disable this reminder)",
+            "shstopcityprojectreminder"
+        )
+    }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -34,24 +79,43 @@ class CityProjectFeatures {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.showMaterials) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
         if (lore.isEmpty()) return
         if (lore[0] != "§8City Project") return
         inInventory = true
 
-        // internal name -> amount
-        val materials = mutableMapOf<String, Int>()
-        for ((_, item) in event.inventoryItems) {
-            val itemName = item.name ?: continue
-            if (itemName != "§eContribute this component!") continue
-            fetchMaterials(item, materials)
+        if (config.showMaterials) {
+            // internal name -> amount
+            val materials = mutableMapOf<String, Int>()
+            for ((_, item) in event.inventoryItems) {
+                val itemName = item.name ?: continue
+                if (itemName != "§eContribute this component!") continue
+                fetchMaterials(item, materials)
+            }
+
+            display = buildList(materials)
         }
 
-        println("materials: $materials")
+        if (config.showReady) {
+            var nextTime = Long.MAX_VALUE
+            for ((_, item) in event.inventoryItems) {
+                val itemName = item.name ?: continue
 
-        display = buildList(materials)
+                for (line in item.getLore()) {
+                    contributeAgainPattern.matchMatcher(line) {
+                        val duration = TimeUtils.getMillis(group("time"))
+                        val endTime = System.currentTimeMillis() + duration
+                        if (endTime < nextTime) {
+                            nextTime = endTime
+                        }
+                    }
+                }
+                if (itemName != "§eContribute this component!") continue
+                nextTime = System.currentTimeMillis()
+                ProfileStorageData.profileSpecific?.nextCityProjectParticipationTime = nextTime
+            }
+        }
     }
 
     private fun buildList(materials: MutableMap<String, Int>) = buildList<List<Any>> {
@@ -96,13 +160,9 @@ class CityProjectFeatures {
             if (line == "") break
             if (line.contains("Bits")) break
 
-            println(" ")
-            println("line: '$line'")
             val (name, amount) = ItemUtils.readItemAmount(line)
             if (name != null) {
                 val internalName = NEUItems.getInternalName(name)
-                println("internalName: $internalName")
-                println("amount: $amount")
                 val old = materials.getOrPut(internalName) { 0 }
                 materials[internalName] = old + amount
             }
@@ -141,5 +201,4 @@ class CityProjectFeatures {
             }
         }
     }
-
 }
