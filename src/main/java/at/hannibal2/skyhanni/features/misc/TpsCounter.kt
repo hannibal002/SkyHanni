@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.HypixelTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -62,7 +61,6 @@ class TpsCounter {
 
             if (hasPacketReceived) {
                 hasPacketReceived = false
-                HypixelTickEvent().postAndCatch()
                 packetsFromLastSecond++
             }
         }

@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class DetectBrokenHyperion {
     private val config get() = SkyHanniMod.feature.slayer
     private var brokenInRow = 0
-    private val logger = LorenzLogger("detect_broken_hyperion")
+    private val logger = LorenzLogger("slayer/detect_broken_hyperion")
 
     @SubscribeEvent
     fun onPurseChange(event: PurseChangeEvent) {
