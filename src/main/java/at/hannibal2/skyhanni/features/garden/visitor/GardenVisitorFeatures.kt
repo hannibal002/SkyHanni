@@ -364,7 +364,7 @@ class GardenVisitorFeatures {
                     if (totalPrice == 0.0) {
                         totalPrice = price
                         val multiplier = NEUItems.getMultiplier(internalName)
-                        val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
+                        val rawName = NEUItems.getItemStackOrNull(multiplier.first)?.name?.removeColor() ?: continue
                         getByNameOrNull(rawName)?.let {
                             val cropAmount = multiplier.second.toLong() * amount
                             val formattedAmount = LorenzUtils.formatInteger(cropAmount)
