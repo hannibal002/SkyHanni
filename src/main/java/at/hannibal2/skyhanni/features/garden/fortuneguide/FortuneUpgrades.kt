@@ -77,7 +77,7 @@ object FortuneUpgrades {
             if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getEnchantments() ?: emptyMap()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
-            if (greenThumbLvl != 5) {
+            if (greenThumbLvl != 5 && visitors != 0.0) {
                 genericUpgrades.add(FortuneUpgrade("Enchant your ${item.displayName} §fwith green thumb ${greenThumbLvl + 1}",
                     1500, "GREEN_THUMB;1", getNeededBooks(greenThumbLvl), visitors * 0.05))
             }
