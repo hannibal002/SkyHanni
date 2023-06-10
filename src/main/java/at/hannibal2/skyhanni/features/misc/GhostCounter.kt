@@ -152,12 +152,13 @@ object GhostCounter {
                 "Highest Kill Combo" to Pair(MAXKILLCOMBO.getInt(), session.maxcombo.roundToInt()),
         )
 
-        for ((t, v) in list) {
-            val rep = if(v.second == "") "" else "(${v.second})"
+        for ((text, value) in list) {
+            val (total, session) = value
+            val se = if(session == "") "" else "($session)"
             addAsSingletonList(config.formatText.replace("&", "§")
-                    .replace("%text%", t)
-                    .replace("%value%", "${v.first}")
-                    .replace("%session%", rep))
+                    .replace("%text%", text)
+                    .replace("%value%", "$total")
+                    .replace("%session%", se))
         }
     }
 

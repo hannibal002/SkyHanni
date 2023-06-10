@@ -481,7 +481,7 @@ public class Misc {
         public boolean onlyOnMist = false;
 
         @Expose
-        @ConfigOption(name = "Force Scavenger Talisman", desc = "Enable this to always use Scavenger talisman in the coins calculation..")
+        @ConfigOption(name = "Force Scavenger Talisman", desc = "Enable this to always use Scavenger talisman in the coins calculation.")
         @ConfigEditorBoolean
         public boolean forceScavengerTalisman = false;
 
@@ -491,7 +491,7 @@ public class Misc {
                 "§e%value% - Value for that text\n" +
                 "%session% - Same as value but for current session")
         @ConfigEditorText
-        public String formatText = "  §6%text%: §b%value%";
+        public String formatText = "  §6%text%: §b%value% §7%session%";
 
         @ConfigOption(name = "Reset", desc = "Reset the counter.")
         @ConfigEditorButton(buttonText = "Reset")
