@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.client.IModGuiFactory
@@ -11,6 +9,7 @@ import net.minecraftforge.fml.client.IModGuiFactory.RuntimeOptionGuiHandler
 import org.lwjgl.input.Keyboard
 import java.io.IOException
 
+@Suppress("unused")
 class ConfigGuiForgeInterop : IModGuiFactory {
     override fun initialize(minecraft: Minecraft) {}
     override fun mainConfigGuiClass(): Class<out GuiScreen> {
