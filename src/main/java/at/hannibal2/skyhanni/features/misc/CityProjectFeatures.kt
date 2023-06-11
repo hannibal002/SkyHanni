@@ -35,7 +35,7 @@ class CityProjectFeatures {
     companion object {
         private val config get() = SkyHanniMod.feature.misc.cityProject
         fun disable() {
-            config.showReady = false
+            config.dailyReminder = false
             LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
         }
     }
