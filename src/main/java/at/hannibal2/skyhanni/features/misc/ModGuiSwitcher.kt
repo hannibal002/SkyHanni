@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.jsonobjects.ModsJson
@@ -151,12 +151,7 @@ object ModGuiSwitcher {
                     // HytilsReborn.INSTANCE.getConfig().openGui()
                     val hytilsReborn = Class.forName("cc.woverflow.hytils.HytilsReborn")
                     val instance = hytilsReborn.getDeclaredField("INSTANCE").get(null)
-
-
                     val config = instance.javaClass.getDeclaredMethod("getConfig").invoke(instance)
-//                Class.forName("cc.polyfrost.oneconfig.config.Config").getDeclaredMethod("openGui").invoke(config)
-//                    Class.forName("gg.essential.vigilance.Vigilant").getDeclaredMethod("gui").invoke(config)
-
                     val gui = Class.forName("gg.essential.vigilance.Vigilant").getDeclaredMethod("gui").invoke(config)
                     val guiUtils = Class.forName("gg.essential.api.utils.GuiUtil")
                     for (method in guiUtils.declaredMethods) {
@@ -168,10 +163,6 @@ object ModGuiSwitcher {
                         }
                     }
                     LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
-//                    guiUtils.declaredMethods[0].invoke(null, gui)
-
-
-                    //Class.forName("cc.polyfrost.oneconfig.config.Config").getMethod("openGui").invoke(config)
                 }
 
                 else -> {
@@ -180,44 +171,16 @@ object ModGuiSwitcher {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.chat("§c[SkyHanni] Error trying to open the gui for mod " + mod.name + "!")
+            CopyErrorCommand.logError(e, "Error trying to open the gui for mod " + mod.name)
         }
     }
 
     @SubscribeEvent
-    fun onRenderOverlay_(event: GuiScreenEvent.DrawScreenEvent.Post) {
+    fun onRenderOverlay(event: GuiScreenEvent.DrawScreenEvent.Post) {
         if (!LorenzUtils.inSkyBlock) return
 
         GlStateManager.pushMatrix()
         SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(display, posLabel = "Test Display")
         GlStateManager.popMatrix()
-    }
-
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-//        if (!SkyHanniMod.feature.dev.debugEnabled) return
-
-//        GlStateManager.translate(0f, 0f, 100f)
-//        SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(display, posLabel = "Test Display")
-//        GlStateManager.translate(0f, 0f, -100f)
-    }
-
-    @JvmStatic
-    fun renderLast() {
-        if (!LorenzUtils.inSkyBlock) return
-//        if (!SkyHanniMod.feature.dev.debugEnabled) return
-
-//        GlStateManager.pushMatrix()
-//        GlStateManager.enableDepth()
-//        GlStateManager.translate(0f, 0f, 100f)
-//
-//        GlStateManager.translate(100f, 100f, 1f)
-//        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow("§ftest", 1f, 1f, 0)
-//
-//        SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(display, posLabel = "Mod Gui Switcher")
-//        GlStateManager.translate(0f, 0f, -100f)
-//        GlStateManager.popMatrix()
     }
 }

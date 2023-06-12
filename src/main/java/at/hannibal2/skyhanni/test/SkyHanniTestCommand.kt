@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import net.minecraft.client.Minecraft
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -44,15 +42,6 @@ class SkyHanniTestCommand {
 
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
-
-            val skytilsClass = Class.forName("gg.skytils.skytilsmod.Skytils")
-
-            println("skytilsClass: $skytilsClass")
-
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            ClientCommandHandler.instance.executeCommand(thePlayer, "/st")
-
-//            skytilsClass.
 
 
 //            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
