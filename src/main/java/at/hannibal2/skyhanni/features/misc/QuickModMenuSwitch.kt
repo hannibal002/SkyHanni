@@ -184,7 +184,7 @@ object QuickModMenuSwitch {
         if (!isEnabled()) return
 
         GlStateManager.pushMatrix()
-        SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(display, posLabel = "Test Display")
+        config.pos.renderStringsAndItems(display, posLabel = "Quick Mod Menu Switch")
         GlStateManager.popMatrix()
     }
 

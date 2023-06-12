@@ -468,6 +468,8 @@ public class Misc {
         @ConfigEditorBoolean
         public boolean insidePlayerInventory = false;
 
+        @Expose
+        public Position pos = new Position(-178, 143, false, true);
     }
 
     @Expose
