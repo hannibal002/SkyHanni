@@ -115,7 +115,7 @@ object ModGuiSwitcher {
                 Renderable.string(nameFormat + mod.name),
                 bypassChecks = true,
                 onClick = { open(mod) },
-                condition = { System.currentTimeMillis() > lastGuiOpen + 300 }
+                condition = { System.currentTimeMillis() > lastGuiOpen + 500 }
             )
             add(listOf(renderable, nameSuffix))
         }
