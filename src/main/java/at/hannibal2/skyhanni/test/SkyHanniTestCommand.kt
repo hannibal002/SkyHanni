@@ -43,7 +43,6 @@ class SkyHanniTestCommand {
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
 
-
 //            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
 //                println("$i: '$s'")
 //            }
