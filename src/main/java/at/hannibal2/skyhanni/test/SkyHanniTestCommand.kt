@@ -163,7 +163,7 @@ class SkyHanniTestCommand {
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
-        if (!SkyHanniMod.feature.dev.debugEnabled) return
+        if (!SkyHanniMod.feature.dev.showInternalName) return
         val itemStack = event.itemStack
         if (itemStack != null) {
             val internalName = itemStack.getInternalName()

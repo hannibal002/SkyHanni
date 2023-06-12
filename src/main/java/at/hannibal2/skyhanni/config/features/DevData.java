@@ -42,6 +42,12 @@ public class DevData {
     public boolean modMenuLog = false;
 
     @Expose
+    @ConfigOption(name = "Show internal name", desc = "Show internal names in item lores.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showInternalName = false;
+
+    @Expose
     public Position debugPos = new Position(10, 10, false, true);
 
     @Expose
