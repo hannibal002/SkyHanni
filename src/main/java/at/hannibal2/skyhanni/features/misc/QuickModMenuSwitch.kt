@@ -14,7 +14,8 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-object ModGuiSwitcher {
+object QuickModMenuSwitch {
+    private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
     private var display = listOf<List<Any>>()
     private var tick = 0
     private var latestGuiPath = ""
@@ -43,7 +44,7 @@ object ModGuiSwitcher {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         if (tick++ % 5 == 0) {
             update()
@@ -64,18 +65,18 @@ object ModGuiSwitcher {
         }
         val mods = mods ?: return
 
-        val defaultInventories = listOf(
-            "net.minecraft.client.gui.inventory.GuiInventory",
-            "net.minecraft.client.gui.GuiIngameMenu",
-        )
-
-        val show = latestGuiPath in defaultInventories || mods.any { it.isInGui() }
-
-        display = if (!show) {
+        display = if (!shouldShow(mods)) {
             emptyList()
         } else {
             renderDisplay(mods)
         }
+    }
+
+    private fun shouldShow(mods: List<Mod>): Boolean {
+        if (config.insideEscapeMenu && latestGuiPath == "net.minecraft.client.gui.GuiIngameMenu") return true
+        if (config.insidePlayerInventory && latestGuiPath == "net.minecraft.client.gui.inventory.GuiInventory") return true
+
+        return mods.any { it.isInGui() }
     }
 
     private fun handleAbstractGuis(openGui: String): String {
@@ -115,7 +116,7 @@ object ModGuiSwitcher {
                 Renderable.string(nameFormat + mod.name),
                 bypassChecks = true,
                 onClick = { open(mod) },
-                condition = { System.currentTimeMillis() > lastGuiOpen + 500 }
+                condition = { System.currentTimeMillis() > lastGuiOpen + 250 }
             )
             add(listOf(renderable, nameSuffix))
         }
@@ -177,10 +178,12 @@ object ModGuiSwitcher {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiScreenEvent.DrawScreenEvent.Post) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         GlStateManager.pushMatrix()
         SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(display, posLabel = "Test Display")
         GlStateManager.popMatrix()
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
