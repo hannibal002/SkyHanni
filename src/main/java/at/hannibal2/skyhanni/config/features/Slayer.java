@@ -113,6 +113,16 @@ public class Slayer {
         @ConfigOption(name = "Minimum Price", desc = "Items below this price will not show up in chat.")
         @ConfigEditorSlider(minValue = 1, maxValue = 5_000_000, minStep = 1)
         public int minimumPrice = 100_000;
+
+        @Expose
+        @ConfigOption(name = "Title Warning", desc = "Show an title for expensive item pickups.")
+        @ConfigEditorBoolean
+        public boolean titleWarning = false;
+
+        @Expose
+        @ConfigOption(name = "Title Price", desc = "Items above this price will show up as title.")
+        @ConfigEditorSlider(minValue = 1, maxValue = 20_000_000, minStep = 1)
+        public int minimumPriceWarning = 500_000;
     }
 
     @Expose
