@@ -32,6 +32,16 @@ public class DevData {
     public boolean commandLogs = false;
 
     @Expose
+    @ConfigOption(
+            name = "Mod Menu Log",
+            desc = "Enables debug messages when the currently opened gui changes, with the path to the gui class. " +
+            "Useful for adding more mods to quick mod menu switch."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean modMenuLog = false;
+
+    @Expose
     public Position debugPos = new Position(10, 10, false, true);
 
     @Expose

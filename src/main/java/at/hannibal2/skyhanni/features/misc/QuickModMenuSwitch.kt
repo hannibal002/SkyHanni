@@ -61,7 +61,10 @@ object QuickModMenuSwitch {
         openGui = handleAbstractGuis(openGui)
         if (latestGuiPath != openGui) {
             latestGuiPath = openGui
-            LorenzUtils.debug("open gui: $latestGuiPath")
+
+            if (SkyHanniMod.feature.dev.modMenuLog) {
+                LorenzUtils.debug("Open GUI: $latestGuiPath")
+            }
         }
         val mods = mods ?: return
 
