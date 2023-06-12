@@ -36,7 +36,7 @@ object Commands {
     private val openMainMenu: (Array<String>) -> Unit = {
         if (it.isNotEmpty()) {
             if (it[0].lowercase() == "gui") {
-                GuiEditManager.openGuiEditor()
+                GuiEditManager.openGuiPositionEditor()
             } else {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
