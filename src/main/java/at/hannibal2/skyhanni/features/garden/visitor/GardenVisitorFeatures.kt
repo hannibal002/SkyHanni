@@ -322,7 +322,7 @@ class GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.inBarn) return
         if (!inVisitorInventory) return
@@ -353,8 +353,9 @@ class GardenVisitorFeatures {
             val formattedLine = line.substring(4)
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
             if (itemName != null) {
-                val internalName = NEUItems.getInternalNameOrNull(itemName)
+                var internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName != null) {
+                    internalName = internalName.replace("◆_", "")
                     price = NEUItems.getPrice(internalName) * amount
 
                     if (config.visitorShowPrice) {
