@@ -62,7 +62,7 @@ class CityProjectFeatures {
         if (profileSpecific.nextCityProjectParticipationTime == 0L) return
         if (System.currentTimeMillis() <= profileSpecific.nextCityProjectParticipationTime) return
 
-        if (lastReminderSend + 10_000 > System.currentTimeMillis()) return
+        if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
         lastReminderSend = System.currentTimeMillis()
 
         LorenzUtils.clickableChat(
@@ -113,8 +113,8 @@ class CityProjectFeatures {
                 }
                 if (itemName != "§eContribute this component!") continue
                 nextTime = System.currentTimeMillis()
-                ProfileStorageData.profileSpecific?.nextCityProjectParticipationTime = nextTime
             }
+            ProfileStorageData.profileSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 
