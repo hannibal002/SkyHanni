@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -42,7 +43,7 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!isEnabled()) return
+        if (!(config.composterDisplayEnabled && GardenAPI.inGarden())) return
 
         readData(event.tabList)
 
@@ -97,6 +98,7 @@ class ComposterDisplay {
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
             val millis = emptyTime.toDouble(DurationUnit.MILLISECONDS).toLong()
+            GardenAPI.config?.composterEmptyTime = System.currentTimeMillis() + millis
             val format = TimeUtils.formatDuration(millis, maxUnits = 2)
             listOf(NEUItems.getItemStack("BUCKET"), "§b$format")
         } else {
@@ -160,10 +162,47 @@ class ComposterDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (isEnabled()) {
+        if (!LorenzUtils.inSkyBlock) return
+
+        if (GardenAPI.inGarden() && config.composterDisplayEnabled) {
             config.composterDisplayPos.renderStringsAndItems(display, posLabel = "Composter Display")
+        }
+
+        checkWarningsAndOutsideGarden()
+    }
+
+    private fun checkWarningsAndOutsideGarden() {
+        val storage = GardenAPI.config ?: return
+
+        val format = if (storage.composterEmptyTime != 0L) {
+            val duration = storage.composterEmptyTime - System.currentTimeMillis()
+            if (duration > 0) {
+                if (duration < 1000 * 60 * 20) {
+                    warn("Your composter in the garden is soon empty!")
+                }
+                TimeUtils.formatDuration(duration, maxUnits = 3)
+            } else {
+                warn("Your composter is empty!")
+                "§cComposter is empty!"
+            }
+        } else "?"
+
+        if (!GardenAPI.inGarden() && config.composterDisplayOutsideGarden) {
+            val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET"), "§b$format"))
+            config.composterDisplayPos.renderStringsAndItems(list, posLabel = "Composter Display")
         }
     }
 
-    fun isEnabled() = config.composterDisplayEnabled && GardenAPI.inGarden()
+    private fun warn(warningMessage: String) {
+        if (!config.composterWarnAlmostClose) return
+        val storage = GardenAPI.config ?: return
+
+        if (LorenzUtils.inDungeons) return
+        if (LorenzUtils.inKuudraFight) return
+
+        if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
+        storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
+        LorenzUtils.chat("§e[SkyHanni] $warningMessage")
+        TitleUtils.sendTitle("§eComposter Warning!", 3_000)
+    }
 }
