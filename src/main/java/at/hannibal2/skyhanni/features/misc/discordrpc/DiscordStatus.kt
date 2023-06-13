@@ -16,8 +16,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import net.minecraft.client.Minecraft
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import java.util.function.Supplier
 import java.util.regex.Pattern
 
@@ -54,7 +58,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val scoreboard = ScoreboardData.sidebarLinesFormatted
         // Matches coins amount in purse or piggy, with optional decimal points
         val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
-            purseRegex.find(it.removeColor())?.groupValues?.get(1)
+            purseRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
         if (coins == "1") {
             lastKnownDisplayStrings[PURSE] = "1 Coin"
@@ -69,6 +73,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
             bitsRegex.find(it.removeColor())?.groupValues?.get(1)
         }
+
         when (bits) {
             "1" -> "1 Bit"
             null -> "0 Bits"
@@ -119,7 +124,36 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     PROFILE({
-        HypixelData.profileName.firstLetterUppercase()
+        val player = LorenzUtils.getPlayerName()
+
+        val tabData = getTabList()
+        val levelRegex = Regex("""\[(\d{1,3})] $player""")
+        var sbLevel = ""
+
+        for (line in tabData) {
+            if (line.contains(player)) {
+                val colorlessLine = line.removeColor()
+                sbLevel = levelRegex.find(colorlessLine)!!.groupValues[1]
+                break
+            }
+        }
+
+        var profile = "Level $sbLevel on "
+
+        profile += (
+                if (HypixelData.ironman) "♲ "
+                else if (HypixelData.bingo) "Ⓑ "
+                else if (HypixelData.stranded) "☀ "
+                else " "
+                )
+
+        val fruit = HypixelData.profileName.firstLetterUppercase()
+        if (fruit == "") profile =
+            lastKnownDisplayStrings[PROFILE] ?: "Level $sbLevel" // profile fruit has not loaded in yet
+        else profile += " $fruit"
+
+        lastKnownDisplayStrings[PROFILE] = profile
+        profile
     }),
 
     SLAYER({
@@ -152,6 +186,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     AUTO({
         val slayerResult = SLAYER.displayMessageSupplier!!.get()
+        val stackingResult = STACKING.displayMessageSupplier!!.get()
         val milestoneResult = try {
             CROP_MILESTONES.displayMessageSupplier!!.get()
         } catch (e: Exception) {
@@ -159,6 +194,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
         if (slayerResult != "Planning to do a slayer quest") slayerResult
         else if (milestoneResult != "Unable to get milestone" && milestoneResult != "Unknown Item" && milestoneResult != "") milestoneResult
+        else if (stackingResult !== "") stackingResult
         else {
             val statusNoAuto = DiscordStatus.values().toMutableList()
             statusNoAuto.remove(AUTO)
@@ -189,6 +225,103 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
             "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
         } ?: "No pet equipped"
+    }),
+
+    // Dynamic-only
+    STACKING({
+        // Logic for getting the currently held stacking enchant is from Skytils, except for getExtraAttributes() which they got from BiscuitDevelopment
+        val enchants = mapOf(
+            "compact" to mapOf(
+                "levels" to listOf(0, 100, 500, 1500, 5000, 15000, 50000, 150000, 500000, 1000000),
+                "nbtNum" to "compact_blocks"
+            ),
+            "cultivating" to mapOf(
+                "levels" to listOf(
+                    0,
+                    1000,
+                    5000,
+                    25000,
+                    100000,
+                    300000,
+                    1500000,
+                    5000000,
+                    20000000,
+                    100000000
+                ), "nbtNum" to "farmed_cultivating"
+            ),
+            "expertise" to mapOf(
+                "levels" to listOf(0, 50, 100, 250, 500, 1000, 2500, 5500, 10000, 15000),
+                "nbtNum" to "expertise_kills"
+            ),
+            "hecatomb" to mapOf(
+                "levels" to listOf(0, 2, 5, 10, 20, 30, 40, 60, 80, 100),
+                "nbtNum" to "hecatomb_s_runs"
+            ),
+            "champion" to mapOf(
+                "levels" to listOf(
+                    0,
+                    50000,
+                    100000,
+                    250000,
+                    500000,
+                    1000000,
+                    1500000,
+                    2000000,
+                    2500000,
+                    3000000
+                ), "nbtNum" to "champion_combat_xp"
+            )
+        ) // nbtNum is the id of the enchantment in the nbt data
+
+
+        fun getExtraAttributes(item: ItemStack?): NBTTagCompound? {
+            return if (item == null || !item.hasTagCompound()) {
+                null
+            } else item.getSubCompound("ExtraAttributes", false)
+        }
+
+        val stackingPercent: String
+        val extraAttributes = getExtraAttributes(Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem())
+
+        fun getProgressPercent(amount: Int, levels: List<Int>): String {
+            var currentLevel = 0
+            var percent = ""
+            for (level in levels.indices) {
+                if (amount > levels[level]) {
+                    currentLevel++
+                    continue
+                }
+                percent = if (amount.toDouble() == 0.0) {
+                    ""
+                } else {
+                    LorenzUtils.formatPercentage((amount.toDouble() - levels[level - 1]) / (levels[level] - levels[level - 1]))
+                }
+                break
+            }
+            return percent
+        }
+
+        if (extraAttributes != null) {
+            val enchantments = extraAttributes.getCompoundTag("enchantments")
+            var stackingEnchant = ""
+            for (enchant in enchants.keys) {
+                if (extraAttributes.hasKey(enchants[enchant]?.get("nbtNum").toString())) {
+                    stackingEnchant = enchant
+                    break
+                }
+            }
+            val levels = enchants[stackingEnchant]?.get("levels") as? List<Int> ?: listOf(0)
+            val level = enchantments.getInteger(stackingEnchant)
+            val amount = extraAttributes.getInteger(enchants[stackingEnchant]?.get("nbtNum").toString())
+            stackingPercent = getProgressPercent(amount, levels)
+
+            if (stackingPercent == "") lastKnownDisplayStrings[STACKING] =
+                "" // outdated info is useless for AUTO; empty strings are manually ignored
+            else lastKnownDisplayStrings[STACKING] =
+                "${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
+        }
+        lastKnownDisplayStrings[STACKING] ?: ""
+
     })
     ;
 

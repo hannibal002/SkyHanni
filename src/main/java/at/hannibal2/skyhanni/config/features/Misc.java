@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.config.core.config.*;
+import com.google.gson.annotations.*;
 import io.github.moulberry.moulconfig.annotations.*;
-import io.github.moulberry.moulconfig.observer.Property;
-import org.lwjgl.input.Keyboard;
+import io.github.moulberry.moulconfig.observer.*;
+import org.lwjgl.input.*;
 
 public class Misc {
 
@@ -253,38 +253,38 @@ public class Misc {
         @Expose
         @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile",
+                "Slayer",
+                "Custom",
+                "Dynamic",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> firstLine = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile",
+                "Slayer",
+                "Custom",
+                "Dynamic",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> secondLine = Property.of(0);
 
@@ -294,20 +294,20 @@ public class Misc {
         public Property<String> customText = Property.of("");
 
         @Expose
-        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone or Slayer progress while doing those, but this if you're doing neither.")
+        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone, Slayer progress, or Stacking enchantment when possible, but this if you're doing none of them.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile",
+                "Slayer",
+                "Custom",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> auto = Property.of(0);
     }
