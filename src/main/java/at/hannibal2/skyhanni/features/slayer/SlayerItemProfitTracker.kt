@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
@@ -127,8 +128,13 @@ class SlayerItemProfitTracker {
         addItemPickup(internalName, itemStack.stackSize)
         logger.log("Coins gained for picking up an item ($itemName) ${price.addSeparators()}")
         if (config.priceInChat) {
-            if (config.minimumPrice < price) {
+            if (price > config.minimumPrice) {
                 LorenzUtils.chat("§e[SkyHanni] §a+Slayer Drop§7: §r$itemName")
+            }
+        }
+        if (config.titleWarning) {
+            if (price > config.minimumPriceWarning) {
+                TitleUtils.sendTitle("§a+ $itemName", 5_000)
             }
         }
     }
@@ -152,6 +158,9 @@ class SlayerItemProfitTracker {
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             if (hidden) {
+                while (name.startsWith("§f")) {
+                    name = name.substring(2)
+                }
                 name = StringUtils.addFormat(name, "§m")
             }
             val text = " §7${amount.addSeparators()}x $name§7: §6$priceFormat"

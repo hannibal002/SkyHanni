@@ -6,12 +6,11 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -51,11 +50,7 @@ class GardenOptimalSpeed {
         if (!isRancherOverlayEnabled()) return
         val gui = event.gui
         if (gui !is GuiEditSign) return
-        gui as AccessorGuiEditSign
-        if (gui.tileSign.signText[1].unformattedText.removeColor() != "^^^^^^"
-            || gui.tileSign.signText[2].unformattedText.removeColor() != "Set your"
-            || gui.tileSign.signText[3].unformattedText.removeColor() != "speed cap!"
-        ) return
+        if (!gui.isRancherSign()) return
         config.optimalSpeedSignPosition.renderStringsAndItems(
             rancherOverlayList,
             posLabel = "Optimal Speed Rancher Overlay"

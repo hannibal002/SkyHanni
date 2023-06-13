@@ -39,6 +39,11 @@
   (Kill a mob with melee-hits to fix this hypixel bug)
 + Added Piece of Wizard Portal show earned by player name (Contributed by HiZe)
 + City Project Daily Reminder - Remind every 24 hours to participate
++ Added Quick Mod Menu Switching (default disabled)
+  + Allows for easy navigation between one Mod Config and another
+  + Default disabled
+  + Detects your SkyBlock Mod automatically 
+  + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.

@@ -16,7 +16,7 @@ class MovementSpeedDisplay {
     private var display = ""
 
     init {
-        fixedRateTimer(name = "skyhanni-movement-speed-display", period = 1_000, initialDelay = 1_000) {
+        fixedRateTimer(name = "skyhanni-movement-speed-display", period = 250, initialDelay = 1_000) {
             checkSpeed()
         }
     }
@@ -31,7 +31,7 @@ class MovementSpeedDisplay {
         }
 
         lastLocation?.let {
-            val distance = it.distance(currentLocation)
+            val distance = it.distance(currentLocation) * 4
             display = "Movement Speed: ${distance.round(2)}"
             lastLocation = currentLocation
         }

@@ -187,6 +187,12 @@ public class Storage {
                 @Expose
                 public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
+
+            @Expose
+            public long composterEmptyTime = 0;
+
+            @Expose
+            public long lastComposterEmptyWarningTime = 0;
         }
 
         @Expose

@@ -35,7 +35,7 @@ class CityProjectFeatures {
     companion object {
         private val config get() = SkyHanniMod.feature.misc.cityProject
         fun disable() {
-            config.showReady = false
+            config.dailyReminder = false
             LorenzUtils.chat("§c[SkyHanni] Disabled city project reminder messages!")
         }
     }
@@ -62,7 +62,7 @@ class CityProjectFeatures {
         if (profileSpecific.nextCityProjectParticipationTime == 0L) return
         if (System.currentTimeMillis() <= profileSpecific.nextCityProjectParticipationTime) return
 
-        if (lastReminderSend + 10_000 > System.currentTimeMillis()) return
+        if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
         lastReminderSend = System.currentTimeMillis()
 
         LorenzUtils.clickableChat(
@@ -113,8 +113,8 @@ class CityProjectFeatures {
                 }
                 if (itemName != "§eContribute this component!") continue
                 nextTime = System.currentTimeMillis()
-                ProfileStorageData.profileSpecific?.nextCityProjectParticipationTime = nextTime
             }
+            ProfileStorageData.profileSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 

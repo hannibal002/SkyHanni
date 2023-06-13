@@ -285,3 +285,8 @@
   + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
   + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)
 + Piece of Wizard Portal show earned by player name (Contributed by HiZe)
++ Quick Mod Menu Switching (default disabled)
+  + Allows for easy navigation between one Mod Config and another
+  + Default disabled
+  + Detects your SkyBlock Mod automatically
+  + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries

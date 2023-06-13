@@ -1004,6 +1004,24 @@ public class Garden {
 
     @Expose
     @ConfigOption(
+            name = "Outside Garden",
+            desc = "Show Time till composter is empty outside garden"
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterDisplayOutsideGarden = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Composter warning",
+            desc = "Warn when the composter gets close to empty, even outside garden."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterWarnAlmostClose = false;
+
+    @Expose
+    @ConfigOption(
             name = "Upgrade Price",
             desc = "Show the price for the composter upgrade in the lore."
     )
