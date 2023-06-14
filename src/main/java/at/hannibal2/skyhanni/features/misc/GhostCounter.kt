@@ -103,12 +103,11 @@ object GhostCounter {
             0.0 -> "0"
             else -> "${((((TOTALMF.get() / TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
-        val currentKill = BESTIARY_CURRENTKILL.get()
-        val killNeeded = BESTIARY_KILLNEEDED.get()
-        val nextLevel = BESTIARY_NEXTLEVEL.get()
-        val bestiary = when (nextLevel.toInt()) {
+        val currentKill = BESTIARY_CURRENTKILL.getInt()
+        val killNeeded = BESTIARY_KILLNEEDED.getInt()
+        val bestiary = when (BESTIARY_NEXTLEVEL.getInt()) {
             -1 -> "${currentKill.addSeparators()} (§c§lMaxed!)"
-            in 1..46 -> "${currentKill.addSeparators()}/${NumberUtil.format(killNeeded)} (${percent(currentKill, killNeeded)})"
+            in 1..46 -> "${currentKill.addSeparators()}/${NumberUtil.format(killNeeded)}"
             else -> "§cOpen Bestiary Menu !"
         }
         addAsSingletonList("§6Ghosts counter")
@@ -365,9 +364,5 @@ object GhostCounter {
                 counter[this] ?: 0.0
         }
 
-    }
-
-    private fun percent(number: Double, total: Double): String {
-        return "${((number / total) * 100).roundToPrecision(4)}%"
     }
 }
