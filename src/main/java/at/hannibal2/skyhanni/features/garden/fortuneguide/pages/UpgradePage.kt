@@ -21,7 +21,6 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
         GuiRenderUtils.drawString("FF increase", (FFGuideGUI.guiLeft + 190)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
         GuiRenderUtils.drawString("Cost per FF", (FFGuideGUI.guiLeft + 225)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
         GuiRenderUtils.drawString("Total cost", (FFGuideGUI.guiLeft + 260)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
-        GuiRenderUtils.drawString("Time to earn back", (FFGuideGUI.guiLeft + 295)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
 
         val upgradeList = if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
 

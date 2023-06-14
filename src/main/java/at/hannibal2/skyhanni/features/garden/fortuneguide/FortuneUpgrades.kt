@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import net.minecraft.item.ItemStack
@@ -25,11 +28,6 @@ object FortuneUpgrades {
 
     val genericUpgrades = mutableListOf<FortuneUpgrade>()
     val cropSpecificUpgrades = mutableListOf<FortuneUpgrade>()
-
-    //todo ironman mode & stranded mode
-    // symbol when this is activated, set by default
-    // toggle to show upgrades that cannot be bought. Stranded still no recomb or gold ball etc.
-    // not sure if i want to use copper price or bz price for stuff like green thumb
 
     fun generateGenericUpgrades() {
         val hidden = GardenAPI.config?.fortune ?: return
@@ -47,6 +45,7 @@ object FortuneUpgrades {
         getEquipmentUpgrades()
         getPetUpgrades()
         getArmorUpgrades()
+        getTalismanUpgrade()
 
         genericUpgrades.populateAndSort(0)
     }
@@ -66,6 +65,15 @@ object FortuneUpgrades {
             4 -> this.sortBy { it.fortuneIncrease }
             5 -> this.sortByDescending { it.fortuneIncrease }
             else -> {}
+        }
+    }
+
+    private fun getTalismanUpgrade() {
+        val currentTalismanTier = CropAccessoryData.cropAccessory?.ordinal ?: return
+        if (currentTalismanTier < 3) {
+            val nextTalisman = CropAccessory.values()[currentTalismanTier + 1]
+            genericUpgrades.add(FortuneUpgrade("Upgrade your talisman to ${nextTalisman.internalName.replace("_", " ").lowercase()}",
+                null, nextTalisman.upgradeCost?.first, nextTalisman.upgradeCost?.second, 10.0))
         }
     }
 
@@ -116,15 +124,11 @@ object FortuneUpgrades {
 
     //todo needs to be called when switching pets
     private fun getPetUpgrades() {
-//        val gardenLvl = GardenAPI.getLevelForExp((GardenAPI.config?.experience ?: -1).toLong())
-
         if (currentPet.getItem().getInternalName().contains(";")) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {
                     //todo once auction stuff is done
-//                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} a green bandana",
-//                        null, "GREEN_BANDANA", -1, (4.0 * gardenLvl).coerceAtMost(60.0)))
                 }
                 else -> {
                     genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} §fa yellow bandana",
@@ -132,29 +136,18 @@ object FortuneUpgrades {
                 }
             }
         }
-
-        //todo add later
-        // not ironman or stranded friendly
-        // assuming stats for having a lvl 100 pet
-//        if (currentPet == FarmingItems.ELEPHANT && currentPet.getItem().getInternalName() != "ELEPHANT;4") {
-//            genericUpgrades.add(FortuneUpgrade("Purchase a legendary elephant pet",
-//                null, "ELEPHANT;4", -1, 180.0))
-//        }
-//        else if (currentPet == FarmingItems.MOOSHROOM_COW && currentPet.getItem().getInternalName() != "MOOSHROOM_COW;4") {
-//            val strength = (GardenAPI.config?.fortune?.farmingStrength)?.toDouble() ?: 0.0
-//            genericUpgrades.add(FortuneUpgrade("Purchase a legendary mooshroom cow pet",
-//                null, "MOOSHROOM_COW;4", -1, 110.0 + strength / 20.0))
-//        }
     }
 
     fun getCropSpecific(tool: ItemStack) {
         cropSpecificUpgrades.clear()
         cropSpecificUpgrades.addAll(genericUpgrades)
-        // todo tell them to get the tool
+        // todo tell them to get the tool if it is missing
         val crop = tool.getCropType() ?: return
         val enchantments = tool.getEnchantments() ?: emptyMap()
         val turboCropLvl = enchantments[crop.getTurboCrop()] ?: 0
         val dedicationLvl = enchantments["dedication"] ?: 0
+        val cultivatingLvl = enchantments["cultivating"] ?: 0
+        val farmingForDummiesCount = tool.getFarmingForDummiesCount() ?: 0
         println("${crop.getTurboCrop().uppercase()};1")
         if (crop in axeCrops) {
             val sunderLvl = enchantments["sunder"] ?: 0
@@ -169,8 +162,12 @@ object FortuneUpgrades {
                     10, "HARVESTING;6", 1, 12.5))
             }
         }
-        if (dedicationLvl != 4) {
-            val cropMilestone = GardenCropMilestones.getTierForCrops(crop.getCounter())
+        if (farmingForDummiesCount != 5) {
+            cropSpecificUpgrades.add(FortuneUpgrade("Add a farming for dummies to your ${tool.displayName}",
+                null, "FARMING_FOR_DUMMIES", 1, 1.0))
+        }
+        val cropMilestone = GardenCropMilestones.getTierForCrops(crop.getCounter())
+        if (dedicationLvl != 4 && cropMilestone > 0) {
             val dedicationMultiplier = listOf(0.5, 0.75, 1.0, 2.0)[dedicationLvl]
             val dedicationIncrease = dedicationMultiplier * cropMilestone - FarmingFortuneDisplay.getDedicationFortune(tool, crop)
             if (dedicationLvl == 3) {
@@ -181,9 +178,13 @@ object FortuneUpgrades {
                     250, "DEDICATION;1", getNeededBooks(dedicationLvl), dedicationIncrease))
             }
         }
+        if (cultivatingLvl == 0) {
+            cropSpecificUpgrades.add(FortuneUpgrade("Enchant your ${tool.displayName} §fwith cultivating",
+                null, "CULTIVATING;1", 1, 6.0))
+        }
         if (turboCropLvl != 5) {
             cropSpecificUpgrades.add(FortuneUpgrade("Enchant your ${tool.displayName} §fwith ${crop.getTurboCrop()} ${turboCropLvl + 1}",
-                null, "${crop.getTurboCrop().uppercase()};1", getNeededBooks(dedicationLvl), 5.0))
+                null, "${crop.getTurboCrop().uppercase()};1", getNeededBooks(turboCropLvl), 5.0))
         }
         recombobulateItem(tool, cropSpecificUpgrades)
         when (tool.getReforgeName()) {
