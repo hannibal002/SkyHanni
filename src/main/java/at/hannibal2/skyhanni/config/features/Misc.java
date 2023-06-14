@@ -488,9 +488,9 @@ public class Misc {
         public boolean onlyOnMist = false;
 
         @Expose
-        @ConfigOption(name = "Force Scavenger Talisman", desc = "Enable this to always use Scavenger talisman in the coins calculation.")
+        @ConfigOption(name = "Maxed Bestiary", desc = "Show progress to max bestiary instead of next level.")
         @ConfigEditorBoolean
-        public boolean forceScavengerTalisman = false;
+        public boolean showMax = false;
 
         @Expose
         @ConfigOption(name = "Custom Format", desc = "§c§lDo not touch if you don't know what you are doing!!\n" +

@@ -58,7 +58,9 @@ object GhostCounter {
 
         for (i in 1..46) {
             this[i] = when (i) {
-                in 1..3 -> i * 5
+                1 -> 10
+                2 -> 15
+                3 -> 75
                 4 -> 150
                 5 -> 250
                 6 -> 500
@@ -105,11 +107,25 @@ object GhostCounter {
         }
         val currentKill = BESTIARY_CURRENTKILL.getInt()
         val killNeeded = BESTIARY_KILLNEEDED.getInt()
-        val bestiary = when (BESTIARY_NEXTLEVEL.getInt()) {
-            -1 -> "${currentKill.addSeparators()} (§c§lMaxed!)"
-            in 1..46 -> "${currentKill.addSeparators()}/${NumberUtil.format(killNeeded)}"
-            else -> "§cOpen Bestiary Menu !"
+        val nextLevel = BESTIARY_NEXTLEVEL.getInt()
+        val bestiary = if (config.showMax){
+            when (nextLevel){
+                -1 -> "${currentKill.addSeparators()} (§c§lMaxed!)"
+                in 1 .. 46 -> {
+                    val sum = bestiaryData.filterKeys { it <= nextLevel-1 }.values.sum()
+                    val cKill = sum + currentKill
+                    "${cKill.addSeparators()}/3M (${percent(cKill.toDouble(), 3_000_000.0)})"
+                }
+                else -> "§cOpen Bestiary Menu !"
+            }
+        }else{
+            when (nextLevel) {
+                -1 -> "${currentKill.addSeparators()} (§c§lMaxed!)"
+                in 1..46 -> "${currentKill.addSeparators()}/${NumberUtil.format(killNeeded)}"
+                else -> "§cOpen Bestiary Menu !"
+            }
         }
+
         addAsSingletonList("§6Ghosts counter")
         val list = mapOf(
                 "Ghosts Killed" to Pair(KILLS.getInt(), SESSION_KILLS.getInt(true)),
@@ -125,7 +141,7 @@ object GhostCounter {
                 "Kill Combo" to Pair(KILLCOMBO.getInt(), ""),
                 "Highest Kill Combo" to Pair(MAXKILLCOMBO.getInt(), SESSION_MAXKILLCOMBO.getInt(true)),
                 "Skill XP Gained" to Pair(SKILLXPGAINED.get().roundToPrecision(2), SESSION_SKILLXPGAINED.get(true).roundToPrecision(2)),
-                "Bestiary %bestiaryLevel%" to Pair(bestiary, "")
+                "Bestiary %bestiaryLevel%->%bestiaryNextLevel%" to Pair(bestiary, "")
         )
         for ((text, v) in list) {
             val (total, session) = v
@@ -134,7 +150,8 @@ object GhostCounter {
                     .replace("%text%", text)
                     .replace("%value%", "$total")
                     .replace("%session%", se)
-                    .replace("%bestiaryLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt()}"))
+                    .replace("%bestiaryLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt()}")
+                    .replace("%bestiaryNextLevel%", if (config.showMax) "46" else "${BESTIARY_NEXTLEVEL.getInt()+1}"))
         }
     }
 
@@ -364,5 +381,9 @@ object GhostCounter {
                 counter[this] ?: 0.0
         }
 
+    }
+
+    private fun percent(number: Double, total: Double): String {
+        return "${((number / total) * 100).roundToPrecision(4)}%"
     }
 }
