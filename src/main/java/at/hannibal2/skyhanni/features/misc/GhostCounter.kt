@@ -113,7 +113,7 @@ object GhostCounter {
         }
         addAsSingletonList("§6Ghosts counter")
         val list = mapOf(
-                "Gosts Killed" to Pair(KILLS.getInt(), SESSION_KILLS.getInt(true)),
+                "Ghosts Killed" to Pair(KILLS.getInt(), SESSION_KILLS.getInt(true)),
                 "Sorrows" to Pair(SORROWCOUNT.getInt(), SESSION_SORROWCOUNT.getInt(true)),
                 "Ghost Since Sorrow" to Pair(GHOSTSINCESORROW.getInt(), ""),
                 "Ghosts/Sorrow" to Pair(value, ""),
@@ -223,6 +223,8 @@ object GhostCounter {
             KILLCOMBOCOINS.set(KILLCOMBOCOINS.get() + group("coin").toDouble())
             update()
         }
+
+        //replace with BestiaryLevelUpEvent ?
         bestiaryPattern.matchMatcher(event.message.removeColor()) {
             val currentLevel = group("newLevel").toInt()
             val nextLevel = if (currentLevel >= 46) 47 else currentLevel + 1
