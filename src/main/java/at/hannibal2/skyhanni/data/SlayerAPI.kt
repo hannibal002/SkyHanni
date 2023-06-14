@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -28,6 +29,7 @@ object SlayerAPI {
     var isInSlayerArea = false
     private var latestSlayerCategory = ""
     private var latestProgressChangeTime = 0L
+    var latestWrongAreaWarning = 0L
     private var latestSlayerProgress = ""
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
@@ -64,7 +66,7 @@ object SlayerAPI {
         }
 
         val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-        val displayName = NEUItems.getItemStack(internalName).nameWithEnchantment
+        val displayName = getNameWithEnchantmentFor(internalName)
 
         val price = NEUItems.getPrice(internalName)
         val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
@@ -79,10 +81,23 @@ object SlayerAPI {
         return result
     }
 
+    fun getNameWithEnchantmentFor(internalName: String): String? {
+        if (internalName == "WISP_POTION") {
+            return "§fWisp's Ice-Flavored Water"
+        }
+        return NEUItems.getItemStack(internalName).nameWithEnchantment
+    }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+
         if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
             questStartTime = System.currentTimeMillis()
+        }
+
+        if (event.message == "  §r§a§lSLAYER QUEST COMPLETE!") {
+            SlayerQuestCompleteEvent().postAndCatch()
         }
     }
 

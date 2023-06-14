@@ -363,4 +363,13 @@ object LorenzUtils {
         }
         return null
     }
+
+    fun GuiEditSign.isRancherSign(): Boolean {
+        if (this !is AccessorGuiEditSign) return false
+
+        val tileSign = (this as AccessorGuiEditSign).tileSign
+        return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
+                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+    }
 }

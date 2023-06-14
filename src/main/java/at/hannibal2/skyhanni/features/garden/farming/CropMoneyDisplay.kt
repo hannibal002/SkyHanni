@@ -105,7 +105,7 @@ object CropMoneyDisplay {
             return newDisplay
         }
 
-        var extraNetherWartPrices = 0.0
+        var extraMushroomCowPerk = 0.0
         GardenAPI.getCurrentlyFarmedCrop()?.let {
             val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
             toolHasBountiful?.put(it, reforgeName == "bountiful")
@@ -115,7 +115,7 @@ object CropMoneyDisplay {
                 val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
                 val mushroomPrice = (redPrice + brownPrice) / 2
                 val perSecond = 20.0 * it.multiplier * mushroomPrice
-                extraNetherWartPrices = perSecond * 60 * 60
+                extraMushroomCowPerk = perSecond * 60 * 60
             }
         }
 
@@ -176,11 +176,11 @@ object CropMoneyDisplay {
             val moneyArray = moneyPerHourData[internalName]!!
 
             for (price in moneyArray) {
-                val finalPrice = price + extraNetherWartPrices
+                val finalPrice = price + extraMushroomCowPerk
                 val format = format(finalPrice)
                 if (debug) {
                     newDisplay.addAsSingletonList(" price: ${price.addSeparators()}")
-                    newDisplay.addAsSingletonList(" extraNetherWartPrices: ${extraNetherWartPrices.addSeparators()}")
+                    newDisplay.addAsSingletonList(" extraMushroomCowPerk: ${extraMushroomCowPerk.addSeparators()}")
                     newDisplay.addAsSingletonList(" finalPrice: ${finalPrice.addSeparators()}")
                 }
                 list.add("$coinsColor$format")

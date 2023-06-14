@@ -274,13 +274,19 @@
 + **Estimated Item Value** - Displays an estimated item value for the item you hover over.
 + **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
 + Server Restart Title
-+ Added City Project Features
++ **City Project Features**
   + Show missing items to contribute inside the inventory
     + Click on the item name to open the bazaar
   + Highlight a component in the inventory that can be contributed
+  + City Project Daily Reminder - Remind every 24 hours to participate
 + **Command Autocomplete**
   + Supports tab completing for warp points when typing /warp
   + Supports party members, friends (need to visit all friend list pages), player on the same server
   + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
   + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)
 + Piece of Wizard Portal show earned by player name (Contributed by HiZe)
++ Quick Mod Menu Switching (default disabled)
+  + Allows for easy navigation between one Mod Config and another
+  + Default disabled
+  + Detects your SkyBlock Mod automatically
+  + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries

@@ -40,15 +40,19 @@ interface Renderable {
             else -> null
         }
 
-        fun link(text: String, onClick: () -> Unit): Renderable = link(string(text), onClick) { true }
-        fun optionalLink(text: String, onClick: () -> Unit, condition: () -> Boolean = { true }): Renderable =
-            link(string(text), onClick, condition)
+        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable = link(string(text), onClick, bypassChecks = bypassChecks) { true }
+        fun optionalLink(text: String, onClick: () -> Unit, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable =
+            link(string(text), onClick, bypassChecks, condition)
 
-        fun link(renderable: Renderable, onClick: () -> Unit, condition: () -> Boolean = { true }): Renderable {
-            return clickable(hoverable(underlined(renderable), renderable, condition), onClick, 0, condition)
+        fun link(renderable: Renderable, onClick: () -> Unit, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
+            return clickable(hoverable(underlined(renderable), renderable, bypassChecks, condition = condition), onClick, 0, bypassChecks, condition)
         }
 
-        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0, condition: () -> Boolean = { true }) =
+        fun clickAndHover(text: String, tips: List<String>, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable {
+            return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
+        }
+
+        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0, bypassChecks: Boolean = false, condition: () -> Boolean = { true }) =
             object : Renderable {
                 override val width: Int
                     get() = render.width
@@ -59,7 +63,7 @@ interface Renderable {
                 override fun render(posX: Int, posY: Int) {
                     val isDown = Mouse.isButtonDown(button)
                     if (isDown > wasDown && isHovered(posX, posY)) {
-                        if (condition() && shouldAllowLink(true)) {
+                        if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onClick()
                         }
                     }
@@ -68,7 +72,7 @@ interface Renderable {
                 }
             }
 
-        fun hoverTips(text: String, tips: List<String>, condition: () -> Boolean = { true }): Renderable {
+        fun hoverTips(text: String, tips: List<String>, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
             val render = string(text)
             return object : Renderable {
                 override val width: Int
@@ -78,7 +82,7 @@ interface Renderable {
                 override fun render(posX: Int, posY: Int) {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
-                        if (condition() && shouldAllowLink(true)) {
+                        if (condition() && shouldAllowLink(true, bypassChecks)) {
                             renderToolTips(posX, posY, tips)
                         }
                     }
@@ -87,6 +91,11 @@ interface Renderable {
         }
 
         private fun renderToolTips(posX: Int, posY: Int, tips: List<String>, border: Int = 1) {
+            GlStateManager.pushMatrix()
+//            GlStateManager.translate(0f, 0f, 2f)
+//            GuiRenderUtils.drawTooltip(tips, posX, posY, 0)
+//            GlStateManager.translate(0f, 0f, -2f)
+
             val x = Utils.getMouseX() - posX + 10
             val startY = Utils.getMouseY() - posY - 10
             var maxX = 0
@@ -117,10 +126,15 @@ interface Renderable {
                 LorenzColor.DARK_GRAY.toColor().rgb
             )
             GlStateManager.translate(0f, 0f, -1f)
+
+            GlStateManager.popMatrix()
         }
 
-        private fun shouldAllowLink(debug: Boolean = false): Boolean {
+        private fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
             val isGuiScreen = Minecraft.getMinecraft().currentScreen != null
+            if (bypassChecks) {
+                return isGuiScreen
+            }
             val isGuiPositionEditor = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
                 ToolTipData.lastSlot == null
@@ -157,14 +171,14 @@ interface Renderable {
             }
         }
 
-        fun hoverable(hovered: Renderable, unhovered: Renderable, condition: () -> Boolean = { true }) =
+        fun hoverable(hovered: Renderable, unhovered: Renderable, bypassChecks: Boolean = false, condition: () -> Boolean = { true }) =
             object : Renderable {
                 override val width: Int
                     get() = max(hovered.width, unhovered.width)
                 override val height = 10
 
                 override fun render(posX: Int, posY: Int) {
-                    if (isHovered(posX, posY) && condition() && shouldAllowLink())
+                    if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks))
                         hovered.render(posX, posY)
                     else
                         unhovered.render(posX, posY)

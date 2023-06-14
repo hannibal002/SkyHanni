@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -34,8 +35,13 @@ class GuiEditManager {
 
         if (NEUItems.neuHasFocus()) return
 
+        val screen = Minecraft.getMinecraft().currentScreen
+        if (screen is GuiEditSign) {
+            if (!screen.isRancherSign()) return
+        }
+
         if (isInGui()) return
-        openGuiEditor()
+        openGuiPositionEditor()
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -63,7 +69,7 @@ class GuiEditManager {
         }
 
         @JvmStatic
-        fun openGuiEditor() {
+        fun openGuiPositionEditor() {
             SkyHanniMod.screenToOpen = GuiPositionEditor(latestPositions.values.toList(), 2)
         }
 

@@ -322,7 +322,7 @@ class GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!GardenAPI.inBarn) return
         if (!inVisitorInventory) return
@@ -353,8 +353,9 @@ class GardenVisitorFeatures {
             val formattedLine = line.substring(4)
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
             if (itemName != null) {
-                val internalName = NEUItems.getInternalNameOrNull(itemName)
+                var internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName != null) {
+                    internalName = internalName.replace("◆_", "")
                     price = NEUItems.getPrice(internalName) * amount
 
                     if (config.visitorShowPrice) {
@@ -364,7 +365,7 @@ class GardenVisitorFeatures {
                     if (totalPrice == 0.0) {
                         totalPrice = price
                         val multiplier = NEUItems.getMultiplier(internalName)
-                        val rawName = NEUItems.getItemStack(multiplier.first).name?.removeColor() ?: continue
+                        val rawName = NEUItems.getItemStackOrNull(multiplier.first)?.name?.removeColor() ?: continue
                         getByNameOrNull(rawName)?.let {
                             val cropAmount = multiplier.second.toLong() * amount
                             val formattedAmount = LorenzUtils.formatInteger(cropAmount)

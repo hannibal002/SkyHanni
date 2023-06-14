@@ -115,7 +115,12 @@ object ItemUtils {
         return false
     }
 
-    fun ItemStack.getInternalName() = NEUItems.getInternalName(this)
+    fun ItemStack.getInternalName(): String {
+        if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
+            return "WISP_POTION"
+        }
+        return NEUItems.getInternalName(this)
+    }
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
 

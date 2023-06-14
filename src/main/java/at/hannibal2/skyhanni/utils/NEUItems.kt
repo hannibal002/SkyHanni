@@ -107,6 +107,9 @@ object NEUItems {
     }
 
     fun getPrice(internalName: String): Double {
+        if (internalName == "WISP_POTION") {
+            return 20_000.0
+        }
         return getPrice(internalName, false)
     }
 

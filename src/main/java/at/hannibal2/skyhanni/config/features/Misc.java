@@ -382,6 +382,11 @@ public class Misc {
         public boolean showReady = true;
 
         @Expose
+        @ConfigOption(name = "Daily Reminder", desc = "Remind every 24 hours to participate.")
+        @ConfigEditorBoolean
+        public boolean dailyReminder = true;
+
+        @Expose
         public Position pos = new Position(150, 150, false, true);
     }
 
@@ -439,6 +444,32 @@ public class Misc {
         @ConfigOption(name = "Replace In Lore", desc = "Replace how text is displayed in lore.\nShow §eis stitched with 2/3...\n§7Instead of §eis stitched with two...")
         @ConfigEditorBoolean
         public boolean replaceLore = true;
+    }
+
+    @ConfigOption(name = "Quick Mod Menu Switch", desc = "")
+    @Accordion
+    @Expose
+    public QuickModMenuSwitch quickModMenuSwitch = new QuickModMenuSwitch();
+
+    public static class QuickModMenuSwitch {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Adding a mod list, allowing to quickly switch between different mod menus")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Inside Escape Menu", desc = "Show the mod list while inside the Escape menu")
+        @ConfigEditorBoolean
+        public boolean insideEscapeMenu = true;
+
+        @Expose
+        @ConfigOption(name = "Inside Inventory", desc = "Show the mod list while inside the player inventory (no chest inventory)")
+        @ConfigEditorBoolean
+        public boolean insidePlayerInventory = false;
+
+        @Expose
+        public Position pos = new Position(-178, 143, false, true);
     }
 
     @Expose
