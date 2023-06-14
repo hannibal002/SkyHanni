@@ -55,7 +55,4 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
         // pageScroll = MathHelper.clamp_int(pageScroll, -100, 0)
         FFGuideGUI.lastMouseScroll = 0
     }
-
-    // works well need to add max scroll, and stop things from rendering if they go above/below a certain point
-    //todo add a scroll bar?, test on trackpad, if it works then no
 }

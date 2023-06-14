@@ -101,7 +101,6 @@ object FortuneUpgrades {
             }
         }
     }
-
     //todo adding armor tier upgrades later
 
     private fun getArmorUpgrades() {
