@@ -150,8 +150,8 @@ object GhostCounter {
                     .replace("%text%", text)
                     .replace("%value%", "$total")
                     .replace("%session%", se)
-                    .replace("%bestiaryLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt()}")
-                    .replace("%bestiaryNextLevel%", if (config.showMax) "46" else "${BESTIARY_NEXTLEVEL.getInt()+1}"))
+                    .replace("%bestiaryLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt()-1}")
+                    .replace("%bestiaryNextLevel%", if (config.showMax) "46" else "${BESTIARY_NEXTLEVEL.getInt()}"))
         }
     }
 
