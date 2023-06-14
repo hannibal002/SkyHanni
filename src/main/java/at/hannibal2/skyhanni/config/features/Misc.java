@@ -467,7 +467,9 @@ public class Misc {
                         "  §bAvg Magic Find: 0",
                         "  §bScavenger Coins: 0",
                         "  §bKill Combo: 0",
-                        "  §bHighest Kill Combo: 0"
+                        "  §bHighest Kill Combo: 0",
+                        "  §bSkill XP Gained: 0",
+                        "  §Bestiary 1: 0/10"
                 }
         )
         public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));

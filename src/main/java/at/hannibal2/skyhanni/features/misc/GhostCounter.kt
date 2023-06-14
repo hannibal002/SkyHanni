@@ -5,15 +5,21 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.GhostCounter.Option.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 object GhostCounter {
 
@@ -28,6 +34,8 @@ object GhostCounter {
     private val skillXPPattern = ".*§3\\+(?<gained>.*) .* \\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
     private val killComboPattern = "[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
+    private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
+    private val bestiaryPattern = "BESTIARY Ghost .*➜(?<newLevel>.*)".toPattern()
     private var tick = 0
     private var lastXp: String = "0"
     private var gain: Int = 0
@@ -42,8 +50,28 @@ object GhostCounter {
             SESSION_BAGOFCASH to 0.0,
             SESSION_TOTALDROPS to 0.0,
             SESSION_SCAVENGERCOINS to 0.0,
-            SESSION_MAXKILLCOMBO to 0.0
+            SESSION_MAXKILLCOMBO to 0.0,
+            SESSION_SKILLXPGAINED to 0.0
     )
+    private val bestiaryData = mutableMapOf<Int, Int>().apply {
+        val commonValue = 100_000
+
+        for (i in 1..46) {
+            this[i] = when (i) {
+                in 1..3 -> i * 5
+                4 -> 150
+                5 -> 250
+                6 -> 500
+                7 -> 1_500
+                8 -> 2_500
+                9 -> 5_000
+                10 -> 15_000
+                11 -> 25_000
+                12 -> 50_000
+                else -> commonValue
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -75,7 +103,14 @@ object GhostCounter {
             0.0 -> "0"
             else -> "${((((TOTALMF.get() / TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
-
+        val currentKill = BESTIARY_CURRENTKILL.get()
+        val killNeeded = BESTIARY_KILLNEEDED.get()
+        val nextLevel = BESTIARY_NEXTLEVEL.get()
+        val bestiary = when (nextLevel.toInt()) {
+            -1 -> "${currentKill.addSeparators()} (§c§lMaxed!)"
+            in 1..46 -> "${currentKill.addSeparators()}/${NumberUtil.format(killNeeded)} (${percent(currentKill, killNeeded)})"
+            else -> "§cOpen Bestiary Menu !"
+        }
         addAsSingletonList("§6Ghosts counter")
         val list = mapOf(
                 "Gosts Killed" to Pair(KILLS.getInt(), SESSION_KILLS.getInt(true)),
@@ -90,19 +125,22 @@ object GhostCounter {
                 "Scavenger Coins" to Pair(SCAVENGERCOINS.getInt(), SESSION_SCAVENGERCOINS.getInt(true)),
                 "Kill Combo" to Pair(KILLCOMBO.getInt(), ""),
                 "Highest Kill Combo" to Pair(MAXKILLCOMBO.getInt(), SESSION_MAXKILLCOMBO.getInt(true)),
+                "Skill XP Gained" to Pair(SKILLXPGAINED.get().roundToPrecision(2), SESSION_SKILLXPGAINED.get(true).roundToPrecision(2)),
+                "Bestiary %bestiaryLevel%" to Pair(bestiary, "")
         )
-
         for ((text, v) in list) {
             val (total, session) = v
             val se = if (session == "") "" else "($session)"
             addAsSingletonList(config.formatText.replace("&", "§")
                     .replace("%text%", text)
                     .replace("%value%", "$total")
-                    .replace("%session%", se))
+                    .replace("%session%", se)
+                    .replace("%bestiaryLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt()}"))
         }
     }
 
     // Part of this was taken from GhostCounterV3 CT module
+    // maybe replace this with a SkillXpGainEvent ?
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
@@ -120,6 +158,10 @@ object GhostCounter {
                             SESSION_KILLS.add(num, true)
                             GHOSTSINCESORROW.add(num)
                             KILLCOMBO.add(num)
+                            SKILLXPGAINED.add(gained * num.roundToLong())
+                            SESSION_SKILLXPGAINED.add(gained * num.roundToLong(), true)
+
+                            BESTIARY_CURRENTKILL.add(num)
                         }
                     }
                 }
@@ -181,6 +223,26 @@ object GhostCounter {
             KILLCOMBOCOINS.set(KILLCOMBOCOINS.get() + group("coin").toDouble())
             update()
         }
+        bestiaryPattern.matchMatcher(event.message.removeColor()) {
+            val currentLevel = group("newLevel").toInt()
+            val nextLevel = if (currentLevel >= 46) 47 else currentLevel + 1
+
+            when (nextLevel) {
+                47 -> {
+                    BESTIARY_NEXTLEVEL.set(-1.0)
+                    BESTIARY_CURRENTKILL.set(3_000_000.0)
+                    BESTIARY_KILLNEEDED.set(0.0)
+                }
+
+                else -> {
+                    BESTIARY_NEXTLEVEL.set(nextLevel.toDouble())
+                    BESTIARY_CURRENTKILL.set(0.0)
+                    val killNeeded: Int = bestiaryData[nextLevel] ?: 0
+                    BESTIARY_KILLNEEDED.set(killNeeded.toDouble())
+                }
+            }
+            update()
+        }
     }
 
     @SubscribeEvent
@@ -194,8 +256,12 @@ object GhostCounter {
 
     fun reset() {
         for (opt in Option.values()) {
-            if (opt.save)
-                opt.set(0.0)
+            if (opt.reset) {
+                if (opt.save)
+                    opt.set(0.0)
+                else
+                    opt.set(0.0, true)
+            }
         }
         update()
     }
@@ -209,11 +275,30 @@ object GhostCounter {
         }
     }
 
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val inventoryName = event.inventoryName
+        if (inventoryName != "Bestiary ➜ Deep Caverns") return
+        val stacks = event.inventoryItems
+        val ghostStack = stacks[13] ?: return
+        val bestiaryNextLevel = Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
+        BESTIARY_NEXTLEVEL.set(bestiaryNextLevel.toDouble())
+
+        for (line in ghostStack.getLore()) {
+            ghostXPPattern.matchMatcher(line.removeColor().trim()) {
+                BESTIARY_CURRENTKILL.set(group("current").formatNumber().toDouble())
+                BESTIARY_KILLNEEDED.set(group("total").formatNumber().toDouble())
+            }
+        }
+        update()
+    }
+
     fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
     }
 
-    enum class Option(val save: Boolean = true) {
+    enum class Option(val save: Boolean = true, val reset: Boolean = true) {
         KILLS,
         SORROWCOUNT,
         VOLTACOUNT,
@@ -227,6 +312,7 @@ object GhostCounter {
         SCAVENGERCOINS,
         MAXKILLCOMBO,
         KILLCOMBO,
+        SKILLXPGAINED,
         SESSION_KILLS(false),
         SESSION_SORROWCOUNT(false),
         SESSION_VOLTACOUNT(false),
@@ -235,7 +321,12 @@ object GhostCounter {
         SESSION_BAGOFCASH(false),
         SESSION_TOTALDROPS(false),
         SESSION_SCAVENGERCOINS(false),
-        SESSION_MAXKILLCOMBO(false);
+        SESSION_MAXKILLCOMBO(false),
+        SESSION_SKILLXPGAINED(false),
+
+        BESTIARY_NEXTLEVEL(true, false),
+        BESTIARY_CURRENTKILL(true, false),
+        BESTIARY_KILLNEEDED(true, false);
 
         fun add(i: Double, s: Boolean = false) {
             if (s)
@@ -258,6 +349,13 @@ object GhostCounter {
                 counter[this]?.roundToInt() ?: 0
         }
 
+        fun getLong(s: Boolean = false): Long {
+            return if (s)
+                session[this]?.toLong() ?: 0
+            else
+                counter[this]?.toLong() ?: 0
+        }
+
         fun get(s: Boolean = false): Double {
             return if (s)
                 session[this] ?: 0.0
@@ -265,5 +363,9 @@ object GhostCounter {
                 counter[this] ?: 0.0
         }
 
+    }
+
+    private fun percent(number: Double, total: Double): String {
+        return "${((number / total) * 100).roundToPrecision(4)}%"
     }
 }
