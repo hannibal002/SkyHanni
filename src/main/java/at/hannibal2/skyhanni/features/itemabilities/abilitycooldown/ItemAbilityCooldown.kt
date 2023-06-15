@@ -144,8 +144,8 @@ class ItemAbilityCooldown {
                 ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
             }
         } else if (message.contains("§lCASTING")) {
-            if (ItemAbility.RAGNAROCK_AXE.specialColor == LorenzColor.WHITE) {
-                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 3_000)
+            if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
+                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10_000)
             }
         } else if (message.contains("§c§lCANCELLED")) {
             ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
@@ -226,7 +226,7 @@ class ItemAbilityCooldown {
         }
         if (ability == ItemAbility.RAGNAROCK_AXE) {
             if (specialColor == LorenzColor.DARK_PURPLE) {
-                ability.activate(null, 14_000)
+                ability.activate(null, 7_000)
             }
         }
     }
