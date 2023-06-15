@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
 
-class SlayerItemProfitTracker {
+object SlayerItemProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
     private var collectedCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.SECONDS).build<Int, Unit>()
 
@@ -271,15 +271,15 @@ class SlayerItemProfitTracker {
                     "§cReset session!",
                     listOf("§cThis will reset your", "§ccurrent session for", "§c$itemLogCategory"),
                 ) {
-                    resetCurrentSession()
+                    resetData(DisplayMode.CURRENT)
                     update()
                 })
         }
     }
 
-    private fun resetCurrentSession() {
+    private fun resetData(displayMode: DisplayMode) {
         val currentLog = currentLog() ?: return
-        val list = currentLog.get(DisplayMode.CURRENT)
+        val list = currentLog.get(displayMode)
         list.items.clear()
         list.mobKillCoins = 0
         list.slayerSpawnCost = 0
@@ -338,4 +338,28 @@ class SlayerItemProfitTracker {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    fun clearProfitCommand(args: Array<String>) {
+        if (itemLogCategory == "") {
+            LorenzUtils.chat(
+                "§c[SkyHanni] No current slayer data found. " +
+                        "Go to a slayer area and start the specific slayer type you want to reset the data of."
+            )
+            return
+        }
+
+        if (args.size == 1) {
+            if (args[0].lowercase() == "confirm") {
+                resetData(DisplayMode.TOTAL)
+                update()
+                LorenzUtils.chat("§e[SkyHanni] You reset your $itemLogCategory slayer data!")
+                return
+            }
+        }
+
+        LorenzUtils.clickableChat(
+            "§e[SkyHanni] Are you sure you want to reset all your $itemLogCategory slayer data? Click here to confirm.",
+            "shclearslayerprofits confirm"
+        )
+    }
 }
