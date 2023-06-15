@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.misc.GhostCounter.Option.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -337,7 +336,6 @@ object GhostCounter {
         if (lastTotalXp > 0) {
             val delta: Float = totalXp - lastTotalXp
             if (delta > 0 && delta < 1000) {
-                chat("Gained $delta XP")
                 xpGainTimer = 3
                 xpGainQueue.add(0, delta)
                 while (xpGainQueue.size > 30) {
