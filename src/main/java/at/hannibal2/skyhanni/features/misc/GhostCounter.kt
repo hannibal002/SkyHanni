@@ -313,7 +313,7 @@ object GhostCounter {
         if (notifyCTModule) {
             notifyCTModule = false
             if (isUsingCTGhostCounter()) {
-                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ?", "shimportghostcounterdata")
+                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
             }
         }
 
