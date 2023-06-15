@@ -53,7 +53,7 @@ object FortuneUpgrades {
     //todo fix NEU price data not being loaded if run too early
     private fun MutableList<FortuneUpgrade>.populateAndSort(style: Int) {
         this.map { upgrade ->
-            val cost = (NEUItems.getPrice(upgrade.requiredItem ?: "") * (upgrade.itemQuantity ?: 1)).toInt()
+            val cost = (NEUItems.getPrice(upgrade.requiredItem) * (upgrade.itemQuantity)).toInt()
             upgrade.cost = cost
             upgrade.costPerFF = (cost / upgrade.fortuneIncrease).toInt()
         }
@@ -73,7 +73,7 @@ object FortuneUpgrades {
         if (currentTalismanTier < 3) {
             val nextTalisman = CropAccessory.values()[currentTalismanTier + 1]
             genericUpgrades.add(FortuneUpgrade("Upgrade your talisman to ${nextTalisman.internalName.replace("_", " ").lowercase()}",
-                null, nextTalisman.upgradeCost?.first, nextTalisman.upgradeCost?.second, 10.0))
+                null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0))
         }
     }
 
@@ -130,8 +130,7 @@ object FortuneUpgrades {
                     //todo once auction stuff is done
                 }
                 else -> {
-                    genericUpgrades.add(FortuneUpgrade("Give your ${currentPet.getItem().displayName} §fa yellow bandana",
-                        300, null, null, 30.0))
+                    //give pet yellow bandana
                 }
             }
         }
@@ -147,7 +146,6 @@ object FortuneUpgrades {
         val dedicationLvl = enchantments["dedication"] ?: 0
         val cultivatingLvl = enchantments["cultivating"] ?: 0
         val farmingForDummiesCount = tool.getFarmingForDummiesCount() ?: 0
-        println("${crop.getTurboCrop().uppercase()};1")
         if (crop in axeCrops) {
             val sunderLvl = enchantments["sunder"] ?: 0
             if (sunderLvl != 5) {
@@ -182,7 +180,7 @@ object FortuneUpgrades {
                 null, "CULTIVATING;1", 1, 6.0))
         }
         if (turboCropLvl != 5) {
-            cropSpecificUpgrades.add(FortuneUpgrade("Enchant your ${tool.displayName} §fwith ${crop.getTurboCrop()} ${turboCropLvl + 1}",
+            cropSpecificUpgrades.add(FortuneUpgrade("Enchant your ${tool.displayName} §fwith ${crop.getTurboCrop().replace("_", " ")} ${turboCropLvl + 1}",
                 null, "${crop.getTurboCrop().uppercase()};1", getNeededBooks(turboCropLvl), 5.0))
         }
         recombobulateItem(tool, cropSpecificUpgrades)

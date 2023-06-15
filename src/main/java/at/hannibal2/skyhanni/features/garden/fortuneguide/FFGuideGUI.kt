@@ -204,20 +204,26 @@ open class FFGuideGUI : GuiScreen() {
         var x = guiLeft + 15
         var y = guiTop - 28
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
+            SoundUtils.playClickSound()
             if (currentCrop != null) {
-                SoundUtils.playClickSound()
                 currentCrop = null
                 if (selectedPage != FortuneGuidePage.UPGRADES) {
                     selectedPage = FortuneGuidePage.OVERVIEW
+                }
+            } else {
+                if (selectedPage == FortuneGuidePage.UPGRADES) {
+                    selectedPage = FortuneGuidePage.OVERVIEW
+                } else {
+                    selectedPage = FortuneGuidePage.UPGRADES
                 }
             }
         }
         for (crop in CropType.values()) {
             x += 30
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
+                SoundUtils.playClickSound()
                 if (currentCrop != crop) {
                     currentCrop = crop
-                    SoundUtils.playClickSound()
                     if (selectedPage == FortuneGuidePage.OVERVIEW) {
                         selectedPage = FortuneGuidePage.CROP
                     }
@@ -225,6 +231,22 @@ open class FFGuideGUI : GuiScreen() {
                         if (item.name == crop.name) {
                             FFStats.getCropStats(crop, item.getItem())
                             FortuneUpgrades.getCropSpecific(item.getItem())
+                        }
+                    }
+                } else {
+                    if (selectedPage == FortuneGuidePage.CROP) {
+                        selectedPage = FortuneGuidePage.UPGRADES
+                        for (item in FarmingItems.values()) {
+                            if (item.name == crop.name) {
+                                FortuneUpgrades.getCropSpecific(item.getItem())
+                            }
+                        }
+                    } else {
+                        selectedPage = FortuneGuidePage.CROP
+                        for (item in FarmingItems.values()) {
+                            if (item.name == crop.name) {
+                                FFStats.getCropStats(crop, item.getItem())
+                            }
                         }
                     }
                 }

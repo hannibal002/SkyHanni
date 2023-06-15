@@ -5,12 +5,14 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.util.MathHelper
 import java.text.DecimalFormat
 
 class UpgradePage: FFGuideGUI.FFGuidePage() {
     private var pageScroll = 0
     private var scrollVelocity = 0.0
     private val maxNoInputFrames = 100
+    private var listLength = 0
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         val adjustedY = FFGuideGUI.guiTop + 20 + pageScroll
@@ -23,7 +25,7 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
         GuiRenderUtils.drawString("Total cost", (FFGuideGUI.guiLeft + 260)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
 
         val upgradeList = if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
-
+        listLength = upgradeList.size
         for ((index, upgrade) in upgradeList.withIndex()) {
             if (adjustedY + 15 * index < FFGuideGUI.guiTop + 20) continue
             if (adjustedY + 15 * index > FFGuideGUI.guiTop + 170) continue
@@ -31,6 +33,9 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             GuiRenderUtils.drawString(DecimalFormat("0.##").format(upgrade.fortuneIncrease), (FFGuideGUI.guiLeft + 200)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
             GuiRenderUtils.drawString(upgrade.costPerFF?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 235)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
             GuiRenderUtils.drawString(upgrade.cost?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 270)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(upgrade.requiredItem, (FFGuideGUI.guiLeft + 300)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+//            val itemStack = upgrade.requiredItem?.let { NEUItems.getItemStack(it) }
+//            GuiRenderUtils.renderItemAndTip(itemStack, (FFGuideGUI.guiLeft + 300) * inverseScale, (adjustedY + 15 * index) * inverseScale, mouseX * inverseScale, mouseY * inverseScale)
         }
         GlStateManager.scale(inverseScale, inverseScale, inverseScale)
         scrollScreen()
@@ -51,8 +56,7 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             pageScroll = 0
         }
 
-        // todo
-        // pageScroll = MathHelper.clamp_int(pageScroll, -100, 0)
+         pageScroll = MathHelper.clamp_int(pageScroll, -(listLength * 15 - 15), 0)
         FFGuideGUI.lastMouseScroll = 0
     }
 }
