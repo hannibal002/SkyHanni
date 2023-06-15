@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.Storage.ProfileSpecific.SlayerProfitList
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleUtils
@@ -37,10 +37,14 @@ class SlayerItemProfitTracker {
     private val logger = LorenzLogger("slayer/item_profit_tracker")
     private var inventoryOpen = false
     private var lastClickDelay = 0L
+    private var currentDisplayMode = DisplayMode.TOTAL
+    private var currentSessionData = mutableMapOf<String, SlayerProfitList>()
 
     private fun addSlayerCosts(price: Int) {
         val itemLog = currentLog() ?: return
-        itemLog.slayerSpawnCost += price
+        itemLog.modify {
+            it.slayerSpawnCost += price
+        }
         update()
     }
 
@@ -70,36 +74,44 @@ class SlayerItemProfitTracker {
     private fun addMobKillCoins(coins: Int) {
         val itemLog = currentLog() ?: return
 
-        itemLog.mobKillCoins += coins
+        itemLog.modify {
+            it.mobKillCoins += coins
+        }
         update()
     }
 
     private fun addItemPickup(internalName: String, stackSize: Int) {
         val itemLog = currentLog() ?: return
 
-        val slayerItemProfit =
-            itemLog.items.getOrPut(internalName) { Storage.ProfileSpecific.SlayerProfitList.SlayerItemProfit() }
+        itemLog.modify {
+            val slayerItemProfit = it.items.getOrPut(internalName) { SlayerProfitList.SlayerItemProfit() }
 
-        slayerItemProfit.timesDropped++
-        slayerItemProfit.totalAmount += stackSize
+            slayerItemProfit.timesDropped++
+            slayerItemProfit.totalAmount += stackSize
+        }
+
         update()
     }
 
-    private fun currentLog(): Storage.ProfileSpecific.SlayerProfitList? {
+    private fun currentLog(): AbstractSlayerProfitList? {
         if (itemLogCategory == "") return null
 
         val profileSpecific = ProfileStorageData.profileSpecific ?: return null
 
-        return profileSpecific.slayerProfitData.getOrPut(itemLogCategory) {
-            Storage.ProfileSpecific.SlayerProfitList()
-        }
+        return AbstractSlayerProfitList(
+            profileSpecific.slayerProfitData.getOrPut(itemLogCategory) { SlayerProfitList() },
+            currentSessionData.getOrPut(itemLogCategory) { SlayerProfitList() }
+        )
     }
 
     @SubscribeEvent
     fun onQuestComplete(event: SlayerQuestCompleteEvent) {
         val itemLog = currentLog() ?: return
 
-        itemLog.slayerCompletedCount++
+        itemLog.modify {
+            it.slayerCompletedCount++
+        }
+
         update()
     }
 
@@ -144,9 +156,20 @@ class SlayerItemProfitTracker {
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
-        val itemLog = currentLog() ?: return@buildList
+        val both = currentLog() ?: return@buildList
+        val itemLog = both.get(currentDisplayMode)
 
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
+        if (inventoryOpen) {
+            addSelector("§7Display Mode: ", DisplayMode.values(),
+                getName = { type -> type.displayName },
+                isCurrent = { it == currentDisplayMode },
+                onChange = {
+                    currentDisplayMode = it
+                    update()
+                })
+        }
+
         var profit = 0.0
         val map = mutableMapOf<Renderable, Long>()
         for ((internalName, itemProfit) in itemLog.items) {
@@ -234,7 +257,7 @@ class SlayerItemProfitTracker {
         addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per boss: $profitPrefix$profitPerBossFormat")))
 
         if (inventoryOpen) {
-            addSelector(" ", PriceSource.values(),
+            addSelector("", PriceSource.values(),
                 getName = { type -> type.displayName },
                 isCurrent = { it.ordinal == config.priceFrom },
                 onChange = {
@@ -242,6 +265,25 @@ class SlayerItemProfitTracker {
                     update()
                 })
         }
+        if (inventoryOpen && currentDisplayMode == DisplayMode.CURRENT) {
+            addAsSingletonList(
+                Renderable.clickAndHover(
+                    "§cReset session!",
+                    listOf("§cThis will reset your", "§ccurrent session for", "§c$itemLogCategory"),
+                ) {
+                    resetCurrentSession()
+                    update()
+                })
+        }
+    }
+
+    private fun resetCurrentSession() {
+        val currentLog = currentLog() ?: return
+        val list = currentLog.get(DisplayMode.CURRENT)
+        list.items.clear()
+        list.mobKillCoins = 0
+        list.slayerSpawnCost = 0
+        list.slayerCompletedCount = 0
     }
 
     private fun getPrice(internalName: String): Double {
@@ -271,6 +313,28 @@ class SlayerItemProfitTracker {
 
 
         config.pos.renderStringsAndItems(display, posLabel = "Slayer Item Profit Tracker")
+    }
+
+    enum class DisplayMode(val displayName: String) {
+        TOTAL("Total"),
+        CURRENT("This Session"),
+        ;
+    }
+
+    class AbstractSlayerProfitList(
+        private val total: SlayerProfitList,
+        private val currentSession: SlayerProfitList,
+    ) {
+
+        fun modify(modifyFunction: (SlayerProfitList) -> Unit) {
+            modifyFunction(total)
+            modifyFunction(currentSession)
+        }
+
+        fun get(displayMode: DisplayMode) = when (displayMode) {
+            DisplayMode.TOTAL -> total
+            DisplayMode.CURRENT -> currentSession
+        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
