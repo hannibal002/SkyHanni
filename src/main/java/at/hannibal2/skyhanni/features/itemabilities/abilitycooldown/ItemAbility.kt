@@ -11,7 +11,7 @@ enum class ItemAbility(
     var lastActivation: Long = 0L,
     var specialColor: LorenzColor? = null,
     var lastItemClick: Long = 0L,
-    val actionBarDetection: Boolean = true
+    val actionBarDetection: Boolean = true,
 ) {
     //TODO add into repo
 
@@ -49,15 +49,19 @@ enum class ItemAbility(
     var newVariant = false
     var internalNames = mutableListOf<String>()
 
-    constructor(cooldownInSeconds: Int, vararg alternateInternalNames: String, alternativePosition: Boolean = false) : this("no name", cooldownInSeconds, actionBarDetection = false, alternativePosition = alternativePosition) {
+    constructor(
+        cooldownInSeconds: Int,
+        vararg alternateInternalNames: String,
+        alternativePosition: Boolean = false,
+    ) : this("no name", cooldownInSeconds, actionBarDetection = false, alternativePosition = alternativePosition) {
         newVariant = true
         internalNames.addAll(alternateInternalNames)
         internalNames.add(name)
     }
 
-    fun activate(color: LorenzColor? = null, offset: Long = 0L) {
+    fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
         specialColor = color
-        lastActivation = System.currentTimeMillis() + offset
+        lastActivation = System.currentTimeMillis() - ((cooldownInSeconds * 1000) - customCooldown)
     }
 
     fun isOnCooldown(): Boolean = lastActivation + getCooldown() > System.currentTimeMillis()
