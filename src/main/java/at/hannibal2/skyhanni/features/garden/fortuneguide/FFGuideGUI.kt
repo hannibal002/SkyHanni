@@ -91,6 +91,7 @@ open class FFGuideGUI : GuiScreen() {
         if (selectedPage == FortuneGuidePage.UPGRADES) {
             //
         } else {
+            GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
             if (currentCrop == null) {
                 GuiRenderUtils.renderItemAndTip(
                     FarmingItems.HELMET.getItem(), guiLeft + 142, guiTop + 5, mouseX, mouseY,
@@ -172,7 +173,6 @@ open class FFGuideGUI : GuiScreen() {
             }
         }
 
-        GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
         GuiRenderUtils.drawStringCentered("§cIn beta! Report issues and suggestions on the discord", guiLeft + sizeX / 2, guiTop + sizeY + 10)
 
         pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)

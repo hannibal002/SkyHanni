@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.MathHelper
@@ -21,19 +23,23 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
         GlStateManager.scale(0.5f, 0.5f, 0.5f)
         GuiRenderUtils.drawString("Upgrade", (FFGuideGUI.guiLeft + 80)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
         GuiRenderUtils.drawString("FF increase", (FFGuideGUI.guiLeft + 190)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
-        GuiRenderUtils.drawString("Cost per FF", (FFGuideGUI.guiLeft + 225)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
-        GuiRenderUtils.drawString("Total cost", (FFGuideGUI.guiLeft + 260)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+        GuiRenderUtils.drawString("Cost/FF", (FFGuideGUI.guiLeft + 225)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+        GuiRenderUtils.drawString("Total", (FFGuideGUI.guiLeft + 250)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
 
         val upgradeList = if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
         listLength = upgradeList.size
         for ((index, upgrade) in upgradeList.withIndex()) {
             if (adjustedY + 15 * index < FFGuideGUI.guiTop + 20) continue
             if (adjustedY + 15 * index > FFGuideGUI.guiTop + 170) continue
+            var formattedUpgrade = upgrade.requiredItem.let { NEUItems.getItemStack(it) }.nameWithEnchantment ?: return
+            if (upgrade.itemQuantity != 1) {
+                formattedUpgrade = "$formattedUpgrade §fx${upgrade.itemQuantity}"
+            }
             GuiRenderUtils.drawString(upgrade.description, (FFGuideGUI.guiLeft + 15)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
             GuiRenderUtils.drawString(DecimalFormat("0.##").format(upgrade.fortuneIncrease), (FFGuideGUI.guiLeft + 200)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(upgrade.costPerFF?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 235)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(upgrade.cost?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 270)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(upgrade.requiredItem, (FFGuideGUI.guiLeft + 300)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(upgrade.costPerFF?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 225)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(upgrade.cost?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 250)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawString(formattedUpgrade, (FFGuideGUI.guiLeft + 280)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
 //            val itemStack = upgrade.requiredItem?.let { NEUItems.getItemStack(it) }
 //            GuiRenderUtils.renderItemAndTip(itemStack, (FFGuideGUI.guiLeft + 300) * inverseScale, (adjustedY + 15 * index) * inverseScale, mouseX * inverseScale, mouseY * inverseScale)
         }
