@@ -456,20 +456,21 @@ public class Misc {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§6Ghosts Counter",
-                        "  §bGhost Killed: 0",
-                        "  §bSorrow: 0",
-                        "  §bGhost since Sorrow: 0",
-                        "  §bGhosts/Sorrow: 0",
-                        "  §bVolta: 0",
-                        "  §bPlasma: 0",
-                        "  §bGhostly Boots: 0",
-                        "  §bBag Of Cash: 0",
-                        "  §bAvg Magic Find: 0",
-                        "  §bScavenger Coins: 0",
-                        "  §bKill Combo: 0",
-                        "  §bHighest Kill Combo: 0",
-                        "  §bSkill XP Gained: 0",
-                        "  §Bestiary 1: 0/10"
+                        "  §bGhost Killed: 42",
+                        "  §bSorrow: 6",
+                        "  §bGhost since Sorrow: 1",
+                        "  §bGhosts/Sorrow: 5",
+                        "  §bVolta: 6",
+                        "  §bPlasma: 8",
+                        "  §bGhostly Boots: 1",
+                        "  §bBag Of Cash: 4",
+                        "  §bAvg Magic Find: 271",
+                        "  §bScavenger Coins: 15,000",
+                        "  §bKill Combo: 14",
+                        "  §bHighest Kill Combo: 96",
+                        "  §bSkill XP Gained: 145,648",
+                        "  §bBestiary 1: 0/10",
+                        "  §bXP/h: 810,410"
                 }
         )
         public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
