@@ -48,11 +48,11 @@ class ItemAbilityCooldown {
                 ItemAbility.ATOMSPLIT_KATANA.sound()
             }
         }
-        if (event.soundName == "random.click") {
-            if (event.pitch == 2.0f && event.volume == 0.55f) {
-                ItemAbility.RAGNAROCK_AXE.sound()
-            }
-        }
+//        if (event.soundName == "random.click") {
+//            if (event.pitch == 2.0f && event.volume == 0.55f) {
+//                ItemAbility.RAGNAROCK_AXE.sound()
+//            }
+//        }
         if (event.soundName == "liquid.lavapop") {
             if (event.pitch == 0.7619048f && event.volume == 0.15f) {
                 ItemAbility.WAND_OF_ATONEMENT.sound()
@@ -137,6 +137,22 @@ class ItemAbilityCooldown {
         if (!isEnabled()) return
 
         val message: String = event.message
+        handleOldAbilities(message)
+
+        if (message.contains("§lCASTING IN ")) {
+            if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.WHITE) {
+                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, -17_000)
+            }
+        } else if (message.contains("§lCASTING")) {
+            if (ItemAbility.RAGNAROCK_AXE.specialColor == LorenzColor.WHITE) {
+                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, -17_000)
+            }
+        } else if (message.contains("§c§lCANCELLED")) {
+            ItemAbility.RAGNAROCK_AXE.activate(null, -3_000)
+        }
+    }
+
+    private fun handleOldAbilities(message: String) {
         if (message.contains(" (§6")) {
             if (message.contains("§b) ")) {
                 val name: String = message.between(" (§6", "§b) ")
@@ -208,6 +224,11 @@ class ItemAbilityCooldown {
                 ability.activate(null, -4_000)
             }
         }
+        if (ability == ItemAbility.RAGNAROCK_AXE) {
+            if (specialColor == LorenzColor.DARK_PURPLE) {
+                ability.activate(null, -6_000)
+            }
+        }
     }
 
     @SubscribeEvent
@@ -243,6 +264,8 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+
         val message = event.message
         if (message == "§dCreeper Veil §r§aActivated!") {
             ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
@@ -292,5 +315,10 @@ class ItemAbilityCooldown {
         }
     }
 
-    class ItemText(val color: LorenzColor, val text: String, val onCooldown: Boolean, val alternativePosition: Boolean)
+    class ItemText(
+        val color: LorenzColor,
+        val text: String,
+        val onCooldown: Boolean,
+        val alternativePosition: Boolean,
+    )
 }
