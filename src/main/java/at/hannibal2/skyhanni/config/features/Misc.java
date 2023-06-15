@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.Storage;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.features.misc.GhostCounter;
-import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
@@ -267,38 +264,38 @@ public class Misc {
         @Expose
         @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom",
+                "Dynamic",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> firstLine = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom",
+                "Dynamic",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> secondLine = Property.of(0);
 
@@ -310,18 +307,18 @@ public class Misc {
         @Expose
         @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone or Slayer progress while doing those, but this if you're doing neither.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> auto = Property.of(0);
     }
@@ -335,7 +332,7 @@ public class Misc {
 
         @Expose
         @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
-            "§cWill not help you to find rabbits or sheep in the Oasis!")
+                "§cWill not help you to find rabbits or sheep in the Oasis!")
         @ConfigEditorBoolean
         public boolean trapperSolver = true;
 
@@ -481,10 +478,142 @@ public class Misc {
         )
         public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
 
+        @ConfigOption(name = "Text Formatting", desc = "")
+        @Accordion
+        @Expose
+        public TextFormatting textFormatting = new TextFormatting();
+
+        public static class TextFormatting {
+
+            @ConfigOption(name = "§eText Formatting Info", desc = "§e%session% §ris §e§lalways §rreplaced with\n" +
+                    "§7the count for your current session.\n" +
+                    "§7Reset when restarting the game.\n" +
+                    "§7You can use §e&Z §7color code to use SBA chroma")
+            @ConfigEditorInfoText
+            public boolean formatInfo = false;
+
+            @ConfigOption(name = "Reset Formatting", desc = "Reset formatting to default text.")
+            @ConfigEditorButton(buttonText = "Reset")
+            public Runnable resetFormatting = GhostCounter.INSTANCE::resetFormatting;
+
+            @Expose
+            @ConfigOption(name = "Title", desc = "Title Line.")
+            @ConfigEditorText
+            public String titleFormat = "§6Ghost Counter";
+
+            @Expose
+            @ConfigOption(name = "Ghost Killed", desc = "Ghost Killed line.\n§e%value% §ris replaced with\n" +
+                    "Ghost Killed.\n" +
+                    "§r%session% is replaced with Ghost killed")
+            @ConfigEditorText
+            public String ghostKiledFormat = "  &6Ghost Killed: &b%value% %session%";
+
+            @Expose
+            @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n§e%value% §ris replaced with\nsorrows dropped.")
+            @ConfigEditorText
+            public String sorrowsFormat = "  &6Sorrow: &b%value% &7%session%";
+
+            @Expose
+            @ConfigOption(name = "Ghost Since Sorrow", desc = "Ghost Since Sorrow line.\n§e%value% §ris replaced with\nGhost since last sorrow drop.")
+            @ConfigEditorText
+            public String ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%";
+
+            @Expose
+            @ConfigOption(name = "Ghost Kill Per Sorrow", desc = "Ghost Kill Per Sorrow line.\n§e%value% §ris replaced with\naverage ghost kill per sorrow drop.")
+            @ConfigEditorText
+            public String ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%";
+
+            @Expose
+            @ConfigOption(name = "Voltas", desc = "Voltas drop line.\n§e%value% §ris replaced with\nvoltas dropped.")
+            @ConfigEditorText
+            public String voltasFormat = "  &6Volta: &b%value% &7%session%";
+
+            @Expose
+            @ConfigOption(name = "Plasmas", desc = "Plasmas drop line.\n§e%value% §ris replaced with\nplasmas dropped.")
+            @ConfigEditorText
+            public String plasmasFormat = "  &6Plasmas: &b%value% &7%session%";
+
+            @Expose
+            @ConfigOption(name = "Ghostly Boots", desc = "Ghostly Boots drop line.\n§e%value% §ris replaced with\nGhostly Boots dropped.")
+            @ConfigEditorText
+            public String ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7%session%";
+
+            @Expose
+            @ConfigOption(name = "Bag Of Cash", desc = "Bag Of Cash drop line.\n§e%value% §ris replaced with\nBag Of Cash dropped.")
+            @ConfigEditorText
+            public String bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7%session%";
+
+            @Expose
+            @ConfigOption(name = "Average Magic Find", desc = "Average Magic Find line.\n§e%value% §ris replaced with\nAverage Magic Find.")
+            @ConfigEditorText
+            public String avgMagicFindFormat = "  &6Avg Magic Find: &b%value%";
+
+            @Expose
+            @ConfigOption(name = "Scavenger Coins", desc = "Scavenger Coins line.\n§e%value% §ris replaced with\nCoins earned from kill ghosts.\nInclude: Scavenger Enchant, Scavenger Talismans, Kill Combo.")
+            @ConfigEditorText
+            public String scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7%session%";
+
+            @Expose
+            @ConfigOption(name = "Kill Combo", desc = "Kill Combo line.\n§e%value% §ris replaced with\nYour current kill combo.")
+            @ConfigEditorText
+            public String killComboFormat = "  &6Kill Combo: &b%value%";
+
+            @Expose
+            @ConfigOption(name = "Highest Kill Combo", desc = "Highest Kill Combo line.\n§e%value% §ris replaced with\nYour current highest kill combo.")
+            @ConfigEditorText
+            public String highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7%session%";
+
+            @Expose
+            @ConfigOption(name = "Skill XP Gained", desc = "Skill XP Gained line.\n§e%value% §ris replaced with\nSkill XP Gained from killing Ghosts.")
+            @ConfigEditorText
+            public String skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7%session%";
+
+            @ConfigOption(name = "Bestiary Formatting", desc = "")
+            @Accordion
+            @Expose
+            public BestiaryFormatting bestiaryFormatting = new BestiaryFormatting();
+
+            public static class BestiaryFormatting {
+
+                @Expose
+                @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §ris replaced with\n" +
+                        "Your current progress to next level.\n" +
+                        "%currentLevel% &4is replaced with your current bestiary level\n" +
+                        "%nextLevel% &4is replaced with your current bestiary level +1.")
+                @ConfigEditorText
+                public String base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
+
+                @Expose
+                @ConfigOption(name = "Nothing", desc = "Text to show when you need to open the\nBestiary Menu to gather data.")
+                @ConfigEditorText
+                public String openMenu = "§cOpen Bestiary Menu !";
+
+                @Expose
+                @ConfigOption(name = "Maxed", desc = "Text to show when your bestiary for ghost is at max level.")
+                @ConfigEditorText
+                public String maxed = "%currentKill% (&c&lMaxed!)";
+
+                @Expose
+                @ConfigOption(name = "Progress to Max", desc = "Text to show progress when the §eMaxed Bestiary§7 option is §aON")
+                @ConfigEditorText
+                public String showMax_progress = "%currentKill%/3M (%percentNumber%%)";
+
+                @Expose
+                @ConfigOption(name = "Progress", desc = "Text to show progress when the §eMaxed Bestiary§7 option is §cOFF")
+                @ConfigEditorText
+                public String progress = "%currentKill%/%killNeeded%";
+            }
+
+            @Expose
+            @ConfigOption(name = "XP/h", desc = "XP Per Hour line.\n§e%value% §ris replaced with\nEstimated amount of combat xp you gain per hour.")
+            @ConfigEditorText
+            public String xpHourFormat = "  &6XP/h: &b%value%";
+        }
+
         @Expose
         @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
         @ConfigEditorSlider(
-                minValue = 0,
+                minValue = -5,
                 maxValue = 10,
                 minStep = 1)
         public int extraSpace = 1;
@@ -499,14 +628,6 @@ public class Misc {
         @ConfigEditorBoolean
         public boolean showMax = false;
 
-        @Expose
-        @ConfigOption(name = "Custom Format", desc = "§c§lDo not touch if you don't know what you are doing!!\n" +
-                "§e%text% - Default text. Ex: Ghost Killed, Sorrows\n" +
-                "§e%value% - Value for that text\n" +
-                "%session% - Same as value but for current session")
-        @ConfigEditorText
-        public String formatText = "  §6%text%: §b%value% §7%session%";
-
         @ConfigOption(name = "Reset", desc = "Reset the counter.")
         @ConfigEditorButton(buttonText = "Reset")
         public Runnable resetCounter = GhostCounter.INSTANCE::reset;
@@ -514,6 +635,7 @@ public class Misc {
         @Expose
         public Position position = new Position(50, 50, false, true);
     }
+
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
     @Expose

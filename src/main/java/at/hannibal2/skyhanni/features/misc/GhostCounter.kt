@@ -31,6 +31,8 @@ object GhostCounter {
     private val config get() = SkyHanniMod.feature.misc.ghostCounter
     private val counter get() = ProfileStorageData.profileSpecific?.ghostCounter?.data ?: mutableMapOf()
     private var display = listOf<List<Any>>()
+
+    //private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
     private val sorrowPattern = "§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
     private val plasmaPattern = "§6§lRARE DROP! §r§9Plasma §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
     private val voltaPattern = "§6§lRARE DROP! §r§9Volta §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
@@ -56,6 +58,9 @@ object GhostCounter {
     private var xpGainTimer = 0
     private var skillInfo: SkillInfo? = null
     private var skillInfoLast: SkillInfo? = null
+
+    //private var notifyCTModule = true
+    private var bestiaryCurrentKill = 0
     private const val skillType = "Combat"
     private var session = mutableMapOf(
             SESSION_KILLS to 0.0,
@@ -112,9 +117,9 @@ object GhostCounter {
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
-        val value = when (SORROWCOUNT.get()) {
-            0.0 -> "0"
-            else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}"
+        val value: Int = when (SORROWCOUNT.get()) {
+            0.0 -> 0
+            else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}".toInt()
         }
         val mgc = when (TOTALDROPS.get()) {
             0.0 -> "0"
@@ -129,59 +134,49 @@ object GhostCounter {
             xpInterp = interp(xpGainHour, xpGainHourLast)
             xp = "${format.format(xpInterp)} ${if (isKilling) "" else "§c(PAUSED)§r"}"
         }
+
+        val bestiaryFormatting = config.textFormatting.bestiaryFormatting
         val currentKill = BESTIARY_CURRENTKILL.getInt()
         val killNeeded = BESTIARY_KILLNEEDED.getInt()
         val nextLevel = BESTIARY_NEXTLEVEL.getInt()
         val bestiary = if (config.showMax) {
             when (nextLevel) {
-                -1 -> "${currentKill.addSeparators()} (§c§lMaxed!)"
+                -1 -> bestiaryFormatting.maxed
                 in 1..46 -> {
                     val sum = bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
                     val cKill = sum + currentKill
-                    "${cKill.addSeparators()}/3M (${percent(cKill.toDouble(), 3_000_000.0)})"
+                    bestiaryCurrentKill = cKill
+                    bestiaryFormatting.showMax_progress
                 }
 
-                else -> "§cOpen Bestiary Menu !"
+                else -> bestiaryFormatting.openMenu
             }
         } else {
             when (nextLevel) {
-                -1 -> "${currentKill.addSeparators()} (§c§lMaxed!)"
-                in 1..46 -> "${currentKill.addSeparators()}/${NumberUtil.format(killNeeded)}"
-                else -> "§cOpen Bestiary Menu !"
+                -1 -> bestiaryFormatting.maxed
+                in 1..46 -> bestiaryFormatting.progress
+                else -> bestiaryFormatting.openMenu
             }
         }
 
-        addAsSingletonList("§6Ghosts counter")
-        val list = mapOf(
-                "Ghosts Killed" to Pair(KILLS.getInt().addSeparators(), SESSION_KILLS.getInt(true).addSeparators()),
-                "Sorrows" to Pair(SORROWCOUNT.getInt().addSeparators(), SESSION_SORROWCOUNT.getInt(true).addSeparators()),
-                "Ghost Since Sorrow" to Pair(GHOSTSINCESORROW.getInt().addSeparators(), ""),
-                "Ghosts/Sorrow" to Pair(value, ""),
-                "Volta" to Pair(VOLTACOUNT.getInt().addSeparators(), SESSION_VOLTACOUNT.getInt(true).addSeparators()),
-                "Plasma" to Pair(PLASMACOUNT.getInt().addSeparators(), SESSION_PLASMACOUNT.getInt(true).addSeparators()),
-                "Ghostly Boots" to Pair(GHOSTLYBOOTS.getInt().addSeparators(), SESSION_GHOSTLYBOOTS.getInt(true).addSeparators()),
-                "Bag Of Cash" to Pair(BAGOFCASH.getInt().addSeparators(), SESSION_BAGOFCASH.getInt(true).addSeparators()),
-                "Avg Magic Find" to Pair(mgc, ""),
-                "Scavenger Coins" to Pair(SCAVENGERCOINS.getInt().addSeparators(), SESSION_SCAVENGERCOINS.getInt(true).addSeparators()),
-                "Kill Combo" to Pair(KILLCOMBO.getInt().addSeparators(), ""),
-                "Highest Kill Combo" to Pair(MAXKILLCOMBO.getInt().addSeparators(), SESSION_MAXKILLCOMBO.getInt(true).addSeparators()),
-                "Skill XP Gained" to Pair(SKILLXPGAINED.get().roundToPrecision(2).addSeparators(), SESSION_SKILLXPGAINED.get(true).roundToPrecision(2).addSeparators()),
-                "Bestiary %bestiaryLevel%->%bestiaryNextLevel%" to Pair(bestiary, ""),
-                "XP/h" to Pair(xp, "")
-        )
-        for ((text, v) in list) {
-            val (total, session) = v
-            val se = if (session == "") "" else "($session)"
-            addAsSingletonList(config.formatText.replace("&", "§")
-                    .replace("%text%", text)
-                    .replace("%value%", total)
-                    .replace("%session%", se)
-                    .replace("%bestiaryLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt() - 1}")
-                    .replace("%bestiaryNextLevel%", if (config.showMax) "46" else "${BESTIARY_NEXTLEVEL.getInt()}"))
-        }
-
-
+        addAsSingletonList(config.textFormatting.titleFormat.replace("&", "§"))
+        addAsSingletonList(config.textFormatting.ghostKiledFormat.formatText(KILLS.getInt(), SESSION_KILLS.getInt(true)))
+        addAsSingletonList(config.textFormatting.sorrowsFormat.formatText(SORROWCOUNT.getInt(), SESSION_SORROWCOUNT.getInt(true)))
+        addAsSingletonList(config.textFormatting.ghostSinceSorrowFormat.formatText(GHOSTSINCESORROW.getInt()))
+        addAsSingletonList(config.textFormatting.ghostKillPerSorrowFormat.formatText(value))
+        addAsSingletonList(config.textFormatting.voltasFormat.formatText(VOLTACOUNT.getInt(), SESSION_VOLTACOUNT.getInt(true)))
+        addAsSingletonList(config.textFormatting.plasmasFormat.formatText(PLASMACOUNT.getInt(), SESSION_PLASMACOUNT.getInt(true)))
+        addAsSingletonList(config.textFormatting.ghostlyBootsFormat.formatText(GHOSTLYBOOTS.getInt(), SESSION_GHOSTLYBOOTS.getInt(true)))
+        addAsSingletonList(config.textFormatting.bagOfCashFormat.formatText(BAGOFCASH.getInt(), SESSION_BAGOFCASH.getInt(true)))
+        addAsSingletonList(config.textFormatting.avgMagicFindFormat.formatText(mgc))
+        addAsSingletonList(config.textFormatting.scavengerCoinsFormat.formatText(SCAVENGERCOINS.getInt(), SESSION_SCAVENGERCOINS.getInt(true)))
+        addAsSingletonList(config.textFormatting.killComboFormat.formatText(KILLCOMBO.getInt(), SESSION_MAXKILLCOMBO.getInt(true)))
+        addAsSingletonList(config.textFormatting.highestKillComboFormat.formatText(MAXKILLCOMBO.getInt(), SESSION_MAXKILLCOMBO.getInt(true)))
+        addAsSingletonList(config.textFormatting.skillXPGainFormat.formatText(SKILLXPGAINED.get(), SESSION_SKILLXPGAINED.get(true)))
+        addAsSingletonList(bestiaryFormatting.base.formatText(bestiary).formatBestiary(currentKill, killNeeded))
+        addAsSingletonList(config.textFormatting.xpHourFormat.formatText(xp))
     }
+
 
     // Part of this was taken from GhostCounterV3 CT module
     // maybe replace this with a SkillXpGainEvent ?
@@ -298,18 +293,6 @@ object GhostCounter {
         SCAVENGERCOINS.add(event.coins)
     }
 
-    fun reset() {
-        for (opt in Option.values()) {
-            if (opt.reset) {
-                if (opt.save)
-                    opt.set(0.0)
-                else
-                    opt.set(0.0, true)
-            }
-        }
-        update()
-    }
-
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
@@ -322,6 +305,55 @@ object GhostCounter {
         if (tick % 40 == 20) {
             calculateXP()
         }
+
+        /*if (notifyCTModule) {
+            notifyCTModule = false
+            if (isUsingCTGhostCounter()) {
+                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved", "")
+            }
+        }*/
+
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val inventoryName = event.inventoryName
+        if (inventoryName != "Bestiary ➜ Deep Caverns") return
+        val stacks = event.inventoryItems
+        val ghostStack = stacks[13] ?: return
+        val bestiaryNextLevel = Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
+        BESTIARY_NEXTLEVEL.set(bestiaryNextLevel.toDouble())
+
+        for (line in ghostStack.getLore()) {
+            ghostXPPattern.matchMatcher(line.removeColor().trim()) {
+                BESTIARY_CURRENTKILL.set(group("current").formatNumber().toDouble())
+                BESTIARY_KILLNEEDED.set(group("total").formatNumber().toDouble())
+            }
+        }
+        update()
+    }
+
+    fun isEnabled(): Boolean {
+        return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
+    }
+
+
+    private fun percent(number: Double, total: Double): String {
+        return "${((number / total) * 100).roundToPrecision(4)}"
+    }
+
+    /**
+     * Taken from NotEnoughUpdates
+     */
+    private fun interp(now: Float, last: Float): Float {
+        var interp = now
+        if (last >= 0 && last != now) {
+            var factor = (System.currentTimeMillis() - lastUpdate) / 1000f
+            factor = LerpUtils.clampZeroOne(factor)
+            interp = last + (now - last) * factor
+        }
+        return interp
     }
 
     /**
@@ -362,27 +394,88 @@ object GhostCounter {
         lastTotalXp = totalXp
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        val inventoryName = event.inventoryName
-        if (inventoryName != "Bestiary ➜ Deep Caverns") return
-        val stacks = event.inventoryItems
-        val ghostStack = stacks[13] ?: return
-        val bestiaryNextLevel = Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
-        BESTIARY_NEXTLEVEL.set(bestiaryNextLevel.toDouble())
-
-        for (line in ghostStack.getLore()) {
-            ghostXPPattern.matchMatcher(line.removeColor().trim()) {
-                BESTIARY_CURRENTKILL.set(group("current").formatNumber().toDouble())
-                BESTIARY_KILLNEEDED.set(group("total").formatNumber().toDouble())
+    fun reset() {
+        for (opt in Option.values()) {
+            if (opt.reset) {
+                if (opt.save)
+                    opt.set(0.0)
+                else
+                    opt.set(0.0, true)
             }
         }
         update()
     }
 
-    fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
+    fun resetFormatting() {
+        val f = config.textFormatting
+        f.titleFormat = "§6Ghost Counter"
+        f.ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
+        f.sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)";
+        f.ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%";
+        f.ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%";
+        f.voltasFormat = "  &6Volta: &b%value% &7(%session%)";
+        f.plasmasFormat = "  &6Plasmas: &b%value% &7(%session%)";
+        f.ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7(%session%)";
+        f.bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7(%session%)";
+        f.avgMagicFindFormat = "  &6Avg Magic Find: &b%value%";
+        f.scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7(%session%)";
+        f.killComboFormat = "  &6Kill Combo: &b%value%";
+        f.highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7(%session%)";
+        f.skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7(%session%)";
+
+        val b = f.bestiaryFormatting
+        b.base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
+        b.openMenu = "§cOpen Bestiary Menu !";
+        b.maxed = "%currentKill% (&c&lMaxed!)"
+        b.showMax_progress = "%currentKill%/3M (%percentNumber%%)"
+        b.progress = "%currentKill%/%killNeeded%"
+    }
+
+    /*private fun isUsingCTGhostCounter(): Boolean {
+        return ghostCounterV3File.exists() && ghostCounterV3File.isFile
+    }*/
+
+    /*fun importCTGhostCounterData() {
+       if (isUsingCTGhostCounter()){
+           val json = ConfigManager.gson.fromJson(FileReader(ghostCounterV3File), com.google.gson.JsonObject::class.java)
+           println(json["ghostsSinceSorrow"])
+           println(json["sorrowCount"])
+           println(json["BagOfCashCount"])
+           println(json["PlasmaCount"])
+           println(json["VoltaCount"])
+           println(json["GhostlyBootsCount"])
+           println(json["ghostsKilled"])
+           println(json["TotalMF"])
+           println(json["TotalDrops"])
+           println(json["AverageMF"])
+       }else
+           chat("§cGhostCounterV3 ChatTriggers module not found!")
+   }*/
+
+    private fun String.formatText(value: Int, session: Int = -1): String {
+        return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())
+                .replace("%session%", session.addSeparators())
+                .replace("&", "§"))
+    }
+
+    private fun String.formatText(t: String): String {
+        return Utils.chromaStringByColourCode(this.replace("%value%", t)
+                .replace("&", "§"))
+    }
+
+    private fun String.formatText(value: Double, session: Double): String {
+        return Utils.chromaStringByColourCode(this.replace("%value%", value.roundToPrecision(2).addSeparators())
+                .replace("%session%", session.roundToPrecision(2).addSeparators())
+                .replace("&", "§"))
+    }
+
+    private fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
+        return Utils.chromaStringByColourCode(this.replace("%currentKill%", currentKill.addSeparators())
+                .replace("%percentNumber%", percent(bestiaryCurrentKill.toDouble(), 3_000_000.0))
+                .replace("%killNeeded%", NumberUtil.format(killNeeded))
+                .replace("%currentLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt() - 1}")
+                .replace("%nextLevel%", if (config.showMax) "46" else "${BESTIARY_NEXTLEVEL.getInt()}")
+                .replace("&", "§"))
     }
 
     enum class Option(val save: Boolean = true, val reset: Boolean = true) {
@@ -442,23 +535,5 @@ object GhostCounter {
             else
                 counter[this] ?: 0.0
         }
-
-    }
-
-    private fun percent(number: Double, total: Double): String {
-        return "${((number / total) * 100).roundToPrecision(4)}%"
-    }
-
-    /**
-     * Taken from NotEnoughUpdates
-     */
-    private fun interp(now: Float, last: Float): Float {
-        var interp = now
-        if (last >= 0 && last != now) {
-            var factor = (System.currentTimeMillis() - lastUpdate) / 1000f
-            factor = LerpUtils.clampZeroOne(factor)
-            interp = last + (now - last) * factor
-        }
-        return interp
     }
 }

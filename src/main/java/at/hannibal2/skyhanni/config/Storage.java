@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
+import  at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
