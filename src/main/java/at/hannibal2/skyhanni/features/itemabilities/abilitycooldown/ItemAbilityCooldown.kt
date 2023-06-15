@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import net.minecraft.client.Minecraft
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -128,7 +127,7 @@ class ItemAbilityCooldown {
     private fun handleItemClick(itemInHand: ItemStack?) {
         if (!LorenzUtils.inSkyBlock) return
         itemInHand?.getInternalName()?.run {
-            ItemAbility.getByInternalName(this)?.newClick()
+            ItemAbility.getByInternalName(this)?.setItemClick()
         }
     }
 
@@ -160,7 +159,7 @@ class ItemAbilityCooldown {
 
     private fun click(ability: ItemAbility) {
         if (ability.actionBarDetection) {
-            ability.oldClick()
+            ability.activate()
         }
     }
 
@@ -181,10 +180,11 @@ class ItemAbilityCooldown {
             if (ability != null) {
 
                 if (ability.isOnCooldown()) {
-                    val duration: Long = ability.lastClick + ability.getCooldown() - System.currentTimeMillis()
-                    val color = if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+                    val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
+                    val color = ability.specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
                     items[stack] = ItemText(color, ability.getDurationText(), true)
                 } else {
+                    ability.specialColor = null
                     items[stack] = ItemText(LorenzColor.GREEN, "R", false)
                 }
             }
@@ -215,6 +215,22 @@ class ItemAbilityCooldown {
         }
     }
 
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        val message = event.message
+        if (message == "§dCreeper Veil §r§aActivated!") {
+            ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
+        }
+        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)" ||
+            message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
+        ) {
+            ItemAbility.WITHER_CLOAK.activate()
+        }
+        if (message == "§dCreeper Veil §r§cDe-activated!") {
+            ItemAbility.WITHER_CLOAK.activate(null, -5000L)
+        }
+    }
+
     private fun hasAbility(stack: ItemStack): ItemAbility? {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()
@@ -236,11 +252,9 @@ class ItemAbilityCooldown {
     }
 
     private fun ItemAbility.sound() {
-        val lastNewClick = lastNewClick
-        val ping = System.currentTimeMillis() - lastNewClick
-//        println("$this click ($ping)")
+        val ping = System.currentTimeMillis() - lastItemClick
         if (ping < 400) {
-            oldClick()
+            activate()
         }
     }
 
