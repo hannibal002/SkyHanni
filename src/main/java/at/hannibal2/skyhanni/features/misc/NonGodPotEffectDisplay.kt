@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -149,7 +150,15 @@ class NonGodPotEffectDisplay {
                     if (name == effect.displayName) continue
                     for (line in stack.getLore()) {
                         if (line.contains("Remaining")) {
-                            val duration = TimeUtils.getMillis(line.split("§f")[1])
+                            val duration = try {
+                                TimeUtils.getMillis(line.split("§f")[1])
+                            } catch (e: IndexOutOfBoundsException) {
+                                CopyErrorCommand.logError(
+                                    Exception("'§f' not found in line '$line'", e),
+                                    "Error while reading Non God-Potion effects from tab list"
+                                )
+                                continue
+                            }
                             effectDuration[effect] = System.currentTimeMillis() + duration
                             update()
                         }

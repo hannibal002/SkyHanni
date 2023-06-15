@@ -35,6 +35,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
+    fun ItemStack.getDungeonStarCount() = getAttributeInt("dungeon_item_level")
+
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
         if (data.petCandies == -1) {
@@ -61,24 +63,6 @@ object SkyBlockItemModifierUtils {
         petLevelPattern.matchMatcher(this.displayName) {
             return group("level").toInt()
         }
-        return 0
-    }
-
-    fun ItemStack.getMasterStars(): Int {
-        val stars = mapOf(
-            "➊" to 1,
-            "➋" to 2,
-            "➌" to 3,
-            "➍" to 4,
-            "➎" to 5,
-        )
-        val itemName = name!!
-        for ((icon, number) in stars) {
-            if (itemName.endsWith(icon)) {
-                return number
-            }
-        }
-
         return 0
     }
 

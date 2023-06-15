@@ -141,14 +141,14 @@ class ItemAbilityCooldown {
 
         if (message.contains("§lCASTING IN ")) {
             if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.WHITE) {
-                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, -17_000)
+                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
             }
         } else if (message.contains("§lCASTING")) {
-            if (ItemAbility.RAGNAROCK_AXE.specialColor == LorenzColor.WHITE) {
-                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, -17_000)
+            if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
+                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10_000)
             }
         } else if (message.contains("§c§lCANCELLED")) {
-            ItemAbility.RAGNAROCK_AXE.activate(null, -3_000)
+            ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
         }
     }
 
@@ -221,12 +221,12 @@ class ItemAbilityCooldown {
     private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
         if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT) {
             if (specialColor == LorenzColor.BLUE) {
-                ability.activate(null, -4_000)
+                ability.activate(null, 4_000)
             }
         }
         if (ability == ItemAbility.RAGNAROCK_AXE) {
             if (specialColor == LorenzColor.DARK_PURPLE) {
-                ability.activate(null, -6_000)
+                ability.activate(null, 7_000)
             }
         }
     }
@@ -276,14 +276,14 @@ class ItemAbilityCooldown {
             ItemAbility.WITHER_CLOAK.activate()
         }
         if (message == "§dCreeper Veil §r§cDe-activated!") {
-            ItemAbility.WITHER_CLOAK.activate(null, -5000L)
+            ItemAbility.WITHER_CLOAK.activate(null, 5000)
         }
 
         youAlignedOthersPattern.matchMatcher(message) {
-            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, -4_000)
+            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6_000)
         }
         if (message == "§eYou §r§aaligned §r§eyourself!") {
-            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, -4_000)
+            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6_000)
         }
     }
 
