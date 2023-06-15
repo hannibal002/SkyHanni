@@ -129,7 +129,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val tabData = getTabList()
         val levelRegex = Regex("""\[(\d{1,3})] $player""")
         var sbLevel = ""
-
+// SkyBlock Level: [999] on Lemon
         for (line in tabData) {
             if (line.contains(player)) {
                 val colorlessLine = line.removeColor()
@@ -138,19 +138,19 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             }
         }
 
-        var profile = "Level $sbLevel on "
+        var profile = "SkyBlock Level: [$sbLevel] on "
 
         profile += (
-                if (HypixelData.ironman) "♲ "
-                else if (HypixelData.bingo) "Ⓑ "
-                else if (HypixelData.stranded) "☀ "
-                else " "
+                if (HypixelData.ironman) "♲"
+                else if (HypixelData.bingo) "Ⓑ"
+                else if (HypixelData.stranded) "☀"
+                else ""
                 )
 
         val fruit = HypixelData.profileName.firstLetterUppercase()
         if (fruit == "") profile =
-            lastKnownDisplayStrings[PROFILE] ?: "Level $sbLevel" // profile fruit has not loaded in yet
-        else profile += " $fruit"
+            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit has not loaded in yet
+        else profile += "$fruit"
 
         lastKnownDisplayStrings[PROFILE] = profile
         profile
