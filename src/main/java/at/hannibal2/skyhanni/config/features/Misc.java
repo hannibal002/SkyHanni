@@ -83,7 +83,7 @@ public class Misc {
     @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the non god pot effects display.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
-    public boolean nonGodPotEffectShowMixins = true;
+    public boolean nonGodPotEffectShowMixins = false;
 
     @Expose
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
