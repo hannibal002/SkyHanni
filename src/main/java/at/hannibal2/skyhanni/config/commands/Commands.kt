@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
+import at.hannibal2.skyhanni.features.misc.GhostCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.test.PacketTest
@@ -63,7 +64,7 @@ object Commands {
         registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
         registerCommand("shcropstartlocation") { GardenStartLocation.setLocationCommand() }
         registerCommand("shstopcityprojectreminder") { CityProjectFeatures.disable() }
-       // registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
+        registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }

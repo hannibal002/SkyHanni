@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
@@ -8,6 +9,8 @@ import at.hannibal2.skyhanni.features.misc.GhostCounter.Option.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.chat
+import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -21,6 +24,8 @@ import io.github.moulberry.notenoughupdates.util.XPInformation
 import io.github.moulberry.notenoughupdates.util.XPInformation.SkillInfo
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.io.File
+import java.io.FileReader
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -32,7 +37,7 @@ object GhostCounter {
     private val counter get() = ProfileStorageData.profileSpecific?.ghostCounter?.data ?: mutableMapOf()
     private var display = listOf<List<Any>>()
 
-    //private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
+    private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
     private val sorrowPattern = "§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
     private val plasmaPattern = "§6§lRARE DROP! §r§9Plasma §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
     private val voltaPattern = "§6§lRARE DROP! §r§9Volta §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
@@ -58,8 +63,7 @@ object GhostCounter {
     private var xpGainTimer = 0
     private var skillInfo: SkillInfo? = null
     private var skillInfoLast: SkillInfo? = null
-
-    //private var notifyCTModule = true
+    private var notifyCTModule = true
     private var bestiaryCurrentKill = 0
     private const val skillType = "Combat"
     private var session = mutableMapOf(
@@ -306,12 +310,12 @@ object GhostCounter {
             calculateXP()
         }
 
-        /*if (notifyCTModule) {
+        if (notifyCTModule) {
             notifyCTModule = false
             if (isUsingCTGhostCounter()) {
                 clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved", "")
             }
-        }*/
+        }
 
     }
 
@@ -431,11 +435,11 @@ object GhostCounter {
         b.progress = "%currentKill%/%killNeeded%"
     }
 
-    /*private fun isUsingCTGhostCounter(): Boolean {
+    private fun isUsingCTGhostCounter(): Boolean {
         return ghostCounterV3File.exists() && ghostCounterV3File.isFile
-    }*/
+    }
 
-    /*fun importCTGhostCounterData() {
+    fun importCTGhostCounterData() {
        if (isUsingCTGhostCounter()){
            val json = ConfigManager.gson.fromJson(FileReader(ghostCounterV3File), com.google.gson.JsonObject::class.java)
            println(json["ghostsSinceSorrow"])
@@ -450,7 +454,7 @@ object GhostCounter {
            println(json["AverageMF"])
        }else
            chat("§cGhostCounterV3 ChatTriggers module not found!")
-   }*/
+   }
 
     private fun String.formatText(value: Int, session: Int = -1): String {
         return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())
