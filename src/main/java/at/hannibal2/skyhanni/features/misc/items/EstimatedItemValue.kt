@@ -172,7 +172,8 @@ object EstimatedItemValue {
             if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == internalName.lowercase()) {
                 val price = NEUItems.getPrice(internalName)
                 val name = NEUItems.getItemStack(internalName).name
-                list.add("§7Reforge: §9$reforgeName")
+                val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
+                list.add("§7Reforge: §9$realReforgeName")
                 list.add("  §7($name §6" + NumberUtil.format(price) + "§7)")
                 return price
             }
