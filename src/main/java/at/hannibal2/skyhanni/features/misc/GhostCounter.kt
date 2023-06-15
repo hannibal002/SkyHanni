@@ -313,7 +313,7 @@ object GhostCounter {
         if (notifyCTModule) {
             notifyCTModule = false
             if (isUsingCTGhostCounter()) {
-                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved", "")
+                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ?", "shimportghostcounterdata")
             }
         }
 
@@ -440,21 +440,27 @@ object GhostCounter {
     }
 
     fun importCTGhostCounterData() {
-       if (isUsingCTGhostCounter()){
-           val json = ConfigManager.gson.fromJson(FileReader(ghostCounterV3File), com.google.gson.JsonObject::class.java)
-           println(json["ghostsSinceSorrow"])
-           println(json["sorrowCount"])
-           println(json["BagOfCashCount"])
-           println(json["PlasmaCount"])
-           println(json["VoltaCount"])
-           println(json["GhostlyBootsCount"])
-           println(json["ghostsKilled"])
-           println(json["TotalMF"])
-           println(json["TotalDrops"])
-           println(json["AverageMF"])
-       }else
-           chat("§cGhostCounterV3 ChatTriggers module not found!")
-   }
+        val c = ProfileStorageData.profileSpecific?.ghostCounter ?: return
+        if (isUsingCTGhostCounter()) {
+            if (c.ctDataImported) {
+                chat("§e[SkyHanni] §cYou already imported GhostCounterV3 data!")
+                return
+            }
+            val json = ConfigManager.gson.fromJson(FileReader(ghostCounterV3File), com.google.gson.JsonObject::class.java)
+            GHOSTSINCESORROW.add(json["ghostsSinceSorrow"].asDouble)
+            SORROWCOUNT.add(json["sorrowCount"].asDouble)
+            BAGOFCASH.add(json["BagOfCashCount"].asDouble)
+            PLASMACOUNT.add(json["PlasmaCount"].asDouble)
+            VOLTACOUNT.add(json["VoltaCount"].asDouble)
+            GHOSTLYBOOTS.add(json["GhostlyBootsCount"].asDouble)
+            KILLS.add(json["ghostsKilled"].asDouble)
+            TOTALMF.add(json["TotalMF"].asDouble)
+            TOTALDROPS.add(json["TotalDrops"].asDouble)
+            c.ctDataImported = true
+            chat("§e[SkyHanni] §aImported data successfully!")
+        } else
+            chat("§e[SkyHanni] §cGhostCounterV3 ChatTriggers module not found!")
+    }
 
     private fun String.formatText(value: Int, session: Int = -1): String {
         return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())

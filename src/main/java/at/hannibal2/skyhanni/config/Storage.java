@@ -206,6 +206,9 @@ public class Storage {
             @Expose
             public Map<Option, Double> data = new HashMap<>();
 
+            @Expose
+            public boolean ctDataImported = false;
+
         }
 
         public long nextCityProjectParticipationTime = 0L;
