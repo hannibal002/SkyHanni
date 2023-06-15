@@ -1089,6 +1089,9 @@ public class Garden {
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
+    public Position composterOutsideGardenPos = new Position(-363, 13, false, true);
+
+    @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
     @ConfigEditorAccordion(id = 22)
     public boolean farmingFortune = false;
