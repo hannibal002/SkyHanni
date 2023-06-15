@@ -36,7 +36,6 @@ object GhostCounter {
     private val config get() = SkyHanniMod.feature.misc.ghostCounter
     private val counter get() = ProfileStorageData.profileSpecific?.ghostCounter?.data ?: mutableMapOf()
     private var display = listOf<List<Any>>()
-
     private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
     private val sorrowPattern = "§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
     private val plasmaPattern = "§6§lRARE DROP! §r§9Plasma §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()
@@ -310,7 +309,7 @@ object GhostCounter {
             calculateXP()
         }
 
-        if (notifyCTModule) {
+        if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported == false) {
             notifyCTModule = false
             if (isUsingCTGhostCounter()) {
                 clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
