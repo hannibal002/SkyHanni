@@ -177,7 +177,8 @@ object SlayerItemProfitTracker {
 
             val price = (getPrice(internalName) * amount).toLong()
 
-            var name = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName
+            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName
+            var name = cleanName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             if (hidden) {
@@ -192,18 +193,24 @@ object SlayerItemProfitTracker {
             val percentage = timesDropped.toDouble() / itemLog.slayerCompletedCount
             val perBoss = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
 
-
             val renderable = if (inventoryOpen) Renderable.clickAndHover(
                 text, listOf(
                     "§7Dropped §e$timesDropped §7times.",
                     "§7Your drop rate: §c$perBoss",
                     "",
-                    "§eClick to " + (if (hidden) "show" else "hide") + "!"
+                    "§eClick to " + (if (hidden) "show" else "hide") + "!",
+                    "§eControl + Click to remove this item!",
                 )
             ) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
-                    lastClickDelay = System.currentTimeMillis()
-                    itemProfit.hidden = !hidden
+
+                    if (LorenzUtils.isControlKeyDown()) {
+                        itemLog.items.remove(internalName)
+                        LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom slayer profit display.")
+                        lastClickDelay = System.currentTimeMillis() + 500
+                    } else {
+                        itemProfit.hidden = !hidden
+                    }
                     update()
                 }
             } else Renderable.string(text)
