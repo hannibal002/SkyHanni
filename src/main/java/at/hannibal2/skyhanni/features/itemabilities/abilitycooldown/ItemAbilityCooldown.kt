@@ -9,16 +9,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class ItemAbilityCooldown {
-
-    var lastAbility = ""
+    private var lastAbility = ""
     var tick = 0
-    val items = mutableMapOf<ItemStack, ItemText>()
+    var items = mapOf<ItemStack, List<ItemText>>()
+    private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
@@ -34,7 +35,7 @@ class ItemAbilityCooldown {
         }
         if (event.soundName == "mob.endermen.portal") {
             if (event.pitch == 0.61904764f && event.volume == 1f) {
-                ItemAbility.GYROKINETIC_WAND.sound()
+                ItemAbility.GYROKINETIC_WAND_LEFT.sound()
             }
         }
         if (event.soundName == "random.anvil_land") {
@@ -169,27 +170,44 @@ class ItemAbilityCooldown {
 
         tick++
         if (tick % 2 == 0) {
-            checkHotbar()
+            checkHotBar()
         }
     }
 
-    private fun checkHotbar() {
-        items.clear()
+    private fun checkHotBar() {
+        val items = mutableMapOf<ItemStack, MutableList<ItemText>>()
         for ((stack, _) in ItemUtils.getItemsInInventoryWithSlots(true)) {
-            val ability = hasAbility(stack)
-            if (ability != null) {
-
-                if (ability.isOnCooldown()) {
-                    val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-                    val color = ability.specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
-                    items[stack] = ItemText(color, ability.getDurationText(), true)
-                } else {
-                    ability.specialColor = null
-                    items[stack] = ItemText(LorenzColor.GREEN, "R", false)
-                }
+            for (ability in hasAbility(stack)) {
+                items.getOrPut(stack) { mutableListOf() }.add(createItemText(ability))
             }
         }
+        this.items = items
+    }
 
+    private fun createItemText(ability: ItemAbility): ItemText {
+        val specialColor = ability.specialColor
+        return if (ability.isOnCooldown()) {
+            val duration: Long =
+                ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
+            val color =
+                specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
+        } else {
+            if (specialColor != null) {
+                ability.specialColor = null
+                tryHandleNextPhase(ability, specialColor)
+                return createItemText(ability)
+            }
+            ItemText(LorenzColor.GREEN, "R", false, ability.alternativePosition)
+        }
+    }
+
+    private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
+        if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT) {
+            if (specialColor == LorenzColor.BLUE) {
+                ability.activate(null, -4_000)
+            }
+        }
     }
 
     @SubscribeEvent
@@ -199,19 +217,27 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val itemText = items.filter { it.key == stack }
+        val list = items.filter { it.key == stack }
             .firstNotNullOfOrNull { it.value } ?: return
-        if (guiOpen && !itemText.onCooldown) return
 
-        val color = itemText.color
-        event.stackTip = color.getChatColor() + itemText.text
-
-        if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
-            var opacity = 130
-            if (color == LorenzColor.GREEN) {
-                opacity = 80
+        for (itemText in list) {
+            if (guiOpen && !itemText.onCooldown) continue
+            val color = itemText.color
+            val renderObject = RenderObject(color.getChatColor() + itemText.text)
+            if (itemText.alternativePosition) {
+                renderObject.offsetX = -8
+                renderObject.offsetY = -10
             }
-            stack.background = color.addOpacity(opacity).rgb
+            event.renderObjects.add(renderObject)
+
+            // fix multiple problems when having multiple abilities
+            if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
+                var opacity = 130
+                if (color == LorenzColor.GREEN) {
+                    opacity = 80
+                }
+                stack.background = color.addOpacity(opacity).rgb
+            }
         }
     }
 
@@ -221,34 +247,42 @@ class ItemAbilityCooldown {
         if (message == "§dCreeper Veil §r§aActivated!") {
             ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
         }
-        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)" ||
-            message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
+        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)"
+            || message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
         ) {
             ItemAbility.WITHER_CLOAK.activate()
         }
         if (message == "§dCreeper Veil §r§cDe-activated!") {
             ItemAbility.WITHER_CLOAK.activate(null, -5000L)
         }
+
+        youAlignedOthersPattern.matchMatcher(message) {
+            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, -4_000)
+        }
+        if (message == "§eYou §r§aaligned §r§eyourself!") {
+            ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, -4_000)
+        }
     }
 
-    private fun hasAbility(stack: ItemStack): ItemAbility? {
+    private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()
 
+        val list = mutableListOf<ItemAbility>()
         for (ability in ItemAbility.values()) {
             if (ability.newVariant) {
                 if (ability.internalNames.contains(internalName)) {
-                    return ability
+                    list.add(ability)
                 }
             } else {
                 for (name in ability.itemNames) {
                     if (itemName.contains(name)) {
-                        return ability
+                        list.add(ability)
                     }
                 }
             }
         }
-        return null
+        return list
     }
 
     private fun ItemAbility.sound() {
@@ -258,5 +292,5 @@ class ItemAbilityCooldown {
         }
     }
 
-    class ItemText(val color: LorenzColor, val text: String, val onCooldown: Boolean)
+    class ItemText(val color: LorenzColor, val text: String, val onCooldown: Boolean, val alternativePosition: Boolean)
 }

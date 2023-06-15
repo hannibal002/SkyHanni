@@ -7,6 +7,7 @@ enum class ItemAbility(
     val abilityName: String,
     private val cooldownInSeconds: Int,
     vararg val itemNames: String,
+    val alternativePosition: Boolean = false,
     var lastActivation: Long = 0L,
     var specialColor: LorenzColor? = null,
     var lastItemClick: Long = 0L,
@@ -15,7 +16,8 @@ enum class ItemAbility(
     //TODO add into repo
 
     HYPERION(5, "SCYLLA", "VALKYRIE", "ASTREA"),
-    GYROKINETIC_WAND(30),
+    GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
+    GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
     ICE_SPRAY_WAND(5),
     ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA"),
@@ -47,7 +49,7 @@ enum class ItemAbility(
     var newVariant = false
     var internalNames = mutableListOf<String>()
 
-    constructor(cooldownInSeconds: Int, vararg alternateInternalNames: String) : this("no name", cooldownInSeconds, actionBarDetection = false) {
+    constructor(cooldownInSeconds: Int, vararg alternateInternalNames: String, alternativePosition: Boolean = false) : this("no name", cooldownInSeconds, actionBarDetection = false, alternativePosition = alternativePosition) {
         newVariant = true
         internalNames.addAll(alternateInternalNames)
         internalNames.add(name)
