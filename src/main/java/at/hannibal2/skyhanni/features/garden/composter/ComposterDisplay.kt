@@ -189,7 +189,7 @@ class ComposterDisplay {
 
         if (!GardenAPI.inGarden() && config.composterDisplayOutsideGarden) {
             val list = Collections.singletonList(listOf(NEUItems.getItemStack("BUCKET"), "§b$format"))
-            config.composterDisplayPos.renderStringsAndItems(list, posLabel = "Composter Display")
+            config.composterOutsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden Display")
         }
     }
 

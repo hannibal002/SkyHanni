@@ -1,19 +1,23 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 
 enum class ItemAbility(
     val abilityName: String,
-    val cooldownInSeconds: Long,
+    private val cooldownInSeconds: Int,
     vararg val itemNames: String,
-    var lastClick: Long = 0L,
-    var lastNewClick: Long = 0L,
-    val actionBarDetection: Boolean = true,
+    val alternativePosition: Boolean = false,
+    var lastActivation: Long = 0L,
+    var specialColor: LorenzColor? = null,
+    var lastItemClick: Long = 0L,
+    val actionBarDetection: Boolean = true
 ) {
     //TODO add into repo
 
     HYPERION(5, "SCYLLA", "VALKYRIE", "ASTREA"),
-    GYROKINETIC_WAND(30),
+    GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
+    GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
     ICE_SPRAY_WAND(5),
     ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA"),
@@ -31,6 +35,7 @@ enum class ItemAbility(
     WEIRD_TUBA(20),
     FIRE_FREEZE_STAFF(10),
     SWORD_OF_BAD_HEALTH(5),
+    WITHER_CLOAK(10),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 30, "Ender Bow"),
@@ -44,22 +49,23 @@ enum class ItemAbility(
     var newVariant = false
     var internalNames = mutableListOf<String>()
 
-    constructor(cooldownInSeconds: Int, vararg alternateInternalNames: String) : this("no name", cooldownInSeconds.toLong(), actionBarDetection = false) {
+    constructor(cooldownInSeconds: Int, vararg alternateInternalNames: String, alternativePosition: Boolean = false) : this("no name", cooldownInSeconds, actionBarDetection = false, alternativePosition = alternativePosition) {
         newVariant = true
         internalNames.addAll(alternateInternalNames)
         internalNames.add(name)
     }
 
-    fun oldClick() {
-        lastClick = System.currentTimeMillis()
+    fun activate(color: LorenzColor? = null, offset: Long = 0L) {
+        specialColor = color
+        lastActivation = System.currentTimeMillis() + offset
     }
 
-    fun isOnCooldown(): Boolean = lastClick + getCooldown() > System.currentTimeMillis()
+    fun isOnCooldown(): Boolean = lastActivation + getCooldown() > System.currentTimeMillis()
 
-    fun getCooldown(): Long = cooldownInSeconds * 1000
+    fun getCooldown(): Long = 1000L * cooldownInSeconds
 
     fun getDurationText(): String {
-        var duration: Long = lastClick + getCooldown() - System.currentTimeMillis()
+        var duration: Long = lastActivation + getCooldown() - System.currentTimeMillis()
         return if (duration < 1600) {
             duration /= 100
             var d = duration.toDouble()
@@ -72,9 +78,9 @@ enum class ItemAbility(
         }
     }
 
-    fun newClick() {
+    fun setItemClick() {
 //        println("newClick $this")
-        lastNewClick = System.currentTimeMillis()
+        lastItemClick = System.currentTimeMillis()
     }
 
     companion object {
