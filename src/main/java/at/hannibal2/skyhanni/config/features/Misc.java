@@ -592,7 +592,7 @@ public class Misc {
                 public String base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
 
                 @Expose
-                @ConfigOption(name = "Nothing", desc = "Text to show when you need to open the\nBestiary Menu to gather data.")
+                @ConfigOption(name = "No Data", desc = "Text to show when you need to open the\nBestiary Menu to gather data.")
                 @ConfigEditorText
                 public String openMenu = "§cOpen Bestiary Menu !";
 

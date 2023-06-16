@@ -55,7 +55,7 @@ object GhostCounter {
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val bestiaryPattern = "BESTIARY Ghost .*➜(?<newLevel>.*)".toPattern()
     private val format = NumberFormat.getIntegerInstance()
-    private val exportPrefix = "gc/"
+    private const val exportPrefix = "gc/"
     private var tick = 0
     private var lastXp: String = "0"
     private var gain: Int = 0
@@ -536,8 +536,12 @@ object GhostCounter {
             return
         }
 
+        if(base64.length <= exportPrefix.length) return
+
         val jsonString = try {
-            String(Base64.getDecoder().decode(base64.trim())).substring(exportPrefix.length)
+            val t = String(Base64.getDecoder().decode(base64.trim()))
+            if (!t.startsWith(exportPrefix)) return
+            t.substring(exportPrefix.length)
         } catch (e: IllegalArgumentException) {
             return
         }
