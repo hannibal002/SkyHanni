@@ -57,7 +57,7 @@ object FortuneUpgrades {
             upgrade.cost = cost
             upgrade.costPerFF = (cost / upgrade.fortuneIncrease).toInt()
         }
-        when (style) {
+        when (style) { // sorting later
             0 -> this.sortBy { it.costPerFF }
             1 -> this.sortByDescending { it.costPerFF }
             2 -> this.sortBy { it.cost }

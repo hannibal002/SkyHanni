@@ -37,6 +37,7 @@ open class FFGuideGUI : GuiScreen() {
         var mouseY = 0
         var lastMouseScroll = 0
         var noMouseScrollFrames = 0
+        var lastClickedHeight = 0
 
         var tooltipToDisplay = mutableListOf<String>()
 
@@ -332,6 +333,10 @@ open class FFGuideGUI : GuiScreen() {
                     currentPet = FarmingItems.RABBIT
                     FFStats.getTotalFF()
                 }
+            }
+        } else {
+            if (GuiRenderUtils.isPointInRect(mouseX, mouseY, guiLeft, guiTop, sizeX, sizeY)) {
+                lastClickedHeight = mouseY
             }
         }
     }

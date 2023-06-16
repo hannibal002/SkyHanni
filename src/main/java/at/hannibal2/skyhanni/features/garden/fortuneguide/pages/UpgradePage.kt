@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.MathHelper
 import java.text.DecimalFormat
@@ -32,6 +34,12 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             if (adjustedY + 15 * index < FFGuideGUI.guiTop + 20) continue
             if (adjustedY + 15 * index > FFGuideGUI.guiTop + 170) continue
             var formattedUpgrade = upgrade.requiredItem.let { NEUItems.getItemStack(it) }.nameWithEnchantment ?: return
+            if (adjustedY + 15 * index - 5 < FFGuideGUI.lastClickedHeight && FFGuideGUI.lastClickedHeight < adjustedY + 15 * index + 10) {
+                FFGuideGUI.lastClickedHeight = 0
+                if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
+                    LorenzUtils.sendCommandToServer("bz ${formattedUpgrade.removeColor()}")
+                }
+            }
             if (upgrade.itemQuantity != 1) {
                 formattedUpgrade = "$formattedUpgrade §fx${upgrade.itemQuantity}"
             }
@@ -40,8 +48,6 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             GuiRenderUtils.drawString(upgrade.costPerFF?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 225)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
             GuiRenderUtils.drawString(upgrade.cost?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 250)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
             GuiRenderUtils.drawString(formattedUpgrade, (FFGuideGUI.guiLeft + 280)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-//            val itemStack = upgrade.requiredItem?.let { NEUItems.getItemStack(it) }
-//            GuiRenderUtils.renderItemAndTip(itemStack, (FFGuideGUI.guiLeft + 300) * inverseScale, (adjustedY + 15 * index) * inverseScale, mouseX * inverseScale, mouseY * inverseScale)
         }
         GlStateManager.scale(inverseScale, inverseScale, inverseScale)
         scrollScreen()
@@ -62,7 +68,7 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             pageScroll = 0
         }
 
-         pageScroll = MathHelper.clamp_int(pageScroll, -(listLength * 15 - 15), 0)
+        pageScroll = MathHelper.clamp_int(pageScroll, -(listLength * 15 - 15), 0)
         FFGuideGUI.lastMouseScroll = 0
     }
 }
