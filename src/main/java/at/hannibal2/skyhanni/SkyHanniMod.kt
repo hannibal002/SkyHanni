@@ -95,7 +95,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.17",
+    version = "0.18.Beta.19",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -221,7 +221,7 @@ class SkyHanniMod {
         loadModule(BarnFishingTimer())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyBLockLevelGuideHelper())
+        loadModule(SkyBlockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -292,7 +292,7 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
-        loadModule(SlayerItemProfitTracker())
+        loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
