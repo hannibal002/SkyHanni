@@ -496,6 +496,14 @@ public class Misc {
             @ConfigEditorButton(buttonText = "Reset")
             public Runnable resetFormatting = GhostCounter.INSTANCE::resetFormatting;
 
+            @ConfigOption(name = "Export Formatting", desc = "Export current formatting to clipboard.")
+            @ConfigEditorButton(buttonText = "Export")
+            public Runnable exportFormatting = GhostCounter.INSTANCE::exportFormatting;
+
+            @ConfigOption(name = "Import Formatting", desc = "Import formatting from clipboard.")
+            @ConfigEditorButton(buttonText = "Import")
+            public Runnable importFormatting = GhostCounter.INSTANCE::importFormatting;
+
             @Expose
             @ConfigOption(name = "Title", desc = "Title Line.")
             @ConfigEditorText

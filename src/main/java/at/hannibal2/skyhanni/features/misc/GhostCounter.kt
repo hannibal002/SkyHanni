@@ -18,14 +18,21 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonArray
+import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import io.github.moulberry.notenoughupdates.util.XPInformation.SkillInfo
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.io.FileReader
+import java.nio.charset.StandardCharsets
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -48,6 +55,7 @@ object GhostCounter {
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val bestiaryPattern = "BESTIARY Ghost .*➜(?<newLevel>.*)".toPattern()
     private val format = NumberFormat.getIntegerInstance()
+    private val exportPrefix = "gc/"
     private var tick = 0
     private var lastXp: String = "0"
     private var gain: Int = 0
@@ -408,31 +416,6 @@ object GhostCounter {
         update()
     }
 
-    fun resetFormatting() {
-        val f = config.textFormatting
-        f.titleFormat = "§6Ghost Counter"
-        f.ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
-        f.sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)";
-        f.ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%";
-        f.ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%";
-        f.voltasFormat = "  &6Volta: &b%value% &7(%session%)";
-        f.plasmasFormat = "  &6Plasmas: &b%value% &7(%session%)";
-        f.ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7(%session%)";
-        f.bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7(%session%)";
-        f.avgMagicFindFormat = "  &6Avg Magic Find: &b%value%";
-        f.scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7(%session%)";
-        f.killComboFormat = "  &6Kill Combo: &b%value%";
-        f.highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7(%session%)";
-        f.skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7(%session%)";
-
-        val b = f.bestiaryFormatting
-        b.base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
-        b.openMenu = "§cOpen Bestiary Menu !";
-        b.maxed = "%currentKill% (&c&lMaxed!)"
-        b.showMax_progress = "%currentKill%/3M (%percentNumber%%)"
-        b.progress = "%currentKill%/%killNeeded%"
-    }
-
     private fun isUsingCTGhostCounter(): Boolean {
         return ghostCounterV3File.exists() && ghostCounterV3File.isFile
     }
@@ -480,11 +463,11 @@ object GhostCounter {
     private fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
         return Utils.chromaStringByColourCode(
                 this.replace("%currentKill%", if (config.showMax) bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
-                .replace("%percentNumber%", percent(bestiaryCurrentKill.toDouble(), 3_000_000.0))
-                .replace("%killNeeded%", NumberUtil.format(killNeeded))
-                .replace("%currentLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt() - 1}")
-                .replace("%nextLevel%", if (config.showMax) "46" else "${BESTIARY_NEXTLEVEL.getInt()}")
-                .replace("&", "§"))
+                        .replace("%percentNumber%", percent(bestiaryCurrentKill.toDouble(), 3_000_000.0))
+                        .replace("%killNeeded%", NumberUtil.format(killNeeded))
+                        .replace("%currentLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt() - 1}")
+                        .replace("%nextLevel%", if (config.showMax) "46" else "${BESTIARY_NEXTLEVEL.getInt()}")
+                        .replace("&", "§"))
     }
 
     enum class Option(val save: Boolean = true, val reset: Boolean = true) {
@@ -543,6 +526,113 @@ object GhostCounter {
                 session[this] ?: 0.0
             else
                 counter[this] ?: 0.0
+        }
+    }
+
+    fun importFormatting() {
+        val base64: String = try {
+            Toolkit.getDefaultToolkit().systemClipboard.getData(DataFlavor.stringFlavor) as String
+        } catch (e: Exception) {
+            return
+        }
+
+        val jsonString = try {
+            String(Base64.getDecoder().decode(base64.trim())).substring(exportPrefix.length)
+        } catch (e: IllegalArgumentException) {
+            return
+        }
+
+        val list = try {
+            JsonParser().parse(jsonString).asJsonArray
+                    .filter { it.isJsonPrimitive }
+                    .map { it.asString }
+        } catch (e: Exception) {
+            return
+        }
+
+        if (list.size == 19) {
+            with(config.textFormatting) {
+                val b = bestiaryFormatting
+                titleFormat = list[0]
+                ghostKiledFormat = list[1]
+                sorrowsFormat = list[2]
+                ghostSinceSorrowFormat = list[3]
+                ghostKillPerSorrowFormat = list[4]
+                voltasFormat = list[5]
+                plasmasFormat = list[6]
+                ghostlyBootsFormat = list[7]
+                bagOfCashFormat = list[8]
+                avgMagicFindFormat = list[9]
+                scavengerCoinsFormat = list[10]
+                killComboFormat = list[11]
+                highestKillComboFormat = list[12]
+                skillXPGainFormat = list[13]
+                b.base = list[14]
+                b.openMenu = list[15]
+                b.maxed = list[16]
+                b.showMax_progress = list[17]
+                b.progress = list[18]
+            }
+        }
+    }
+
+    fun exportFormatting() {
+        val list = mutableListOf<String>()
+        with(config.textFormatting){
+            list.add(titleFormat)
+            list.add(ghostKiledFormat)
+            list.add(sorrowsFormat)
+            list.add(ghostSinceSorrowFormat)
+            list.add(ghostKillPerSorrowFormat)
+            list.add(voltasFormat)
+            list.add(plasmasFormat)
+            list.add(ghostlyBootsFormat)
+            list.add(bagOfCashFormat)
+            list.add(avgMagicFindFormat)
+            list.add(scavengerCoinsFormat)
+            list.add(killComboFormat)
+            list.add(highestKillComboFormat)
+            list.add(skillXPGainFormat)
+            with(bestiaryFormatting){
+                list.add(base)
+                list.add(openMenu)
+                list.add(maxed)
+                list.add(showMax_progress)
+                list.add(progress)
+            }
+        }
+        val jsonArray = JsonArray()
+        for (l in list) {
+            jsonArray.add(JsonPrimitive(l))
+        }
+        val base64 = Base64.getEncoder().encodeToString((exportPrefix + jsonArray).toByteArray(StandardCharsets.UTF_8))
+        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(base64), null)
+    }
+
+    fun resetFormatting() {
+        with(config.textFormatting) {
+            titleFormat = "&6Ghost Counter"
+            ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)"
+            sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)"
+            ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%"
+            ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%"
+            voltasFormat = "  &6Volta: &b%value% &7(%session%)"
+            plasmasFormat = "  &6Plasmas: &b%value% &7(%session%)"
+            ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7(%session%)"
+            bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7(%session%)"
+            avgMagicFindFormat = "  &6Avg Magic Find: &b%value%"
+            scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7(%session%)"
+            killComboFormat = "  &6Kill Combo: &b%value%"
+            highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7(%session%)"
+            skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7(%session%)"
+            xpHourFormat = "  &6XP/h: &b%value%"
+            with(bestiaryFormatting) {
+                base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%"
+                openMenu = "§cOpen Bestiary Menu !"
+                maxed = "%currentKill% (&c&lMaxed!)"
+                showMax_progress = "%currentKill%/3M (%percentNumber%%)"
+                progress = "%currentKill%/%killNeeded%"
+            }
         }
     }
 }
