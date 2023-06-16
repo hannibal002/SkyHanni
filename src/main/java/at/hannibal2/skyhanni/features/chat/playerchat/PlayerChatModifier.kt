@@ -60,14 +60,6 @@ class PlayerChatModifier {
     private fun cutMessage(input: String): String {
         var string = input
 
-        if (SkyHanniMod.feature.chat.chatFilter) {
-            if (string.contains("§r§f: ")) {
-                if (PlayerChatFilter.shouldChatFilter(string)) {
-                    string = string.replace("§r§f: ", "§r§7: ")
-                }
-            }
-        }
-
         if (SkyHanniMod.feature.chat.playerRankHider) {
             for (pattern in patterns) {
                 string = string.replace(pattern, "§b$1")
@@ -79,6 +71,14 @@ class PlayerChatModifier {
             if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {
                 //all players same color in chat
                 string = string.replace("§r§7: ", "§r§f: ")
+            }
+        }
+
+        if (SkyHanniMod.feature.chat.chatFilter) {
+            if (string.contains("§r§f: ")) {
+                if (PlayerChatFilter.shouldChatFilter(string)) {
+                    string = string.replace("§r§f: ", "§r§7: ")
+                }
             }
         }
 

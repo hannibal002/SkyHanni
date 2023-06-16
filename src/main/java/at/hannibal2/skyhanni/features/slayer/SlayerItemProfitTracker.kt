@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
 
-class SlayerItemProfitTracker {
+object SlayerItemProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
     private var collectedCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.SECONDS).build<Int, Unit>()
 
@@ -119,6 +119,7 @@ class SlayerItemProfitTracker {
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         val packet = event.packet
         if (packet !is S0DPacketCollectItem) return
@@ -177,7 +178,8 @@ class SlayerItemProfitTracker {
 
             val price = (getPrice(internalName) * amount).toLong()
 
-            var name = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName
+            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName
+            var name = cleanName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
             if (hidden) {
@@ -192,18 +194,24 @@ class SlayerItemProfitTracker {
             val percentage = timesDropped.toDouble() / itemLog.slayerCompletedCount
             val perBoss = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
 
-
             val renderable = if (inventoryOpen) Renderable.clickAndHover(
                 text, listOf(
                     "§7Dropped §e$timesDropped §7times.",
                     "§7Your drop rate: §c$perBoss",
                     "",
-                    "§eClick to " + (if (hidden) "show" else "hide") + "!"
+                    "§eClick to " + (if (hidden) "show" else "hide") + "!",
+                    "§eControl + Click to remove this item!",
                 )
             ) {
                 if (System.currentTimeMillis() > lastClickDelay + 150) {
-                    lastClickDelay = System.currentTimeMillis()
-                    itemProfit.hidden = !hidden
+
+                    if (LorenzUtils.isControlKeyDown()) {
+                        itemLog.items.remove(internalName)
+                        LorenzUtils.chat("§e[SkyHanni] Removed $cleanName §efrom slayer profit display.")
+                        lastClickDelay = System.currentTimeMillis() + 500
+                    } else {
+                        itemProfit.hidden = !hidden
+                    }
                     update()
                 }
             } else Renderable.string(text)
@@ -271,15 +279,15 @@ class SlayerItemProfitTracker {
                     "§cReset session!",
                     listOf("§cThis will reset your", "§ccurrent session for", "§c$itemLogCategory"),
                 ) {
-                    resetCurrentSession()
+                    resetData(DisplayMode.CURRENT)
                     update()
                 })
         }
     }
 
-    private fun resetCurrentSession() {
+    private fun resetData(displayMode: DisplayMode) {
         val currentLog = currentLog() ?: return
-        val list = currentLog.get(DisplayMode.CURRENT)
+        val list = currentLog.get(displayMode)
         list.items.clear()
         list.mobKillCoins = 0
         list.slayerSpawnCost = 0
@@ -338,4 +346,28 @@ class SlayerItemProfitTracker {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    fun clearProfitCommand(args: Array<String>) {
+        if (itemLogCategory == "") {
+            LorenzUtils.chat(
+                "§c[SkyHanni] No current slayer data found. " +
+                        "Go to a slayer area and start the specific slayer type you want to reset the data of."
+            )
+            return
+        }
+
+        if (args.size == 1) {
+            if (args[0].lowercase() == "confirm") {
+                resetData(DisplayMode.TOTAL)
+                update()
+                LorenzUtils.chat("§e[SkyHanni] You reset your $itemLogCategory slayer data!")
+                return
+            }
+        }
+
+        LorenzUtils.clickableChat(
+            "§e[SkyHanni] Are you sure you want to reset all your $itemLogCategory slayer data? Click here to confirm.",
+            "shclearslayerprofits confirm"
+        )
+    }
 }
