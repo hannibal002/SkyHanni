@@ -119,6 +119,7 @@ object SlayerItemProfitTracker {
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         val packet = event.packet
         if (packet !is S0DPacketCollectItem) return
