@@ -149,7 +149,7 @@ class NonGodPotEffectDisplay {
                 for (effect in NonGodPotEffect.values()) {
                     if (name == effect.displayName) continue
                     for (line in stack.getLore()) {
-                        if (line.contains("Remaining")) {
+                        if (line.contains("Remaining") && line != "§7Time Remaining: §aCompleted!") {
                             val duration = try {
                                 TimeUtils.getMillis(line.split("§f")[1])
                             } catch (e: IndexOutOfBoundsException) {
