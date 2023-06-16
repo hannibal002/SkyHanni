@@ -31,15 +31,25 @@ object CopyErrorCommand {
         if (cache.getIfPresent(pair) != null) return
         cache.put(pair, Unit)
 
-        val stackTrace = error.stackTraceToString()
+        val stackTrace = error.stackTraceToString().removeSpam()
         val randomId = UUID.randomUUID().toString()
 
         errorMessages[randomId] =
-            "```\nSkyHanni ${SkyHanniMod.version}: $message\n$stackTrace```"
+            "```\nSkyHanni ${SkyHanniMod.version}: $message\n \n$stackTrace```"
 
         LorenzUtils.clickableChat(
             "§c[SkyHanni ${SkyHanniMod.version}]: $message. Click here to copy the error into the clipboard.",
             "shcopyerror $randomId"
         )
     }
+}
+
+private fun String.removeSpam(): String {
+    val ignored = listOf(
+        "at io.netty.",
+        "at net.minecraft.network.",
+        "at net.minecraftforge.fml.common.network.handshake.",
+        "at java.lang.Thread.run",
+    )
+    return split("\r\n\t").filter { line -> !ignored.any { line.startsWith(it) } }.joinToString("\n")
 }
