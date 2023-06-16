@@ -499,19 +499,19 @@ public class Misc {
             @Expose
             @ConfigOption(name = "Title", desc = "Title Line.")
             @ConfigEditorText
-            public String titleFormat = "§6Ghost Counter";
+            public String titleFormat = "&6Ghost Counter";
 
             @Expose
             @ConfigOption(name = "Ghost Killed", desc = "Ghost Killed line.\n§e%value% §ris replaced with\n" +
                     "Ghost Killed.\n" +
                     "§r%session% is replaced with Ghost killed")
             @ConfigEditorText
-            public String ghostKiledFormat = "  &6Ghost Killed: &b%value% %session%";
+            public String ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n§e%value% §ris replaced with\nsorrows dropped.")
             @ConfigEditorText
-            public String sorrowsFormat = "  &6Sorrow: &b%value% &7%session%";
+            public String sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Ghost Since Sorrow", desc = "Ghost Since Sorrow line.\n§e%value% §ris replaced with\nGhost since last sorrow drop.")
@@ -526,22 +526,22 @@ public class Misc {
             @Expose
             @ConfigOption(name = "Voltas", desc = "Voltas drop line.\n§e%value% §ris replaced with\nvoltas dropped.")
             @ConfigEditorText
-            public String voltasFormat = "  &6Volta: &b%value% &7%session%";
+            public String voltasFormat = "  &6Voltas: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Plasmas", desc = "Plasmas drop line.\n§e%value% §ris replaced with\nplasmas dropped.")
             @ConfigEditorText
-            public String plasmasFormat = "  &6Plasmas: &b%value% &7%session%";
+            public String plasmasFormat = "  &6Plasmas: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Ghostly Boots", desc = "Ghostly Boots drop line.\n§e%value% §ris replaced with\nGhostly Boots dropped.")
             @ConfigEditorText
-            public String ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7%session%";
+            public String ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Bag Of Cash", desc = "Bag Of Cash drop line.\n§e%value% §ris replaced with\nBag Of Cash dropped.")
             @ConfigEditorText
-            public String bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7%session%";
+            public String bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Average Magic Find", desc = "Average Magic Find line.\n§e%value% §ris replaced with\nAverage Magic Find.")
@@ -551,7 +551,7 @@ public class Misc {
             @Expose
             @ConfigOption(name = "Scavenger Coins", desc = "Scavenger Coins line.\n§e%value% §ris replaced with\nCoins earned from kill ghosts.\nInclude: Scavenger Enchant, Scavenger Talismans, Kill Combo.")
             @ConfigEditorText
-            public String scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7%session%";
+            public String scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Kill Combo", desc = "Kill Combo line.\n§e%value% §ris replaced with\nYour current kill combo.")
@@ -561,12 +561,12 @@ public class Misc {
             @Expose
             @ConfigOption(name = "Highest Kill Combo", desc = "Highest Kill Combo line.\n§e%value% §ris replaced with\nYour current highest kill combo.")
             @ConfigEditorText
-            public String highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7%session%";
+            public String highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Skill XP Gained", desc = "Skill XP Gained line.\n§e%value% §ris replaced with\nSkill XP Gained from killing Ghosts.")
             @ConfigEditorText
-            public String skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7%session%";
+            public String skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7(%session%)";
 
             @ConfigOption(name = "Bestiary Formatting", desc = "")
             @Accordion

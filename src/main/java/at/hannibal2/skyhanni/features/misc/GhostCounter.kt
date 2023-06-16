@@ -56,7 +56,7 @@ object GhostCounter {
     private var lastUpdate: Long = -1
     private var lastTotalXp = -1f
     private var isKilling = false
-    private val xpGainQueue = LinkedList<Float>()
+    private val xpGainQueue = mutableListOf<Float>()
     private var xpGainHourLast = -1f
     private var xpGainHour = -1f
     private var xpGainTimer = 0
@@ -162,7 +162,7 @@ object GhostCounter {
             }
         }
 
-        addAsSingletonList(config.textFormatting.titleFormat.replace("&", "§"))
+        addAsSingletonList(Utils.chromaStringByColourCode(config.textFormatting.titleFormat.replace("&", "§")))
         addAsSingletonList(config.textFormatting.ghostKiledFormat.formatText(KILLS.getInt(), SESSION_KILLS.getInt(true)))
         addAsSingletonList(config.textFormatting.sorrowsFormat.formatText(SORROWCOUNT.getInt(), SESSION_SORROWCOUNT.getInt(true)))
         addAsSingletonList(config.textFormatting.ghostSinceSorrowFormat.formatText(GHOSTSINCESORROW.getInt()))
@@ -315,7 +315,6 @@ object GhostCounter {
                 clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
             }
         }
-
     }
 
     @SubscribeEvent
@@ -479,7 +478,8 @@ object GhostCounter {
     }
 
     private fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
-        return Utils.chromaStringByColourCode(this.replace("%currentKill%", currentKill.addSeparators())
+        return Utils.chromaStringByColourCode(
+                this.replace("%currentKill%", if (config.showMax) bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
                 .replace("%percentNumber%", percent(bestiaryCurrentKill.toDouble(), 3_000_000.0))
                 .replace("%killNeeded%", NumberUtil.format(killNeeded))
                 .replace("%currentLevel%", if (BESTIARY_NEXTLEVEL.getInt() < 0) "46" else "${BESTIARY_NEXTLEVEL.getInt() - 1}")
