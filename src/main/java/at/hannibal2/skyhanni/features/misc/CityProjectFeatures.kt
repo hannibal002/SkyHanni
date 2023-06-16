@@ -52,15 +52,15 @@ class CityProjectFeatures {
 
     private fun checkDailyReminder() {
         if (!config.dailyReminder) return
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
+        val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (LorenzUtils.inDungeons) return
         if (LorenzUtils.inKuudraFight) return
         if (FarmingContestAPI.inContest) return
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
-        if (profileSpecific.nextCityProjectParticipationTime == 0L) return
-        if (System.currentTimeMillis() <= profileSpecific.nextCityProjectParticipationTime) return
+        if (playerSpecific.nextCityProjectParticipationTime == 0L) return
+        if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
 
         if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
         lastReminderSend = System.currentTimeMillis()
@@ -114,7 +114,7 @@ class CityProjectFeatures {
                 if (itemName != "§eContribute this component!") continue
                 nextTime = System.currentTimeMillis()
             }
-            ProfileStorageData.profileSpecific?.nextCityProjectParticipationTime = nextTime
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 

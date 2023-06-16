@@ -31,13 +31,14 @@ object CopyErrorCommand {
         if (cache.getIfPresent(pair) != null) return
         cache.put(pair, Unit)
 
-        val errorMessage = error.toString()
-        val stackTrace = error.stackTrace.asList().joinToString("\n")
+        val stackTrace = error.stackTraceToString()
         val randomId = UUID.randomUUID().toString()
-        errorMessages[randomId] = "```$errorMessage\nCaused at:\n$stackTrace```"
+
+        errorMessages[randomId] =
+            "```\nSkyHanni ${SkyHanniMod.version}: $message\n$stackTrace```"
 
         LorenzUtils.clickableChat(
-            "§cSkyHanni ${SkyHanniMod.version} $message. Click here to copy the error into the clipboard.",
+            "§c[SkyHanni ${SkyHanniMod.version}]: $message. Click here to copy the error into the clipboard.",
             "shcopyerror $randomId"
         )
     }

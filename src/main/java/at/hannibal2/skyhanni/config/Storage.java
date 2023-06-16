@@ -29,6 +29,9 @@ public class Storage {
 
         @Expose
         public Integer gardenCommunityUpgrade = -1;
+
+        @Expose
+        public long nextCityProjectParticipationTime = 0L;
     }
 
     public static class ProfileSpecific {
@@ -199,9 +202,6 @@ public class Storage {
             @Expose
             public long lastComposterEmptyWarningTime = 0;
         }
-
-        @Expose
-        public long nextCityProjectParticipationTime = 0L;
 
         @Expose
         public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
