@@ -65,6 +65,7 @@ object Commands {
         registerCommand("shcropstartlocation") { GardenStartLocation.setLocationCommand() }
         registerCommand("shstopcityprojectreminder") { CityProjectFeatures.disable() }
         registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
+        registerCommand("shclearfarmingitems") { clearFarmingItems() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
@@ -107,6 +108,13 @@ object Commands {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
         }
+    }
+
+    private fun clearFarmingItems() {
+        val config = GardenAPI.config?.fortune ?: return
+        LorenzUtils.chat("§e[SkyHanni] clearing farming items")
+        config.farmingItems.clear()
+        config.outdatedItems.clear()
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

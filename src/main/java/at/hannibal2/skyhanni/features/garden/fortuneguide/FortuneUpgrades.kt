@@ -196,7 +196,10 @@ object FortuneUpgrades {
 
     private fun recombobulateItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
         if (item.isRecombobulated()) return
-        val reforge = item.getReforgeName()?.let { FarmingReforges.valueOf(it.uppercase()) } ?: return
+        val reforge = item.getReforgeName()?.let {
+            FarmingReforges.values().find { enumValue -> enumValue.name == it.uppercase()
+            }
+        } ?: return
 
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         val increase = reforge[item.getItemRarity() + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
@@ -206,7 +209,6 @@ object FortuneUpgrades {
 
     private fun reforgeItem(item: ItemStack, reforge: FarmingReforges, list: MutableList<FortuneUpgrade>,copperPrice: Int? = null) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-
         val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(FortuneUpgrade("§7Reforge your ${item.displayName} §7to ${reforge.reforgeName}",
             copperPrice, reforge.reforgeItem, 1, increase))
