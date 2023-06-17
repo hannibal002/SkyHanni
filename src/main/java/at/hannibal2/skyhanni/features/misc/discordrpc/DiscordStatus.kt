@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.function.Supplier
 import java.util.regex.Pattern
@@ -271,7 +272,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         // Logic for getting the currently held stacking enchant is from Skytils, except for getExtraAttributes() which they got from BiscuitDevelopment
 
 
-        fun getExtraAttributes(item: net.minecraft.item.ItemStack?): NBTTagCompound? {
+        fun getExtraAttributes(item: ItemStack?): NBTTagCompound? {
             return if (item == null || !item.hasTagCompound()) {
                 null
             } else item.getSubCompound("ExtraAttributes", false)
@@ -297,6 +298,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             return percent
         }
 
+        var stackingReturn = ""
         if (extraAttributes != null) {
             val enchantments = extraAttributes.getCompoundTag("enchantments")
             var stackingEnchant = ""
@@ -311,12 +313,11 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             val amount = extraAttributes.getInteger(stackingEnchants[stackingEnchant]?.get("nbtNum").toString())
             val stackingPercent = getProgressPercent(amount, levels)
 
-            if (stackingPercent == "") lastKnownDisplayStrings[STACKING] =
-                "" // outdated info is useless for AUTO; empty strings are manually ignored
-            else lastKnownDisplayStrings[STACKING] =
-                "${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
+            stackingReturn =
+                if (stackingPercent == "" || amount == 0) "" // outdated info is useless for AUTO; empty strings are manually ignored
+                else "${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
         }
-        lastKnownDisplayStrings[STACKING] ?: ""
+        stackingReturn
 
     })
     ;
