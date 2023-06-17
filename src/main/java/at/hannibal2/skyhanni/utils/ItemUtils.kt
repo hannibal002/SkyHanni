@@ -136,7 +136,7 @@ object ItemUtils {
     }
 
     fun ItemStack.getItemRarity(): Int {
-
+        //todo make into an enum in future
         return when (this.getLore().lastOrNull()?.take(4)) {
             "§f§l" -> 0     // common
             "§a§l" -> 1     // uncommon
@@ -150,7 +150,6 @@ object ItemUtils {
             else -> -1      // unknown
         }
     }
-
 
     //extra method for shorter name and kotlin nullability logic
     var ItemStack.name: String?

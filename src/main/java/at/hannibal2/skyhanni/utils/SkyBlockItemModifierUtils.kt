@@ -47,7 +47,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPetItem(): String? {
         val data = cachedData
-        if (data.heldItem == "" || data.heldItem == null) {
+        if (data.heldItem == "") {
             data.heldItem = getPetInfo()?.get("heldItem")?.asString
         }
         return data.heldItem

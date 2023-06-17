@@ -127,6 +127,9 @@ public class Storage {
             public String composterCurrentFuelItem = "";
 
             @Expose
+            public int uniqueVisitors = 0;
+
+            @Expose
             public VisitorDrops visitorDrops = new VisitorDrops();
 
             public static class VisitorDrops {
@@ -173,9 +176,6 @@ public class Storage {
 
                 @Expose
                 public Map<FarmingItems, Boolean> outdatedItems = new HashMap<>();
-
-                @Expose
-                public int uniqueVisitors = 0;
 
                 @Expose
                 public int anitaUpgrade = -1;

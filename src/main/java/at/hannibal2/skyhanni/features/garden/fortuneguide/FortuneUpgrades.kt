@@ -78,7 +78,7 @@ object FortuneUpgrades {
     }
 
     private fun getEquipmentUpgrades() {
-        val visitors = GardenAPI.config?.fortune?.uniqueVisitors?.toDouble() ?: 0.0
+        val visitors = GardenAPI.config?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in equipment) {
             val item = piece.getItem()
             //todo tell them to purchase the missing item
