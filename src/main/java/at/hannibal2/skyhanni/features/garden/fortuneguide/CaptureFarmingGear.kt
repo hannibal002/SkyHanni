@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,20 +13,25 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.round
 
 class CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.config?.fortune?.farmingItems
+    private val outdatedItems get() = GardenAPI.config?.fortune?.outdatedItems
 
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
     private val anitaMenuPattern = "You have: [+](?<level>.*)%".toPattern()
 
+    private val lotusUpgradePattern = "Lotus (?<piece>.*) upgraded to [+].*☘!".toPattern()
+    private val petLevelUpPattern = "Your (?<pet>.*) leveled up to level .*!".toPattern()
 
     companion object {
         private val strengthPattern = " Strength: §r§c❁(?<strength>.*)".toPattern()
@@ -45,7 +51,7 @@ class CaptureFarmingGear {
             val currentCrop = itemStack.getCropType()
 
             if (currentCrop == null) {
-                //todo generic tool as fallback item
+                //todo better fall back items
                 //todo Daedalus axe
             } else {
                 for (item in FarmingItems.values()) {
@@ -83,6 +89,7 @@ class CaptureFarmingGear {
         if (!LorenzUtils.inSkyBlock) return
         val hidden = GardenAPI.config?.fortune ?: return
         val farmingItems = farmingItems ?: return
+        val outdatedItems = outdatedItems ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
             for ((_, slot) in event.inventoryItems) {
                 val split = slot.getInternalName().split("_")
@@ -90,8 +97,13 @@ class CaptureFarmingGear {
                     for (item in FarmingItems.values()) {
                         if (item.name == split.last()) {
                             farmingItems[item] = slot
+                            outdatedItems[item] = false
                         }
                     }
+                    FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
+                    val enchantments = slot.getEnchantments() ?: emptyMap()
+                    val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
+                    GardenAPI.config?.uniqueVisitors = round(FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)).toInt()
                 }
             }
         }
@@ -109,18 +121,21 @@ class CaptureFarmingGear {
                 if (split.first() == "ELEPHANT") {
                     if (split.last().toInt() > highestElephantLvl) {
                         farmingItems[FarmingItems.ELEPHANT] = item
+                        outdatedItems[FarmingItems.ELEPHANT] = false
                         highestElephantLvl = split.last().toInt()
                     }
                 }
                 if (split.first() == "MOOSHROOM_COW") {
                     if (split.last().toInt() > highestMooshroomLvl) {
                         farmingItems[FarmingItems.MOOSHROOM_COW] = item
+                        outdatedItems[FarmingItems.MOOSHROOM_COW] = false
                         highestMooshroomLvl = split.last().toInt()
                     }
                 }
                 if (split.first() == "RABBIT") {
                     if (split.last().toInt() > highestRabbitLvl) {
                         farmingItems[FarmingItems.RABBIT] = item
+                        outdatedItems[FarmingItems.RABBIT] = false
                         highestRabbitLvl = split.last().toInt()
                     }
                 }
@@ -181,6 +196,7 @@ class CaptureFarmingGear {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val hidden = GardenAPI.config?.fortune ?: return
+        val outdatedItems = outdatedItems ?: return
         val msg = event.message.removeColor().trim()
         fortuneUpgradePattern.matchMatcher(msg) {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
@@ -190,6 +206,22 @@ class CaptureFarmingGear {
         }
         anitaBuffPattern.matchMatcher(msg) {
             hidden.anitaUpgrade = group("level").toInt() / 2
+        }
+        lotusUpgradePattern.matchMatcher(msg) {
+            val piece = group("piece").uppercase()
+            for (item in FarmingItems.values()) {
+                if (item.name == piece) {
+                    outdatedItems[item] = true
+                }
+            }
+        }
+        petLevelUpPattern.matchMatcher(msg) {
+            val pet = group("pet").uppercase()
+            for (item in FarmingItems.values()) {
+                if (item.name.contains(pet)) {
+                    outdatedItems[item] = true
+                }
+            }
         }
         if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
             hidden.cakeExpiring = System.currentTimeMillis() + 172800000

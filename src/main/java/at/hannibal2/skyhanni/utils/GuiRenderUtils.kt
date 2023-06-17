@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
@@ -29,6 +28,39 @@ object GuiRenderUtils {
 
     fun drawString(str: String, x: Float, y: Float) {
         Minecraft.getMinecraft().fontRendererObj.drawString(str, x, y, 0xffffff, true)
+    }
+
+    fun drawString(str: String, x: Int, y: Int) {
+        Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
+    }
+
+    fun drawTwoLineString(str: String, x: Float, y: Float) {
+        val desiredSplitIndex = str.length / 2
+        var splitIndex = -1
+        var lastColorCode = ""
+
+        for (i in desiredSplitIndex downTo 0) {
+            if (str[i] == ' ') {
+                splitIndex = i
+                break
+            }
+        }
+
+        if (splitIndex == -1) {
+            splitIndex = desiredSplitIndex
+        }
+        for (i in 0 until  desiredSplitIndex) {
+            if (str[i] == '§' && i + 1 < str.length) {
+                lastColorCode = str.substring(i, i + 2)
+            }
+        }
+
+        val firstString = str.substring(0, splitIndex).trim()
+        val secondString = lastColorCode + str.substring(splitIndex).trim()
+
+        Minecraft.getMinecraft().fontRendererObj.drawString(firstString, x, y - 5, 0xffffff, true)
+        Minecraft.getMinecraft().fontRendererObj.drawString(secondString, x, y + 5, 0xffffff, true)
+
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
@@ -141,6 +173,10 @@ object GuiRenderUtils {
         }
     }
 
+    fun renderItemAndTip(item: ItemStack?, x: Float, y: Float, mouseX: Float, mouseY: Float, color: Int = 0xFF43464B.toInt()) {
+        renderItemAndTip(item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
+    }
+
     // assuming 70% font size
     fun drawFarmingBar(
         label: String,
@@ -167,17 +203,17 @@ object GuiRenderUtils {
         }
 
         val filledWidth = (width * barProgress).toInt()
-        val current = DecimalFormat("0.##").format(currentVal.round(2))
+        val current = DecimalFormat("0.##").format(currentVal)
         val progressPercentage = (barProgress * 10000).roundToInt() / 100
         val inverseScale = 1 / textScale
         val textWidth: Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth("$progressPercentage%")
         val barColor = barColorGradient(barProgress)
 
-        GlStateManager.scale(textScale, textScale, textScale)
+        GlStateManager.scale(textScale, textScale, 1f)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
-        drawString("§2$current / $maxValue☘", xPos * inverseScale, (yPos + 8) * inverseScale)
+        drawString("§2$current / ${DecimalFormat("0.#").format(maxValue)}☘", xPos * inverseScale, (yPos + 8) * inverseScale)
         drawString("§2$progressPercentage%", (xPos + width - textWidth * textScale) * inverseScale, (yPos + 8) * inverseScale)
-        GlStateManager.scale(inverseScale, inverseScale, inverseScale)
+        GlStateManager.scale(inverseScale, inverseScale, 1f)
 
         GuiScreen.drawRect(xPos, yPos + 16, xPos + width, yPos + 20, 0xFF43464B.toInt())
         GuiScreen.drawRect(xPos + 1, yPos + 17, xPos + width - 1, yPos + 19, barColor.darkenColor())
@@ -204,5 +240,4 @@ object GuiRenderUtils {
         val color = Color(this)
         return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
     }
-
 }
