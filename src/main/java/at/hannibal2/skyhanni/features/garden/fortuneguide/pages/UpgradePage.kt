@@ -50,7 +50,8 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             GuiRenderUtils.drawString("§6" + upgrade.costPerFF?.let { NumberUtil.format(it) }, (FFGuideGUI.guiLeft + 300) * inverseScale, (adjustedY + 25 * index) * inverseScale)
             GuiRenderUtils.drawString(("§6" + upgrade.cost?.let { NumberUtil.format(it) }), (FFGuideGUI.guiLeft + 335) * inverseScale, (adjustedY + 25 * index) * inverseScale)
             GuiRenderUtils.drawString(formattedUpgrade, (FFGuideGUI.guiLeft + 180) * inverseScale, (adjustedY + 25 * index) * inverseScale)
-            GuiRenderUtils.renderItemAndTip(upgradeItem, (FFGuideGUI.guiLeft + 155) * inverseScale, (adjustedY + 25 * index - 5) * inverseScale, mouseX * inverseScale, mouseY * inverseScale)
+            GuiRenderUtils.renderItemAndTip(upgradeItem, (FFGuideGUI.guiLeft + 155) * inverseScale, (adjustedY + 25 * index - 5) * inverseScale,
+                mouseX * inverseScale, mouseY * inverseScale, 0x00FFFFFF)
         }
         GlStateManager.scale(inverseScale, inverseScale, 1f)
         scrollScreen()
