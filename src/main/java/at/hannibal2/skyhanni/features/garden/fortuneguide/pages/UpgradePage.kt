@@ -20,21 +20,23 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
 
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         val adjustedY = FFGuideGUI.guiTop + 20 + pageScroll
-        val inverseScale = 1 / 0.5f
+        val inverseScale = 1 / 0.75f
 
-        GlStateManager.scale(0.5f, 0.5f, 0.5f)
-        GuiRenderUtils.drawString("Upgrade", (FFGuideGUI.guiLeft + 80)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
-        GuiRenderUtils.drawString("FF increase", (FFGuideGUI.guiLeft + 190)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
-        GuiRenderUtils.drawString("Cost/FF", (FFGuideGUI.guiLeft + 225)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
-        GuiRenderUtils.drawString("Total", (FFGuideGUI.guiLeft + 250)  * inverseScale, (FFGuideGUI.guiTop + 5)  * inverseScale)
+        GlStateManager.scale(0.75f, 0.75f, 1f)
+        GuiRenderUtils.drawString("Upgrade", (FFGuideGUI.guiLeft + 45) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
+        GuiRenderUtils.drawString("FF increase", (FFGuideGUI.guiLeft + 240) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
+        GuiRenderUtils.drawString("Cost/FF", (FFGuideGUI.guiLeft + 290) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
+        GuiRenderUtils.drawString("Total", (FFGuideGUI.guiLeft + 330) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
+        GuiRenderUtils.drawString("Item", (FFGuideGUI.guiLeft + 190) * inverseScale, (FFGuideGUI.guiTop + 5) * inverseScale)
 
         val upgradeList = if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
         listLength = upgradeList.size
         for ((index, upgrade) in upgradeList.withIndex()) {
-            if (adjustedY + 15 * index < FFGuideGUI.guiTop + 20) continue
-            if (adjustedY + 15 * index > FFGuideGUI.guiTop + 170) continue
-            var formattedUpgrade = upgrade.requiredItem.let { NEUItems.getItemStack(it) }.nameWithEnchantment ?: return
-            if (adjustedY + 15 * index - 5 < FFGuideGUI.lastClickedHeight && FFGuideGUI.lastClickedHeight < adjustedY + 15 * index + 10) {
+            if (adjustedY + 25 * index < FFGuideGUI.guiTop + 20) continue
+            if (adjustedY + 25 * index > FFGuideGUI.guiTop + 160) continue
+            val upgradeItem = upgrade.requiredItem.let { NEUItems.getItemStack(it) }
+            var formattedUpgrade = upgradeItem.nameWithEnchantment ?: return
+            if (adjustedY + 25 * index - 5 < FFGuideGUI.lastClickedHeight && FFGuideGUI.lastClickedHeight < adjustedY + 25 * index + 10) {
                 FFGuideGUI.lastClickedHeight = 0
                 if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
                     LorenzUtils.sendCommandToServer("bz ${formattedUpgrade.removeColor()}")
@@ -43,13 +45,14 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             if (upgrade.itemQuantity != 1) {
                 formattedUpgrade = "$formattedUpgrade §fx${upgrade.itemQuantity}"
             }
-            GuiRenderUtils.drawString(upgrade.description, (FFGuideGUI.guiLeft + 15)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(DecimalFormat("0.##").format(upgrade.fortuneIncrease), (FFGuideGUI.guiLeft + 200)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(upgrade.costPerFF?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 225)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(upgrade.cost?.let { NumberUtil.format(it) } ?: "unknown", (FFGuideGUI.guiLeft + 250)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
-            GuiRenderUtils.drawString(formattedUpgrade, (FFGuideGUI.guiLeft + 280)  * inverseScale, (adjustedY + 15 * index)  * inverseScale)
+            GuiRenderUtils.drawTwoLineString(upgrade.description, (FFGuideGUI.guiLeft + 15) * inverseScale, (adjustedY + 25 * index) * inverseScale)
+            GuiRenderUtils.drawString("§a${DecimalFormat("0.##").format(upgrade.fortuneIncrease)}", (FFGuideGUI.guiLeft + 270) * inverseScale, (adjustedY + 25 * index) * inverseScale)
+            GuiRenderUtils.drawString("§6" + upgrade.costPerFF?.let { NumberUtil.format(it) }, (FFGuideGUI.guiLeft + 300) * inverseScale, (adjustedY + 25 * index) * inverseScale)
+            GuiRenderUtils.drawString(("§6" + upgrade.cost?.let { NumberUtil.format(it) }), (FFGuideGUI.guiLeft + 335) * inverseScale, (adjustedY + 25 * index) * inverseScale)
+            GuiRenderUtils.drawString(formattedUpgrade, (FFGuideGUI.guiLeft + 180) * inverseScale, (adjustedY + 25 * index) * inverseScale)
+            GuiRenderUtils.renderItemAndTip(upgradeItem, (FFGuideGUI.guiLeft + 155) * inverseScale, (adjustedY + 25 * index - 5) * inverseScale, mouseX * inverseScale, mouseY * inverseScale)
         }
-        GlStateManager.scale(inverseScale, inverseScale, inverseScale)
+        GlStateManager.scale(inverseScale, inverseScale, 1f)
         scrollScreen()
     }
 

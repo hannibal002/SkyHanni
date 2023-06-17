@@ -30,6 +30,39 @@ object GuiRenderUtils {
         Minecraft.getMinecraft().fontRendererObj.drawString(str, x, y, 0xffffff, true)
     }
 
+    fun drawString(str: String, x: Int, y: Int) {
+        Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
+    }
+
+    fun drawTwoLineString(str: String, x: Float, y: Float) {
+        val desiredSplitIndex = str.length / 2
+        var splitIndex = -1
+        var lastColorCode = ""
+
+        for (i in desiredSplitIndex downTo 0) {
+            if (str[i] == ' ') {
+                splitIndex = i
+                break
+            }
+        }
+
+        if (splitIndex == -1) {
+            splitIndex = desiredSplitIndex
+        }
+        for (i in 0 until  desiredSplitIndex) {
+            if (str[i] == '§' && i + 1 < str.length) {
+                lastColorCode = str.substring(i, i + 2)
+            }
+        }
+
+        val firstString = str.substring(0, splitIndex).trim()
+        val secondString = lastColorCode + str.substring(splitIndex).trim()
+
+        Minecraft.getMinecraft().fontRendererObj.drawString(firstString, x, y - 5, 0xffffff, true)
+        Minecraft.getMinecraft().fontRendererObj.drawString(secondString, x, y + 5, 0xffffff, true)
+
+    }
+
     fun drawStringCentered(str: String?, x: Int, y: Int) {
         drawStringCentered(
             str,
@@ -138,6 +171,10 @@ object GuiRenderUtils {
                 FFGuideGUI.tooltipToDisplay.addAll(tt)
             }
         }
+    }
+
+    fun renderItemAndTip(item: ItemStack?, x: Float, y: Float, mouseX: Float, mouseY: Float, color: Int = 0xFF43464B.toInt()) {
+        renderItemAndTip(item, x.toInt(), y.toInt(), mouseX.toInt(), mouseY.toInt(), color)
     }
 
     // assuming 70% font size
