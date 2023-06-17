@@ -42,10 +42,16 @@ public class DevData {
     public boolean modMenuLog = false;
 
     @Expose
-    @ConfigOption(name = "Show internal name", desc = "Show internal names in item lores.")
+    @ConfigOption(name = "Show internal name", desc = "Show internal names in item lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showInternalName = false;
+
+    @Expose
+    @ConfigOption(name = "Show item UUID", desc = "Show the Unique Identifier of items. in the lore.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showItemUuid = false;
 
     @Expose
     public Position debugPos = new Position(10, 10, false, true);
