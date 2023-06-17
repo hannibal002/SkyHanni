@@ -35,12 +35,12 @@ object GardenAPI {
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
     var mushroomCowPet = false
-    var inBarn = false
+    private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val config get() = ProfileStorageData.profileSpecific?.garden
 
     var tick = 0
-    val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
+    private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
