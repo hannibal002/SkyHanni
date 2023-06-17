@@ -514,7 +514,7 @@ public class Misc {
                     "Ghost Killed.\n" +
                     "§r%session% is replaced with Ghost killed")
             @ConfigEditorText
-            public String ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
+            public String ghostKilledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
 
             @Expose
             @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n§e%value% §ris replaced with\nsorrows dropped.")
