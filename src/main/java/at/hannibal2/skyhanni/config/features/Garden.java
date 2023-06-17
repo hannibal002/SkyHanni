@@ -245,7 +245,7 @@ public class Garden {
                         "§eThis feature is in beta please report issues on the discord!"
         )
         @ConfigEditorBoolean
-        public boolean enabled = false;
+        public boolean enabled = true;
 
         @Expose
         @ConfigOption(
