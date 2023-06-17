@@ -85,18 +85,15 @@ class ChatManager {
 
         val last = lines.last()
         if (last.startsWith("§f§lCOMMON")) return true
-        if (last.startsWith("§f§lCOMMON")) return true
         if (last.startsWith("§a§lUNCOMMON")) return true
         if (last.startsWith("§9§lRARE")) return true
         if (last.startsWith("§5§lEPIC")) return true
         if (last.startsWith("§6§lLEGENDARY")) return true
+        if (last.startsWith("§d§lMYTHIC")) return true
         if (last.startsWith("§c§lSPECIAL")) return true
 
         // TODO confirm this format is correct
         if (last.startsWith("§c§lVERY SPECIAL")) return true
-
-        if (last.startsWith("§d§lMYTHIC")) return true
-
         return false
     }
 
