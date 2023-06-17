@@ -215,6 +215,18 @@ public class Storage {
             @Expose
             public boolean ctDataImported = false;
 
+            @Expose
+            public double bestiaryNextLevel = 0;
+
+            @Expose
+            public double bestiaryCurrentKill = 0;
+
+            @Expose
+            public double bestiaryKillNeeded = 0;
+
+            @Expose
+            public double totalMF = 0;
+
         }
 
         public long nextCityProjectParticipationTime = 0L;
