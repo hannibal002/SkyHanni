@@ -355,7 +355,7 @@ open class FFGuideGUI : GuiScreen() {
             drawRect(x, y, x + 25, y + 28, if (currentCrop == crop) 0x50555555 else 0x50000000)
             GuiRenderUtils.renderItemStack(crop.icon, x + 5, y + 5)
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
-                tooltipToDisplay.add("§e${crop.name}")
+                tooltipToDisplay.add("§e${crop.cropName}")
             }
         }
 
