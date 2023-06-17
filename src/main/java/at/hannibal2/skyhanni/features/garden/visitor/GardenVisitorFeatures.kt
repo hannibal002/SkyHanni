@@ -324,7 +324,7 @@ class GardenVisitorFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!GardenAPI.inBarn) return
+        if (!GardenAPI.onBarnPlot) return
         if (!inVisitorInventory) return
         if (event.itemStack.name != "§aAccept Offer") return
 
