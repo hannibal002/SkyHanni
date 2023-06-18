@@ -54,6 +54,12 @@ public class DevData {
     public boolean showItemUuid = false;
 
     @Expose
+    @ConfigOption(name = "Copy Rng Meter", desc = "Copies internal names and maxed xp needed from rng meter inventories in json format into the clipboard.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean copyRngMeter = false;
+
+    @Expose
     public Position debugPos = new Position(10, 10, false, true);
 
     @Expose
