@@ -6,6 +6,9 @@ import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Misc {
 
     @Expose
@@ -259,38 +262,38 @@ public class Misc {
         @Expose
         @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom",
+                "Dynamic",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> firstLine = Property.of(0);
 
         @Expose
         @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Dynamic",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom",
+                "Dynamic",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> secondLine = Property.of(0);
 
@@ -302,18 +305,18 @@ public class Misc {
         @Expose
         @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone or Slayer progress while doing those, but this if you're doing neither.")
         @ConfigEditorDropdown(values = {
-            "Nothing",
-            "Location",
-            "Purse",
-            "Bits",
-            "Stats",
-            "Held Item",
-            "Skyblock Date",
-            "Profile (Fruit)",
-            "Slayer",
-            "Custom",
-            "Crop Milestone",
-            "Current Pet"
+                "Nothing",
+                "Location",
+                "Purse",
+                "Bits",
+                "Stats",
+                "Held Item",
+                "Skyblock Date",
+                "Profile (Fruit)",
+                "Slayer",
+                "Custom",
+                "Crop Milestone",
+                "Current Pet"
         })
         public Property<Integer> auto = Property.of(0);
     }

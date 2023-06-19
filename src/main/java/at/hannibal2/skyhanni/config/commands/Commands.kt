@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
+import at.hannibal2.skyhanni.features.misc.GhostCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
@@ -51,7 +52,7 @@ object Commands {
         // main commands
         registerCommand("sh", openMainMenu)
         registerCommand("skyhanni", openMainMenu)
-        
+
         registerCommand("ff") { openFortuneGuide() }
 
         // for users - regular commands
@@ -65,6 +66,7 @@ object Commands {
         registerCommand("shcropstartlocation") { GardenStartLocation.setLocationCommand() }
         registerCommand("shstopcityprojectreminder") { CityProjectFeatures.disable() }
         registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
+        registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
         registerCommand("shclearfarmingitems") { clearFarmingItems() }
 
         // for users - fix bugs
@@ -100,8 +102,9 @@ object Commands {
         registerCommand("shcopyerror") { CopyErrorCommand.command(it) }
 
     }
+
     @JvmStatic
-     fun openFortuneGuide() {
+    fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
             LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
         } else {
@@ -122,9 +125,9 @@ object Commands {
     }
 
     private fun createCommand(function: (Array<String>) -> Unit) =
-        object : ProcessCommandRunnable() {
-            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-                function(args.asList().toTypedArray())
+            object : ProcessCommandRunnable() {
+                override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
+                    function(args.asList().toTypedArray())
+                }
             }
-        }
 }

@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
@@ -219,7 +220,7 @@ class SkyHanniMod {
         loadModule(BarnFishingTimer())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyBlockLevelGuideHelper())
+        loadModule(SkyblockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -296,6 +297,7 @@ class SkyHanniMod {
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
         loadModule(ShowItemUuid())
+        loadModule(GhostCounter)
 
         init()
 
