@@ -296,6 +296,7 @@ class SkyHanniMod {
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
         loadModule(ShowItemUuid())
+        loadModule(FrozenTreasureTracker())
 
         init()
 

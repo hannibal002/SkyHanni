@@ -6,6 +6,10 @@ import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Misc {
 
     @Expose
@@ -476,6 +480,69 @@ public class Misc {
 
         @Expose
         public Position pos = new Position(-178, 143, false, true);
+    }
+
+    @Expose
+    @ConfigOption(name = "Frozen Treasure Tracker", desc = "")
+    @Accordion
+    public Misc.FrozenTreasureTracker frozenTreasureTracker = new Misc.FrozenTreasureTracker();
+
+    public static class FrozenTreasureTracker {
+
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Tracks all of your drops from frozen treasure in the Glacial Caves\n" +
+                        "§eIce calculations are an estimate but are relatively accurate"
+        )
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Text Format",
+                desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = { // todo change colours
+                        "§e§lFrozen Treasure Tracker",
+                        "§e1,636 Treasures Mined",
+                        "§e3.2 Total Ice",
+                        "§e342,192 Ice/hr",
+                        "§e31,002 Compact Procs",
+                        " ",
+                        "§b182 §fWhite Gift",
+                        "§b94 §aGreen Gift",
+                        "§b17 §9§cRed Gift",
+                        "§b328 §fPacked Ice",
+                        "§b80 §aEnchanted Ice",
+                        "§b4 §9Enchanted Packed Ice",
+                        "§b182 §aIce Bait",
+                        "§b3 §aGlowy Chum Bait",
+                        "§b36 §5Glacial Fragment",
+                        "§b6 §fGlacial Talisman",
+                        " ",
+                }
+        )
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 14, 15));
+
+        @Expose
+        @ConfigOption(name = "Count Compact", desc = "Adds compact drops from your pickaxe to the ice total.")
+        @ConfigEditorBoolean
+        public boolean countCompact = true;
+
+        @Expose
+        @ConfigOption(name = "Only in Glacial Cave", desc = "Only shows the overlay while in the Glacial Cave.")
+        @ConfigEditorBoolean
+        public boolean onlyInCave = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Chat messages", desc = "Hides the chat messages from frozen treasures.")
+        @ConfigEditorBoolean
+        public boolean hideMessages = false;
+
+        @Expose
+        public Position glacialDropPos = new Position(10, 80, false, true);
     }
 
     @Expose
