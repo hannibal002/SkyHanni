@@ -280,19 +280,19 @@
   + SkyBlock Command `/tp` to check the play time still works
 
 ## Misc
-- Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
-- Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
-- Hiding exp Bottles lying on the ground.
-- **Real Time** - Display the current computer time, a handy feature when playing in full-screen mode.
-- Highlight the voidling extremist in pink color.
-- Highlight millenia aged blaze color in red
-- Option to hide all damage splashes, from anywhere in Skyblock.
-- Hide armor or just helmet of other player or yourself
-- Display the active non-god potion effects.
-- Wishing compass uses amount display.
-- Brewing Stand Overlay.
-- Crimson Isle Reputation Helper.
-- Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
++ Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
++ Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
++ Hiding exp Bottles lying on the ground.
++ **Real Time** - Display the current computer time, a handy feature when playing in full-screen mode.
++ Highlight the voidling extremist in pink color.
++ Highlight millenia aged blaze color in red
++ Option to hide all damage splashes, from anywhere in Skyblock.
++ Hide armor or just helmet of other player or yourself
++ Display the active non-god potion effects.
++ Wishing compass uses amount display.
++ Brewing Stand Overlay.
++ Crimson Isle Reputation Helper.
++ Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network needs to be done.
 + **Tia Relay Helper** - Helps with solving the sound puzzle.
 + **Hide dead entities** - Similar to Skytil's feature for inside dungeon, but for everywhere.
