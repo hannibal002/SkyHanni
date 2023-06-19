@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.*;
-import com.google.gson.annotations.*;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
-import io.github.moulberry.moulconfig.observer.*;
-import org.lwjgl.input.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.github.moulberry.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -510,9 +507,9 @@ public class Misc {
                 exampleText = { // todo change colours
                         "§e§lFrozen Treasure Tracker",
                         "§e1,636 Treasures Mined",
-                        "§e3.2 Total Ice",
+                        "§e3.2m Total Ice",
                         "§e342,192 Ice/hr",
-                        "§e31,002 Compact Procs",
+                        "§e1,002 Compact Procs",
                         " ",
                         "§b182 §fWhite Gift",
                         "§b94 §aGreen Gift",
