@@ -186,7 +186,7 @@ class SackDisplay {
                     add(itemStack)
                     if (!isTrophySack)
                         add(Renderable.optionalLink("${itemName.replace("§k", "")}: ", {
-                            BazaarApi.searchForBazaarItem(itemName, -1)
+                            BazaarApi.searchForBazaarItem(itemName)
                         }) { !NEUItems.neuHasFocus() })
                     else
                         add("${itemName.replace("§k", "")}: ")
@@ -252,7 +252,7 @@ class SackDisplay {
                     add(" §7- ")
                     add(NEUItems.getItemStack(internalName))
                     add(Renderable.optionalLink("$name: ", {
-                        BazaarApi.searchForBazaarItem(name.dropLast(1), -1)
+                        BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
                     add(" ($rough-§a$flawed-§9$fine-§5$flawless)")
                     val price = (roughprice + flawedprice + fineprice + flawlessprice)
