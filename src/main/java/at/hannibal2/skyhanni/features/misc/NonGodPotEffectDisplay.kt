@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -14,7 +11,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -140,18 +136,20 @@ class NonGodPotEffectDisplay {
         checkFooter = true
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet is S30PacketWindowItems) {
-            for (stack in packet.itemStacks) {
-                val name = stack?.name ?: continue
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!event.inventoryName.endsWith("Active Effects")) return
+
+        for (stack in event.inventoryItems.values) {
+                val name = stack.name ?: continue
                 for (effect in NonGodPotEffect.values()) {
                     if (name == effect.displayName) continue
                     for (line in stack.getLore()) {
                         if (line.contains("Remaining") &&
                             line != "§7Time Remaining: §aCompleted!" &&
-                            !line.contains("Remaining Uses")) {
+                            !line.contains("Remaining Uses")
+                        ) {
                             val duration = try {
                                 TimeUtils.getMillis(line.split("§f")[1])
                             } catch (e: IndexOutOfBoundsException) {
@@ -165,10 +163,13 @@ class NonGodPotEffectDisplay {
                             update()
                         }
                     }
-                }
             }
         }
+    }
 
+    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+        val packet = event.packet
         if (!checkFooter) return
         if (packet is S47PacketPlayerListHeaderFooter) {
             val formattedText = packet.footer.formattedText

@@ -67,10 +67,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.PacketTest
-import at.hannibal2.skyhanni.test.ShowItemUuid
-import at.hannibal2.skyhanni.test.SkyHanniTestCommand
-import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.*
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
@@ -310,6 +307,7 @@ class SkyHanniMod {
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
         loadModule(TestBingo)
+        loadModule(TestCopyRngMeterValues)
     }
 
     @Mod.EventHandler
