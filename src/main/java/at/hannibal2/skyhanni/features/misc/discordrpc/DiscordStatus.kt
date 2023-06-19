@@ -108,7 +108,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
         if (coins == "1") {
             lastKnownDisplayStrings[PURSE] = "1 Coin"
-        } else if (coins != "") {
+        } else if (coins != "" && coins != null) {
             lastKnownDisplayStrings[PURSE] = "$coins Coins"
         }
         lastKnownDisplayStrings[PURSE] ?: ""
