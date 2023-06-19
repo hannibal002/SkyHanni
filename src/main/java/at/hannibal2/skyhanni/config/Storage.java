@@ -274,5 +274,23 @@ public class Storage {
                 public boolean hidden;
             }
         }
+
+        @Expose
+        public Map<String, SlayerRngMeterStorage> slayerRngMeter = new HashMap<>();
+
+        public static class SlayerRngMeterStorage {
+
+            @Expose
+            public long currentMeter = -1;
+
+            @Expose
+            public long gainPerBoss = -1;
+
+            @Expose
+            public long goalNeeded = -1;
+
+            @Expose
+            public String itemGoal = "?";
+        }
     }
 }

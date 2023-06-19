@@ -105,4 +105,6 @@ object StringUtils {
             "$format$text"
         }
     }
+
+    fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 }

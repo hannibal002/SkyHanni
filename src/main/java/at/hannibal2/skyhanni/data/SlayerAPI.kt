@@ -27,7 +27,7 @@ object SlayerAPI {
 
     var questStartTime = 0L
     var isInSlayerArea = false
-    private var latestSlayerCategory = ""
+    var latestSlayerCategory = ""
     private var latestProgressChangeTime = 0L
     var latestWrongAreaWarning = 0L
     private var latestSlayerProgress = ""
@@ -106,10 +106,14 @@ object SlayerAPI {
         if (event.phase != TickEvent.Phase.START) return
         if (!LorenzUtils.inSkyBlock) return
 
+        // wait with sending SlayerChangeEvent until profile is detected
+        if (ProfileStorageData.profileSpecific == null) return
+
         val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest") ?: ""
         if (slayerQuest != latestSlayerCategory) {
-            SlayerChangeEvent(latestSlayerCategory, slayerQuest).postAndCatch()
+            val old = latestSlayerCategory
             latestSlayerCategory = slayerQuest
+            SlayerChangeEvent(old, latestSlayerCategory).postAndCatch()
         }
 
         val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2) ?: ""

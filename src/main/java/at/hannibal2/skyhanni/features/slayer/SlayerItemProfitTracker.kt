@@ -211,6 +211,7 @@ object SlayerItemProfitTracker {
                         lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         itemProfit.hidden = !hidden
+                        lastClickDelay = System.currentTimeMillis()
                     }
                     update()
                 }

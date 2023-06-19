@@ -144,6 +144,33 @@ public class Slayer {
     }
 
     @Expose
+    @ConfigOption(name = "RNG Meter Display", desc = "")
+    @Accordion
+    public RngMeterDisplay rngMeterDisplay = new RngMeterDisplay();
+
+    public static class RngMeterDisplay {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Display amount of bosses needed until next rng meter drop.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Warn Empty", desc = "Warn when no item is set in the rng meter.")
+        @ConfigEditorBoolean
+        public boolean warnEmpty = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Chat", desc = "Hide the rng meter message from chat if current item is selected.")
+        @ConfigEditorBoolean
+        public boolean hideChat = true;
+
+        @Expose
+        public Position pos = new Position(410, 110, false, true);
+
+    }
+
+    @Expose
     @ConfigOption(name = "Broken Wither Impact",
             desc = "Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp. " +
             "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
