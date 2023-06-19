@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.config.core.config.*;
+import com.google.gson.annotations.*;
 import io.github.moulberry.moulconfig.annotations.*;
-import io.github.moulberry.moulconfig.observer.Property;
-import org.lwjgl.input.Keyboard;
+import io.github.moulberry.moulconfig.observer.*;
+import org.lwjgl.input.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -269,7 +269,7 @@ public class Misc {
                 "Stats",
                 "Held Item",
                 "Skyblock Date",
-                "Profile (Fruit)",
+                "Profile",
                 "Slayer",
                 "Custom",
                 "Dynamic",
@@ -288,7 +288,7 @@ public class Misc {
                 "Stats",
                 "Held Item",
                 "Skyblock Date",
-                "Profile (Fruit)",
+                "Profile",
                 "Slayer",
                 "Custom",
                 "Dynamic",
@@ -303,7 +303,7 @@ public class Misc {
         public Property<String> customText = Property.of("");
 
         @Expose
-        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone or Slayer progress while doing those, but this if you're doing neither.")
+        @ConfigOption(name = "Dynamic", desc = "\"Dynamic\" above shows your Crop Milestone, Slayer progress, or Stacking enchantment when possible, but this if you're doing none of them.")
         @ConfigEditorDropdown(values = {
                 "Nothing",
                 "Location",
@@ -312,7 +312,7 @@ public class Misc {
                 "Stats",
                 "Held Item",
                 "Skyblock Date",
-                "Profile (Fruit)",
+                "Profile",
                 "Slayer",
                 "Custom",
                 "Crop Milestone",
