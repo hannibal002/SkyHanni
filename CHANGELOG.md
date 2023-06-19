@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.18.BETA
+## Version 0.18 (2023-06-19)
 
 ### New Features
 + Added **Visitor Drop Counter** (Contributed by CalMWolfs)
