@@ -12,8 +12,11 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
@@ -271,18 +274,20 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     STACKING({
         // Logic for getting the currently held stacking enchant is from Skytils, except for getExtraAttributes() which they got from BiscuitDevelopment
 
-
         fun getExtraAttributes(item: ItemStack?): NBTTagCompound? {
             return if (item == null || !item.hasTagCompound()) {
                 null
             } else item.getSubCompound("ExtraAttributes", false)
         }
 
-        val extraAttributes = getExtraAttributes(Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem())
+        val itemInHand = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()
+        val itemName = itemInHand?.let { NEUItems.getItemStack(it.getInternalName()).name?.removeColor() ?: "" } ?: ""
+
+        val extraAttributes = getExtraAttributes(itemInHand)
 
         fun getProgressPercent(amount: Int, levels: List<Int>): String {
             var currentLevel = 0
-            var percent = ""
+            var percent = "MAXED"
             for (level in levels.indices) {
                 if (amount > levels[level]) {
                     currentLevel++
@@ -315,7 +320,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
             stackingReturn =
                 if (stackingPercent == "" || amount == 0) "" // outdated info is useless for AUTO; empty strings are manually ignored
-                else "${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
+                else "$itemName: ${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
         }
         stackingReturn
 
