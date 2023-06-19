@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features;
 
-import akka.actor.Kill;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
@@ -82,7 +81,7 @@ public class GhostCounter {
                 "Ghost Killed.\n" +
                 "§e%session% §7is replaced with Ghost killed")
         @ConfigEditorText
-        public String ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
+        public String ghostKilledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
 
         @Expose
         @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n" +
@@ -308,7 +307,7 @@ public class GhostCounter {
     @Expose
     @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
     @ConfigEditorBoolean
-    public boolean onlyOnMist = false;
+    public boolean onlyOnMist = true;
 
     @Expose
     @ConfigOption(name = "Maxed Bestiary", desc = "Show progress to max bestiary instead of next level.")

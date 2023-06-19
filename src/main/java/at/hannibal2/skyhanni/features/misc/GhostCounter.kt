@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -196,7 +195,7 @@ object GhostCounter {
         }
 
         addAsSingletonList(Utils.chromaStringByColourCode(config.textFormatting.titleFormat.replace("&", "§")))
-        addAsSingletonList(config.textFormatting.ghostKiledFormat.formatText(KILLS.getInt(), KILLS.getInt(true)))
+        addAsSingletonList(config.textFormatting.ghostKilledFormat.formatText(KILLS.getInt(), KILLS.getInt(true)))
         addAsSingletonList(config.textFormatting.sorrowsFormat.formatText(SORROWCOUNT.getInt(), SORROWCOUNT.getInt(true)))
         addAsSingletonList(config.textFormatting.ghostSinceSorrowFormat.formatText(GHOSTSINCESORROW.getInt()))
         addAsSingletonList(config.textFormatting.ghostKillPerSorrowFormat.formatText(value))
@@ -512,7 +511,7 @@ object GhostCounter {
         if (list.size == 30) {
             with(config.textFormatting) {
                 titleFormat = list[0]
-                ghostKiledFormat = list[1]
+                ghostKilledFormat = list[1]
                 sorrowsFormat = list[2]
                 ghostSinceSorrowFormat = list[3]
                 ghostKillPerSorrowFormat = list[4]
@@ -557,7 +556,7 @@ object GhostCounter {
         val list = mutableListOf<String>()
         with(config.textFormatting) {
             list.add(titleFormat)
-            list.add(ghostKiledFormat)
+            list.add(ghostKilledFormat)
             list.add(sorrowsFormat)
             list.add(ghostSinceSorrowFormat)
             list.add(ghostKillPerSorrowFormat)
@@ -606,7 +605,7 @@ object GhostCounter {
     fun resetFormatting() {
         with(config.textFormatting) {
             titleFormat = "&6Ghost Counter"
-            ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)"
+            ghostKilledFormat = "  &6Ghost Killed: &b%value% &7(%session%)"
             sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)"
             ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%"
             ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%"
