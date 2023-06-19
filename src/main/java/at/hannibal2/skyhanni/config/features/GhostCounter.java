@@ -40,7 +40,8 @@ public class GhostCounter {
                     "  §bBestiary 1: 0/10",
                     "  §bXP/h: 810,410",
                     "  §bKills/h: 420",
-                    "  §bETA: 14d"
+                    "  §bETA: 14d",
+                    "  §bMoney/h: 13,420,069"
             }
     )
     public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
@@ -279,6 +280,12 @@ public class GhostCounter {
             @ConfigEditorText
             public String paused = "&c(PAUSED)";
         }
+
+        @Expose
+        @ConfigOption(name = "Money Per Hour", desc = "Money Per Hour.\n§e%value% §7is replaced with\nEstimated money you get per hour\n" +
+                "Calculated with your kill per hour and your average magic find.")
+        @ConfigEditorText
+        public String moneyHourFormat = "  &6$/h: &b%value%";
     }
 
     @Expose

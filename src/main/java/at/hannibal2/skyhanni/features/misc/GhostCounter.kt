@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.misc.GhostCounter.Option.*
 import at.hannibal2.skyhanni.utils.CombatUtils._isKilling
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateETA
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -211,6 +213,14 @@ object GhostCounter {
         addAsSingletonList(xpHourFormatting.base.formatText(xp))
         addAsSingletonList(killHourFormatting.base.formatText(killh))
         addAsSingletonList(etaFormatting.base.formatText(eta).formatText(killETA))
+
+        /*
+        I'm very not sure about all that
+         */
+        val rate = 0.12 * (1 + (mgc.toDouble()/100))
+        val price =  (BazaarApi.getBazaarDataByInternalName("SORROW")?.sellPrice ?: 0).toLong()
+        val final: String = (killInterp * price * (rate/100)).toLong().addSeparators()
+        addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
     }
 
 
@@ -499,7 +509,7 @@ object GhostCounter {
             return
         }
 
-        if (list.size == 29) {
+        if (list.size == 30) {
             with(config.textFormatting) {
                 titleFormat = list[0]
                 ghostKiledFormat = list[1]
@@ -538,6 +548,7 @@ object GhostCounter {
                     noData = list[27]
                     progress = list[28]
                 }
+                moneyHourFormat = list[29]
             }
         }
     }
@@ -582,6 +593,7 @@ object GhostCounter {
                 list.add(noData)
                 list.add(progress)
             }
+            list.add(moneyHourFormat)
         }
         val jsonArray = JsonArray()
         for (l in list) {
@@ -630,6 +642,7 @@ object GhostCounter {
                 noData = "§bN/A"
                 progress = "§b%value%"
             }
+            moneyHourFormat = "  &6$/h: &b%value%"
         }
     }
 }
