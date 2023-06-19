@@ -3,7 +3,13 @@
 ## Version 0.18.BETA
 
 ### New Features
-+ Added Visitor Drop Counter to track all the drops from visitors.
++ Added **Visitor Drop Counter** (Contributed by CalMWolfs)
+  + Counts up all the drops that you get from visitors
+  + Count each rarity of visitor Accepted
+  + Count copper, farming exp and coins spent
+  + Setting to show number or drop first
+  + Setting to show as the icon instead of the name
+  + Setting to show only on the barn plot
 + Added **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
 + Added **Garden Start Location**
   + Show the start waypoint for your farm with the currently holding tool.
@@ -14,7 +20,10 @@
   + Sortable by price or items stored (both desc/asc)
   + Option to show prices from Bazaar or NPC
 + Added Farming Fortune Breakdown for Armor and Equipment (Contributed by CalMWolfs)
+  + Run /ff to open the menu
   + Works with: Base Stats, Reforge Bonus, Ability Fortune and Green Thumb
+  + Breakdown for the true farming fortune from each crop
+  + Ability to select a single piece of armor or equipment
 + Added Server Restart Title
 + Added Jacob Contest Stats Summary
   + Showing Blocks per Second and total Blocks clicked after a farming contest in chat
@@ -28,7 +37,7 @@
   + Supports tab completing for warp points when typing /warp
   + Supports party members, friends (need to visit all friend list pages), player on the same server
   + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
-  + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)
+  + Supports VIP /visit suggestions (e.g. PortalHub or Hubportal)
 + Added Item Profit Tracker (Slayer only)
   + Count items collected and how much you pay while doing slayer, calculates final profit
   + Shows the price of the item collected in chat (default disabled)
@@ -36,15 +45,51 @@
   + Show item name and price over items laying on ground (only in slayer areas)
 + Added Broken Hyperion Warning (Slayer only)
   + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
-  (Kill a mob with melee-hits to fix this hypixel bug)
+  + Kill a mob with melee-hits to fix this hypixel bug
+  + Only while doing slayer
 + Added Piece of Wizard Portal show earned by player name (Contributed by HiZe)
-+ City Project Daily Reminder - Remind every 24 hours to participate
++ City Project Daily Reminder
+  + Remind every 24 hours to participate
 + Added Quick Mod Menu Switching (default disabled)
   + Allows for easy navigation between one Mod Config and another
   + Default disabled
   + Detects your SkyBlock Mod automatically 
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
-+ Added **Arachne Chat Hider** - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
++ Added **Arachne Chat Hider**
+  + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
++ Added **Contest Time Needed**
+  + Show the time and missing FF for every crop inside Jacob's Farming Contest inventory
++ Added **Sack Item Display** (Contributed by HiZe)
+  + Added price display next to sack items
+  + Can be disabled
+  + Sortable by price or items stored (both desc/asc)
+  + Option to show prices from Bazaar or NPC
++ Added profile id chat hider
++ Added Garden Crop Start Location
+  + Show the start waypoint for your farm with the currently holding tool.
+  + Auto-detects the start of the farm when farming for the first time
+  + Option to manually set the waypoint with `/shcropstartlocation`
++ Added Pet Candies Used number
+  + Works even after Hypixel removed the `10 pet candies applied` line
++ Added Estimated Armor Value display
+  + Shows the price of all 4 armor pieces combined inside the wardrobe
++ Added Garden Plot Icon (Contributed by HiZe)
+  + Select an item from the inventory to replace the icon in the Configure Plots inventory
+  + Change the Edit mode in the bottom right corner in the Configure Plots inventory
++ Showing fished item names
++ Show numbers of Pocket Sack-In-A-Sack applied on a sack (Default disabled, contributed by HiZe)
++ Added a warning when finding a visitor with a rare reward
+  + Show message in chat, over the visitor and prevents refusing
++ Added composter empty timer for outside garden
++ Added title warning when picking up an expensive slayer item
++ Added **RNG Meter Display**
+  + Display number of bosses needed until the next RNG Meter item drops
+  + Warn when no item is set in the RNG Meter
+  + Hide the RNG Meter message from chat if the current item is selected
++ Added **Ghost Counter** (Contributed by HiZe)
+  + Shows number of ghosts killed in the Mist in Dwarven Mines
+  + Shows kill combo, coins per scavenger, all item drops, bestiarity, magic find and more
+  + Each display line is highly customizable
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
@@ -57,10 +102,31 @@
   + Derpy double health support
   + More fair detection logic
 + Added extra setting to allow/block clicks for the 'hide not clickable' feature
++ Disabled hide far particles feature in M7 boss fight. This will fix M7 boss fight features from other mods
++ Added support for multiple players/profiles:
+  + SkyHanni saves all profile specific data now separately (e.g., garden data, crimson isle reputation progress, minion display text on the island)
+  + Config toggles and GUI elements stay synced between all profiles
++ Reworked Hide Armor
+  + More options
+    = Fixed Movement bugs with Depth Strider enchantment
+    = Fixed compatibility issues with other mods
+    Note: The hide armor config got reset, if you want to use it, you have to enable it again)
++ Added support for maxed out crop milestones
++ Showing total price for visitor items needed
++ Warning when BPS in Jacob contest ff needed display is below 1
++ More Discord Rich Presence features (Contributed by NetheriteMiner)
+  + Option "Profile" not only shows the profile name but also the profile type and SkyBlock level
+  + Option "Dynamic" now also supports stacking enchantments
++ Highlight the item in bazaar search result inventory when clicking on an item list (Contributed by CalMWolfs)
 
 ### Fixes
-= Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)
-= Fixed Hypixel bug that the equipment lore talks about "kills" instead of "visitors" (Contributed by CalMWolfs)
++ Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)
++ Fixed Hypixel bug that the equipment lore talks about "kills" instead of "visitors" (Contributed by CalMWolfs)
++ Fixed reforge stone 'warped' not detected in item price display
++ Hotkey to open SkyHanni Position Editor no longer works inside signs
+
+### Removals
+- Removed Garden Recent Teleport Pads display
 
 ## Version 0.17 (2023-05-11)
 

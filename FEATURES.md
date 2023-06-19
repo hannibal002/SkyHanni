@@ -20,7 +20,8 @@
 - Scan messages sent by players in all-chat for blacklisted words and greys out the message.
 - Chat peeking (holding key to display chat without opening the chat gui)
 - Compact Potion Effect Messages
-- **Arachne Chat Hider** - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
+- **Arachne Chat Hider**
+  - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
@@ -65,6 +66,11 @@
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
 + **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + **Contest Time** - Adds the real time format to the farming contest description.
++ Added Pet Candies Used number
+  + Works even after Hypixel removed the `10 pet candies applied` line
++ Added Estimated Armor Value display
+  + Shows the price of all 4 armor pieces combined inside the wardrobe
++ Show numbers of Pocket Sack-In-A-Sack applied on a sack (Default disabled, contributed by HiZe)
 
 ## Item Abilities
 - Show the cooldown of items in the inventory.
@@ -114,6 +120,7 @@
 - **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (Thanks appable0
 + **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (Thanks appable0)
++ Showing fished item names
 
 ## Damage Indicator
 - Show the remaining health of selected bosses in the game in a bigger GUI.
@@ -150,7 +157,13 @@
   + Show item name and price over items laying on ground (only in slayer areas)
 + **Broken Hyperion Warning**
   + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
-    (Kill a mob with melee-hits to fix this hypixel bug)
+  + Kill a mob with melee-hits to fix this hypixel bug
+  + Only works while doing slayer
++ Title warning when picking up an expensive slayer item
++ Added **RNG Meter Display**
+  + Display number of bosses needed until the next RNG Meter item drops
+  + Warn when no item is set in the RNG Meter
+  + Hide the RNG Meter message from chat if the current item is selected
 
 ### Diana
 + Show burrows near you.
@@ -240,6 +253,22 @@
   + Option to manually set the waypoint with /shcropstartlocation
 + Jacob Contest Stats Summary
   + Showing Blocks per Second and total Blocks clicked after a farming contest in chat
++ Added **Contest Time Needed**
+  + Show the time and missing FF for every crop inside Jacob's Farming Contest inventory
++ Added Garden Crop Start Location
+  + Show the start waypoint for your farm with the currently holding tool.
+  + Auto-detects the start of the farm when farming for the first time
+  + Option to manually set the waypoint with `/shcropstartlocation`
++ Added Farming Fortune Breakdown for Armor and Equipment (Contributed by CalMWolfs)
+  + Run /ff to open the menu
+  + Works with: Base Stats, Reforge Bonus, Ability Fortune and Green Thumb
+  + Breakdown for the true farming fortune from each crop
+  + Ability to select a single piece of armor or equipment
++ Added Garden Plot Icon (Contributed by HiZe)
+  + Select an item from the inventory to replace the icon in the Configure Plots inventory
+  + Change the Edit mode in the bottom right corner in the Configure Plots inventory
++ Show a warning when finding a **visitor with a rare reward**
+  + Show message in chat, over the visitor and prevents refusing
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
@@ -284,10 +313,19 @@
   + Supports tab completing for warp points when typing /warp
   + Supports party members, friends (need to visit all friend list pages), player on the same server
   + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
-  + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)
+  + Supports VIP /visit suggestions (e.g. PortalHub or Hubportal) 
 + Piece of Wizard Portal show earned by player name (Contributed by HiZe)
 + Quick Mod Menu Switching (default disabled)
   + Allows for easy navigation between one Mod Config and another
   + Default disabled
   + Detects your SkyBlock Mod automatically
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
++ **Sack Item Display** (Contributed by HiZe)
+  + Added price display next to sack items
+  + Can be disabled
+  + Sortable by price or items stored (both desc/asc)
+  + Option to show prices from Bazaar or NPC
++ Added **Ghost Counter** (Contributed by HiZe)
+  + Shows number of ghosts killed in the Mist in Dwarven Mines
+  + Shows kill combo, coins per scavenger, all item drops, bestiarity, magic find and more
+  + Each display line is highly customizable
