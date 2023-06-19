@@ -182,9 +182,13 @@ class NonGodPotEffectDisplay {
             for (line in lines) {
                 for (effect in NonGodPotEffect.values()) {
                     if (line.startsWith(effect.displayName)) {
-                        val duration = TimeUtils.getMillis(line.split("§f")[1])
-                        effectDuration[effect] = System.currentTimeMillis() + duration
-                        update()
+                        try {
+                            val duration = TimeUtils.getMillis(line.split("§f")[1])
+                            effectDuration[effect] = System.currentTimeMillis() + duration
+                            update()
+                        } catch (e: IndexOutOfBoundsException) {
+                            LorenzUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
+                        }
                     }
                 }
                 patternEffectsCount.matchMatcher(line) {
