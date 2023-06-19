@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import  at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
@@ -204,6 +205,33 @@ public class Storage {
         }
 
         @Expose
+        public GhostCounter ghostCounter = new GhostCounter();
+
+        public static class GhostCounter {
+
+            @Expose
+            public Map<Option, Double> data = new HashMap<>();
+
+            @Expose
+            public boolean ctDataImported = false;
+
+            @Expose
+            public double bestiaryNextLevel = 0;
+
+            @Expose
+            public double bestiaryCurrentKill = 0;
+
+            @Expose
+            public double bestiaryKillNeeded = 0;
+
+            @Expose
+            public double totalMF = 0;
+
+        }
+
+        public long nextCityProjectParticipationTime = 0L;
+
+        @Expose
         public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
 
         public static class SlayerProfitList {
@@ -231,6 +259,5 @@ public class Storage {
                 public boolean hidden;
             }
         }
-
     }
 }
