@@ -8,6 +8,11 @@ import io.github.moulberry.moulconfig.annotations.ConfigOption;
 public class Bazaar {
 
     @Expose
+    @ConfigOption(name = "Purchase Helper", desc = "Highlights the item you are trying to buy in the Bazaar.")
+    @ConfigEditorBoolean
+    public boolean purchaseHelper = true;
+
+    @Expose
     @ConfigOption(name = "Order Helper", desc = "Show visual hints inside the Bazaar Manage Order view when items are ready to pickup or outbid.")
     @ConfigEditorBoolean
     public boolean orderHelper = false;
