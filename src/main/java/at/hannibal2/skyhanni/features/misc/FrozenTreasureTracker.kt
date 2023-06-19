@@ -31,7 +31,7 @@ class FrozenTreasureTracker {
     private var missedMinutes = 0
     private var compactPattern = "COMPACT! You found an Enchanted Ice!".toPattern()
 
-    private var treasureCount = mapOf<FrozenTreasures, Int>()
+    private var treasureCount = mapOf<FrozenTreasure, Int>()
 
     init {
         fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 60_000) {
@@ -77,7 +77,7 @@ class FrozenTreasureTracker {
             if (config.hideMessages) event.isCanceled
         }
 
-        for (treasure in FrozenTreasures.values()) {
+        for (treasure in FrozenTreasure.values()) {
             if ("FROZEN TREASURE! You found ${treasure.displayName}!".toRegex().matches(message)) {
                 val old = treasureCount[treasure] ?: 0
                 treasureCount = treasureCount.editCopy { this[treasure] = old + 1 }
@@ -109,7 +109,7 @@ class FrozenTreasureTracker {
         addAsSingletonList("§e${formatNumber(compactProcs)} Compact Procs")
         addAsSingletonList("")
 
-        for (treasure in FrozenTreasures.values()) {
+        for (treasure in FrozenTreasure.values()) {
             val count = treasureCount[treasure] ?: 0
             addAsSingletonList("§b${formatNumber(count)} ${treasure.displayName}")
         }
@@ -133,7 +133,7 @@ class FrozenTreasureTracker {
     private fun calculateIce() {
         estimatedIce = 0
         if (config.countCompact) estimatedIce += compactProcs * 160
-        for (treasure in FrozenTreasures.values()) {
+        for (treasure in FrozenTreasure.values()) {
             val amount = treasureCount[treasure] ?: 0
             estimatedIce += amount * treasure.defaultAmount * treasure.iceMultiplier
         }
