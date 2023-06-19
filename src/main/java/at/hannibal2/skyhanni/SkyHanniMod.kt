@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
@@ -66,9 +67,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.PacketTest
-import at.hannibal2.skyhanni.test.SkyHanniTestCommand
-import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.*
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
@@ -95,7 +94,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.17",
+    version = "0.18.Beta.20",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -221,7 +220,7 @@ class SkyHanniMod {
         loadModule(BarnFishingTimer())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyBLockLevelGuideHelper())
+        loadModule(SkyblockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -292,11 +291,13 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
-        loadModule(SlayerItemProfitTracker())
+        loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
+        loadModule(ShowItemUuid())
+        loadModule(GhostCounter)
 
         init()
 
@@ -306,6 +307,7 @@ class SkyHanniMod {
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
         loadModule(TestBingo)
+        loadModule(TestCopyRngMeterValues)
     }
 
     @Mod.EventHandler

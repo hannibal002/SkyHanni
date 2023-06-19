@@ -14,7 +14,7 @@ class PasteIntoSigns {
         if (!LorenzUtils.onHypixel) return
         if (!SkyHanniMod.feature.misc.pasteIntoSigns) return
 
-        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) && Keyboard.isKeyDown(Keyboard.KEY_V)) {
+        if (LorenzUtils.isControlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_V)) {
             val clipboard = OSUtils.readFromClipboard() ?: return
             LorenzUtils.setTextIntoSign(clipboard.take(15))
         }

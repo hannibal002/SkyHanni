@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import  at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
@@ -29,6 +30,9 @@ public class Storage {
 
         @Expose
         public Integer gardenCommunityUpgrade = -1;
+
+        @Expose
+        public long nextCityProjectParticipationTime = 0L;
     }
 
     public static class ProfileSpecific {
@@ -124,6 +128,9 @@ public class Storage {
             public String composterCurrentFuelItem = "";
 
             @Expose
+            public int uniqueVisitors = 0;
+
+            @Expose
             public VisitorDrops visitorDrops = new VisitorDrops();
 
             public static class VisitorDrops {
@@ -169,6 +176,9 @@ public class Storage {
             public static class Fortune {
 
                 @Expose
+                public Map<FarmingItems, Boolean> outdatedItems = new HashMap<>();
+
+                @Expose
                 public int anitaUpgrade = -1;
 
                 @Expose
@@ -195,6 +205,30 @@ public class Storage {
         }
 
         @Expose
+        public GhostCounter ghostCounter = new GhostCounter();
+
+        public static class GhostCounter {
+
+            @Expose
+            public Map<Option, Double> data = new HashMap<>();
+
+            @Expose
+            public boolean ctDataImported = false;
+
+            @Expose
+            public double bestiaryNextLevel = 0;
+
+            @Expose
+            public double bestiaryCurrentKill = 0;
+
+            @Expose
+            public double bestiaryKillNeeded = 0;
+
+            @Expose
+            public double totalMF = 0;
+
+        }
+
         public long nextCityProjectParticipationTime = 0L;
 
         @Expose
@@ -225,6 +259,5 @@ public class Storage {
                 public boolean hidden;
             }
         }
-
     }
 }

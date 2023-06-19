@@ -245,7 +245,7 @@ public class Garden {
                         "§eThis feature is in beta please report issues on the discord!"
         )
         @ConfigEditorBoolean
-        public boolean enabled = false;
+        public boolean enabled = true;
 
         @Expose
         @ConfigOption(
@@ -520,7 +520,7 @@ public class Garden {
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the  §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the hand. §cOnly updates after scrolling in the hotbar.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean keyBindEnabled = false;
@@ -1087,6 +1087,9 @@ public class Garden {
 
     @Expose
     public Position composterDisplayPos = new Position(-363, 13, false, true);
+
+    @Expose
+    public Position composterOutsideGardenPos = new Position(-363, 13, false, true);
 
     @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")

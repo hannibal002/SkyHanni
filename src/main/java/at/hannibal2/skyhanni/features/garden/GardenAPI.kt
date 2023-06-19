@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
@@ -25,6 +24,7 @@ import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
+import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -35,11 +35,12 @@ object GardenAPI {
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
     var mushroomCowPet = false
-    var inBarn = false
+    private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val config get() = ProfileStorageData.profileSpecific?.garden
 
     var tick = 0
+    private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
@@ -60,7 +61,7 @@ object GardenAPI {
         if (!inGarden()) return
         tick++
         if (tick % 10 == 0) {
-            inBarn = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §aThe Garden")
+            inBarn = barnArea.isVecInside(Minecraft.getMinecraft().thePlayer.positionVector)
 
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return

@@ -6,6 +6,9 @@ import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.*;
 import org.lwjgl.input.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Misc {
 
     @Expose
@@ -78,6 +81,12 @@ public class Misc {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     public boolean nonGodPotEffectDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the non god pot effects display.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean nonGodPotEffectShowMixins = false;
 
     @Expose
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);

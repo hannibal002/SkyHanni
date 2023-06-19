@@ -29,24 +29,23 @@ class ItemTipHelper {
 //        if (lastColorCacheTime.getOrDefault(uuid, 0L) + 1000 > System.currentTimeMillis()) {
 //            stackTip = cache[uuid]!!
 //        } else {
-            val itemTipEvent = RenderItemTipEvent(stack)
+            val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
             itemTipEvent.postAndCatch()
-            stackTip = itemTipEvent.stackTip
-//            cache[uuid] = stackTip
-//            lastColorCacheTime[uuid] = System.currentTimeMillis()
-//        }
 
-        if (stackTip.isEmpty()) return
+        if (itemTipEvent.renderObjects.isEmpty()) return
 
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         GlStateManager.disableBlend()
 
-        val fontRenderer = event.fontRenderer
-        val x = event.x + 17 - fontRenderer.getStringWidth(stackTip)
-        val y = event.y + 9
+        for (renderObject in itemTipEvent.renderObjects) {
+            val fontRenderer = event.fontRenderer
+            val text = renderObject.text
+            val x = event.x + 17 - fontRenderer.getStringWidth(text) + renderObject.offsetX
+            val y = event.y + 9 + renderObject.offsetY
+            fontRenderer.drawStringWithShadow(text, x.toFloat(), y.toFloat(), 16777215)
+        }
 
-        fontRenderer.drawStringWithShadow(stackTip, x.toFloat(), y.toFloat(), 16777215)
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
     }
