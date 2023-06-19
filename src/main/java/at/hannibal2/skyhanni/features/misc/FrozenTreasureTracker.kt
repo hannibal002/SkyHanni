@@ -28,13 +28,13 @@ class FrozenTreasureTracker {
     private var lastEstimatedIce = 0L
     private val icePerMin = mutableListOf<Long>()
     private var icePerHour = 0
-    private var missedMinutes = 0
+    private var stoppedChecks = 0
     private var compactPattern = "COMPACT! You found an Enchanted Ice!".toPattern()
 
     private var treasureCount = mapOf<FrozenTreasure, Int>()
 
     init {
-        fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 60_000) {
+        fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 15_000) {
             if (!onJerryWorkshop()) return@fixedRateTimer
             calculateIcePerHour()
         }
@@ -44,17 +44,17 @@ class FrozenTreasureTracker {
         val difference = estimatedIce - lastEstimatedIce
         lastEstimatedIce = estimatedIce
         if (difference == 0L) {
-            missedMinutes += 1
-            if (missedMinutes == 3) {
-                missedMinutes = 0
+            stoppedChecks += 1
+            if (stoppedChecks == 12) {
+                stoppedChecks = 0
                 icePerMin.clear()
                 icePerHour = 0
             }
             return
         }
-        missedMinutes = 0
+        stoppedChecks = 0
         icePerMin.add(difference)
-        if (difference != estimatedIce) icePerHour = icePerMin.average().toInt()
+        if (difference != estimatedIce) icePerHour = icePerMin.average().toInt() * 240
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
