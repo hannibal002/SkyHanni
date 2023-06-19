@@ -42,6 +42,7 @@ class FrozenTreasureTracker {
 
     private fun calculateIcePerHour() {
         val difference = estimatedIce - lastEstimatedIce
+        lastEstimatedIce = estimatedIce
         if (difference == 0L) {
             missedMinutes += 1
             if (missedMinutes == 3) {
@@ -53,7 +54,7 @@ class FrozenTreasureTracker {
         }
         missedMinutes = 0
         icePerMin.add(difference)
-        icePerHour = icePerMin.average().toInt()
+        if (difference != estimatedIce) icePerHour = icePerMin.average().toInt()
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
