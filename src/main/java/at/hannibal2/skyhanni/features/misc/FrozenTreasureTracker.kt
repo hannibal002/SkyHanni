@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -38,6 +39,14 @@ class FrozenTreasureTracker {
             if (!onJerryWorkshop()) return@fixedRateTimer
             calculateIcePerHour()
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        icePerHour = 0
+        stoppedChecks = 0
+        icePerMin.clear()
+        saveAndUpdate()
     }
 
     private fun calculateIcePerHour() {
