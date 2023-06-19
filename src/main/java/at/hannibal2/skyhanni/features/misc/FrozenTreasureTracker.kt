@@ -78,7 +78,7 @@ class FrozenTreasureTracker {
         }
 
         for (treasure in FrozenTreasure.values()) {
-            if ("FROZEN TREASURE! You found ${treasure.displayName}!".toRegex().matches(message)) {
+            if ("FROZEN TREASURE! You found ${treasure.displayName.removeColor()}!".toRegex().matches(message)) {
                 val old = treasureCount[treasure] ?: 0
                 treasureCount = treasureCount.editCopy { this[treasure] = old + 1 }
                 saveAndUpdate()
