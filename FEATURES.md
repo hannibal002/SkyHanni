@@ -20,6 +20,7 @@
 - Scan messages sent by players in all-chat for blacklisted words and greys out the message.
 - Chat peeking (holding key to display chat without opening the chat gui)
 - Compact Potion Effect Messages
+- **Arachne Chat Hider** - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)

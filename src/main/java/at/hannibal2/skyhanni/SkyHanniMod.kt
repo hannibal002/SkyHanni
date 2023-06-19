@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.*
+import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
@@ -295,6 +296,7 @@ class SkyHanniMod {
         loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
+        loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)

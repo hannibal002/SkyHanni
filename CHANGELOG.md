@@ -44,6 +44,7 @@
   + Default disabled
   + Detects your SkyBlock Mod automatically 
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
++ Added **Arachne Chat Hider** - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
