@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import akka.actor.Kill;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
@@ -37,7 +38,9 @@ public class GhostCounter {
                     "  §bHighest Kill Combo: 96",
                     "  §bSkill XP Gained: 145,648",
                     "  §bBestiary 1: 0/10",
-                    "  §bXP/h: 810,410"
+                    "  §bXP/h: 810,410",
+                    "  §bKills/h: 420",
+                    "  §bETA: 14d"
             }
     )
     public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
@@ -76,67 +79,79 @@ public class GhostCounter {
         @Expose
         @ConfigOption(name = "Ghost Killed", desc = "Ghost Killed line.\n§e%value% §ris replaced with\n" +
                 "Ghost Killed.\n" +
-                "§r%session% is replaced with Ghost killed")
+                "§e%session% §7is replaced with Ghost killed")
         @ConfigEditorText
         public String ghostKiledFormat = "  &6Ghost Killed: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n§e%value% §ris replaced with\nsorrows dropped.")
+        @ConfigOption(name = "Sorrows", desc = "Sorrows drop line.\n" +
+                "§e%value% §7is replaced with\nsorrows dropped.")
         @ConfigEditorText
         public String sorrowsFormat = "  &6Sorrow: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Ghost Since Sorrow", desc = "Ghost Since Sorrow line.\n§e%value% §ris replaced with\nGhost since last sorrow drop.")
+        @ConfigOption(name = "Ghost Since Sorrow", desc = "Ghost Since Sorrow line.\n" +
+                "§e%value% §7is replaced with\nGhost since last sorrow drop.")
         @ConfigEditorText
         public String ghostSinceSorrowFormat = "  &6Ghost since Sorrow: &b%value%";
 
         @Expose
-        @ConfigOption(name = "Ghost Kill Per Sorrow", desc = "Ghost Kill Per Sorrow line.\n§e%value% §ris replaced with\naverage ghost kill per sorrow drop.")
+        @ConfigOption(name = "Ghost Kill Per Sorrow", desc = "Ghost Kill Per Sorrow line.\n" +
+                "§e%value% §7is replaced with\naverage ghost kill per sorrow drop.")
         @ConfigEditorText
         public String ghostKillPerSorrowFormat = "  &6Ghosts/Sorrow: &b%value%";
 
         @Expose
-        @ConfigOption(name = "Voltas", desc = "Voltas drop line.\n§e%value% §ris replaced with\nvoltas dropped.")
+        @ConfigOption(name = "Voltas", desc = "Voltas drop line.\n" +
+                "§e%value% §7is replaced with\nvoltas dropped.")
         @ConfigEditorText
         public String voltasFormat = "  &6Voltas: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Plasmas", desc = "Plasmas drop line.\n§e%value% §ris replaced with\nplasmas dropped.")
+        @ConfigOption(name = "Plasmas", desc = "Plasmas drop line.\n" +
+                "§e%value% §7is replaced with\nplasmas dropped.")
         @ConfigEditorText
         public String plasmasFormat = "  &6Plasmas: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Ghostly Boots", desc = "Ghostly Boots drop line.\n§e%value% §ris replaced with\nGhostly Boots dropped.")
+        @ConfigOption(name = "Ghostly Boots", desc = "Ghostly Boots drop line.\n" +
+                "§e%value% §7is replaced with\nGhostly Boots dropped.")
         @ConfigEditorText
         public String ghostlyBootsFormat = "  &6Ghostly Boots: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Bag Of Cash", desc = "Bag Of Cash drop line.\n§e%value% §ris replaced with\nBag Of Cash dropped.")
+        @ConfigOption(name = "Bag Of Cash", desc = "Bag Of Cash drop line.\n" +
+                "§e%value% §7is replaced with\nBag Of Cash dropped.")
         @ConfigEditorText
         public String bagOfCashFormat = "  &6Bag Of Cash: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Average Magic Find", desc = "Average Magic Find line.\n§e%value% §ris replaced with\nAverage Magic Find.")
+        @ConfigOption(name = "Average Magic Find", desc = "Average Magic Find line.\n" +
+                "§e%value% §7is replaced with\nAverage Magic Find.")
         @ConfigEditorText
         public String avgMagicFindFormat = "  &6Avg Magic Find: &b%value%";
 
         @Expose
-        @ConfigOption(name = "Scavenger Coins", desc = "Scavenger Coins line.\n§e%value% §ris replaced with\nCoins earned from kill ghosts.\nInclude: Scavenger Enchant, Scavenger Talismans, Kill Combo.")
+        @ConfigOption(name = "Scavenger Coins", desc = "Scavenger Coins line.\n" +
+                "§e%value% §7is replaced with\nCoins earned from kill ghosts.\nInclude: Scavenger Enchant, Scavenger Talismans, Kill Combo.")
         @ConfigEditorText
         public String scavengerCoinsFormat = "  &6Scavenger Coins: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Kill Combo", desc = "Kill Combo line.\n§e%value% §ris replaced with\nYour current kill combo.")
+        @ConfigOption(name = "Kill Combo", desc = "Kill Combo line.\n" +
+                "§e%value% §7is replaced with\nYour current kill combo.")
         @ConfigEditorText
         public String killComboFormat = "  &6Kill Combo: &b%value%";
 
         @Expose
-        @ConfigOption(name = "Highest Kill Combo", desc = "Highest Kill Combo line.\n§e%value% §ris replaced with\nYour current highest kill combo.")
+        @ConfigOption(name = "Highest Kill Combo", desc = "Highest Kill Combo line.\n" +
+                "§e%value% §7is replaced with\nYour current highest kill combo.")
         @ConfigEditorText
         public String highestKillComboFormat = "  &6Highest Kill Combo: &b%value% &7(%session%)";
 
         @Expose
-        @ConfigOption(name = "Skill XP Gained", desc = "Skill XP Gained line.\n§e%value% §ris replaced with\nSkill XP Gained from killing Ghosts.")
+        @ConfigOption(name = "Skill XP Gained", desc = "Skill XP Gained line.\n" +
+                "§e%value% §7is replaced with\nSkill XP Gained from killing Ghosts.")
         @ConfigEditorText
         public String skillXPGainFormat = "  &6Skill XP Gained: &b%value% &7(%session%)";
 
@@ -148,10 +163,11 @@ public class GhostCounter {
         public static class BestiaryFormatting {
 
             @Expose
-            @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §ris replaced with\n" +
+            @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §7is replaced with\n" +
                     "Your current progress to next level.\n" +
-                    "%currentLevel% &4is replaced with your current bestiary level\n" +
-                    "%nextLevel% &4is replaced with your current bestiary level +1.")
+                    "§e%currentLevel% &7is replaced with your current bestiary level\n" +
+                    "§e%nextLevel% §7is replaced with your current bestiary level +1.\n" +
+                    "§e%value% §7is replaced with one of the text below.")
             @ConfigEditorText
             public String base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
 
@@ -161,25 +177,108 @@ public class GhostCounter {
             public String openMenu = "§cOpen Bestiary Menu !";
 
             @Expose
-            @ConfigOption(name = "Maxed", desc = "Text to show when your bestiary for ghost is at max level.")
+            @ConfigOption(name = "Maxed", desc = "Text to show when your bestiary for ghost is at max level.\n" +
+                    "§e%currentKill% §7is replaced with your current total kill.")
             @ConfigEditorText
             public String maxed = "%currentKill% (&c&lMaxed!)";
 
             @Expose
-            @ConfigOption(name = "Progress to Max", desc = "Text to show progress when the §eMaxed Bestiary§7 option is §aON")
+            @ConfigOption(name = "Progress to Max", desc = "Text to show progress when the §eMaxed Bestiary §7option is §aON\n" +
+                    "§e%currentKill% §7is replaced with your current total kill.")
             @ConfigEditorText
             public String showMax_progress = "%currentKill%/3M (%percentNumber%%)";
 
             @Expose
-            @ConfigOption(name = "Progress", desc = "Text to show progress when the §eMaxed Bestiary§7 option is §cOFF")
+            @ConfigOption(name = "Progress", desc = "Text to show progress when the §eMaxed Bestiary§7 option is §cOFF\n" +
+                    "§e%currentKill% §7is replaced with how many kill you have to the next level.\n" +
+                    "§e%killNeeded% §7is replaced with how many kill you need to reach the next level.")
             @ConfigEditorText
             public String progress = "%currentKill%/%killNeeded%";
         }
 
+
+        @ConfigOption(name = "XP Per Hour Formatting", desc = "")
+        @Accordion
         @Expose
-        @ConfigOption(name = "XP/h", desc = "XP Per Hour line.\n§e%value% §ris replaced with\nEstimated amount of combat xp you gain per hour.")
-        @ConfigEditorText
-        public String xpHourFormat = "  &6XP/h: &b%value%";
+        public XPHourFormatting xpHourFormatting = new XPHourFormatting();
+
+        public static class XPHourFormatting {
+
+            @Expose
+            @ConfigOption(name = "XP/h", desc = "XP Per Hour line.\n" +
+                    "§e%value% §7is replaced with one of the text below.")
+            @ConfigEditorText
+            public String base = "  &6XP/h: &b%value%";
+
+            @Expose
+            @ConfigOption(name = "No Data", desc = "XP Per Hour line.\n§e%value% §7is replaced with\nEstimated amount of combat xp you gain per hour.")
+            @ConfigEditorText
+            public String noData = "&bN/A";
+
+            @Expose
+            @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
+                    "when you are doing nothing for a given amount of seconds")
+            @ConfigEditorText
+            public String paused = "&c(PAUSED)";
+        }
+
+
+        @ConfigOption(name = "ETA Formatting", desc = "")
+        @Accordion
+        @Expose
+        public ETAFormatting etaFormatting = new ETAFormatting();
+
+        public static class ETAFormatting {
+            @Expose
+            @ConfigOption(name = "ETA to next level", desc = "ETA To Next Level Line.\n" +
+                    "§e%value% §7is replaced with one of the text below.")
+            @ConfigEditorText
+            public String base = "  &6ETA: &b%value%";
+
+            @Expose
+            @ConfigOption(name = "Maxed!", desc = "So you really maxed ghost bestiary ?")
+            @ConfigEditorText
+            public String maxed = "&c&lMAXED!";
+
+            @Expose
+            @ConfigOption(name = "No Data", desc = "Start killing some ghosts !")
+            @ConfigEditorText
+            public String noData = "&bN/A";
+
+            @Expose
+            @ConfigOption(name = "Progress", desc = "Text to show progress to next level.")
+            @ConfigEditorText
+            public String progress = "&b%value%";
+
+            @Expose
+            @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
+                    "when you are doing nothing for a given amount of seconds")
+            @ConfigEditorText
+            public String paused = "&c(PAUSED)";
+        }
+
+        @ConfigOption(name = "Kill Per Hour Formatting", desc = "")
+        @Expose
+        @Accordion
+        public KillHourFormatting killHourFormatting = new KillHourFormatting();
+
+        public static class KillHourFormatting {
+            @Expose
+            @ConfigOption(name = "Kill/h", desc = "Kill Per Hour line.\n§e%value% §7is replaced with\nEstimated kills per hour you get.")
+            @ConfigEditorText
+            public String base = "  &6Kill/h: &b%value%";
+
+            @Expose
+            @ConfigOption(name = "No Data", desc = "Start killing some ghosts !")
+            @ConfigEditorText
+            public String noData = "&bN/A";
+
+            @Expose
+            @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
+                    "when you are doing nothing for a given amount of seconds")
+            @ConfigEditorText
+            public String paused = "&c(PAUSED)";
+        }
     }
 
     @Expose
@@ -189,6 +288,15 @@ public class GhostCounter {
             maxValue = 10,
             minStep = 1)
     public int extraSpace = 1;
+
+    @Expose
+    @ConfigOption(name = "Pause Timer", desc = "How many seconds does it wait before pausing.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 20,
+            minStep = 1
+    )
+    public int pauseTimer = 3;
 
     @Expose
     @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
