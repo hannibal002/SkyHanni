@@ -67,6 +67,8 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             else -> FFStats.armorTotalFF
         }
 
+        var word = if (currentArmor == 0) "Armor" else "Piece"
+
         line = if (currentArmor == 0) "§7§2Total fortune from your armor\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${armorItem.getItem().displayName}"
         var value = if (currentArmor == 0) {
@@ -84,7 +86,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
                 else -> 78.75
             }
         }
-        GuiRenderUtils.drawFarmingBar("§2Total Armor Fortune", line, armorFF[FFTypes.TOTAL] ?: 0, value,
+        GuiRenderUtils.drawFarmingBar("§2Total $word Fortune", line, armorFF[FFTypes.TOTAL] ?: 0, value,
             FFGuideGUI.guiLeft + 135, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentArmor == 0) "§7§2The base fortune from your armor\n§2Select a piece for more info"
@@ -97,7 +99,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         else {
             if (FFStats.usingSpeedBoots) 60 else 30
         }
-        GuiRenderUtils.drawFarmingBar("§2Base Armor Fortune", line, armorFF[FFTypes.BASE] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2Base $word Fortune", line, armorFF[FFTypes.BASE] ?: 0,
             value, FFGuideGUI.guiLeft + 135,
             FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
@@ -106,6 +108,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         value = if (FFStats.usingSpeedBoots) {
             when (currentArmor) {
                 0 -> 50
+                4 -> 0
                 else -> 16.67
             }
         } else {
@@ -115,7 +118,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             }
         }
 
-        GuiRenderUtils.drawFarmingBar("§2Armor Ability", line, armorFF[FFTypes.ABILITY] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2$word Ability", line, armorFF[FFTypes.ABILITY] ?: 0,
             value, FFGuideGUI.guiLeft + 135,
             FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
@@ -126,7 +129,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         } else if (currentArmor == 4) {
             if (FFStats.usingSpeedBoots) 25 else 30
         } else 30
-        GuiRenderUtils.drawFarmingBar("§2Armor Reforge", line, armorFF[FFTypes.REFORGE] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2$word Reforge", line, armorFF[FFTypes.REFORGE] ?: 0,
             value, FFGuideGUI.guiLeft + 135,
             FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
@@ -149,6 +152,8 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         GuiRenderUtils.drawFarmingBar("§2Pet Item", line, currentPet[FFTypes.PET_ITEM] ?: 0, 60, FFGuideGUI.guiLeft + 185,
             FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
+        word = if (currentEquipment == 0) "Equipment" else "Piece"
+
         val equipmentItem = when (currentEquipment) {
             1 -> FarmingItems.NECKLACE
             2 -> FarmingItems.CLOAK
@@ -166,31 +171,31 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
 
         line = if (currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${equipmentItem.getItem().displayName}"
-        GuiRenderUtils.drawFarmingBar("§2Total Equipment Fortune", line, equipmentFF[FFTypes.TOTAL] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2Total $word Fortune", line, equipmentFF[FFTypes.TOTAL] ?: 0,
             if (currentEquipment == 0) 198 else 49.5,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total base fortune from your\n${equipmentItem.getItem().displayName}"
-        GuiRenderUtils.drawFarmingBar("§2Equipment Base Fortune", line, equipmentFF[FFTypes.BASE] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2$word Base Fortune", line, equipmentFF[FFTypes.BASE] ?: 0,
             if (currentEquipment == 0) 20 else 5,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 55, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's abilities\n§2Select a piece for more info"
         else "§7§2Total ability fortune from your\n${equipmentItem.getItem().displayName}"
-        GuiRenderUtils.drawFarmingBar("§2Equipment Ability", line, equipmentFF[FFTypes.ABILITY] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2$word Ability", line, equipmentFF[FFTypes.ABILITY] ?: 0,
             if (currentEquipment == 0) 60 else 15,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 80, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
         else "§7§2Total reforge fortune from your\n${equipmentItem.getItem().displayName}"
-        GuiRenderUtils.drawFarmingBar("§2Equipment Reforge", line, equipmentFF[FFTypes.REFORGE] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2$word Reforge", line, equipmentFF[FFTypes.REFORGE] ?: 0,
             if (currentEquipment == 0) 40 else 10,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
         else "§7§2Total enchantment fortune from your\n${equipmentItem.getItem().displayName}"
-        GuiRenderUtils.drawFarmingBar("§2Equipment Enchantment", line, equipmentFF[FFTypes.GREEN_THUMB] ?: 0,
+        GuiRenderUtils.drawFarmingBar("§2$word Enchantment", line, equipmentFF[FFTypes.GREEN_THUMB] ?: 0,
             if (currentEquipment == 0) 78 else 19.5,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
     }
