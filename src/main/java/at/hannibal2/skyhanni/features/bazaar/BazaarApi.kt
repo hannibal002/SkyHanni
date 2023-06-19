@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,13 +34,20 @@ class BazaarApi {
         fun isBazaarItem(internalName: String): Boolean {
             return NEUItems.manager.auctionManager.getBazaarInfo(internalName) != null
         }
+
+        fun searchForBazaarItem(displayName: String, amount: Int){
+            if (NEUItems.neuHasFocus()) return
+            if (LorenzUtils.noTradeMode) return
+            if (LorenzUtils.inDungeons || LorenzUtils.inKuudraFight) return
+            LorenzUtils.sendCommandToServer("bz ${displayName.removeColor()}")
+            if (amount != -1) OSUtils.copyToClipboard(amount.toString())
+        }
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inBazaarInventory = checkIfInBazaar(event)
     }
-
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

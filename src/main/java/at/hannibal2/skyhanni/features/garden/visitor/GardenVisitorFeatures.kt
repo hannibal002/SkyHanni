@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -175,9 +176,8 @@ class GardenVisitorFeatures {
                 list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
                     if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                         LorenzUtils.setTextIntoSign("$amount")
-                    } else if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
-                        LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
-                        OSUtils.copyToClipboard("$amount")
+                    } else {
+                        BazaarApi.searchForBazaarItem(name, amount)
                     }
                 }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
 

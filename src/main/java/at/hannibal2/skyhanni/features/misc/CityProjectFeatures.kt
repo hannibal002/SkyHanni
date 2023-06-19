@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -136,9 +136,8 @@ class CityProjectFeatures {
             list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
                 if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                     LorenzUtils.setTextIntoSign("$amount")
-                } else if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
-                    LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
-                    OSUtils.copyToClipboard("$amount")
+                } else {
+                    BazaarApi.searchForBazaarItem(name, amount)
                 }
             }) { inInventory && !NEUItems.neuHasFocus() })
 

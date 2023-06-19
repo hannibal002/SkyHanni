@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.MathHelper
 import java.text.DecimalFormat
@@ -38,9 +37,7 @@ class UpgradePage: FFGuideGUI.FFGuidePage() {
             var formattedUpgrade = upgradeItem.nameWithEnchantment ?: return
             if (adjustedY + 25 * index - 5 < FFGuideGUI.lastClickedHeight && FFGuideGUI.lastClickedHeight < adjustedY + 25 * index + 10) {
                 FFGuideGUI.lastClickedHeight = 0
-                if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
-                    LorenzUtils.sendCommandToServer("bz ${formattedUpgrade.removeColor()}")
-                }
+                BazaarApi.searchForBazaarItem(formattedUpgrade, upgrade.itemQuantity)
             }
             if (upgrade.itemQuantity != 1) {
                 formattedUpgrade = "$formattedUpgrade §fx${upgrade.itemQuantity}"
