@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -87,14 +88,18 @@ class BazaarApi {
                 continue
             }
 
-            if (stack.displayName.removeColor().contains(currentSearchedItem)) {
+            if (stack.displayName.removeColor() == currentSearchedItem) {
                 slot highlight LorenzColor.GREEN
             }
         }
     }
 
-    //[Bazaar] Buy Order Setup! 1x Enchanted Sugar Cane
-    //[Bazaar] Bought 1x Enchanted Sugar Cane
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if ("\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toRegex().matches(event.message.removeColor())) {
+            currentSearchedItem = ""
+        }
+    }
 
     private fun checkIfInBazaar(event: InventoryOpenEvent): Boolean {
         val returnItem = event.inventorySize - 5
