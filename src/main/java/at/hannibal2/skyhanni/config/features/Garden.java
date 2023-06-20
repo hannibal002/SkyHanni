@@ -1212,6 +1212,8 @@ public class Garden {
 
         @Expose
         public Position pos = new Position(445, 225, false, true);
+        @Expose
+        public Position posOutside = new Position(445, 225, false, true);
     }
 
     @Expose

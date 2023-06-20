@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraft.client.Minecraft
@@ -16,7 +17,8 @@ class GardenYawAndPitch {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (config.enabled) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
         if (!GardenAPI.inGarden() && !config.showEverywhere) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
@@ -39,7 +41,11 @@ class GardenYawAndPitch {
             "§aYaw: §f${yaw.toDouble().round(config.yawPrecision)}",
             "§aPitch: §f${pitch.toDouble().round(config.pitchPrecision)}",
         )
-        config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")
+        if (GardenAPI.inGarden()) {
+            config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")
+        } else {
+            config.posOutside.renderStrings(displayList, posLabel = "Yaw and Pitch")
+        }
     }
 
     @SubscribeEvent
