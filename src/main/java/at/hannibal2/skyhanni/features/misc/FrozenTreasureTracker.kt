@@ -120,7 +120,7 @@ class FrozenTreasureTracker {
         addAsSingletonList("")
 
         for (treasure in FrozenTreasure.values()) {
-            val count = treasureCount[treasure] ?: 0
+            val count = (treasureCount[treasure] ?: 0) * treasure.defaultAmount // enchanted ice will be inaccurate
             addAsSingletonList("§b${formatNumber(count)} ${treasure.displayName}")
         }
         addAsSingletonList("")
