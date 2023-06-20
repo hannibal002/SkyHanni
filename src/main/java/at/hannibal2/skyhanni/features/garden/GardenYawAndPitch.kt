@@ -16,8 +16,9 @@ class GardenYawAndPitch {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (GardenAPI.toolInHand == null) return
+        if (config.enabled) return
+        if (!GardenAPI.inGarden() && !config.showEverywhere) return
+        if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
         val player = Minecraft.getMinecraft().thePlayer
 
@@ -45,6 +46,4 @@ class GardenYawAndPitch {
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastChange = System.currentTimeMillis()
     }
-
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 }
