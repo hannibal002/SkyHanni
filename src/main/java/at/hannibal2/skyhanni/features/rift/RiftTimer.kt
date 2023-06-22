@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
@@ -95,5 +94,5 @@ class RiftTimer {
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
-    fun isEnabled() = LorenzUtils.inIsland(IslandType.THE_RIFT) && config.enabled
+    fun isEnabled() = RiftAPI.inRift() && config.enabled
 }
