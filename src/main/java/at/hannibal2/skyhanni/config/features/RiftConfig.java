@@ -43,7 +43,7 @@ public class RiftConfig {
 
         @Expose
         @ConfigOption(name = "Shy Warning", desc = "Shows a warning when a shy is going to steal your time. " +
-                "Useful if you play without volume")
+                "Useful if you play without volume.")
         @ConfigEditorBoolean
         public boolean shyWarning = true;
     }

@@ -275,6 +275,9 @@
   + Show the remaining rift time, max time, percentage, and extra time changes.
 + **Highlight Guide**
   + Highlight things to do in the Rift Guide.
++ Added **Shy Warning** (Contributed by CalMWolfs)
+  + Shows a warning when a shy is going to steal your time.
+  + Useful if you play without volume.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

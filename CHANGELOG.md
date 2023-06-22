@@ -7,6 +7,13 @@
   + Show the remaining rift time, max time, percentage, and extra time changes.
 + **Rift Highlight Guide**
   + Highlight things to do in the Rift Guide.
++ Added **Shy Warning** (Contributed by CalMWolfs)
+  + Shows a warning when a shy is going to steal your time.
+  + Useful if you play without volume.
+
+### Changes
++ Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
++ Added wizard warp as diana waypoint
 
 ## Version 0.18 (2023-06-19)
 
