@@ -35,7 +35,7 @@ public class Bingo {
         @ConfigOption(
                 name = "Show Guide",
                 desc = "Show tips and difficulty for bingo goals inside the bingo card inventory.\n" +
-                        "§7(§eData from Bingo Splash Community§7)"
+                        "§eData from Bingo Splash Community§7, made by §cMayxo"
         )
         @ConfigEditorBoolean
         public boolean bingoSplashGuide = true;

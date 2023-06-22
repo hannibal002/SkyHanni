@@ -196,7 +196,7 @@ object SlayerItemProfitTracker {
 
             val renderable = if (inventoryOpen) Renderable.clickAndHover(
                 text, listOf(
-                    "§7Dropped §e$timesDropped §7times.",
+                    "§7Dropped §e${timesDropped.addSeparators()} §7times.",
                     "§7Your drop rate: §c$perBoss",
                     "",
                     "§eClick to " + (if (hidden) "show" else "hide") + "!",
@@ -250,8 +250,8 @@ object SlayerItemProfitTracker {
         val slayerCompletedCount = itemLog.slayerCompletedCount
         addAsSingletonList(
             Renderable.hoverTips(
-                "§7Bosses killed: §e$slayerCompletedCount",
-                listOf("§7You killed the $itemLogCategory boss", "§e$slayerCompletedCount §7times.")
+                "§7Bosses killed: §e${slayerCompletedCount.addSeparators()}",
+                listOf("§7You killed the $itemLogCategory boss", "§e${slayerCompletedCount.addSeparators()} §7times.")
             )
         )
 

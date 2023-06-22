@@ -19,6 +19,7 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
     GARDEN_GUEST("Garden Guest"),
     SPIDER_DEN("Spider's Den"),
     WINTER("Jerry's Workshop"), //todo confirm
+    THE_RIFT("The Rift"),
 
     NONE(""),
     UNKNOWN("???"),

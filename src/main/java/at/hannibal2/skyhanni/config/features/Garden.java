@@ -1196,12 +1196,24 @@ public class Garden {
         public int timeout = 5;
 
         @Expose
-        @ConfigOption(name = "Always Shown", desc = "Always show the Yaw and Pitch overlay, ignoring the timeout.")
+        @ConfigOption(name = "Show Without Tool", desc = "Does not require you to hold a tool for the overlay to show.")
+        @ConfigEditorBoolean
+        public boolean showWithoutTool = false;
+
+        @Expose
+        @ConfigOption(name = "Show Outside Garden", desc = "The overlay will work outside of the garden.")
+        @ConfigEditorBoolean
+        public boolean showEverywhere = false;
+
+        @Expose
+        @ConfigOption(name = "Ignore Timeout", desc = "Ignore the timeout after not moving mouse.")
         @ConfigEditorBoolean
         public boolean showAlways = false;
 
         @Expose
         public Position pos = new Position(445, 225, false, true);
+        @Expose
+        public Position posOutside = new Position(445, 225, false, true);
     }
 
     @Expose

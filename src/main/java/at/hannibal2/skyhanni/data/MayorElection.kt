@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.jsonobjects.MayorJson
-import com.google.gson.GsonBuilder
-import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,10 +15,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class MayorElection {
     private var tick = 0
     private var lastUpdate = 0L
-
-    private val gson = GsonBuilder().setPrettyPrinting()
-        .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
-        .create()
 
     companion object {
         var rawMayorData: MayorJson? = null
@@ -52,7 +47,7 @@ class MayorElection {
             SkyHanniMod.coroutineScope.launch {
                 val url = "https://api.hypixel.net/resources/skyblock/election"
                 val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
-                rawMayorData = gson.fromJson(jsonObject, MayorJson::class.java)
+                rawMayorData = ConfigManager.gson.fromJson(jsonObject, MayorJson::class.java)
                 val data = rawMayorData ?: return@launch
                 val map = mutableMapOf<Int, MayorJson.Candidate>()
                 map put data.mayor.election.getPairs()
