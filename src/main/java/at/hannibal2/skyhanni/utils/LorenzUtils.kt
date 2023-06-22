@@ -372,4 +372,13 @@ object LorenzUtils {
                 && tileSign.signText[2].unformattedText.removeColor() == "Set your"
                 && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
+
+    fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
+
+    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N) {
+        val old = this[item] ?: 0
+        val d = old.toDouble() + amount.toDouble()
+        @Suppress("UNCHECKED_CAST")
+        this[item] = d as N
+    }
 }

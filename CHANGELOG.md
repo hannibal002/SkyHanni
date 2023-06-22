@@ -1,5 +1,11 @@
 # SkyHanni - Change Log
 
+## Version 0.19 (unreleased)
+
+### New Features
++ Added **Rift Timer**
+  + Show the remaining rift time, max time, percentage, and extra time changes.
+
 ## Version 0.18 (2023-06-19)
 
 ### New Features

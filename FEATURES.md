@@ -270,6 +270,10 @@
 + Show a warning when finding a **visitor with a rare reward**
   + Show message in chat, over the visitor and prevents refusing
 
+## The Rift
++ **Rift Timer**
+  + Show the remaining rift time, max time, percentage, and extra time changes.
+
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
 + **/shmarkplayer <player>** - marking a player with yellow color.
