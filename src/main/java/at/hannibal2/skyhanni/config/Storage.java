@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
@@ -230,6 +231,20 @@ public class Storage {
             @Expose
             public double totalMF = 0;
 
+        }
+
+        @Expose
+        public FrozenTreasureTracker frozenTreasureTracker = new FrozenTreasureTracker();
+
+        public static class FrozenTreasureTracker {
+            @Expose
+            public int treasuresMined = 0;
+
+            @Expose
+            public int compactProcs = 0;
+
+            @Expose
+            public Map<FrozenTreasure, Integer> treasureCount = new HashMap<>();
         }
 
         public long nextCityProjectParticipationTime = 0L;
