@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.Entity
 
 object LocationUtils {
 
@@ -11,6 +12,8 @@ object LocationUtils {
     fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
+
+    fun Entity.distanceToPlayer() = getLorenzVec().distance(playerLocation())
 
     fun playerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
