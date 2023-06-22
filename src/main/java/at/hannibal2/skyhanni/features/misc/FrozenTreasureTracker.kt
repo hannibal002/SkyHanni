@@ -132,6 +132,7 @@ class FrozenTreasureTracker {
         if (amount is Long) return NumberUtil.format(amount)
         return "$amount"
     }
+
     private fun saveAndUpdate() {
         val hidden = ProfileStorageData.profileSpecific?.frozenTreasureTracker ?: return
         hidden.treasuresMined = treasuresMined
@@ -155,9 +156,10 @@ class FrozenTreasureTracker {
         if (!config.enabled) return
         if (!onJerryWorkshop()) return
         if (config.onlyInCave && !inGlacialCave()) return
-        config.glacialDropPos.renderStringsAndItems(display, posLabel = "Visitor Stats")
+        config.position.renderStringsAndItems(display, posLabel = "Visitor Stats")
     }
 
-    private fun onJerryWorkshop() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.WINTER
+    private fun onJerryWorkshop() = LorenzUtils.inIsland(IslandType.WINTER)
+
     private fun inGlacialCave() = onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 }

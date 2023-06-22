@@ -543,7 +543,7 @@ public class Misc {
         public boolean hideMessages = false;
 
         @Expose
-        public Position glacialDropPos = new Position(10, 80, false, true);
+        public Position position = new Position(10, 80, false, true);
     }
 
     @Expose
