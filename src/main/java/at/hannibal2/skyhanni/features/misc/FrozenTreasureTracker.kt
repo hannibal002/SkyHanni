@@ -84,15 +84,16 @@ class FrozenTreasureTracker {
         compactPattern.matchMatcher(message) {
             compactProcs += 1
             saveAndUpdate()
-            if (config.hideMessages) event.isCanceled
+            if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
         for (treasure in FrozenTreasure.values()) {
             if ("FROZEN TREASURE! You found ${treasure.displayName.removeColor()}!".toRegex().matches(message)) {
+                treasuresMined += 1
                 val old = treasureCount[treasure] ?: 0
                 treasureCount = treasureCount.editCopy { this[treasure] = old + 1 }
                 saveAndUpdate()
-                if (config.hideMessages) event.isCanceled
+                if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
             }
         }
     }
@@ -112,15 +113,15 @@ class FrozenTreasureTracker {
     }
 
     private fun drawTreasureDisplay() = buildList<List<Any>> {
-        addAsSingletonList("§e§lFrozen Treasure Tracker")
-        addAsSingletonList("§e${formatNumber(treasuresMined)} Treasures Mined")
-        addAsSingletonList("§e${formatNumber(estimatedIce)} Total Ice")
-        addAsSingletonList("§e${formatNumber(icePerHour)} Ice/hr")
-        addAsSingletonList("§e${formatNumber(compactProcs)} Compact Procs")
+        addAsSingletonList("§1§lFrozen Treasure Tracker")
+        addAsSingletonList("§6${formatNumber(treasuresMined)} Treasures Mined")
+        addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
+        addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
+        addAsSingletonList("§8${formatNumber(compactProcs)} Compact Procs")
         addAsSingletonList("")
 
         for (treasure in FrozenTreasure.values()) {
-            val count = (treasureCount[treasure] ?: 0) * treasure.defaultAmount // enchanted ice will be inaccurate
+            val count = (treasureCount[treasure] ?: 0) * if (config.showAsDrops) treasure.defaultAmount else 1
             addAsSingletonList("§b${formatNumber(count)} ${treasure.displayName}")
         }
         addAsSingletonList("")
@@ -142,7 +143,7 @@ class FrozenTreasureTracker {
 
     private fun calculateIce() {
         estimatedIce = 0
-        if (config.countCompact) estimatedIce += compactProcs * 160
+        estimatedIce += compactProcs * 160
         for (treasure in FrozenTreasure.values()) {
             val amount = treasureCount[treasure] ?: 0
             estimatedIce += amount * treasure.defaultAmount * treasure.iceMultiplier
@@ -158,5 +159,5 @@ class FrozenTreasureTracker {
     }
 
     private fun onJerryWorkshop() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.WINTER
-    private fun inGlacialCave() = onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains("Glacial Cave")
+    private fun inGlacialCave() = onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 }

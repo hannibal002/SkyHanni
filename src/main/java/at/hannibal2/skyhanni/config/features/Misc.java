@@ -504,12 +504,12 @@ public class Misc {
                 desc = "Drag text to change the appearance of the overlay."
         )
         @ConfigEditorDraggableList(
-                exampleText = { // todo change colours
-                        "§e§lFrozen Treasure Tracker",
-                        "§e1,636 Treasures Mined",
-                        "§e3.2m Total Ice",
-                        "§e342,192 Ice/hr",
-                        "§e1,002 Compact Procs",
+                exampleText = {
+                        "§1§lFrozen Treasure Tracker",
+                        "§61,636 Treasures Mined",
+                        "§33.2m Total Ice",
+                        "§3342,192 Ice/hr",
+                        "§81,002 Compact Procs",
                         " ",
                         "§b182 §fWhite Gift",
                         "§b94 §aGreen Gift",
@@ -527,14 +527,15 @@ public class Misc {
         public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 14, 15));
 
         @Expose
-        @ConfigOption(name = "Count Compact", desc = "Adds compact drops from your pickaxe to the ice total.")
-        @ConfigEditorBoolean
-        public boolean countCompact = true;
-
-        @Expose
         @ConfigOption(name = "Only in Glacial Cave", desc = "Only shows the overlay while in the Glacial Cave.")
         @ConfigEditorBoolean
         public boolean onlyInCave = true;
+
+        @Expose
+        @ConfigOption(name = "Show as drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
+                "E.g. 3 Ice Bait -> 48 Ice Bait")
+        @ConfigEditorBoolean
+        public boolean showAsDrops = false;
 
         @Expose
         @ConfigOption(name = "Hide Chat messages", desc = "Hides the chat messages from frozen treasures.")
