@@ -191,7 +191,6 @@ class CaptureFarmingGear {
         }
     }
 
-    //todo pet level up
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -225,6 +224,9 @@ class CaptureFarmingGear {
         }
         if (msg == "Yum! You gain +5☘ Farming Fortune for 48 hours!") {
             hidden.cakeExpiring = System.currentTimeMillis() + 172800000
+        }
+        if (msg == "CARROTS EXPORTATION COMPLETE!") {
+            hidden.carrotFortune = true
         }
     }
 }

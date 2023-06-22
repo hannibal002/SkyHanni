@@ -194,6 +194,9 @@ public class Storage {
                 public long cakeExpiring = -1L;
 
                 @Expose
+                public boolean carrotFortune = false;
+
+                @Expose
                 public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
             }
 
