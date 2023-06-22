@@ -36,15 +36,17 @@ object CopyErrorCommand {
         } ?: "§c[SkyHanni] Error id not found!")
     }
 
-    fun logError(error: Throwable, message: String) {
-        Minecraft.getMinecraft().thePlayer ?: throw Error(message, error)
+    fun logError(throwable: Throwable, message: String) {
+        val error = Error(message, throwable)
+        Minecraft.getMinecraft().thePlayer ?: throw error
+        error.printStackTrace()
 
-        val pair = error.stackTrace[0].let { it.fileName to it.lineNumber }
+        val pair = throwable.stackTrace[0].let { it.fileName to it.lineNumber }
         if (cache.getIfPresent(pair) != null) return
         cache.put(pair, Unit)
 
-        val fullStackTrace = error.getExactStackTrace(true).joinToString("\n")
-        val stackTrace = error.getExactStackTrace(false).joinToString("\n").removeSpam()
+        val fullStackTrace = throwable.getExactStackTrace(true).joinToString("\n")
+        val stackTrace = throwable.getExactStackTrace(false).joinToString("\n").removeSpam()
         val randomId = UUID.randomUUID().toString()
 
         errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.version}: $message\n \n$stackTrace\n```"
