@@ -3,6 +3,8 @@
 ## Version 0.19 (unreleased)
 
 ### New Features
+
+#### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
 + **Rift Highlight Guide**
@@ -11,7 +13,8 @@
   + Shows a warning when a shy is going to steal your time.
   + Useful if you play without volume.
 + Added **Larvas Highlighter**
-  + Highlight larvas on trees while holding a Larva Hook in the hand
+  + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
+  + Customize the color
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)

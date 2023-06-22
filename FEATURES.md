@@ -280,6 +280,7 @@
   + Useful if you play without volume.
 + Added **Larvas Highlighter**
   + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
+  + Customize the color
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
