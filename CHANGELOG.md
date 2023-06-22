@@ -5,6 +5,8 @@
 ### New Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
++ **Rift Highlight Guide**
+  + Highlight things to do in the Rift Guide.
 
 ## Version 0.18 (2023-06-19)
 

@@ -40,7 +40,7 @@ object CopyErrorCommand {
         Minecraft.getMinecraft().thePlayer ?: throw Error(message, error)
 
         val pair = error.stackTrace[0].let { it.fileName to it.lineNumber }
-//        if (cache.getIfPresent(pair) != null) return
+        if (cache.getIfPresent(pair) != null) return
         cache.put(pair, Unit)
 
         val fullStackTrace = error.getExactStackTrace(true).joinToString("\n")
