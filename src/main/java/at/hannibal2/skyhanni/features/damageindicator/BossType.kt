@@ -74,6 +74,9 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     ARACHNE_SMALL("§cSmall Arachne", 21),
     ARACHNE_BIG("§4Big Arachne", 21),
 
+    // The Rift
+    LEECH_SUPREME("§cLeech Supreme", 22),
+
     //TODO arachne
 
     //TODO corelone

@@ -85,7 +85,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
-    public DamageIndicator damageIndicator = new DamageIndicator();
+    public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")

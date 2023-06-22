@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.damageindicator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
@@ -190,6 +191,12 @@ class MobFinder {
                     if (floor6Sadan) {
                         return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true)
                     }
+                }
+            }
+        } else if (RiftAPI.inRift()) {
+            if (entity is EntityOtherPlayerMP) {
+                if (entity.name == "Leech Supreme") {
+                    return EntityResult(bossType = BossType.LEECH_SUPREME)
                 }
             }
         } else {

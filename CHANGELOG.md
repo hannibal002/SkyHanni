@@ -20,6 +20,7 @@
   + Customize the color
 + Added **Agaricus Cap** countdown
   + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
++ Added **Leech Supreme** to Damage Indicator
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)

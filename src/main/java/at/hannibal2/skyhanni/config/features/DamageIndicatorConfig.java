@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DamageIndicator {
+public class DamageIndicatorConfig {
 
     @Expose
     @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the boss' remaining health.")
@@ -57,11 +57,12 @@ public class DamageIndicator {
                     "§bDiana Mobs",
                     "§bSea Creatures",
                     "Dummy",
-                    "§bArachne"
+                    "§bArachne",
+                    "§bThe Rift Bosses"
             }
     )
     //TODO only show currently working and tested features
-    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21));
+    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21, 22));
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")
