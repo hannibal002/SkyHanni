@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -53,7 +54,7 @@ class PocketSackInASackDisplay {
         val it = event.toolTip.listIterator()
         for (line in it) {
             valPattern.matchMatcher(line) {
-                val replace = when (group("number")) {
+                val replace = when (group("number").removeColor()) {
                     "a" -> "§c1"
                     "two" -> "§62"
                     "three" -> "§a3"
