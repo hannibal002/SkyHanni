@@ -79,17 +79,13 @@ object RepoUtils {
     fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?): T? {
         if (repo.exists()) {
             val jsonFile = File(repo, "constants/$constant.json")
-            try {
-                BufferedReader(
-                    InputStreamReader(
-                        FileInputStream(jsonFile),
-                        StandardCharsets.UTF_8
-                    )
-                ).use { reader ->
-                    return gson.fromJson(reader, clazz)
-                }
-            } catch (e: Exception) {
-                return null
+            BufferedReader(
+                InputStreamReader(
+                    FileInputStream(jsonFile),
+                    StandardCharsets.UTF_8
+                )
+            ).use { reader ->
+                return gson.fromJson(reader, clazz)
             }
         }
         return null
