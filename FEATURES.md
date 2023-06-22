@@ -66,9 +66,9 @@
 + **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
 + **Duplicate Hider** - Hides duplicate farming contests in the inventory.
 + **Contest Time** - Adds the real time format to the farming contest description.
-+ Added Pet Candies Used number
++ **Pet Candies Used number**
   + Works even after Hypixel removed the `10 pet candies applied` line
-+ Added Estimated Armor Value display
++ **Estimated Armor Value display**
   + Shows the price of all 4 armor pieces combined inside the wardrobe
 + Show numbers of Pocket Sack-In-A-Sack applied on a sack (Default disabled, contributed by HiZe)
 
@@ -160,7 +160,7 @@
   + Kill a mob with melee-hits to fix this hypixel bug
   + Only works while doing slayer
 + Title warning when picking up an expensive slayer item
-+ Added **RNG Meter Display**
++ **RNG Meter Display**
   + Display number of bosses needed until the next RNG Meter item drops
   + Warn when no item is set in the RNG Meter
   + Hide the RNG Meter message from chat if the current item is selected
@@ -253,18 +253,18 @@
   + Option to manually set the waypoint with /shcropstartlocation
 + Jacob Contest Stats Summary
   + Showing Blocks per Second and total Blocks clicked after a farming contest in chat
-+ Added **Contest Time Needed**
++ **Contest Time Needed**
   + Show the time and missing FF for every crop inside Jacob's Farming Contest inventory
-+ Added Garden Crop Start Location
++ **Garden Crop Start Location**
   + Show the start waypoint for your farm with the currently holding tool.
   + Auto-detects the start of the farm when farming for the first time
   + Option to manually set the waypoint with `/shcropstartlocation`
-+ Added Farming Fortune Breakdown for Armor and Equipment (Contributed by CalMWolfs)
++ **Farming Fortune Breakdown** for Armor and Equipment (Contributed by CalMWolfs)
   + Run /ff to open the menu
   + Works with: Base Stats, Reforge Bonus, Ability Fortune and Green Thumb
   + Breakdown for the true farming fortune from each crop
   + Ability to select a single piece of armor or equipment
-+ Added Garden Plot Icon (Contributed by HiZe)
++ **Garden Plot Icon** (Contributed by HiZe)
   + Select an item from the inventory to replace the icon in the Configure Plots inventory
   + Change the Edit mode in the bottom right corner in the Configure Plots inventory
 + Show a warning when finding a **visitor with a rare reward**
@@ -275,16 +275,16 @@
   + Show the remaining rift time, max time, percentage, and extra time changes.
 + **Highlight Guide**
   + Highlight things to do in the Rift Guide.
-+ Added **Shy Warning** (Contributed by CalMWolfs)
++ **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy is going to steal your time.
   + Useful if you play without volume.
-+ Added **Larvas Highlighter**
++ **Larvas Highlighter**
   + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
   + Customize the color
-+ Added **Odonatas Highlighter**
++ **Odonatas Highlighter**
   + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
   + Customize the color
-+ Added **Agaricus Cap** countdown
++ **Agaricus Cap** countdown
   + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
 
 ## Commands
@@ -338,11 +338,16 @@
   + Detects your SkyBlock Mod automatically
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
 + **Sack Item Display** (Contributed by HiZe)
-  + Added price display next to sack items
+  + price display next to sack items
   + Can be disabled
   + Sortable by price or items stored (both desc/asc)
   + Option to show prices from Bazaar or NPC
-+ Added **Ghost Counter** (Contributed by HiZe)
++ **Ghost Counter** (Contributed by HiZe)
   + Shows number of ghosts killed in the Mist in Dwarven Mines
   + Shows kill combo, coins per scavenger, all item drops, bestiarity, magic find and more
   + Each display line is highly customizable
++ **Frozen Treasure Tracker** (Contributed by CalMWolfs)
+  + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
+  + Show Ice per hour
+  + Customizable GUI
+  + Option to hide the chat messages

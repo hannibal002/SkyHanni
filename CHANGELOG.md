@@ -3,6 +3,11 @@
 ## Version 0.19 (unreleased)
 
 ### New Features
++ **Frozen Treasure Tracker** (Contributed by CalMWolfs)
+  + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
+  + Show Ice per hour
+  + Customizable GUI
+  + Option to hide the chat messages
 
 #### Rift Features
 + Added **Rift Timer**
