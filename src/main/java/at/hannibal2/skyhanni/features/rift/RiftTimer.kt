@@ -32,7 +32,7 @@ class RiftTimer {
         val message = event.message
         "    §r§7You have §r§a(?<time>.*)ф §r§7left before the rift collapses!".toPattern().matchMatcher(message) {
             val time = group("time")
-            maxTime = formatTime(time)
+            maxTime = getTime(time)
         }
     }
 
@@ -45,23 +45,27 @@ class RiftTimer {
             "§(?<color>[a7])(?<time>.*)ф Left.*".toPattern().matchMatcher(entry) {
                 val color = group("color")
                 if (color == "7") {
-                    display = emptyList()
+                    val currentTime = getTime(group("time"))
+                    if (currentTime > maxTime) {
+                        maxTime = currentTime
+                        update(currentTime)
+                    }
                     return
                 }
-                val time = group("time")
-                val currentTime = formatTime(time)
-                update(currentTime)
+                update(getTime(group("time")))
             }
         }
     }
 
-    private fun formatTime(time: String) = TimeUtils.getMillis(time.replace("m", "m "))
+    private fun getTime(time: String) = TimeUtils.getMillis(time.replace("m", "m "))
 
     private fun update(currentTime: Long) {
         if (currentTime == latestTime) return
         val diff = (currentTime - latestTime) + 1000
         latestTime = currentTime
-        addDiff(diff)
+        if (latestTime != maxTime) {
+            addDiff(diff)
+        }
 
         val currentFormat = TimeUtils.formatDuration(currentTime)
         val percentage = LorenzUtils.formatPercentage(currentTime.toDouble() / maxTime)

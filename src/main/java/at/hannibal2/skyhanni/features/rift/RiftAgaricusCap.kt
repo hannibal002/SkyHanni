@@ -63,7 +63,6 @@ class RiftAgaricusCap {
 
         val countDown = System.currentTimeMillis() - startTime
         val format = TimeUtils.formatDuration(countDown - 1000, showMilliSeconds = true)
-
         event.drawDynamicText(location, "§b$format", 1.5)
     }
 
