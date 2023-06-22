@@ -41,11 +41,6 @@ class RiftAgaricusCap {
             }
 
             "minecraft:red_mushroom" -> {
-                if (startTime != 0L && startTime != -1L) {
-                    val s = System.currentTimeMillis() - startTime
-                    LorenzUtils.debug("red mushroom after ${s}ms!")
-                }
-
                 if (location == currentLocation) {
                     startTime = -1L
                     return location
