@@ -2,17 +2,18 @@ package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import net.minecraft.client.Minecraft
-import kotlin.concurrent.fixedRateTimer
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CruxWarnings {
     private val shyNames = arrayOf("I'm ugly! :(", "Eek!", "Don't look at me!", "Look away!")
 
-    init {
-        fixedRateTimer(name = "skyhanni-shywarner-timer", period = 250) {
-            Minecraft.getMinecraft().thePlayer ?: return@fixedRateTimer
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (event.isMod(2)) {
             checkForShy()
         }
     }
