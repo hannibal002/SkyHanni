@@ -273,6 +273,8 @@
 ## The Rift
 + **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
++ **Highlight Guide**
+  + Highlight things to do in the Rift Guide.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

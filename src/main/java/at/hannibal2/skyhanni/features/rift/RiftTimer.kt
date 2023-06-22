@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -9,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
@@ -19,7 +19,7 @@ class RiftTimer {
     private val changes = mutableMapOf<Long, String>()
 
     @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onJoinWorld(ignored: WorldEvent.Load) {
         display = emptyList()
     }
 

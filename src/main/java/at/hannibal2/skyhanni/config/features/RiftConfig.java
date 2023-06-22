@@ -11,9 +11,9 @@ public class RiftConfig {
     @ConfigOption(name = "Rift Timer", desc = "")
     @Accordion
     @Expose
-    public TimerConfig timer = new TimerConfig();
+    public RiftTimerConfig timer = new RiftTimerConfig();
 
-    public static class TimerConfig {
+    public static class RiftTimerConfig {
 
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show the remaining rift time, max time, percentage, and extra time changes.")
@@ -47,4 +47,9 @@ public class RiftConfig {
         @ConfigEditorBoolean
         public boolean shyWarning = true;
     }
+
+    @Expose
+    @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
+    @ConfigEditorBoolean
+    public boolean highlightGuide = true;
 }

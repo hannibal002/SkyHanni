@@ -59,6 +59,7 @@ import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.skyhanni.features.rift.HighlightRiftGuide
 import at.hannibal2.skyhanni.features.rift.CruxWarnings
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftTimer
@@ -305,6 +306,7 @@ class SkyHanniMod {
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())
+        loadModule(HighlightRiftGuide())
         loadModule(CruxWarnings())
 
         init()
