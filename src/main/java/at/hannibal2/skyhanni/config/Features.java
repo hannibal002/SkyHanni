@@ -116,16 +116,12 @@ public class Features extends Config {
     public Garden garden = new Garden();
 
     @Expose
-    @Category(name = "Rift", desc = "Features for the Rift.")
-    public Rift rift = new Rift();
+    @Category(name = "The Rift", desc = "Features for The Rift dimension.")
+    public RiftConfig rift = new RiftConfig();
 
     @Expose
     @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
     public GhostCounter ghostCounter = new GhostCounter();
-
-    @Expose
-    @Category(name = "The Rift", desc = "Features for The Rift dimension.")
-    public RiftConfig rift = new RiftConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
