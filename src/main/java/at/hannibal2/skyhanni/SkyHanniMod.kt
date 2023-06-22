@@ -307,6 +307,7 @@ class SkyHanniMod {
         loadModule(CruxWarnings())
         loadModule(RiftLarva())
         loadModule(RiftOdonata())
+        loadModule(RiftAgaricusCap())
 
         init()
 

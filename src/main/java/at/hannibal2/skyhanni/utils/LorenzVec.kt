@@ -64,6 +64,8 @@ data class LorenzVec(
 
     fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
 
+    fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
+
     fun printWithAccuracy(accuracy: Int): String {
         val x = (round(x * accuracy) / accuracy)
         val y = (round(y * accuracy) / accuracy)
@@ -88,6 +90,8 @@ data class LorenzVec(
     }
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
+
+    fun equals(other: LorenzVec) = x == other.x && y == other.y && z == other.z
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
 

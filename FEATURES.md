@@ -284,6 +284,8 @@
 + Added **Odonatas Highlighter**
   + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
   + Customize the color
++ Added **Agaricus Cap** countdown
+  + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

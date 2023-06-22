@@ -30,7 +30,7 @@ class HypixelData {
 
         fun readSkyBlockArea(): String {
             return ScoreboardData.sidebarLinesFormatted
-                .firstOrNull { it.startsWith(" §7⏣ ") }
+                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
                 ?.substring(5)?.removeColor()
                 ?: "invalid"
         }

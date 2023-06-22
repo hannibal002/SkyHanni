@@ -39,4 +39,18 @@ object BlockUtils {
 
         return false
     }
+
+    fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
+        val help = direction.normalize().multiply(distance)
+        val target = start.add(help)
+        val result = Minecraft.getMinecraft().theWorld.rayTraceBlocks(start.toVec3(), target.toVec3())
+
+        return result?.blockPos?.toLorenzVec()
+    }
+
+    fun getBlockLookingAt(duration: Double = 10.0) = rayTrace(
+        LocationUtils.playerEyeLocation(),
+        Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec(),
+        duration
+    )
 }

@@ -91,4 +91,9 @@ public class RiftConfig {
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
     @ConfigEditorBoolean
     public boolean highlightGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) §7changes color from brown to red and is breakable.")
+    @ConfigEditorBoolean
+    public boolean agaricusCap = true;
 }
