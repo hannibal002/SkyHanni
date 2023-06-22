@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import org.apache.commons.io.FileUtils
@@ -15,7 +14,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 
 class RepoManager(private val configLocation: File) {
-    val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+    private val gson get() = ConfigManager.gson
     private var latestRepoCommit: String? = null
     private val repoLocation: File = File(configLocation, "repo")
 
