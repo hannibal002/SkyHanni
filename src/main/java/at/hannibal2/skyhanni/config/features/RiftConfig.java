@@ -32,6 +32,18 @@ public class RiftConfig {
 
         @Expose
         public Position timerPosition = new Position(10, 10, false, true);
+    }
 
+    @ConfigOption(name = "Crux Warnings", desc = "")
+    @Accordion
+    @Expose
+    public CruxWarnings crux = new CruxWarnings();
+
+    public static class CruxWarnings {
+
+        @Expose
+        @ConfigOption(name = "Shy Warning Title", desc = "Shows an extra warning when a shy is going to steal your Rift Time.")
+        @ConfigEditorBoolean
+        public boolean shyWarning = true;
     }
 }
