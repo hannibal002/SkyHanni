@@ -60,6 +60,7 @@ import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftTimer
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
@@ -145,6 +146,7 @@ class SkyHanniMod {
         loadModule(PartyAPI())
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
+        loadModule(RiftAPI)
 
         // features
         loadModule(BazaarOrderHelper())
