@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import kotlin.concurrent.fixedRateTimer
 
@@ -12,6 +12,7 @@ class CruxWarnings {
 
     init {
         fixedRateTimer(name = "skyhanni-shywarner-timer", period = 250) {
+            Minecraft.getMinecraft().thePlayer ?: return@fixedRateTimer
             checkForShy()
         }
     }
@@ -20,14 +21,14 @@ class CruxWarnings {
         try {
             if (!(RiftAPI.inRift() || !SkyHanniMod.feature.rift.crux.shyWarning)) return
             val world = Minecraft.getMinecraft().theWorld ?: return
-            for (entity in world.getLoadedEntityList()) {
-                val name = entity.name
-                if (shyNames.any { it == name }) {
-                    if (entity.getLorenzVec().distanceToPlayer() < 8) {
-                        TitleUtils.sendTitle("§eLook away!", 250)
-                    }
+            val loadedEntityList = world.getLoadedEntityList() ?: return
+            for (entity in loadedEntityList) {
+                if (entity.name in shyNames && entity.distanceToPlayer() < 8) {
+                    TitleUtils.sendTitle("§eLook away!", 250)
                 }
             }
-        } catch (_: Throwable) {}
+        } catch (e: Throwable) {
+            CopyErrorCommand.logError(e, "Check for Shy failed")
+        }
     }
 }
