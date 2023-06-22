@@ -59,9 +59,7 @@ import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.rift.HighlightRiftGuide
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftTimer
+import at.hannibal2.skyhanni.features.rift.*
 import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
@@ -97,7 +95,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18",
+    version = "0.19.Beta.1",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -307,6 +305,10 @@ class SkyHanniMod {
         loadModule(GhostCounter)
         loadModule(RiftTimer())
         loadModule(HighlightRiftGuide())
+        loadModule(CruxWarnings())
+        loadModule(RiftLarva())
+        loadModule(RiftOdonata())
+        loadModule(RiftAgaricusCap())
 
         init()
 

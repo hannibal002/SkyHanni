@@ -3,10 +3,30 @@
 ## Version 0.19 (unreleased)
 
 ### New Features
+
+#### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
 + **Rift Highlight Guide**
   + Highlight things to do in the Rift Guide.
++ Added **Shy Warning** (Contributed by CalMWolfs)
+  + Shows a warning when a shy is going to steal your time.
+  + Useful if you play without volume.
++ Added **Larvas Highlighter**
+  + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
+  + Customize the color
++ Added **Odonatas Highlighter**
+  + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
+  + Customize the color
++ Added **Agaricus Cap** countdown
+  + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
+
+### Changes
++ Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
++ Added wizard warp as diana waypoint
+
+### Fixes
++ Fixed Pocket Sack-In-A-Sack Replace in lore
 
 ## Version 0.18 (2023-06-19)
 

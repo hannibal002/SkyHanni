@@ -100,6 +100,7 @@ class BurrowWarpHelper {
         //        CRYPT("Crypt", LorenzVec(-190, 74, -88), 25),
         DA("Dark Auction", LorenzVec(91, 74, 173), 2),
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
+        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks

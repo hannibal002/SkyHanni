@@ -24,7 +24,7 @@ class HighlightRiftGuide {
 
         val inGuide = event.inventoryItems[40]?.getLore()?.let {
             if (it.size == 1) {
-                it[0] == "§7To Rift Guide"
+                it[0].startsWith("§7To Rift Guide")
             } else false
         } ?: false
         if (!inGuide) return

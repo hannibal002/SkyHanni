@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class PocketSackInASackDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pocketSackInASack
-    private val valPattern = "§5§o§7This sack is stitched with (?<number>.*)".toPattern()
+    private val valPattern = "§5§o§7This sack is stitched with (?<number>.*)§7.".toPattern()
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {

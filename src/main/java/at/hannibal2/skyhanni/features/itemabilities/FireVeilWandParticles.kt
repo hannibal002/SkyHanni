@@ -6,13 +6,12 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SpecialColour
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 class FireVeilWandParticles {
 
@@ -48,8 +47,7 @@ class FireVeilWandParticles {
         if (SkyHanniMod.feature.itemAbilities.fireVeilWandDisplay != 1) return
         if (System.currentTimeMillis() > lastClick + 5_500) return
 
-        val color =
-            Color(SpecialColour.specialToChromaRGB(SkyHanniMod.feature.itemAbilities.fireVeilWandDisplayColor), true)
+        val color = SkyHanniMod.feature.itemAbilities.fireVeilWandDisplayColor.toChromaColor()
 
         RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)
     }

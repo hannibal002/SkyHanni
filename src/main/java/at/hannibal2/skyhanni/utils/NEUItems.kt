@@ -134,15 +134,11 @@ object NEUItems {
         .withKnownInternalName(internalName)
         .resolveToItemStack()?.copy()
 
-    fun getItemStack(internalName: String): ItemStack {
-        val stack = getItemStackOrNull(internalName)
-        if (stack == null) {
-            val error = "ItemResolutionQuery returns null for internalName '$internalName'"
-            LorenzUtils.error(error)
-            throw RuntimeException(error)
-        }
-        return stack
-    }
+    fun getItemStack(internalName: String): ItemStack = getItemStackOrNull(internalName)
+        ?: throw IllegalStateException(
+            "Could not find the Item '$internalName' in NEU Repo",
+            Error("ItemResolutionQuery returns null for internalName '$internalName'")
+        )
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 

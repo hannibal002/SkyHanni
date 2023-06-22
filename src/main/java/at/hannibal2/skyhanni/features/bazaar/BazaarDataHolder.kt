@@ -48,8 +48,13 @@ class BazaarDataHolder {
 
     fun getData(internalName: String) = bazaarData[internalName] ?: createNewData(internalName)
 
-    private fun createNewData(internalName: String): BazaarData {
-        val displayName = NEUItems.getItemStack(internalName).name!!.removeColor()
+    private fun createNewData(internalName: String): BazaarData? {
+        val stack = NEUItems.getItemStackOrNull(internalName)
+        if (stack == null) {
+            LorenzUtils.debug("Bazaar data is null: '$internalName'")
+            return null
+        }
+        val displayName = stack.name!!.removeColor()
         val sellPrice = NEUItems.getPrice(internalName, true)
         val buyPrice = NEUItems.getPrice(internalName, false)
         val npcPrice = npcPrices[internalName].let {
