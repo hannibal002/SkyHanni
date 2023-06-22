@@ -10,10 +10,15 @@
 + Added **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy is going to steal your time.
   + Useful if you play without volume.
++ Added **Larvas Highlighter**
+  + Highlight larvas on trees while holding a Larva Hook in the hand
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
+
+### Fixes
++ Fixed Pocket Sack-In-A-Sack Replace in lore
 
 ## Version 0.18 (2023-06-19)
 

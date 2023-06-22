@@ -278,6 +278,8 @@
 + Added **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy is going to steal your time.
   + Useful if you play without volume.
++ Added **Larvas Highlighter**
+  + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

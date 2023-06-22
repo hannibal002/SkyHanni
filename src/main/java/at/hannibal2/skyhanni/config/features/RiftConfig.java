@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class RiftConfig {
@@ -52,4 +53,23 @@ public class RiftConfig {
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
     @ConfigEditorBoolean
     public boolean highlightGuide = true;
+
+    @ConfigOption(name = "Larvas", desc = "")
+    @Accordion
+    @Expose
+    public LarvasConfig larvas = new LarvasConfig();
+
+    public static class LarvasConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight", desc = "Highlight larvas on trees while holding a Larva Hook in the hand.")
+        @ConfigEditorBoolean
+        public boolean highlight = true;
+
+        @Expose
+        @ConfigOption(name = "Color", desc = "Color of the Ashfang Gravity Orbs.")
+        @ConfigEditorColour
+        public String highlightColor = "0:120:255:85:85";
+
+    }
 }

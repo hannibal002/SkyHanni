@@ -20,6 +20,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
+import java.awt.Color
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -381,4 +382,7 @@ object LorenzUtils {
         @Suppress("UNCHECKED_CAST")
         this[item] = d as N
     }
+
+    /** transfer string colors from the config to java.awt.Color */
+    fun String.toChromaColor() = Color(SpecialColour.specialToChromaRGB(this), true)
 }
