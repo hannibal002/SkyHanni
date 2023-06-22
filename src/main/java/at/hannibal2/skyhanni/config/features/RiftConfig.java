@@ -42,7 +42,8 @@ public class RiftConfig {
     public static class CruxWarnings {
 
         @Expose
-        @ConfigOption(name = "Shy Warning Title", desc = "Shows an extra warning when a shy is going to steal your Rift Time.")
+        @ConfigOption(name = "Shy Warning", desc = "Shows a warning when a shy is going to steal your time. " +
+                "Useful if you play without volume")
         @ConfigEditorBoolean
         public boolean shyWarning = true;
     }

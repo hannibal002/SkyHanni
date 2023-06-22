@@ -28,6 +28,6 @@ class CruxWarnings {
                     }
                 }
             }
-        } catch (_: Throwable) {} // need this
+        } catch (_: Throwable) {}
     }
 }
