@@ -21,6 +21,8 @@ class RiftTimer {
     @SubscribeEvent
     fun onJoinWorld(ignored: WorldEvent.Load) {
         display = emptyList()
+        maxTime = 0
+        latestTime = 0
     }
 
     @SubscribeEvent
