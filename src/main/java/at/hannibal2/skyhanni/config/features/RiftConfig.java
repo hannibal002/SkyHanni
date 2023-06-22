@@ -49,11 +49,6 @@ public class RiftConfig {
         public boolean shyWarning = true;
     }
 
-    @Expose
-    @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
-    @ConfigEditorBoolean
-    public boolean highlightGuide = true;
-
     @ConfigOption(name = "Larvas", desc = "")
     @Accordion
     @Expose
@@ -62,14 +57,38 @@ public class RiftConfig {
     public static class LarvasConfig {
 
         @Expose
-        @ConfigOption(name = "Highlight", desc = "Highlight larvas on trees while holding a Larva Hook in the hand.")
+        @ConfigOption(name = "Highlight", desc = "Highlight §cLarvas on trees §7while holding a §eLarva Hook §7in the hand.")
         @ConfigEditorBoolean
         public boolean highlight = true;
 
         @Expose
-        @ConfigOption(name = "Color", desc = "Color of the Ashfang Gravity Orbs.")
+        @ConfigOption(name = "Color", desc = "Color of the Larvas.")
         @ConfigEditorColour
-        public String highlightColor = "0:120:255:85:85";
+        public String highlightColor = "0:120:13:49:255";
 
     }
+
+    @ConfigOption(name = "Odonatas", desc = "")
+    @Accordion
+    @Expose
+    public OdonataConfig odonata = new OdonataConfig();
+
+    public static class OdonataConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding a §eEmpty Odonata Bottle §7in the hand.")
+        @ConfigEditorBoolean
+        public boolean highlight = true;
+
+        @Expose
+        @ConfigOption(name = "Color", desc = "Color of the Odonatas.")
+        @ConfigEditorColour
+        public String highlightColor = "0:120:13:49:255";
+
+    }
+
+    @Expose
+    @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
+    @ConfigEditorBoolean
+    public boolean highlightGuide = true;
 }

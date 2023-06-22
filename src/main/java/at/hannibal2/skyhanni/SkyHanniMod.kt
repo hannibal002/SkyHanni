@@ -306,6 +306,7 @@ class SkyHanniMod {
         loadModule(HighlightRiftGuide())
         loadModule(CruxWarnings())
         loadModule(RiftLarva())
+        loadModule(RiftOdonata())
 
         init()
 

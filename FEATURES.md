@@ -281,6 +281,9 @@
 + Added **Larvas Highlighter**
   + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
   + Customize the color
++ Added **Odonatas Highlighter**
+  + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
+  + Customize the color
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

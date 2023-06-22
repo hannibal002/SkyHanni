@@ -15,6 +15,9 @@
 + Added **Larvas Highlighter**
   + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
   + Customize the color
++ Added **Odonatas Highlighter**
+  + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
+  + Customize the color
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
