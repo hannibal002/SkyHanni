@@ -21,12 +21,9 @@ class CruxWarnings {
     private fun checkForShy() {
         try {
             if (!(RiftAPI.inRift() || !SkyHanniMod.feature.rift.crux.shyWarning)) return
-            val world = Minecraft.getMinecraft().theWorld ?: return
-            val loadedEntityList = world.getLoadedEntityList() ?: return
-            for (entity in loadedEntityList) {
-                if (entity.name in shyNames && entity.distanceToPlayer() < 8) {
-                    TitleUtils.sendTitle("§eLook away!", 250)
-                }
+            val list = Minecraft.getMinecraft().theWorld?.getLoadedEntityList() ?: return
+            if (list.any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
+                TitleUtils.sendTitle("§eLook away!", 250)
             }
         } catch (e: Throwable) {
             CopyErrorCommand.logError(e, "Check for Shy failed")
