@@ -305,8 +305,9 @@ class SkyHanniMod {
         loadModule(GhostCounter)
         loadModule(RiftTimer())
         loadModule(HighlightRiftGuide())
-        loadModule(CruxWarnings())
+        loadModule(ShyCruxWarnings())
         loadModule(RiftLarva())
+        loadModule(VoltHighlighter())
         loadModule(RiftOdonata())
         loadModule(RiftAgaricusCap())
 
