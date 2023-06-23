@@ -25,14 +25,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EnigmaSoulWaypoints {
     private var inInventory = false
-    private val soulLocations = mutableMapOf<String, Pair<LorenzVec, RiftRegion>>()
+    private val soulLocations = mutableMapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStackOrNull("SKYBLOCK_ENIGMA_SOUL") ?: ItemStack(Blocks.obsidian) // can prob have a better fallback
-        Utils.createItemStack(neuItem.item, "§5Toggle Missing", "§7Click here to toggle", "§7the waypoints for each", "§7missing souls on this page")
+        val neuItem = NEUItems.getItemStackOrNull("SKYBLOCK_ENIGMA_SOUL")
+            ?: ItemStack(Blocks.obsidian) // can prob have a better fallback
+        Utils.createItemStack(
+            neuItem.item,
+            "§5Toggle Missing",
+            "§7Click here to toggle",
+            "§7the waypoints for each",
+            "§7missing souls on this page"
+        )
     }
 
     @SubscribeEvent
@@ -71,7 +78,7 @@ object EnigmaSoulWaypoints {
         if (!inInventory || !RiftAPI.inRift()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
-            event.isCanceled =  true
+            event.usePickblockInstead()
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
                 adding = false
@@ -83,7 +90,7 @@ object EnigmaSoulWaypoints {
 
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
-            event.isCanceled =  true // maybe change to a middle click
+            event.usePickblockInstead()
             if (soulLocations.contains(split.last())) {
                 if (!trackedSouls.contains(split.last())) {
                     LorenzUtils.chat("§5Tracking the ${split.last()} Enigma Soul!")
@@ -123,8 +130,8 @@ object EnigmaSoulWaypoints {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!RiftAPI.inRift()) return
         for (soul in trackedSouls) {
-            soulLocations[soul]?.let { event.drawWaypointFilled(it.first, LorenzColor.DARK_PURPLE.toColor(), true, true) }
-            soulLocations[soul]?.let { event.drawDynamicText(it.first.add(0, 1, 0), "§5$soul Soul", 1.0) }
+            soulLocations[soul]?.let { event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), true, true) }
+            soulLocations[soul]?.let { event.drawDynamicText(it.add(0, 1, 0), "§5$soul Soul", 1.0) }
         }
     }
 
@@ -133,7 +140,6 @@ object EnigmaSoulWaypoints {
         val data = event.getConstant("EnigmaSouls") ?: return
 
         for (area in data.entrySet()) {
-            val region = RiftRegion.values().firstOrNull {it.areaName == area.key.toString()} ?: continue
             val element = area.value.asJsonArray
 
             for (i in 0 until element.size()) {
@@ -142,8 +148,7 @@ object EnigmaSoulWaypoints {
                 val position = itemObject["position"].asString
                 val split = position.split(", ")
                 if (split.size == 3) {
-                    val location = LorenzVec(split[0].toDouble(), split[1].toDouble(), split[2].toDouble())
-                    soulLocations[name] = Pair(location, region)
+                    soulLocations[name] = LorenzVec(split[0].toDouble(), split[1].toDouble(), split[2].toDouble())
                 }
             }
         }
@@ -164,9 +169,9 @@ object EnigmaSoulWaypoints {
         var closestDistance = 8.0
 
         for (soul in soulLocations) {
-            if (soul.value.first.distanceToPlayer() < closestDistance) {
+            if (soul.value.distanceToPlayer() < closestDistance) {
                 closestSoul = soul.key
-                closestDistance = soul.value.first.distanceToPlayer()
+                closestDistance = soul.value.distanceToPlayer()
             }
         }
         trackedSouls.remove(closestSoul)
