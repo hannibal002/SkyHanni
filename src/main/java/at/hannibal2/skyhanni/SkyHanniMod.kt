@@ -309,6 +309,7 @@ class SkyHanniMod {
         loadModule(RiftLarva())
         loadModule(RiftOdonata())
         loadModule(RiftAgaricusCap())
+        loadModule(EnigmaSoulWaypoints())
 
         init()
 
