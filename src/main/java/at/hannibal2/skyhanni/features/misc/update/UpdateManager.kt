@@ -117,6 +117,9 @@ object UpdateManager {
         CurrentVersion.ofTag(SkyHanniMod.version),
         SkyHanniMod.MODID,
     )
+    init {
+        context.cleanup()
+    }
 
     enum class UpdateState {
         AVAILABLE,
