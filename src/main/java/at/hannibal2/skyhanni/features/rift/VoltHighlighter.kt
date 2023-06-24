@@ -1,15 +1,18 @@
 package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
@@ -25,7 +28,7 @@ class VoltHighlighter {
     private val LIGHTNING_DISTANCE = 7F
     private val ARMOR_SLOT_HEAD = 3
     private val CHARGE_TIME = 12.seconds
-    private var dischargingSince = SimpleTimeMark.farPast()
+    private var chargingSince = mapOf<Entity, SimpleTimeMark>()
 
     @SubscribeEvent
     fun onArmorChange(event: EntityEquipmentChangeEvent) {
@@ -34,20 +37,15 @@ class VoltHighlighter {
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING
             && event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
         ) {
-            dischargingSince = SimpleTimeMark.now()
+            chargingSince = chargingSince.editCopy {
+                this[event.entity] = SimpleTimeMark.now()
+            }
         }
     }
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!RiftAPI.inRift() || !(config.voltRange || config.voltMoodMeter)) return
-        val dischargeTimeLeft = CHARGE_TIME - dischargingSince.passedSince()
-        if (dischargeTimeLeft > Duration.ZERO) {
-            TitleUtils.sendTitle(
-                "§eLightning: ${TimeUtils.formatDuration(dischargeTimeLeft, showMilliSeconds = true)}",
-                50
-            )
-        }
         val list = Minecraft.getMinecraft().theWorld?.loadedEntityList ?: return
         for (entity in list) {
             if (entity !is EntityLivingBase) continue
@@ -73,6 +71,15 @@ class VoltHighlighter {
                     partialTicks = event.partialTicks,
                     height = 20F
                 )
+                val dischargingSince = chargingSince.getOrDefault(entity, SimpleTimeMark.farPast())
+                val dischargeTimeLeft = CHARGE_TIME - dischargingSince.passedSince()
+                if (dischargeTimeLeft > Duration.ZERO) {
+                    event.drawDynamicText(
+                        event.exactLocation(entity).add(0.0, 2.5, 0.0),
+                        "§eLightning: ${TimeUtils.formatDuration(dischargeTimeLeft, showMilliSeconds = true)}",
+                        2.5
+                    )
+                }
             }
         }
     }
@@ -104,7 +111,7 @@ class VoltHighlighter {
 
     }
 
-    private fun getVoltState(entity: net.minecraft.entity.Entity): VoltState {
+    private fun getVoltState(entity: Entity): VoltState {
         if (entity !is EntityArmorStand) return VoltState.NO_VOLT
         val helmet = entity.getCurrentArmor(ARMOR_SLOT_HEAD) ?: return VoltState.NO_VOLT
         return getVoltState(helmet)
