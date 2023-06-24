@@ -167,9 +167,9 @@ class ItemDisplayOverlayFeatures {
                     "§7§7You may harvest §6(?<amount>.)/.*".toPattern().matchMatcher(line) {
                         val amount = group("amount").toInt()
                         return when {
-                            amount > 4 -> "§a${group("amount")}"
-                            amount > 2 -> "§e${group("amount")}"
-                            else -> "§c${group("amount")}"
+                            amount > 4 -> "§a$amount"
+                            amount > 2 -> "§e$amount"
+                            else -> "§c$amount"
                         }
                     }
                 }
