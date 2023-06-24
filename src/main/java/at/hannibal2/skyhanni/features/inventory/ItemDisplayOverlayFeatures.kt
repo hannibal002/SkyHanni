@@ -165,7 +165,12 @@ class ItemDisplayOverlayFeatures {
             if (item.getInternalName() == "LARVA_HOOK") {
                 for (line in item.getLore()) {
                     "§7§7You may harvest §6(?<amount>.)/.*".toPattern().matchMatcher(line) {
-                        return group("amount")
+                        val amount = group("amount").toInt()
+                        return when {
+                            amount > 4 -> "§a${group("amount")}"
+                            amount > 2 -> "§e${group("amount")}"
+                            else -> "§c${group("amount")}"
+                        }
                     }
                 }
             }
