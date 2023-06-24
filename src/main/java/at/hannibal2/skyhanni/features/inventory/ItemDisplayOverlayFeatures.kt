@@ -164,7 +164,7 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
             if (item.getInternalName() == "LARVA_HOOK") {
                 for (line in item.getLore()) {
-                    "§7§7You may harvest §6(?<amount>.)/.*".toPattern().matchMatcher(line) {
+                    "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
                         val amount = group("amount").toInt()
                         return when {
                             amount > 4 -> "§a$amount"
