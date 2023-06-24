@@ -48,6 +48,12 @@ public class DevData {
     public boolean showInternalName = false;
 
     @Expose
+    @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even if it is blank.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showEmptyNames = false;
+
+    @Expose
     @ConfigOption(name = "Show item UUID", desc = "Show the Unique Identifier of items. in the lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -58,6 +64,12 @@ public class DevData {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean copyRngMeter = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Missing Repo Items", desc = "Highlights each item in the current inventory that is not in your current NEU repo.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean highlightMissingRepo = false;
 
     @Expose
     public Position debugPos = new Position(10, 10, false, true);

@@ -319,6 +319,7 @@ class SkyHanniMod {
         loadModule(PacketTest())
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
+        loadModule(HighlightMissingRepoItems())
     }
 
     @Mod.EventHandler

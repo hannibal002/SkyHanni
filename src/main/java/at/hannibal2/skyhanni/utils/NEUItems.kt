@@ -30,7 +30,7 @@ object NEUItems {
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
-    private var allItemsCache = mapOf<String, String>() // item name -> internal name
+    var allItemsCache = mapOf<String, String>() // item name -> internal name
 
     fun getInternalName(itemName: String): String {
         return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
@@ -53,7 +53,7 @@ object NEUItems {
         return null
     }
 
-    private fun readAllNeuItems(): Map<String, String> {
+    fun readAllNeuItems(): Map<String, String> {
         val map = mutableMapOf<String, String>()
         for (internalName in manager.itemInformation.keys) {
             val name = manager.createItem(internalName).displayName.removeColor().lowercase()
