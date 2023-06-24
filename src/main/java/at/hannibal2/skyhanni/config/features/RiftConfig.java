@@ -50,22 +50,22 @@ public class RiftConfig {
 
 
         @Expose
-        @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a volt is discharging lightning")
+        @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a volt is discharging lightning.")
         @ConfigEditorBoolean
         public boolean voltWarning = true;
 
         @Expose
-        @ConfigOption(name = "Volt Range Highlighter", desc = "Shows the area in which a Volt might strike lightning")
+        @ConfigOption(name = "Volt Range Highlighter", desc = "Shows the area in which a Volt might strike lightning.")
         @ConfigEditorBoolean
         public boolean voltRange = true;
 
         @Expose
-        @ConfigOption(name = "Volt Range Highlighter Colour", desc = "In which colour should the volt range be highlighted")
+        @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the volt range be highlighted?")
         @ConfigEditorColour
         public String voltColour = "0:60:0:0:255";
 
         @Expose
-        @ConfigOption(name = "Volt mood colour", desc = "Change the colour of the volt enemy depending on their mood")
+        @ConfigOption(name = "Volt mood color", desc = "Change the color of the volt enemy depending on their mood.")
         @ConfigEditorBoolean
         public boolean voltMoodMeter = false;
 

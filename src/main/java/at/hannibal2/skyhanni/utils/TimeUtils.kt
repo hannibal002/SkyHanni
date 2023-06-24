@@ -19,6 +19,7 @@ object TimeUtils {
         duration.inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
     )
 
+    @Deprecated("Use kotlin.time.Duration instead!")
     fun formatDuration(
         millis: Long,
         biggestUnit: TimeUnit = TimeUnit.YEAR,
