@@ -115,6 +115,11 @@ loom {
     mixin {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
+    runConfigs {
+        "server" {
+            isIdeConfigGenerated = false
+        }
+    }
 }
 
 // Tasks:
