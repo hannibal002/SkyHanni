@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.inventory.Slot
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -33,20 +32,14 @@ class HighlightMissingRepoItems {
     }
 
     private fun highlightItems(slots: Iterable<Slot>) {
+        if (NEUItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
             if (!slot.hasStack) continue
             val internalName = slot.stack.getInternalName()
             if (internalName == "") continue
-            if (!NEUItems.allItemsCache.containsValue(internalName)) {
+            if (!NEUItems.allInternalNames.contains(internalName)) {
                 slot highlight LorenzColor.RED
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
-        if (NEUItems.allItemsCache.isEmpty()) {
-            NEUItems.allItemsCache = NEUItems.readAllNeuItems()
         }
     }
 
