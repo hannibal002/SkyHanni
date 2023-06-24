@@ -10,6 +10,8 @@ import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,10 +21,13 @@ class GardenDeskInSBMenu {
     private var showItem = false
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("DOUBLE_PLANT")
-        Utils.createItemStack(neuItem.item, "§bDesk", "§7Click here to", "§7run §e/desk")
+        var neuItem = NEUItems.getItemStackOrNull("DOUBLE_PLANT")
+        if (neuItem == null) {
+            neuItem = ItemStack(Blocks.double_plant)
+            Utils.showOutdatedRepoNotification()
+        }
+        Utils.createItemStack(neuItem!!.item, "§bDesk", "§7Click here to", "§7run §e/desk")
     }
-
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
@@ -44,7 +49,7 @@ class GardenDeskInSBMenu {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (showItem && event.slotId == 10) {
-            event.isCanceled =  true
+            event.isCanceled = true
             LorenzUtils.sendCommandToServer("desk")
         }
     }
