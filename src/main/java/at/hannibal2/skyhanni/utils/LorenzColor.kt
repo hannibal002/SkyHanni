@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import net.minecraft.client.Minecraft
+import net.minecraft.item.EnumDyeColor
+import net.minecraft.util.ChatComponentText
 import java.awt.Color
 
 enum class LorenzColor(private var chatColorCode: Char, private val color: Color) {
@@ -31,5 +35,30 @@ enum class LorenzColor(private var chatColorCode: Char, private val color: Color
         val green = color.green
         val blue = color.blue
         return Color(red, green, blue, opacity)
+    }
+
+    companion object {
+        fun getMatchingColor(enumDyeColor: EnumDyeColor): LorenzColor? {
+            return when(enumDyeColor) {
+                EnumDyeColor.WHITE -> WHITE
+                EnumDyeColor.MAGENTA -> LIGHT_PURPLE
+                EnumDyeColor.PINK -> LIGHT_PURPLE
+                EnumDyeColor.RED -> RED
+                EnumDyeColor.SILVER -> GRAY
+                EnumDyeColor.GRAY -> GRAY
+                EnumDyeColor.GREEN -> DARK_GREEN
+                EnumDyeColor.LIME -> GREEN
+                EnumDyeColor.BLUE -> BLUE
+                EnumDyeColor.PURPLE -> DARK_PURPLE
+                EnumDyeColor.YELLOW -> YELLOW
+                else -> {
+                    CopyErrorCommand.logError(
+                        Exception("Unknown dye color: $enumDyeColor"),
+                        "Unknown dye color: $enumDyeColor"
+                    )
+                    return null
+                }
+            }
+        }
     }
 }

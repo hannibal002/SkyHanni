@@ -310,6 +310,7 @@ class SkyHanniMod {
         loadModule(VoltHighlighter())
         loadModule(RiftOdonata())
         loadModule(RiftAgaricusCap())
+        loadModule(DungeonLividFinder)
 
         init()
 
