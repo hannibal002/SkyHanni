@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.jsonobjects.EnigmaSoulsJson
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -130,26 +131,21 @@ object EnigmaSoulWaypoints {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!RiftAPI.inRift()) return
         for (soul in trackedSouls) {
-            soulLocations[soul]?.let { event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), true, true) }
-            soulLocations[soul]?.let { event.drawDynamicText(it.add(0, 1, 0), "§5$soul Soul", 1.0) }
+            soulLocations[soul]?.let {
+                event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
+                event.drawDynamicText(it.add(0, 1, 0), "§5$soul Soul", 1.5)
+            }
         }
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant("EnigmaSouls") ?: return
-
-        for (area in data.entrySet()) {
-            val element = area.value.asJsonArray
-
-            for (i in 0 until element.size()) {
-                val itemObject = element[i].asJsonObject
-                val name = itemObject["name"].asString
-                val position = itemObject["position"].asString
-                val split = position.split(", ")
-                if (split.size == 3) {
-                    soulLocations[name] = LorenzVec(split[0].toDouble(), split[1].toDouble(), split[2].toDouble())
-                }
+        val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls") ?: return
+        val areas = data.areas ?: error("'areas' is null in EnigmaSouls!")
+        soulLocations.clear()
+        for ((area, locations) in areas) {
+            for (location in locations) {
+                soulLocations[location.name] = location.position
             }
         }
     }
@@ -158,7 +154,6 @@ object EnigmaSoulWaypoints {
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
         val message = event.message.removeColor().trim()
-        // not sure how this works for buying the souls
         if (message == "You have already found that Enigma Soul!" || message == "SOUL! You unlocked an Enigma Soul!") {
             hideClosestSoul()
         }
@@ -168,13 +163,15 @@ object EnigmaSoulWaypoints {
         var closestSoul = ""
         var closestDistance = 8.0
 
-        for (soul in soulLocations) {
-            if (soul.value.distanceToPlayer() < closestDistance) {
-                closestSoul = soul.key
-                closestDistance = soul.value.distanceToPlayer()
+        for ((soul, location) in soulLocations) {
+            if (location.distanceToPlayer() < closestDistance) {
+                closestSoul = soul
+                closestDistance = location.distanceToPlayer()
             }
         }
-        trackedSouls.remove(closestSoul)
-        LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!")
+        if (closestSoul in trackedSouls) {
+            trackedSouls.remove(closestSoul)
+            LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!")
+        }
     }
 }
