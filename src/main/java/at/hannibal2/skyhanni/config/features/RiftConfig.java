@@ -118,4 +118,12 @@ public class RiftConfig {
     @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) §7changes color from brown to red and is breakable.")
     @ConfigEditorBoolean
     public boolean agaricusCap = true;
+
+    @Expose
+    @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
+    @ConfigEditorBoolean
+    public boolean cruxTalismanProgress = true;
+
+    @Expose
+    public Position cruxTalismanPosition = new Position(144, 139, false, true);
 }
