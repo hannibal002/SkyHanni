@@ -91,7 +91,7 @@ object Commands {
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shstoplisteners") { SkyHanniTestCommand.stopListeners() }
         registerCommand("shreloadlisteners") { SkyHanniTestCommand.reloadListeners() }
-        registerCommand("shcopylocation") { SkyHanniTestCommand.copyLocation() }
+        registerCommand("shcopylocation") { SkyHanniTestCommand.copyLocation(it) }
         registerCommand("shcopyentities") { CopyNearbyEntitiesCommand.command(it) }
         registerCommand("shcopytablist") { CopyTabListCommand.command(it) }
         registerCommand("shcopyscoreboard") { CopyScoreboardCommand.command(it) }
