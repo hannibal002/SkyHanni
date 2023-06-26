@@ -2,10 +2,22 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import kotlin.time.Duration
 
 object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
+
+
+    fun formatDuration(
+        duration: Duration,
+        biggestUnit: TimeUnit = TimeUnit.YEAR,
+        showMilliSeconds: Boolean = false,
+        longName: Boolean = false,
+        maxUnits: Int = -1
+    ): String = formatDuration(
+        duration.inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
+    )
 
     fun formatDuration(
         millis: Long,
@@ -14,6 +26,7 @@ object TimeUtils {
         longName: Boolean = false,
         maxUnits: Int = -1
     ): String {
+        // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
         var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
         for (unit in TimeUnit.values()) {

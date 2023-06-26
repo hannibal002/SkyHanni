@@ -286,6 +286,11 @@
   + Customize the color
 + **Agaricus Cap** countdown
   + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
++ **Volt Crux Warning** (Contributed by nea)
+  + Shows a warning while a volt is discharging lightning
+  + Shows the area in which a Volt might strike lightning
+  + Change the color of the area
+  + Change the color of the volt enemy depending on their mood (default disabled)
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

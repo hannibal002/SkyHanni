@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CruxWarnings {
+class ShyCruxWarnings {
     private val shyNames = arrayOf("I'm ugly! :(", "Eek!", "Don't look at me!", "Look away!")
 
     @SubscribeEvent

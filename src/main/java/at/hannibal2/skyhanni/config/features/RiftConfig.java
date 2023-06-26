@@ -47,6 +47,28 @@ public class RiftConfig {
                 "Useful if you play without volume.")
         @ConfigEditorBoolean
         public boolean shyWarning = true;
+
+
+        @Expose
+        @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a volt is discharging lightning.")
+        @ConfigEditorBoolean
+        public boolean voltWarning = true;
+
+        @Expose
+        @ConfigOption(name = "Volt Range Highlighter", desc = "Shows the area in which a Volt might strike lightning.")
+        @ConfigEditorBoolean
+        public boolean voltRange = true;
+
+        @Expose
+        @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the volt range be highlighted?")
+        @ConfigEditorColour
+        public String voltColour = "0:60:0:0:255";
+
+        @Expose
+        @ConfigOption(name = "Volt mood color", desc = "Change the color of the volt enemy depending on their mood.")
+        @ConfigEditorBoolean
+        public boolean voltMoodMeter = false;
+
     }
 
     @ConfigOption(name = "Larvas", desc = "")

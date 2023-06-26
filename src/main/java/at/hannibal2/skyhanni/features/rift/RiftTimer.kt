@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.rift
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -23,17 +22,6 @@ class RiftTimer {
         display = emptyList()
         maxTime = 0
         latestTime = 0
-    }
-
-    @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-
-        val message = event.message
-        "    §r§7You have §r§a(?<time>.*)ф §r§7left before the rift collapses!".toPattern().matchMatcher(message) {
-            val time = group("time")
-            maxTime = getTime(time)
-        }
     }
 
     @SubscribeEvent

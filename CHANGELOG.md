@@ -2,13 +2,6 @@
 
 ## Version 0.19 (unreleased)
 
-### New Features
-+ **Frozen Treasure Tracker** (Contributed by CalMWolfs)
-  + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
-  + Show Ice per hour
-  + Customizable GUI
-  + Option to hide the chat messages
-
 #### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
@@ -26,6 +19,18 @@
 + Added **Agaricus Cap** countdown
   + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
 + Added **Leech Supreme** to Damage Indicator
++ Added **Volt Crux Warning** (Contributed by nea)
+  + Shows a warning while a volt is discharging lightning
+  + Shows the area in which a Volt might strike lightning
+  + Change the color of the area
+  + Change the color of the volt enemy depending on their mood (default disabled)
+
+### Other Features
++ **Frozen Treasure Tracker** (Contributed by CalMWolfs)
+  + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
+  + Show Ice per hour
+  + Customizable GUI
+  + Option to hide the chat messages
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
