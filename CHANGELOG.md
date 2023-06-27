@@ -41,6 +41,7 @@
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
++ Added option to show exact prices in estimated item value
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore

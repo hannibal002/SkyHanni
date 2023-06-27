@@ -240,6 +240,12 @@ public class Misc {
     public boolean estimatedIemValueAlwaysEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean estimatedIemValueExactPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor in the wardrobe inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
