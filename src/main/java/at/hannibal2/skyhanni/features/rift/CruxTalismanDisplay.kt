@@ -50,37 +50,37 @@ class CruxTalismanDisplay {
         if (!event.isMod(20)) return
         displayLine.clear()
         bonusesLine.clear()
-        var found = false
-        var bonusFound = false
+
         val inventoryStack = InventoryUtils.getItemsInOwnInventory()
-        for (stack in inventoryStack) {
-            val internalName = stack.getInternalName()
-            if (internalName.contains(partialName)) {
-                for (line in stack.getLore()) {
-                    if (line.startsWith("§7Kill Milestones")) {
-                        found = true
-                        continue
-                    }
-                    if (found) {
-                        if (line.isEmpty()) {
-                            found = false
-                            continue
-                        }
-                        displayLine.add(line)
-                    }
+        inventoryStack.filter { it.getInternalName().contains(partialName) }.forEach { stack ->
+            var found = false
+            var bonusFound = false
+
+            stack.getLore().forEach forEachLine@{ line ->
+                if (line.startsWith("§7Kill Milestones")) {
+                    found = true
+                    return@forEachLine
                 }
-                for (line in stack.getLore()) {
-                    if (line.startsWith("§7Total Bonuses")) {
-                        bonusFound = true
-                        continue
+
+                if (found) {
+                    if (line.isEmpty()) {
+                        found = false
+                        return@forEachLine
                     }
-                    if (bonusFound) {
-                        if (line.isEmpty()) {
-                            bonusFound = false
-                            continue
-                        }
-                        bonusesLine.add(line)
+                    displayLine.add(line)
+                }
+
+                if (line.startsWith("§7Total Bonuses")) {
+                    bonusFound = true
+                    return@forEachLine
+                }
+
+                if (bonusFound) {
+                    if (line.isEmpty()) {
+                        bonusFound = false
+                        return@forEachLine
                     }
+                    bonusesLine.add(line)
                 }
             }
         }
@@ -88,5 +88,4 @@ class CruxTalismanDisplay {
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.cruxTalismanProgress && InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }
-
 }
