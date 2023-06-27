@@ -109,6 +109,25 @@ public class RiftConfig {
 
     }
 
+    @ConfigOption(name = "Enigma Soul Waypoints", desc = "")
+    @Accordion
+    @Expose
+    public EnigmaSoulConfig enigmaSoulWaypoints = new EnigmaSoulConfig();
+
+    public static class EnigmaSoulConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Click on Enigma Souls in Rift Guides to highlight their location.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Color", desc = "Color of the Enigma Souls.")
+        @ConfigEditorColour
+        public String color = "0:120:13:49:255";
+
+    }
+
     @Expose
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
     @ConfigEditorBoolean
