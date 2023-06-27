@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.slayer
 
+import net.minecraft.entity.Entity
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
@@ -12,6 +13,7 @@ enum class SlayerType(val displayName: String, val clazz: Class<*>) {
     SVEN("Sven Packmaster", EntityWolf::class.java),
     VOID("Voidgloom Seraph", EntityEnderman::class.java),
     INFERNO("Inferno Demonlord", EntityBlaze::class.java),
+    VAMPIRE("Riftstalker Bloodfiend", Entity::class.java)
     ;
 
     companion object {
@@ -39,6 +41,10 @@ enum class SlayerType(val displayName: String, val clazz: Class<*>) {
                 "The Wasteland",
                 "Smoldering Tomb",
                 -> INFERNO
+
+                "Stillgore Château",
+                "Oubliette",
+                -> VAMPIRE
 
                 else -> return null
             }
