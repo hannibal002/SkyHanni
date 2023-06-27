@@ -24,6 +24,8 @@
   + Shows the area in which a Volt might strike lightning
   + Change the color of the area
   + Change the color of the volt enemy depending on their mood (default disabled)
++ Added **Enigma Soul Waypoints** (Contributed by CalMWolfs)
+  + Click on the soul name inside Rift Guide to show/hide
 
 ### Other Features
 + **Frozen Treasure Tracker** (Contributed by CalMWolfs)
