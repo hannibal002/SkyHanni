@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CruxTalismanDisplay {
@@ -17,6 +16,7 @@ class CruxTalismanDisplay {
     private val partialName = "CRUX_TALISMAN"
     private var display = listOf<List<Any>>()
     private val displayLine = mutableListOf<String>()
+    private val bonusesLine = mutableListOf<String>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -32,7 +32,16 @@ class CruxTalismanDisplay {
     }
 
     private fun drawDisplay(): List<List<Any>> {
-        return buildList { if (displayLine.isNotEmpty()) displayLine.forEach { addAsSingletonList(it) } }
+        return buildList {
+            if (displayLine.isNotEmpty()) {
+                addAsSingletonList("§7Progress:")
+                displayLine.forEach { addAsSingletonList(it) }
+            }
+            if (bonusesLine.isNotEmpty()) {
+                addAsSingletonList("§7Bonuses:")
+                bonusesLine.forEach { addAsSingletonList("  $it") }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -40,7 +49,9 @@ class CruxTalismanDisplay {
         if (!isEnabled()) return
         if (!event.isMod(20)) return
         displayLine.clear()
+        bonusesLine.clear()
         var found = false
+        var bonusFound = false
         val inventoryStack = InventoryUtils.getItemsInOwnInventory()
         for (stack in inventoryStack) {
             val internalName = stack.getInternalName()
@@ -56,6 +67,19 @@ class CruxTalismanDisplay {
                             continue
                         }
                         displayLine.add(line)
+                    }
+                }
+                for (line in stack.getLore()) {
+                    if (line.startsWith("§7Total Bonuses")) {
+                        bonusFound = true
+                        continue
+                    }
+                    if (bonusFound) {
+                        if (line.isEmpty()) {
+                            bonusFound = false
+                            continue
+                        }
+                        bonusesLine.add(line)
                     }
                 }
             }
