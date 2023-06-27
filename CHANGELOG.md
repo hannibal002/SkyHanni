@@ -44,7 +44,8 @@
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
-  = Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
++ Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
++ Fixed frozen treasures per hour display being inaccurate (Contributed by CalMWolfs)
 
 ## Version 0.18 (2023-06-19)
 
