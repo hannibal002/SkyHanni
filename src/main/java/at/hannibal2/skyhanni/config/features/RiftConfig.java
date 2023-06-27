@@ -33,6 +33,7 @@ public class RiftConfig {
 
         @Expose
         public Position timerPosition = new Position(10, 10, false, true);
+
     }
 
     @ConfigOption(name = "Crux Warnings", desc = "")
@@ -47,7 +48,6 @@ public class RiftConfig {
                 "Useful if you play without volume.")
         @ConfigEditorBoolean
         public boolean shyWarning = true;
-
 
         @Expose
         @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a volt is discharging lightning.")
@@ -117,7 +117,8 @@ public class RiftConfig {
     public static class OdonataConfig {
 
         @Expose
-        @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding a §eEmpty Odonata Bottle §7in the hand.")
+        @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding a " +
+                "§eEmpty Odonata Bottle §7in the hand.")
         @ConfigEditorBoolean
         public boolean highlight = true;
 
@@ -128,13 +129,57 @@ public class RiftConfig {
 
     }
 
+    @ConfigOption(name = "Enigma Soul Waypoints", desc = "")
+    @Accordion
+    @Expose
+    public EnigmaSoulConfig enigmaSoulWaypoints = new EnigmaSoulConfig();
+
+    public static class EnigmaSoulConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Click on Enigma Souls in Rift Guides to highlight their location.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Color", desc = "Color of the Enigma Souls.")
+        @ConfigEditorColour
+        public String color = "0:120:13:49:255";
+
+    }
+
     @Expose
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
     @ConfigEditorBoolean
     public boolean highlightGuide = true;
 
     @Expose
-    @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) §7changes color from brown to red and is breakable.")
+    @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) " +
+            "§7changes color from brown to red and is breakable.")
     @ConfigEditorBoolean
     public boolean agaricusCap = true;
+
+    @ConfigOption(name = "Kloon Hacking", desc = "")
+    @Accordion
+    @Expose
+    public KloonHacking hacking = new KloonHacking();
+
+    public static class KloonHacking {
+
+        @Expose
+        @ConfigOption(name = "Hacking Solver", desc = "Highlights the correct button to click in the hacking inventory.")
+        @ConfigEditorBoolean
+        public boolean solver = true;
+
+        @Expose
+        @ConfigOption(name = "Color Guide", desc = "Tells you which colour to pick.")
+        @ConfigEditorBoolean
+        public boolean colour = true;
+
+        @Expose
+        @ConfigOption(name = "Terminal Waypoints", desc = "While wearing the helmet, waypoints will appear at each terminal location.")
+        @ConfigEditorBoolean
+        public boolean waypoints = true;
+
+    }
 }

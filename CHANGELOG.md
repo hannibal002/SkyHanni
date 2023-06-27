@@ -24,6 +24,12 @@
   + Shows the area in which a Volt might strike lightning
   + Change the color of the area
   + Change the color of the volt enemy depending on their mood (default disabled)
++ Added **Enigma Soul Waypoints** (Contributed by CalMWolfs)
+  + Click on the soul name inside Rift Guide to show/hide
++ Added **Kloon Hacking** (Contributed by CalMWolfs)
+  + Highlights the correct button to click in the hacking inventory
+  + Tells you which colour to pick
+  + While wearing the helmet, waypoints will appear at each terminal location
 
 ### Other Features
 + **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -38,6 +44,8 @@
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
++ Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
++ Fixed frozen treasures per hour display being inaccurate (Contributed by CalMWolfs)
 
 ## Version 0.18 (2023-06-19)
 
