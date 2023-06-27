@@ -23,6 +23,7 @@ class KloonHacking {
     private var inTerminalInventory = false
     private var inColourInventory = false
     private val correctButtons = mutableListOf<String>()
+    private var nearestColor: String? = null
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -60,21 +61,19 @@ class KloonHacking {
     fun onInventoryClose(event: InventoryCloseEvent) {
         inTerminalInventory = false
         inColourInventory = false
+        nearestColor = null
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!RiftAPI.inRift()) return
-        if (!SkyHanniMod.feature.rift.hacking.solver) return
         if (inTerminalInventory) {
+            if (!SkyHanniMod.feature.rift.hacking.solver) return
             var i = 0
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.slotIndex == 11 + 10 * i) {
-                    if (slot.stack!!.displayName.removeColor() == correctButtons[i]) {
-                        slot highlight LorenzColor.GREEN
-                    } else {
-                        slot highlight LorenzColor.RED
-                    }
+                    val correctButton = slot.stack!!.displayName.removeColor() == correctButtons[i]
+                    slot highlight if (correctButton) LorenzColor.GREEN else LorenzColor.RED
                     continue
                 }
                 if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18) {
@@ -89,14 +88,10 @@ class KloonHacking {
         }
         if (inColourInventory) {
             if (!SkyHanniMod.feature.rift.hacking.colour) return
-            val targetColour = getNearestColour()
+            val targetColour = nearestColor ?: getNearestColour()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slot.stack!!.getLore().isNotEmpty()) {
-                    for (line in slot.stack.getLore()) {
-                        if (line.contains(targetColour)) {
-                            slot highlight LorenzColor.GREEN
-                        }
-                    }
+                if (slot.stack.getLore().any { it.contains(targetColour) }) {
+                    slot highlight LorenzColor.GREEN
                 }
             }
         }
@@ -124,11 +119,13 @@ class KloonHacking {
         var closestDistance = 8.0
 
         for (terminal in KloonTerminal.values()) {
-            if (terminal.location.distanceToPlayer() < closestDistance) {
+            val distance = terminal.location.distanceToPlayer()
+            if (distance < closestDistance) {
                 closestTerminal = terminal.name
-                closestDistance = terminal.location.distanceToPlayer()
+                closestDistance = distance
             }
         }
+        nearestColor = closestTerminal
         return closestTerminal
     }
 }
