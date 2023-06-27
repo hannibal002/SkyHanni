@@ -311,6 +311,7 @@ class SkyHanniMod {
         loadModule(RiftOdonata())
         loadModule(RiftAgaricusCap())
         loadModule(EnigmaSoulWaypoints)
+        loadModule(DungeonLividFinder)
 
         init()
 
