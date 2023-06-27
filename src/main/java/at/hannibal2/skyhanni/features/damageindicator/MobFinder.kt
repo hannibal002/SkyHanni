@@ -174,7 +174,11 @@ class MobFinder {
             if (DungeonData.isOneOf("F5", "M5")) {
                 if (entity is EntityOtherPlayerMP) {
                     if (entity == DungeonLividFinder.livid) {
-                        return EntityResult(bossType=BossType.DUNGEON_F5, ignoreBlocks = true, finalDungeonBoss = true)
+                        return EntityResult(
+                            bossType = BossType.DUNGEON_F5,
+                            ignoreBlocks = true,
+                            finalDungeonBoss = true
+                        )
                     }
                 }
             }
@@ -521,7 +525,7 @@ class MobFinder {
 
                 //F5
                 "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
-                    floor5lividEntity = findLivid()
+                    floor5lividEntity = DungeonLividFinder.livid
                     floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
                 }
 
@@ -577,9 +581,5 @@ class MobFinder {
                 }
             }
         }
-    }
-
-    private fun findLivid(): EntityOtherPlayerMP? {
-        return DungeonLividFinder.livid
     }
 }
