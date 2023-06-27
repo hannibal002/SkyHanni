@@ -11,15 +11,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.util.Utils
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
 
 class CruxTalismanDisplay {
 
-    private val config get() = SkyHanniMod.feature.rift.crux
+    private val config get() = SkyHanniMod.feature.rift.cruxTalisman
     private val partialName = "CRUX_TALISMAN"
     private var display = listOf<List<Any>>()
     private val displayLine = mutableListOf<Crux>()
@@ -31,7 +27,7 @@ class CruxTalismanDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.cruxTalismanPosition.renderStringsAndItems(
+        config.position.renderStringsAndItems(
                 display,
                 posLabel = "Crux Talisman Display"
         )
@@ -51,17 +47,28 @@ class CruxTalismanDisplay {
             if (i == 6)
                 maxed = true
 
+            if(!config.compactWhenMaxed && maxed) maxed = false
+
             if (displayLine.isNotEmpty()) {
                 addAsSingletonList("§7Crux Talisman Progress: ${if (maxed) "§a§lMAXED!" else "§a$percent%"}")
                 if (!maxed) {
                     displayLine.forEach {
-                        if (!it.maxed) {
-                            p += it.progress.removeColor().split("/")[0].toInt()
-                            addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
+                        if (config.compactWhenMaxed) {
+                            if (!it.maxed) {
+                                p += it.progress.removeColor().split("/")[0].toInt()
+                                addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
+                            } else {
+                                addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
+                                p += 100
+                            }
                         } else {
                             addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
-                            p += 100
+                            p += if (it.progress.contains("MAXED"))
+                                100
+                            else
+                                it.progress.removeColor().split("/")[0].toInt()
                         }
+
                     }
                 }
             }
@@ -84,7 +91,6 @@ class CruxTalismanDisplay {
         inventoryStack.filter { it.getInternalName().contains(partialName) }.forEach { stack ->
             var bonusFound = false
             stack.getLore().forEach line@{ line ->
-                println(line)
                 progressPattern.matchMatcher(line) {
                     val tier = group("tier").replace("-", "0")
                     val name = group("name")
@@ -110,5 +116,5 @@ class CruxTalismanDisplay {
 
     data class Crux(val name: String, val tier: String, val progress: String, val maxed: Boolean)
 
-    fun isEnabled() = RiftAPI.inRift() && config.cruxTalismanProgress && InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }
+    fun isEnabled() = RiftAPI.inRift() && config.enabled && InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }
 }

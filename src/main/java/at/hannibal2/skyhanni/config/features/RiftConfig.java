@@ -35,7 +35,7 @@ public class RiftConfig {
         public Position timerPosition = new Position(10, 10, false, true);
     }
 
-    @ConfigOption(name = "Crux Features", desc = "")
+    @ConfigOption(name = "Crux Warnings", desc = "")
     @Accordion
     @Expose
     public CruxWarnings crux = new CruxWarnings();
@@ -68,14 +68,26 @@ public class RiftConfig {
         @ConfigOption(name = "Volt mood color", desc = "Change the color of the volt enemy depending on their mood.")
         @ConfigEditorBoolean
         public boolean voltMoodMeter = false;
+    }
 
+    @ConfigOption(name = "Crux Talisman Progress", desc = "")
+    @Accordion
+    @Expose
+    public CruxTalisman cruxTalisman = new CruxTalisman();
+
+    public static class CruxTalisman {
         @Expose
         @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
         @ConfigEditorBoolean
-        public boolean cruxTalismanProgress = true;
+        public boolean enabled = true;
 
         @Expose
-        public Position cruxTalismanPosition = new Position(144, 139, false, true);
+        @ConfigOption(name = "Compact", desc = "Show a compacted version of the overlay when the talisman is maxed.")
+        @ConfigEditorBoolean
+        public boolean compactWhenMaxed = false;
+
+        @Expose
+        public Position position = new Position(144, 139, false, true);
     }
 
     @ConfigOption(name = "Larvas", desc = "")
