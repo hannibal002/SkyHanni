@@ -357,7 +357,7 @@ object GhostCounter {
         if (inventoryName != "Bestiary ➜ Deep Caverns") return
         val stacks = event.inventoryItems
         val ghostStack = stacks[13] ?: return
-        val bestiaryNextLevel = Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
+        val bestiaryNextLevel = if (ghostStack.displayName == "§cGhost") 1 else Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
         hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
 
         for (line in ghostStack.getLore()) {
