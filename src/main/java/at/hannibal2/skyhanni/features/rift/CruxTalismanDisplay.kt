@@ -11,7 +11,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.util.Utils
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 
 class CruxTalismanDisplay {
 
@@ -48,7 +52,7 @@ class CruxTalismanDisplay {
                 maxed = true
 
             if (displayLine.isNotEmpty()) {
-                addAsSingletonList("§7Crux Talisman Progress: ${if (maxed) "§a§lMAXED!" else ""}")
+                addAsSingletonList("§7Crux Talisman Progress: ${if (maxed) "§a§lMAXED!" else "§a$percent%"}")
                 if (!maxed) {
                     displayLine.forEach {
                         if (!it.maxed) {
@@ -82,7 +86,7 @@ class CruxTalismanDisplay {
             stack.getLore().forEach line@{ line ->
                 println(line)
                 progressPattern.matchMatcher(line) {
-                    val tier = group("tier")
+                    val tier = group("tier").replace("-", "0")
                     val name = group("name")
                     val progress = group("progress")
                     val crux = Crux(name, tier, progress, progress.contains("MAXED"))
