@@ -23,7 +23,6 @@ class CruxTalismanDisplay {
         if (!isEnabled()) return
         config.cruxTalismanPosition.renderStringsAndItems(
                 display,
-                extraSpace = 0,
                 posLabel = "Crux Talisman Display"
         )
 
@@ -46,7 +45,7 @@ class CruxTalismanDisplay {
         val inventoryStack = InventoryUtils.getItemsInOwnInventory()
         for (stack in inventoryStack) {
             val internalName = stack.getInternalName()
-            if (internalName.contains("CRUX_TALISMAN".toRegex())) {
+            if (internalName.contains(partialName)) {
                 for (line in stack.getLore()) {
                     if (line.startsWith("§7Kill Milestones")) {
                         found = true
