@@ -35,7 +35,7 @@ object QuickModMenuSwitch {
                         Class.forName(path)
                         add(Mod(name, mod.description, mod.command, mod.guiPath))
                         continue@out
-                    } catch (ignored_: Exception) {
+                    } catch (_: Exception) {
                     }
                 }
             }
