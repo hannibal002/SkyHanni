@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EnigmaSoulWaypoints {
+    private val config get() = SkyHanniMod.feature.rift.enigmaSoulWaypoints
     private var inInventory = false
     private val soulLocations = mutableMapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
@@ -45,6 +47,8 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
+        if (!isEnabled()) return
+
         if (inventoryUnfound.isEmpty()) return
         if (event.inventory is ContainerLocalMenu && inInventory && event.slotNumber == 31) {
             event.replaceWith(item)
@@ -76,7 +80,7 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: SlotClickEvent) {
-        if (!inInventory || !RiftAPI.inRift()) return
+        if (!inInventory || !isEnabled()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
             event.usePickblockInstead()
@@ -106,7 +110,7 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!RiftAPI.inRift() || !inInventory) return
+        if (!isEnabled() || !inInventory) return
 
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
@@ -129,7 +133,7 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!isEnabled()) return
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
@@ -152,7 +156,7 @@ object EnigmaSoulWaypoints {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!isEnabled()) return
         val message = event.message.removeColor().trim()
         if (message == "You have already found that Enigma Soul!" || message == "SOUL! You unlocked an Enigma Soul!") {
             hideClosestSoul()
@@ -174,4 +178,6 @@ object EnigmaSoulWaypoints {
             LorenzUtils.chat("§5Found the $closestSoul Enigma Soul!")
         }
     }
+
+    fun isEnabled() = RiftAPI.inRift() && config.enabled
 }
