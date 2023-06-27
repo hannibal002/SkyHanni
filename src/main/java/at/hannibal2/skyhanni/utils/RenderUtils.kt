@@ -803,16 +803,15 @@ object RenderUtils {
     fun RenderWorldLastEvent.draw3DLine(
         p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean, targetColor: Color? = null
     ) {
-
         val render = Minecraft.getMinecraft().renderViewEntity
         val worldRenderer = Tessellator.getInstance().worldRenderer
         val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
         val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
         val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
         GlStateManager.pushMatrix()
-        GlStateManager.pushAttrib()
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
+        GlStateManager.disableLighting()
         GlStateManager.translate(-realX, -realY, -realZ)
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
@@ -823,24 +822,26 @@ object RenderUtils {
             GL11.glDisable(GL11.GL_DEPTH_TEST)
             GlStateManager.depthMask(false)
         }
-        GlStateManager.shadeModel(GL11.GL_SMOOTH)
         GlStateManager.color(1f, 1f, 1f, 1f)
+        if (targetColor != null)
+            GlStateManager.shadeModel(GL11.GL_SMOOTH)
         worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR)
         worldRenderer.pos(p1.x, p1.y, p1.z).color(color.red, color.green, color.blue, color.alpha).endVertex()
         val secondColor = targetColor ?: color
-        worldRenderer.pos(p2.x, p2.y, p2.z).color(secondColor.red, secondColor.green, secondColor.blue, secondColor.alpha).endVertex()
+        worldRenderer.pos(p2.x, p2.y, p2.z)
+            .color(secondColor.red, secondColor.green, secondColor.blue, secondColor.alpha).endVertex()
         Tessellator.getInstance().draw()
         if (!depth) {
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GlStateManager.depthMask(true)
         }
+        GlStateManager.shadeModel(GL11.GL_FLAT)
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
-        GlStateManager.popAttrib()
     }
 
     fun RenderWorldLastEvent.exactLocation(entity: Entity): LorenzVec {
@@ -858,11 +859,12 @@ object RenderUtils {
         timeTillRepeat: Duration,
         offset: Float = 0f,
         saturation: Float = 1F,
-        brightness: Float = 0.8F
+        brightness: Float = 0.8F,
+        timeOverride: Long = System.currentTimeMillis()
     ): Color {
         return Color(
             Color.HSBtoRGB(
-                ((offset + System.currentTimeMillis() / timeTillRepeat.toDouble(DurationUnit.MILLISECONDS)) % 1).toFloat(),
+                ((offset + timeOverride / timeTillRepeat.toDouble(DurationUnit.MILLISECONDS)) % 1).toFloat(),
                 saturation,
                 brightness
             )
