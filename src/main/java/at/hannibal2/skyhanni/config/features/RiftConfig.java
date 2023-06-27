@@ -35,7 +35,7 @@ public class RiftConfig {
         public Position timerPosition = new Position(10, 10, false, true);
     }
 
-    @ConfigOption(name = "Crux Warnings", desc = "")
+    @ConfigOption(name = "Crux Features", desc = "")
     @Accordion
     @Expose
     public CruxWarnings crux = new CruxWarnings();
@@ -69,6 +69,13 @@ public class RiftConfig {
         @ConfigEditorBoolean
         public boolean voltMoodMeter = false;
 
+        @Expose
+        @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
+        @ConfigEditorBoolean
+        public boolean cruxTalismanProgress = true;
+
+        @Expose
+        public Position cruxTalismanPosition = new Position(144, 139, false, true);
     }
 
     @ConfigOption(name = "Larvas", desc = "")
@@ -118,12 +125,4 @@ public class RiftConfig {
     @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) §7changes color from brown to red and is breakable.")
     @ConfigEditorBoolean
     public boolean agaricusCap = true;
-
-    @Expose
-    @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
-    @ConfigEditorBoolean
-    public boolean cruxTalismanProgress = true;
-
-    @Expose
-    public Position cruxTalismanPosition = new Position(144, 139, false, true);
 }

@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CruxTalismanDisplay {
 
-    private val config get() = SkyHanniMod.feature.rift
+    private val config get() = SkyHanniMod.feature.rift.crux
     private val partialName = "CRUX_TALISMAN"
     private var display = listOf<List<Any>>()
     private val displayLine = mutableListOf<String>()
@@ -25,7 +25,6 @@ class CruxTalismanDisplay {
                 display,
                 posLabel = "Crux Talisman Display"
         )
-
     }
 
     private fun update() {
