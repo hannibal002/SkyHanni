@@ -291,6 +291,8 @@
   + Shows the area in which a Volt might strike lightning
   + Change the color of the area
   + Change the color of the volt enemy depending on their mood (default disabled)
++ **Enigma Soul Waypoints** (Contributed by CalMWolfs)
+  + Click on the soul name inside Rift Guide to show/hide
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
