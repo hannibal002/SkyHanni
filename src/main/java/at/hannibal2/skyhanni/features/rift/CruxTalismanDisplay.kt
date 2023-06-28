@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
 object CruxTalismanDisplay {
 
@@ -40,14 +39,6 @@ object CruxTalismanDisplay {
         display = drawDisplay()
     }
 
-    fun setLore() {
-        val lore = listOf(
-                " §23 §2Shy§7: §e82§7/§a100 §7kills",
-                " §82 §8Shadow§7: §e33§7/§a50 §7kills",
-                " §e- §eVolt§7: §e3§7/§a10 §7kills").toTypedArray()
-        Utils.editItemStackInfo(InventoryUtils.getItemInHand(), InventoryUtils.getItemInHand()?.displayName, false, *lore)
-    }
-
     private fun drawDisplay() = buildList {
         var maxedKill = 0
         var percent = 0
@@ -65,16 +56,17 @@ object CruxTalismanDisplay {
                 displayLine.forEach {
                     percent += if (config.compactWhenMaxed) {
                         if (!it.maxed) {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)?.toInt() ?: 0
+                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)?.toInt()
+                                    ?: 0
                         } else {
                             100
                         }
                     } else {
                         if (it.progress.contains("MAXED"))
                             100
-                        else
-                        {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)?.toInt() ?: 0
+                        else {
+                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)?.toInt()
+                                    ?: 0
                         }
                     }
                     addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
@@ -91,12 +83,9 @@ object CruxTalismanDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (event.isMod(40)) {
-            containItem = InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }
-        }
-
         if (!isEnabled()) return
-        if (event.isMod(20)) {
+        if (event.isMod(40)) {
+            if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }) return
             displayLine.clear()
             bonusesLine.clear()
             maxed = false
@@ -130,5 +119,5 @@ object CruxTalismanDisplay {
 
     data class Crux(val name: String, val tier: String, val progress: String, val maxed: Boolean)
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled && containItem
+    fun isEnabled() = RiftAPI.inRift() && config.enabled
 }

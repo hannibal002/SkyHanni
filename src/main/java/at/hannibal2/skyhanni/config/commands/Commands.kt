@@ -101,7 +101,6 @@ object Commands {
         registerCommand("shtestpacket") { PacketTest.toggle() }
         registerCommand("shtestmessage") { TestChatCommand.command(it) }
         registerCommand("shcopyerror") { CopyErrorCommand.command(it) }
-        registerCommand("shsetlore") { CruxTalismanDisplay.setLore()}
 
     }
 
