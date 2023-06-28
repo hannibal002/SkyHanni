@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -111,6 +112,11 @@ class ItemAbilityCooldown {
         if (event.soundName == "random.eat") {
             if (event.pitch == 1.0f && event.volume == 1.0f) {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
+            }
+        }
+        if (event.soundName == "random.drink") {
+            if (event.pitch == 1.8888888f && event.volume == 1.0f) {
+                ItemAbility.HOLY_ICE.sound()
             }
         }
     }
