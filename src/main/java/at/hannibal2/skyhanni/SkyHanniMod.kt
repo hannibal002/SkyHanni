@@ -313,7 +313,7 @@ class SkyHanniMod {
         loadModule(KloonHacking())
         loadModule(EnigmaSoulWaypoints)
         loadModule(DungeonLividFinder)
-        loadModule(CruxTalismanDisplay())
+        loadModule(CruxTalismanDisplay)
 
         init()
 

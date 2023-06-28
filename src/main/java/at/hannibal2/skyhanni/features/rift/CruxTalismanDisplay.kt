@@ -11,9 +11,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
-class CruxTalismanDisplay {
+object CruxTalismanDisplay {
 
     private val config get() = SkyHanniMod.feature.rift.cruxTalisman
     private val partialName = "CRUX_TALISMAN"
@@ -23,7 +25,7 @@ class CruxTalismanDisplay {
     private val progressPattern = ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|(?:§[0-9a-z]\\d+§[0-9a-z]\\/§[0-9a-z]\\d+)).*".toPattern()
     private var containItem = false
     private var maxed = false
-    private var percent = 0.0
+    private var percentValue = 0.0
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -38,60 +40,70 @@ class CruxTalismanDisplay {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): List<List<Any>> {
-        return buildList {
-            var i = 0
-            var p = 0
-            for (crux in displayLine)
-                if (crux.maxed)
-                    i++
-            if (i == 6)
-                maxed = true
+    fun setLore() {
+        val lore = listOf(
+                " §23 §2Shy§7: §e82§7/§a100 §7kills",
+                " §82 §8Shadow§7: §e33§7/§a50 §7kills",
+                " §e- §eVolt§7: §e3§7/§a10 §7kills").toTypedArray()
+        Utils.editItemStackInfo(InventoryUtils.getItemInHand(), InventoryUtils.getItemInHand()?.displayName, false, *lore)
+    }
 
-            if (!config.compactWhenMaxed && maxed) maxed = false
+    private fun drawDisplay() = buildList {
+        var maxedKill = 0
+        var percent = 0
+        for (crux in displayLine)
+            if (crux.maxed)
+                maxedKill++
+        if (maxedKill == 6)
+            maxed = true
 
-            if (displayLine.isNotEmpty()) {
-                addAsSingletonList("§7Crux Talisman Progress: ${if (maxed) "§a§lMAXED!" else "§a$percent%"}")
-                if (!maxed) {
-                    displayLine.forEach {
-                        if (config.compactWhenMaxed) {
-                            if (!it.maxed) {
-                                p += it.progress.removeColor().split("/")[0].toInt()
-                                addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
-                            } else {
-                                addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
-                                p += 100
-                            }
+        if (!config.compactWhenMaxed && maxed) maxed = false
+
+        if (displayLine.isNotEmpty()) {
+            addAsSingletonList("§7Crux Talisman Progress: ${if (maxed) "§a§lMAXED!" else "§a$percentValue%"}")
+            if (!maxed) {
+                displayLine.forEach {
+                    percent += if (config.compactWhenMaxed) {
+                        if (!it.maxed) {
+                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)?.toInt() ?: 0
                         } else {
-                            addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
-                            p += if (it.progress.contains("MAXED"))
-                                100
-                            else
-                                it.progress.removeColor().split("/")[0].toInt()
+                            100
                         }
-
+                    } else {
+                        if (it.progress.contains("MAXED"))
+                            100
+                        else
+                        {
+                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)?.toInt() ?: 0
+                        }
                     }
+                    addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
                 }
             }
-            percent = ((p.toDouble() / 600) * 100).roundToPrecision(1)
-            if (bonusesLine.isNotEmpty()) {
-                addAsSingletonList("§7Bonuses:")
-                bonusesLine.forEach { addAsSingletonList("  $it") }
-            }
+        }
+        percentValue = ((percent.toDouble() / 600) * 100).roundToPrecision(1)
+        if (bonusesLine.isNotEmpty() && config.showBonuses) {
+            addAsSingletonList("§7Bonuses:")
+            bonusesLine.forEach { addAsSingletonList("  $it") }
         }
     }
 
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (event.isMod(40)) {
+            containItem = InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }
+        }
+
         if (!isEnabled()) return
         if (event.isMod(20)) {
             displayLine.clear()
             bonusesLine.clear()
             maxed = false
+            var bonusFound = false
             val inventoryStack = InventoryUtils.getItemsInOwnInventory()
-            inventoryStack.filter { it.getInternalName().contains(partialName) }.forEach { stack ->
-                var bonusFound = false
-                stack.getLore().forEach line@{ line ->
+            for (stack in inventoryStack) {
+                line@ for (line in stack.getLore()) {
                     progressPattern.matchMatcher(line) {
                         val tier = group("tier").replace("-", "0")
                         val name = group("name")
@@ -101,20 +113,17 @@ class CruxTalismanDisplay {
                     }
                     if (line.startsWith("§7Total Bonuses")) {
                         bonusFound = true
-                        return@line
+                        continue@line
                     }
                     if (bonusFound) {
                         if (line.isEmpty()) {
                             bonusFound = false
-                            return@line
+                            continue@line
                         }
                         bonusesLine.add(line)
                     }
                 }
             }
-        }
-        if (event.isMod(40)) {
-            containItem = InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }
         }
         update()
     }

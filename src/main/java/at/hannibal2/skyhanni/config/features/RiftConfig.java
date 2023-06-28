@@ -87,6 +87,11 @@ public class RiftConfig {
         public boolean compactWhenMaxed = false;
 
         @Expose
+        @ConfigOption(name = "Show Bonuses", desc = "Show bonuses you get from the talisman.")
+        @ConfigEditorBoolean
+        public boolean showBonuses = true;
+
+        @Expose
         public Position position = new Position(144, 139, false, true);
     }
 
