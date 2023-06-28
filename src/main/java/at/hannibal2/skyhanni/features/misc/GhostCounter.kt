@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -54,7 +55,7 @@ object GhostCounter {
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = listOf<List<Any>>()
     private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
-    private val skillXPPattern = ".*§3\\+(?<gained>.*).*\\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
+    private val skillXPPattern = ".*§3\\+(?<gained>\\d+.?(?:\\d+)?).*\\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val bestiaryPattern = "BESTIARY Ghost .*➜(?<newLevel>.*)".toPattern()
@@ -100,6 +101,7 @@ object GhostCounter {
             }
         }
     }
+    val actionBar = mutableListOf<String>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -228,6 +230,7 @@ object GhostCounter {
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
+        actionBar.add(event.message)
         skillXPPattern.matchMatcher(event.message) {
             val gained = group("gained").formatNumber().toDouble()
             val total = group("total")
@@ -644,4 +647,10 @@ object GhostCounter {
             moneyHourFormat = "  &6$/h: &b%value%"
         }
     }
+
+    fun copyActionbar(){
+        OSUtils.copyToClipboard(actionBar.joinToString("\n" ))
+        actionBar.clear()
+    }
+
 }

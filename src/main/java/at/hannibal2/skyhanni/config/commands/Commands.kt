@@ -86,6 +86,7 @@ object Commands {
         registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
         registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
         registerCommand("shshowcropmoneycalculation") { CropMoneyDisplay.toggleShowCalculation() }
+        registerCommand("shcopyactionbar") { GhostCounter.copyActionbar()}
 
         // for developers - coding help
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
