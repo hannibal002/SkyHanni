@@ -120,14 +120,13 @@ class KloonHacking {
         if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
 
-        "You've set the color of this terminal to (?<colour>.*)!".toPattern()
-            .matchMatcher(event.message.removeColor()) {
-                val hidden = ProfileStorageData.profileSpecific ?: return
-                val colour = group("colour")
-                val completedTerminal = KloonTerminal.values().firstOrNull { it.name == colour } ?: return
-                if (completedTerminal != nearestTerminal) return
-                hidden.completedTerminals.add(completedTerminal)
-            }
+        "You've set the color of this terminal to (?<colour>.*)!".toPattern().matchMatcher(event.message.removeColor()) {
+            val hidden = ProfileStorageData.profileSpecific ?: return
+            val colour = group("colour")
+            val completedTerminal = KloonTerminal.values().firstOrNull { it.name == colour } ?: return
+            if (completedTerminal != nearestTerminal) return
+            hidden.completedTerminals.add(completedTerminal)
+        }
     }
 
     @SubscribeEvent
