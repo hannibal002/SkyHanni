@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -12,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -23,7 +22,7 @@ class KloonHacking {
     private var inTerminalInventory = false
     private var inColourInventory = false
     private val correctButtons = mutableListOf<String>()
-    private var nearestColor: String? = null
+    private var nearestTerminal: KloonTerminal? = null
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -41,6 +40,7 @@ class KloonHacking {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inTerminalInventory = false
         inColourInventory = false
+        nearestTerminal = null
         if (!RiftAPI.inRift()) return
         if (!SkyHanniMod.feature.rift.hacking.solver) return
         if (event.inventoryName == "Hacking" || event.inventoryName == "Hacking (As seen on CSI)") {
@@ -61,7 +61,6 @@ class KloonHacking {
     fun onInventoryClose(event: InventoryCloseEvent) {
         inTerminalInventory = false
         inColourInventory = false
-        nearestColor = null
     }
 
     @SubscribeEvent
@@ -88,9 +87,9 @@ class KloonHacking {
         }
         if (inColourInventory) {
             if (!SkyHanniMod.feature.rift.hacking.colour) return
-            val targetColour = nearestColor ?: getNearestColour()
+            val targetColour = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slot.stack.getLore().any { it.contains(targetColour) }) {
+                if (slot.stack.getLore().any { it.contains(targetColour?.name ?: "") }) {
                     slot highlight LorenzColor.GREEN
                 }
             }
@@ -100,7 +99,6 @@ class KloonHacking {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: SlotClickEvent) {
         if (!inTerminalInventory || !RiftAPI.inRift()) return
-        if (!inTerminalInventory) return
         event.usePickblockInstead()
     }
 
@@ -109,23 +107,53 @@ class KloonHacking {
         if (!RiftAPI.inRift()) return
         if (!SkyHanniMod.feature.rift.hacking.waypoints) return
         if (!wearingHelmet) return
+        val hidden = ProfileStorageData.profileSpecific ?: return
         for (terminal in KloonTerminal.values()) {
-            event.drawWaypointFilled(terminal.location, LorenzColor.DARK_RED.toColor(), true, true)
+            if (terminal !in hidden.completedTerminals) {
+                event.drawWaypointFilled(terminal.location, LorenzColor.DARK_RED.toColor(), true, true)
+            }
         }
     }
 
-    private fun getNearestColour(): String {
-        var closestTerminal = ""
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!RiftAPI.inRift()) return
+        if (!wearingHelmet) return
+
+        "You've set the color of this terminal to (?<colour>.*)!".toPattern()
+            .matchMatcher(event.message.removeColor()) {
+                val hidden = ProfileStorageData.profileSpecific ?: return
+                val colour = group("colour")
+                val completedTerminal = KloonTerminal.values().firstOrNull { it.name == colour } ?: return
+                if (completedTerminal != nearestTerminal) return
+                hidden.completedTerminals.add(completedTerminal)
+            }
+    }
+
+    @SubscribeEvent
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!RiftAPI.inRift()) return
+        if (!inTerminalInventory) return
+        if (!SkyHanniMod.feature.rift.hacking.solver) return
+
+        val neededTooltips = listOf(0, 2, 3, 4, 5, 6, 8, 9, 26, 27, 44, 45)
+        if (event.slot.slotIndex !in neededTooltips) {
+            event.toolTip.clear()
+        }
+    }
+
+    private fun getNearestTerminal(): KloonTerminal? {
+        var closestTerminal: KloonTerminal? = null
         var closestDistance = 8.0
 
         for (terminal in KloonTerminal.values()) {
             val distance = terminal.location.distanceToPlayer()
             if (distance < closestDistance) {
-                closestTerminal = terminal.name
+                closestTerminal = terminal
                 closestDistance = distance
             }
         }
-        nearestColor = closestTerminal
+        nearestTerminal = closestTerminal
         return closestTerminal
     }
 }
