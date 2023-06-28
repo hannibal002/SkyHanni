@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.*
+import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
@@ -58,6 +59,7 @@ import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
+import at.hannibal2.skyhanni.features.rift.*
 import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
@@ -66,9 +68,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.PacketTest
-import at.hannibal2.skyhanni.test.SkyHanniTestCommand
-import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.test.*
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
@@ -95,7 +95,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.18.Beta.17",
+    version = "0.19.Beta.3",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -145,6 +145,7 @@ class SkyHanniMod {
         loadModule(PartyAPI())
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
+        loadModule(RiftAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -221,7 +222,7 @@ class SkyHanniMod {
         loadModule(BarnFishingTimer())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
-        loadModule(SkyBLockLevelGuideHelper())
+        loadModule(SkyblockLevelGuideHelper())
         loadModule(OdgerWaypoint())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
@@ -292,11 +293,26 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(WarpTabComplete)
         loadModule(PlayerTabComplete)
-        loadModule(SlayerItemProfitTracker())
+        loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
         loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
+        loadModule(ArachneChatMessageHider())
+        loadModule(ShowItemUuid())
+        loadModule(FrozenTreasureTracker())
+        loadModule(SlayerRngMeterDisplay())
+        loadModule(GhostCounter)
+        loadModule(RiftTimer())
+        loadModule(HighlightRiftGuide())
+        loadModule(ShyCruxWarnings())
+        loadModule(RiftLarva())
+        loadModule(VoltHighlighter())
+        loadModule(RiftOdonata())
+        loadModule(RiftAgaricusCap())
+        loadModule(KloonHacking())
+        loadModule(EnigmaSoulWaypoints)
+        loadModule(DungeonLividFinder)
 
         init()
 
@@ -306,6 +322,8 @@ class SkyHanniMod {
         loadModule(ButtonOnPause())
         loadModule(PacketTest())
         loadModule(TestBingo)
+        loadModule(TestCopyRngMeterValues)
+        loadModule(HighlightMissingRepoItems())
     }
 
     @Mod.EventHandler

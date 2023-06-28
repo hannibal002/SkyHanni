@@ -42,10 +42,34 @@ public class DevData {
     public boolean modMenuLog = false;
 
     @Expose
-    @ConfigOption(name = "Show internal name", desc = "Show internal names in item lores.")
+    @ConfigOption(name = "Show internal name", desc = "Show internal names in item lore.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showInternalName = false;
+
+    @Expose
+    @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even if it is blank.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showEmptyNames = false;
+
+    @Expose
+    @ConfigOption(name = "Show item UUID", desc = "Show the Unique Identifier of items. in the lore.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showItemUuid = false;
+
+    @Expose
+    @ConfigOption(name = "Copy Rng Meter", desc = "Copies internal names and maxed xp needed from rng meter inventories in json format into the clipboard.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean copyRngMeter = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Missing Repo Items", desc = "Highlights each item in the current inventory that is not in your current NEU repo.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean highlightMissingRepo = false;
 
     @Expose
     public Position debugPos = new Position(10, 10, false, true);

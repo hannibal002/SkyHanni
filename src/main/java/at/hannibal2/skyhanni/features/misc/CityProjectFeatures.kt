@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -52,15 +52,15 @@ class CityProjectFeatures {
 
     private fun checkDailyReminder() {
         if (!config.dailyReminder) return
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
+        val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (LorenzUtils.inDungeons) return
         if (LorenzUtils.inKuudraFight) return
         if (FarmingContestAPI.inContest) return
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
-        if (profileSpecific.nextCityProjectParticipationTime == 0L) return
-        if (System.currentTimeMillis() <= profileSpecific.nextCityProjectParticipationTime) return
+        if (playerSpecific.nextCityProjectParticipationTime == 0L) return
+        if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
 
         if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
         lastReminderSend = System.currentTimeMillis()
@@ -114,7 +114,7 @@ class CityProjectFeatures {
                 if (itemName != "§eContribute this component!") continue
                 nextTime = System.currentTimeMillis()
             }
-            ProfileStorageData.profileSpecific?.nextCityProjectParticipationTime = nextTime
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 
@@ -136,9 +136,8 @@ class CityProjectFeatures {
             list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
                 if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                     LorenzUtils.setTextIntoSign("$amount")
-                } else if (!NEUItems.neuHasFocus() && !LorenzUtils.noTradeMode) {
-                    LorenzUtils.sendCommandToServer("bz ${name.removeColor()}")
-                    OSUtils.copyToClipboard("$amount")
+                } else {
+                    BazaarApi.searchForBazaarItem(name, amount)
                 }
             }) { inInventory && !NEUItems.neuHasFocus() })
 

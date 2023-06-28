@@ -85,7 +85,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
-    public DamageIndicator damageIndicator = new DamageIndicator();
+    public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
@@ -114,6 +114,14 @@ public class Features extends Config {
     @Expose
     @Category(name = "Garden", desc = "Features on the Garden island.")
     public Garden garden = new Garden();
+
+    @Expose
+    @Category(name = "The Rift", desc = "Features for The Rift dimension.")
+    public RiftConfig rift = new RiftConfig();
+
+    @Expose
+    @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
+    public GhostCounter ghostCounter = new GhostCounter();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")

@@ -58,7 +58,7 @@ class BazaarBestSellMethod {
             val result = NumberUtil.format(totalDiff.toInt())
 
             val name = NEUItems.getItemStack(internalName).nameWithEnchantment
-            return "§b$name§f sell difference: §e$result coins"
+            return "$name§7 sell difference: §6$result coins"
         } catch (e: Error) {
             e.printStackTrace()
             return ""
@@ -72,7 +72,5 @@ class BazaarBestSellMethod {
         SkyHanniMod.feature.bazaar.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.bestSellMethod
-    }
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.bazaar.bestSellMethod
 }

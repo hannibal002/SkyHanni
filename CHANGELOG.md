@@ -1,10 +1,66 @@
 # SkyHanni - Change Log
 
-## Version 0.18.BETA
+## Version 0.19 (unreleased)
+
+#### Rift Features
++ Added **Rift Timer**
+  + Show the remaining rift time, max time, percentage, and extra time changes.
++ **Rift Highlight Guide**
+  + Highlight things to do in the Rift Guide.
++ Added **Shy Warning** (Contributed by CalMWolfs)
+  + Shows a warning when a shy is going to steal your time.
+  + Useful if you play without volume.
++ Added **Larvas Highlighter**
+  + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
+  + Customize the color
++ Added **Odonatas Highlighter**
+  + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
+  + Customize the color
++ Added **Agaricus Cap** countdown
+  + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
++ Added **Leech Supreme** to Damage Indicator
++ Added **Volt Crux Warning** (Contributed by nea)
+  + Shows a warning while a volt is discharging lightning
+  + Shows the area in which a Volt might strike lightning
+  + Change the color of the area
+  + Change the color of the volt enemy depending on their mood (default disabled)
++ Added **Enigma Soul Waypoints** (Contributed by CalMWolfs)
+  + Click on the soul name inside Rift Guide to show/hide
++ Added **Kloon Hacking** (Contributed by CalMWolfs)
+  + Highlights the correct button to click in the hacking inventory
+  + Tells you which colour to pick
+  + While wearing the helmet, waypoints will appear at each terminal location
+
+### Other Features
++ **Frozen Treasure Tracker** (Contributed by CalMWolfs)
+  + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
+  + Show Ice per hour
+  + Customizable GUI
+  + Option to hide the chat messages
+
+### Changes
++ Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
++ Added wizard warp as diana waypoint
++ Added option to show exact prices in estimated item value
+
+### Fixes
++ Fixed Pocket Sack-In-A-Sack Replace in lore
++ Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
++ Fixed frozen treasures per hour display being inaccurate (Contributed by CalMWolfs)
++ Fixed bug with ghost counter sometimes not detecting new kills (Contributed by CalMWolfs)
+
+## Version 0.18 (2023-06-19)
 
 ### New Features
-+ Added Visitor Drop Counter to track all the drops from visitors.
-+ Added **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
++ Added **Visitor Drop Counter** (Contributed by CalMWolfs)
+  + Counts up all the drops that you get from visitors
+  + Count each rarity of visitor Accepted
+  + Count copper, farming exp and coins spent
+  + Setting to show number or drop first
+  + Setting to show as the icon instead of the name
+  + Setting to show only on the barn plot
++ Added **Contest Time Needed**
+  + Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
 + Added **Garden Start Location**
   + Show the start waypoint for your farm with the currently holding tool.
   + Auto-detects the start of the farm when farming for the first time
@@ -14,7 +70,10 @@
   + Sortable by price or items stored (both desc/asc)
   + Option to show prices from Bazaar or NPC
 + Added Farming Fortune Breakdown for Armor and Equipment (Contributed by CalMWolfs)
+  + Run /ff to open the menu
   + Works with: Base Stats, Reforge Bonus, Ability Fortune and Green Thumb
+  + Breakdown for the true farming fortune from each crop
+  + Ability to select a single piece of armor or equipment
 + Added Server Restart Title
 + Added Jacob Contest Stats Summary
   + Showing Blocks per Second and total Blocks clicked after a farming contest in chat
@@ -28,7 +87,7 @@
   + Supports tab completing for warp points when typing /warp
   + Supports party members, friends (need to visit all friend list pages), player on the same server
   + Supports these commands: /p, /party, /pt (party transfer), /f, /friend /msg, /w, /tell, /boop, /visit, /invite, /ah, /pv (NEU's Profile Viewer), /shmarkplayer (SkyHanni's Mark Player feature)
-  + Supports VIP /visit suggestions (currently PortalHub and prtlhub, if you know similar islands, tell us please)
+  + Supports VIP /visit suggestions (e.g. PortalHub or Hubportal)
 + Added Item Profit Tracker (Slayer only)
   + Count items collected and how much you pay while doing slayer, calculates final profit
   + Shows the price of the item collected in chat (default disabled)
@@ -36,14 +95,51 @@
   + Show item name and price over items laying on ground (only in slayer areas)
 + Added Broken Hyperion Warning (Slayer only)
   + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
-  (Kill a mob with melee-hits to fix this hypixel bug)
+  + Kill a mob with melee-hits to fix this hypixel bug
+  + Only while doing slayer
 + Added Piece of Wizard Portal show earned by player name (Contributed by HiZe)
-+ City Project Daily Reminder - Remind every 24 hours to participate
++ City Project Daily Reminder
+  + Remind every 24 hours to participate
 + Added Quick Mod Menu Switching (default disabled)
   + Allows for easy navigation between one Mod Config and another
   + Default disabled
   + Detects your SkyBlock Mod automatically 
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
++ Added **Arachne Chat Hider**
+  + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
++ Added **Contest Time Needed**
+  + Show the time and missing FF for every crop inside Jacob's Farming Contest inventory
++ Added **Sack Item Display** (Contributed by HiZe)
+  + Added price display next to sack items
+  + Can be disabled
+  + Sortable by price or items stored (both desc/asc)
+  + Option to show prices from Bazaar or NPC
++ Added profile id chat hider
++ Added Garden Crop Start Location
+  + Show the start waypoint for your farm with the currently holding tool.
+  + Auto-detects the start of the farm when farming for the first time
+  + Option to manually set the waypoint with `/shcropstartlocation`
++ Added Pet Candies Used number
+  + Works even after Hypixel removed the `10 pet candies applied` line
++ Added Estimated Armor Value display
+  + Shows the price of all 4 armor pieces combined inside the wardrobe
++ Added Garden Plot Icon (Contributed by HiZe)
+  + Select an item from the inventory to replace the icon in the Configure Plots inventory
+  + Change the Edit mode in the bottom right corner in the Configure Plots inventory
++ Showing fished item names
++ Show numbers of Pocket Sack-In-A-Sack applied on a sack (Default disabled, contributed by HiZe)
++ Added a warning when finding a visitor with a rare reward
+  + Show message in chat, over the visitor and prevents refusing
++ Added composter empty timer for outside garden
++ Added title warning when picking up an expensive slayer item
++ Added **RNG Meter Display**
+  + Display number of bosses needed until the next RNG Meter item drops
+  + Warn when no item is set in the RNG Meter
+  + Hide the RNG Meter message from chat if the current item is selected
++ Added **Ghost Counter** (Contributed by HiZe)
+  + Shows number of ghosts killed in the Mist in Dwarven Mines
+  + Shows kill combo, coins per scavenger, all item drops, bestiarity, magic find and more
+  + Each display line is highly customizable
 
 ### Changes
 + Added Options for displays Crop Milestone and Best Crop Time.
@@ -56,95 +152,173 @@
   + Derpy double health support
   + More fair detection logic
 + Added extra setting to allow/block clicks for the 'hide not clickable' feature
++ Disabled hide far particles feature in M7 boss fight. This will fix M7 boss fight features from other mods
++ Added support for multiple players/profiles:
+  + SkyHanni saves all profile specific data now separately (e.g., garden data, crimson isle reputation progress, minion display text on the island)
+  + Config toggles and GUI elements stay synced between all profiles
++ Reworked Hide Armor
+  + More options
+    = Fixed Movement bugs with Depth Strider enchantment
+    = Fixed compatibility issues with other mods
+    Note: The hide armor config got reset, if you want to use it, you have to enable it again)
++ Added support for maxed out crop milestones
++ Showing total price for visitor items needed
++ Warning when BPS in Jacob contest ff needed display is below 1
++ More Discord Rich Presence features (Contributed by NetheriteMiner)
+  + Option "Profile" not only shows the profile name but also the profile type and SkyBlock level
+  + Option "Dynamic" now also supports stacking enchantments
++ Highlight the item in bazaar search result inventory when clicking on an item list (Contributed by CalMWolfs)
 
 ### Fixes
-= Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)
-= Fixed Hypixel bug that the equipment lore talks about "kills" instead of "visitors" (Contributed by CalMWolfs)
++ Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)
++ Fixed Hypixel bug that the equipment lore talks about "kills" instead of "visitors" (Contributed by CalMWolfs)
++ Fixed reforge stone 'warped' not detected in item price display
++ Hotkey to open SkyHanni Position Editor no longer works inside signs
+
+### Removals
+- Removed Garden Recent Teleport Pads display
 
 ## Version 0.17 (2023-05-11)
 
 ### Features
-+ Added **Time to Kill** - Show the time it takes to kill the Slayer boss.
++ Added **Time to Kill**
+  + Show the time it takes to kill the Slayer boss.
 + Added skill and collection level as item stack.
-+ Added **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
++ Added **Auction Highlighter**
+  + Highlight own items that are sold in green and that are expired in red.
 + Added support for tier 1 minions and title send for the minion craft helper.
 + Added Chicken head Timer.
 + Added **rancher boots** speed display.
-+ Added **Unclaimed Rewards** - Highlight contests with unclaimed rewards in the jacob inventory.
-+ Added **Duplicate Hider** - Hides duplicate farming contests in the inventory.
-+ Added **Contest Time** - Adds the real time format to the farming contest description.
-+ Added **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (contributed by appable)
-+ Added **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (contributed by appable)
-+ Added **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
-+ Added **Estimated Item Value** - Displays an estimated item value for the item you hover over.
++ Added **Unclaimed Rewards**
+  + Highlight contests with unclaimed rewards in the jacob inventory.
++ Added **Duplicate Hider**
+  + Hides duplicate farming contests in the inventory.
++ Added **Contest Time**
+  + Adds the real time format to the farming contest description.
++ Added **Hide Repeated Catches** (contributed by appable)
+  + Delete past catches of the same trophy fish from chat 
++ Added **Trophy Counter Design** (contributed by appable)
+  + Change the way trophy fish messages gets displayed in the chat
++ Added **CH Join**
+  + Helps buy a Pass for accessing the Crystal Hollows if needed
++ Added **Estimated Item Value**
+  + Displays an estimated item value for the item you hover over
 + Added Arachne to damage indicator.
-+ Added **Arachne Minis Hider** -  Hides the nametag above arachne minis.
-+ Added **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
-+ Added **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
++ Added **Arachne Minis Hider**
+  + Hides the nametag above arachne minis
++ Added **Arachne Boss Highlighter**
+  + Highlight the arachne boss in red and mini bosses and orange.
++ Added **Discord RPC** (contributed by NetheriteMiner)
+  + Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence
 
 ### Garden Features
-+ Added **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
-+ Added **Visitor Display** - Show all items needed for the visitors.
-+ Added **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.
-+ Added **Show Price** - Show the bazaar price of the items required for the visitors.
-+ Added **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
-+ Added **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
-+ Added **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
-+ Added **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
-+ Added **Plot Price** - Show the price of the plot in coins when inside the Configure Plots inventory.
-+ Added **Garden Crop Milestone Display** - Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
-+ Added **Best Crop Display** - Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
-+ Added **Copper Price** - Show the price for copper inside the visitor gui.
-+ Added **Amount and Time** - Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
-+ Added **Custom Keybinds** - Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
++ Added **Copper Price**
+  + Show copper to coin prices inside the Sky Mart inventory.
++ Added **Visitor Display**
+  + Show all items needed for the visitors.
++ Added **Visitor Highlight**
+  + Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs
++ Added **Show Price**
+  + Show the bazaar price of the items required for the visitors.
++ Added **Crop Milestone** Number
+  + Show the number of the crop milestone in the inventory.
++ Added **Crop Upgrades** Number
+  + Show the number of upgrades in the crop upgrades inventory.
++ Added **Visitor Timer**
+  + Timer when the next visitor will appear, and a number how many visitors are already waiting.
++ Added **Visitor Notification**
+  + Show as title and in chat when a new visitor is visiting your island.
++ Added **Plot Price**
+  + Show the price of the plot in coins when inside the Configure Plots inventory.
++ Added **Garden Crop Milestone Display**
+  + Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. (Requires a tool with either a counter or cultivating enchantment)
++ Added **Best Crop Display**
+  + Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden level or skyblock level.
++ Added **Copper Price**
+  + Show the price for copper inside the visitor gui.
++ Added **Amount and Time**
+  + Show the exact item amount and the remaining time when farmed manually. Especially useful for ironman.
++ Added **Custom Keybinds**
+  + Use custom keybinds while having a farming tool or Daedalus Axe in the hand in the garden.
 + Added Desk shortcut in SkyBlock Menu.
-+ Added **Garden Level Display** - Show the current garden level and progress to the next level.
++ Added **Garden Level Display**
+  + Show the current garden level and progress to the next level.
 + Added **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
 + Added farming weight next leaderboard position eta.
-+ Added **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
-+ Added **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
++ Added **Dicer Counter**
+  + Count RNG drops for Melon Dicer and Pumpkin Dicer.
++ Added **Optimal Speed**
+  + Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
   + Also available to select directly in the rancher boots overlay (contributed by nea)
-+ Added **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
-+ Added **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
++ Added **Warn When Close**
+  + Warn with title and sound when the next crop milestone upgrade happens in 5 seconds
+  + Useful for switching to a different pet for leveling
++ Added **Money per Hour**
+  + Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
 + Added farming contest timer.
 + Added wrong fungi cutter mode warning.
 + Added show the price per garden experience inside the visitor gui.
 + Added support for mushroom cow pet perk. (Counting and updating mushroom collection when breaking crops with mushroom blocks, added extra gui for time till crop milestones)
 + Added blocks/second display to crop milestone gui and made all crop milestone gui elements customizable/toggleable.
 + Added farming armor drops counter.
-+ Added **Colored Name** - Show the visitor name in the color of the rarity.
-+ Added **Visitor Item Preview** - Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
-+ Added **Teleport Pad Compact Name** - Hide the 'Warp to' and 'No Destination' texts over teleport pads.
-+ Added **Money per Hour Advanced stats** - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
-+ Added **Anita Medal Profit** - Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
-+ Added **Composter Compact Display** - Displays the compost data from the tab list in a compact form as gui element.
-+ Added **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
-+ Added **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
-+ Added **Number Composter Upgrades** - Show the number of upgrades in the composter upgrades inventory.
-+ Added **Composter Inventory Numbers** - Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
-+ Added **True Farming Fortune - Displays** current farming fortune, including crop-specific bonuses. (contributed by appable)
-+ Added **Tooltip Tweaks Compact Descriptions** - Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
-+ Added **Tooltip Tweaks Breakdown Hotkey** - When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
-+ Added **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
-+ Added command **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
-+ Added **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
-+ Added **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
-+ Added **Inventory Numbers** - Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
-+ Added **Composter Overlay** - Show the cheapest items for organic matter and fuel, show profit per compost/hour/day and time per compost
-+ Added **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
++ Added **Colored Name**
+  + Show the visitor name in the color of the rarity.
++ Added **Visitor Item Preview**
+  + Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
++ Added **Teleport Pad Compact Name**
+  + Hide the 'Warp to' and 'No Destination' texts over teleport pads.
++ Added **Money per Hour Advanced stats**
+  + Show not only Sell Offer price but also Instant Sell price and NPC Sell price
+  + Suggestion: Enable Compact Price as well for this
++ Added **Anita Medal Profit**
+  + Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
++ Added **Composter Compact Display**
+  + Displays the compost data from the tab list in a compact form as gui element.
++ Added **Composter Upgrade Price**
+  + Show the price for the composter upgrade in the lore
++ Added **Highlight Upgrade**
+  + Highlight Upgrades that can be bought right now.
++ Added **Number Composter Upgrades**
+  + Show the number of upgrades in the composter upgrades inventory.
++ Added **Composter Inventory Numbers**
+  + Show the amount of Organic Matter, Fuel and Composts Available while inside the composter inventory.
++ Added **True Farming Fortune
+  + Displays** current farming fortune, including crop-specific bonuses. (contributed by appable)
++ Added **Tooltip Tweaks Compact Descriptions**
+  + Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation. (contributed by appable)
++ Added **Tooltip Tweaks Breakdown Hotkey**
+  + When the keybind is pressed, show a breakdown of all fortune sources on a tool. (contributed by appable)
++ Added **Tooltip Tweaks Tooltip Format**
+  + Show crop-specific farming fortune in tooltip. (contributed by appable)
++ Added command **/shcropspeedmeter**
+  + Helps calculate the real farming fortune with the formula crops broken per block.
++ Added **Compost Low Notification**
+  + Shows a notification as title when organic matter/fuel is low.
++ Added **Jacob's Contest Warning**
+  + Show a warning shortly before a new jacob contest starts.
++ Added **Inventory Numbers**
+  + Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
++ Added **Composter Overlay**
+  + Show the cheapest items for organic matter and fuel, show profit per compost/hour/day and time per compost
++ Added **Composter Upgrades Overlay**
+  + Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
 + Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 + Introduced a new command '/shcroptime <amount> <item>' that displays the estimated time it will take to gather the requested quantity of a particular item based on the current crop speed.
 + Show the average crop milestone in the crop milestone inventory.
-+ Added **FF for Contest** - Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory.
-+ Added **yaw and pitch display** - Shows yaw and pitch with customizable precision while holding a farm tool. Automatically fades out if there is no movement for a customizable duration (Contributed by Sefer)
++ Added **FF for Contest**
+  + Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory.
++ Added **yaw and pitch display**
+  + Shows yaw and pitch with customizable precision while holding a farm tool. Automatically fades out if there is no movement for a customizable duration (Contributed by Sefer)
 + Added warning when 6th visitors is ready (Contributed by CalMWolfs)
 
 ### Features from other Mods
 > *The following features are only there because I want them when testing SkyHanni features without other mods present.*
 + Added Hide explosions.
-+ Added **Enderman Teleportation Hider** - Stops the enderman teleportation animation (Like in SBA)
-+ Added **Fire Overlay Hider** - Hide the fire overlay (Like in Skytils)
++ Added **Enderman Teleportation Hider**
+  + Stops the enderman teleportation animation (Like in SBA)
++ Added **Fire Overlay Hider**
+  + Hide the fire overlay (Like in Skytils)
 
 ### Changes
 + Reworked reputation helper design in the crimson isle.
@@ -155,9 +329,9 @@
 + Fixed a bug that caused fire veil particle `hider/redline drawer` to not always detect the right click correctly.
 + Removed `Fixing Skytils custom Damage Splash` (Skytils has already fixed this bug. Additionally, this option enabled and skytils' damage splash disabled caused the hypixel damage splash to not show the tailing commas at all)
 + Fixed bug with particles that blocks NotEnoughUpdates' Fishing features.
-+ Hopefully fixed incompatibility with skytils' hide cheap coins feature.
++ Hopefully fixed incompatibility with skytils `hide cheap coins` feature.
 + Fixed dungeon milestone messages getting wrongfully formatted.
-+ Fixed bazaar features not working for items with an - (turbo farming books and triple strike)
++ Fixed bazaar features not working for items with an `-` (turbo farming books and triple strike)
 + Fixed Crab Hat of Celebration not being detected as an accessory correctly.
 + Added support for soopy's \[hand] feature
 

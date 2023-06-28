@@ -20,6 +20,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
+import java.awt.Color
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -372,4 +373,16 @@ object LorenzUtils {
                 && tileSign.signText[2].unformattedText.removeColor() == "Set your"
                 && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
+
+    fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
+
+    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N) {
+        val old = this[item] ?: 0
+        val d = old.toDouble() + amount.toDouble()
+        @Suppress("UNCHECKED_CAST")
+        this[item] = d as N
+    }
+
+    /** transfer string colors from the config to java.awt.Color */
+    fun String.toChromaColor() = Color(SpecialColour.specialToChromaRGB(this), true)
 }

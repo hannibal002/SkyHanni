@@ -30,7 +30,8 @@ object NEUItems {
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
-    private var allItemsCache = mapOf<String, String>() // item name -> internal name
+    var allItemsCache = mapOf<String, String>() // item name -> internal name
+    var allInternalNames = mutableListOf<String>()
 
     fun getInternalName(itemName: String): String {
         return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
@@ -53,11 +54,13 @@ object NEUItems {
         return null
     }
 
-    private fun readAllNeuItems(): Map<String, String> {
+    fun readAllNeuItems(): Map<String, String> {
+        allInternalNames.clear()
         val map = mutableMapOf<String, String>()
         for (internalName in manager.itemInformation.keys) {
             val name = manager.createItem(internalName).displayName.removeColor().lowercase()
             map[name] = internalName
+            allInternalNames.add(internalName)
         }
         return map
     }
@@ -134,15 +137,11 @@ object NEUItems {
         .withKnownInternalName(internalName)
         .resolveToItemStack()?.copy()
 
-    fun getItemStack(internalName: String): ItemStack {
-        val stack = getItemStackOrNull(internalName)
-        if (stack == null) {
-            val error = "ItemResolutionQuery returns null for internalName '$internalName'"
-            LorenzUtils.error(error)
-            throw RuntimeException(error)
-        }
-        return stack
-    }
+    fun getItemStack(internalName: String): ItemStack = getItemStackOrNull(internalName)
+        ?: throw IllegalStateException(
+            "Could not find the Item '$internalName' in NEU Repo",
+            Error("ItemResolutionQuery returns null for internalName '$internalName'")
+        )
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 

@@ -58,7 +58,7 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     DUNGEON_F2("", 12),
     DUNGEON_F3("", 13),
     DUNGEON_F4_THORN("§cThorn", 14),
-    DUNGEON_F5("", 15),
+    DUNGEON_F5("§dLivid", 15),
     DUNGEON_F("", 16),
     DUNGEON_75("", 17),
 
@@ -73,6 +73,9 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     DUMMY("Dummy", 20),
     ARACHNE_SMALL("§cSmall Arachne", 21),
     ARACHNE_BIG("§4Big Arachne", 21),
+
+    // The Rift
+    LEECH_SUPREME("§cLeech Supreme", 22),
 
     //TODO arachne
 

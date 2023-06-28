@@ -12,17 +12,18 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMasterStars
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
@@ -117,7 +118,12 @@ object EstimatedItemValue {
 
         if (basePrice == totalPrice) return listOf()
 
-        list.add("§aTotal: §6§l" + NumberUtil.format(totalPrice))
+        val numberFormat = if (config.estimatedIemValueExactPrice) {
+            totalPrice.addSeparators()
+        } else {
+            NumberUtil.format(totalPrice)
+        }
+        list.add("§aTotal: §6§l$numberFormat")
 
         val newDisplay = mutableListOf<List<Any>>()
         for (line in list) {
@@ -172,7 +178,8 @@ object EstimatedItemValue {
             if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == internalName.lowercase()) {
                 val price = NEUItems.getPrice(internalName)
                 val name = NEUItems.getItemStack(internalName).name
-                list.add("§7Reforge: §9$reforgeName")
+                val realReforgeName = if (reforgeName.equals("Warped")) "Hyper" else reforgeName
+                list.add("§7Reforge: §9$realReforgeName")
                 list.add("  §7($name §6" + NumberUtil.format(price) + "§7)")
                 return price
             }
@@ -299,7 +306,7 @@ object EstimatedItemValue {
     }
 
     private fun addTransmissionTuners(stack: ItemStack, list: MutableList<String>): Double {
-        val count = stack.getTransmissionTunerCount()  ?: return 0.0
+        val count = stack.getTransmissionTunerCount() ?: return 0.0
 
         val wtfHardcodedTuner = "TRANSMISSION_TUNER"
         val price = NEUItems.getPrice(wtfHardcodedTuner) * count
@@ -317,8 +324,10 @@ object EstimatedItemValue {
     }
 
     private fun addMasterStars(stack: ItemStack, list: MutableList<String>): Double {
-        val masterStars = stack.getMasterStars()
-        if (masterStars == 0) return 0.0
+        val totalStars = stack.getDungeonStarCount() ?: return 0.0
+
+        val masterStars = totalStars - 5
+        if (masterStars < 1) return 0.0
 
         var price = 0.0
 

@@ -29,6 +29,7 @@ class SlayerItemsOnGround {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!SlayerAPI.isInSlayerArea) return
+        if (!SlayerAPI.hasActiveSlayerQuest()) return
 
         for (entityItem in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityItem>()) {
             val location = event.exactLocation(entityItem).add(0.0, 0.8, 0.0)

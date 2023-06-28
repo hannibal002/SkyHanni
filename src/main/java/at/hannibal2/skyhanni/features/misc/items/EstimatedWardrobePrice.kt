@@ -29,6 +29,7 @@ class EstimatedWardrobePrice {
 
         var index = 3
         val toolTip = event.toolTip
+        if (toolTip.size < 4) return
         toolTip.add(index++, "")
         toolTip.add(index++, "§aEstimated Armor Value:")
 

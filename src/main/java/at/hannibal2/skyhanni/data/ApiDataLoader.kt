@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -31,19 +30,6 @@ class ApiDataLoader {
                 val apiKey = SkyHanniMod.feature.storage.apiKey
                 val uuid = LorenzUtils.getPlayerUuid()
                 loadProfileData(apiKey, uuid, currentProfileId)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onStatusBar(event: LorenzChatEvent) {
-        val message = event.message
-        if (message.startsWith("§aYour new API key is §r§b")) {
-            SkyHanniMod.feature.storage.apiKey = message.substring(26)
-            LorenzUtils.chat("§b[SkyHanni] A new API Key has been detected and installed")
-
-            if (currentProfileName != "") {
-                updateApiData()
             }
         }
     }
@@ -99,7 +85,6 @@ class ApiDataLoader {
                     LorenzUtils.error("§c[SkyHanni] Invalid API key from $modName")
                 }
             }
-            LorenzUtils.error("§c[SkyHanni] SkyHanni has no API key set. Please run /api new")
         }
     }
 

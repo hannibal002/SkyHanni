@@ -245,7 +245,7 @@ public class Garden {
                         "§eThis feature is in beta please report issues on the discord!"
         )
         @ConfigEditorBoolean
-        public boolean enabled = false;
+        public boolean enabled = true;
 
         @Expose
         @ConfigOption(
@@ -520,7 +520,7 @@ public class Garden {
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the  §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the hand. §cOnly updates after scrolling in the hotbar.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     public boolean keyBindEnabled = false;
@@ -1089,6 +1089,9 @@ public class Garden {
     public Position composterDisplayPos = new Position(-363, 13, false, true);
 
     @Expose
+    public Position composterOutsideGardenPos = new Position(-363, 13, false, true);
+
+    @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
     @ConfigEditorAccordion(id = 22)
     public boolean farmingFortune = false;
@@ -1193,12 +1196,24 @@ public class Garden {
         public int timeout = 5;
 
         @Expose
-        @ConfigOption(name = "Always Shown", desc = "Always show the Yaw and Pitch overlay, ignoring the timeout.")
+        @ConfigOption(name = "Show Without Tool", desc = "Does not require you to hold a tool for the overlay to show.")
+        @ConfigEditorBoolean
+        public boolean showWithoutTool = false;
+
+        @Expose
+        @ConfigOption(name = "Show Outside Garden", desc = "The overlay will work outside of the garden.")
+        @ConfigEditorBoolean
+        public boolean showEverywhere = false;
+
+        @Expose
+        @ConfigOption(name = "Ignore Timeout", desc = "Ignore the timeout after not moving mouse.")
         @ConfigEditorBoolean
         public boolean showAlways = false;
 
         @Expose
         public Position pos = new Position(445, 225, false, true);
+        @Expose
+        public Position posOutside = new Position(445, 225, false, true);
     }
 
     @Expose

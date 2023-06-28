@@ -21,8 +21,6 @@ class EntityMovementData {
         }
     }
 
-    var tick = 0
-
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.inSkyBlock) return

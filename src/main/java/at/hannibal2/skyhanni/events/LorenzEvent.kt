@@ -18,7 +18,6 @@ abstract class LorenzEvent : Event() {
             if (it is NoSuchMethodError) {
                 LorenzUtils.chat("§c[SkyHanni] You need to use a newer version of NotEnoughUpdates (alpha-11 or newer)! If you need help downloading it, go to the skyhanni discord.")
             } else {
-                it.printStackTrace()
                 CopyErrorCommand.logError(it, "Caught an ${it::class.simpleName ?: "error"} at ${eventName}: '${it.message}'")
             }
         }.getOrDefault(isCanceled)

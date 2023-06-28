@@ -20,8 +20,10 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
+import at.hannibal2.skyhanni.features.misc.GhostCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
@@ -50,7 +52,7 @@ object Commands {
         // main commands
         registerCommand("sh", openMainMenu)
         registerCommand("skyhanni", openMainMenu)
-        
+
         registerCommand("ff") { openFortuneGuide() }
 
         // for users - regular commands
@@ -63,6 +65,9 @@ object Commands {
         registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
         registerCommand("shcropstartlocation") { GardenStartLocation.setLocationCommand() }
         registerCommand("shstopcityprojectreminder") { CityProjectFeatures.disable() }
+        registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
+        registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
+        registerCommand("shclearfarmingitems") { clearFarmingItems() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
@@ -97,14 +102,22 @@ object Commands {
         registerCommand("shcopyerror") { CopyErrorCommand.command(it) }
 
     }
+
     @JvmStatic
-     fun openFortuneGuide() {
+    fun openFortuneGuide() {
         if (!LorenzUtils.inSkyBlock) {
             LorenzUtils.chat("§cJoin Skyblock to open the fortune guide!")
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
         }
+    }
+
+    private fun clearFarmingItems() {
+        val config = GardenAPI.config?.fortune ?: return
+        LorenzUtils.chat("§e[SkyHanni] clearing farming items")
+        config.farmingItems.clear()
+        config.outdatedItems.clear()
     }
 
     private fun registerCommand(name: String, function: (Array<String>) -> Unit) {

@@ -122,10 +122,15 @@ public class Chat {
             "except for players who are nearby or during dungeons/a Kuudra fight.")
     @ConfigEditorBoolean
     public boolean hideFarDeathMessages = false;
-    //TODO jawbus + x
+    //TODO jawbus + thunder
 
     @Expose
     @ConfigOption(name = "Compact Potion Message", desc = "Shorten chat messages about player potion effects.")
     @ConfigEditorBoolean
     public boolean compactPotionMessage = true;
+
+    @Expose
+    @ConfigOption(name = "Arachne Hider", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")
+    @ConfigEditorBoolean
+    public boolean hideArachneMessages = false;
 }

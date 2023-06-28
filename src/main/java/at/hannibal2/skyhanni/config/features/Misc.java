@@ -6,6 +6,10 @@ import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.*;
 import org.lwjgl.input.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Misc {
 
     @Expose
@@ -78,6 +82,12 @@ public class Misc {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     public boolean nonGodPotEffectDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Show Mixins", desc = "Include god pot mixins in the non god pot effects display.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 5)
+    public boolean nonGodPotEffectShowMixins = false;
 
     @Expose
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
@@ -228,6 +238,12 @@ public class Misc {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean estimatedIemValueExactPrice = false;
 
     @Expose
     @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor in the wardrobe inventory.")
@@ -470,6 +486,70 @@ public class Misc {
 
         @Expose
         public Position pos = new Position(-178, 143, false, true);
+    }
+
+    @Expose
+    @ConfigOption(name = "Frozen Treasure Tracker", desc = "")
+    @Accordion
+    public Misc.FrozenTreasureTracker frozenTreasureTracker = new Misc.FrozenTreasureTracker();
+
+    public static class FrozenTreasureTracker {
+
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Tracks all of your drops from frozen treasure in the Glacial Caves\n" +
+                        "§eIce calculations are an estimate but are relatively accurate"
+        )
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Text Format",
+                desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§1§lFrozen Treasure Tracker",
+                        "§61,636 Treasures Mined",
+                        "§33.2m Total Ice",
+                        "§3342,192 Ice/hr",
+                        "§81,002 Compact Procs",
+                        " ",
+                        "§b182 §fWhite Gift",
+                        "§b94 §aGreen Gift",
+                        "§b17 §9§cRed Gift",
+                        "§b328 §fPacked Ice",
+                        "§b80 §aEnchanted Ice",
+                        "§b4 §9Enchanted Packed Ice",
+                        "§b182 §aIce Bait",
+                        "§b3 §aGlowy Chum Bait",
+                        "§b36 §5Glacial Fragment",
+                        "§b6 §fGlacial Talisman",
+                        " ",
+                }
+        )
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 14, 15));
+
+        @Expose
+        @ConfigOption(name = "Only in Glacial Cave", desc = "Only shows the overlay while in the Glacial Cave.")
+        @ConfigEditorBoolean
+        public boolean onlyInCave = true;
+
+        @Expose
+        @ConfigOption(name = "Show as drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
+                "E.g. 3 Ice Bait -> 48 Ice Bait")
+        @ConfigEditorBoolean
+        public boolean showAsDrops = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Chat messages", desc = "Hides the chat messages from frozen treasures.")
+        @ConfigEditorBoolean
+        public boolean hideMessages = false;
+
+        @Expose
+        public Position position = new Position(10, 80, false, true);
     }
 
     @Expose

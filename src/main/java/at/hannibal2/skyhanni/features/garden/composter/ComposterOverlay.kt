@@ -3,19 +3,23 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -389,10 +393,9 @@ class ComposterOverlay {
             val name = itemName.substring(0, 2) + selected + rawItemName
             list.add(Renderable.link("$name§r §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
                 onClick(internalName)
-                if (LorenzUtils.isControlKeyDown() && !LorenzUtils.noTradeMode) {
+                if (LorenzUtils.isControlKeyDown()) {
                     inInventory = false
-                    LorenzUtils.sendCommandToServer("bz $rawItemName")
-                    OSUtils.copyToClipboard("${itemsNeeded.toInt()}")
+                    BazaarApi.searchForBazaarItem(itemName, itemsNeeded.toInt())
                 }
             })
             bigList.add(list)

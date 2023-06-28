@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.commands;
 
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
@@ -7,7 +8,7 @@ import net.minecraft.util.BlockPos;
 import java.util.List;
 
 /**
- @author Moulberry
+ * @author Moulberry
  **/
 public class SimpleCommand extends CommandBase {
 
@@ -50,7 +51,11 @@ public class SimpleCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        runnable.processCommand(sender, args);
+        try {
+            runnable.processCommand(sender, args);
+        } catch (Throwable e) {
+            CopyErrorCommand.INSTANCE.logError(e, "Error while running command /" + commandName);
+        }
     }
 
     @Override

@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.18.Beta.17"
+version = "0.19.Beta.3"
 
 // Toolchains:
 java {
@@ -78,8 +78,8 @@ dependencies {
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.3")
-    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.3:test")
+    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.4")
+    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.4:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
 }
@@ -114,6 +114,11 @@ loom {
     // If you don't want mixins, remove these lines
     mixin {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
+    }
+    runConfigs {
+        "server" {
+            isIdeConfigGenerated = false
+        }
     }
 }
 

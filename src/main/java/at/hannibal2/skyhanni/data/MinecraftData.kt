@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class MinecraftData {
 
@@ -48,5 +51,15 @@ class MinecraftData {
         ) {
             event.isCanceled = true
         }
+    }
+
+    private var tick = 0
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        Minecraft.getMinecraft().thePlayer ?: return
+        tick++
+        LorenzTickEvent(tick).postAndCatch()
     }
 }
