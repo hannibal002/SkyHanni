@@ -233,61 +233,55 @@ object GhostCounter {
     }
 
 
-        @SubscribeEvent
-        fun onSBAActionBar(event: LorenzActionBarEvent){
-            if (!isEnabled()) return
-            if(hasSBA){
-                skillText?.get(renderListener) ?: return
-                val name = skill?.get(renderListener).toString()
-                //println(name)
-                val realName = name[0].uppercase() + name.substring(1).lowercase()
-               // println(realName)
-                if (realName.lowercase() != "combat") return
-                val skillText = skillText?.get(renderListener).toString()
-                //println(skillText)
-                val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
-               // println(gained)
-                actionBar.add("text: $skillText || gained: $gained")
-                val xp: String = if (skillText.contains("(")) {
-                    val regex = "\\((.+)\\)".toRegex()
-                    val matchResult = regex.find(skillText)
-                    matchResult?.groupValues?.get(1) ?: "-1/-1"
-                } else {
-                    "-1/-1"
-                }
-                println(xp)
-                val total = xp.split("/")[0].replace("\\D".toRegex(), "")
-                //val current = xp.split("/")[1].replace(",", "").toInt()
-                //println(current)
+    /*
+    Pain
+     */
+    @SubscribeEvent
+    fun onSBASkillText(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        if (!event.isMod(20)) return
+        if (hasSBA) {
+            skillText?.get(renderListener) ?: return
+            val name = skill?.get(renderListener).toString()
+            val realName = name[0].uppercase() + name.substring(1).lowercase()
+            if (realName.lowercase() != "combat") return
+            val skillText = skillText?.get(renderListener).toString()
+            val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
+            actionBar.add("text: $skillText || gained: $gained")
+            val xp: String = if (skillText.contains("(")) {
+                val regex = "\\((.+)\\)".toRegex()
+                val matchResult = regex.find(skillText)
+                matchResult?.groupValues?.get(1) ?: "-1/-1"
+            } else {
+                "-1/-1"
+            }
+            val total = xp.split("/")[0].replace("\\D".toRegex(), "")
 
-                if (total != lastXp){
-                    if (gained in 150.0..450.0){
-                        gain = (total.toLong() - lastXp.toLong()).toDouble().roundToInt()
-                        num = (gain.toDouble()/gained)
-                        println("lastxp: $lastXp")
-                        println("num: $num")
-                        if (lastXp != "0"){
-                            if (num >= 0){
-                                KILLS.add(num)
-                                KILLS.add(num, true)
-                                GHOSTSINCESORROW.add(num)
-                                KILLCOMBO.add(num)
-                                SKILLXPGAINED.add(gained * num.roundToLong())
-                                SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                                hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
-                            }
+            if (total != lastXp) {
+                if (gained in 150.0..450.0) {
+                    gain = (total.toLong() - lastXp.toLong()).toDouble().roundToInt()
+                    num = (gain.toDouble() / gained)
+                    if (lastXp != "0") {
+                        if (num >= 0) {
+                            KILLS.add(num)
+                            KILLS.add(num, true)
+                            GHOSTSINCESORROW.add(num)
+                            KILLCOMBO.add(num)
+                            SKILLXPGAINED.add(gained * num.roundToLong())
+                            SKILLXPGAINED.add(gained * num.roundToLong(), true)
+                            hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
                         }
                     }
-                    lastXp = total
                 }
+                lastXp = total
             }
         }
+    }
+
     // Part of this was taken from GhostCounterV3 CT module
     // maybe replace this with a SkillXpGainEvent ?
-
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
-
         if (!isEnabled()) return
         skillXPPattern.matchMatcher(event.message) {
             val gained = group("gained").formatNumber().toDouble()
