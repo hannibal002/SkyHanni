@@ -101,6 +101,7 @@ class SkyHanniMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
         checkIfNeuIsLoaded()
+        GhostCounter.checkSBA()
 
         // utils
         loadModule(this)

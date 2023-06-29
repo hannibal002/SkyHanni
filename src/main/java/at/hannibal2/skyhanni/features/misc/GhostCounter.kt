@@ -42,6 +42,7 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.io.FileReader
+import java.lang.reflect.Field
 import java.nio.charset.StandardCharsets
 import java.text.NumberFormat
 import java.util.*
@@ -50,6 +51,7 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 object GhostCounter {
+
 
     val config get() = SkyHanniMod.feature.ghostCounter
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
@@ -60,6 +62,11 @@ object GhostCounter {
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val bestiaryPattern = "BESTIARY Ghost .*➜(?<newLevel>.*)".toPattern()
     private val format = NumberFormat.getIntegerInstance()
+    private var hasSBA = true
+    private var skillText: Field? = null
+    private var skill: Field? = null
+    private var instance: Any? = null
+    private var renderListener: Any? = null
     private const val exportPrefix = "gc/"
     private var tick = 0
     private var lastXp: String = "0"
@@ -101,7 +108,8 @@ object GhostCounter {
             }
         }
     }
-    val actionBar = mutableListOf<String>()
+    private val actionBar = mutableListOf<String>()
+
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -218,19 +226,69 @@ object GhostCounter {
         /*
         I'm very not sure about all that
          */
-        val rate = 0.12 * (1 + (mgc.toDouble()/100))
-        val price =  (BazaarApi.getBazaarDataByInternalName("SORROW")?.sellPrice ?: 0).toLong()
-        val final: String = (killInterp * price * (rate/100)).toLong().addSeparators()
+        val rate = 0.12 * (1 + (mgc.toDouble() / 100))
+        val price = (BazaarApi.getBazaarDataByInternalName("SORROW")?.sellPrice ?: 0).toLong()
+        val final: String = (killInterp * price * (rate / 100)).toLong().addSeparators()
         addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
     }
 
 
+        @SubscribeEvent
+        fun onSBAActionBar(event: LorenzActionBarEvent){
+            if (!isEnabled()) return
+            if(hasSBA){
+                skillText?.get(renderListener) ?: return
+                val name = skill?.get(renderListener).toString()
+                //println(name)
+                val realName = name[0].uppercase() + name.substring(1).lowercase()
+               // println(realName)
+                if (realName.lowercase() != "combat") return
+                val skillText = skillText?.get(renderListener).toString()
+                //println(skillText)
+                val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
+               // println(gained)
+                actionBar.add("text: $skillText || gained: $gained")
+                val xp: String = if (skillText.contains("(")) {
+                    val regex = "\\((.+)\\)".toRegex()
+                    val matchResult = regex.find(skillText)
+                    matchResult?.groupValues?.get(1) ?: "-1/-1"
+                } else {
+                    "-1/-1"
+                }
+                println(xp)
+                val total = xp.split("/")[0].replace(",", "")
+                //val current = xp.split("/")[1].replace(",", "").toInt()
+                //println(current)
+
+                if (total != lastXp){
+                    if (gained in 150.0..450.0){
+                        gain = ((total.toLong() - lastXp.toLong()).toDouble()).roundToInt()
+                        num = (gain.toDouble()/gained)
+                        println("lastxp: $lastXp")
+                        println("num: $num")
+                        if (lastXp != "0"){
+                            if (num >= 0){
+                                KILLS.add(num)
+                                KILLS.add(num, true)
+                                GHOSTSINCESORROW.add(num)
+                                KILLCOMBO.add(num)
+                                SKILLXPGAINED.add(gained * num.roundToLong())
+                                SKILLXPGAINED.add(gained * num.roundToLong(), true)
+                                hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
+                            }
+                        }
+                    }
+                    lastXp = total
+                }
+            }
+        }
     // Part of this was taken from GhostCounterV3 CT module
     // maybe replace this with a SkillXpGainEvent ?
+
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
+
         if (!isEnabled()) return
-        actionBar.add(event.message)
         skillXPPattern.matchMatcher(event.message) {
             val gained = group("gained").formatNumber().toDouble()
             val total = group("total")
@@ -351,6 +409,11 @@ object GhostCounter {
                 clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
             }
         }
+
+        if (tick % 500 == 0) {
+            actionBar.clear()
+        }
+
     }
 
     @SubscribeEvent
@@ -648,9 +711,22 @@ object GhostCounter {
         }
     }
 
-    fun copyActionbar(){
-        OSUtils.copyToClipboard(actionBar.joinToString("\n" ))
+    fun copyActionbar() {
+        OSUtils.copyToClipboard(actionBar.joinToString("\n"))
         actionBar.clear()
+    }
+
+    fun checkSBA() {
+        hasSBA = try {
+            val sba = Class.forName("codes.biscuit.skyblockaddons.SkyblockAddons")
+            val instance = sba.getDeclaredField("instance").also { it.isAccessible = true }.get(null)
+            renderListener = instance.javaClass.getDeclaredMethod("getRenderListener").also { it.isAccessible = true }.invoke(instance)
+            skill = renderListener!!.javaClass.getDeclaredField("skill").also { it.isAccessible = true }
+            skillText = renderListener!!.javaClass.getDeclaredField("skillText").also { it.isAccessible = true }
+            true
+        } catch (e: Throwable) {
+            false
+        }
     }
 
 }
