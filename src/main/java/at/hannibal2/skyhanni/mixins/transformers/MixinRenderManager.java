@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.features.rift.DanceRoomHelper;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
