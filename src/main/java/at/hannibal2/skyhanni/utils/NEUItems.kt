@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -16,9 +19,11 @@ import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
+import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -32,6 +37,14 @@ object NEUItems {
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, String>() // item name -> internal name
     var allInternalNames = mutableListOf<String>()
+    private var warnedAlready = false
+
+    private val fallbackItem by lazy { Utils.createItemStack(
+            ItemStack(Blocks.barrier).item,
+            "§cMissing Repo Item",
+            "§cYour NEU repo seems to be out of date"
+        )
+    }
 
     fun getInternalName(itemName: String): String {
         return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
@@ -69,6 +82,11 @@ object NEUItems {
         val lowercase = itemName.lowercase()
         if (itemNameCache.containsKey(lowercase)) {
             return itemNameCache[lowercase]!!
+        }
+
+        if (itemName == "§cmissing repo item") {
+            itemNameCache[lowercase] = "MISSING_ITEM"
+            return "MISSING_ITEM"
         }
 
         resolveEnchantmentByName(itemName)?.let {
@@ -137,11 +155,21 @@ object NEUItems {
         .withKnownInternalName(internalName)
         .resolveToItemStack()?.copy()
 
-    fun getItemStack(internalName: String): ItemStack = getItemStackOrNull(internalName)
-        ?: throw IllegalStateException(
-            "Could not find the Item '$internalName' in NEU Repo",
-            Error("ItemResolutionQuery returns null for internalName '$internalName'")
-        )
+    fun getItemStack(internalName: String): ItemStack {
+        val item = getItemStackOrNull(internalName)
+            ?: try {
+                throw IllegalStateException("Something went wrong!")
+            } catch (e: IllegalStateException) {
+                if (ProfileStorageData.playerSpecific?.lastRepoIssueVersion != SkyHanniMod.version || !warnedAlready) {
+                    Utils.showOutdatedRepoNotification()
+                    CopyErrorCommand.logError(e, "Encountered an error getting the item for §7$internalName§c. " +
+                            "This is probably because your NEU repo is outdated")
+                }
+                warnedAlready = true
+                return fallbackItem
+            }
+        return item
+    }
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 
