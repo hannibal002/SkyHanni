@@ -313,7 +313,7 @@ class SkyHanniMod {
         loadModule(KloonHacking())
         loadModule(EnigmaSoulWaypoints)
         loadModule(DungeonLividFinder)
-        loadModule(DanceRoomHelper())
+        loadModule(DanceRoomHelper)
         init()
 
         // test stuff

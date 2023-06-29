@@ -10,13 +10,13 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DanceRoomHelper {
+object DanceRoomHelper {
 
     private var display = listOf<String>()
     private val config get() = SkyHanniMod.feature.rift.danceRoomHelper
     private var i = 0
     private var found = false
-    private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
+    val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
     private val instruction = mutableListOf(
             "move",
@@ -75,12 +75,10 @@ class DanceRoomHelper {
             for (line in instruction) {
                 if (i == line.index) {
                     add("§9§l>>> §c§l${line.value.uppercase()} §9§l<<<")
-                } else if (config.compact && (i + 1..i + config.lineToShow).contains(line.index)) {
+                } else if (i + 1 == line.index) {
                     add("§e§l${line.value.uppercase()}")
-                } else if (i < line.index) {
-                    add(if (config.compact) "§7" else "§7§m" + line.value.uppercase())
-                } else {
-                    add(if (config.compact) "§a" else "§7" + line.value.uppercase())
+                } else if ((i + 2..i + config.lineToShow).contains(line.index)) {
+                    add("§7${line.value.uppercase()}")
                 }
             }
         }
@@ -97,9 +95,10 @@ class DanceRoomHelper {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load){
+    fun onWorldChange(event: WorldEvent.Load) {
         inRoom = false
     }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return

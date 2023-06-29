@@ -168,19 +168,19 @@ public class RiftConfig {
     public static class DanceRoomHelper{
 
         @Expose
-        @ConfigOption(name= "Enabled", desc = "Show the helper")
+        @ConfigOption(name= "Enabled", desc = "Show the helper.")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Compact mode", desc = "Show a compacted version of the tasks you need to do.")
-        @ConfigEditorBoolean
-        public boolean compact = true;
-
-        @Expose
-        @ConfigOption(name = "Lines to show", desc = "How many tasks you should see if the compact mode is enabled")
+        @ConfigOption(name = "Lines to show", desc = "How many tasks you should see.")
         @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 1)
         public int lineToShow = 3;
+
+        @Expose
+        @ConfigOption(name = "Hide others players", desc = "Hide others players inside the dance room.")
+        @ConfigEditorBoolean
+        public boolean hidePlayers = false;
 
         @Expose
         public Position position = new Position(442, 239, false, true);
