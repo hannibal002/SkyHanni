@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 
 public class RiftConfig {
 
@@ -163,4 +160,31 @@ public class RiftConfig {
         public boolean waypoints = true;
 
     }
+
+    @ConfigOption(name = "Dance Room Helper", desc = "")
+    @Accordion
+    @Expose
+    public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
+    public static class DanceRoomHelper{
+
+        @Expose
+        @ConfigOption(name= "Enabled", desc = "Show the helper")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Compact mode", desc = "Show a compacted version of the tasks you need to do.")
+        @ConfigEditorBoolean
+        public boolean compact = true;
+
+        @Expose
+        @ConfigOption(name = "Lines to show", desc = "How many tasks you should see if the compact mode is enabled")
+        @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 3)
+        public int lineToShow = 3;
+
+        @Expose
+        public Position position = new Position(442, 239, false, true);
+
+    }
+
 }
