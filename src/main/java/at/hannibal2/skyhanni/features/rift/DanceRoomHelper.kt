@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import kotlinx.coroutines.*
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DanceRoomHelper {
@@ -73,13 +74,13 @@ class DanceRoomHelper {
         display = buildList {
             for (line in instruction) {
                 if (i == line.index) {
-                    add("§9§l>>> §c§l${line.value} §9§l<<<")
+                    add("§9§l>>> §c§l${line.value.uppercase()} §9§l<<<")
                 } else if (config.compact && (i + 1..i + config.lineToShow).contains(line.index)) {
-                    add("§e§l${line.value}")
+                    add("§e§l${line.value.uppercase()}")
                 } else if (i < line.index) {
-                    add(if (config.compact) "§7" else "§7§m" + line.value)
+                    add(if (config.compact) "§7" else "§7§m" + line.value.uppercase())
                 } else {
-                    add(if (config.compact) "§a" else "§7" + line.value)
+                    add(if (config.compact) "§a" else "§7" + line.value.uppercase())
                 }
             }
         }
@@ -96,17 +97,21 @@ class DanceRoomHelper {
     }
 
     @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load){
+        inRoom = false
+    }
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         update()
-        if (event.isMod(20)) {
+        if (event.isMod(10)) {
             inRoom = danceRoom.isVecInside(net.minecraft.client.Minecraft.getMinecraft().thePlayer.positionVector)
         }
     }
 
     @SubscribeEvent
     fun onSound(event: at.hannibal2.skyhanni.events.PlaySoundEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() && !inRoom) return
         if (event.soundName == "random.burp" && event.volume == 0.8f) {
             i = 0
             found = false

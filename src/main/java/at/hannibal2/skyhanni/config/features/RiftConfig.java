@@ -179,7 +179,7 @@ public class RiftConfig {
 
         @Expose
         @ConfigOption(name = "Lines to show", desc = "How many tasks you should see if the compact mode is enabled")
-        @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 3)
+        @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 1)
         public int lineToShow = 3;
 
         @Expose
