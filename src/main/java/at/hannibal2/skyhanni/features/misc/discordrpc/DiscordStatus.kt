@@ -102,16 +102,6 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             lastKnownDisplayStrings[LOCATION] = location
         }
         lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
-        /**
-         *    looks slightly weird if visiting someone else's island,
-         *    I was thinking of using LorenzUtils.skyblockIsland to determine if they're visiting,
-         *    but it takes too long to load, so we 'd have to put in some sort of artificial delay
-         *    like what I did in DiscordRPCManager.onWorldChange.
-         *    after that, use the tab-list "Owner:" line to get the person we're visiting, but I don't know
-         *    if that'll work with coops, and you'd have to deal with color codes as well
-         *    anyway, I'm pretty sure sba had "'s Island" without the name filled in this entire time,
-         *    so I'd rather have [RANK] NameThatGetsCutOff for example than 's Island
-         */
     }),
 
     PURSE({
