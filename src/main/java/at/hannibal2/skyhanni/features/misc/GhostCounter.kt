@@ -256,13 +256,13 @@ object GhostCounter {
                     "-1/-1"
                 }
                 println(xp)
-                val total = xp.split("/")[0].replace(",", "")
+                val total = xp.split("/")[0].replace("\\D".toRegex(), "")
                 //val current = xp.split("/")[1].replace(",", "").toInt()
                 //println(current)
 
                 if (total != lastXp){
                     if (gained in 150.0..450.0){
-                        gain = ((total.toLong() - lastXp.toLong()).toDouble()).roundToInt()
+                        gain = (total.toLong() - lastXp.toLong()).toDouble().roundToInt()
                         num = (gain.toDouble()/gained)
                         println("lastxp: $lastXp")
                         println("num: $num")
@@ -409,11 +409,6 @@ object GhostCounter {
                 clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
             }
         }
-
-        if (tick % 500 == 0) {
-            actionBar.clear()
-        }
-
     }
 
     @SubscribeEvent
