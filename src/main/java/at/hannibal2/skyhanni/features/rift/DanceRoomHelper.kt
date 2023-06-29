@@ -14,7 +14,7 @@ object DanceRoomHelper {
 
     private var display = listOf<String>()
     private val config get() = SkyHanniMod.feature.rift.danceRoomHelper
-    private var i = 0
+    private var index = 0
     private var found = false
     val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
@@ -73,11 +73,11 @@ object DanceRoomHelper {
     fun update() {
         display = buildList {
             for (line in instruction) {
-                if (i == line.index) {
+                if (index == line.index) {
                     add("§9§l>>> §c§l${line.value.uppercase()} §9§l<<<")
-                } else if (i + 1 == line.index) {
+                } else if (index + 1 == line.index) {
                     add("§e§l${line.value.uppercase()}")
-                } else if ((i + 2..i + config.lineToShow).contains(line.index)) {
+                } else if ((index + 2..index + config.lineToShow).contains(line.index)) {
                     add("§7${line.value.uppercase()}")
                 }
             }
@@ -112,7 +112,7 @@ object DanceRoomHelper {
     fun onSound(event: at.hannibal2.skyhanni.events.PlaySoundEvent) {
         if (!isEnabled() && !inRoom) return
         if (event.soundName == "random.burp" && event.volume == 0.8f) {
-            i = 0
+            index = 0
             found = false
             update()
         }
@@ -126,7 +126,7 @@ object DanceRoomHelper {
     fun start(interval: Long): Job {
         return CoroutineScope(Dispatchers.Default).launch {
             while (NonCancellable.isActive && found) {
-                i++
+                index++
                 delay(interval)
             }
         }
