@@ -6,30 +6,41 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 class ActionBarStatsData {
-    private val pattern =
-        Pattern.compile("..((?:\\d|,)*)\\/(?:\\d|,)*(.) *..((?:\\d|,)*)..(. \\w*) *..((?:\\d|,)*)\\/(?:\\d|,)*(✎).*")
-// Sample input: §c2,817/2,817❤     §a703§a❈ Defense     §b3,479/3,479✎ Mana
-// Returns the following groups: 1 = 2,817; 2 = ❤; 3 = 703; 4 = ❈ Defense; 5 = 3,479; 6 = ✎ Mana
+    private val healthPattern = Pattern.compile("§c(?<health>[\\d,]+)/[\\d,]+❤.*")
+    private val defensePattern = Pattern.compile(".*§a(?<defense>[\\d,]+)§a❈.*")
+    private val manaPattern = Pattern.compile(".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*")
+    private val riftTimePattern = Pattern.compile("§[a7](?<riftTime>[\\dms ]+)ф.*")
 
     companion object {
-        var groups = listOf<String>()
+        var groups = mutableMapOf("health" to "", "riftTime" to "", "defense" to "", "mana" to "")
     }
 
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
-        groups = readGroups(event.message)
+        readGroups(event.message)
     }
 
-    private fun readGroups(message: String): List<String> {
-        if (!LorenzUtils.inSkyBlock) return emptyList()
+    private fun readGroups(message: String) {
+        if (!LorenzUtils.inSkyBlock) return
 
-        val matcher = pattern.matcher(message)
-        if (!matcher.matches()) return emptyList()
+        val healthMatcher = healthPattern.matcher(message)
+        val defenseMatcher = defensePattern.matcher(message)
+        val manaMatcher = manaPattern.matcher(message)
+        val riftTimeMatcher = riftTimePattern.matcher(message)
 
-        val list = mutableListOf<String>()
-        for (i in 1..matcher.groupCount()) {
-            list.add(matcher.group(i))
+        if (healthMatcher.matches()) {
+            groups["health"] = healthMatcher.group("health")
         }
-        return list
+        if (defenseMatcher.matches()) {
+            groups["defense"] = defenseMatcher.group("defense")
+        }
+        if (manaMatcher.matches()) {
+            groups["mana"] = manaMatcher.group("mana")
+        }
+        if (riftTimeMatcher.matches()) {
+            groups["riftTime"] = riftTimeMatcher.group("riftTime")
+        } else {
+            groups["riftTime"] = ""
+        }
     }
 }

@@ -23,8 +23,8 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 object DiscordRPCManager : IPCListener {
-    private val applicationID = 653443797182578707L
-    private val updatePeriod = 4200L
+    private const val applicationID = 1093298182735282176L
+    private const val updatePeriod = 4200L
 
     private val config get() = feature.misc.discordRPC
 
