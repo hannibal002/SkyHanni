@@ -6,6 +6,7 @@ import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class RiftConfig {
 
@@ -89,7 +90,7 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Show Bonuses", desc = "Show bonuses you get from the talisman.")
         @ConfigEditorBoolean
-        public boolean showBonuses = true;
+        public Property<Boolean> showBonuses = Property.of(true);
 
         @Expose
         public Position position = new Position(144, 139, false, true);

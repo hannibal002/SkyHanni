@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -71,7 +73,7 @@ object CruxTalismanDisplay {
             }
         }
         percentValue = ((percent.toDouble() / 600) * 100).roundToPrecision(1)
-        if (bonusesLine.isNotEmpty() && config.showBonuses) {
+        if (bonusesLine.isNotEmpty() && config.showBonuses.get()) {
             addAsSingletonList("§7Bonuses:")
             bonusesLine.forEach { addAsSingletonList("  $it") }
         }
@@ -112,6 +114,11 @@ object CruxTalismanDisplay {
             }
         }
         update()
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        LorenzUtils.onToggle(config.showBonuses) { update() }
     }
 
     data class Crux(val name: String, val tier: String, val progress: String, val maxed: Boolean)
