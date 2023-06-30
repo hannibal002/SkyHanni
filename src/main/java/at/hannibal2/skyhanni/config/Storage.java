@@ -35,6 +35,9 @@ public class Storage {
 
         @Expose
         public long nextCityProjectParticipationTime = 0L;
+
+        @Expose
+        public String lastRepoIssueVersion = "";
     }
 
     public static class ProfileSpecific {
