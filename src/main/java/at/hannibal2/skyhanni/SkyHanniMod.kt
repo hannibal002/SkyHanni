@@ -315,6 +315,7 @@ class SkyHanniMod {
         loadModule(DungeonLividFinder)
         loadModule(CruxTalismanDisplay)
         loadModule(DanceRoomHelper)
+        loadModule(LaserParkour())
 
         init()
 
