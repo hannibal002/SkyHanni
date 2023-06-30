@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
+import at.hannibal2.skyhanni.features.rift.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
@@ -34,6 +35,9 @@ public class Storage {
 
         @Expose
         public long nextCityProjectParticipationTime = 0L;
+
+        @Expose
+        public String lastRepoIssueVersion = "";
     }
 
     public static class ProfileSpecific {
@@ -247,7 +251,15 @@ public class Storage {
             public Map<FrozenTreasure, Integer> treasureCount = new HashMap<>();
         }
 
-        public long nextCityProjectParticipationTime = 0L;
+        @Expose
+        public RiftStorage rift = new RiftStorage();
+
+        public static class RiftStorage {
+
+            @Expose
+            public List<KloonTerminal> completedKloonTerminals = new ArrayList<>();
+
+        }
 
         @Expose
         public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();

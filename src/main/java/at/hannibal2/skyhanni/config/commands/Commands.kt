@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -86,6 +87,7 @@ object Commands {
         registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
         registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
         registerCommand("shshowcropmoneycalculation") { CropMoneyDisplay.toggleShowCalculation() }
+        registerCommand("shstoprepowarnings") { stopRepoWarnings()}
 
         // for developers - coding help
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
@@ -110,6 +112,17 @@ object Commands {
         } else {
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
+        }
+    }
+
+    private fun stopRepoWarnings() {
+        val hidden = ProfileStorageData.playerSpecific?.lastRepoIssueVersion
+        if (hidden == SkyHanniMod.version) {
+            ProfileStorageData.playerSpecific?.lastRepoIssueVersion = ""
+            LorenzUtils.chat("§e[SkyHanni] Re-enabled repo warnings.")
+        } else {
+            ProfileStorageData.playerSpecific?.lastRepoIssueVersion = SkyHanniMod.version
+            LorenzUtils.chat("§e[SkyHanni] Disabled repo warnings until next update.")
         }
     }
 

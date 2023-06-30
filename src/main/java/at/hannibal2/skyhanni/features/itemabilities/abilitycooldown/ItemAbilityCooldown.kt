@@ -113,6 +113,11 @@ class ItemAbilityCooldown {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
         }
+        if (event.soundName == "random.drink") {
+            if (event.pitch == 1.8888888f && event.volume == 1.0f) {
+                ItemAbility.HOLY_ICE.sound()
+            }
+        }
     }
 
     @SubscribeEvent

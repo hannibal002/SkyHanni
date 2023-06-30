@@ -6,6 +6,7 @@ import io.github.moulberry.moulconfig.annotations.Accordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.observer.Property;
 
 public class RiftConfig {
 
@@ -68,7 +69,31 @@ public class RiftConfig {
         @ConfigOption(name = "Volt mood color", desc = "Change the color of the volt enemy depending on their mood.")
         @ConfigEditorBoolean
         public boolean voltMoodMeter = false;
+    }
 
+    @ConfigOption(name = "Crux Talisman Progress", desc = "")
+    @Accordion
+    @Expose
+    public CruxTalisman cruxTalisman = new CruxTalisman();
+
+    public static class CruxTalisman {
+        @Expose
+        @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Compact", desc = "Show a compacted version of the overlay when the talisman is maxed.")
+        @ConfigEditorBoolean
+        public boolean compactWhenMaxed = false;
+
+        @Expose
+        @ConfigOption(name = "Show Bonuses", desc = "Show bonuses you get from the talisman.")
+        @ConfigEditorBoolean
+        public Property<Boolean> showBonuses = Property.of(true);
+
+        @Expose
+        public Position position = new Position(144, 139, false, true);
     }
 
     @ConfigOption(name = "Larvas", desc = "")
