@@ -168,7 +168,7 @@ public class RiftConfig {
     public static class DanceRoomHelper{
 
         @Expose
-        @ConfigOption(name= "Enabled", desc = "Show the helper.")
+        @ConfigOption(name= "Enabled", desc = "Helps solving the dance room in the mirror verse by showing multiple tasks at once.")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
@@ -178,12 +178,12 @@ public class RiftConfig {
         public int lineToShow = 3;
 
         @Expose
-        @ConfigOption(name = "Space", desc = "Space between each lines..")
+        @ConfigOption(name = "Space", desc = "Change the space between each line.")
         @ConfigEditorSlider(minStep = 1, maxValue = 10, minValue = -5)
         public int extraSpace = 0;
 
         @Expose
-        @ConfigOption(name = "Hide others players", desc = "Hide others players inside the dance room.")
+        @ConfigOption(name = "Hide others players", desc = "Hide other players inside the dance room.")
         @ConfigEditorBoolean
         public boolean hidePlayers = false;
 

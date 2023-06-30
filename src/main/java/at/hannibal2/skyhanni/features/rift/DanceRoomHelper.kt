@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.rift
 
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import kotlinx.coroutines.*
-import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,58 +19,58 @@ object DanceRoomHelper {
     private val config get() = SkyHanniMod.feature.rift.danceRoomHelper
     private var index = 0
     private var found = false
-    val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
+    private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
-    private val instruction = mutableListOf(
-            "move",
-            "move",
-            "move",
-            "move",
-            "move",
-            "sneak",
-            "stand",
-            "sneak",
-            "stand",
-            "sneak",
-            "stand",
-            "sneak",
-            "stand",
-            "sneak jump",
-            "stand jump",
-            "sneak",
-            "stand",
-            "sneak jump",
-            "stand jump",
-            "sneak",
-            "stand",
-            "sneak jump",
-            "stand jump",
-            "sneak",
-            "stand",
-            "sneak jump",
-            "stand jump",
-            "sneak",
-            "stand",
-            "sneak jump",
-            "stand jump",
-            "sneak",
-            "stand",
-            "sneak jump punch",
-            "stand jump punch",
-            "sneak punch",
-            "stand punch",
-            "sneak jump punch",
-            "stand jump punch",
-            "sneak punch",
-            "stand punch",
-            "sneak jump punch",
-            "stand jump punch",
-            "sneak punch",
-            "stand punch",
-            "sneak jump punch",
-            "stand jump punch",
-            "sneak punch",
-            "stand punch",
+    private val instruction = listOf(
+        "move",
+        "move",
+        "move",
+        "move",
+        "move",
+        "sneak",
+        "stand",
+        "sneak",
+        "stand",
+        "sneak",
+        "stand",
+        "sneak",
+        "stand",
+        "sneak jump",
+        "stand jump",
+        "sneak",
+        "stand",
+        "sneak jump",
+        "stand jump",
+        "sneak",
+        "stand",
+        "sneak jump",
+        "stand jump",
+        "sneak",
+        "stand",
+        "sneak jump",
+        "stand jump",
+        "sneak",
+        "stand",
+        "sneak jump",
+        "stand jump",
+        "sneak",
+        "stand",
+        "sneak jump punch",
+        "stand jump punch",
+        "sneak punch",
+        "stand punch",
+        "sneak jump punch",
+        "stand jump punch",
+        "sneak punch",
+        "stand punch",
+        "sneak jump punch",
+        "stand jump punch",
+        "sneak punch",
+        "stand punch",
+        "sneak jump punch",
+        "stand jump punch",
+        "sneak punch",
+        "stand punch",
     ).withIndex()
 
     fun update() {
@@ -88,11 +90,11 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (inRoom) {
-            config.position.renderStrings(display,
-                    config.extraSpace,
-                    posLabel = "Dance Room Helper")
-        }
+        config.position.renderStrings(
+            display,
+            config.extraSpace,
+            posLabel = "Dance Room Helper"
+        )
     }
 
 
@@ -104,9 +106,11 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        update()
         if (event.isMod(10)) {
             inRoom = danceRoom.isVecInside(net.minecraft.client.Minecraft.getMinecraft().thePlayer.positionVector)
+        }
+        if (inRoom) {
+            update()
         }
     }
 
@@ -122,6 +126,18 @@ object DanceRoomHelper {
             found = true
             start(2000)
             update()
+        }
+    }
+
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (RiftAPI.inRift() && config.hidePlayers) {
+            val entity = event.entity
+            if (entity is EntityOtherPlayerMP) {
+                if (danceRoom.isVecInside(entity.getLorenzVec().toVec3())) {
+                    event.isCanceled = true
+                }
+            }
         }
     }
 
