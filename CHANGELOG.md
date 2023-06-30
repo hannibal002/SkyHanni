@@ -30,6 +30,13 @@
   + Highlights the correct button to click in the hacking inventory
   + Tells you which colour to pick
   + While wearing the helmet, waypoints will appear at each terminal location
++ Added **Crux Talisman Progress** Display - HiZe
+  + Show bonuses you get from the talisman
++ Added existing slayer feature support for **Vampire Slayer** - HiZe
+  + This contains RNG Meter, Slayer quest warning and Items on ground
++ Added item ability cooldown support for **Weirder Tuba** and **Holy Ice** - HiZe
++ Added **Lazer Parkour** Solver - CalMWolfs
+  + Highlights the location of the invisible blocks in the MirrorVerse
 
 ### Other Features
 + **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -42,6 +49,7 @@
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
 + Added option to show exact prices in estimated item value
++ Better error handling with missing neu repo items - CalMWolfs
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
