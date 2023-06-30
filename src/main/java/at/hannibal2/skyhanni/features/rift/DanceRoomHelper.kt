@@ -19,7 +19,6 @@ object DanceRoomHelper {
     private var found = false
     val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
-    val renderer = Minecraft.getMinecraft().fontRendererObj
     private val instruction = mutableListOf(
             "move",
             "move",
