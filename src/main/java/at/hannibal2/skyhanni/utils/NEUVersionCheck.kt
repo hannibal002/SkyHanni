@@ -22,7 +22,8 @@ object NEUVersionCheck {
                         "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
                         "You currently need NEU version 2.1.1-Alpha-16.1 or later.\n" +
                         "NEU 2.1 is NOT the latest version.\n" +
-                        "It is ONLY in the alphas channel in the NEU discord\n" +
+                        "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
+                        "Or in the #neu-updates channel in the SkyHanni discord\n" +
                         "Use these links to download the latest version:"
             )
             return
