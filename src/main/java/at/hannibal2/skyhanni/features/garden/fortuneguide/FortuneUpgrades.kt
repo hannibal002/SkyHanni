@@ -39,7 +39,7 @@ object FortuneUpgrades {
         }
         if (hidden.anitaUpgrade != -1 && hidden.anitaUpgrade != 15) {
             genericUpgrades.add(FortuneUpgrade("§7Upgrade Anita bonus to level ${hidden.anitaUpgrade + 1}",
-                null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 3.0))
+                null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 2.0))
         }
 
         getEquipmentUpgrades()

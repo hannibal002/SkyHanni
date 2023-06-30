@@ -173,9 +173,6 @@ open class FFGuideGUI : GuiScreen() {
                     FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140, mouseX, mouseY)
             }
         }
-
-        GuiRenderUtils.drawStringCentered("§cIn beta! Report issues and suggestions on the discord", guiLeft + sizeX / 2, guiTop + sizeY + 10)
-
         pages[selectedPage]?.drawPage(mouseX, mouseY, partialTicks)
 
         GlStateManager.popMatrix()
