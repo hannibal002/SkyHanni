@@ -246,7 +246,10 @@ object GhostCounter {
             val realName = name[0].uppercase() + name.substring(1).lowercase()
             if (realName.lowercase() != "combat") return
             val skillText = skillText?.get(renderListener).toString()
-            val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
+            //val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
+            val reg = "[+](.*) \\(".toRegex()
+            val result = reg.find(skillText)
+            val gained = result?.groupValues?.get(1)?.toDouble() ?: 0.0
             actionBar.add("text: $skillText || gained: $gained")
             val xp: String = if (skillText.contains("(")) {
                 val regex = "\\((.+)\\)".toRegex()
@@ -322,6 +325,7 @@ object GhostCounter {
                         hidden?.totalMF = hidden?.totalMF?.plus(group("mf").substring(4).toDouble())
                                 ?: group("mf").substring(4).toDouble()
                         TOTALDROPS.add(1.0)
+                        GHOSTSINCESORROW.set(0.0)
                         update()
                     }
 
