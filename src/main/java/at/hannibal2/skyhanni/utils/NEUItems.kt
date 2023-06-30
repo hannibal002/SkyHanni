@@ -39,7 +39,8 @@ object NEUItems {
     var allInternalNames = mutableListOf<String>()
     private var warnedAlready = false
 
-    private val fallbackItem by lazy { Utils.createItemStack(
+    private val fallbackItem by lazy {
+        Utils.createItemStack(
             ItemStack(Blocks.barrier).item,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date"
@@ -155,20 +156,17 @@ object NEUItems {
         .withKnownInternalName(internalName)
         .resolveToItemStack()?.copy()
 
-    fun getItemStack(internalName: String): ItemStack {
-        val item = getItemStackOrNull(internalName)
-            ?: try {
-                throw IllegalStateException("Something went wrong!")
-            } catch (e: IllegalStateException) {
-                if (ProfileStorageData.playerSpecific?.lastRepoIssueVersion != SkyHanniMod.version || !warnedAlready) {
-                    Utils.showOutdatedRepoNotification()
-                    CopyErrorCommand.logError(e, "Encountered an error getting the item for §7$internalName§c. " +
-                            "This is probably because your NEU repo is outdated")
-                }
-                warnedAlready = true
-                return fallbackItem
-            }
-        return item
+    fun getItemStack(internalName: String): ItemStack = getItemStackOrNull(internalName) ?: run {
+        if (ProfileStorageData.playerSpecific?.lastRepoIssueVersion != SkyHanniMod.version || !warnedAlready) {
+            Utils.showOutdatedRepoNotification()
+            CopyErrorCommand.logError(
+                IllegalStateException("Something went wrong!"),
+                "Encountered an error getting the item for §7$internalName§c. " +
+                        "This is probably because your NEU repo is outdated"
+            )
+        }
+        warnedAlready = true
+        fallbackItem
     }
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())

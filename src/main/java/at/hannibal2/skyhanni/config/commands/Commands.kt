@@ -119,10 +119,10 @@ object Commands {
         val hidden = ProfileStorageData.playerSpecific?.lastRepoIssueVersion
         if (hidden == SkyHanniMod.version) {
             ProfileStorageData.playerSpecific?.lastRepoIssueVersion = ""
-            LorenzUtils.chat("§e[SkyHanni] re-enabled repo warnings")
+            LorenzUtils.chat("§e[SkyHanni] Re-enabled repo warnings.")
         } else {
             ProfileStorageData.playerSpecific?.lastRepoIssueVersion = SkyHanniMod.version
-            LorenzUtils.chat("§e[SkyHanni] disabled repo warnings until next update")
+            LorenzUtils.chat("§e[SkyHanni] Disabled repo warnings until next update.")
         }
     }
 
