@@ -107,9 +107,9 @@ class KloonHacking {
         if (!RiftAPI.inRift()) return
         if (!SkyHanniMod.feature.rift.hacking.waypoints) return
         if (!wearingHelmet) return
-        val hidden = ProfileStorageData.profileSpecific ?: return
+        val hidden = ProfileStorageData.profileSpecific?.rift ?: return
         for (terminal in KloonTerminal.values()) {
-            if (terminal !in hidden.completedTerminals) {
+            if (terminal !in hidden.completedKloonTerminals) {
                 event.drawWaypointFilled(terminal.location, LorenzColor.DARK_RED.toColor(), true, true)
             }
         }
@@ -121,11 +121,11 @@ class KloonHacking {
         if (!wearingHelmet) return
 
         "You've set the color of this terminal to (?<colour>.*)!".toPattern().matchMatcher(event.message.removeColor()) {
-            val hidden = ProfileStorageData.profileSpecific ?: return
+            val hidden = ProfileStorageData.profileSpecific?.rift ?: return
             val colour = group("colour")
             val completedTerminal = KloonTerminal.values().firstOrNull { it.name == colour } ?: return
             if (completedTerminal != nearestTerminal) return
-            hidden.completedTerminals.add(completedTerminal)
+            hidden.completedKloonTerminals.add(completedTerminal)
         }
     }
 

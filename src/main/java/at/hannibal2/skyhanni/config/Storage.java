@@ -249,7 +249,14 @@ public class Storage {
         }
 
         @Expose
-        public List<KloonTerminal> completedTerminals = new ArrayList<>();
+        public RiftStorage rift = new RiftStorage();
+
+        public static class RiftStorage {
+
+            @Expose
+            public List<KloonTerminal> completedKloonTerminals = new ArrayList<>();
+
+        }
 
         @Expose
         public Map<String, SlayerProfitList> slayerProfitData = new HashMap<>();
