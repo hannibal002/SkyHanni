@@ -10,7 +10,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LaserParkour {
-    private val config get() = SkyHanniMod.feature.rift
+    private val config get() = SkyHanniMod.feature.rift.mirrorVerse
     private val puzzleRoom = AxisAlignedBB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 
     @SubscribeEvent

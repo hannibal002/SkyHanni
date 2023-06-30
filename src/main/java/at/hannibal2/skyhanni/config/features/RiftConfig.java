@@ -140,10 +140,19 @@ public class RiftConfig {
     @ConfigEditorBoolean
     public boolean agaricusCap = true;
 
+    @ConfigOption(name = "Mirror Verse", desc = "")
+    @Accordion
     @Expose
-    @ConfigOption(name = "Laser Parkour", desc = "Highlights the location of the invisible blocks.")
-    @ConfigEditorBoolean
-    public boolean laserParkour = true;
+    public MirrorVerse mirrorVerse = new MirrorVerse();
+
+    public static class MirrorVerse {
+
+        @Expose
+        @ConfigOption(name = "Laser Parkour", desc = "Highlights the location of the invisible blocks.")
+        @ConfigEditorBoolean
+        public boolean laserParkour = true;
+
+    }
 
     @ConfigOption(name = "Kloon Hacking", desc = "")
     @Accordion
