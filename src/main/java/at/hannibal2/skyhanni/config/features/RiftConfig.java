@@ -178,6 +178,11 @@ public class RiftConfig {
         public int lineToShow = 3;
 
         @Expose
+        @ConfigOption(name = "Space", desc = "Space between each lines..")
+        @ConfigEditorSlider(minStep = 1, maxValue = 10, minValue = -5)
+        public int extraSpace = 0;
+
+        @Expose
         @ConfigOption(name = "Hide others players", desc = "Hide others players inside the dance room.")
         @ConfigEditorBoolean
         public boolean hidePlayers = false;

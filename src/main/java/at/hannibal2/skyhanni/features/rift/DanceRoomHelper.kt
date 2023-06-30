@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import kotlinx.coroutines.*
+import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,6 +19,7 @@ object DanceRoomHelper {
     private var found = false
     val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
+    val renderer = Minecraft.getMinecraft().fontRendererObj
     private val instruction = mutableListOf(
             "move",
             "move",
@@ -89,10 +91,11 @@ object DanceRoomHelper {
         if (!isEnabled()) return
         if (inRoom) {
             config.position.renderStrings(display,
-                    extraSpace = -2,
+                    config.extraSpace,
                     posLabel = "Dance Room Helper")
         }
     }
+
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
