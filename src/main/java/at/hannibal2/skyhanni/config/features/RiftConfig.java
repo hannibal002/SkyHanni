@@ -140,6 +140,11 @@ public class RiftConfig {
     @ConfigEditorBoolean
     public boolean agaricusCap = true;
 
+    @Expose
+    @ConfigOption(name = "Laser Parkour", desc = "Highlights the location of the invisible blocks.")
+    @ConfigEditorBoolean
+    public boolean laserParkour = true;
+
     @ConfigOption(name = "Kloon Hacking", desc = "")
     @Accordion
     @Expose
