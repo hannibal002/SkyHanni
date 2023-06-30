@@ -314,6 +314,7 @@ class SkyHanniMod {
         loadModule(EnigmaSoulWaypoints)
         loadModule(DungeonLividFinder)
         loadModule(CruxTalismanDisplay)
+        loadModule(LaserParkour())
 
         init()
 
