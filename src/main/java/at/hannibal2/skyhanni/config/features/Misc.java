@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
-import at.hannibal2.skyhanni.config.core.config.*;
-import com.google.gson.annotations.*;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
-import io.github.moulberry.moulconfig.observer.*;
-import org.lwjgl.input.*;
+import io.github.moulberry.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
