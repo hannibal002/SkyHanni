@@ -325,6 +325,7 @@ class SkyHanniMod {
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
         loadModule(HighlightMissingRepoItems())
+        loadModule(WaypointSaver())
     }
 
     @Mod.EventHandler

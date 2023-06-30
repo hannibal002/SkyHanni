@@ -94,6 +94,7 @@ data class LorenzVec(
     fun equals(other: LorenzVec) = x == other.x && y == other.y && z == other.z
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
+    fun roundDown() = LorenzVec(x.toInt().toDouble(), y.toInt().toDouble(), z.toInt().toDouble())
 
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
