@@ -93,6 +93,7 @@ object EnigmaSoulWaypoints {
             }
         }
 
+        if (event.slot.stack == null) return
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
             event.usePickblockInstead()
