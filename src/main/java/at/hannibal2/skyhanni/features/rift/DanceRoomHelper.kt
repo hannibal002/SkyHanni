@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
@@ -21,61 +23,11 @@ object DanceRoomHelper {
     private var found = false
     private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
-    private val instruction = listOf(
-        "move",
-        "move",
-        "move",
-        "move",
-        "move",
-        "sneak",
-        "stand",
-        "sneak",
-        "stand",
-        "sneak",
-        "stand",
-        "sneak",
-        "stand",
-        "sneak jump",
-        "stand jump",
-        "sneak",
-        "stand",
-        "sneak jump",
-        "stand jump",
-        "sneak",
-        "stand",
-        "sneak jump",
-        "stand jump",
-        "sneak",
-        "stand",
-        "sneak jump",
-        "stand jump",
-        "sneak",
-        "stand",
-        "sneak jump",
-        "stand jump",
-        "sneak",
-        "stand",
-        "sneak jump punch",
-        "stand jump punch",
-        "sneak punch",
-        "stand punch",
-        "sneak jump punch",
-        "stand jump punch",
-        "sneak punch",
-        "stand punch",
-        "sneak jump punch",
-        "stand jump punch",
-        "sneak punch",
-        "stand punch",
-        "sneak jump punch",
-        "stand jump punch",
-        "sneak punch",
-        "stand punch",
-    ).withIndex()
+    private var instructions: List<String> = emptyList()
 
     fun update() {
         display = buildList {
-            for (line in instruction) {
+            for (line in instructions.withIndex()) {
                 if (index == line.index) {
                     add("§9§l>>> §c§l${line.value.uppercase()} §9§l<<<")
                 } else if (index + 1 == line.index) {
@@ -91,12 +43,11 @@ object DanceRoomHelper {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderStrings(
-            display,
-            config.extraSpace,
-            posLabel = "Dance Room Helper"
+                display,
+                config.extraSpace,
+                posLabel = "Dance Room Helper"
         )
     }
-
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
@@ -138,6 +89,13 @@ object DanceRoomHelper {
                     event.isCanceled = true
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions")?.let {
+            instructions = it.instructions
         }
     }
 
