@@ -560,13 +560,13 @@ public class Misc {
     public static class TextBox {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enables showing the textbox while on SkyBlock.")
+        @ConfigOption(name = "Enabled", desc = "Enables showing the textbox while in SkyBlock.")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
         @Expose
         @ConfigOption(name = "Text", desc = "Enter your text that you want to display here.\n" +
-                "§eUse '&' as the minecraft colour code character.")
+                "§eUses '&' as the Minecraft colour code character.")
         @ConfigEditorText
         public String text = "&aYour Text Here";
 
