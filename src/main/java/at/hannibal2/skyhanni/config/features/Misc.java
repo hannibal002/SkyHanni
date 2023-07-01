@@ -553,6 +553,28 @@ public class Misc {
     }
 
     @Expose
+    @ConfigOption(name = "Custom Text box", desc = "")
+    @Accordion
+    public TextBox textBox = new TextBox();
+
+    public static class TextBox {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enables showing the textbox while on SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Text", desc = "Enter your text that you want to display here.\n" +
+                "§eUse '&' as the minecraft colour code character.")
+        @ConfigEditorText
+        public String text = "&aYour Text Here";
+
+        @Expose
+        public Position position = new Position(10, 80, false, true);
+    }
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     public boolean hideExpBottles = false;
