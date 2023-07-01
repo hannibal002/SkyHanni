@@ -18,9 +18,7 @@ import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -34,8 +32,7 @@ object EnigmaSoulWaypoints {
     private var adding = true
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStackOrNull("SKYBLOCK_ENIGMA_SOUL")
-            ?: ItemStack(Blocks.obsidian) // can prob have a better fallback
+        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL")
         Utils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
@@ -93,6 +90,7 @@ object EnigmaSoulWaypoints {
             }
         }
 
+        if (event.slot.stack == null) return
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
             event.usePickblockInstead()

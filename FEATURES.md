@@ -297,6 +297,11 @@
   + Highlights the correct button to click in the hacking inventory
   + Tells you which colour to pick
   + While wearing the helmet, waypoints will appear at each terminal location
+  + Hide already completed kloon terminal waypoints
++ **Crux Talisman Progress** Display - HiZe
+  + Show bonuses you get from the talisman
++ **Lazer Parkour** Solver - CalMWolfs
+  + Highlights the location of the invisible blocks in the MirrorVerse
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
