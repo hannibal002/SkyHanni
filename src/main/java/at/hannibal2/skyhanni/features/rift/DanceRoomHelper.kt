@@ -27,6 +27,7 @@ object DanceRoomHelper {
 
     fun update() {
         display = buildList {
+            if (instructions.isEmpty()) add("§cError fetching Dance Room Instructions! try /shreloadlocalrepo")
             for (line in instructions.withIndex()) {
                 if (index == line.index) {
                     add("§9§l>>> §c§l${line.value.uppercase()} §9§l<<<")
@@ -109,5 +110,4 @@ object DanceRoomHelper {
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled
-
 }
