@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.misc.GhostCounter.Option.*
@@ -35,8 +36,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
@@ -57,15 +58,23 @@ object GhostCounter {
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = listOf<List<Any>>()
     private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
-    private val skillXPPattern = ".*§3\\+(?<gained>\\d+.?(?:\\d+)?).*\\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
+    //private val skillXPPattern = ".*§3\\+(?<gained>\\d+.?(?:\\d+)?).*\\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
+    private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
+    private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val bestiaryPattern = "BESTIARY Ghost .*➜(?<newLevel>.*)".toPattern()
-    private val format = NumberFormat.getIntegerInstance()
+    private val format = NumberFormat.getInstance()
+    private var percent: Float = 0.0f
+    private var totalSkillXp = 0
+    private var currentSkillXp = 0.0f
+    private var skillText2 = ""
+    private var lastParsedSkillSection = ""
+    private var lastSkillProgressString: String? = null
+    private var lastSkillType: String? = null
     private var hasSBA = true
     private var skillText: Field? = null
     private var skill: Field? = null
-    private var instance: Any? = null
     private var renderListener: Any? = null
     private const val exportPrefix = "gc/"
     private var tick = 0
@@ -236,47 +245,90 @@ object GhostCounter {
     /*
     Pain
      */
-    @SubscribeEvent
-    fun onSBASkillText(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-        if (!event.isMod(20)) return
-        if (hasSBA) {
-            skillText?.get(renderListener) ?: return
-            val name = skill?.get(renderListener).toString()
-            val realName = name[0].uppercase() + name.substring(1).lowercase()
-            if (realName.lowercase() != "combat") return
-            val skillText = skillText?.get(renderListener).toString()
-            //val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
-            val reg = "[+](.*) \\(".toRegex()
-            val result = reg.find(skillText)
-            val gained = result?.groupValues?.get(1)?.toDouble() ?: 0.0
-            actionBar.add("text: $skillText || gained: $gained")
-            val xp: String = if (skillText.contains("(")) {
-                val regex = "\\((.+)\\)".toRegex()
-                val matchResult = regex.find(skillText)
-                matchResult?.groupValues?.get(1) ?: "-1/-1"
-            } else {
-                "-1/-1"
-            }
-            val total = xp.split("/")[0].replace("\\D".toRegex(), "")
+    /*    @SubscribeEvent
+        fun onSBASkillText(event: LorenzTickEvent) {
+            if (!isEnabled()) return
+            if (!event.isMod(20)) return
+            if (hasSBA) {
+                skillText?.get(renderListener) ?: return
+                val name = skill?.get(renderListener).toString()
+                val realName = name[0].uppercase() + name.substring(1).lowercase()
+                if (realName.lowercase() != "combat") return
+                val skillText = skillText?.get(renderListener).toString()
+                //val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
+                val reg = "[+](.*) \\(".toRegex()
+                val result = reg.find(skillText)
+                val gained = result?.groupValues?.get(1)?.toDouble() ?: 0.0
+                actionBar.add("text: $skillText || gained: $gained")
+                val xp: String = if (skillText.contains("(")) {
+                    val regex = "\\((.+)\\)".toRegex()
+                    val matchResult = regex.find(skillText)
+                    matchResult?.groupValues?.get(1) ?: "-1/-1"
+                } else {
+                    "-1/-1"
+                }
+                val total = xp.split("/")[0].replace("\\D".toRegex(), "")
 
-            if (total != lastXp) {
-                if (gained in 150.0..450.0) {
-                    gain = (total.toLong() - lastXp.toLong()).toDouble().roundToInt()
-                    num = (gain.toDouble() / gained)
-                    if (lastXp != "0") {
-                        if (num >= 0) {
-                            KILLS.add(num)
-                            KILLS.add(num, true)
-                            GHOSTSINCESORROW.add(num)
-                            KILLCOMBO.add(num)
-                            SKILLXPGAINED.add(gained * num.roundToLong())
-                            SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                            hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
+                if (total != lastXp) {
+                    if (gained in 150.0..450.0) {
+                        gain = (total.toLong() - lastXp.toLong()).toDouble().roundToInt()
+                        num = (gain.toDouble() / gained)
+                        if (lastXp != "0") {
+                            if (num >= 0) {
+                                KILLS.add(num)
+                                KILLS.add(num, true)
+                                GHOSTSINCESORROW.add(num)
+                                KILLCOMBO.add(num)
+                                SKILLXPGAINED.add(gained * num.roundToLong())
+                                SKILLXPGAINED.add(gained * num.roundToLong(), true)
+                                hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
+                            }
                         }
                     }
+                    lastXp = total
                 }
-                lastXp = total
+            }
+        }*/
+
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (event.isMod(20)) {
+            actionBar.add(skillText2)
+            skillXPPattern.matchMatcher(skillText2) {
+                val gained = group("gained").formatNumber().toDouble()
+                val total = group("current")
+                if (total != lastXp) {
+                    val res = total.replace("\\D".toRegex(), "")
+                    gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
+                    num = (gain.toDouble() / gained)
+                    if (gained in 150.0..450.0) {
+                        if (lastXp != "0") {
+                            if (num >= 0) {
+                                KILLS.add(num)
+                                KILLS.add(num, true)
+                                GHOSTSINCESORROW.add(num)
+                                KILLCOMBO.add(num)
+                                SKILLXPGAINED.add(gained * num.roundToLong())
+                                SKILLXPGAINED.add(gained * num.roundToLong(), true)
+                                hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
+                            }
+                        }
+                    }
+                    lastXp = res
+                }
+            }
+            inMist = LorenzUtils.skyBlockArea == "The Mist"
+            update()
+        }
+        if (event.isMod(40)) {
+            calculateXP()
+            calculateETA()
+        }
+        if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported != true) {
+            notifyCTModule = false
+            if (isUsingCTGhostCounter()) {
+                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
             }
         }
     }
@@ -286,27 +338,53 @@ object GhostCounter {
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
-        skillXPPattern.matchMatcher(event.message) {
-            val gained = group("gained").formatNumber().toDouble()
-            val total = group("total")
-            if (total != lastXp) {
-                val res = total.replace("\\D".toRegex(), "")
-                gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
-                num = (gain.toDouble() / gained)
-                if (gained in 150.0..450.0) {
-                    if (lastXp != "0") {
-                        if (num >= 0) {
-                            KILLS.add(num)
-                            KILLS.add(num, true)
-                            GHOSTSINCESORROW.add(num)
-                            KILLCOMBO.add(num)
-                            SKILLXPGAINED.add(gained * num.roundToLong())
-                            SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                            hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
-                        }
+        combatSectionPattern.matchMatcher(event.message) {
+            if (group("skillName").lowercase() != "combat") return
+            parseCombatSection(event.message)
+        }
+    }
+
+    private fun parseCombatSection(section: String) {
+        val sb = StringBuilder()
+        val nf = NumberFormat.getInstance(Locale.US)
+        nf.maximumFractionDigits = 2
+        if (lastParsedSkillSection == section) {
+            sb.append(lastSkillProgressString)
+        } else if (combatSectionPattern.matcher(section).find()) {
+            combatSectionPattern.matchMatcher(section) {
+                sb.append("+").append(group("gained"))
+                val skillName = group("skillName")
+                val skillPercent = group("percent") != null
+                var parse = true
+                if (skillPercent) {
+                    percent = nf.parse(group("percent")).toFloat()
+                    val level = XPInformation.getInstance().getSkillInfo(skillName).level
+                    if (level > 0) {
+                        totalSkillXp = SkillExperience.getExpForNextLevel(level).toInt()
+                        currentSkillXp = totalSkillXp * percent / 100
+                    } else {
+                        parse = false
                     }
+                } else {
+                    currentSkillXp = nf.parse(group("current")).toFloat()
+                    totalSkillXp = nf.parse(group("total")).toInt()
                 }
-                lastXp = res
+                percent = 100f.coerceAtMost(percent)
+                if (!parse) {
+                    sb.append(" (").append(String.format("%.2f", percent)).append("%)")
+                } else {
+                    sb.append(" (").append(nf.format(currentSkillXp))
+                    if (totalSkillXp != 0) {
+                        sb.append("/")
+                        sb.append(nf.format(totalSkillXp))
+                    }
+                    sb.append(")")
+                }
+                lastParsedSkillSection = section
+                lastSkillProgressString = sb.toString()
+            }
+            if (sb.toString().isNotEmpty()) {
+                skillText2 = sb.toString()
             }
         }
     }
@@ -385,28 +463,6 @@ object GhostCounter {
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         SCAVENGERCOINS.add(event.coins, true)
         SCAVENGERCOINS.add(event.coins)
-    }
-
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!isEnabled()) return
-        tick++
-        if (tick % 20 == 0) {
-            inMist = LorenzUtils.skyBlockArea == "The Mist"
-            update()
-        }
-
-        if (tick % 40 == 20) {
-            calculateXP()
-            calculateETA()
-        }
-
-        if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported == true) {
-            notifyCTModule = false
-            if (isUsingCTGhostCounter()) {
-                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
-            }
-        }
     }
 
     @SubscribeEvent
