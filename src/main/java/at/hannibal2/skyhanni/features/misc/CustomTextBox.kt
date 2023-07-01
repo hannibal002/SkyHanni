@@ -29,6 +29,6 @@ class CustomTextBox {
             newList.add(listOf(config.text.replace("&", "§")))
             display = newList
         }
-        config.position.renderStringsAndItems(display, posLabel = "Visitor Stats")
+        config.position.renderStringsAndItems(display, posLabel = "Custom Text Box")
     }
 }
