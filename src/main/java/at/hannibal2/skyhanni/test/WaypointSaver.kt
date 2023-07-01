@@ -22,7 +22,7 @@ class WaypointSaver {
         if (!LorenzUtils.inSkyBlock) return
         if (!Keyboard.getEventKeyState()) return
         if (NEUItems.neuHasFocus()) return
-        if (System.currentTimeMillis() - timeLastSaved < 300) return
+        if (System.currentTimeMillis() - timeLastSaved < 100) return
 
         Minecraft.getMinecraft().currentScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
@@ -31,13 +31,24 @@ class WaypointSaver {
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
         if (config.deleteKey == key) {
             locations = locations.dropLast(1).toMutableList()
-            timeLastSaved = System.currentTimeMillis()
+            locations.copyLocations()
         }
         if (config.saveKey == key) {
-            locations.add(LocationUtils.playerLocation().roundDown())
-            timeLastSaved = System.currentTimeMillis()
-            OSUtils.copyToClipboard(locations.joinToString(",\n"))
+            locations.add(LocationUtils.playerLocation().roundLocation())
+            locations.copyLocations()
         }
+    }
+
+    private fun MutableList<LorenzVec>.copyLocations() {
+        val resultList = mutableListOf<String>()
+        timeLastSaved = System.currentTimeMillis()
+        for (location in this) {
+            val x = location.z.toString().replace(",", ".")
+            val y = location.z.toString().replace(",", ".")
+            val z = location.z.toString().replace(",", ".")
+            resultList.add("\"$x:$y:$z\"")
+        }
+        OSUtils.copyToClipboard(resultList.joinToString((",\n")))
     }
 
     @SubscribeEvent

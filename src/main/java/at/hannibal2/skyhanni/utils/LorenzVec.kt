@@ -94,7 +94,13 @@ data class LorenzVec(
     fun equals(other: LorenzVec) = x == other.x && y == other.y && z == other.z
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
-    fun roundDown() = LorenzVec(x.toInt().toDouble(), y.toInt().toDouble(), z.toInt().toDouble())
+
+    fun roundLocation(): LorenzVec {
+        val x = if (this.x < 0) x.toInt().toDouble() - 1 else x.toInt().toDouble()
+        val y = y.toInt().toDouble() - 1
+        val z = if (this.z < 0) z.toInt().toDouble() - 1 else z.toInt().toDouble()
+        return LorenzVec(x, y, z)
+    }
 
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
