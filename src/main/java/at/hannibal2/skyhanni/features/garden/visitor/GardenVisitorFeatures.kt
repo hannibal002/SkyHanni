@@ -54,6 +54,7 @@ class GardenVisitorFeatures {
     private val logger = LorenzLogger("garden/visitors")
     private var price = 0.0
     private val offerCache = mutableListOf<String>()
+    private var blockedOnce = false
 
     companion object {
         var inVisitorInventory = false
@@ -260,10 +261,13 @@ class GardenVisitorFeatures {
 
             visitor.hasReward()?.let {
                 if (config.visitorRewardWarning.preventRefusing) {
-                    event.isCanceled = true
-                    LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
-                    Minecraft.getMinecraft().thePlayer.closeScreen()
-                    return
+                    if (!blockedOnce) {
+                        event.isCanceled = true
+                        LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        LorenzUtils.chat("§e[SkyHanni] §eClick again to refuse the offer")
+                        blockedOnce = true
+                        return
+                    }
                 }
             }
 
@@ -420,6 +424,7 @@ class GardenVisitorFeatures {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inVisitorInventory = false
+        blockedOnce = false
         offerCache.clear()
     }
 
