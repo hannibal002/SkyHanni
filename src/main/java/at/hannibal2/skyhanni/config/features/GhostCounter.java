@@ -262,7 +262,7 @@ public class GhostCounter {
                     "§e%minutes% §7is replaced with minutes remaining.\n" +
                     "§e%seconds% §7is replaced with seconds remaining.")
             @ConfigEditorText
-            public String time = "&6%days%d%hours%h%minutes%m%seconds%s";
+            public String time = "&6%days%%hours%%minutes%%seconds%";
         }
 
         @ConfigOption(name = "Kill Per Hour Formatting", desc = "")

@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -43,7 +42,6 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.io.FileReader
-import java.lang.reflect.Field
 import java.nio.charset.StandardCharsets
 import java.text.NumberFormat
 import java.util.*
@@ -53,13 +51,10 @@ import kotlin.math.roundToLong
 
 object GhostCounter {
 
-
     val config get() = SkyHanniMod.feature.ghostCounter
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = listOf<List<Any>>()
     private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
-
-    //private val skillXPPattern = ".*§3\\+(?<gained>\\d+.?(?:\\d+)?).*\\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
     private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
     private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
@@ -69,16 +64,10 @@ object GhostCounter {
     private var percent: Float = 0.0f
     private var totalSkillXp = 0
     private var currentSkillXp = 0.0f
-    private var skillText2 = ""
+    private var skillText = ""
     private var lastParsedSkillSection = ""
     private var lastSkillProgressString: String? = null
-    private var lastSkillType: String? = null
-    private var hasSBA = true
-    private var skillText: Field? = null
-    private var skill: Field? = null
-    private var renderListener: Any? = null
     private const val exportPrefix = "gc/"
-    private var tick = 0
     private var lastXp: String = "0"
     private var gain: Int = 0
     private var num: Double = 0.0
@@ -118,8 +107,6 @@ object GhostCounter {
             }
         }
     }
-    private val actionBar = mutableListOf<String>()
-
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -142,13 +129,12 @@ object GhostCounter {
         display = formatDisplay(drawDisplay())
     }
 
-    private fun prettyTime(millis: Long): Map<String?, String?> {
-        var map: Map<String?, String?>
+    private fun prettyTime(millis: Long): Map<String, String> {
         val seconds = millis / 1000 % 60
         val minutes = millis / 1000 / 60 % 60
         val hours = millis / 1000 / 60 / 60 % 24
         val days = millis / 1000 / 60 / 60 / 24
-        map = buildMap<String?, String?> {
+        return buildMap {
             if (millis < 0) {
                 clear()
             } else if (minutes == 0L && hours == 0L && days == 0L) {
@@ -167,7 +153,6 @@ object GhostCounter {
                 put("days", days.toString())
             }
         }
-        return map
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
@@ -187,17 +172,18 @@ object GhostCounter {
             xp = xpHourFormatting.noData
         } else {
             xpInterp = interp(xpGainHour, xpGainHourLast, lastUpdate)
-            xp = "${format.format(xpInterp)} ${if (isKilling) "" else xpHourFormatting.paused}"
+            val part = "([0-9]{3,}[^,]+)".toRegex().find(format.format(xpInterp))?.groupValues?.get(1) ?: "N/A"
+            xp = "$part ${if (isKilling) "" else xpHourFormatting.paused}"
         }
 
         val killHourFormatting = config.textFormatting.killHourFormatting
-        val killh: String
+        val killHour: String
         var killInterp: Long = 0
         if (killGainHourLast == killGainHour && killGainHour <= 0) {
-            killh = killHourFormatting.noData
+            killHour = killHourFormatting.noData
         } else {
             killInterp = interp(killGainHour.toFloat(), killGainHourLast.toFloat(), lastKillUpdate).toLong()
-            killh = "${format.format(killInterp)} ${if (_isKilling) "" else killHourFormatting.paused}"
+            killHour = "${format.format(killInterp)} ${if (_isKilling) "" else killHourFormatting.paused}"
         }
 
         val bestiaryFormatting = config.textFormatting.bestiaryFormatting
@@ -236,7 +222,7 @@ object GhostCounter {
             if (killGainHour < 1) {
                 etaFormatting.noData
             } else {
-                val timeMap: Map<String?, String?> = prettyTime(remaining.toLong() * 1000 * 60 * 60 / killInterp)
+                val timeMap = prettyTime(remaining.toLong() * 1000 * 60 * 60 / killInterp)
                 val time = buildString {
                     if (timeMap.isNotEmpty()) {
                         val formatMap = mapOf(
@@ -277,102 +263,32 @@ object GhostCounter {
         addAsSingletonList(config.textFormatting.skillXPGainFormat.formatText(SKILLXPGAINED.get(), SKILLXPGAINED.get(true)))
         addAsSingletonList(bestiaryFormatting.base.formatText(bestiary).formatBestiary(currentKill, killNeeded))
         addAsSingletonList(xpHourFormatting.base.formatText(xp))
-        addAsSingletonList(killHourFormatting.base.formatText(killh))
+        addAsSingletonList(killHourFormatting.base.formatText(killHour))
         addAsSingletonList(etaFormatting.base.formatText(eta).formatText(killETA))
 
-        /*
-        I'm very not sure about all that
-         */
         val rate = 0.12 * (1 + (mgc.toDouble() / 100))
         val price = (BazaarApi.getBazaarDataByInternalName("SORROW")?.sellPrice ?: 0).toLong()
         val final: String = (killInterp * price * (rate / 100)).toLong().addSeparators()
-        actionBar.add("=== start money ===")
-        actionBar.add("mgc: ${mgc.toDouble()}")
-        actionBar.add("interp: $killInterp")
-        actionBar.add("price: $price")
-        actionBar.add("rate: $rate")
-        actionBar.add("final: $final")
-        actionBar.add("=== end money ===")
         addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
     }
-
-
-    /*
-    Pain
-     */
-    /*    @SubscribeEvent
-        fun onSBASkillText(event: LorenzTickEvent) {
-            if (!isEnabled()) return
-            if (!event.isMod(20)) return
-            if (hasSBA) {
-                skillText?.get(renderListener) ?: return
-                val name = skill?.get(renderListener).toString()
-                val realName = name[0].uppercase() + name.substring(1).lowercase()
-                if (realName.lowercase() != "combat") return
-                val skillText = skillText?.get(renderListener).toString()
-                //val gained = skillText.split("+")[1].split(" (")[0].replace(",", "").toDouble()
-                val reg = "[+](.*) \\(".toRegex()
-                val result = reg.find(skillText)
-                val gained = result?.groupValues?.get(1)?.toDouble() ?: 0.0
-                actionBar.add("text: $skillText || gained: $gained")
-                val xp: String = if (skillText.contains("(")) {
-                    val regex = "\\((.+)\\)".toRegex()
-                    val matchResult = regex.find(skillText)
-                    matchResult?.groupValues?.get(1) ?: "-1/-1"
-                } else {
-                    "-1/-1"
-                }
-                val total = xp.split("/")[0].replace("\\D".toRegex(), "")
-
-                if (total != lastXp) {
-                    if (gained in 150.0..450.0) {
-                        gain = (total.toLong() - lastXp.toLong()).toDouble().roundToInt()
-                        num = (gain.toDouble() / gained)
-                        if (lastXp != "0") {
-                            if (num >= 0) {
-                                KILLS.add(num)
-                                KILLS.add(num, true)
-                                GHOSTSINCESORROW.add(num)
-                                KILLCOMBO.add(num)
-                                SKILLXPGAINED.add(gained * num.roundToLong())
-                                SKILLXPGAINED.add(gained * num.roundToLong(), true)
-                                hidden?.bestiaryCurrentKill = hidden?.bestiaryCurrentKill?.plus(num) ?: num
-                            }
-                        }
-                    }
-                    lastXp = total
-                }
-            }
-        }*/
-
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.isMod(20)) {
-            //actionBar.add("===== START =====")
-            //actionBar.add("SkillText: $skillText2")
-            skillXPPattern.matchMatcher(skillText2) {
+            skillXPPattern.matchMatcher(skillText) {
                 val gained = group("gained").formatNumber().toDouble()
-                //actionBar.add("Gained: $gained")
-                val total = group("current")
-                //actionBar.add("Total: $total")
-                if (total != lastXp) {
-                    val res = if (total.contains(".")) {
-                        total.split(".")[0].replace("\\D".toRegex(), "")
+                val current = group("current")
+                if (current != lastXp) {
+                    val res = if (current.contains(".")) {
+                        "(?:[0-9,]+){3,}".toRegex().find(current)?.groupValues?.get(1) ?: "0"
                     } else {
-                        total.replace("\\D".toRegex(), "")
+                        current.replace("\\D".toRegex(), "")
                     }
-                    //actionBar.add("Res: $res")
-                    //actionBar.add("TotalReplace: ${total.replace("\\D".toRegex(), "")}")
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
-                    // actionBar.add("Gain: $gain")
-                    // actionBar.add("Num: $num")
                     if (gained in 150.0..450.0) {
-                        //  actionBar.add("InRange: true")
                         if (lastXp != "0") {
-                            // actionBar.add("LastXp: $lastXp")
                             if (num >= 0) {
                                 KILLS.add(num)
                                 KILLS.add(num, true)
@@ -387,24 +303,21 @@ object GhostCounter {
                     lastXp = res
                 }
             }
+            if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported != true) {
+                notifyCTModule = false
+                if (isUsingCTGhostCounter()) {
+                    clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
+                }
+            }
             inMist = LorenzUtils.skyBlockArea == "The Mist"
             update()
-            // actionBar.add("===== END =====")
         }
         if (event.isMod(40)) {
             calculateXP()
             calculateETA()
         }
-        if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported != true) {
-            notifyCTModule = false
-            if (isUsingCTGhostCounter()) {
-                clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
-            }
-        }
     }
 
-    // Part of this was taken from GhostCounterV3 CT module
-    // maybe replace this with a SkillXpGainEvent ?
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
@@ -454,7 +367,7 @@ object GhostCounter {
                 lastSkillProgressString = sb.toString()
             }
             if (sb.toString().isNotEmpty()) {
-                skillText2 = sb.toString()
+                skillText = sb.toString()
             }
         }
     }
@@ -473,10 +386,6 @@ object GhostCounter {
                         hidden?.totalMF = hidden?.totalMF?.plus(group("mf").substring(4).toDouble())
                                 ?: group("mf").substring(4).toDouble()
                         TOTALDROPS.add(1.0)
-                        actionBar.add("=== mf start ===")
-                        actionBar.add("totalMF: ${hidden?.totalMF ?: "N/A"}")
-                        actionBar.add("group: ${group("mf").substring(4).toDouble()}")
-                        actionBar.add("=== mf end")
                         if (opt == SORROWCOUNT)
                             GHOSTSINCESORROW.set(0.0)
                         update()
@@ -496,7 +405,6 @@ object GhostCounter {
                     else -> {}
                 }
             }
-
         }
         killComboExpiredPattern.matchMatcher(event.message) {
             if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt()) {
@@ -549,7 +457,6 @@ object GhostCounter {
         val ghostStack = stacks[13] ?: return
         val bestiaryNextLevel = if (ghostStack.displayName == "§cGhost") 1 else Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
         hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
-
         for (line in ghostStack.getLore()) {
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {
                 hidden?.bestiaryCurrentKill = group("current").formatNumber().toDouble()
@@ -563,8 +470,8 @@ object GhostCounter {
         return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
     }
 
-    private fun percent(number: Double, total: Double): String {
-        return "${((number / total) * 100).roundToPrecision(4)}"
+    private fun percent(number: Double): String {
+        return "${((number / 3_000_000) * 100).roundToPrecision(4)}"
     }
 
     fun reset() {
@@ -623,7 +530,7 @@ object GhostCounter {
     private fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
         return Utils.chromaStringByColourCode(
                 this.replace("%currentKill%", if (config.showMax) bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
-                        .replace("%percentNumber%", percent(bestiaryCurrentKill.toDouble(), 3_000_000.0))
+                        .replace("%percentNumber%", percent(bestiaryCurrentKill.toDouble()))
                         .replace("%killNeeded%", NumberUtil.format(killNeeded))
                         .replace("%currentLevel%", if (hidden?.bestiaryNextLevel?.toInt()!! < 0) "46" else "${hidden?.bestiaryNextLevel?.toInt()!! - 1}")
                         .replace("%nextLevel%", if (config.showMax) "46" else "${hidden?.bestiaryNextLevel?.toInt()!!}")
@@ -682,7 +589,6 @@ object GhostCounter {
         }
 
         if (base64.length <= exportPrefix.length) return
-
         val jsonString = try {
             val t = String(Base64.getDecoder().decode(base64.trim()))
             if (!t.startsWith(exportPrefix)) return
@@ -833,28 +739,9 @@ object GhostCounter {
                 maxed = "§c§lMAXED!"
                 noData = "§bN/A"
                 progress = "§b%value%"
-                time = "&6%days%d%hours%h%minutes%m%seconds%s"
+                time = "&6%days%%hours%%minutes%%seconds%"
             }
             moneyHourFormat = "  &6$/h: &b%value%"
         }
     }
-
-    fun copyActionbar() {
-        OSUtils.copyToClipboard(actionBar.joinToString("\n"))
-        actionBar.clear()
-    }
-
-    fun checkSBA() {
-        hasSBA = try {
-            val sba = Class.forName("codes.biscuit.skyblockaddons.SkyblockAddons")
-            val instance = sba.getDeclaredField("instance").also { it.isAccessible = true }.get(null)
-            renderListener = instance.javaClass.getDeclaredMethod("getRenderListener").also { it.isAccessible = true }.invoke(instance)
-            skill = renderListener!!.javaClass.getDeclaredField("skill").also { it.isAccessible = true }
-            skillText = renderListener!!.javaClass.getDeclaredField("skillText").also { it.isAccessible = true }
-            true
-        } catch (e: Throwable) {
-            false
-        }
-    }
-
 }
