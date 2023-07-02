@@ -41,7 +41,9 @@ object CopyErrorCommand {
         Minecraft.getMinecraft().thePlayer ?: throw error
         error.printStackTrace()
 
-        val pair = throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+        val pair = if (throwable.stackTrace.isNotEmpty()) {
+            throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+        } else message to 0
         if (cache.getIfPresent(pair) != null) return
         cache.put(pair, Unit)
 
