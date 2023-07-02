@@ -58,6 +58,7 @@ object GhostCounter {
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = listOf<List<Any>>()
     private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
+
     //private val skillXPPattern = ".*§3\\+(?<gained>\\d+.?(?:\\d+)?).*\\((?<total>.*)\\/(?<current>.*)\\).*".toPattern()
     private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
     private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
@@ -141,6 +142,34 @@ object GhostCounter {
         display = formatDisplay(drawDisplay())
     }
 
+    private fun prettyTime(millis: Long): Map<String?, String?> {
+        var map: Map<String?, String?>
+        val seconds = millis / 1000 % 60
+        val minutes = millis / 1000 / 60 % 60
+        val hours = millis / 1000 / 60 / 60 % 24
+        val days = millis / 1000 / 60 / 60 / 24
+        map = buildMap<String?, String?> {
+            if (millis < 0) {
+                clear()
+            } else if (minutes == 0L && hours == 0L && days == 0L) {
+                put("seconds", seconds.toString())
+            } else if (hours == 0L && days == 0L) {
+                put("seconds", seconds.toString())
+                put("minutes", minutes.toString())
+            } else if (days == 0L) {
+                put("seconds", seconds.toString())
+                put("minutes", minutes.toString())
+                put("hours", hours.toString())
+            } else {
+                put("seconds", seconds.toString())
+                put("minutes", minutes.toString())
+                put("hours", hours.toString())
+                put("days", days.toString())
+            }
+        }
+        return map
+    }
+
     private fun drawDisplay() = buildList<List<Any>> {
         val value: Int = when (SORROWCOUNT.get()) {
             0.0 -> 0
@@ -170,7 +199,6 @@ object GhostCounter {
             killInterp = interp(killGainHour.toFloat(), killGainHourLast.toFloat(), lastKillUpdate).toLong()
             killh = "${format.format(killInterp)} ${if (_isKilling) "" else killHourFormatting.paused}"
         }
-
 
         val bestiaryFormatting = config.textFormatting.bestiaryFormatting
         val currentKill = hidden?.bestiaryCurrentKill?.toInt() ?: 0
@@ -208,7 +236,27 @@ object GhostCounter {
             if (killGainHour < 1) {
                 etaFormatting.noData
             } else {
-                killETA = Utils.prettyTime(remaining.toLong() * 1000 * 60 * 60 / killInterp)
+                val timeMap: Map<String?, String?> = prettyTime(remaining.toLong() * 1000 * 60 * 60 / killInterp)
+                val time = buildString {
+                    if (timeMap.isNotEmpty()) {
+                        val formatMap = mapOf(
+                                "%days%" to "days",
+                                "%hours%" to "hours",
+                                "%minutes%" to "minutes",
+                                "%seconds%" to "seconds"
+                        )
+                        for ((format, key) in formatMap) {
+                            if (etaFormatting.time.contains(format)) {
+                                timeMap[key]?.let { value ->
+                                    append("$value${format[1]}")
+                                }
+                            }
+                        }
+                    } else {
+                        append("§cEnded!")
+                    }
+                }
+                killETA = time
                 etaFormatting.progress + if (_isKilling) "" else etaFormatting.paused
             }
         }
@@ -238,6 +286,13 @@ object GhostCounter {
         val rate = 0.12 * (1 + (mgc.toDouble() / 100))
         val price = (BazaarApi.getBazaarDataByInternalName("SORROW")?.sellPrice ?: 0).toLong()
         val final: String = (killInterp * price * (rate / 100)).toLong().addSeparators()
+        actionBar.add("=== start money ===")
+        actionBar.add("mgc: ${mgc.toDouble()}")
+        actionBar.add("interp: $killInterp")
+        actionBar.add("price: $price")
+        actionBar.add("rate: $rate")
+        actionBar.add("final: $final")
+        actionBar.add("=== end money ===")
         addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
     }
 
@@ -293,17 +348,31 @@ object GhostCounter {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
         if (event.isMod(20)) {
-            actionBar.add(skillText2)
+            //actionBar.add("===== START =====")
+            //actionBar.add("SkillText: $skillText2")
             skillXPPattern.matchMatcher(skillText2) {
                 val gained = group("gained").formatNumber().toDouble()
+                //actionBar.add("Gained: $gained")
                 val total = group("current")
+                //actionBar.add("Total: $total")
                 if (total != lastXp) {
-                    val res = total.replace("\\D".toRegex(), "")
+                    val res = if (total.contains(".")) {
+                        total.split(".")[0].replace("\\D".toRegex(), "")
+                    } else {
+                        total.replace("\\D".toRegex(), "")
+                    }
+                    //actionBar.add("Res: $res")
+                    //actionBar.add("TotalReplace: ${total.replace("\\D".toRegex(), "")}")
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
+                    // actionBar.add("Gain: $gain")
+                    // actionBar.add("Num: $num")
                     if (gained in 150.0..450.0) {
+                        //  actionBar.add("InRange: true")
                         if (lastXp != "0") {
+                            // actionBar.add("LastXp: $lastXp")
                             if (num >= 0) {
                                 KILLS.add(num)
                                 KILLS.add(num, true)
@@ -320,6 +389,7 @@ object GhostCounter {
             }
             inMist = LorenzUtils.skyBlockArea == "The Mist"
             update()
+            // actionBar.add("===== END =====")
         }
         if (event.isMod(40)) {
             calculateXP()
@@ -403,7 +473,12 @@ object GhostCounter {
                         hidden?.totalMF = hidden?.totalMF?.plus(group("mf").substring(4).toDouble())
                                 ?: group("mf").substring(4).toDouble()
                         TOTALDROPS.add(1.0)
-                        GHOSTSINCESORROW.set(0.0)
+                        actionBar.add("=== mf start ===")
+                        actionBar.add("totalMF: ${hidden?.totalMF ?: "N/A"}")
+                        actionBar.add("group: ${group("mf").substring(4).toDouble()}")
+                        actionBar.add("=== mf end")
+                        if (opt == SORROWCOUNT)
+                            GHOSTSINCESORROW.set(0.0)
                         update()
                     }
 
@@ -497,6 +572,7 @@ object GhostCounter {
             opt.set(0.0)
             opt.set(0.0, true)
         }
+        hidden?.totalMF = 0.0
         update()
     }
 
@@ -623,7 +699,7 @@ object GhostCounter {
             return
         }
 
-        if (list.size == 30) {
+        if (list.isNotEmpty()) {
             with(config.textFormatting) {
                 titleFormat = list[0]
                 ghostKilledFormat = list[1]
@@ -661,8 +737,9 @@ object GhostCounter {
                     maxed = list[26]
                     noData = list[27]
                     progress = list[28]
+                    time = list[29]
                 }
-                moneyHourFormat = list[29]
+                moneyHourFormat = list[30]
             }
         }
     }
@@ -706,6 +783,7 @@ object GhostCounter {
                 list.add(maxed)
                 list.add(noData)
                 list.add(progress)
+                list.add(time)
             }
             list.add(moneyHourFormat)
         }
@@ -755,6 +833,7 @@ object GhostCounter {
                 maxed = "§c§lMAXED!"
                 noData = "§bN/A"
                 progress = "§b%value%"
+                time = "&6%days%d%hours%h%minutes%m%seconds%s"
             }
             moneyHourFormat = "  &6$/h: &b%value%"
         }

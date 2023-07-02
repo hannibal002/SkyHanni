@@ -69,6 +69,7 @@ object Commands {
         registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
         registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
         registerCommand("shclearfarmingitems") { clearFarmingItems() }
+        registerCommand("shresetghostcounter") { GhostCounter.reset() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
@@ -87,8 +88,8 @@ object Commands {
         registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
         registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
         registerCommand("shshowcropmoneycalculation") { CropMoneyDisplay.toggleShowCalculation() }
-        registerCommand("shcopyactionbar") { GhostCounter.copyActionbar()}
-        registerCommand("shstoprepowarnings") { stopRepoWarnings()}
+        registerCommand("shcopyactionbar") { GhostCounter.copyActionbar() }
+        registerCommand("shstoprepowarnings") { stopRepoWarnings() }
 
         // for developers - coding help
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
@@ -139,9 +140,9 @@ object Commands {
     }
 
     private fun createCommand(function: (Array<String>) -> Unit) =
-        object : ProcessCommandRunnable() {
-            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-                function(args.asList().toTypedArray())
+            object : ProcessCommandRunnable() {
+                override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
+                    function(args.asList().toTypedArray())
+                }
             }
-        }
 }
