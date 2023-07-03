@@ -29,7 +29,9 @@ class HighlightMiningCommissionMobs {
         AUTOMATON("Automaton Slayer", { it is EntityIronGolem }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
         YOG("Yog Slayer", { it is EntityMagmaCube }), // TODO this is still untested
-
+        THYST("Thyst Slayer", { false }), // TODO check name
+        CORLEONE("Corleone Slayer", { false }), // TODO check name
+        SLUDGE("Sludge Slayer", { false }), // TODO check name
         ;
     }
 
