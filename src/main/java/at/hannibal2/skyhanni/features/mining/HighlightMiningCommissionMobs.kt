@@ -8,10 +8,13 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntityEndermite
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
+import net.minecraft.entity.monster.EntitySlime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMiningCommissionMobs {
@@ -21,17 +24,19 @@ class HighlightMiningCommissionMobs {
     enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
 
         // Dwarven Mines
-        STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }), // TODO this is still untested
-        GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }), // TODO this is still untested
-        ICE_WALKER("Ice Walker Slayer", { it.name == "Ice Walker" }), // TODO this is still untested
+        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }),
+        STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }), // TODO test it
+        ICE_WALKER("Ice Walker Slayer", { it.name == "Ice Walker" }), // TODO test it
+        GOLDEN_GOBLIN("Golden Goblin Slayer", { false }), // TODO test it
 
         // Crystal Hollows
         AUTOMATON("Automaton Slayer", { it is EntityIronGolem }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
-        YOG("Yog Slayer", { it is EntityMagmaCube }), // TODO this is still untested
-        THYST("Thyst Slayer", { false }), // TODO check name
-        CORLEONE("Corleone Slayer", { false }), // TODO check name
-        SLUDGE("Sludge Slayer", { false }), // TODO check name
+        YOG("Yog Slayer", { it is EntityMagmaCube }),
+        THYST("Thyst Slayer", { it is EntityEndermite && it.baseMaxHealth == 5_000 }),
+        CORLEONE("Corleone Slayer", { it.baseMaxHealth == 1_000_000 && it.name == "Team Treasurite" }), // TODO test it
+        SLUDGE("Sludge Slayer", { it is EntitySlime && it.baseMaxHealth == 10_000 }), // TODO test it
+        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }), // TODO test it
         ;
     }
 
