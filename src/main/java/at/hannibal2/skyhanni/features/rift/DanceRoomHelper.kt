@@ -58,6 +58,7 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!inRoom) return
         config.position.renderStrings(
             display,
             config.extraSpace,
@@ -83,7 +84,7 @@ object DanceRoomHelper {
 
     @SubscribeEvent
     fun onSound(event: at.hannibal2.skyhanni.events.PlaySoundEvent) {
-        if (!isEnabled() && !inRoom) return
+        if (!isEnabled() || !inRoom) return
         if (event.soundName == "random.burp" && event.volume == 0.8f) {
             index = 0
             found = false
