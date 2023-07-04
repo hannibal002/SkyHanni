@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
@@ -91,11 +92,11 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
 @Mod(
-    modid = SkyHanniMod.MODID,
-    clientSideOnly = true,
-    useMetadata = true,
-    guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.5",
+        modid = SkyHanniMod.MODID,
+        clientSideOnly = true,
+        useMetadata = true,
+        guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
+        version = "0.19.Beta.5",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -376,7 +377,7 @@ class SkyHanniMod {
         val modules: MutableList<Any> = ArrayList()
         val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
-            CoroutineName("SkyHanni") + SupervisorJob(globalJob)
+                CoroutineName("SkyHanni") + SupervisorJob(globalJob)
         )
         var screenToOpen: GuiScreen? = null
         private var screenTicks = 0

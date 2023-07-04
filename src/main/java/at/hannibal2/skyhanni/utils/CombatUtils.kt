@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.features.misc.GhostCounter
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 
@@ -68,7 +67,7 @@ object CombatUtils {
     /*
     Must be a better way to do this than repeating the calculateXP function
      */
-    fun calculateETA(){
+    fun calculateETA() {
         lastKillUpdate = System.currentTimeMillis()
         killGainHourLast = killGainHour
         val nextLevel = GhostCounter.hidden?.bestiaryNextLevel?.toInt() ?: return
@@ -76,34 +75,35 @@ object CombatUtils {
         val sum = GhostCounter.bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
         val cKill = sum + kill
         val totalKill = if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill else cKill
-        if (lastTotalKill > 0){
+        if (lastTotalKill > 0) {
             val delta: Int = totalKill - lastTotalKill
-            if (delta in 1..19){
+            if (delta in 1..19) {
                 gainTimer = GhostCounter.config.pauseTimer
                 killGainQueue.add(0, delta)
-                while (killGainQueue.size > 30){
+                while (killGainQueue.size > 30) {
                     killGainQueue.removeLast()
                 }
                 var totalGain = 0
                 for (f in killGainQueue) totalGain += f
                 killGainHour = totalGain * (60 * 60) / killGainQueue.size
                 _isKilling = true
-            }else if(gainTimer > 0){
+            } else if (gainTimer > 0) {
                 gainTimer--
                 killGainQueue.add(0, 0)
-                while (killGainQueue.size > 30){
+                while (killGainQueue.size > 30) {
                     killGainQueue.removeLast()
                 }
                 var totalGain = 0
                 for (f in killGainQueue) totalGain += f
                 killGainHour = totalGain * (60 * 60) / killGainQueue.size
                 _isKilling = true
-            }else if (delta <= 0){
+            } else if (delta <= 0) {
                 _isKilling = false
             }
         }
         lastTotalKill = totalKill
     }
+
     /**
      * Taken from NotEnoughUpdates
      */

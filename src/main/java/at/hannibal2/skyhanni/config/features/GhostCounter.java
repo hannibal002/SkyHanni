@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.misc.ghostcounter.Formatting;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -61,15 +62,15 @@ public class GhostCounter {
 
         @ConfigOption(name = "Reset Formatting", desc = "Reset formatting to default text.")
         @ConfigEditorButton(buttonText = "Reset")
-        public Runnable resetFormatting = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::resetFormatting;
+        public Runnable resetFormatting = Formatting.INSTANCE::reset;
 
         @ConfigOption(name = "Export Formatting", desc = "Export current formatting to clipboard.")
         @ConfigEditorButton(buttonText = "Export")
-        public Runnable exportFormatting = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::exportFormatting;
+        public Runnable exportFormatting = Formatting.INSTANCE::export;
 
         @ConfigOption(name = "Import Formatting", desc = "Import formatting from clipboard.")
         @ConfigEditorButton(buttonText = "Import")
-        public Runnable importFormatting = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::importFormatting;
+        public Runnable importFormatting = Formatting.INSTANCE::importFormat;
 
         @Expose
         @ConfigOption(name = "Title", desc = "Title Line.")
@@ -325,7 +326,7 @@ public class GhostCounter {
 
     @ConfigOption(name = "Reset", desc = "Reset the counter.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetCounter = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::reset;
+    public Runnable resetCounter = at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter.INSTANCE::reset;
 
     @Expose
     public Position position = new Position(50, 50, false, true);
