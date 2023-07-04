@@ -139,9 +139,9 @@ object Commands {
     }
 
     private fun createCommand(function: (Array<String>) -> Unit) =
-            object : ProcessCommandRunnable() {
-                override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-                    function(args.asList().toTypedArray())
-                }
+        object : ProcessCommandRunnable() {
+            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
+                function(args.asList().toTypedArray())
             }
+        }
 }

@@ -343,7 +343,7 @@ object GhostCounter {
                     percent = nf.parse(group("percent")).toFloat()
                     val level = XPInformation.getInstance().getSkillInfo(skillName).level
                     if (level > 0) {
-                        totalSkillXp = SkillExperience.getExpForNextLevel(level).toInt()
+                        totalSkillXp = SkillExperience.getExpForNextLevel(level)
                         currentSkillXp = totalSkillXp * percent / 100
                     } else {
                         parse = false
