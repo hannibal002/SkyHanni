@@ -32,7 +32,7 @@ object EnigmaSoulWaypoints {
     private var adding = true
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL")
+        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL", true)
         Utils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",

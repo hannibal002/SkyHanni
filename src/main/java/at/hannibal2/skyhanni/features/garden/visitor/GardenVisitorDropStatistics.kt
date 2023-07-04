@@ -127,7 +127,7 @@ object GardenVisitorDropStatistics {
         for (reward in VisitorReward.values()) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
-                val stack = NEUItems.getItemStack(reward.internalName)
+                val stack = NEUItems.getItemStack(reward.internalName, true)
                 if (config.displayNumbersFirst)
                     add(listOf("§b${count.addSeparators()} ", stack))
                 else add(listOf(stack, " §b${count.addSeparators()}"))

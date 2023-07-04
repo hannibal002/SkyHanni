@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -37,7 +35,6 @@ object NEUItems {
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, String>() // item name -> internal name
     var allInternalNames = mutableListOf<String>()
-    private var warnedAlready = false
 
     private val fallbackItem by lazy {
         Utils.createItemStack(
@@ -156,16 +153,16 @@ object NEUItems {
         .withKnownInternalName(internalName)
         .resolveToItemStack()?.copy()
 
-    fun getItemStack(internalName: String): ItemStack = getItemStackOrNull(internalName) ?: run {
-        if (ProfileStorageData.playerSpecific?.lastRepoIssueVersion != SkyHanniMod.version || !warnedAlready) {
+    fun getItemStack(internalName: String, definite: Boolean = false): ItemStack = getItemStackOrNull(internalName) ?: run {
+        if (definite) {
             Utils.showOutdatedRepoNotification()
-            CopyErrorCommand.logError(
-                IllegalStateException("Something went wrong!"),
-                "Encountered an error getting the item for §7$internalName§c. " +
-                        "This is probably because your NEU repo is outdated"
-            )
         }
-        warnedAlready = true
+        CopyErrorCommand.logError(
+            IllegalStateException("Something went wrong!"),
+            "Encountered an error getting the item for §7$internalName§c. " +
+                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni" +
+                    "Discord if this is the case"
+        )
         fallbackItem
     }
 
