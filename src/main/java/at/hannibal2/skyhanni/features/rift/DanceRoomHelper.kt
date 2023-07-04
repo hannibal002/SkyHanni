@@ -34,26 +34,26 @@ object DanceRoomHelper {
             for ((lineIndex, line) in instructions.withIndex()) {
                 if (line != null) {
                     if (index < instructions.size && index == lineIndex) {
-                        add("§7Now: ${line.format()} ${if (countdown != null) "§f$countdown" else ""}")
+                        add("${config.danceRoomFormatting.now.replace("&", "§")} ${line.format()} ${if (countdown != null) "§f$countdown" else ""}")
                     } else if (index + 1 < instructions.size && index + 1 == lineIndex) {
-                        add("§7Next: ${line.format()}")
+                        add("${config.danceRoomFormatting.next.replace("&", "§")} ${line.format()}")
                     } else if (index + 2 < instructions.size && (index + 2..index + config.lineToShow).contains(lineIndex)) {
-                        add("§7Later: ${line.format()}")
+                        add("${config.danceRoomFormatting.later.replace("&", "§")} ${line.format()}")
                     }
                 }
             }
         }
     }
 
-    private fun String.format() = split(" ").joinToString(" ") { it.firstLetterUppercase().addColor() }
+    private fun String.format() = split(" ").joinToString(" ") { it.firstLetterUppercase().addColor().replace("&", "§") }
 
     private fun String.addColor() = when (this) {
-        "Move" -> "§e"
-        "Stand" -> "§e"
-        "Sneak" -> "§5"
-        "Jump" -> "§b"
-        "Punch" -> "§d"
-        else -> "§f"
+        "Move" -> config.danceRoomFormatting.color.move
+        "Stand" -> config.danceRoomFormatting.color.stand
+        "Sneak" -> config.danceRoomFormatting.color.sneak
+        "Jump" -> config.danceRoomFormatting.color.jump
+        "Punch" -> config.danceRoomFormatting.color.punch
+        else -> config.danceRoomFormatting.color.fallback
     } + this
 
     @SubscribeEvent
