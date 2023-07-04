@@ -177,7 +177,7 @@ public class RiftConfig {
         public static class DanceRoomHelper{
 
             @Expose
-            @ConfigOption(name= "Enabled", desc = "Helps solving the dance room in the mirror verse by showing multiple tasks at once.")
+            @ConfigOption(name= "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
             @ConfigEditorBoolean
             public boolean enabled = false;
 

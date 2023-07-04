@@ -302,6 +302,10 @@
   + Show bonuses you get from the talisman
 + **Lazer Parkour** Solver - CalMWolfs
   + Highlights the location of the invisible blocks in the MirrorVerse
++ Mirrorverse **Dance Room Helper** - HiZe
+  + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
+  + Change how many tasks you should see
+  + Hide other players inside the dance room
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
@@ -367,3 +371,7 @@
   + Show Ice per hour
   + Customizable GUI
   + Option to hide the chat messages
++ **Custom Text Box** - CalMWolfs
+  + Write fancy text into a gui element to show on your screen at all time
+  + Supports color codes
+  + Supports line breaks `\n` - hannibal2

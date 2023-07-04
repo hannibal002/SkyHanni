@@ -37,25 +37,42 @@
 + Added item ability cooldown support for **Weirder Tuba** and **Holy Ice** - HiZe
 + Added **Lazer Parkour** Solver - CalMWolfs
   + Highlights the location of the invisible blocks in the MirrorVerse
++ Added Mirrorverse **Dance Room Helper** - HiZe
+  + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
+  + Change how many tasks you should see
+  + Hide other players inside the dance room
 
 ### Other Features
-+ **Frozen Treasure Tracker** (Contributed by CalMWolfs)
++ Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
   + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
   + Show Ice per hour
   + Customizable GUI
   + Option to hide the chat messages
++ Added **Custom Text Box** - CalMWolfs
+  + Write fancy text into a gui element to show on your screen at all time
+  + Supports color codes
+  + Supports line breaks `\n` - hannibal2
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
 + Added option to show exact prices in estimated item value
 + Better error handling with missing neu repo items - CalMWolfs
++ Changes to **Discord RCP** - NetheriteMiner
+  + More images for different locations
+  + Fixed names unnecessarily getting cut off when visiting an island in Location
+  + Fewer crashes because of NEU Item Repo
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
 + Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
 + Fixed frozen treasures per hour display being inaccurate (Contributed by CalMWolfs)
 + Fixed bug with ghost counter sometimes not detecting new kills (Contributed by CalMWolfs)
++ **Ghost Counter** fixes - HiZe & ksipli
+  + Should no longer have compatibility issues with other mods
+  + It work even if the action bar show percent +xxx (xx%) instead of +xxx (xxx/xxx)
+  + Added command /shresetghostcounter to reset everything (not the bestiary data)
+  + Added time format in ETA formatting (can show days, hours, minutes and seconds remaining)
 
 ## Version 0.18 (2023-06-19)
 
