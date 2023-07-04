@@ -174,10 +174,10 @@ public class RiftConfig {
         @Expose
         public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
 
-        public static class DanceRoomHelper{
+        public static class DanceRoomHelper {
 
             @Expose
-            @ConfigOption(name= "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
+            @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
             @ConfigEditorBoolean
             public boolean enabled = false;
 
@@ -232,4 +232,24 @@ public class RiftConfig {
 
     }
 
+    @Expose
+    @ConfigOption(name = "Living Metal Suit Progress", desc = "")
+    @Accordion
+    public LivingMetalSuitProgress livingMetalSuitProgress = new LivingMetalSuitProgress();
+
+    public static class LivingMetalSuitProgress {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Display progress Living Metal Suit")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Compact", desc = "Show a compacted version of the overlay when the set is maxed.")
+        @ConfigEditorBoolean
+        public boolean compactWhenMaxed = false;
+
+        @Expose
+        public Position position = new Position(100, 100);
+    }
 }
