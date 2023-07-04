@@ -565,10 +565,11 @@ public class Misc {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Text", desc = "Enter your text that you want to display here.\n" +
-                "§eUses '&' as the Minecraft colour code character.")
+        @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
+                "§eUse '&' as the colour code character.\n" +
+                "§eUse '\\n' as the line break character.")
         @ConfigEditorText
-        public String text = "&aYour Text Here";
+        public Property<String> text = Property.of("&aYour Text Here\n&bYour new line here");
 
         @Expose
         public Position position = new Position(10, 80, false, true);
