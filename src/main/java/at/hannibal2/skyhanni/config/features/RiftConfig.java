@@ -197,6 +197,11 @@ public class RiftConfig {
             public boolean hidePlayers = false;
 
             @Expose
+            @ConfigOption(name = "Hide Title", desc = "Hide Instructions, \"§aIt's happening!\" §7and \"§aKeep it up!\" §7titles.")
+            @ConfigEditorBoolean
+            public boolean hideOriginalTitle = false;
+
+            @Expose
             public Position position = new Position(442, 239, false, true);
 
         }
