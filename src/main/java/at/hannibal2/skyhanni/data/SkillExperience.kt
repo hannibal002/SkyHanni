@@ -98,6 +98,8 @@ class SkillExperience {
             return 0
         }
 
+        fun getExpForNextLevel(requestedLevel: Int) = levelingExp[requestedLevel]
+
         fun getExpForLevel(requestedLevel: Int): Long {
             var total = 0L
             var level = 0
