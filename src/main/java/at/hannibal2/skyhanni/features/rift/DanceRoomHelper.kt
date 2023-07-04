@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.*
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
@@ -17,36 +19,50 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DanceRoomHelper {
 
-    private var display = listOf<String>()
-    private val config get() = SkyHanniMod.feature.rift.danceRoomHelper
+    private var display = emptyList<String>()
+    private val config get() = SkyHanniMod.feature.rift.mirrorVerse.danceRoomHelper
     private var index = 0
     private var found = false
     private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
     private var inRoom = false
-    private var instructions: List<String> = emptyList()
+    private var instructions = emptyList<String>()
 
     fun update() {
         display = buildList {
-            if (instructions.isEmpty()) add("§cError fetching Dance Room Instructions! try /shreloadlocalrepo")
+            if (instructions.isEmpty()) {
+                add("§cError fetching Dance Room Instructions!")
+                add("§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo")
+            }
             for (line in instructions.withIndex()) {
                 if (index == line.index) {
-                    add("§9§l>>> §c§l${line.value.uppercase()} §9§l<<<")
+                    add("§7Now: ${line.value.format()}")
                 } else if (index + 1 == line.index) {
-                    add("§e§l${line.value.uppercase()}")
+                    add("§7Next: ${line.value.format()}")
                 } else if ((index + 2..index + config.lineToShow).contains(line.index)) {
-                    add("§7${line.value.uppercase()}")
+                    add("§7Later: ${line.value.format()}")
                 }
             }
         }
     }
 
+    private fun String.format() = split(" ").joinToString(" ") { it.firstLetterUppercase().addColor() }
+
+    private fun String.addColor() = when (this) {
+        "Move" -> "§e"
+        "Stand" -> "§e"
+        "Sneak" -> "§5"
+        "Jump" -> "§b"
+        "Punch" -> "§d"
+        else -> "§f"
+    } + this
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderStrings(
-                display,
-                config.extraSpace,
-                posLabel = "Dance Room Helper"
+            display,
+            config.extraSpace,
+            posLabel = "Dance Room Helper"
         )
     }
 
@@ -59,7 +75,7 @@ object DanceRoomHelper {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.isMod(10)) {
-            inRoom = danceRoom.isVecInside(net.minecraft.client.Minecraft.getMinecraft().thePlayer.positionVector)
+            inRoom = danceRoom.isVecInside(Minecraft.getMinecraft().thePlayer.positionVector)
         }
         if (inRoom) {
             update()
