@@ -20,7 +20,7 @@ class SkyHanniTestCommand {
 
     companion object {
         var displayLine = ""
-        var displayList = listOf<List<Any>>()
+        var displayList = emptyList<List<Any>>()
 
         var a = 1.0
         var b = 60.0

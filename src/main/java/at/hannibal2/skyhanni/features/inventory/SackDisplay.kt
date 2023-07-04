@@ -33,7 +33,7 @@ class SackDisplay {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val sackItem = mutableMapOf<String, Item>()
     private val runeItem = mutableMapOf<String, Rune>()
     private val gemstoneItem = mutableMapOf<String, Gemstone>()

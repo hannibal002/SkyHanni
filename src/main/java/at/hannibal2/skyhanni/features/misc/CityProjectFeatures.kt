@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CityProjectFeatures {
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var tick = 0
     private var lastReminderSend = 0L

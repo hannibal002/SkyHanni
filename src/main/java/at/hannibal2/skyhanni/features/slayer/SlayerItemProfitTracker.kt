@@ -33,7 +33,7 @@ object SlayerItemProfitTracker {
     private var collectedCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.SECONDS).build<Int, Unit>()
 
     private var itemLogCategory = ""
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val logger = LorenzLogger("slayer/item_profit_tracker")
     private var inventoryOpen = false
     private var lastClickDelay = 0L
