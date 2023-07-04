@@ -314,6 +314,7 @@ class SkyHanniMod {
         loadModule(EnigmaSoulWaypoints)
         loadModule(DungeonLividFinder)
         loadModule(CruxTalismanDisplay)
+        loadModule(DanceRoomHelper)
         loadModule(LaserParkour())
         loadModule(CustomTextBox())
 

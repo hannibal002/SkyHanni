@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 
 public class RiftConfig {
@@ -172,8 +169,40 @@ public class RiftConfig {
 
     public static class MirrorVerse {
 
+        @ConfigOption(name = "Dance Room Helper", desc = "")
+        @Accordion
         @Expose
-        @ConfigOption(name = "Laser Parkour", desc = "Highlights the location of the invisible blocks.")
+        public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
+
+        public static class DanceRoomHelper{
+
+            @Expose
+            @ConfigOption(name= "Enabled", desc = "Helps solving the dance room in the mirror verse by showing multiple tasks at once.")
+            @ConfigEditorBoolean
+            public boolean enabled = false;
+
+            @Expose
+            @ConfigOption(name = "Lines to show", desc = "How many tasks you should see.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 1)
+            public int lineToShow = 3;
+
+            @Expose
+            @ConfigOption(name = "Space", desc = "Change the space between each line.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 10, minValue = -5)
+            public int extraSpace = 0;
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players inside the dance room.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
+
+            @Expose
+            public Position position = new Position(442, 239, false, true);
+
+        }
+
+        @Expose
+        @ConfigOption(name = "Tubulator", desc = "Highlights the location of the invisible blocks (Laser Parkour).")
         @ConfigEditorBoolean
         public boolean laserParkour = true;
 
@@ -202,4 +231,5 @@ public class RiftConfig {
         public boolean waypoints = true;
 
     }
+
 }
