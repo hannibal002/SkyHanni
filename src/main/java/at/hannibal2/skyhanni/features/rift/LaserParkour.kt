@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,7 +17,7 @@ class LaserParkour {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!RiftAPI.inRift()) return
         if (!config.laserParkour) return
-        if (!puzzleRoom.isVecInside(Minecraft.getMinecraft().thePlayer.positionVector)) return
+        if (!puzzleRoom.isPlayerInside()) return
         for (location in locations) {
             event.drawWaypointFilled(location, LorenzColor.GREEN.toColor())
         }

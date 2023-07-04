@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.*
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
@@ -74,7 +74,7 @@ object DanceRoomHelper {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.isMod(10)) {
-            inRoom = danceRoom.isVecInside(Minecraft.getMinecraft().thePlayer.positionVector)
+            inRoom = danceRoom.isPlayerInside()
         }
         if (inRoom) {
             update()
