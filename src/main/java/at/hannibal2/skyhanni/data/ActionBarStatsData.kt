@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ActionBarStatsData {
     private val patterns = mapOf(
-        "health" to "§c(?<health>[\\d,]+)/[\\d,]+❤.*".toPattern(),
+        "health" to "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*".toPattern(),
         "defense" to ".*§a(?<defense>[\\d,]+)§a❈.*".toPattern(),
         "mana" to ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*".toPattern(),
         "riftTime" to "§[a7](?<riftTime>[\\dms ]+)ф.*".toPattern(),
