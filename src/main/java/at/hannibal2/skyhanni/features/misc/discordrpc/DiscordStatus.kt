@@ -3,15 +3,12 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 // SkyblockAddons code, adapted for SkyHanni
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
@@ -133,7 +130,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     STATS({
         val groups = ActionBarStatsData.groups
-        val statString = if (groups["riftTime"] == "") {
+        val statString = if (!RiftAPI.inRift()) {
             "❤${groups["health"]} ❈${groups["defense"]} ✎${groups["mana"]}"
         } else {
             "${groups["riftTime"]}ф ✎${groups["mana"]}"
