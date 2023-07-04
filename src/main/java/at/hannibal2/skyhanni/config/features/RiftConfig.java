@@ -212,17 +212,17 @@ public class RiftConfig {
                 @Expose
                 @ConfigOption(name = "Now", desc = "Formatting for \"Now:\"")
                 @ConfigEditorText
-                public String now = "&7Now: ";
+                public String now = "&7Now:";
 
                 @Expose
                 @ConfigOption(name = "Next", desc = "Formatting for \"Next:\"")
                 @ConfigEditorText
-                public String next = "&7Next: ";
+                public String next = "&7Next:";
 
                 @Expose
                 @ConfigOption(name = "Later", desc = "Formatting for \"Later:\"")
                 @ConfigEditorText
-                public String later = "&7Later: ";
+                public String later = "&7Later:";
 
                 @Expose
                 @ConfigOption(name = "Color Option", desc = "")
