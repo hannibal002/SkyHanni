@@ -25,8 +25,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 
 object GardenCropMilestoneDisplay {
-    private var progressDisplay = listOf<List<Any>>()
-    private var mushroomCowPerkDisplay = listOf<List<Any>>()
+    private var progressDisplay = emptyList<List<Any>>()
+    private var mushroomCowPerkDisplay = emptyList<List<Any>>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
     private val config get() = SkyHanniMod.feature.garden
     private val bestCropTime = GardenBestCropTime()

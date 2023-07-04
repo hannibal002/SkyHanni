@@ -68,6 +68,7 @@ object Commands {
         registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
         registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
         registerCommand("shclearfarmingitems") { clearFarmingItems() }
+        registerCommand("shresetghostcounter") { GhostCounter.reset() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }

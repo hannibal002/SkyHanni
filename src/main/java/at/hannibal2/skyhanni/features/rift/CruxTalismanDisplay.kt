@@ -19,7 +19,7 @@ object CruxTalismanDisplay {
 
     private val config get() = SkyHanniMod.feature.rift.cruxTalisman
     private val partialName = "CRUX_TALISMAN"
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val displayLine = mutableListOf<Crux>()
     private val bonusesLine = mutableListOf<String>()
     private val progressPattern =

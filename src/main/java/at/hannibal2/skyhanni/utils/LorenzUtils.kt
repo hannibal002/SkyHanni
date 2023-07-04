@@ -275,6 +275,10 @@ object LorenzUtils {
         whenChanged { _, _ -> observer.run() }
     }
 
+    fun <T> Property<out T>.afterChange(observer: T.() -> Unit) {
+        whenChanged { _, new -> observer(new) }
+    }
+
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()
 

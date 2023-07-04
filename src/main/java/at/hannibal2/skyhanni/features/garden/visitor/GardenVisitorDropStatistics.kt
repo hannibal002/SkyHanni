@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
     private val config get() = SkyHanniMod.feature.garden.visitorDropsStatistics
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
 
     private var acceptedVisitors = 0
     var deniedVisitors = 0

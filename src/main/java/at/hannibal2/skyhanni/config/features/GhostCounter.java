@@ -255,6 +255,14 @@ public class GhostCounter {
                     "when you are doing nothing for a given amount of seconds")
             @ConfigEditorText
             public String paused = "&c(PAUSED)";
+
+            @Expose
+            @ConfigOption(name = "Time", desc = "§e%days% §7is replaced with days remaining.\n" +
+                    "§e%hours% §7is replaced with hours remaining.\n" +
+                    "§e%minutes% §7is replaced with minutes remaining.\n" +
+                    "§e%seconds% §7is replaced with seconds remaining.")
+            @ConfigEditorText
+            public String time = "&6%days%%hours%%minutes%%seconds%";
         }
 
         @ConfigOption(name = "Kill Per Hour Formatting", desc = "")
@@ -279,6 +287,7 @@ public class GhostCounter {
             @ConfigEditorText
             public String paused = "&c(PAUSED)";
         }
+
 
         @Expose
         @ConfigOption(name = "Money Per Hour", desc = "Money Per Hour.\n§e%value% §7is replaced with\nEstimated money you get per hour\n" +

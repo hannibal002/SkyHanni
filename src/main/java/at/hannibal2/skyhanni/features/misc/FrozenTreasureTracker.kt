@@ -22,7 +22,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class FrozenTreasureTracker {
     private val config get() = SkyHanniMod.feature.misc.frozenTreasureTracker
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var treasuresMined = 0
     private var compactProcs = 0
     private var estimatedIce = 0L
@@ -162,7 +162,7 @@ class FrozenTreasureTracker {
         if (!config.enabled) return
         if (!onJerryWorkshop()) return
         if (config.onlyInCave && !inGlacialCave()) return
-        config.position.renderStringsAndItems(display, posLabel = "Visitor Stats")
+        config.position.renderStringsAndItems(display, posLabel = "Frozen Treasure Tracker")
     }
 
     private fun onJerryWorkshop() = LorenzUtils.inIsland(IslandType.WINTER)

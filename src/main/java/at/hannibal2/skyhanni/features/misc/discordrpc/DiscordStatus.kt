@@ -3,20 +3,15 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 // SkyblockAddons code, adapted for SkyHanni
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
@@ -77,27 +72,33 @@ val stackingEnchants = mapOf(
     )
 ) // nbtNum is the id of the enchantment in the nbt data
 
+private fun getVisitingName(): String {
+    val tabData = getTabList()
+    val ownerRegex = Pattern.compile(".*Owner: (?<username>\\w+).*")
+    for (line in tabData) {
+        val colorlessLine = line.removeColor()
+        val ownerMatcher = ownerRegex.matcher(colorlessLine)
+        if (ownerMatcher.matches()) {
+            return ownerMatcher.group("username")
+        }
+    }
+    return "Someone"
+}
+
 enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
 
     NONE(null),
 
     LOCATION({
         var location = LorenzUtils.skyBlockArea
+        val island = LorenzUtils.skyBlockIsland
         if (location == "Your Island") location = "Private Island"
-        if (location != "None" && location != "invalid") {
+        if (island == IslandType.PRIVATE_ISLAND_GUEST) lastKnownDisplayStrings[LOCATION] =
+            "${getVisitingName()}'s Island"
+        else if (location != "None" && location != "invalid") {
             lastKnownDisplayStrings[LOCATION] = location
         }
         lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
-        /**
-         *    looks slightly weird if visiting someone else's island,
-         *    I was thinking of using LorenzUtils.skyblockIsland to determine if they're visiting,
-         *    but it takes too long to load, so we 'd have to put in some sort of artificial delay
-         *    like what I did in DiscordRPCManager.onWorldChange.
-         *    after that, use the tab-list "Owner:" line to get the person we're visiting, but I don't know
-         *    if that'll work with coops, and you'd have to deal with color codes as well
-         *    anyway, I'm pretty sure sba had "'s Island" without the name filled in this entire time,
-         *    so I'd rather have [RANK] NameThatGetsCutOff for example than 's Island
-         */
     }),
 
     PURSE({
@@ -129,15 +130,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
     STATS({
         val groups = ActionBarStatsData.groups
-        var statString = ""
-        for (item in groups.indices) {
-            when (groups[item]) {
-                "❤" -> statString = "❤${groups[item - 1]} "
-                "❈ Defense" -> statString = "$statString❈${groups[item - 1]} "
-                "✎" -> statString = "$statString✎${groups[item - 1]} "
-            }
+        val statString = if (!RiftAPI.inRift()) {
+            "❤${groups["health"]} ❈${groups["defense"]} ✎${groups["mana"]}"
+        } else {
+            "${groups["riftTime"]}ф ✎${groups["mana"]}"
         }
-        if (groups.isNotEmpty()) {
+        if (groups["mana"] != "") {
             lastKnownDisplayStrings[STATS] = statString
         }
         lastKnownDisplayStrings[STATS] ?: ""
@@ -281,7 +279,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         }
 
         val itemInHand = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()
-        val itemName = itemInHand?.let { NEUItems.getItemStack(it.getInternalName()).name?.removeColor() ?: "" } ?: ""
+        val itemName = itemInHand?.displayName?.removeColor() ?: ""
 
         val extraAttributes = getExtraAttributes(itemInHand)
 

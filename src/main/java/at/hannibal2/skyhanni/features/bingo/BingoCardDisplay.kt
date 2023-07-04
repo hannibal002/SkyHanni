@@ -27,7 +27,7 @@ class BingoCardDisplay {
     private val MAX_COMMUNITY_GOALS = 5
 
     private var tick = 0
-    private var display = listOf<String>()
+    private var display = emptyList<String>()
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
     init {

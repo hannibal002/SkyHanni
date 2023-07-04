@@ -19,7 +19,7 @@ import kotlin.time.DurationUnit
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden
     private val hidden get() = GardenAPI.config
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
 
     private var tabListData by ComposterAPI::tabListData

@@ -131,7 +131,7 @@ class SkyHanniMod {
         loadModule(CropAccessoryData())
         loadModule(MayorElection())
         loadModule(GardenComposterUpgradesData())
-        loadModule(ActionBarStatsData())
+        loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneAverage())
         loadModule(GardenCropSpeed)
         loadModule(ProfileStorageData)
@@ -314,7 +314,9 @@ class SkyHanniMod {
         loadModule(EnigmaSoulWaypoints)
         loadModule(DungeonLividFinder)
         loadModule(CruxTalismanDisplay)
+        loadModule(DanceRoomHelper)
         loadModule(LaserParkour())
+        loadModule(CustomTextBox())
 
         init()
 

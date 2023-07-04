@@ -38,7 +38,7 @@ object CropMoneyDisplay {
         update()
     }
 
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
     private var tick = 0
     private var loaded = false

@@ -43,7 +43,7 @@ private val config get() = SkyHanniMod.feature.garden
 
 class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var lastClickedNpc = 0
     private var tick = 0
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
