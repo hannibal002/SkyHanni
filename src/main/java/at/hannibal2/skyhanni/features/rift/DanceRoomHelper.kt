@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
@@ -102,7 +101,7 @@ object DanceRoomHelper {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
             if (entity is EntityOtherPlayerMP) {
-                if (danceRoom.isVecInside(entity.getLorenzVec().toVec3())) {
+                if (inRoom) {
                     event.isCanceled = true
                 }
             }
