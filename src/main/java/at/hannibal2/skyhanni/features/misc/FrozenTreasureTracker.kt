@@ -162,7 +162,7 @@ class FrozenTreasureTracker {
         if (!config.enabled) return
         if (!onJerryWorkshop()) return
         if (config.onlyInCave && !inGlacialCave()) return
-        config.position.renderStringsAndItems(display, posLabel = "Visitor Stats")
+        config.position.renderStringsAndItems(display, posLabel = "Frozen Treasure Tracker")
     }
 
     private fun onJerryWorkshop() = LorenzUtils.inIsland(IslandType.WINTER)
