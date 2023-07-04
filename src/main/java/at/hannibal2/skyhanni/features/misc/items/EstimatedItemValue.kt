@@ -45,7 +45,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EstimatedItemValue {
     private val config get() = SkyHanniMod.feature.misc
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
 

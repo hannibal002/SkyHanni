@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DicerRngDropCounter {
-    private var display = listOf<String>()
+    private var display = emptyList<String>()
     private val drops = mutableMapOf<CropType, MutableMap<DropRarity, Int>>()
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = SkyHanniMod.feature.garden

@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class JacobContestTimeNeeded {
     private val config get() = SkyHanniMod.feature.garden
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var currentBracket = ContestBracket.GOLD
 
     @SubscribeEvent(priority = EventPriority.LOW)
