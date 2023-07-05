@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
@@ -62,9 +61,9 @@ object DanceRoomHelper {
         if (!isEnabled()) return
         if (!inRoom) return
         config.position.renderStrings(
-                display,
-                config.extraSpace,
-                posLabel = "Dance Room Helper"
+            display,
+            config.extraSpace,
+            posLabel = "Dance Room Helper"
         )
     }
 
