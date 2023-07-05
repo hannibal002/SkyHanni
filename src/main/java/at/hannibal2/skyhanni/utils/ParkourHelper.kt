@@ -51,6 +51,16 @@ class ParkourHelper(
             if (!showEverything) {
                 if (current == locations.size - 1) visible = false
 
+                if (visible) {
+                    for ((index, location) in locations.withIndex()) {
+                        if (location.offsetCenter().distanceToPlayer() < detectionRange) {
+                            if (Minecraft.getMinecraft().thePlayer.onGround) {
+                                current = index
+                            }
+                        }
+                    }
+                }
+
                 val distanceToPlayer = locations.first().offsetCenter().distanceToPlayer()
                 if (distanceToPlayer < detectionRange) {
                     visible = true
@@ -61,14 +71,6 @@ class ParkourHelper(
                 }
 
                 if (!visible) return
-
-                for ((index, location) in locations.withIndex()) {
-                    if (location.offsetCenter().distanceToPlayer() < detectionRange) {
-                        if (Minecraft.getMinecraft().thePlayer.onGround) {
-                            current = index
-                        }
-                    }
-                }
 
                 if (current < 0) return
             } else {

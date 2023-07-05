@@ -271,11 +271,42 @@ public class RiftConfig {
         }
 
 
+        @ConfigOption(name = "Tubulator", desc = "")
+        @Accordion
         @Expose
-        @ConfigOption(name = "Tubulator", desc = "Highlights the location of the invisible blocks (Laser Parkour).")
-        @ConfigEditorBoolean
-        public boolean laserParkour = true;
+        public TubulatorConfig tubulatorConfig = new TubulatorConfig();
+        public static class TubulatorConfig {
 
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Highlights the location of the invisible Tubulator blocks (Laser Parkour).")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 30, minValue = 1)
+            public Property<Integer> lookAhead = Property.of(2);
+
+            @Expose
+            @ConfigOption(name = "Outline", desc = "Outlines the top edge of the platforms.")
+            @ConfigEditorBoolean
+            public boolean outline = true;
+
+            @Expose
+            @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+            @ConfigEditorBoolean
+            public Property<Boolean> rainbowColor = Property.of(true);
+
+            @Expose
+            @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+            @ConfigEditorColour
+            public Property<String> monochromeColor = Property.of("0:60:0:0:255");
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
+        }
     }
 
     @ConfigOption(name = "Kloon Hacking", desc = "")
