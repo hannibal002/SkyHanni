@@ -47,8 +47,8 @@ class WaypointSaver {
         val resultList = mutableListOf<String>()
         timeLastSaved = System.currentTimeMillis()
         for (location in this) {
-            val x = location.z.toString().replace(",", ".")
-            val y = location.z.toString().replace(",", ".")
+            val x = location.x.toString().replace(",", ".")
+            val y = location.y.toString().replace(",", ".")
             val z = location.z.toString().replace(",", ".")
             resultList.add("\"$x:$y:$z\"")
         }
