@@ -28,7 +28,7 @@ class ParkourHelper(
     var rainbowColor = false
     var monochromeColor: Color = Color.WHITE
     var lookAhead = 2
-    var outline = true
+    var outline = false
     var showEverything = false
 
     fun inParkour() = current != -1
@@ -114,8 +114,8 @@ class ParkourHelper(
                     event.drawFilledBoundingBox(aabb, colorForIndex(index), .6f)
                 } else {
                   val aabb = axisAlignedBB(location)
-                    event.drawFilledBoundingBox(axisAlignedBB(locations[shortCut.to]), Color.RED, 1f)
-                    event.drawDynamicText(locations[shortCut.to].add(-0.5, 1.0, -0.5), "§cShortcut", 2.5)
+                    event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
                 }
                 if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber) {
                     if (!isMovingPlatform) {
