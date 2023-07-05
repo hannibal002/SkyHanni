@@ -384,4 +384,9 @@ object LorenzUtils {
             get(index)
         } else null
     }
+
+    fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {
+        if (this == null) return emptyList()
+        return listOf(this)
+    }
 }

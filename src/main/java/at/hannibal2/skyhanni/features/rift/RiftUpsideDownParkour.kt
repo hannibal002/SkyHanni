@@ -14,13 +14,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftUpsideDownParkour {
     private val config get() = SkyHanniMod.feature.rift.mirrorVerse.upsideDownParkour
-
     private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour") ?: return
-        parkourHelper = ParkourHelper(data.locations, data.shortCuts)
+        parkourHelper = ParkourHelper(
+            data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
+            data.shortCuts,
+            platformSize = 2.0,
+            detectionRange = 2.0
+        )
+        updateConfig()
     }
 
     @SubscribeEvent
@@ -47,12 +52,16 @@ class RiftUpsideDownParkour {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         LorenzUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
-            parkourHelper?.run {
-                rainbowColor = config.rainbowColor.get()
-                monochromeColor = config.monochromeColor.get().toChromaColor()
-                lookAhead = config.lookAhead.get() + 1
-                outline = config.outline
-            }
+            updateConfig()
+        }
+    }
+
+    private fun updateConfig() {
+        parkourHelper?.run {
+            rainbowColor = config.rainbowColor.get()
+            monochromeColor = config.monochromeColor.get().toChromaColor()
+            lookAhead = config.lookAhead.get() + 1
+            outline = config.outline
         }
     }
 
