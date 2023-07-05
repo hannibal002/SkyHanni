@@ -69,7 +69,7 @@ public class DevConfig {
     @ConfigAccordionId(id = 0)
     public boolean highlightMissingRepo = false;
 
-    @ConfigOption(name = "Parcour Waypoints", desc = "")
+    @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
     @Expose
     public Waypoints waypoint = new Waypoints();

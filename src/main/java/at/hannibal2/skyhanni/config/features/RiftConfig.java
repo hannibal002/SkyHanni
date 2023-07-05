@@ -169,6 +169,39 @@ public class RiftConfig {
 
     public static class MirrorVerse {
 
+        @ConfigOption(name = "Lava Maze", desc = "")
+        @Accordion
+        @Expose
+        public LavaMazeConfig lavaMazeConfig = new LavaMazeConfig();
+
+        public static class LavaMazeConfig {
+
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the mirror verse by showing the correct way.")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 30, minValue = 1)
+            public Property<Integer> lookAhead = Property.of(3);
+
+            @Expose
+            @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+            @ConfigEditorBoolean
+            public Property<Boolean> rainbowColor = Property.of(true);
+
+            @Expose
+            @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+            @ConfigEditorColour
+            public Property<String> monochromeColor = Property.of("0:60:0:0:255");
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
+        }
+
         @ConfigOption(name = "Dance Room Helper", desc = "")
         @Accordion
         @Expose
@@ -198,7 +231,6 @@ public class RiftConfig {
 
             @Expose
             public Position position = new Position(442, 239, false, true);
-
         }
 
         @ConfigOption(name = "Upside Down Parkour", desc = "")
