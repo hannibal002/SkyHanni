@@ -70,12 +70,14 @@ class MirrorVerseJumpAndRun {
         if (current < 0) return
 
         val inProgressVec = getInProgressPair().toSingletonListOrEmpty()
-        for ((prev, next) in locations.asSequence().withIndex().zipWithNext().drop(current).take(lookAhead - 1) + inProgressVec) {
+        for ((prev, next) in locations.asSequence().withIndex().zipWithNext().drop(current)
+            .take(lookAhead - 1) + inProgressVec) {
             event.draw3DLine(prev.value, next.value, colorForIndex(prev.index), 5, false, colorForIndex(next.index))
         }
+        val nextShortcuts = current until current + lookAhead
         for (shortCut in shortCuts) {
-            if (current == shortCut.from && shortCut.to in locations.indices) {
-                event.draw3DLine(locations[current], locations[shortCut.to], Color.RED, 3, false)
+            if (shortCut.from in nextShortcuts && shortCut.to in locations.indices) {
+                event.draw3DLine(locations[shortCut.from], locations[shortCut.to], Color.RED, 3, false)
                 event.drawFilledBoundingBox(axisAlignedBB(locations[shortCut.to]), Color.RED, 1f)
                 event.drawDynamicText(locations[shortCut.to].add(-0.5, 1.0, -0.5), "§cShortcut", 2.5)
             }
@@ -93,6 +95,7 @@ class MirrorVerseJumpAndRun {
         val nextPosition = locations[current + 1]
         val lookAheadStart = locations[current + lookAhead - 1]
         val lookAheadEnd = locations[current + lookAhead]
+        if (playerLocation().distance(nextPosition) > currentPosition.distance(nextPosition)) return null
         return Pair(
             IndexedValue(current + lookAhead - 1, lookAheadStart),
             IndexedValue(
