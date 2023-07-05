@@ -15,6 +15,7 @@ public class RiftMirrorJumpJson {
     public static class ShortCut {
         @Expose
         public int from;
+        @Expose
         public int to;
     }
 }
