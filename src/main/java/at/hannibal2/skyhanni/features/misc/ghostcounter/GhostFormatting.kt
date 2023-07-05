@@ -176,5 +176,4 @@ object GhostFormatting {
             moneyHourFormat = "  &6$/h: &b%value%"
         }
     }
-
 }
