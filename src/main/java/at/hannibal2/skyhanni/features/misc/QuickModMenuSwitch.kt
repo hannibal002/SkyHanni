@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 
 object QuickModMenuSwitch {
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var tick = 0
     private var latestGuiPath = ""
 
@@ -35,7 +35,7 @@ object QuickModMenuSwitch {
                         Class.forName(path)
                         add(Mod(name, mod.description, mod.command, mod.guiPath))
                         continue@out
-                    } catch (ignored_: Exception) {
+                    } catch (_: Exception) {
                     }
                 }
             }

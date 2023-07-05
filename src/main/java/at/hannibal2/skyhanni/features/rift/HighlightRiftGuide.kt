@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HighlightRiftGuide {
     private val config get() = SkyHanniMod.feature.rift
     private var inInventory = false
-    private var highlightedItems = listOf<Int>()
+    private var highlightedItems = emptyList<Int>()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {

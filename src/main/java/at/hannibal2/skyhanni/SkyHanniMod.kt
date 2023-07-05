@@ -96,7 +96,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.4",
+    version = "0.19.Beta.6",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -132,7 +132,7 @@ class SkyHanniMod {
         loadModule(CropAccessoryData())
         loadModule(MayorElection())
         loadModule(GardenComposterUpgradesData())
-        loadModule(ActionBarStatsData())
+        loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneAverage())
         loadModule(GardenCropSpeed)
         loadModule(ProfileStorageData)
@@ -315,7 +315,11 @@ class SkyHanniMod {
         loadModule(EnigmaSoulWaypoints)
         loadModule(DungeonLividFinder)
         loadModule(CruxTalismanDisplay)
-        loadModule(LaserParkour())
+        loadModule(DanceRoomHelper)
+        loadModule(TubulatorParkour())
+        loadModule(CustomTextBox())
+        loadModule(RiftUpsideDownParkour())
+        loadModule(RiftLavaMazeParkour())
         loadModule(HighlightMiningCommissionMobs())
 
         init()
@@ -328,6 +332,7 @@ class SkyHanniMod {
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
         loadModule(HighlightMissingRepoItems())
+        loadModule(ParkourWaypointSaver())
     }
 
     @Mod.EventHandler

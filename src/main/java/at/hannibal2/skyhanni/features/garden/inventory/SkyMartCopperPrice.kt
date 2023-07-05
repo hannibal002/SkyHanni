@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkyMartCopperPrice {
     private val pattern = "§c(?<amount>.*) Copper".toPattern()
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
 
     companion object {

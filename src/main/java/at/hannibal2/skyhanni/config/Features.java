@@ -129,7 +129,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
-    public DevData dev = new DevData();
+    public DevConfig dev = new DevConfig();
 
     @Expose
     public OldHidden hidden = new OldHidden();

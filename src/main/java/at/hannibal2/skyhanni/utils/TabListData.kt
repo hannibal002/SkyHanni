@@ -16,7 +16,7 @@ import java.util.*
 class TabListData {
 
     companion object {
-        private var cache = listOf<String>()
+        private var cache = emptyList<String>()
 
         // TODO replace with TabListUpdateEvent
         fun getTabList() = cache

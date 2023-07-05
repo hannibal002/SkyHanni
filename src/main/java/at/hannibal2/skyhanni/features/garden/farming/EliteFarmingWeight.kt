@@ -74,7 +74,7 @@ class EliteFarmingWeight {
         private val config get() = SkyHanniMod.feature.garden
         private val localCounter = mutableMapOf<CropType, Long>()
 
-        private var display = listOf<String>()
+        private var display = emptyList<String>()
         private var profileId = ""
         private var lastLeaderboardUpdate = 0L
         private var apiError = false
@@ -304,8 +304,8 @@ class EliteFarmingWeight {
         private fun specialMushroomWeight(weightPerCrop: MutableMap<CropType, Double>, totalWeight: Double): Double {
             val cactusWeight = weightPerCrop[CropType.CACTUS]!!
             val sugarCaneWeight = weightPerCrop[CropType.SUGAR_CANE]!!
-            val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight;
-            val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight;
+            val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight
+            val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight
 
             val mushroomFactor = CropType.MUSHROOM.getFactor()
             val mushroomCollection = CropType.MUSHROOM.getLocalCounter()

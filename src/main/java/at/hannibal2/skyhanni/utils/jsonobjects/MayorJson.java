@@ -60,7 +60,7 @@ public class MayorJson {
         public Election election;
     }
 
-    public class Perk {
+    public static class Perk {
         @Expose
         public String name;
         @Expose

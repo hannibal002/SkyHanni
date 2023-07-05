@@ -21,7 +21,7 @@ class NonGodPotEffectDisplay {
     private val config get() = SkyHanniMod.feature.misc
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Long>()
-    private var display = listOf<String>()
+    private var display = emptyList<String>()
     private var lastTick = 0L
 
     enum class NonGodPotEffect(val apiName: String, val displayName: String, val isMixin: Boolean = false) {

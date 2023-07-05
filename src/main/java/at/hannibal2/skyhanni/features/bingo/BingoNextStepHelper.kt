@@ -35,8 +35,8 @@ class BingoNextStepHelper {
 
     companion object {
         private val finalSteps = mutableListOf<NextStep>()
-        private var currentSteps = listOf<NextStep>()
-        var currentHelp = listOf<String>()
+        private var currentSteps = emptyList<NextStep>()
+        var currentHelp = emptyList<String>()
 
         fun command() {
             updateResult(true)
