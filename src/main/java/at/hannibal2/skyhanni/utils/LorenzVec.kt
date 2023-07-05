@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
@@ -94,6 +95,19 @@ data class LorenzVec(
     fun equals(other: LorenzVec) = x == other.x && y == other.y && z == other.z
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
+
+    fun roundLocation(): LorenzVec {
+        val x = if (this.x < 0) x.toInt().toDouble() - 1 else x.toInt().toDouble()
+        val y = y.toInt().toDouble() - 1
+        val z = if (this.z < 0) z.toInt().toDouble() - 1 else z.toInt().toDouble()
+        return LorenzVec(x, y, z)
+    }
+
+    fun boundingToOffset(offX: Double, offY: Double, offZ: Double) = AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
+
+    fun scale(scalar: Double): LorenzVec {
+        return LorenzVec(scalar * x, scalar * y, scalar * z)
+    }
 
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
