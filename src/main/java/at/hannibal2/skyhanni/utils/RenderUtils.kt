@@ -23,6 +23,8 @@ import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 object RenderUtils {
 
@@ -551,7 +553,8 @@ object RenderUtils {
         GlStateManager.translate(getAbsX().toFloat(), (getAbsY() + offsetY).toFloat(), 0F)
         var offsetX = 0
         for (any in line) {
-            val renderable = Renderable.fromAny(any, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $any")
+            val renderable =
+                Renderable.fromAny(any, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $any")
 
             renderable.render(getAbsX() + offsetX, getAbsY() + offsetY)
             offsetX += renderable.width
@@ -783,43 +786,62 @@ object RenderUtils {
         }
     }
 
-    fun RenderWorldLastEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        GlStateManager.disableDepth()
-        GlStateManager.disableCull()
+    fun RenderWorldLastEvent.drawFilledBoundingBox(
+        aabb: AxisAlignedBB,
+        c: Color,
+        alphaMultiplier: Float = 1f,
+        /**
+         * If set to `true`, renders the box relative to the camera instead of relative to the world.
+         * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
+         */
+        renderRelativeToCamera: Boolean = false,
+        drawVerticalBarriers: Boolean = true
+    ) {
+        drawFilledBoundingBox(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
+    }
 
+    fun RenderWorldLastEvent.draw3DLine(
+        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean, targetColor: Color? = null
+    ) {
         val render = Minecraft.getMinecraft().renderViewEntity
         val worldRenderer = Tessellator.getInstance().worldRenderer
         val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
         val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
         val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
         GlStateManager.pushMatrix()
+        GlStateManager.disableDepth()
+        GlStateManager.disableCull()
+        GlStateManager.disableLighting()
         GlStateManager.translate(-realX, -realY, -realZ)
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GL11.glLineWidth(lineWidth.toFloat())
         if (!depth) {
             GL11.glDisable(GL11.GL_DEPTH_TEST)
             GlStateManager.depthMask(false)
         }
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
-        worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        if (targetColor != null)
+            GlStateManager.shadeModel(GL11.GL_SMOOTH)
+        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR)
+        worldRenderer.pos(p1.x, p1.y, p1.z).color(color.red, color.green, color.blue, color.alpha).endVertex()
+        val secondColor = targetColor ?: color
+        worldRenderer.pos(p2.x, p2.y, p2.z)
+            .color(secondColor.red, secondColor.green, secondColor.blue, secondColor.alpha).endVertex()
         Tessellator.getInstance().draw()
-        GlStateManager.translate(realX, realY, realZ)
         if (!depth) {
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GlStateManager.depthMask(true)
         }
+        GlStateManager.shadeModel(GL11.GL_FLAT)
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
-        GlStateManager.enableDepth()
     }
 
     fun RenderWorldLastEvent.exactLocation(entity: Entity): LorenzVec {
@@ -831,5 +853,21 @@ object RenderUtils {
         val y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
         val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
         return LorenzVec(x, y, z)
+    }
+
+    fun chromaColor(
+        timeTillRepeat: Duration,
+        offset: Float = 0f,
+        saturation: Float = 1F,
+        brightness: Float = 0.8F,
+        timeOverride: Long = System.currentTimeMillis()
+    ): Color {
+        return Color(
+            Color.HSBtoRGB(
+                ((offset + timeOverride / timeTillRepeat.toDouble(DurationUnit.MILLISECONDS)) % 1).toFloat(),
+                saturation,
+                brightness
+            )
+        )
     }
 }

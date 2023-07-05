@@ -192,7 +192,7 @@ class FarmingFortuneDisplay {
         fun getCounterFortune(tool: ItemStack?): Double {
             val counter = tool?.getHoeCounter() ?: return 0.0
             val digits = floor(log10(counter.toDouble()))
-            return (16 * digits - 48).takeIf { it > 0.0 } ?: 0.0
+            return (16 * digits - 48).coerceAtLeast(0.0)
         }
 
         fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
