@@ -318,6 +318,7 @@ class SkyHanniMod {
         loadModule(LaserParkour())
         loadModule(CustomTextBox())
         loadModule(RiftUpsideDownParkour())
+        loadModule(RiftLavaMazeParkour())
 
         init()
 
