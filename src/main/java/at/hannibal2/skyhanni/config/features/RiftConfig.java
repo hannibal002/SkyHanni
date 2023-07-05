@@ -214,7 +214,7 @@ public class RiftConfig {
             public boolean enabled = true;
 
             @Expose
-            @ConfigOption(name = "Look Ahead", desc = "Change wow many platforms should be shown in front of you.")
+            @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
             @ConfigEditorSlider(minStep = 1, maxValue = 9, minValue = 1)
             public int lookAhead = 2;
 
