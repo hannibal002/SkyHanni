@@ -104,7 +104,6 @@ object DanceRoomHelper {
         if (!isEnabled() && !inRoom) return
         val packet = event.packet
         if (packet !is S45PacketTitle) return
-        if (packet.type != S45PacketTitle.Type.SUBTITLE) return
         if (config.hideOriginalTitle) event.isCanceled = true
     }
 
