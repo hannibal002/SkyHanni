@@ -52,7 +52,7 @@ import kotlin.math.roundToLong
 object GhostCounter {
 
     val config get() = SkyHanniMod.feature.ghostCounter
-    private val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
+    val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
     private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
     private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
