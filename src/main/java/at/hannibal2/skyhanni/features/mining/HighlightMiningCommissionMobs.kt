@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.inIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEndermite
@@ -84,5 +84,5 @@ class HighlightMiningCommissionMobs {
     }
 
     fun isEnabled() = config.highlightCommissionMobs &&
-            (IslandType.DWARVEN_MINES.inIsland() || IslandType.CRYSTAL_HOLLOWS.inIsland())
+            (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
 }

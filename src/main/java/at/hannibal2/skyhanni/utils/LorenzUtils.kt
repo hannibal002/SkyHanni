@@ -369,7 +369,7 @@ object LorenzUtils {
 
     fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
 
-    fun IslandType.inIsland() = inIsland(this)
+    fun IslandType.isInIsland() = inIsland(this)
 
     fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N) {
         val old = this[item] ?: 0
