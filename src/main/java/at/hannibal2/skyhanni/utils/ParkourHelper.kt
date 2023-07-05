@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
@@ -103,11 +104,11 @@ class ParkourHelper(
 
             for ((index, location) in locations.asSequence().withIndex().drop(current)
                 .take(lookAhead) + inProgressVec.map { it.second }) {
-                var aabb = axisAlignedBB(location)
-                val isMovingPlattform = location !in locations
-                if (isMovingPlattform) {
-                    aabb = aabb.expandBlock()
-                }
+                val isMovingPlatform = location !in locations
+                if (isMovingPlatform && showEverything) continue
+                val aabb = if (isMovingPlatform) {
+                    axisAlignedBB(location).expandBlock()
+                } else axisAlignedBB(location)
 
                 event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
                 if (!isMovingPlattform) {
@@ -123,8 +124,8 @@ class ParkourHelper(
 
     private fun getInProgressPair(): Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>? {
         if (current < 0 || current + lookAhead >= locations.size) return null
-        val currentPosition = locations[current]
-        val nextPosition = locations[current + 1]
+        val currentPosition = locations[current].offsetCenter()
+        val nextPosition = locations[current + 1].offsetCenter()
         val lookAheadStart = locations[current + lookAhead - 1]
         val lookAheadEnd = locations[current + lookAhead]
 
