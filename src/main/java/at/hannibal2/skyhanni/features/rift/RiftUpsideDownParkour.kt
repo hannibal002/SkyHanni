@@ -10,23 +10,23 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.jsonobjects.JumpAndRunJson
-import at.hannibal2.skyhanni.utils.jsonobjects.JumpAndRunJson.ShortCut
+import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
+import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson.ShortCut
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
-class UpsideDownJumpAndRun {
-    private var locations = listOf<LorenzVec>()
-    private var shortCuts: List<ShortCut> = listOf()
+class RiftUpsideDownParkour {
+    private var locations = emptyList<LorenzVec>()
+    private var shortCuts = emptyList<ShortCut>()
     private var current = -1
     private var visible = false
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<JumpAndRunJson>("UpsideDownJumpAndRun") ?: return
+        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour") ?: return
         locations = data.locations
         shortCuts = data.shortCuts
     }
@@ -113,6 +113,6 @@ class UpsideDownJumpAndRun {
 }
 
 private fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {
-    if (this == null) return listOf()
+    if (this == null) return emptyList()
     return listOf(this)
 }
