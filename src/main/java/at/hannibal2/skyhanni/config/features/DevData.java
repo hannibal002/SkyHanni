@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
+import org.lwjgl.input.Keyboard;
 
 public class DevData {
 
@@ -70,6 +68,25 @@ public class DevData {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean highlightMissingRepo = false;
+
+    @ConfigOption(name = "Waypoints", desc = "")
+    @Accordion
+    @Expose
+    public Waypoints waypoint = new Waypoints();
+
+    public static class Waypoints {
+
+        @Expose
+        @ConfigOption(name = "Save Hotkey", desc = "Saves block location to the waypoints list and copies everything to your clipboard.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int saveKey = Keyboard.KEY_NONE;
+
+        @Expose
+        @ConfigOption(name = "Delete Hotkey", desc = "Deletes the last saved location for when you make a mistake.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int deleteKey = Keyboard.KEY_NONE;
+
+    }
 
     @Expose
     public Position debugPos = new Position(10, 10, false, true);

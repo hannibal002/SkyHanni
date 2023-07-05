@@ -95,6 +95,13 @@ data class LorenzVec(
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
 
+    fun roundLocation(): LorenzVec {
+        val x = if (this.x < 0) x.toInt().toDouble() - 1 else x.toInt().toDouble()
+        val y = y.toInt().toDouble() - 1
+        val z = if (this.z < 0) z.toInt().toDouble() - 1 else z.toInt().toDouble()
+        return LorenzVec(x, y, z)
+    }
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
