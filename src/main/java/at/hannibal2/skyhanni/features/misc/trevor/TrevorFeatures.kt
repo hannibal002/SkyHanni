@@ -88,7 +88,7 @@ class TrevorFeatures {
 
         var matcher = trapperPattern.matcher(event.message.removeColor())
         if (matcher.matches()) {
-            timeUntilNextReady = if (GardenCropSpeed.finneganPerkActive()) 31 else 61
+            timeUntilNextReady = if (GardenCropSpeed.finneganPerkActive()) 16 else 61
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
