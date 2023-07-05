@@ -11,14 +11,13 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
-class ParkourHelper(val locations: List<LorenzVec>, val shortCuts: List<ParkourJson.ShortCut>) {
+class ParkourHelper(val locations: List<LorenzVec>, private val shortCuts: List<ParkourJson.ShortCut>) {
     private var current = -1
     private var visible = false
 
     var rainbowColor = true
     var monochromeColor: Color = Color.WHITE
     var lookAhead = 2
-
 
     fun inParkour() = current != -1
 
