@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson.ShortCut
 import net.minecraft.client.Minecraft
@@ -95,12 +96,16 @@ class RiftUpsideDownParkour {
                 event.draw3DLine(locations[shortCut.from], locations[shortCut.to], Color.RED, 3, false)
                 event.drawFilledBoundingBox(axisAlignedBB(locations[shortCut.to]), Color.RED, 1f)
                 event.drawDynamicText(locations[shortCut.to].add(-0.5, 1.0, -0.5), "§cShortcut", 2.5)
+                if (config.outline) event.outlineTopFace(axisAlignedBB(locations[shortCut.to]), 2, Color.BLACK, true)
             }
-
         }
         for ((index, location) in locations.asSequence().withIndex().drop(current)
             .take(lookAhead) + inProgressVec.map { it.second }) {
-            event.drawFilledBoundingBox(axisAlignedBB(location), colorForIndex(index), 1f)
+            if (config.outline && location in locations) {
+                event.drawFilledBoundingBox(axisAlignedBB(location), colorForIndex(index), 1f)
+                if (config.outline && location in locations) event.outlineTopFace(axisAlignedBB(location), 2, Color.BLACK, true)
+            }
+            event.drawFilledBoundingBox(axisAlignedBB(location), colorForIndex(index), .5f)
         }
     }
 
