@@ -15,7 +15,6 @@
     "MixinRenderManager",
     "gui.AccessorGuiContainer",
     "gui.MixinGuiContainer",
-    "renderer.MixinBlockRendererDispatcher",
     "renderer.MixinRendererLivingEntity"
   ],
   "client": [
