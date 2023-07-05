@@ -22,7 +22,7 @@ class WaypointSaver {
         if (!LorenzUtils.inSkyBlock) return
         if (!Keyboard.getEventKeyState()) return
         if (NEUItems.neuHasFocus()) return
-        if (System.currentTimeMillis() - timeLastSaved < 100) return
+        if (System.currentTimeMillis() - timeLastSaved < 250) return
 
         Minecraft.getMinecraft().currentScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
@@ -34,7 +34,11 @@ class WaypointSaver {
             locations.copyLocations()
         }
         if (config.saveKey == key) {
-            locations.add(LocationUtils.playerLocation().roundLocation())
+            val newLocation = LocationUtils.playerLocation().roundLocation()
+            if (locations.isNotEmpty()) {
+                if (newLocation == locations.last()) return
+            }
+            locations.add(newLocation)
             locations.copyLocations()
         }
     }
