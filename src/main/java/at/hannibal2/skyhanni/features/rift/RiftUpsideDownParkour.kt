@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.rift
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -19,6 +23,7 @@ import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 class RiftUpsideDownParkour {
+    private val config get() = SkyHanniMod.feature.rift.mirrorVerse.upsideDownParkour
     private var locations = emptyList<LorenzVec>()
     private var shortCuts = emptyList<ShortCut>()
     private var current = -1
@@ -32,20 +37,30 @@ class RiftUpsideDownParkour {
     }
 
     @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!isEnabled()) return
+        if (!config.hidePlayers) return
+
+        if (current != -1) {
+            event.isCanceled = true
+        }
+    }
+
+    @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+
         if (event.message == "§c§lOH NO! THE LAVA OOFED YOU BACK TO THE START!") {
             current = -1
             visible = false
         }
     }
 
-    val lookAhead get() = 2
+    private val lookAhead get() = config.lookAhead + 1
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        // TODO reenable this
-//        if (!RiftAPI.inRift()) return
-//        if (LorenzUtils.skyBlockArea != "Mirrorverse") return
+        if (!isEnabled()) return
 
         if (current == locations.size - 1) visible = false
 
@@ -89,7 +104,7 @@ class RiftUpsideDownParkour {
         }
     }
 
-    fun getInProgressPair(): Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>? {
+    private fun getInProgressPair(): Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>? {
         if (current < 0 || current + lookAhead >= locations.size) return null
         val currentPosition = locations[current]
         val nextPosition = locations[current + 1]
@@ -109,7 +124,13 @@ class RiftUpsideDownParkour {
 
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(-1.0, 0.0, -1.0).boundingToOffset(2, -1, 2).expandBlock()
 
-    private fun colorForIndex(index: Int) = RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f)
+    private fun colorForIndex(index: Int) = if (config.rainbowColor) {
+        RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f)
+    } else {
+        config.monochromeColor.toChromaColor()
+    }
+
+    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled
 }
 
 private fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {

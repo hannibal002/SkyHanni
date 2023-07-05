@@ -174,10 +174,10 @@ public class RiftConfig {
         @Expose
         public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
 
-        public static class DanceRoomHelper{
+        public static class DanceRoomHelper {
 
             @Expose
-            @ConfigOption(name= "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
+            @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
             @ConfigEditorBoolean
             public boolean enabled = false;
 
@@ -199,6 +199,39 @@ public class RiftConfig {
             @Expose
             public Position position = new Position(442, 239, false, true);
 
+        }
+
+        @ConfigOption(name = "Upside Down Parkour", desc = "")
+        @Accordion
+        @Expose
+        public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
+
+        public static class UpsideDownParkour {
+
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Helps to solve the upside down parkour in the mirror verse by showing the correct way.")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Look Ahead", desc = "How many plattforms should be shown in front of you?")
+            @ConfigEditorSlider(minStep = 1, maxValue = 9, minValue = 1)
+            public int lookAhead = 2;
+
+            @Expose
+            @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+            @ConfigEditorBoolean
+            public boolean rainbowColor = true;
+
+            @Expose
+            @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+            @ConfigEditorColour
+            public String monochromeColor = "0:60:0:0:255";
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the upside down parkour.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
         }
 
         @Expose
