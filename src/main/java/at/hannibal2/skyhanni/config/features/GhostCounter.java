@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.misc.ghostcounter.Formatting;
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostFormatting;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
@@ -63,15 +63,15 @@ public class GhostCounter {
 
         @ConfigOption(name = "Reset Formatting", desc = "Reset formatting to default text.")
         @ConfigEditorButton(buttonText = "Reset")
-        public Runnable resetFormatting = Formatting.INSTANCE::reset;
+        public Runnable resetFormatting = GhostFormatting.INSTANCE::reset;
 
         @ConfigOption(name = "Export Formatting", desc = "Export current formatting to clipboard.")
         @ConfigEditorButton(buttonText = "Export")
-        public Runnable exportFormatting = Formatting.INSTANCE::export;
+        public Runnable exportFormatting = GhostFormatting.INSTANCE::export;
 
         @ConfigOption(name = "Import Formatting", desc = "Import formatting from clipboard.")
         @ConfigEditorButton(buttonText = "Import")
-        public Runnable importFormatting = Formatting.INSTANCE::importFormat;
+        public Runnable importFormatting = GhostFormatting.INSTANCE::importFormat;
 
         @Expose
         @ConfigOption(name = "Title", desc = "Title Line.")

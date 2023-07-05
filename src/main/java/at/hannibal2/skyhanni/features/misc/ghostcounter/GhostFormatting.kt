@@ -9,7 +9,7 @@ import java.awt.datatransfer.StringSelection
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-object Formatting {
+object GhostFormatting {
 
     private const val exportPrefix = "gc/"
 
