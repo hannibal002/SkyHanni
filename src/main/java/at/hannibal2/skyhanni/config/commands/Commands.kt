@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniTestCommand
@@ -66,9 +67,9 @@ object Commands {
         registerCommand("shcropstartlocation") { GardenStartLocation.setLocationCommand() }
         registerCommand("shstopcityprojectreminder") { CityProjectFeatures.disable() }
         registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
-        registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
+        registerCommand("shimportghostcounterdata") { GhostUtil.importCTGhostCounterData() }
         registerCommand("shclearfarmingitems") { clearFarmingItems() }
-        registerCommand("shresetghostcounter") { GhostCounter.reset() }
+        registerCommand("shresetghostcounter") { GhostUtil.reset() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }

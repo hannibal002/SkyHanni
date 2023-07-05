@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter;
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.rift.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
@@ -215,7 +216,7 @@ public class Storage {
         public static class GhostCounter {
 
             @Expose
-            public Map<at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter.Option, Double> data = new HashMap<>();
+            public Map<GhostData.Option, Double> data = new HashMap<>();
 
             @Expose
             public boolean ctDataImported = false;

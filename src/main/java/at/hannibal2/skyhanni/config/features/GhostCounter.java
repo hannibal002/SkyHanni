@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.Formatting;
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -326,7 +327,7 @@ public class GhostCounter {
 
     @ConfigOption(name = "Reset", desc = "Reset the counter.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetCounter = at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter.INSTANCE::reset;
+    public Runnable resetCounter = GhostUtil.INSTANCE::reset;
 
     @Expose
     public Position position = new Position(50, 50, false, true);

@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.features.misc.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter.Option.*
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.Option.*
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.bestiaryData
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.formatBestiary
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.formatText
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.isUsingCTGhostCounter
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.utils.CombatUtils._isKilling
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateETA
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateXP
@@ -22,30 +26,19 @@ import at.hannibal2.skyhanni.utils.CombatUtils.xpGainHourLast
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.JsonArray
-import com.google.gson.JsonParser
-import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.StringSelection
 import java.io.File
-import java.io.FileReader
-import java.nio.charset.StandardCharsets
 import java.text.NumberFormat
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -54,7 +47,7 @@ object GhostCounter {
     val config get() = SkyHanniMod.feature.ghostCounter
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
-    private var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
+    var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
     private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
     private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
@@ -74,38 +67,6 @@ object GhostCounter {
     private var notifyCTModule = true
     var bestiaryCurrentKill = 0
     private var killETA = ""
-    private var session = mutableMapOf(
-            KILLS to 0.0,
-            SORROWCOUNT to 0.0,
-            VOLTACOUNT to 0.0,
-            PLASMACOUNT to 0.0,
-            GHOSTLYBOOTS to 0.0,
-            BAGOFCASH to 0.0,
-            TOTALDROPS to 0.0,
-            SCAVENGERCOINS to 0.0,
-            MAXKILLCOMBO to 0.0,
-            SKILLXPGAINED to 0.0
-    )
-    val bestiaryData = mutableMapOf<Int, Int>().apply {
-        val commonValue = 100_000
-        for (i in 1..46) {
-            this[i] = when (i) {
-                1 -> 10
-                2 -> 15
-                3 -> 75
-                4 -> 150
-                5 -> 250
-                6 -> 500
-                7 -> 1_500
-                8 -> 2_500
-                9 -> 5_000
-                10 -> 15_000
-                11 -> 25_000
-                12 -> 50_000
-                else -> commonValue
-            }
-        }
-    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -128,34 +89,8 @@ object GhostCounter {
         display = formatDisplay(drawDisplay())
     }
 
-    private fun prettyTime(millis: Long): Map<String, String> {
-        val seconds = millis / 1000 % 60
-        val minutes = millis / 1000 / 60 % 60
-        val hours = millis / 1000 / 60 / 60 % 24
-        val days = millis / 1000 / 60 / 60 / 24
-        return buildMap {
-            if (millis < 0) {
-                clear()
-            } else if (minutes == 0L && hours == 0L && days == 0L) {
-                put("seconds", seconds.toString())
-            } else if (hours == 0L && days == 0L) {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-            } else if (days == 0L) {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-                put("hours", hours.toString())
-            } else {
-                put("seconds", seconds.toString())
-                put("minutes", minutes.toString())
-                put("hours", hours.toString())
-                put("days", days.toString())
-            }
-        }
-    }
-
     private fun drawDisplay() = buildList<List<Any>> {
-        val value: Int = when (SORROWCOUNT.get()) {
+        val value: Int = when (GhostData.Option.SORROWCOUNT.get()) {
             0.0 -> 0
             else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}".toInt()
         }
@@ -375,7 +310,7 @@ object GhostCounter {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockIsland != IslandType.DWARVEN_MINES) return
-        for (opt in Option.values()) {
+        for (opt in GhostData.Option.values()) {
             val pattern = opt.pattern ?: continue
             pattern.matchMatcher(event.message) {
                 when (opt) {
@@ -467,116 +402,5 @@ object GhostCounter {
 
     fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
-    }
-
-    private fun percent(number: Double): String {
-        return "${((number / 3_000_000) * 100).roundToPrecision(4)}"
-    }
-
-    fun reset() {
-        for (opt in Option.values()) {
-            opt.set(0.0)
-            opt.set(0.0, true)
-        }
-        hidden?.totalMF = 0.0
-        update()
-    }
-
-    private fun isUsingCTGhostCounter(): Boolean {
-        return ghostCounterV3File.exists() && ghostCounterV3File.isFile
-    }
-
-    fun importCTGhostCounterData() {
-        val c = ProfileStorageData.profileSpecific?.ghostCounter ?: return
-        if (isUsingCTGhostCounter()) {
-            if (c.ctDataImported) {
-                chat("§e[SkyHanni] §cYou already imported GhostCounterV3 data!")
-                return
-            }
-            val json = ConfigManager.gson.fromJson(FileReader(ghostCounterV3File), com.google.gson.JsonObject::class.java)
-            GHOSTSINCESORROW.add(json["ghostsSinceSorrow"].asDouble)
-            SORROWCOUNT.add(json["sorrowCount"].asDouble)
-            BAGOFCASH.add(json["BagOfCashCount"].asDouble)
-            PLASMACOUNT.add(json["PlasmaCount"].asDouble)
-            VOLTACOUNT.add(json["VoltaCount"].asDouble)
-            GHOSTLYBOOTS.add(json["GhostlyBootsCount"].asDouble)
-            KILLS.add(json["ghostsKilled"].asDouble)
-            hidden?.totalMF = hidden?.totalMF?.plus(json["TotalMF"].asDouble) ?: json["TotalMF"].asDouble
-            TOTALDROPS.add(json["TotalDrops"].asDouble)
-            c.ctDataImported = true
-            chat("§e[SkyHanni] §aImported data successfully!")
-        } else
-            chat("§e[SkyHanni] §cGhostCounterV3 ChatTriggers module not found!")
-    }
-
-    private fun String.formatText(value: Int, session: Int = -1): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())
-                .replace("%session%", session.addSeparators())
-                .replace("&", "§"))
-    }
-
-    private fun String.formatText(t: String): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", t)
-                .replace("&", "§"))
-    }
-
-    private fun String.formatText(value: Double, session: Double): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", value.roundToPrecision(2).addSeparators())
-                .replace("%session%", session.roundToPrecision(2).addSeparators())
-                .replace("&", "§"))
-    }
-
-    private fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
-        return Utils.chromaStringByColourCode(
-                this.replace("%currentKill%", if (config.showMax) bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
-                        .replace("%percentNumber%", percent(bestiaryCurrentKill.toDouble()))
-                        .replace("%killNeeded%", NumberUtil.format(killNeeded))
-                        .replace("%currentLevel%", if (hidden?.bestiaryNextLevel?.toInt()!! < 0) "46" else "${hidden?.bestiaryNextLevel?.toInt()!! - 1}")
-                        .replace("%nextLevel%", if (config.showMax) "46" else "${hidden?.bestiaryNextLevel?.toInt()!!}")
-                        .replace("&", "§"))
-    }
-
-    enum class Option(val pattern: Pattern? = null) {
-        KILLS,
-        SORROWCOUNT("§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
-        VOLTACOUNT("§6§lRARE DROP! §r§9Volta §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
-        PLASMACOUNT("§6§lRARE DROP! §r§9Plasma §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
-        GHOSTLYBOOTS("§6§lRARE DROP! §r§9Ghostly Boots §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
-        BAGOFCASH("§eThe ghost's death materialized §r§61,000,000 coins §r§efrom the mists!".toPattern()),
-        KILLCOMBOCOINS("[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill".toPattern()),
-        TOTALDROPS,
-        GHOSTSINCESORROW,
-        SCAVENGERCOINS,
-        MAXKILLCOMBO,
-        KILLCOMBO("[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill".toPattern()),
-        SKILLXPGAINED;
-
-        fun add(i: Double, s: Boolean = false) {
-            if (s)
-                session[this] = session[this]?.plus(i) ?: i
-            else
-                hidden?.data?.set(this, hidden?.data?.get(this)?.plus(i) ?: i)
-        }
-
-        fun set(i: Double, s: Boolean = false) {
-            if (s)
-                session[this] = i
-            else
-                hidden?.data?.set(this, i)
-        }
-
-        fun getInt(s: Boolean = false): Int {
-            return if (s)
-                session[this]?.roundToInt() ?: 0
-            else
-                hidden?.data?.get(this)?.roundToInt() ?: 0
-        }
-
-        fun get(s: Boolean = false): Double {
-            return if (s)
-                session[this] ?: 0.0
-            else
-                hidden?.data?.get(this) ?: 0.0
-        }
     }
 }
