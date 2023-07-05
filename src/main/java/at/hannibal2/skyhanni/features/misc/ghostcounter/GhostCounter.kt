@@ -342,10 +342,10 @@ object GhostCounter {
         }
         killComboExpiredPattern.matchMatcher(event.message) {
             if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt()) {
-                MAXKILLCOMBO.set(group("combo").toDouble())
+                MAXKILLCOMBO.set(group("combo").formatNumber().toDouble())
             }
             if (KILLCOMBO.getInt() > MAXKILLCOMBO.getInt(true)) {
-                MAXKILLCOMBO.set(group("combo").toDouble(), true)
+                MAXKILLCOMBO.set(group("combo").formatNumber().toDouble(), true)
             }
             KILLCOMBOCOINS.set(0.0)
             KILLCOMBO.set(0.0)
