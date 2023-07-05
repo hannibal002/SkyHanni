@@ -7,16 +7,16 @@ import kotlin.math.roundToInt
 object GhostData {
 
     private var session = mutableMapOf(
-            KILLS to 0.0,
-            SORROWCOUNT to 0.0,
-            VOLTACOUNT to 0.0,
-            PLASMACOUNT to 0.0,
-            GHOSTLYBOOTS to 0.0,
-            BAGOFCASH to 0.0,
-            TOTALDROPS to 0.0,
-            SCAVENGERCOINS to 0.0,
-            MAXKILLCOMBO to 0.0,
-            SKILLXPGAINED to 0.0
+        KILLS to 0.0,
+        SORROWCOUNT to 0.0,
+        VOLTACOUNT to 0.0,
+        PLASMACOUNT to 0.0,
+        GHOSTLYBOOTS to 0.0,
+        BAGOFCASH to 0.0,
+        TOTALDROPS to 0.0,
+        SCAVENGERCOINS to 0.0,
+        MAXKILLCOMBO to 0.0,
+        SKILLXPGAINED to 0.0
     )
 
     val bestiaryData = mutableMapOf<Int, Int>().apply {

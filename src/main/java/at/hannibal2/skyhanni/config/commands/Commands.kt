@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
@@ -127,9 +126,9 @@ object Commands {
     }
 
     private fun createCommand(function: (Array<String>) -> Unit) =
-            object : ProcessCommandRunnable() {
-                override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
-                    function(args.asList().toTypedArray())
-                }
+        object : ProcessCommandRunnable() {
+            override fun processCommand(sender: ICommandSender?, args: Array<out String>) {
+                function(args.asList().toTypedArray())
             }
+        }
 }

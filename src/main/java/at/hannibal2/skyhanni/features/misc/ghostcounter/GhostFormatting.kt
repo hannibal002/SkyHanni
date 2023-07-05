@@ -31,8 +31,8 @@ object GhostFormatting {
 
         val list = try {
             JsonParser().parse(jsonString).asJsonArray
-                    .filter { it.isJsonPrimitive }
-                    .map { it.asString }
+                .filter { it.isJsonPrimitive }
+                .map { it.asString }
         } catch (e: Exception) {
             return
         }

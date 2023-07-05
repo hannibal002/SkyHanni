@@ -20,7 +20,7 @@ object GhostUtil {
         GhostCounter.update()
     }
 
-     fun isUsingCTGhostCounter(): Boolean {
+    fun isUsingCTGhostCounter(): Boolean {
         return GhostCounter.ghostCounterV3File.exists() && GhostCounter.ghostCounterV3File.isFile
     }
 
@@ -49,6 +49,7 @@ object GhostUtil {
             }
         }
     }
+
     fun importCTGhostCounterData() {
         val c = ProfileStorageData.profileSpecific?.ghostCounter ?: return
         if (isUsingCTGhostCounter()) {
@@ -64,7 +65,8 @@ object GhostUtil {
             GhostData.Option.VOLTACOUNT.add(json["VoltaCount"].asDouble)
             GhostData.Option.GHOSTLYBOOTS.add(json["GhostlyBootsCount"].asDouble)
             GhostData.Option.KILLS.add(json["ghostsKilled"].asDouble)
-            GhostCounter.hidden?.totalMF = GhostCounter.hidden?.totalMF?.plus(json["TotalMF"].asDouble) ?: json["TotalMF"].asDouble
+            GhostCounter.hidden?.totalMF = GhostCounter.hidden?.totalMF?.plus(json["TotalMF"].asDouble)
+                ?: json["TotalMF"].asDouble
             GhostData.Option.TOTALDROPS.add(json["TotalDrops"].asDouble)
             c.ctDataImported = true
             LorenzUtils.chat("§e[SkyHanni] §aImported data successfully!")
@@ -74,29 +76,29 @@ object GhostUtil {
 
     fun String.formatText(value: Int, session: Int = -1): String {
         return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())
-                .replace("%session%", session.addSeparators())
-                .replace("&", "§"))
+            .replace("%session%", session.addSeparators())
+            .replace("&", "§"))
     }
 
     fun String.formatText(t: String): String {
         return Utils.chromaStringByColourCode(this.replace("%value%", t)
-                .replace("&", "§"))
+            .replace("&", "§"))
     }
 
     fun String.formatText(value: Double, session: Double): String {
         return Utils.chromaStringByColourCode(this.replace("%value%", value.roundToPrecision(2).addSeparators())
-                .replace("%session%", session.roundToPrecision(2).addSeparators())
-                .replace("&", "§"))
+            .replace("%session%", session.roundToPrecision(2).addSeparators())
+            .replace("&", "§"))
     }
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
         return Utils.chromaStringByColourCode(
-                this.replace("%currentKill%", if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
-                        .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
-                        .replace("%killNeeded%", NumberUtil.format(killNeeded))
-                        .replace("%currentLevel%", if (GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! < 0) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! - 1}")
-                        .replace("%nextLevel%", if (GhostCounter.config.showMax) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!!}")
-                        .replace("&", "§"))
+            this.replace("%currentKill%", if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
+                .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
+                .replace("%killNeeded%", NumberUtil.format(killNeeded))
+                .replace("%currentLevel%", if (GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! < 0) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! - 1}")
+                .replace("%nextLevel%", if (GhostCounter.config.showMax) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!!}")
+                .replace("&", "§"))
     }
 
     private fun percent(number: Double): String {

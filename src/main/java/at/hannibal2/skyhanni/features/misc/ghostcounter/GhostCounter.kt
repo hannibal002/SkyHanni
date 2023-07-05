@@ -73,8 +73,8 @@ object GhostCounter {
         if (!isEnabled()) return
         if (config.onlyOnMist && !inMist) return
         config.position.renderStringsAndItems(display,
-                extraSpace = config.extraSpace,
-                posLabel = "Ghost Counter")
+            extraSpace = config.extraSpace,
+            posLabel = "Ghost Counter")
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -160,10 +160,10 @@ object GhostCounter {
                 val time = buildString {
                     if (timeMap.isNotEmpty()) {
                         val formatMap = mapOf(
-                                "%days%" to "days",
-                                "%hours%" to "hours",
-                                "%minutes%" to "minutes",
-                                "%seconds%" to "seconds"
+                            "%days%" to "days",
+                            "%hours%" to "hours",
+                            "%minutes%" to "minutes",
+                            "%seconds%" to "seconds"
                         )
                         for ((format, key) in formatMap) {
                             if (etaFormatting.time.contains(format)) {
@@ -318,7 +318,7 @@ object GhostCounter {
                         opt.add(1.0)
                         opt.add(1.0, true)
                         hidden?.totalMF = hidden?.totalMF?.plus(group("mf").substring(4).toDouble())
-                                ?: group("mf").substring(4).toDouble()
+                            ?: group("mf").substring(4).toDouble()
                         TOTALDROPS.add(1.0)
                         if (opt == SORROWCOUNT)
                             GHOSTSINCESORROW.set(0.0)
