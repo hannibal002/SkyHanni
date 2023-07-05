@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -18,6 +19,7 @@ class ParkourHelper(val locations: List<LorenzVec>, private val shortCuts: List<
     var rainbowColor = true
     var monochromeColor: Color = Color.WHITE
     var lookAhead = 2
+    var outline = true
 
     fun inParkour() = current != -1
 
@@ -60,8 +62,8 @@ class ParkourHelper(val locations: List<LorenzVec>, private val shortCuts: List<
                 event.draw3DLine(locations[shortCut.from], locations[shortCut.to], Color.RED, 3, false)
                 event.drawFilledBoundingBox(axisAlignedBB(locations[shortCut.to]), Color.RED, 1f)
                 event.drawDynamicText(locations[shortCut.to].add(-0.5, 1.0, -0.5), "§cShortcut", 2.5)
+                if (outline) event.outlineTopFace(axisAlignedBB(locations[shortCut.to]), 2, Color.BLACK, true)
             }
-
         }
 
         for ((index, location) in locations.asSequence().withIndex().drop(current)
@@ -69,9 +71,11 @@ class ParkourHelper(val locations: List<LorenzVec>, private val shortCuts: List<
             var aabb = axisAlignedBB(location)
             if (location !in locations) {
                 aabb = aabb.expandBlock()
+                event.drawFilledBoundingBox(aabb, colorForIndex(index), .6f)
+            } else {
+                event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
+                if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
             }
-
-            event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
         }
     }
 
