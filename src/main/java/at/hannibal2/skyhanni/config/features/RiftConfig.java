@@ -216,17 +216,17 @@ public class RiftConfig {
             @Expose
             @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
             @ConfigEditorSlider(minStep = 1, maxValue = 9, minValue = 1)
-            public int lookAhead = 2;
+            public Property<Integer> lookAhead = Property.of(2);
 
             @Expose
             @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
             @ConfigEditorBoolean
-            public boolean rainbowColor = true;
+            public Property<Boolean> rainbowColor = Property.of(true);
 
             @Expose
             @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
             @ConfigEditorColour
-            public String monochromeColor = "0:60:0:0:255";
+            public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
             @Expose
             @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the upside down parkour.")
