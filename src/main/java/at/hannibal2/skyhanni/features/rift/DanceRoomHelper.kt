@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
@@ -34,7 +35,7 @@ object DanceRoomHelper {
             for ((lineIndex, line) in instructions.withIndex()) {
                 if (line != null) {
                     if (index < instructions.size && index == lineIndex) {
-                        add("${config.danceRoomFormatting.now.replace("&", "§")} ${line.format()} ${if (countdown != null) "§f$countdown" else ""}")
+                        add("${config.danceRoomFormatting.now.replace("&", "§")} ${line.format()} ${if (countdown != null) "${config.danceRoomFormatting.color.countdown.replace("&", "§")}$countdown" else ""}")
                     } else if (index + 1 < instructions.size && index + 1 == lineIndex) {
                         add("${config.danceRoomFormatting.next.replace("&", "§")} ${line.format()}")
                     } else if (index + 2 < instructions.size && (index + 2..index + config.lineToShow).contains(lineIndex)) {

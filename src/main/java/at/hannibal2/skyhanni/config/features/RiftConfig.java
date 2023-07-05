@@ -254,6 +254,11 @@ public class RiftConfig {
                     public String punch = "&d";
 
                     @Expose
+                    @ConfigOption(name = "Countdown", desc = "Color for the Countdown")
+                    @ConfigEditorText
+                    public String countdown = "&f";
+
+                    @Expose
                     @ConfigOption(name = "Default", desc = "Fallback color")
                     @ConfigEditorText
                     public String fallback = "&f";
@@ -295,5 +300,4 @@ public class RiftConfig {
         public boolean waypoints = true;
 
     }
-
 }
