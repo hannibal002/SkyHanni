@@ -173,7 +173,6 @@ public class RiftConfig {
         @Accordion
         @Expose
         public LavaMazeConfig lavaMazeConfig = new LavaMazeConfig();
-
         public static class LavaMazeConfig {
 
             @Expose
@@ -202,42 +201,11 @@ public class RiftConfig {
             public boolean hidePlayers = false;
         }
 
-        @ConfigOption(name = "Dance Room Helper", desc = "")
-        @Accordion
-        @Expose
-        public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
-
-        public static class DanceRoomHelper {
-
-            @Expose
-            @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
-            @ConfigEditorBoolean
-            public boolean enabled = false;
-
-            @Expose
-            @ConfigOption(name = "Lines to show", desc = "How many tasks you should see.")
-            @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 1)
-            public int lineToShow = 3;
-
-            @Expose
-            @ConfigOption(name = "Space", desc = "Change the space between each line.")
-            @ConfigEditorSlider(minStep = 1, maxValue = 10, minValue = -5)
-            public int extraSpace = 0;
-
-            @Expose
-            @ConfigOption(name = "Hide others players", desc = "Hide other players inside the dance room.")
-            @ConfigEditorBoolean
-            public boolean hidePlayers = false;
-
-            @Expose
-            public Position position = new Position(442, 239, false, true);
-        }
 
         @ConfigOption(name = "Upside Down Parkour", desc = "")
         @Accordion
         @Expose
         public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
-
         public static class UpsideDownParkour {
 
             @Expose
@@ -270,6 +238,38 @@ public class RiftConfig {
             @ConfigEditorBoolean
             public boolean hidePlayers = false;
         }
+
+
+        @ConfigOption(name = "Dance Room Helper", desc = "")
+        @Accordion
+        @Expose
+        public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
+        public static class DanceRoomHelper {
+
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
+            @ConfigEditorBoolean
+            public boolean enabled = false;
+
+            @Expose
+            @ConfigOption(name = "Lines to show", desc = "How many tasks you should see.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 49, minValue = 1)
+            public int lineToShow = 3;
+
+            @Expose
+            @ConfigOption(name = "Space", desc = "Change the space between each line.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 10, minValue = -5)
+            public int extraSpace = 0;
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players inside the dance room.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
+
+            @Expose
+            public Position position = new Position(442, 239, false, true);
+        }
+
 
         @Expose
         @ConfigOption(name = "Tubulator", desc = "Highlights the location of the invisible blocks (Laser Parkour).")
