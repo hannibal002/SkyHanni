@@ -125,7 +125,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
-    public Misc misc = new Misc();
+    public MiscConfig misc = new MiscConfig();
 
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
