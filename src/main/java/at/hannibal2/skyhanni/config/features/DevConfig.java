@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
-public class DevData {
+public class DevConfig {
 
     @Expose
     @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.")
@@ -69,7 +69,7 @@ public class DevData {
     @ConfigAccordionId(id = 0)
     public boolean highlightMissingRepo = false;
 
-    @ConfigOption(name = "Waypoints", desc = "")
+    @ConfigOption(name = "Parcour Waypoints", desc = "")
     @Accordion
     @Expose
     public Waypoints waypoint = new Waypoints();
@@ -77,7 +77,7 @@ public class DevData {
     public static class Waypoints {
 
         @Expose
-        @ConfigOption(name = "Save Hotkey", desc = "Saves block location to the waypoints list and copies everything to your clipboard.")
+        @ConfigOption(name = "Save Hotkey", desc = "Saves block location to a temporarily parkour and copies everything to your clipboard.")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int saveKey = Keyboard.KEY_NONE;
 
@@ -85,6 +85,11 @@ public class DevData {
         @ConfigOption(name = "Delete Hotkey", desc = "Deletes the last saved location for when you make a mistake.")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int deleteKey = Keyboard.KEY_NONE;
+
+        @Expose
+        @ConfigOption(name = "Show Platform Number", desc = "Show the index number over the platform for every parkour.")
+        @ConfigEditorBoolean
+        public boolean showPlatformNumber = false;
 
     }
 

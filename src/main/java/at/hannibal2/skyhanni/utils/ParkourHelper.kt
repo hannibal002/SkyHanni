@@ -111,8 +111,10 @@ class ParkourHelper(
                 } else axisAlignedBB(location)
 
                 event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
-                if (!isMovingPlattform) {
-                    event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
+                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber) {
+                    if (!isMovingPlatform) {
+                        event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
+                    }
                 }
             }
         } catch (e: Throwable) {
