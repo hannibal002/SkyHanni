@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class FarmingArmorDrops {
-    private var display = listOf<String>()
+    private var display = emptyList<String>()
     private val drops = mutableMapOf<ArmorDropType, Int>()
     private var hasArmor = false
     private var tick = 0

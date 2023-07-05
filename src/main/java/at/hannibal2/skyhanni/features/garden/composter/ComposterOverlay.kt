@@ -37,8 +37,8 @@ class ComposterOverlay {
     private var fuelFactors: Map<String, Double> = emptyMap()
 
     private val config get() = SkyHanniMod.feature.garden
-    private var organicMatterDisplay = listOf<List<Any>>()
-    private var fuelExtraDisplay = listOf<List<Any>>()
+    private var organicMatterDisplay = emptyList<List<Any>>()
+    private var fuelExtraDisplay = emptyList<List<Any>>()
 
     private var currentTimeType = TimeType.HOUR
     private var inComposter = false

@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
     private val config get() = SkyHanniMod.feature.garden
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
 
     companion object {
         var inInventory = false

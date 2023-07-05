@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.damageindicator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
@@ -172,8 +173,12 @@ class MobFinder {
 
             if (DungeonData.isOneOf("F5", "M5")) {
                 if (entity is EntityOtherPlayerMP) {
-                    if (entity == floor5lividEntity) {
-                        return EntityResult(floor5lividEntitySpawnTime, true, finalDungeonBoss = true)
+                    if (entity == DungeonLividFinder.livid) {
+                        return EntityResult(
+                            bossType = BossType.DUNGEON_F5,
+                            ignoreBlocks = true,
+                            finalDungeonBoss = true
+                        )
                     }
                 }
             }
@@ -520,7 +525,7 @@ class MobFinder {
 
                 //F5
                 "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
-                    floor5lividEntity = findLivid()
+                    floor5lividEntity = DungeonLividFinder.livid
                     floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
                 }
 
@@ -576,17 +581,5 @@ class MobFinder {
                 }
             }
         }
-    }
-
-    private fun findLivid(): EntityOtherPlayerMP? {
-        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-            if (entity is EntityOtherPlayerMP) {
-                if (entity.name == "Livid ") {
-                    return entity
-                }
-            }
-        }
-
-        return null
     }
 }

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
@@ -61,7 +62,7 @@ object GardenAPI {
         if (!inGarden()) return
         tick++
         if (tick % 10 == 0) {
-            inBarn = barnArea.isVecInside(Minecraft.getMinecraft().thePlayer.positionVector)
+            inBarn = barnArea.isPlayerInside()
 
             // We ignore random hypixel moments
             Minecraft.getMinecraft().currentScreen ?: return

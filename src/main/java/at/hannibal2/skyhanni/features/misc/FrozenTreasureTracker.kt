@@ -22,7 +22,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class FrozenTreasureTracker {
     private val config get() = SkyHanniMod.feature.misc.frozenTreasureTracker
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var treasuresMined = 0
     private var compactProcs = 0
     private var estimatedIce = 0L
@@ -35,7 +35,7 @@ class FrozenTreasureTracker {
     private var treasureCount = mapOf<FrozenTreasure, Int>()
 
     init {
-        fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 15_000) {
+        fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 1000) {
             if (!onJerryWorkshop()) return@fixedRateTimer
             calculateIcePerHour()
         }
@@ -52,9 +52,17 @@ class FrozenTreasureTracker {
     private fun calculateIcePerHour() {
         val difference = estimatedIce - lastEstimatedIce
         lastEstimatedIce = estimatedIce
+
+        if (difference == estimatedIce) {
+            return
+        }
+
+        icePerHour = icePerMin.average().toInt() * 3600
+        icePerMin.add(difference)
+
         if (difference == 0L) {
             stoppedChecks += 1
-            if (stoppedChecks == 12) {
+            if (stoppedChecks == 60) {
                 stoppedChecks = 0
                 icePerMin.clear()
                 icePerHour = 0
@@ -62,8 +70,6 @@ class FrozenTreasureTracker {
             return
         }
         stoppedChecks = 0
-        icePerMin.add(difference)
-        if (difference != estimatedIce) icePerHour = icePerMin.average().toInt() * 240
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -156,7 +162,7 @@ class FrozenTreasureTracker {
         if (!config.enabled) return
         if (!onJerryWorkshop()) return
         if (config.onlyInCave && !inGlacialCave()) return
-        config.position.renderStringsAndItems(display, posLabel = "Visitor Stats")
+        config.position.renderStringsAndItems(display, posLabel = "Frozen Treasure Tracker")
     }
 
     private fun onJerryWorkshop() = LorenzUtils.inIsland(IslandType.WINTER)

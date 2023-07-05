@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
     private val config get() = SkyHanniMod.feature.rift.timer
-    private var display = listOf<String>()
+    private var display = emptyList<String>()
     private var maxTime = 0L
     private var latestTime = 0L
     private val changes = mutableMapOf<Long, String>()

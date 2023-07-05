@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
@@ -44,7 +45,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EstimatedItemValue {
     private val config get() = SkyHanniMod.feature.misc
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
 
@@ -117,7 +118,12 @@ object EstimatedItemValue {
 
         if (basePrice == totalPrice) return listOf()
 
-        list.add("§aTotal: §6§l" + NumberUtil.format(totalPrice))
+        val numberFormat = if (config.estimatedIemValueExactPrice) {
+            totalPrice.addSeparators()
+        } else {
+            NumberUtil.format(totalPrice)
+        }
+        list.add("§aTotal: §6§l$numberFormat")
 
         val newDisplay = mutableListOf<List<Any>>()
         for (line in list) {
@@ -300,7 +306,7 @@ object EstimatedItemValue {
     }
 
     private fun addTransmissionTuners(stack: ItemStack, list: MutableList<String>): Double {
-        val count = stack.getTransmissionTunerCount()  ?: return 0.0
+        val count = stack.getTransmissionTunerCount() ?: return 0.0
 
         val wtfHardcodedTuner = "TRANSMISSION_TUNER"
         val price = NEUItems.getPrice(wtfHardcodedTuner) * count

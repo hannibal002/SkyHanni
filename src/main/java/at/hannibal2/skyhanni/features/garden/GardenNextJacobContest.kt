@@ -28,8 +28,8 @@ import javax.swing.JOptionPane
 import javax.swing.UIManager
 
 class GardenNextJacobContest {
-    private var display = listOf<Any>()
-    private var simpleDisplay = listOf<String>()
+    private var display = emptyList<Any>()
+    private var simpleDisplay = emptyList<String>()
     private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false

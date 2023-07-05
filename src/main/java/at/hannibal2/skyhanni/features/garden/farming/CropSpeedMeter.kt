@@ -15,11 +15,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CropSpeedMeter {
-    private var display = listOf<String>()
+    private var display = emptyList<String>()
     private var currentCrop: CropType? = null
     private var currentBlocks = 0
     private var tick = 0
-    private var snapshot = listOf<String>()
+    private var snapshot = emptyList<String>()
 
     @SubscribeEvent
     fun onBlockBreak(event: CropClickEvent) {

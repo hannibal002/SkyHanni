@@ -20,7 +20,7 @@ class SkyHanniTestCommand {
 
     companion object {
         var displayLine = ""
-        var displayList = listOf<List<Any>>()
+        var displayList = emptyList<List<Any>>()
 
         var a = 1.0
         var b = 60.0
@@ -174,6 +174,7 @@ class SkyHanniTestCommand {
         val itemStack = event.itemStack
         if (itemStack != null) {
             val internalName = itemStack.getInternalName()
+            if (internalName == "" && !SkyHanniMod.feature.dev.showEmptyNames) return
             event.toolTip.add("Internal Name: '$internalName'")
         }
     }

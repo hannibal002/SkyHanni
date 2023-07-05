@@ -30,7 +30,7 @@ import kotlin.math.log10
 class FarmingFortuneDisplay {
     private val tabFortunePattern = " Farming Fortune: §r§6☘(\\d+)".toRegex()
 
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var accessoryProgressDisplay = ""
 
     private var lastToolSwitch: Long = 0

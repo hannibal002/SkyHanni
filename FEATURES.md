@@ -291,6 +291,21 @@
   + Shows the area in which a Volt might strike lightning
   + Change the color of the area
   + Change the color of the volt enemy depending on their mood (default disabled)
++ **Enigma Soul Waypoints** (Contributed by CalMWolfs)
+  + Click on the soul name inside Rift Guide to show/hide
++ **Kloon Hacking** (Contributed by CalMWolfs)
+  + Highlights the correct button to click in the hacking inventory
+  + Tells you which colour to pick
+  + While wearing the helmet, waypoints will appear at each terminal location
+  + Hide already completed kloon terminal waypoints
++ **Crux Talisman Progress** Display - HiZe
+  + Show bonuses you get from the talisman
++ **Lazer Parkour** Solver - CalMWolfs
+  + Highlights the location of the invisible blocks in the MirrorVerse
++ Mirrorverse **Dance Room Helper** - HiZe
+  + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
+  + Change how many tasks you should see
+  + Hide other players inside the dance room
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
@@ -356,3 +371,7 @@
   + Show Ice per hour
   + Customizable GUI
   + Option to hide the chat messages
++ **Custom Text Box** - CalMWolfs
+  + Write fancy text into a gui element to show on your screen at all time
+  + Supports color codes
+  + Supports line breaks `\n` - hannibal2

@@ -2,34 +2,27 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 
-class ActionBarStatsData {
-    private val pattern =
-        Pattern.compile("..((?:\\d|,)*)\\/(?:\\d|,)*(.) *..((?:\\d|,)*)..(. \\w*) *..((?:\\d|,)*)\\/(?:\\d|,)*(✎).*")
-// Sample input: §c2,817/2,817❤     §a703§a❈ Defense     §b3,479/3,479✎ Mana
-// Returns the following groups: 1 = 2,817; 2 = ❤; 3 = 703; 4 = ❈ Defense; 5 = 3,479; 6 = ✎ Mana
+object ActionBarStatsData {
+    private val patterns = mapOf(
+        "health" to "§[c6](?<health>[\\d,]+)/[\\d,]+❤.*".toPattern(),
+        "defense" to ".*§a(?<defense>[\\d,]+)§a❈.*".toPattern(),
+        "mana" to ".*§b(?<mana>[\\d,]+)/[\\d,]+✎.*".toPattern(),
+        "riftTime" to "§[a7](?<riftTime>[\\dms ]+)ф.*".toPattern(),
+    )
 
-    companion object {
-        var groups = listOf<String>()
-    }
+    var groups = mutableMapOf("health" to "", "riftTime" to "", "defense" to "", "mana" to "")
 
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
-        groups = readGroups(event.message)
-    }
+        if (!LorenzUtils.inSkyBlock) return
 
-    private fun readGroups(message: String): List<String> {
-        if (!LorenzUtils.inSkyBlock) return emptyList()
-
-        val matcher = pattern.matcher(message)
-        if (!matcher.matches()) return emptyList()
-
-        val list = mutableListOf<String>()
-        for (i in 1..matcher.groupCount()) {
-            list.add(matcher.group(i))
+        for ((groupName, pattern) in patterns) {
+            pattern.matchMatcher(event.message) {
+                groups[groupName] = group(groupName)
+            }
         }
-        return list
     }
 }

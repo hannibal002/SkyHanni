@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenVisitorDropStatistics {
     private val config get() = SkyHanniMod.feature.garden.visitorDropsStatistics
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
 
     private var acceptedVisitors = 0
     var deniedVisitors = 0
@@ -127,7 +127,7 @@ object GardenVisitorDropStatistics {
         for (reward in VisitorReward.values()) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
-                val stack = NEUItems.getItemStack(reward.internalName)
+                val stack = NEUItems.getItemStack(reward.internalName, true)
                 if (config.displayNumbersFirst)
                     add(listOf("§b${count.addSeparators()} ", stack))
                 else add(listOf(stack, " §b${count.addSeparators()}"))
