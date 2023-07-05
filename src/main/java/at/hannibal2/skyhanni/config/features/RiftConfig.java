@@ -209,12 +209,12 @@ public class RiftConfig {
         public static class UpsideDownParkour {
 
             @Expose
-            @ConfigOption(name = "Enabled", desc = "Helps to solve the upside down parkour in the mirror verse by showing the correct way.")
+            @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the mirror verse by showing the correct way.")
             @ConfigEditorBoolean
             public boolean enabled = true;
 
             @Expose
-            @ConfigOption(name = "Look Ahead", desc = "How many plattforms should be shown in front of you?")
+            @ConfigOption(name = "Look Ahead", desc = "Change wow many platforms should be shown in front of you.")
             @ConfigEditorSlider(minStep = 1, maxValue = 9, minValue = 1)
             public int lookAhead = 2;
 
