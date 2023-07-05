@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
 import at.hannibal2.skyhanni.features.inventory.*
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
+import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
@@ -319,6 +320,7 @@ class SkyHanniMod {
         loadModule(CustomTextBox())
         loadModule(RiftUpsideDownParkour())
         loadModule(RiftLavaMazeParkour())
+        loadModule(HighlightMiningCommissionMobs())
 
         init()
 
