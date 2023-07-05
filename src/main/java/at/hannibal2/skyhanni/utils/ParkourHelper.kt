@@ -94,12 +94,12 @@ class ParkourHelper(
                     val from = locations[shortCut.from].offsetCenter()
                     val to = locations[shortCut.to].offsetCenter()
                     event.draw3DLine(from, to, Color.RED, 3, false)
+                    val textLocation = from.add(to.subtract(from).normalize())
+                    event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
 
                     val aabb = axisAlignedBB(locations[shortCut.to])
                     event.drawFilledBoundingBox(aabb, Color.RED, 1f)
-                    val textLocation = from.add(to.subtract(from).normalize())
-                    event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
-                    if (outline) event.outlineTopFace(axisAlignedBB(locations[shortCut.to]), 2, Color.BLACK, true)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
                 }
 
             }
