@@ -15,7 +15,7 @@ enum class ItemAbility(
 ) {
     //TODO add into repo
 
-    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTREA"),
+    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA"),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
