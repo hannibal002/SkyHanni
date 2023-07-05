@@ -317,7 +317,7 @@ class SkyHanniMod {
         loadModule(DanceRoomHelper)
         loadModule(LaserParkour())
         loadModule(CustomTextBox())
-        loadModule(MirrorVerseJumpAndRun())
+        loadModule(UpsideDownJumpAndRun())
 
         init()
 
