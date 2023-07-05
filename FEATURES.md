@@ -306,6 +306,12 @@
   + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
   + Change how many tasks you should see
   + Hide other players inside the dance room
++ **Upside Down** Parkour & **Lava Maze** - hannibal2
+  + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
+  + Change how many platforms should be shown in front of you
+  + Rainbow color (optional) - nea
+  + Hide other players while doing the parkour
+  + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.

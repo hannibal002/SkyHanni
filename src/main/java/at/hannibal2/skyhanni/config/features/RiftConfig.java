@@ -248,7 +248,7 @@ public class RiftConfig {
             @Expose
             @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
             @ConfigEditorSlider(minStep = 1, maxValue = 9, minValue = 1)
-            public Property<Integer> lookAhead = Property.of(2);
+            public Property<Integer> lookAhead = Property.of(3);
 
             @Expose
             @ConfigOption(name = "Outline", desc = "Outlines the top edge of the platforms.")
