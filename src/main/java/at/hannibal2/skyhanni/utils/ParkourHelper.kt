@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -27,6 +28,7 @@ class ParkourHelper(
     var rainbowColor = false
     var monochromeColor: Color = Color.WHITE
     var lookAhead = 2
+    var outline = false
     var showEverything = false
 
     fun inParkour() = current != -1
@@ -92,11 +94,12 @@ class ParkourHelper(
                     val from = locations[shortCut.from].offsetCenter()
                     val to = locations[shortCut.to].offsetCenter()
                     event.draw3DLine(from, to, Color.RED, 3, false)
+                    val textLocation = from.add(to.subtract(from).normalize())
+                    event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
 
                     val aabb = axisAlignedBB(locations[shortCut.to])
                     event.drawFilledBoundingBox(aabb, Color.RED, 1f)
-                    val textLocation = from.add(to.subtract(from).normalize())
-                    event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
                 }
 
             }
@@ -105,11 +108,14 @@ class ParkourHelper(
                 .take(lookAhead) + inProgressVec.map { it.second }) {
                 val isMovingPlatform = location !in locations
                 if (isMovingPlatform && showEverything) continue
-                val aabb = if (isMovingPlatform) {
-                    axisAlignedBB(location).expandBlock()
-                } else axisAlignedBB(location)
-
-                event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
+                if (isMovingPlatform) {
+                    val aabb = axisAlignedBB(location).expandBlock()
+                    event.drawFilledBoundingBox(aabb, colorForIndex(index), .6f)
+                } else {
+                  val aabb = axisAlignedBB(location)
+                    event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
+                }
                 if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber) {
                     if (!isMovingPlatform) {
                         event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)

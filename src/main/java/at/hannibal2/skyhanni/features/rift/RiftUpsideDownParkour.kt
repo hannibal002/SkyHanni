@@ -61,6 +61,7 @@ class RiftUpsideDownParkour {
             rainbowColor = config.rainbowColor.get()
             monochromeColor = config.monochromeColor.get().toChromaColor()
             lookAhead = config.lookAhead.get() + 1
+            outline = config.outline
         }
     }
 

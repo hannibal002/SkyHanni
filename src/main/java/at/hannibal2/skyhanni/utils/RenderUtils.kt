@@ -800,6 +800,17 @@ object RenderUtils {
         drawFilledBoundingBox(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
     }
 
+    fun RenderWorldLastEvent.outlineTopFace(boundingBox: AxisAlignedBB, lineWidth: Int, colour: Color, depth: Boolean) {
+        val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
+        val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
+        val cornerThree = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
+        val cornerFour = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ)
+        this.draw3DLine(cornerOne, cornerTwo, colour, lineWidth, depth)
+        this.draw3DLine(cornerTwo, cornerThree, colour, lineWidth, depth)
+        this.draw3DLine(cornerThree, cornerFour, colour, lineWidth, depth)
+        this.draw3DLine(cornerFour, cornerOne, colour, lineWidth, depth)
+    }
+
     fun RenderWorldLastEvent.draw3DLine(
         p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean, targetColor: Color? = null
     ) {
