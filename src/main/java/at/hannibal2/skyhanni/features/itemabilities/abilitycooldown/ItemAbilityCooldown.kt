@@ -123,9 +123,6 @@ class ItemAbilityCooldown {
                 ItemAbility.HOLY_ICE.sound()
             }
         }
-        if (event.soundName == "game.player.hurt") return
-        if (event.soundName == "mob.zombie.hurt") return
-        println("name: ${event.soundName}, pitch: ${event.pitch}, volume: ${event.volume}")
     }
 
     @SubscribeEvent
