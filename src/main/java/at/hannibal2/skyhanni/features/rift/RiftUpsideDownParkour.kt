@@ -105,7 +105,7 @@ class RiftUpsideDownParkour {
                 event.drawFilledBoundingBox(axisAlignedBB(location), colorForIndex(index), 1f)
                 if (config.outline && location in locations) event.outlineTopFace(axisAlignedBB(location), 2, Color.BLACK, true)
             }
-            event.drawFilledBoundingBox(axisAlignedBB(location), colorForIndex(index), .5f)
+            event.drawFilledBoundingBox(axisAlignedBB(location), colorForIndex(index), .6f)
         }
     }
 
