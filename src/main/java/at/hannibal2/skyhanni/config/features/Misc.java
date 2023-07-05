@@ -240,6 +240,12 @@ public class Misc {
     public boolean estimatedIemValueAlwaysEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean estimatedIemValueExactPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor in the wardrobe inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
@@ -541,6 +547,29 @@ public class Misc {
         @ConfigOption(name = "Hide Chat messages", desc = "Hides the chat messages from frozen treasures.")
         @ConfigEditorBoolean
         public boolean hideMessages = false;
+
+        @Expose
+        public Position position = new Position(10, 80, false, true);
+    }
+
+    @Expose
+    @ConfigOption(name = "Custom Text box", desc = "")
+    @Accordion
+    public TextBox textBox = new TextBox();
+
+    public static class TextBox {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enables showing the textbox while in SkyBlock.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Text", desc = "Enter text you want to display here.\n" +
+                "§eUse '&' as the colour code character.\n" +
+                "§eUse '\\n' as the line break character.")
+        @ConfigEditorText
+        public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 
         @Expose
         public Position position = new Position(10, 80, false, true);

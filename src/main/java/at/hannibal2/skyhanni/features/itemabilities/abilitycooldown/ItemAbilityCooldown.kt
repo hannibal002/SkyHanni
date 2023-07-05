@@ -68,6 +68,11 @@ class ItemAbilityCooldown {
                 ItemAbility.VOODOO_DOLL.sound()
             }
         }
+        if (event.soundName == "random.successful_hit") {
+            if (event.volume == 1.0f && event.pitch == 0.7936508f) {
+                ItemAbility.VOODOO_DOLL_WILTED.sound()
+            }
+        }
         if (event.soundName == "random.explode") {
             if (event.pitch == 4.047619f && event.volume == 0.2f) {
                 ItemAbility.GOLEM_SWORD.sound()
@@ -111,6 +116,11 @@ class ItemAbilityCooldown {
         if (event.soundName == "random.eat") {
             if (event.pitch == 1.0f && event.volume == 1.0f) {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
+            }
+        }
+        if (event.soundName == "random.drink") {
+            if (event.pitch == 1.8888888f && event.volume == 1.0f) {
+                ItemAbility.HOLY_ICE.sound()
             }
         }
     }

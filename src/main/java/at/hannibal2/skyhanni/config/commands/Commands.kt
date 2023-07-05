@@ -68,6 +68,7 @@ object Commands {
         registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
         registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
         registerCommand("shclearfarmingitems") { clearFarmingItems() }
+        registerCommand("shresetghostcounter") { GhostCounter.reset() }
 
         // for users - fix bugs
         registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
@@ -91,7 +92,7 @@ object Commands {
         registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shstoplisteners") { SkyHanniTestCommand.stopListeners() }
         registerCommand("shreloadlisteners") { SkyHanniTestCommand.reloadListeners() }
-        registerCommand("shcopylocation") { SkyHanniTestCommand.copyLocation() }
+        registerCommand("shcopylocation") { SkyHanniTestCommand.copyLocation(it) }
         registerCommand("shcopyentities") { CopyNearbyEntitiesCommand.command(it) }
         registerCommand("shcopytablist") { CopyTabListCommand.command(it) }
         registerCommand("shcopyscoreboard") { CopyScoreboardCommand.command(it) }

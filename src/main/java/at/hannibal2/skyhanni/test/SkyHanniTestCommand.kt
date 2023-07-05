@@ -20,7 +20,7 @@ class SkyHanniTestCommand {
 
     companion object {
         var displayLine = ""
-        var displayList = listOf<List<Any>>()
+        var displayList = emptyList<List<Any>>()
 
         var a = 1.0
         var b = 60.0
@@ -152,11 +152,18 @@ class SkyHanniTestCommand {
             LorenzUtils.chat("§e[SkyHanni] stopped ${modules.size} listener classes.")
         }
 
-        fun copyLocation() {
+        fun copyLocation(args: Array<String>) {
             val location = LocationUtils.playerLocation()
-            val x = LorenzUtils.formatDouble(location.x)
-            val y = LorenzUtils.formatDouble(location.y)
-            val z = LorenzUtils.formatDouble(location.z)
+            val x = LorenzUtils.formatDouble(location.x + 0.001).replace(",", ".")
+            val y = LorenzUtils.formatDouble(location.y + 0.001).replace(",", ".")
+            val z = LorenzUtils.formatDouble(location.z + 0.001).replace(",", ".")
+            if (args.size == 1) {
+                if (args[0].equals("json", false)) {
+                    OSUtils.copyToClipboard("\"$x:$y:$z\"")
+                    return
+                }
+            }
+
             OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
         }
     }
@@ -167,6 +174,7 @@ class SkyHanniTestCommand {
         val itemStack = event.itemStack
         if (itemStack != null) {
             val internalName = itemStack.getInternalName()
+            if (internalName == "" && !SkyHanniMod.feature.dev.showEmptyNames) return
             event.toolTip.add("Internal Name: '$internalName'")
         }
     }

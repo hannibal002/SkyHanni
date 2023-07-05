@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 class GardenBestCropTime {
-    var display = listOf<List<Any>>()
+    var display = emptyList<List<Any>>()
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden

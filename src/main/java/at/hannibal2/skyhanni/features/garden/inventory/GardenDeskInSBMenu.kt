@@ -19,10 +19,9 @@ class GardenDeskInSBMenu {
     private var showItem = false
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("DOUBLE_PLANT")
+        val neuItem = NEUItems.getItemStack("DOUBLE_PLANT", true)
         Utils.createItemStack(neuItem.item, "§bDesk", "§7Click here to", "§7run §e/desk")
     }
-
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
@@ -44,7 +43,7 @@ class GardenDeskInSBMenu {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: SlotClickEvent) {
         if (showItem && event.slotId == 10) {
-            event.isCanceled =  true
+            event.isCanceled = true
             LorenzUtils.sendCommandToServer("desk")
         }
     }

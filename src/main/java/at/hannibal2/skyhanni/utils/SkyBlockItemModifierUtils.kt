@@ -16,6 +16,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
 
+    fun ItemStack.getPolarvoidBookCount() = getAttributeInt("polarvoid")
+
     fun ItemStack.getCultivatingCounter() = getAttributeLong("farmed_cultivating")
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
@@ -35,7 +37,11 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
-    fun ItemStack.getDungeonStarCount() = getAttributeInt("dungeon_item_level")
+    fun ItemStack.getDungeonStarCount() = getAttributeInt("dungeon_item_level")?.let {
+        getAttributeInt("upgrade_level")?.let { upgradeLevel ->
+            return it.coerceAtLeast(upgradeLevel)
+        } ?: it
+    }
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
@@ -129,7 +135,7 @@ object SkyBlockItemModifierUtils {
         enchantments.keySet.associateWith { enchantments.getInteger(it) }
     }
 
-    fun ItemStack.getAppliedPocketSackInASack(): Int?{
+    fun ItemStack.getAppliedPocketSackInASack(): Int? {
         val data = cachedData
         if (data.sackInASack == -1) {
             data.sackInASack = getAttributeInt("sack_pss")

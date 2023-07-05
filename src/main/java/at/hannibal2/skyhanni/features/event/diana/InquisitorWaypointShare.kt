@@ -35,7 +35,7 @@ object InquisitorWaypointShare {
     private var inquisitor = -1
     private var lastInquisitor = -1
     private var lastShareTime = 0L
-    private var inquisitorsNearby = listOf<EntityOtherPlayerMP>()
+    private var inquisitorsNearby = emptyList<EntityOtherPlayerMP>()
     private var tick = 0
 
     private val logger = LorenzLogger("diana/waypoints")

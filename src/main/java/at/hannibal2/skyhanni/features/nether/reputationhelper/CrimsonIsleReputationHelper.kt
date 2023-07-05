@@ -28,7 +28,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     var repoData: JsonObject = JsonObject()
     var factionType = FactionType.NONE
 
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var dirty = true
     private var tick = 0
 

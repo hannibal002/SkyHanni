@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 class MinionCraftHelper {
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
     private var tick = 0
-    private var display = listOf<String>()
+    private var display = emptyList<String>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
     private val tierOneMinions = mutableListOf<String>()

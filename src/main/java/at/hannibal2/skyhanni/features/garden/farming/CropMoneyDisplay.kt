@@ -38,7 +38,7 @@ object CropMoneyDisplay {
         update()
     }
 
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
     private var tick = 0
     private var loaded = false
@@ -153,13 +153,13 @@ object CropMoneyDisplay {
 
             try {
                 if (isSeeds(internalName)) {
-                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS"))
+                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS", true))
                 } else {
                     list.add(NEUItems.getItemStack(internalName))
                 }
 
                 if (cropNames[internalName] == CropType.WHEAT && config.moneyPerHourMergeSeeds) {
-                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS"))
+                    list.add(NEUItems.getItemStack("BOX_OF_SEEDS", true))
                 }
             } catch (e: NullPointerException) {
                 e.printStackTrace()

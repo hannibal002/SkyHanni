@@ -41,7 +41,9 @@ object CopyErrorCommand {
         Minecraft.getMinecraft().thePlayer ?: throw error
         error.printStackTrace()
 
-        val pair = throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+        val pair = if (throwable.stackTrace.isNotEmpty()) {
+            throwable.stackTrace[0].let { it.fileName to it.lineNumber }
+        } else message to 0
         if (cache.getIfPresent(pair) != null) return
         cache.put(pair, Unit)
 
@@ -54,7 +56,7 @@ object CopyErrorCommand {
             "```\nSkyHanni ${SkyHanniMod.version}: $message\n(full stack trace)\n \n$fullStackTrace\n```"
 
         LorenzUtils.clickableChat(
-            "§c[SkyHanni ${SkyHanniMod.version}]: $message. Click here to copy the error into the clipboard.",
+            "§c[SkyHanni ${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
             "shcopyerror $randomId"
         )
     }

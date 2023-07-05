@@ -20,7 +20,7 @@ import kotlin.math.ceil
 
 class JacobContestFFNeededDisplay {
     private val config get() = SkyHanniMod.feature.garden
-    private var display = listOf<List<Any>>()
+    private var display = emptyList<List<Any>>()
     private var lastToolTipTime = 0L
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
 

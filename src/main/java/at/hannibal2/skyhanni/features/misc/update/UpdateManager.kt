@@ -36,7 +36,7 @@ object UpdateManager {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         SkyHanniMod.feature.about.updateStream.onToggle {
-                reset()
+            reset()
         }
     }
 
@@ -91,7 +91,11 @@ object UpdateManager {
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
-                    LorenzUtils.clickableChat("§e[SkyHanni] §aSkyhanni found a new update: ${it.update.versionName}. Go check §b/sh download update §afor more info.", "sh")
+                    LorenzUtils.clickableChat(
+                        "§e[SkyHanni] §aSkyhanni found a new update: ${it.update.versionName}. " +
+                                "Go check §b/sh download update §afor more info.",
+                        "sh"
+                    )
                 }
             }, MinecraftExecutor.OnThread)
     }
@@ -117,6 +121,7 @@ object UpdateManager {
         CurrentVersion.ofTag(SkyHanniMod.version),
         SkyHanniMod.MODID,
     )
+
     init {
         context.cleanup()
     }
