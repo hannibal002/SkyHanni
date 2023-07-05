@@ -47,6 +47,9 @@
   + Rainbow color (optional) - nea
   + Hide other players while doing the parkour
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
++ Added Jinxed voodoo doll ability cooldown support - HiZe
++ Added Polarvoid Books to estimated item value - jani
++ Added Chumcap support for Chum Bucket Hider - jani
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -58,6 +61,8 @@
   + Write fancy text into a gui element to show on your screen at all time
   + Supports color codes
   + Supports line breaks `\n` - hannibal2
++ Added **Highlight Commission Mobs** - hannibal2
+  + Highlight Mobs that are part of active commissions
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -83,6 +88,9 @@
 + Fixed **Dungeon Master Stars** calculation not working correctly sometimes – hannibal2 & Fix3dll
 + Fixed Discord Rich Presence detecting absorption hearts not correctly – NetheriteMiner
 + Fixed Reputation Helper **Kuudra Completions** not getting detected and adding T4 and T5 support - Cinshay
+  = Fixed Item Ability cooldown not working for Astraea - hannibal2
+  = Fixed a typo in the config - hannibal2
+  = Added a workaround for a crash when refusing a visitor - hannibal2
 
 ## Version 0.18 (2023-06-19)
 

@@ -121,6 +121,10 @@
 + **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (Thanks appable0
 + **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (Thanks appable0)
 + Showing fished item names
++ **Chum/Chumcap Bucket Hider**
+  + Hide the name tags of Chum/Chumcap Bucket of other players.
+  + Hide the Chum/Chumcap Bucket.
+  + Hides your own Chum/Chumcap Bucket.
 
 ## Damage Indicator
 - Show the remaining health of selected bosses in the game in a bigger GUI.
@@ -312,6 +316,10 @@
   + Rainbow color (optional) - nea
   + Hide other players while doing the parkour
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
+
+## Mining
++ **Highlight Commission Mobs** - hannibal2
+  + Highlight Mobs that are part of active commissions
 
 ## Commands
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
