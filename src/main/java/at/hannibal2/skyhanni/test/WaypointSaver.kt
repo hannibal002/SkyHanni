@@ -34,7 +34,7 @@ class WaypointSaver {
             locations.copyLocations()
         }
         if (config.saveKey == key) {
-            val newLocation = LocationUtils.playerLocation().roundLocation()
+            val newLocation = LorenzVec.getBlockBelowPlayer()
             if (locations.isNotEmpty()) {
                 if (newLocation == locations.last()) return
             }
