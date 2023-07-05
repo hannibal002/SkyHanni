@@ -68,6 +68,11 @@ class ItemAbilityCooldown {
                 ItemAbility.VOODOO_DOLL.sound()
             }
         }
+        if (event.soundName == "random.successful_hit") {
+            if (event.volume == 1.0f && event.pitch == 0.7936508f) {
+                ItemAbility.VOODOO_DOLL_WILTED.sound()
+            }
+        }
         if (event.soundName == "random.explode") {
             if (event.pitch == 4.047619f && event.volume == 0.2f) {
                 ItemAbility.GOLEM_SWORD.sound()
