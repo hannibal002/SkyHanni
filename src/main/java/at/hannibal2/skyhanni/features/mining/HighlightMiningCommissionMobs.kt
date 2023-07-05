@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEndermite
@@ -25,18 +25,20 @@ class HighlightMiningCommissionMobs {
 
         // Dwarven Mines
         DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }),
-        STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }), // TODO test it
-        ICE_WALKER("Ice Walker Slayer", { it.name == "Ice Walker" }), // TODO test it
-        GOLDEN_GOBLIN("Golden Goblin Slayer", { false }), // TODO test it
+        STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }),
+        ICE_WALKER("Ice Walker Slayer", { it.name == "Ice Walker" }),
+        GOLDEN_GOBLIN("Golden Goblin Slayer", { false }),
 
         // Crystal Hollows
         AUTOMATON("Automaton Slayer", { it is EntityIronGolem }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
         YOG("Yog Slayer", { it is EntityMagmaCube }),
-        THYST("Thyst Slayer", { it is EntityEndermite && it.baseMaxHealth == 5_000 }),
-        CORLEONE("Corleone Slayer", { it.baseMaxHealth == 1_000_000 && it.name == "Team Treasurite" }), // TODO test it
-        SLUDGE("Sludge Slayer", { it is EntitySlime && it.baseMaxHealth == 10_000 }), // TODO test it
-        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }), // TODO test it
+        THYST("Thyst Slayer", { it is EntityEndermite && it.hasMaxHealth(5_000) }),
+        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name == "Team Treasurite" }),
+        SLUDGE("Sludge Slayer", {
+            it is EntitySlime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000))
+        }),
+        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
         ;
     }
 
