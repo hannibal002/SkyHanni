@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.jsonobjects.RiftMirrorJumpJson
+import at.hannibal2.skyhanni.utils.jsonobjects.RiftMirrorJumpJson.ShortCut
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,6 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class MirrorVerseJumpAndRun {
     private var locations = listOf<LorenzVec>()
+    private var shortCuts: List<ShortCut> = listOf()
     private var current = -1
     private var visible = false
 
@@ -25,6 +28,7 @@ class MirrorVerseJumpAndRun {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftMirrorJumpJson>("MirrorVerseJump") ?: return
         locations = data.locations
+        shortCuts = data.shortCuts
     }
 
     @SubscribeEvent
@@ -34,6 +38,8 @@ class MirrorVerseJumpAndRun {
             visible = false
         }
     }
+
+    val lookAhead get() = 2
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
@@ -54,10 +60,6 @@ class MirrorVerseJumpAndRun {
 
         if (!visible) return
 
-        // TODO add config
-//        val platformsLookAhead = 2
-        val lookAhead = 2
-
         for ((index, location) in locations.withIndex()) {
             if (location.distanceToPlayer() < 2) {
                 if (Minecraft.getMinecraft().thePlayer.onGround) {
@@ -65,76 +67,49 @@ class MirrorVerseJumpAndRun {
                 }
             }
         }
+        if (current < 0) return
 
-        for ((index, location) in locations.withIndex()) {
-            if (index < current) continue
-            if (index > current + lookAhead) break
+        val inProgressVec = getInProgressPair().toSingletonListOrEmpty()
+        for ((prev, next) in locations.asSequence().withIndex().zipWithNext().drop(current).take(lookAhead - 1) + inProgressVec) {
+            event.draw3DLine(prev.value, next.value, colorForIndex(prev.index), 5, false, colorForIndex(next.index))
+        }
+        for (shortCut in shortCuts) {
+            if (current == shortCut.from && shortCut.to in locations.indices) {
+                event.draw3DLine(locations[current], locations[shortCut.to], Color.RED, 3, false)
+                event.drawFilledBoundingBox(axisAlignedBB(locations[shortCut.to]), Color.RED, 1f)
+                event.drawDynamicText(locations[shortCut.to].add(-0.5, 1.0, -0.5), "§cShortcut", 2.5)
+            }
 
+        }
+        for ((index, location) in locations.asSequence().withIndex().drop(current)
+            .take(lookAhead) + inProgressVec.map { it.second }) {
             event.drawFilledBoundingBox(axisAlignedBB(location), colorForIndex(index), 1f)
-
-            locations.getOrNull(index + 1)?.let { next ->
-                if (current + lookAhead != index)
-                    event.draw3DLine(
-                        location,
-                        next,
-                        colorForIndex(index),
-                        5,
-                        false,
-                        colorForIndex(index + 1)
-                    )
-            }
-
-            if (current == index) {
-                renderLookAhead(index, lookAhead, location, event)
-            }
-
-            // TODO add shortcuts to repo
-            if (index == 14) {
-                locations[25].let {
-                    event.draw3DLine(location, it, Color.RED, 3, false)
-                    event.drawFilledBoundingBox(axisAlignedBB(it), Color.RED, 1f)
-                    event.drawDynamicText(it.add(-0.5, 1.0, -0.5), "§cShortcut", 2.5)
-                }
-            }
         }
     }
 
-    private fun renderLookAhead(
-        index: Int,
-        lookAhead: Int,
-        location: LorenzVec,
-        event: RenderWorldLastEvent
-    ) {
-        locations.getOrNull(index + 1)?.let { next ->
-            val currentDistance = next.distanceToPlayer()
-            val nextDistance = next.distance(location)
-            val percentage = 1 - (currentDistance / nextDistance)
-            if (percentage > 0) {
-                locations.getOrNull(index + lookAhead + 1)?.let { b ->
-                    val a = locations[index + lookAhead]
-                    val direction = b.subtract(a)
-                    val middle = a.add(direction.multiply(percentage))
-
-                    event.drawFilledBoundingBox(
-                        axisAlignedBB(middle),
-                        colorForIndex(index + lookAhead),
-                        0.7f
-                    )
-
-                    event.draw3DLine(
-                        a,
-                        middle,
-                        colorForIndex(index + lookAhead),
-                        5,
-                        false,
-                        targetColor = colorForIndex(index + lookAhead + 1)
-                    )
-                }
-            }
-        }
+    fun getInProgressPair(): Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>? {
+        if (current < 0 || current + lookAhead >= locations.size) return null
+        val currentPosition = locations[current]
+        val nextPosition = locations[current + 1]
+        val lookAheadStart = locations[current + lookAhead - 1]
+        val lookAheadEnd = locations[current + lookAhead]
+        return Pair(
+            IndexedValue(current + lookAhead - 1, lookAheadStart),
+            IndexedValue(
+                current + lookAhead, lookAheadStart.add(
+                    lookAheadEnd.subtract(lookAheadStart)
+                        .scale(playerLocation().distance(currentPosition) / currentPosition.distance(nextPosition))
+                )
+            )
+        )
     }
 
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(-1.0, 0.0, -1.0).boundingToOffset(2, -1, 2).expandBlock()
 
     private fun colorForIndex(index: Int) = RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f)
+}
+
+private fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {
+    if (this == null) return listOf()
+    return listOf(this)
 }

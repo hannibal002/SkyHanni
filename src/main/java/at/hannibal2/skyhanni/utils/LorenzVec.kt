@@ -7,7 +7,11 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.round
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class LorenzVec(
     val x: Double,
@@ -97,6 +101,10 @@ data class LorenzVec(
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
 
     fun boundingToOffset(offX: Int, offY: Int, offZ: Int) = AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
+
+    fun scale(scalar: Double): LorenzVec {
+        return LorenzVec(scalar * x, scalar * y, scalar * z)
+    }
 
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
