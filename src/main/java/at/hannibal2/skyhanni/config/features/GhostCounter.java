@@ -42,7 +42,8 @@ public class GhostCounter {
                     "  §bXP/h: 810,410",
                     "  §bKills/h: 420",
                     "  §bETA: 14d",
-                    "  §bMoney/h: 13,420,069"
+                    "  §bMoney/h: 13,420,069",
+                    "  §bMoney made: 14B"
             }
     )
     public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
@@ -296,6 +297,13 @@ public class GhostCounter {
                 "Calculated with your kill per hour and your average magic find.")
         @ConfigEditorText
         public String moneyHourFormat = "  &6$/h: &b%value%";
+
+        @Expose
+        @ConfigOption(name = "Money made", desc = "Calculate the money you made.\nInclude §eSorrow§7, §ePlasma§7, §eVolta§7, §e1M coins drop\n" +
+                "§eGhostly Boots§7, §eScavenger coins.\n" +
+                "§cUsing current Sell Offer value.")
+        @ConfigEditorText
+        public String moneyMadeFormat = "&6Money made: &b%value%";
     }
 
     @Expose
@@ -331,5 +339,4 @@ public class GhostCounter {
 
     @Expose
     public Position position = new Position(50, 50, false, true);
-
 }

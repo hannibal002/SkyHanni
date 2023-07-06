@@ -27,12 +27,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -47,6 +49,7 @@ object GhostCounter {
     val config get() = SkyHanniMod.feature.ghostCounter
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
+    private var debug = listOf<String>()
     var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
     private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
     private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
@@ -201,9 +204,25 @@ object GhostCounter {
         addAsSingletonList(etaFormatting.base.formatText(eta).formatText(killETA))
 
         val rate = 0.12 * (1 + (mgc.toDouble() / 100))
-        val price = (BazaarApi.getBazaarDataByInternalName("SORROW")?.sellPrice ?: 0).toLong()
-        val final: String = (killInterp * price * (rate / 100)).toLong().addSeparators()
+        val sorrowValue = (BazaarApi.getBazaarDataByInternalName("SORROW")?.buyPrice ?: 0).toLong()
+        val final: String = (killInterp * sorrowValue * (rate / 100)).toLong().addSeparators()
         addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
+
+        val plasmaValue = (BazaarApi.getBazaarDataByInternalName("PLASMA")?.buyPrice ?: 0).toLong()
+        val voltaValue = (BazaarApi.getBazaarDataByInternalName("VOLTA")?.buyPrice ?: 0).toLong()
+        val bootsValue = (BazaarApi.getBazaarDataByInternalName("GHOST_BOOTS")?.buyPrice ?: 0).toLong()
+        val moneyMade = sorrowValue + plasmaValue + voltaValue + BAGOFCASH.getInt() + SCAVENGERCOINS.get() + bootsValue
+
+        debug = buildList {
+            add("Sorrow: §b${sorrowValue.addSeparators()} §fx §b${SORROWCOUNT.getInt()} §f= §6${(sorrowValue * SORROWCOUNT.getInt()).addSeparators()}")
+            add("Plasma: §b${plasmaValue.addSeparators()} §fx §b${PLASMACOUNT.getInt()} §f= §6${(plasmaValue * PLASMACOUNT.getInt()).addSeparators()}")
+            add("Volta: §b${voltaValue.addSeparators()} §fx §b${VOLTACOUNT.getInt()} §f= §6${(voltaValue * VOLTACOUNT.getInt()).addSeparators()}")
+            add("Ghostly Boots: §b${bootsValue.addSeparators()} §fx §b${GHOSTLYBOOTS.getInt().addSeparators()} §f= §6${(bootsValue * GHOSTLYBOOTS.getInt()).addSeparators()}")
+            add("Scavenger coins: §b${SCAVENGERCOINS.getInt().addSeparators()}")
+            add("Bag Of Cash (1M coins drop): §b1M §fx §b${BAGOFCASH.getInt()} §f= §6${(1_000_000 * BAGOFCASH.getInt()).addSeparators()}")
+        }
+        val moneyMadeWithTips = Renderable.hoverTips(config.textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()), debug)
+        addAsSingletonList(moneyMadeWithTips)
     }
 
     @SubscribeEvent

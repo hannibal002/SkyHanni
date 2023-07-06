@@ -78,6 +78,7 @@ object GhostFormatting {
                     time = list[29]
                 }
                 moneyHourFormat = list[30]
+                moneyMadeFormat = list[31]
             }
         }
     }
@@ -124,6 +125,7 @@ object GhostFormatting {
                 list.add(time)
             }
             list.add(moneyHourFormat)
+            list.add(moneyMadeFormat)
         }
         val jsonArray = JsonArray()
         for (l in list) {
@@ -174,6 +176,7 @@ object GhostFormatting {
                 time = "&6%days%%hours%%minutes%%seconds%"
             }
             moneyHourFormat = "  &6$/h: &b%value%"
+            moneyMadeFormat = "  &6Money made: &b%value%"
         }
     }
 }
