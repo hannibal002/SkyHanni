@@ -55,7 +55,7 @@ object GhostCounter {
     private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
-    private val bestiaryPattern = "BESTIARY Ghost .*➜(?<newLevel>.*)".toPattern()
+    private val bestiaryPattern = ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*".toPattern() //   &r&3&lBESTIARY &b&lGhost &89➜&b10&r
     private val format = NumberFormat.getInstance()
     private var percent: Float = 0.0f
     private var totalSkillXp = 0
