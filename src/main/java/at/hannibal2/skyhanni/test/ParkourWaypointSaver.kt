@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 
-class WaypointSaver {
+class ParkourWaypointSaver {
     private val config get() = SkyHanniMod.feature.dev.waypoint
     private var timeLastSaved: Long = 0
     private var locations = mutableListOf<LorenzVec>()
