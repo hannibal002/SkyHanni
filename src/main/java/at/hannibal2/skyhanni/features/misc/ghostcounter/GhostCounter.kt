@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.text.NumberFormat
@@ -269,7 +270,7 @@ object GhostCounter {
                     clickableChat("§6[SkyHanni] GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data", "shimportghostcounterdata")
                 }
             }
-            inMist = LorenzUtils.skyBlockArea == "The Mist"
+            inMist = Minecraft.getMinecraft().thePlayer.posY <= 110 // some area don't show as 'The Mist' in the scoreboard
             update()
         }
         if (event.isMod(40)) {
@@ -281,6 +282,7 @@ object GhostCounter {
     @SubscribeEvent
     fun onActionBar(event: LorenzActionBarEvent) {
         if (!isEnabled()) return
+        if (!inMist) return
         combatSectionPattern.matchMatcher(event.message) {
             if (group("skillName").lowercase() != "combat") return
             parseCombatSection(event.message)
@@ -301,7 +303,7 @@ object GhostCounter {
                 var parse = true
                 if (skillPercent) {
                     percent = nf.parse(group("percent")).toFloat()
-                    val level = XPInformation.getInstance().getSkillInfo(skillName).level
+                    val level = XPInformation.getInstance().getSkillInfo(skillName)?.level ?: 0
                     if (level > 0) {
                         totalSkillXp = SkillExperience.getExpForNextLevel(level)
                         currentSkillXp = totalSkillXp * percent / 100
