@@ -101,10 +101,10 @@ object DanceRoomHelper {
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.ReceiveEvent) {
-        if (!isEnabled() && !inRoom) return
+        if (!isEnabled()) return
         val packet = event.packet
         if (packet !is S45PacketTitle) return
-        if (config.hideOriginalTitle) event.isCanceled = true
+        if (config.hideOriginalTitle && inRoom) event.isCanceled = true
     }
 
     private fun startCountdown(seconds: Int, milliseconds: Int) {
