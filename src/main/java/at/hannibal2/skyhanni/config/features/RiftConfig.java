@@ -333,4 +333,40 @@ public class RiftConfig {
 
     }
 
+    @Expose
+    @ConfigOption(name = "Highlight Own Slayer", desc = "")
+    @Accordion
+    public HighlightOwnSlayer highlightOwnSlayer = new HighlightOwnSlayer();
+    public static class HighlightOwnSlayer {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Highlight your own vampire slayer boss.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Color", desc = "What color to highlight the boss in.")
+        @ConfigEditorColour
+        public String highlightColor = "0:249:0:255:88";
+
+        @Expose
+        @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
+        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 250)
+        public int withAlpha = 80;
+
+        @Expose
+        @ConfigOption(name = "See Trough Blocs", desc = "Highlight the boss even when behind blocs, others mobs, etc")
+        @ConfigEditorBoolean
+        public boolean seeTrough = false;
+
+        @Expose
+        @ConfigOption(name = "20% health", desc = "Change color when the boss is below 20% health.")
+        @ConfigEditorBoolean
+        public boolean changeColorWhenCanSteak = true;
+
+        @Expose
+        @ConfigOption(name = "Color", desc = "Color when the boss is below 20% health.")
+        @ConfigEditorColour
+        public String steakColor = "0:255:255:0:41";
+    }
 }
