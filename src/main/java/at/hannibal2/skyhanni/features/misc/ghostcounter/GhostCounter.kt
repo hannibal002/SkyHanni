@@ -27,10 +27,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -49,7 +49,6 @@ object GhostCounter {
     val config get() = SkyHanniMod.feature.ghostCounter
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
-    private var debug = listOf<String>()
     var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
     private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
     private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
@@ -93,11 +92,11 @@ object GhostCounter {
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
-        val value: Int = when (GhostData.Option.SORROWCOUNT.get()) {
+        val ghostKillPerSorrow: Int = when (SORROWCOUNT.get()) {
             0.0 -> 0
             else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}".toInt()
         }
-        val mgc = when (TOTALDROPS.get()) {
+        val avgMagicFind = when (TOTALDROPS.get()) {
             0.0 -> "0"
             else -> "${((((hidden?.totalMF!! / TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
@@ -188,12 +187,12 @@ object GhostCounter {
         addAsSingletonList(config.textFormatting.ghostKilledFormat.formatText(KILLS.getInt(), KILLS.getInt(true)))
         addAsSingletonList(config.textFormatting.sorrowsFormat.formatText(SORROWCOUNT.getInt(), SORROWCOUNT.getInt(true)))
         addAsSingletonList(config.textFormatting.ghostSinceSorrowFormat.formatText(GHOSTSINCESORROW.getInt()))
-        addAsSingletonList(config.textFormatting.ghostKillPerSorrowFormat.formatText(value))
+        addAsSingletonList(config.textFormatting.ghostKillPerSorrowFormat.formatText(ghostKillPerSorrow))
         addAsSingletonList(config.textFormatting.voltasFormat.formatText(VOLTACOUNT.getInt(), VOLTACOUNT.getInt(true)))
         addAsSingletonList(config.textFormatting.plasmasFormat.formatText(PLASMACOUNT.getInt(), PLASMACOUNT.getInt(true)))
         addAsSingletonList(config.textFormatting.ghostlyBootsFormat.formatText(GHOSTLYBOOTS.getInt(), GHOSTLYBOOTS.getInt(true)))
         addAsSingletonList(config.textFormatting.bagOfCashFormat.formatText(BAGOFCASH.getInt(), BAGOFCASH.getInt(true)))
-        addAsSingletonList(config.textFormatting.avgMagicFindFormat.formatText(mgc))
+        addAsSingletonList(config.textFormatting.avgMagicFindFormat.formatText(avgMagicFind))
         addAsSingletonList(config.textFormatting.scavengerCoinsFormat.formatText(SCAVENGERCOINS.getInt(), SCAVENGERCOINS.getInt(true)))
         addAsSingletonList(config.textFormatting.killComboFormat.formatText(KILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
         addAsSingletonList(config.textFormatting.highestKillComboFormat.formatText(MAXKILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
@@ -203,26 +202,34 @@ object GhostCounter {
         addAsSingletonList(killHourFormatting.base.formatText(killHour))
         addAsSingletonList(etaFormatting.base.formatText(eta).formatText(killETA))
 
-        val rate = 0.12 * (1 + (mgc.toDouble() / 100))
+        val rate = 0.12 * (1 + (avgMagicFind.toDouble() / 100))
         val sorrowValue = (BazaarApi.getBazaarDataByInternalName("SORROW")?.buyPrice ?: 0).toLong()
         val final: String = (killInterp * sorrowValue * (rate / 100)).toLong().addSeparators()
-        addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
-
         val plasmaValue = (BazaarApi.getBazaarDataByInternalName("PLASMA")?.buyPrice ?: 0).toLong()
         val voltaValue = (BazaarApi.getBazaarDataByInternalName("VOLTA")?.buyPrice ?: 0).toLong()
-        val bootsValue = (BazaarApi.getBazaarDataByInternalName("GHOST_BOOTS")?.buyPrice ?: 0).toLong()
-        val moneyMade = sorrowValue + plasmaValue + voltaValue + BAGOFCASH.getInt() + SCAVENGERCOINS.get() + bootsValue
-
-        debug = buildList {
-            add("Sorrow: §b${sorrowValue.addSeparators()} §fx §b${SORROWCOUNT.getInt()} §f= §6${(sorrowValue * SORROWCOUNT.getInt()).addSeparators()}")
-            add("Plasma: §b${plasmaValue.addSeparators()} §fx §b${PLASMACOUNT.getInt()} §f= §6${(plasmaValue * PLASMACOUNT.getInt()).addSeparators()}")
-            add("Volta: §b${voltaValue.addSeparators()} §fx §b${VOLTACOUNT.getInt()} §f= §6${(voltaValue * VOLTACOUNT.getInt()).addSeparators()}")
-            add("Ghostly Boots: §b${bootsValue.addSeparators()} §fx §b${GHOSTLYBOOTS.getInt().addSeparators()} §f= §6${(bootsValue * GHOSTLYBOOTS.getInt()).addSeparators()}")
-            add("Scavenger coins: §b${SCAVENGERCOINS.getInt().addSeparators()}")
-            add("Bag Of Cash (1M coins drop): §b1M §fx §b${BAGOFCASH.getInt()} §f= §6${(1_000_000 * BAGOFCASH.getInt()).addSeparators()}")
+        var moneyMade: Long = 0
+        val priceMap = listOf(
+            Triple("Sorrow", SORROWCOUNT.getInt(), sorrowValue),
+            Triple("Plasma", PLASMACOUNT.getInt(), plasmaValue),
+            Triple("Volta", VOLTACOUNT.getInt(), voltaValue),
+            Triple("Bag Of Cash", BAGOFCASH.getInt(), 1_000_000),
+            Triple("Scavenger Coins", SCAVENGERCOINS.getInt(), 1),
+            Triple("Ghostly Boots", GHOSTLYBOOTS.getInt(), 77_777)
+        )
+        val moneyMadeTips = buildList {
+            for ((name, count, value) in priceMap) {
+                moneyMade += (count.toLong() * value.toLong())
+                add("$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} §f= §6${(value.toLong() * count.toLong()).addSeparators()}")
+            }
+            add("§bTotal: §6${moneyMade.addSeparators()}")
+            add("§eClick to copy to clipboard!")
         }
-        val moneyMadeWithTips = Renderable.hoverTips(config.textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()), debug)
-        addAsSingletonList(moneyMadeWithTips)
+        val moneyMadeWithClickableTips = Renderable.clickAndHover(
+            config.textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
+            moneyMadeTips
+        ) { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+        addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
+        addAsSingletonList(moneyMadeWithClickableTips)
     }
 
     @SubscribeEvent

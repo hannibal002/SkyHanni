@@ -303,7 +303,7 @@ public class GhostCounter {
                 "§eGhostly Boots§7, §eScavenger coins.\n" +
                 "§cUsing current Sell Offer value.")
         @ConfigEditorText
-        public String moneyMadeFormat = "&6Money made: &b%value%";
+        public String moneyMadeFormat = "  &6Money made: &b%value%";
     }
 
     @Expose
