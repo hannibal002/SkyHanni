@@ -13,7 +13,7 @@ public class CommandsFeatures {
 
     @Expose
     @ConfigOption(name = "Party transfer", desc = "Allows §e/pt <player> §7as alias for §e/party transfer§7.\n" +
-            "§7SkyBlock Command §e/tp §7to check the play time still works.")
+            "§7SkyBlock command §e/pt §7to check the play time still works.")
     @ConfigEditorBoolean
     public boolean usePartyTransferAlias = true;
 }

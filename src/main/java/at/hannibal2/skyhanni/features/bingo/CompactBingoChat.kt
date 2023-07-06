@@ -111,14 +111,12 @@ class CompactBingoChat {
     private fun onNewAreaDiscovered(message: String): Boolean {
         if (message == " §r§6§lNEW AREA DISCOVERED!") {
             newArea = 1
-            println("new area $newArea $message")
             return false
         }
 
         if (message != "") {
             if (newArea == 1) {
                 newArea = 2
-                println("new area $newArea $message")
                 return false
             }
 
@@ -127,7 +125,6 @@ class CompactBingoChat {
                     return true
                 } else {
                     newArea = 0
-                    println("new area $newArea $message")
                 }
             }
         }
