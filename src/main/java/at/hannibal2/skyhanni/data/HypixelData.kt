@@ -28,12 +28,7 @@ class HypixelData {
         var profileName = ""
         var joinedWorld = 0L
 
-        fun readSkyBlockArea(): String {
-            return ScoreboardData.sidebarLinesFormatted
-                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                ?.substring(5)?.removeColor()
-                ?: "invalid"
-        }
+        var skyBlockArea = "?"
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -71,6 +66,15 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (event.isMod(2)) {
+            if (LorenzUtils.inSkyBlock) {
+                skyBlockArea = ScoreboardData.sidebarLinesFormatted
+                    .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
+                    ?.substring(5)?.removeColor()
+                    ?: "?"
+            }
+        }
+
         if (!event.isMod(5)) return
 
         if (!LorenzUtils.onHypixel) {

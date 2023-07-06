@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -104,12 +105,17 @@ object GardenVisitorDropStatistics {
         //1
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
         //2
-        addAsSingletonList(
-            "§a${visitorRarities[0].addSeparators()}§f-" +
-                    "§9${visitorRarities[1].addSeparators()}§f-" +
-                    "§6${visitorRarities[2].addSeparators()}§f-" +
-                    "§c${visitorRarities[3].addSeparators()}"
-        )
+        if (visitorRarities.isNotEmpty()) {
+            addAsSingletonList(
+                "§a${visitorRarities[0].addSeparators()}§f-" +
+                        "§9${visitorRarities[1].addSeparators()}§f-" +
+                        "§6${visitorRarities[2].addSeparators()}§f-" +
+                        "§c${visitorRarities[3].addSeparators()}"
+            )
+        } else {
+            addAsSingletonList("§c?")
+            CopyErrorCommand.logError(RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"), "Error rendering visitor drop statistics")
+        }
         //3
         addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))
         //4

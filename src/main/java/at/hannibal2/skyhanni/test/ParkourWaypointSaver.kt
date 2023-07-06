@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -16,6 +17,7 @@ class ParkourWaypointSaver {
     private val config get() = SkyHanniMod.feature.dev.waypoint
     private var timeLastSaved: Long = 0
     private var locations = mutableListOf<LorenzVec>()
+    private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -31,7 +33,7 @@ class ParkourWaypointSaver {
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
         if (config.deleteKey == key) {
             locations = locations.dropLast(1).toMutableList()
-            locations.copyLocations()
+            update()
         }
         if (config.saveKey == key) {
             val newLocation = LorenzVec.getBlockBelowPlayer()
@@ -39,7 +41,15 @@ class ParkourWaypointSaver {
                 if (newLocation == locations.last()) return
             }
             locations.add(newLocation)
-            locations.copyLocations()
+            update()
+        }
+    }
+
+    private fun update() {
+        locations.copyLocations()
+        parkourHelper = ParkourHelper(locations, emptyList()).also {
+            it.showEverything = true
+            it.rainbowColor = true
         }
     }
 
@@ -47,8 +57,8 @@ class ParkourWaypointSaver {
         val resultList = mutableListOf<String>()
         timeLastSaved = System.currentTimeMillis()
         for (location in this) {
-            val x = location.z.toString().replace(",", ".")
-            val y = location.z.toString().replace(",", ".")
+            val x = location.x.toString().replace(",", ".")
+            val y = location.y.toString().replace(",", ".")
             val z = location.z.toString().replace(",", ".")
             resultList.add("\"$x:$y:$z\"")
         }
@@ -58,8 +68,14 @@ class ParkourWaypointSaver {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        for (location in locations) {
-            event.drawWaypointFilled(location, LorenzColor.GREEN.toColor())
+
+        if (locations.size > 2) {
+            parkourHelper?.render(event)
+        } else {
+            for (location in locations) {
+                val aabb = location.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
+                event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toColor(), 1f)
+            }
         }
     }
 }

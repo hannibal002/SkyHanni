@@ -38,7 +38,7 @@ class ChumBucketHider {
         val name = entity.name
 
         // First text line
-        if (name.endsWith("'s Chum Bucket")) {
+        if (name.endsWith("'s Chum Bucket") || name.endsWith("'s Chumcap Bucket")) {
             if (name.contains(LorenzUtils.getPlayerName()) && !config.hideOwn.get()) return
             titleEntity.add(entity)
             hiddenEntities.add(entity)
@@ -61,7 +61,7 @@ class ChumBucketHider {
 
         // Chum Bucket
         if (config.hideBucket.get()) {
-            if (entity.inventory.any { it != null && it.name == "§fEmpty Chum Bucket" }) {
+            if (entity.inventory.any { it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket")}) {
                 val entityLocation = entity.getLorenzVec()
                 for (title in titleEntity) {
                     if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {

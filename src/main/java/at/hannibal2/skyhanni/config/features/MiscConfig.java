@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Misc {
+public class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Pet", desc = "")
@@ -491,7 +491,7 @@ public class Misc {
     @Expose
     @ConfigOption(name = "Frozen Treasure Tracker", desc = "")
     @Accordion
-    public Misc.FrozenTreasureTracker frozenTreasureTracker = new Misc.FrozenTreasureTracker();
+    public MiscConfig.FrozenTreasureTracker frozenTreasureTracker = new MiscConfig.FrozenTreasureTracker();
 
     public static class FrozenTreasureTracker {
 
@@ -573,6 +573,19 @@ public class Misc {
 
         @Expose
         public Position position = new Position(10, 80, false, true);
+    }
+
+    @Expose
+    @ConfigOption(name = "Mining", desc = "")
+    @Accordion
+    public MiningConfig mining = new MiningConfig();
+    public static class MiningConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
+        @ConfigEditorBoolean
+        public boolean highlightCommissionMobs = false;
+
     }
 
     @Expose
