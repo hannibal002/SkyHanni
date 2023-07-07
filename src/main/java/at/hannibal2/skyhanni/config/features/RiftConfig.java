@@ -345,15 +345,9 @@ public class RiftConfig {
         public boolean enabled = true;
 
         @Expose
-        @ConfigOption(name = "Highlight Others ", desc = "Highlight others players boss.")
+        @ConfigOption(name = "Highlight Others ", desc = "Highlight others players boss.\n§cOnly when you hit them!")
         @ConfigEditorBoolean
         public boolean highlightOthers = true;
-
-        @Expose
-        @ConfigOption(name = "Color", desc = "What color to highlight the boss in.")
-        @ConfigEditorColour
-        public String highlightColor = "0:249:0:255:88";
-
 
         @Expose
         @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
@@ -366,13 +360,18 @@ public class RiftConfig {
         public boolean seeTrough = false;
 
         @Expose
-        @ConfigOption(name = "20% health", desc = "Change color when the boss is below 20% health.")
+        @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
         @ConfigEditorBoolean
         public boolean changeColorWhenCanSteak = true;
 
         @Expose
-        @ConfigOption(name = "Color", desc = "Color when the boss is below 20% health.")
+        @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
         @ConfigEditorColour
-        public String steakColor = "0:255:255:0:41";
+        public String highlightColor = "0:249:0:255:88";
+
+        @Expose
+        @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
+        @ConfigEditorColour
+        public String steakColor = "0:255:255:0:88";
     }
 }
