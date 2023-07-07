@@ -345,9 +345,15 @@ public class RiftConfig {
         public boolean enabled = true;
 
         @Expose
+        @ConfigOption(name = "Highlight Others ", desc = "Highlight others players boss.")
+        @ConfigEditorBoolean
+        public boolean highlightOthers = true;
+
+        @Expose
         @ConfigOption(name = "Color", desc = "What color to highlight the boss in.")
         @ConfigEditorColour
         public String highlightColor = "0:249:0:255:88";
+
 
         @Expose
         @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
