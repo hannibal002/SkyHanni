@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -25,6 +27,9 @@ class ItemAbilityCooldown {
     fun onSoundEvent(event: PlaySoundEvent) {
         if (event.soundName == "mob.zombie.remedy") {
             if (event.pitch == 0.6984127f && event.volume == 1f) {
+                val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
+                if (abilityScrolls.size != 3) return
+
                 ItemAbility.HYPERION.sound()
             }
         }
