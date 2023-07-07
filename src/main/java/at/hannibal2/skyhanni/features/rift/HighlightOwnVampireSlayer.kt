@@ -118,7 +118,7 @@ class HighlightOwnVampireSlayer {
     }
 
     /*
-    Sometime the armorstand move by 1bloc on x and y so i had to do this
+    Sometime the armorstand move by 1bloc on x and z so i had to do this
     Maybe there is another solution
      */
     private fun EntityLivingBase.getAllNameTags(

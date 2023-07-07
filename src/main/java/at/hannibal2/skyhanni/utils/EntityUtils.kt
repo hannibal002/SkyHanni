@@ -63,20 +63,6 @@ object EntityUtils {
         val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlocPos()
         val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlocPos()
         val alignedBB = AxisAlignedBB(a, b)
-
-        GlStateManager.disableDepth()
-        GlStateManager.disableCull()
-        RenderUtils.drawFilledBoundingBox(alignedBB,
-            Color.PINK,
-            1f,
-            renderRelativeToCamera = true,
-            true)
-        GlStateManager.disableTexture2D()
-        GlStateManager.disableLighting()
-        GlStateManager.enableTexture2D()
-
-        GlStateManager.enableDepth()
-        GlStateManager.enableCull()
         val clazz = EntityArmorStand::class.java
         val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
         return found.find {
