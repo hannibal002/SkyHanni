@@ -361,7 +361,7 @@ public class RiftConfig {
         public int withAlpha = 80;
 
         @Expose
-        @ConfigOption(name = "See Trough Blocs", desc = "Highlight the boss even when behind blocs, others mobs, etc")
+        @ConfigOption(name = "See Through Blocs", desc = "Highlight the boss even when behind blocs, others mobs, etc")
         @ConfigEditorBoolean
         public boolean seeTrough = false;
 
