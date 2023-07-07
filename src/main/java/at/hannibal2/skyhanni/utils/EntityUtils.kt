@@ -54,7 +54,7 @@ object EntityUtils {
         contains: String,
         radius: Double = 5.0,
     ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(0, 2, 0)
+        val center = getLorenzVec().add(0, 5, 0)
         val a = center.add(-radius, -radius - 3, -radius).toBlocPos()
         val b = center.add(radius, radius + 3, radius).toBlocPos()
         val alignedBB = AxisAlignedBB(a, b)
