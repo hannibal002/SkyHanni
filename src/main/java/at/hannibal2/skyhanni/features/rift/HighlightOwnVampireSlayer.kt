@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -42,7 +43,7 @@ class HighlightOwnVampireSlayer {
         val distance = start.distance(vec)
         val other = taggedEntityList.contains(this)
         if (name != "Bloodfiend ") return
-        getAllNameTags("Spawned by").forEach {
+        getAllNameTagsInRadiusWith("Spawned by").forEach {
             val neededHealth = when (baseMaxHealth) {
                 625 -> 125f // t1
                 1100 -> 220f // t2
@@ -52,20 +53,10 @@ class HighlightOwnVampireSlayer {
             }
             val canUseSteak = health <= neededHealth
             val color = if (canUseSteak && config.changeColorWhenCanSteak) config.steakColor.toChromaColor().withAlpha(config.withAlpha) else config.highlightColor.toChromaColor().withAlpha(config.withAlpha)
-            //println("name ${it.name}")
             val shouldRender = when (other) {
                 true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !it.name.contains(username) && distance <= 20 && isNPC()
                 false -> isEnabled() && it.name.contains(username) && distance <= 20 && isNPC()
             }
-            /*println("===")
-            println("name: ${it.name}")
-            println("shouldRender: $shouldRender")
-            println("enabled: ${isEnabled()}")
-            println("contain: ${it.name.contains(username)}")
-            println("distance <= 20: ${distance <= 20}")
-            println("isNPC: ${isNPC()}")
-            println("taggedContain: ${taggedEntityList.contains(this)}")
-            println("===")*/
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
             if (shouldRender)
@@ -79,7 +70,7 @@ class HighlightOwnVampireSlayer {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.clickedEntity !is EntityOtherPlayerMP) return
         if (!event.clickedEntity.isNPC()) return
-        event.clickedEntity.getAllNameTags("Spawned by").forEach {
+        event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by").forEach {
             if (!it.name.contains(username)) {
                 if (!taggedEntityList.contains(event.clickedEntity))
                     taggedEntityList.add(event.clickedEntity)
@@ -114,26 +105,6 @@ class HighlightOwnVampireSlayer {
         if (!config.seeTrough) return
         if (entityList.contains(event.entity) && LocationUtils.canSee(LocationUtils.playerEyeLocation(), event.entity.getLorenzVec())) {
             GlStateManager.enableDepth()
-        }
-    }
-
-    /*
-    Sometime the armorstand move by 1bloc on x and z so i had to do this
-    Maybe there is another solution
-     */
-    private fun EntityLivingBase.getAllNameTags(
-        contains: String,
-        inaccuracy: Double = 5.0,
-    ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(0, 5, 0)
-        val a = center.add(-5.0, -inaccuracy - 3, -5.0).toBlocPos()
-        val b = center.add(5.0, inaccuracy + 3, 5.0).toBlocPos()
-        val alignedBB = AxisAlignedBB(a, b)
-        val clazz = EntityArmorStand::class.java
-        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-        return found.filter {
-            val result = it.name.contains(contains)
-            result
         }
     }
 

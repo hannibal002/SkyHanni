@@ -50,6 +50,22 @@ object EntityUtils {
         }
     }
 
+    fun EntityLivingBase.getAllNameTagsInRadiusWith(
+        contains: String,
+        radius: Double = 5.0,
+    ): List<EntityArmorStand> {
+        val center = getLorenzVec().add(0, 2, 0)
+        val a = center.add(-radius, -radius - 3, -radius).toBlocPos()
+        val b = center.add(radius, radius + 3, radius).toBlocPos()
+        val alignedBB = AxisAlignedBB(a, b)
+        val clazz = EntityArmorStand::class.java
+        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
+        return found.filter {
+            val result = it.name.contains(contains)
+            result
+        }
+    }
+
     fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
