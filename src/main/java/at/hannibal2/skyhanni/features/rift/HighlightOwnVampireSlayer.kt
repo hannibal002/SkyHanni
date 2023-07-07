@@ -103,7 +103,7 @@ class HighlightOwnVampireSlayer {
     fun pre(event: RenderLivingEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeTrough) return
-        if (entityList.contains(event.entity)) {
+        if (entityList.contains(event.entity) && LocationUtils.canSee(LocationUtils.playerEyeLocation(), event.entity.getLorenzVec())) {
             GlStateManager.disableDepth()
         }
     }
@@ -112,7 +112,7 @@ class HighlightOwnVampireSlayer {
     fun pre(event: RenderLivingEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeTrough) return
-        if (entityList.contains(event.entity)) {
+        if (entityList.contains(event.entity) && LocationUtils.canSee(LocationUtils.playerEyeLocation(), event.entity.getLorenzVec())) {
             GlStateManager.enableDepth()
         }
     }
