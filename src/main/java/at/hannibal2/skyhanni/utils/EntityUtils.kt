@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.multiplayer.WorldClient
-import net.minecraft.entity.EntityLiving
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
@@ -11,10 +11,11 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
+import java.awt.Color
 
 object EntityUtils {
 
-    fun EntityLiving.hasNameTagWith(
+    fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
@@ -24,7 +25,7 @@ object EntityUtils {
         return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
     }
 
-    fun EntityLiving.getAllNameTagsWith(
+    fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
@@ -51,7 +52,7 @@ object EntityUtils {
         }
     }
 
-    fun EntityLiving.getNameTagWith(
+    fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
@@ -62,6 +63,20 @@ object EntityUtils {
         val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlocPos()
         val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlocPos()
         val alignedBB = AxisAlignedBB(a, b)
+
+        GlStateManager.disableDepth()
+        GlStateManager.disableCull()
+        RenderUtils.drawFilledBoundingBox(alignedBB,
+            Color.PINK,
+            1f,
+            renderRelativeToCamera = true,
+            true)
+        GlStateManager.disableTexture2D()
+        GlStateManager.disableLighting()
+        GlStateManager.enableTexture2D()
+
+        GlStateManager.enableDepth()
+        GlStateManager.enableCull()
         val clazz = EntityArmorStand::class.java
         val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
         return found.find {
