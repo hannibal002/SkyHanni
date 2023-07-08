@@ -342,7 +342,11 @@ class SkyHanniMod {
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
         repo = RepoManager(configManager.configDirectory)
-        repo.loadRepoInformation()
+        try {
+            repo.loadRepoInformation()
+        } catch (e: Exception) {
+            Exception("Error reading repo data", e).printStackTrace()
+        }
     }
 
     fun loadModule(obj: Any) {

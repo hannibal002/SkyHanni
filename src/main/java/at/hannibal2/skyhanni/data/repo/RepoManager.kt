@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.repo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -122,8 +123,7 @@ class RepoManager(private val configLocation: File) {
                     LorenzUtils.chat("§e[SkyHanni] §a$answerMessage")
                 }
             } catch (e: java.lang.Exception) {
-                comp.completeExceptionally(e)
-                LorenzUtils.error("An error occurred while trying to reload the repo! See logs for more info.")
+                CopyErrorCommand.logError(e, "Error reading repo data!")
             }
         }
         return comp
