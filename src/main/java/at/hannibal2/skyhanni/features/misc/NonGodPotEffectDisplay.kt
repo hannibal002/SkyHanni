@@ -76,6 +76,11 @@ class NonGodPotEffectDisplay {
             effectDuration[NonGodPotEffect.GOBLIN] = System.currentTimeMillis() + 1000 * 60 * 20
             update()
         }
+        if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
+            checkFooter = true
+            effectDuration.remove(NonGodPotEffect.GOBLIN)
+            update()
+        }
     }
 
     private fun update() {
