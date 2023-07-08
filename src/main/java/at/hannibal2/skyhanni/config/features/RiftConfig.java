@@ -173,6 +173,7 @@ public class RiftConfig {
         @Accordion
         @Expose
         public LavaMazeConfig lavaMazeConfig = new LavaMazeConfig();
+
         public static class LavaMazeConfig {
 
             @Expose
@@ -206,6 +207,7 @@ public class RiftConfig {
         @Accordion
         @Expose
         public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
+
         public static class UpsideDownParkour {
 
             @Expose
@@ -244,6 +246,7 @@ public class RiftConfig {
         @Accordion
         @Expose
         public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
+
         public static class DanceRoomHelper {
 
             @Expose
@@ -275,6 +278,7 @@ public class RiftConfig {
         @Accordion
         @Expose
         public TubulatorConfig tubulatorConfig = new TubulatorConfig();
+
         public static class TubulatorConfig {
 
             @Expose
@@ -334,18 +338,19 @@ public class RiftConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Highlight Own Slayer", desc = "")
+    @ConfigOption(name = "Vampire Slayer Features", desc = "")
     @Accordion
-    public HighlightOwnSlayer highlightOwnSlayer = new HighlightOwnSlayer();
+    public HighlightOwnSlayer vampireSlayerFeatures = new HighlightOwnSlayer();
+
     public static class HighlightOwnSlayer {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Highlight your own vampire slayer boss.")
+        @ConfigOption(name = "Highlight your boss", desc = "Highlight your own vampire slayer boss.")
         @ConfigEditorBoolean
-        public boolean enabled = true;
+        public boolean highlightOwnBoss = true;
 
         @Expose
-        @ConfigOption(name = "Highlight Others ", desc = "Highlight others players boss.\n§cOnly when you hit them!")
+        @ConfigOption(name = "Highlight Others boss", desc = "Highlight others players boss.\n§cOnly when you hit them!")
         @ConfigEditorBoolean
         public boolean highlightOthers = true;
 
@@ -355,7 +360,7 @@ public class RiftConfig {
         public int withAlpha = 80;
 
         @Expose
-        @ConfigOption(name = "See Through Blocs", desc = "Highlight the boss even when behind blocs, others mobs, etc")
+        @ConfigOption(name = "See Through Blocs", desc = "Highlight even when behind blocs, others mobs, etc")
         @ConfigEditorBoolean
         public boolean seeTrough = false;
 
@@ -373,5 +378,22 @@ public class RiftConfig {
         @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
         @ConfigEditorColour
         public String steakColor = "0:255:255:0:88";
+
+        @Expose
+        @ConfigOption(name = "Blood Ichor", desc = "")
+        @Accordion
+        public BloodIchor bloodIchor = new BloodIchor();
+
+        public static class BloodIchor {
+            @Expose
+            @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Color", desc = "Highlight color.")
+            @ConfigEditorColour
+            public String color = "0:199:100:0:88";
+        }
     }
 }

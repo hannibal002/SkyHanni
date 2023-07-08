@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -16,25 +17,39 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightOwnVampireSlayer {
 
-    private val config get() = SkyHanniMod.feature.rift.highlightOwnSlayer
+    private val config get() = SkyHanniMod.feature.rift.vampireSlayerFeatures
     private val entityList = mutableListOf<EntityOtherPlayerMP>()
     private val taggedEntityList = mutableListOf<EntityOtherPlayerMP>()
     private val username = Minecraft.getMinecraft().session.username
+    private val bloodIchorTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach { it.process() }
+        if (config.highlightOwnBoss || config.highlightOthers) {
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach { it.process() }
+        }
+        if (config.bloodIchor.highlight) {
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
+                if (stand.hasSkullTexture(bloodIchorTexture)) {
+                    val start = LocationUtils.playerLocation()
+                    val vec = stand.position.toLorenzVec()
+                    val distance = start.distance(vec)
+                    RenderLivingEntityHelper.setEntityColor(
+                        stand,
+                        config.bloodIchor.color.toChromaColor().withAlpha(config.withAlpha)
+                    ) { isEnabled() && distance <= 20 }
+                }
+            }
+        }
     }
 
     private fun EntityOtherPlayerMP.process() {
@@ -55,7 +70,7 @@ class HighlightOwnVampireSlayer {
             val color = if (canUseSteak && config.changeColorWhenCanSteak) config.steakColor.toChromaColor().withAlpha(config.withAlpha) else config.highlightColor.toChromaColor().withAlpha(config.withAlpha)
             val shouldRender = when (other) {
                 true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !it.name.contains(username) && distance <= 20 && isNPC()
-                false -> isEnabled() && it.name.contains(username) && distance <= 20 && isNPC()
+                false -> config.highlightOwnBoss && isEnabled() && it.name.contains(username) && distance <= 20 && isNPC()
             }
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
@@ -108,5 +123,5 @@ class HighlightOwnVampireSlayer {
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
+    fun isEnabled() = RiftAPI.inRift()
 }
