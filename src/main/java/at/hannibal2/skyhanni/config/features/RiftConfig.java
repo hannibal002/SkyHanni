@@ -386,7 +386,24 @@ public class RiftConfig {
 
         public static class BloodIchor {
             @Expose
-            @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor")
+            @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Color", desc = "Highlight color.")
+            @ConfigEditorColour
+            public String color = "0:199:100:0:88";
+        }
+
+        @Expose
+        @ConfigOption(name = "Killer Spring", desc = "")
+        @Accordion
+        public KillerSpring killerSpring = new KillerSpring();
+
+        public static class KillerSpring {
+            @Expose
+            @ConfigOption(name = "Highlight Killer Spring", desc = "Highlight the Killer Spring tower.")
             @ConfigEditorBoolean
             public boolean highlight = true;
 

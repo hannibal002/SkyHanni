@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -29,23 +30,27 @@ class HighlightOwnVampireSlayer {
     private val taggedEntityList = mutableListOf<EntityOtherPlayerMP>()
     private val username = Minecraft.getMinecraft().session.username
     private val bloodIchorTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
+    private val killerSpringTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdmN2E3YmM4YWM4NmYyM2NhN2JmOThhZmViNzY5NjAyMjdlMTgzMmZlMjA5YTMwMjZmNmNlYjhiZGU3NGY1NCJ9fX0="
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
+        val start = LocationUtils.playerLocation()
         if (config.highlightOwnBoss || config.highlightOthers) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach { it.process() }
         }
-        if (config.bloodIchor.highlight) {
+        if (config.bloodIchor.highlight || config.killerSpring.highlight) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
-                if (stand.hasSkullTexture(bloodIchorTexture)) {
-                    val start = LocationUtils.playerLocation()
+                if (stand.hasSkullTexture(bloodIchorTexture) || stand.hasSkullTexture(killerSpringTexture)) {
                     val vec = stand.position.toLorenzVec()
                     val distance = start.distance(vec)
+                    val color = if (stand.hasSkullTexture(bloodIchorTexture)) config.bloodIchor.color.toChromaColor().withAlpha(config.withAlpha)
+                    else if (stand.hasSkullTexture(killerSpringTexture)) config.killerSpring.color.toChromaColor().withAlpha(config.withAlpha)
+                    else LorenzColor.WHITE.toColor().withAlpha(config.withAlpha)
                     RenderLivingEntityHelper.setEntityColor(
                         stand,
-                        config.bloodIchor.color.toChromaColor().withAlpha(config.withAlpha)
+                        color
                     ) { isEnabled() && distance <= 20 }
                 }
             }
