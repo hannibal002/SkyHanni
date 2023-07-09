@@ -360,9 +360,9 @@ public class RiftConfig {
         public int withAlpha = 80;
 
         @Expose
-        @ConfigOption(name = "See Through Blocs", desc = "Highlight even when behind blocs, others mobs, etc")
+        @ConfigOption(name = "See Through Blocs", desc = "Highlight even when behind others mobs/players")
         @ConfigEditorBoolean
-        public boolean seeTrough = false;
+        public boolean seeThrough = false;
 
         @Expose
         @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
@@ -380,7 +380,7 @@ public class RiftConfig {
         public String steakColor = "0:255:255:0:88";
 
         @Expose
-        @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+        @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
         @ConfigEditorBoolean
         public boolean twinClawsTitle = true;
 
@@ -416,6 +416,23 @@ public class RiftConfig {
             @ConfigOption(name = "Color", desc = "Highlight color.")
             @ConfigEditorColour
             public String color = "0:199:100:0:88";
+        }
+
+        @Expose
+        @ConfigOption(name = "Co-op Boss", desc = "")
+        @Accordion
+        public CoopBossHighlight coopsBossHighlight = new CoopBossHighlight();
+
+        public static class CoopBossHighlight {
+            @Expose
+            @ConfigOption(name = "Highlight Co-op Boss", desc = "Highlight boss of your co-op member.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Co-op Members", desc = "Add your co-op member here.\n§eFormat: §7Name1,Name2,Name3")
+            @ConfigEditorText
+            public String coopMembers = "";
         }
     }
 }
