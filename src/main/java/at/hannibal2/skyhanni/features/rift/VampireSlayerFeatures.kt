@@ -42,23 +42,27 @@ class VampireSlayerFeatures {
         if (!event.isMod(5)) return
         val start = LocationUtils.playerLocation()
         if (config.highlightOwnBoss || config.highlightOthers) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach { it.process() }
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
+                val vec = it.position.toLorenzVec()
+                val distance = start.distance(vec)
+                if (distance <= 20)
+                    it.process()
+            }
         }
         if (config.bloodIchor.highlight || config.killerSpring.highlight) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
+                val vec = stand.position.toLorenzVec()
+                val distance = start.distance(vec)
                 if (stand.hasSkullTexture(bloodIchorTexture) || stand.hasSkullTexture(killerSpringTexture)) {
                     val isIchor = stand.hasSkullTexture(bloodIchorTexture)
-                    val vec = stand.position.toLorenzVec()
-                    val distance = start.distance(vec)
-                    val color = if (stand.hasSkullTexture(bloodIchorTexture)) config.bloodIchor.color.toChromaColor().withAlpha(config.withAlpha)
+                    val color = if (isIchor) config.bloodIchor.color.toChromaColor().withAlpha(config.withAlpha)
                     else if (stand.hasSkullTexture(killerSpringTexture)) config.killerSpring.color.toChromaColor().withAlpha(config.withAlpha)
                     else LorenzColor.WHITE.toColor().withAlpha(config.withAlpha)
-                    val shouldRender = isEnabled() && distance <= 20
                     RenderLivingEntityHelper.setEntityColor(
                         stand,
                         color
-                    ) { shouldRender }
-                    if (shouldRender && isIchor)
+                    ) { distance <= 20 }
+                    if (isIchor && distance <= 20)
                         entityList.add(stand)
                 }
             }
@@ -66,9 +70,6 @@ class VampireSlayerFeatures {
     }
 
     private fun EntityOtherPlayerMP.process() {
-        val start = LocationUtils.playerLocation()
-        val vec = position.toLorenzVec()
-        val distance = start.distance(vec)
         val other = taggedEntityList.contains(this)
         if (name != "Bloodfiend ") return
         if (config.twinClawsTitle) {
@@ -118,8 +119,8 @@ class VampireSlayerFeatures {
             val canUseSteak = health <= neededHealth
             val color = if (canUseSteak && config.changeColorWhenCanSteak) config.steakColor.toChromaColor().withAlpha(config.withAlpha) else config.highlightColor.toChromaColor().withAlpha(config.withAlpha)
             val shouldRender = when (other) {
-                true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !containUser && distance <= 20 && isNPC()
-                false -> config.highlightOwnBoss && isEnabled() && (containUser || containCoop) && distance <= 20 && isNPC()
+                true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !containUser && isNPC()
+                false -> config.highlightOwnBoss && isEnabled() && (containUser || containCoop) && isNPC()
             }
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
