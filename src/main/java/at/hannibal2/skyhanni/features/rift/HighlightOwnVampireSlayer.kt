@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
@@ -64,13 +65,15 @@ class HighlightOwnVampireSlayer {
         val distance = start.distance(vec)
         val other = taggedEntityList.contains(this)
         if (name != "Bloodfiend ") return
-        getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
-            if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().matches(stand.name)) {
-                val contain = getAllNameTagsInRadiusWith("Spawned by").any { it.name.contains(username) }
-                if (contain) {
-                    val title = ".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().find(stand.name)?.groupValues?.get(1)
-                    //I modified sendTitle to take a heightModifier, so the title don't overlap with impels and others titles
-                    TitleUtils.sendTitle("§6TWINCLAWS $title", 150, 2.4)
+        if (config.twinClawsTitle) {
+            getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
+                if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().matches(stand.name)) {
+                    val containUser = getAllNameTagsInRadiusWith("Spawned by").any { it.name.contains(username) }
+                    if (containUser) {
+                        val title = ".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().find(stand.name)?.groupValues?.get(1)
+                        //I modified sendTitle to take a heightModifier, so the title don't overlap with impels and others titles
+                        TitleUtils.sendTitle("§6TWINCLAWS $title", 150, 2.4)
+                    }
                 }
             }
         }

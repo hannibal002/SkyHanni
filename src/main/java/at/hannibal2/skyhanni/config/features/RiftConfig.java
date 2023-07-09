@@ -380,6 +380,11 @@ public class RiftConfig {
         public String steakColor = "0:255:255:0:88";
 
         @Expose
+        @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+        @ConfigEditorBoolean
+        public boolean twinClawsTitle = true;
+
+        @Expose
         @ConfigOption(name = "Blood Ichor", desc = "")
         @Accordion
         public BloodIchor bloodIchor = new BloodIchor();
