@@ -19,13 +19,12 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightOwnVampireSlayer {
+class VampireSlayerFeatures {
 
     private val config get() = SkyHanniMod.feature.rift.vampireSlayerFeatures
     private val entityList = mutableListOf<EntityOtherPlayerMP>()

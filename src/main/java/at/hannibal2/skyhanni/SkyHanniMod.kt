@@ -321,7 +321,7 @@ class SkyHanniMod {
         loadModule(RiftUpsideDownParkour())
         loadModule(RiftLavaMazeParkour())
         loadModule(HighlightMiningCommissionMobs())
-        loadModule(HighlightOwnVampireSlayer())
+        loadModule(VampireSlayerFeatures())
 
         init()
 
