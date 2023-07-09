@@ -396,6 +396,11 @@ public class RiftConfig {
             public boolean highlight = true;
 
             @Expose
+            @ConfigOption(name = "Beacon Beam", desc = "Render a beacon beam where the Blood Ichor is.")
+            @ConfigEditorBoolean
+            public boolean renderBeam = true;
+
+            @Expose
             @ConfigOption(name = "Color", desc = "Highlight color.")
             @ConfigEditorColour
             public String color = "0:199:100:0:88";

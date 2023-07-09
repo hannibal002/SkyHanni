@@ -176,13 +176,14 @@ class VampireSlayerFeatures {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
-        entityList.filterIsInstance<EntityArmorStand>().forEach {
-            if (it.isEntityAlive) {
-                event.drawWaypointFilled(it.position.toLorenzVec().add(0, -2, 0), config.bloodIchor.color.toChromaColor(),
-                    seeThroughBlocks = false,
-                    beacon = true)
+        if (config.bloodIchor.renderBeam)
+            entityList.filterIsInstance<EntityArmorStand>().forEach {
+                if (it.isEntityAlive) {
+                    event.drawWaypointFilled(it.position.toLorenzVec().add(0, -2, 0), config.bloodIchor.color.toChromaColor(),
+                        seeThroughBlocks = false,
+                        beacon = true)
+                }
             }
-        }
     }
 
     fun isEnabled() = RiftAPI.inRift()
