@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -63,7 +64,18 @@ class HighlightOwnVampireSlayer {
         val distance = start.distance(vec)
         val other = taggedEntityList.contains(this)
         if (name != "Bloodfiend ") return
+        getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
+            if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().matches(stand.name)) {
+                val contain = getAllNameTagsInRadiusWith("Spawned by").any { it.name.contains(username) }
+                if (contain) {
+                    val title = ".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().find(stand.name)?.groupValues?.get(1)
+                    //I modified sendTitle to take a heightModifier, so the title don't overlap with impels and others titles
+                    TitleUtils.sendTitle("§6TWINCLAWS $title", 150, 2.4)
+                }
+            }
+        }
         getAllNameTagsInRadiusWith("Spawned by").forEach {
+            val containUser = it.name.contains(username)
             val neededHealth = when (baseMaxHealth) {
                 625 -> 125f // t1
                 1100 -> 220f // t2
@@ -74,8 +86,8 @@ class HighlightOwnVampireSlayer {
             val canUseSteak = health <= neededHealth
             val color = if (canUseSteak && config.changeColorWhenCanSteak) config.steakColor.toChromaColor().withAlpha(config.withAlpha) else config.highlightColor.toChromaColor().withAlpha(config.withAlpha)
             val shouldRender = when (other) {
-                true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !it.name.contains(username) && distance <= 20 && isNPC()
-                false -> config.highlightOwnBoss && isEnabled() && it.name.contains(username) && distance <= 20 && isNPC()
+                true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !containUser && distance <= 20 && isNPC()
+                false -> config.highlightOwnBoss && isEnabled() && containUser && distance <= 20 && isNPC()
             }
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
