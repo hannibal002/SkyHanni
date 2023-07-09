@@ -66,12 +66,10 @@ class VampireSlayerFeatures {
         if (name != "Bloodfiend ") return
         if (config.twinClawsTitle) {
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
-                if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().matches(stand.name)) {
+                if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) {
                     val containUser = getAllNameTagsInRadiusWith("Spawned by").any { it.name.contains(username) }
                     if (containUser) {
-                        val title = ".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+([0-9.,]+s).*".toRegex().find(stand.name)?.groupValues?.get(1)
-                        //I modified sendTitle to take a heightModifier, so the title don't overlap with impels and others titles
-                        TitleUtils.sendTitle("§6TWINCLAWS $title", 150, 2.4)
+                        TitleUtils.sendTitle("§6§lTWINCLAWS", 300, 2.6)
                     }
                 }
             }
