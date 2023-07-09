@@ -81,7 +81,7 @@ class VampireSlayerFeatures {
                     val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
                         coopList.isNotEmpty() && config.coopsBossHighlight.highlight && coopList.any { it2 ->
                             var contain = false
-                            if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)){
+                            if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
                                 val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
                                 contain = it2 == name
                             }
@@ -89,7 +89,7 @@ class VampireSlayerFeatures {
                         }
                     }
                     if (containUser || containCoop || taggedEntityList.contains(this)) {
-                        val color = if (containUser) "§6" else if (taggedEntityList.contains(this)) "§c" else if(containCoop) "§3" else "§f"
+                        val color = if (containUser) "§6" else if (taggedEntityList.contains(this)) "§c" else if (containCoop) "§3" else "§f"
                         TitleUtils.sendTitle("$color§lTWINCLAWS", 300, 2.6)
                     }
                 }
@@ -101,7 +101,7 @@ class VampireSlayerFeatures {
             val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
                 coopList.isNotEmpty() && config.coopsBossHighlight.highlight && coopList.any { it2 ->
                     var contain = false
-                    if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)){
+                    if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
                         val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
                         contain = it2 == name
                     }
@@ -119,7 +119,7 @@ class VampireSlayerFeatures {
             val color = if (canUseSteak && config.changeColorWhenCanSteak) config.steakColor.toChromaColor().withAlpha(config.withAlpha) else config.highlightColor.toChromaColor().withAlpha(config.withAlpha)
             val shouldRender = when (other) {
                 true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !containUser && distance <= 20 && isNPC()
-                false -> config.highlightOwnBoss && isEnabled() && (containUser||containCoop) && distance <= 20 && isNPC()
+                false -> config.highlightOwnBoss && isEnabled() && (containUser || containCoop) && distance <= 20 && isNPC()
             }
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
