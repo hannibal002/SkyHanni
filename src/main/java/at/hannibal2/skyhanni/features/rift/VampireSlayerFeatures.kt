@@ -25,6 +25,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class VampireSlayerFeatures {
@@ -185,6 +186,12 @@ class VampireSlayerFeatures {
                         beacon = true)
                 }
             }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load){
+        if (!isEnabled())
+            entityList.clear()
     }
 
     fun isEnabled() = RiftAPI.inRift()
