@@ -469,14 +469,18 @@ public class RiftConfig {
             }
         }
 
-//        @Expose
-//        @ConfigOption(name = "Colosseum", desc = "")
-//        @Accordion
-//        public ColosseumConfig colosseumConfig = new ColosseumConfig();
-//
-//        public static class ColosseumConfig {
-//
-//        }
+        @Expose
+        @ConfigOption(name = "Colosseum", desc = "")
+        @Accordion
+        public ColosseumConfig colosseumConfig = new ColosseumConfig();
+
+        public static class ColosseumConfig {
+
+            @Expose
+            @ConfigOption(name = "Highlight Blobbercysts", desc = "Highlight Blobbercysts in Bacte fight.")
+            @ConfigEditorBoolean
+            public boolean highlightBlobbercysts = true;
+        }
 
 //        @Expose
 //        @ConfigOption(name = "Stillgore Chateau", desc = "")
