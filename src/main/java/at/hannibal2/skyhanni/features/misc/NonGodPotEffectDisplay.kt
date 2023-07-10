@@ -149,7 +149,7 @@ class NonGodPotEffectDisplay {
         for (stack in event.inventoryItems.values) {
                 val name = stack.name ?: continue
                 for (effect in NonGodPotEffect.values()) {
-                    if (name == effect.displayName) continue
+                    if (name != effect.displayName) continue
                     for (line in stack.getLore()) {
                         if (line.contains("Remaining") &&
                             line != "§7Time Remaining: §aCompleted!" &&
