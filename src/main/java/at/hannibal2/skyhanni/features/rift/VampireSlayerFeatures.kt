@@ -46,7 +46,7 @@ class VampireSlayerFeatures {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
                 val vec = it.position.toLorenzVec()
                 val distance = start.distance(vec)
-                if (distance <= 20)
+                if (distance <= 15)
                     it.process()
             }
         }
@@ -62,8 +62,8 @@ class VampireSlayerFeatures {
                     RenderLivingEntityHelper.setEntityColor(
                         stand,
                         color
-                    ) { distance <= 20 }
-                    if (isIchor && distance <= 20)
+                    ) { distance <= 15 }
+                    if (isIchor && distance <= 15)
                         entityList.add(stand)
                 }
             }
@@ -90,8 +90,7 @@ class VampireSlayerFeatures {
                         }
                     }
                     if (containUser || containCoop || taggedEntityList.contains(this.entityId)) {
-                        val color = if (containUser) "§6" else if (taggedEntityList.contains(this.entityId)) "§c" else if (containCoop) "§3" else "§f"
-                        TitleUtils.sendTitle("$color§lTWINCLAWS", 300, 2.6)
+                        TitleUtils.sendTitle("§6§lTWINCLAWS", 300, 2.6)
                     }
                 }
             }
@@ -120,7 +119,7 @@ class VampireSlayerFeatures {
                  true -> config.highlightOthers && isEnabled() && taggedEntityList.contains(this) && isNPC()
                  false -> config.highlightOwnBoss && isEnabled() && isNPC() || containCoop
              }*/
-            if (containUser && taggedEntityList.contains(this.entityId)){
+            if (containUser && taggedEntityList.contains(this.entityId)) {
                 taggedEntityList.remove(this.entityId)
             }
             val shouldRender = if (config.highlightOwnBoss && containUser && isNPC()) true
@@ -145,7 +144,6 @@ class VampireSlayerFeatures {
             if (!taggedEntityList.contains(event.clickedEntity.entityId)) {
                 taggedEntityList.add(event.clickedEntity.entityId)
             }
-
         }
     }
 
