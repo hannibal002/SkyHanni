@@ -98,24 +98,24 @@ public class Fishing {
     public int barnTimerAlertTime = 330;
 
     @Expose
-    @ConfigOption(name = "Chum Bucket Hider", desc = "")
+    @ConfigOption(name = "Chum/Chumcap Bucket Hider", desc = "")
     @Accordion
     public ChumBucketHider chumBucketHider = new ChumBucketHider();
 
     public static class ChumBucketHider {
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Hide the Chum Bucket name tags for other players.")
+        @ConfigOption(name = "Enable", desc = "Hide the Chum/Chumcap Bucket name tags for other players.")
         @ConfigEditorBoolean
         public Property<Boolean> enabled = Property.of(true);
 
         @Expose
-        @ConfigOption(name = "Hide Bucket", desc = "Hide the Chum Bucket.")
+        @ConfigOption(name = "Hide Bucket", desc = "Hide the Chum/Chumcap Bucket.")
         @ConfigEditorBoolean
         public Property<Boolean> hideBucket = Property.of(false);
 
         @Expose
-        @ConfigOption(name = "Hide Own", desc = "Hides your own Chum Bucket.")
+        @ConfigOption(name = "Hide Own", desc = "Hides your own Chum/Chumcap Bucket.")
         @ConfigEditorBoolean
         public Property<Boolean> hideOwn = Property.of(false);
     }

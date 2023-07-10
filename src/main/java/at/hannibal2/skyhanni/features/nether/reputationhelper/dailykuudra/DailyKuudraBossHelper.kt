@@ -19,7 +19,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
     val kuudraTiers = mutableListOf<KuudraTier>()
-    private val pattern = "  Kuudra's Hollow \\(T(?<tier>.*)\\)".toPattern()
 
     private var kuudraLocation: LorenzVec? = null
     private var allKuudraDone = true
@@ -45,11 +44,11 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
 
         val message = event.message
-        if (message != "                               §r§6§lKUUDRA DOWN!") return
+        if (!message.contains("KUUDRA DOWN!") || message.contains(":")) return
 
         for (line in ScoreboardData.sidebarLines) {
-            pattern.matchMatcher(line) {
-                val tier = group("tier").toInt()
+            if(line.contains("Kuudra's") && line.contains("Hollow") && line.contains("(")){
+                val tier = line.substringAfter("(T").substring(0,1).toInt()
                 val kuudraTier = getByTier(tier)!!
                 finished(kuudraTier)
                 return
@@ -68,10 +67,10 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     fun render(display: MutableList<List<Any>>) {
         val done = kuudraTiers.count { it.doneToday }
         display.addAsSingletonList("")
-        display.addAsSingletonList("§7Daily Kuudra (§e$done§8/§e3 killed§7)")
-        if (done != 2) {
+        display.addAsSingletonList("§7Daily Kuudra (§e$done§8/§e5 killed§7)")
+        if (done < 5) {
             for (tier in kuudraTiers) {
-                val result = if (tier.doneToday) "§7Done" else "§bTodo"
+                val result = if (tier.doneToday) "§aDone" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
                 if (displayItem == null) {

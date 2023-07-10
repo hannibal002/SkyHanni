@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
 import at.hannibal2.skyhanni.features.inventory.*
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
+import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
@@ -95,7 +96,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.5",
+    version = "0.19.Beta.7",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -315,8 +316,12 @@ class SkyHanniMod {
         loadModule(DungeonLividFinder)
         loadModule(CruxTalismanDisplay)
         loadModule(DanceRoomHelper)
-        loadModule(LaserParkour())
+        loadModule(TubulatorParkour())
         loadModule(CustomTextBox())
+        loadModule(RiftUpsideDownParkour())
+        loadModule(RiftLavaMazeParkour())
+        loadModule(HighlightMiningCommissionMobs())
+        loadModule(ShowMotesNpcSellPrice())
 
         init()
 
@@ -328,6 +333,7 @@ class SkyHanniMod {
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
         loadModule(HighlightMissingRepoItems())
+        loadModule(ParkourWaypointSaver())
     }
 
     @Mod.EventHandler
@@ -337,7 +343,11 @@ class SkyHanniMod {
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
         repo = RepoManager(configManager.configDirectory)
-        repo.loadRepoInformation()
+        try {
+            repo.loadRepoInformation()
+        } catch (e: Exception) {
+            Exception("Error reading repo data", e).printStackTrace()
+        }
     }
 
     fun loadModule(obj: Any) {

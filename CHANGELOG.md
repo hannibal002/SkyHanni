@@ -41,6 +41,15 @@
   + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
   + Change how many tasks you should see
   + Hide other players inside the dance room
++ Added **Upside Down** Parkour & **Lava Maze** - hannibal2
+  + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
+  + Change how many platforms should be shown in front of you
+  + Rainbow color (optional) - nea
+  + Hide other players while doing the parkour
+  + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
++ Added Jinxed voodoo doll ability cooldown support - HiZe
++ Added Polarvoid Books to estimated item value - jani
++ Added Chumcap support for Chum Bucket Hider - jani
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -52,6 +61,8 @@
   + Write fancy text into a gui element to show on your screen at all time
   + Supports color codes
   + Supports line breaks `\n` - hannibal2
++ Added **Highlight Commission Mobs** - hannibal2
+  + Highlight Mobs that are part of active commissions
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -62,17 +73,24 @@
   + More images for different locations
   + Fixed names unnecessarily getting cut off when visiting an island in Location
   + Fewer crashes because of NEU Item Repo
++ Changed time for Trapper from 30 to 15 seconds while Finnegan is mayor – CalMWolfs
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
 + Fixed possible crash with broken neu repo when opening the desk inventory in garden (Contributed by CalMWolfs)
 + Fixed frozen treasures per hour display being inaccurate (Contributed by CalMWolfs)
 + Fixed bug with ghost counter sometimes not detecting new kills (Contributed by CalMWolfs)
-+ **Ghost Counter** fixes - HiZe & ksipli
++ Fixed **Ghost Counter** - HiZe & ksipli
   + Should no longer have compatibility issues with other mods
   + It work even if the action bar show percent +xxx (xx%) instead of +xxx (xxx/xxx)
   + Added command /shresetghostcounter to reset everything (not the bestiary data)
   + Added time format in ETA formatting (can show days, hours, minutes and seconds remaining)
++ Fixed **Dungeon Master Stars** calculation not working correctly sometimes – hannibal2 & Fix3dll
++ Fixed Discord Rich Presence detecting absorption hearts not correctly – NetheriteMiner
++ Fixed Reputation Helper **Kuudra Completions** not getting detected and adding T4 and T5 support - Cinshay
+  = Fixed Item Ability cooldown not working for Astraea - hannibal2
+  = Fixed a typo in the config - hannibal2
+  = Added a workaround for a crash when refusing a visitor - hannibal2
 
 ## Version 0.18 (2023-06-19)
 

@@ -104,7 +104,7 @@ public class Position {
 
 		if (wasPositiveX) {
 			if (this.x < 0) {
-				deltaX += -this.x;
+				deltaX -= this.x;
 				this.x = 0;
 			}
 			if (this.x > screenWidth) {
@@ -138,7 +138,7 @@ public class Position {
 
 		if (wasPositiveY) {
 			if (this.y < 0) {
-				deltaY += -this.y;
+				deltaY -= this.y;
 				this.y = 0;
 			}
 			if (this.y > screenHeight) {

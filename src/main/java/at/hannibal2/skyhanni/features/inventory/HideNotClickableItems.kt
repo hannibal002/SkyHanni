@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
+import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -170,10 +171,24 @@ class HideNotClickableItems {
             hideAttributeFusion(chestName, stack) -> true
             hideYourEquipment(chestName, stack) -> true
             hideComposter(chestName, stack) -> true
+            hideRiftMotesGrubber(chestName, stack) -> true
             else -> {
                 false
             }
         }
+    }
+
+    private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
+//        if (!RiftAPI.inRift()) return false
+
+        if (chestName != "Motes Grubber") return false
+
+        reverseColor = true
+
+        if (stack.motesNpcPrice() != null) return false
+
+        hideReason = "Not sellable for Motes!"
+        return true
     }
 
     private fun hideComposter(chestName: String, stack: ItemStack): Boolean {

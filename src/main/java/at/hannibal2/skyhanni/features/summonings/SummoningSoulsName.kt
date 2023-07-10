@@ -18,7 +18,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class SummoningSoulsName {
 
-    var tick = 0
     private val texture =
         "ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU" +
                 "4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdH" +
@@ -34,11 +33,8 @@ class SummoningSoulsName {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        tick++
         //TODO use packets instead of this
-        if (tick % 1 == 0) {
             check()
-        }
     }
 
     private fun check() {
