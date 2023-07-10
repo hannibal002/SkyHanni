@@ -28,15 +28,9 @@ class ShowMotesNpcSellPrice {
             val withBurger = motes + (config.burgerStacks * 5) * motes / 100
             val perWithBurger = motesPerItem + (config.burgerStacks * 5) * motesPerItem / 100
             event.toolTip.add("§6NPC price: §d${withBurger.addSeparators()} Motes §7($size x §d${perWithBurger.addSeparators()} Motes§7)")
-            if (config.burgerStacks > 0) {
-                event.toolTip.add("§6Burger buff: §d${(withBurger-motes)} Motes")
-            }
         } else {
             val perWithBurger = motesPerItem + (config.burgerStacks * 5) * motesPerItem / 100
             event.toolTip.add("§6NPC price: §d${perWithBurger.addSeparators()} Motes")
-            if (config.burgerStacks > 0) {
-                event.toolTip.add("§6Burger buff: §d${(perWithBurger*motesPerItem)} Motes")
-            }
         }
     }
 
