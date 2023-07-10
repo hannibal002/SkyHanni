@@ -19,18 +19,13 @@
 
 package at.hannibal2.skyhanni.config.core.config;
 
-import com.google.gson.annotations.Expose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 
 public class Position {
-	@Expose
 	private int x;
-	@Expose
 	private int y;
-	@Expose
 	private boolean centerX;
-	@Expose
 	private boolean centerY;
 
 	private boolean clicked = false;

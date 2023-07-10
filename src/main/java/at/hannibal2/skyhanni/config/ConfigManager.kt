@@ -23,7 +23,6 @@ import kotlin.concurrent.fixedRateTimer
 class ConfigManager {
     companion object {
         val gson = GsonBuilder().setPrettyPrinting()
-            .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
