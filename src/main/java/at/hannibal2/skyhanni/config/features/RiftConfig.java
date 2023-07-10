@@ -333,4 +333,9 @@ public class RiftConfig {
 
     }
 
+    @Expose
+    @ConfigOption(name = "Show Motes Price", desc = "Show the Motes NPC price in the item lore.")
+    @ConfigEditorBoolean
+    public boolean showMotesPrice = true;
+
 }
