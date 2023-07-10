@@ -37,14 +37,12 @@ class BlobbercystsHighlight {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         if (!isEnabled()) return
-        if (!config.highlightBlobbercysts) return
         entityList.clear()
     }
 
     @SubscribeEvent
     fun onLivingDeath(event: LivingDeathEvent) {
         if (!isEnabled()) return
-        if (!config.highlightBlobbercysts) return
         if (entityList.contains(event.entity)) {
             entityList.remove(event.entity)
         }
@@ -53,7 +51,6 @@ class BlobbercystsHighlight {
     @SubscribeEvent
     fun pre(event: RenderLivingEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
-        if (!config.highlightBlobbercysts) return
         if (event.entity.name != blobberName) return
         GlStateManager.disableDepth()
     }
@@ -61,10 +58,9 @@ class BlobbercystsHighlight {
     @SubscribeEvent
     fun pre(event: RenderLivingEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
-        if (!config.highlightBlobbercysts) return
         if (event.entity.name != blobberName) return
         GlStateManager.enableDepth()
     }
 
-    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Colosseum"
+    fun isEnabled() = RiftAPI.inRift() && config.highlightBlobbercysts && LorenzUtils.skyBlockArea == "Colosseum"
 }
