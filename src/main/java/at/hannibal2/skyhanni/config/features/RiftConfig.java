@@ -415,14 +415,90 @@ public class RiftConfig {
     public static class VampireSlayerConfig {
 
         @Expose
-        @ConfigOption(name = "Highlight your boss", desc = "Highlight your own vampire slayer boss.")
-        @ConfigEditorBoolean
-        public boolean highlightOwnBoss = true;
+        @ConfigOption(name = "Your Boss", desc = "")
+        @Accordion
+        public OwnBoss ownBoss = new OwnBoss();
+        public static class OwnBoss {
+
+            @Expose
+            @ConfigOption(name = "Highlight your boss", desc = "Highlight your own vampire slayer boss.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+            @ConfigEditorColour
+            public String highlightColor = "0:249:0:255:88";
+
+            @Expose
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak your boss.")
+            @ConfigEditorBoolean
+            public boolean steakAlert = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+            @ConfigEditorBoolean
+            public boolean twinClawsTitle = true;
+        }
 
         @Expose
-        @ConfigOption(name = "Highlight Others boss", desc = "Highlight others players boss.\n§cOnly when you hit them!")
-        @ConfigEditorBoolean
-        public boolean highlightOthers = true;
+        @ConfigOption(name = "Others Boss", desc = "")
+        @Accordion
+        public OthersBoss othersBoss = new OthersBoss();
+        public static class OthersBoss {
+
+            @Expose
+            @ConfigOption(name = "Highlight Others people boss", desc = "Highlight others players boss.\nYou need to hit them first.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+            @ConfigEditorColour
+            public String highlightColor = "0:249:0:255:88";
+
+            @Expose
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak your boss.")
+            @ConfigEditorBoolean
+            public boolean steakAlert = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsTitle = true;
+        }
+
+        @Expose
+        @ConfigOption(name = "Co-op Boss", desc = "")
+        @Accordion
+        public CoopBossHighlight coopsBossHighlight = new CoopBossHighlight();
+
+        public static class CoopBossHighlight {
+            @Expose
+            @ConfigOption(name = "Highlight Co-op Boss", desc = "Highlight boss of your co-op member.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+            @ConfigEditorColour
+            public String highlightColor = "0:249:0:255:88";
+
+            @Expose
+            @ConfigOption(name = "Co-op Members", desc = "Add your co-op member here.\n§eFormat: §7Name1,Name2,Name3")
+            @ConfigEditorText
+            public String coopMembers = "";
+
+            @Expose
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak your boss.")
+            @ConfigEditorBoolean
+            public boolean steakAlert = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+            @ConfigEditorBoolean
+            public boolean twinClawsTitle = true;
+        }
 
         @Expose
         @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
@@ -440,19 +516,10 @@ public class RiftConfig {
         public boolean changeColorWhenCanSteak = true;
 
         @Expose
-        @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
-        @ConfigEditorColour
-        public String highlightColor = "0:249:0:255:88";
-
-        @Expose
         @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
         @ConfigEditorColour
         public String steakColor = "0:255:255:0:88";
 
-        @Expose
-        @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
-        @ConfigEditorBoolean
-        public boolean twinClawsTitle = true;
 
         @Expose
         @ConfigOption(name = "Blood Ichor", desc = "")
@@ -491,23 +558,6 @@ public class RiftConfig {
             @ConfigOption(name = "Color", desc = "Highlight color.")
             @ConfigEditorColour
             public String color = "0:199:100:0:88";
-        }
-
-        @Expose
-        @ConfigOption(name = "Co-op Boss", desc = "")
-        @Accordion
-        public CoopBossHighlight coopsBossHighlight = new CoopBossHighlight();
-
-        public static class CoopBossHighlight {
-            @Expose
-            @ConfigOption(name = "Highlight Co-op Boss", desc = "Highlight boss of your co-op member.")
-            @ConfigEditorBoolean
-            public boolean highlight = true;
-
-            @Expose
-            @ConfigOption(name = "Co-op Members", desc = "Add your co-op member here.\n§eFormat: §7Name1,Name2,Name3")
-            @ConfigEditorText
-            public String coopMembers = "";
         }
     }
 

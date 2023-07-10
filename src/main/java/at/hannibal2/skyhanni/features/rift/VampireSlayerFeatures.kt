@@ -42,7 +42,7 @@ class VampireSlayerFeatures {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         val start = LocationUtils.playerLocation()
-        if (config.highlightOwnBoss || config.highlightOthers) {
+        if (config.ownBoss.highlight || config.othersBoss.highlight ||config.coopsBossHighlight.highlight) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
                 val vec = it.position.toLorenzVec()
                 val distance = start.distance(vec)
@@ -72,7 +72,7 @@ class VampireSlayerFeatures {
 
     private fun EntityOtherPlayerMP.process() {
         if (name != "Bloodfiend ") return
-        if (config.twinClawsTitle) {
+        if (config.ownBoss.twinClawsTitle || config.othersBoss.twinClawsTitle || config.coopsBossHighlight.twinClawsTitle) {
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
                 if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) {
                     val coopList = config.coopsBossHighlight.coopMembers.split(",").toList()
@@ -89,7 +89,12 @@ class VampireSlayerFeatures {
                             contain
                         }
                     }
-                    if (containUser || containCoop || taggedEntityList.contains(this.entityId)) {
+                    val shouldSendTitle =
+                        if (containUser && config.ownBoss.twinClawsTitle) true
+                        else if (containCoop && config.coopsBossHighlight.twinClawsTitle) true
+                        else taggedEntityList.contains(this.entityId) && config.othersBoss.twinClawsTitle
+
+                    if (shouldSendTitle) {
                         TitleUtils.sendTitle("§6§lTWINCLAWS", 300, 2.6)
                     }
                 }
@@ -113,18 +118,33 @@ class VampireSlayerFeatures {
                 2400 -> 480f // t4
                 else -> 600f // t5
             }
-            val canUseSteak = health <= neededHealth
-            val color = if (canUseSteak && config.changeColorWhenCanSteak) config.steakColor.toChromaColor().withAlpha(config.withAlpha) else config.highlightColor.toChromaColor().withAlpha(config.withAlpha)
-            /* val shouldRender = when (!containUser) {
-                 true -> config.highlightOthers && isEnabled() && taggedEntityList.contains(this) && isNPC()
-                 false -> config.highlightOwnBoss && isEnabled() && isNPC() || containCoop
-             }*/
             if (containUser && taggedEntityList.contains(this.entityId)) {
                 taggedEntityList.remove(this.entityId)
             }
-            val shouldRender = if (config.highlightOwnBoss && containUser && isNPC()) true
-            else if (config.highlightOthers && taggedEntityList.contains(this.entityId) && isNPC()) true
-            else config.coopsBossHighlight.highlight && containCoop && isNPC()
+            val canUseSteak = health <= neededHealth
+            val ownBoss = config.ownBoss.highlight && containUser && isNPC()
+            val otherBoss = config.othersBoss.highlight && taggedEntityList.contains(this.entityId) && isNPC()
+            val coopBoss = config.coopsBossHighlight.highlight && containCoop && isNPC()
+            val shouldRender = if (ownBoss) true else if (otherBoss) true else coopBoss
+
+            val color =
+                if (canUseSteak && config.changeColorWhenCanSteak)
+                    config.steakColor.color()
+            else if (ownBoss) config.ownBoss.highlightColor.color()
+            else if (otherBoss) config.othersBoss.highlightColor.color()
+            else if (coopBoss) config.coopsBossHighlight.highlightColor.color()
+            else 0
+
+            val shouldSendSteakTitle =
+                if (canUseSteak && config.ownBoss.steakAlert && containUser) true
+                    else if(canUseSteak && config.othersBoss.steakAlert && taggedEntityList.contains(this.entityId)) true
+            else canUseSteak && config.coopsBossHighlight.steakAlert && containCoop
+
+            if (shouldSendSteakTitle)
+                TitleUtils.sendTitle("§cSTEAK!", 300)
+
+            println("shoulrender: $shouldRender")
+            println("contain coop: $containCoop")
 
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
@@ -133,14 +153,27 @@ class VampireSlayerFeatures {
         }
     }
 
+    private fun String.color(): Int{
+        return toChromaColor().withAlpha(config.withAlpha)
+    }
+
     @SubscribeEvent
     fun onEntityHit(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.clickedEntity !is EntityOtherPlayerMP) return
         if (!event.clickedEntity.isNPC()) return
+        val coopList = config.coopsBossHighlight.coopMembers.split(",").toList()
         event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by").forEach {
-            if (it.name.contains(username)) return
+            val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
+                var contain = false
+                if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
+                    val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
+                    contain = it2 == name
+                }
+                contain
+            }
+            if (it.name.contains(username) || containCoop) return
             if (!taggedEntityList.contains(event.clickedEntity.entityId)) {
                 taggedEntityList.add(event.clickedEntity.entityId)
             }
