@@ -64,6 +64,7 @@ import at.hannibal2.skyhanni.features.rift.RiftTimer
 import at.hannibal2.skyhanni.features.rift.ShowMotesNpcSellPrice
 import at.hannibal2.skyhanni.features.rift.VampireSlayerFeatures
 import at.hannibal2.skyhanni.features.rift.area.RiftLarva
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingMetalSuitProgress
@@ -341,6 +342,7 @@ class SkyHanniMod {
         loadModule(ShowMotesNpcSellPrice())
         loadModule(LivingMetalSuitProgress())
         loadModule(VampireSlayerFeatures())
+        loadModule(BlobbercystsHighlight())
 
         init()
 
