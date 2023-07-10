@@ -31,7 +31,8 @@ class ShowMotesNpcSellPrice {
             event.toolTip.add("§6NPC price: $burgerText§d${withBurger.addSeparators()} Motes §7($size x §d${perWithBurger.addSeparators()} Motes§7)")
         } else {
             val perWithBurger = motesPerItem + (config.burgerStacks * 5) * motesPerItem / 100
-            event.toolTip.add("§6NPC price: §d${perWithBurger.addSeparators()} Motes")
+            val burgerText = if(config.burgerStacks>0) "(${config.burgerStacks}x≡) " else ""
+            event.toolTip.add("§6NPC price: $burgerText§d${perWithBurger.addSeparators()} Motes")
         }
     }
 
