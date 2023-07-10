@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.rift
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -11,7 +11,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
-    private val config get() = SkyHanniMod.feature.rift.timer
+    private val config get() = RiftAPI.config.timer
     private var display = emptyList<String>()
     private var maxTime = 0L
     private var latestTime = 0L

@@ -1,6 +1,5 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.everywhere
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -12,7 +11,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightRiftGuide {
-    private val config get() = SkyHanniMod.feature.rift
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
 
@@ -59,5 +57,5 @@ class HighlightRiftGuide {
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.highlightGuide
+    fun isEnabled() = RiftAPI.inRift() && RiftAPI.config.highlightGuide
 }

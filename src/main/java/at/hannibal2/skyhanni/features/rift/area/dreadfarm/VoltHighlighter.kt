@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
@@ -23,7 +23,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class VoltHighlighter {
-    private val config get() = SkyHanniMod.feature.rift.crux
+
+    private val config get() = RiftAPI.config.area.dreadfarmConfig.voltCrux
 
     private val LIGHTNING_DISTANCE = 7F
     private val ARMOR_SLOT_HEAD = 3

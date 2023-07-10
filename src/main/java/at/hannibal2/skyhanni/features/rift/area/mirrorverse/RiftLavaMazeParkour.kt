@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ParkourHelper
@@ -12,18 +12,18 @@ import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class RiftUpsideDownParkour {
-    private val config get() = SkyHanniMod.feature.rift.mirrorVerse.upsideDownParkour
+class RiftLavaMazeParkour {
+    private val config get() = RiftAPI.config.area.mirrorVerseConfig.lavaMazeConfig
     private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour") ?: return
+        val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour") ?: return
         parkourHelper = ParkourHelper(
-            data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
+            data.locations,
             data.shortCuts,
-            platformSize = 2.0,
-            detectionRange = 2.0
+            platformSize = 1.0,
+            detectionRange = 1.0
         )
         updateConfig()
     }
@@ -44,7 +44,7 @@ class RiftUpsideDownParkour {
     fun onChatMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (event.message == "§c§lOH NO! THE LAVA OOFED YOU BACK TO THE START!") {
+        if (event.message == "§c§lEEK! THE LAVA OOFED YOU!") {
             parkourHelper?.reset()
         }
     }
@@ -61,7 +61,6 @@ class RiftUpsideDownParkour {
             rainbowColor = config.rainbowColor.get()
             monochromeColor = config.monochromeColor.get().toChromaColor()
             lookAhead = config.lookAhead.get() + 1
-            outline = config.outline
         }
     }
 
