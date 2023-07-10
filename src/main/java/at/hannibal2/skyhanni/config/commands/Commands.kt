@@ -30,7 +30,11 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 
 object Commands {
@@ -47,61 +51,207 @@ object Commands {
         }
     }
 
+    // command -> description
+    private val commands = mutableListOf<CommandInfo>()
+
+    enum class CommandCategory(val color: String, val categoryName: String, val description: String) {
+        MAIN("§6", "Main Command", "Most useful commands of SkyHanni"),
+        USERS_NORMAL("§e", "Normal Command", "Normal Command for everyone to use"),
+        USERS_BUG_FIX("§f", "User Bug Fix", "A Command to fix small bugs"),
+        DEVELOPER_CODING_HELP(
+            "§5", "Developer Coding Help",
+            "A Command that can help with developing new features. §cIntended for developers only!"
+        ),
+        DEVELOPER_DEBUG_FEATURES(
+            "§9", "Developer Debug Features",
+            "A Command that is useful for monitoring/debugging existing features. §cIntended for developers only!"
+        ),
+        INTERNAL("§8", "Internal Command", "A Command that should §cnever §7be called manually!"),
+
+    }
+
+    class CommandInfo(val name: String, val description: String, val category: CommandCategory)
+
+    private var currentCategory = CommandCategory.MAIN
+
     fun init() {
+        currentCategory = CommandCategory.MAIN
+        usersMain()
 
-        // main commands
-        registerCommand("sh", openMainMenu)
-        registerCommand("skyhanni", openMainMenu)
+        currentCategory = CommandCategory.USERS_NORMAL
+        usersNormal()
 
-        registerCommand("ff") { openFortuneGuide() }
+        currentCategory = CommandCategory.USERS_BUG_FIX
+        usersBugFix()
 
-        // for users - regular commands
-        registerCommand("shmarkplayer") { MarkedPlayerManager.command(it) }
-        registerCommand("shtrackcollection") { CollectionCounter.command(it) }
-        registerCommand("shsetapikey") { ApiDataLoader.command(it) }
-        registerCommand("shcropspeedmeter") { CropSpeedMeter.toggle() }
-        registerCommand("shcroptime") { GardenCropTimeCommand.onCommand(it) }
-        registerCommand("shshareinquis") { InquisitorWaypointShare.sendInquisitor() }
-        registerCommand("shrpcstart") { DiscordRPCManager.startCommand() }
-        registerCommand("shcropstartlocation") { GardenStartLocation.setLocationCommand() }
-        registerCommand("shstopcityprojectreminder") { CityProjectFeatures.disable() }
-        registerCommand("shclearslayerprofits") { SlayerItemProfitTracker.clearProfitCommand(it) }
-        registerCommand("shimportghostcounterdata") { GhostCounter.importCTGhostCounterData() }
-        registerCommand("shclearfarmingitems") { clearFarmingItems() }
-        registerCommand("shresetghostcounter") { GhostCounter.reset() }
+        currentCategory = CommandCategory.DEVELOPER_CODING_HELP
+        developersCodingHelp()
 
-        // for users - fix bugs
-        registerCommand("shupdaterepo") { SkyHanniMod.repo.updateRepo() }
-        registerCommand("shconfigsave") { SkyHanniMod.configManager.saveConfig("manual-command") }
-        registerCommand("shresetburrowwarps") { BurrowWarpHelper.resetDisabledWarps() }
-        registerCommand("shtogglehypixelapierrors") { APIUtil.toggleApiErrorMessages() }
-        registerCommand("shclearcropspeed") { GardenAPI.clearCropSpeed() }
-        registerCommand("shclearminiondata") { MinionFeatures.clearMinionData() }
+        currentCategory = CommandCategory.DEVELOPER_DEBUG_FEATURES
+        developersDebugFeatures()
 
-        // for developers - debug existing features
-        registerCommand("shtest") { SkyHanniTestCommand.testCommand(it) }
-        registerCommand("shtestbingo") { TestBingo.toggle() }
-        registerCommand("shprintbingohelper") { BingoNextStepHelper.command() }
-        registerCommand("shreloadbingodata") { BingoCardDisplay.command() }
-        registerCommand("shtestgardenvisitors") { SkyHanniTestCommand.testGardenVisitors() }
-        registerCommand("shtestcomposter") { ComposterOverlay.onCommand(it) }
-        registerCommand("shtestinquisitor") { InquisitorWaypointShare.test() }
-        registerCommand("shshowcropmoneycalculation") { CropMoneyDisplay.toggleShowCalculation() }
+        currentCategory = CommandCategory.INTERNAL
+        internalCommands()
+    }
 
-        // for developers - coding help
-        registerCommand("shreloadlocalrepo") { SkyHanniMod.repo.reloadLocalRepo() }
-        registerCommand("shstoplisteners") { SkyHanniTestCommand.stopListeners() }
-        registerCommand("shreloadlisteners") { SkyHanniTestCommand.reloadListeners() }
-        registerCommand("shcopylocation") { SkyHanniTestCommand.copyLocation(it) }
-        registerCommand("shcopyentities") { CopyNearbyEntitiesCommand.command(it) }
-        registerCommand("shcopytablist") { CopyTabListCommand.command(it) }
-        registerCommand("shcopyscoreboard") { CopyScoreboardCommand.command(it) }
-        registerCommand("shcopyitem") { CopyItemCommand.command(it) }
-        registerCommand("shcopyparticles") { CopyNearbyParticlesCommand.command(it) }
-        registerCommand("shtestpacket") { PacketTest.toggle() }
-        registerCommand("shtestmessage") { TestChatCommand.command(it) }
-        registerCommand("shcopyerror") { CopyErrorCommand.command(it) }
+    private fun usersMain() {
+        registerCommand("sh", "Opens the main SkyHanni config", openMainMenu)
+        registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
+        registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
+        registerCommand("shcommands", "Shows this list") { commandHelp(it) }
+    }
 
+    private fun usersNormal() {
+        registerCommand(
+            "shmarkplayer",
+            "Add a highlight effect to a player for better visibility"
+        ) { MarkedPlayerManager.command(it) }
+        registerCommand("shtrackcollection", "Tracks your collection gain over time") { CollectionCounter.command(it) }
+        registerCommand(
+            "shcroptime",
+            "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
+        ) { GardenCropTimeCommand.onCommand(it) }
+        registerCommand(
+            "shrpcstart",
+            "Manually starts the Discord Rich Presence feature"
+        ) { DiscordRPCManager.startCommand() }
+        registerCommand(
+            "shcropstartlocation",
+            "Manually sets the crop start location"
+        ) { GardenStartLocation.setLocationCommand() }
+        registerCommand(
+            "shclearslayerprofits",
+            "Clearing the total slayer profit for the current slayer type"
+        ) { SlayerItemProfitTracker.clearProfitCommand(it) }
+        registerCommand(
+            "shimportghostcounterdata",
+            "Manually importing the ghost counter data from GhostCounterV3"
+        ) { GhostCounter.importCTGhostCounterData() }
+        registerCommand(
+            "shclearfarmingitems",
+            "Clear farming items saved for the Farming Fortune Guide"
+        ) { clearFarmingItems() }
+        registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostCounter.reset() }
+    }
+
+    private fun usersBugFix() {
+        registerCommand("shupdaterepo", "Download the Skyhanni repo again") { SkyHanniMod.repo.updateRepo() }
+        registerCommand(
+            "shsetapikey",
+            "Manually set the api key (§cThis command will get removed soon§7)"
+        ) { ApiDataLoader.command(it) } // TODO remove with api
+        registerCommand(
+            "shresetburrowwarps",
+            "Manually resetting disabled diana burrow warp points"
+        ) { BurrowWarpHelper.resetDisabledWarps() }
+        registerCommand(
+            "shtogglehypixelapierrors",
+            "Show/hide hypixel api error messages in chat"
+        ) { APIUtil.toggleApiErrorMessages() }
+        registerCommand(
+            "shclearcropspeed",
+            "Reset garden crop speed data and best crop time data"
+        ) { GardenAPI.clearCropSpeed() }
+        registerCommand(
+            "shclearminiondata",
+            "Reset data about minion profit and the name display on the private island"
+        ) { MinionFeatures.clearMinionData() }
+    }
+
+    private fun developersDebugFeatures() {
+        registerCommand("shtestbingo", "dev command") { TestBingo.toggle() }
+        registerCommand("shprintbingohelper", "dev command") { BingoNextStepHelper.command() }
+        registerCommand("shreloadbingodata", "dev command") { BingoCardDisplay.command() }
+        registerCommand("shtestgardenvisitors", "dev command") { SkyHanniTestCommand.testGardenVisitors() }
+        registerCommand("shtestcomposter", "dev command") { ComposterOverlay.onCommand(it) }
+        registerCommand("shtestinquisitor", "dev command") { InquisitorWaypointShare.test() }
+        registerCommand("shshowcropmoneycalculation", "dev command") { CropMoneyDisplay.toggleShowCalculation() }
+        registerCommand("shcropspeedmeter", "Debugs how many crops you collect over time") { CropSpeedMeter.toggle() }
+        registerCommand(
+            "shconfigsave",
+            "Manually saving the config"
+        ) { SkyHanniMod.configManager.saveConfig("manual-command") }
+    }
+
+    private fun developersCodingHelp() {
+        registerCommand("shtest", "Unused test command.") { SkyHanniTestCommand.testCommand(it) }
+        registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
+        registerCommand(
+            "shstoplisteners",
+            "Unregistering all loaded forge event listeners"
+        ) { SkyHanniTestCommand.stopListeners() }
+        registerCommand(
+            "shreloadlisteners",
+            "Trying to load all forge event listeners again. Might not work at all"
+        ) { SkyHanniTestCommand.reloadListeners() }
+        registerCommand(
+            "shcopylocation",
+            "Copies the player location as LorenzVec format to the clipboard"
+        ) { SkyHanniTestCommand.copyLocation(it) }
+        registerCommand(
+            "shcopyentities",
+            "Copies entities in the specified radius around the player to the clipboard"
+        ) { CopyNearbyEntitiesCommand.command(it) }
+        registerCommand("shcopytablist", "Copies the tab list data to the clipboard") { CopyTabListCommand.command(it) }
+        registerCommand(
+            "shcopyscoreboard",
+            "Copies the scoreboard data to the clipboard"
+        ) { CopyScoreboardCommand.command(it) }
+        registerCommand(
+            "shcopyitem",
+            "Copies information about the item in hand to the clipboard"
+        ) { CopyItemCommand.command(it) }
+        registerCommand(
+            "shcopyparticles",
+            "Copied information about the particles that spawn in the next 50ms to the clipboard"
+        ) { CopyNearbyParticlesCommand.command(it) }
+        registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.toggle() }
+        registerCommand(
+            "shtestmessage",
+            "Sends a custom chat message client side in the chat"
+        ) { TestChatCommand.command(it) }
+    }
+
+    private fun internalCommands() {
+        registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
+        registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
+        registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
+    }
+
+    private fun commandHelp(args: Array<String>) {
+        var filter: (String) -> Boolean = { true }
+        val title: String
+        if (args.size == 1) {
+            val searchTerm = args[0].lowercase()
+            filter = { it.lowercase().contains(searchTerm) }
+            title = "SkyHanni commands with '§e$searchTerm§7'"
+        } else {
+            title = "All SkyHanni commands"
+        }
+        val base = ChatComponentText(" \n§7$title:\n")
+        for (command in commands) {
+            if (!filter(command.name) && !filter(command.description)) continue
+            val category = command.category
+            val name = command.name
+            val color = category.color
+            val text = ChatComponentText("$color/$name")
+            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/$name")
+
+            val hoverText = buildList {
+                add("§e/$name")
+                add(" §7${command.description}")
+                add("")
+                add("$color${category.categoryName}")
+                add("  §7${category.description}")
+            }
+
+            text.chatStyle.chatHoverEvent =
+                HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hoverText.joinToString("\n")))
+            base.appendSibling(text)
+            base.appendSibling(ChatComponentText("§7, "))
+        }
+        base.appendSibling(ChatComponentText("\n "))
+        Minecraft.getMinecraft().thePlayer.addChatMessage(base)
     }
 
     @JvmStatic
@@ -121,8 +271,9 @@ object Commands {
         config.outdatedItems.clear()
     }
 
-    private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
+    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+        commands.add(CommandInfo(name, description, currentCategory))
     }
 
     private fun createCommand(function: (Array<String>) -> Unit) =
