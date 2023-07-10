@@ -178,10 +178,22 @@ object EstimatedItemValue {
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
-        val internalName = stack.getInternalName()
+        var internalName = stack.getInternalName().removePrefix("VANQUISHED_")
+        val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
+        var genericName =  internalName
+        if (kuudraSets.any { internalName.contains(it) }
+            && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) }) {
+            for (prefix in listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")) {
+                internalName = internalName.removePrefix(prefix)
+            }
+            genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
+        }
         if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
             val price =
-                getPriceOrCompositePriceForAttribute("ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first, attributes[0].second)
+                getPriceOrCompositePriceForAttribute(
+                    "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
+                    attributes[0].second
+                )
             if (price != null) {
                 list.add(
                     "§7Attribute §9${
@@ -192,7 +204,7 @@ object EstimatedItemValue {
             }
         }
         if (attributes.size != 2) return 0.0
-        val basePrice = NEUItems.getPrice(internalName) ?: 0.0
+        val basePrice = NEUItems.getPriceOrNull(internalName) ?: 0.0
         var subTotal = 0.0
         val combo = internalName + "+ATTRIBUTE_" + attributes[0].first + "+ATTRIBUTE_" + attributes[1].first
         val comboPrice = NEUItems.getPriceOrNull(combo)
@@ -202,11 +214,6 @@ object EstimatedItemValue {
         } else {
             list.add("§7Attributes:")
         }
-        val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
-        val genericName = if (kuudraSets.any { internalName.startsWith(it) }
-            && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) }) {
-            kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
-        } else internalName
         for (attr in attributes) {
             val price =
                 getPriceOrCompositePriceForAttribute("$genericName+ATTRIBUTE_${attr.first}", attr.second)
