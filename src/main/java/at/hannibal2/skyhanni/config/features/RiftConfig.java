@@ -217,12 +217,12 @@ public class RiftConfig {
 
         public static class MirrorVerse {
 
-        @ConfigOption(name = "Lava Maze", desc = "")
-        @Accordion
-        @Expose
-        public LavaMazeConfig lavaMazeConfig = new LavaMazeConfig();
+            @ConfigOption(name = "Lava Maze", desc = "")
+            @Accordion
+            @Expose
+            public LavaMazeConfig lavaMazeConfig = new LavaMazeConfig();
 
-        public static class LavaMazeConfig {
+            public static class LavaMazeConfig {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the mirror verse by showing the correct way.")
@@ -251,12 +251,12 @@ public class RiftConfig {
             }
 
 
-        @ConfigOption(name = "Upside Down Parkour", desc = "")
-        @Accordion
-        @Expose
-        public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
+            @ConfigOption(name = "Upside Down Parkour", desc = "")
+            @Accordion
+            @Expose
+            public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
 
-        public static class UpsideDownParkour {
+            public static class UpsideDownParkour {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the mirror verse by showing the correct way.")
@@ -290,12 +290,12 @@ public class RiftConfig {
             }
 
 
-        @ConfigOption(name = "Dance Room Helper", desc = "")
-        @Accordion
-        @Expose
-        public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
+            @ConfigOption(name = "Dance Room Helper", desc = "")
+            @Accordion
+            @Expose
+            public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
 
-        public static class DanceRoomHelper {
+            public static class DanceRoomHelper {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the mirror verse by showing multiple tasks at once.")
@@ -344,16 +344,16 @@ public class RiftConfig {
                     @ConfigEditorText
                     public String later = "&7Later:";
 
-                @Expose
-                @ConfigOption(name = "Color Option", desc = "")
-                @Accordion
-                public Color color = new Color();
-
-                public static class Color {
                     @Expose
-                    @ConfigOption(name = "Move", desc = "Color for the Move instruction")
-                    @ConfigEditorText
-                    public String move = "&e";
+                    @ConfigOption(name = "Color Option", desc = "")
+                    @Accordion
+                    public Color color = new Color();
+
+                    public static class Color {
+                        @Expose
+                        @ConfigOption(name = "Move", desc = "Color for the Move instruction")
+                        @ConfigEditorText
+                        public String move = "&e";
 
                         @Expose
                         @ConfigOption(name = "Stand", desc = "Color for the Stand instruction")
@@ -392,12 +392,12 @@ public class RiftConfig {
             }
 
 
-        @ConfigOption(name = "Tubulator", desc = "")
-        @Accordion
-        @Expose
-        public TubulatorConfig tubulatorConfig = new TubulatorConfig();
+            @ConfigOption(name = "Tubulator", desc = "")
+            @Accordion
+            @Expose
+            public TubulatorConfig tubulatorConfig = new TubulatorConfig();
 
-        public static class TubulatorConfig {
+            public static class TubulatorConfig {
 
                 @Expose
                 @ConfigOption(name = "Enabled", desc = "Highlights the location of the invisible Tubulator blocks (Laser Parkour).")
@@ -447,161 +447,8 @@ public class RiftConfig {
 
         public static class LivingCaveConfig {
 
-            @Expose
-            @ConfigOption(name = "Vampire Slayer Features", desc = "")
-    @Accordion
-    public VampireSlayerConfig vampireSlayerConfig = new VampireSlayerConfig();
 
-    public static class VampireSlayerConfig {
-
-        @Expose
-        @ConfigOption(name = "Your Boss", desc = "")
-        @Accordion
-        public OwnBoss ownBoss = new OwnBoss();
-        public static class OwnBoss {
-
-            @Expose
-            @ConfigOption(name = "Highlight your boss", desc = "Highlight your own vampire slayer boss.")
-            @ConfigEditorBoolean
-            public boolean highlight = true;
-
-            @Expose
-            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
-            @ConfigEditorColour
-            public String highlightColor = "0:249:0:255:88";
-
-            @Expose
-            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak your boss.")
-            @ConfigEditorBoolean
-            public boolean steakAlert = true;
-
-            @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
-            @ConfigEditorBoolean
-            public boolean twinClawsTitle = true;
-        }
-
-        @Expose
-        @ConfigOption(name = "Others Boss", desc = "")
-        @Accordion
-        public OthersBoss othersBoss = new OthersBoss();
-        public static class OthersBoss {
-
-            @Expose
-            @ConfigOption(name = "Highlight Others people boss", desc = "Highlight others players boss.\nYou need to hit them first.")
-            @ConfigEditorBoolean
-            public boolean highlight = true;
-
-            @Expose
-            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
-            @ConfigEditorColour
-            public String highlightColor = "0:249:0:255:88";
-
-            @Expose
-            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak the boss.")
-            @ConfigEditorBoolean
-            public boolean steakAlert = true;
-
-            @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
-            @ConfigEditorBoolean
-            public boolean twinClawsTitle = true;
-        }
-
-        @Expose
-        @ConfigOption(name = "Co-op Boss", desc = "")
-        @Accordion
-        public CoopBossHighlight coopsBossHighlight = new CoopBossHighlight();
-
-        public static class CoopBossHighlight {
-            @Expose
-            @ConfigOption(name = "Highlight Co-op Boss", desc = "Highlight boss of your co-op member.")
-            @ConfigEditorBoolean
-            public boolean highlight = true;
-
-            @Expose
-            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
-            @ConfigEditorColour
-            public String highlightColor = "0:249:0:255:88";
-
-            @Expose
-            @ConfigOption(name = "Co-op Members", desc = "Add your co-op member here.\n§eFormat: §7Name1,Name2,Name3")
-            @ConfigEditorText
-            public String coopMembers = "";
-
-            @Expose
-            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak the boss.")
-            @ConfigEditorBoolean
-            public boolean steakAlert = true;
-
-            @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
-            @ConfigEditorBoolean
-            public boolean twinClawsTitle = true;
-        }
-
-        @Expose
-        @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
-        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 250)
-        public int withAlpha = 80;
-
-        @Expose
-        @ConfigOption(name = "See Through Blocs", desc = "Highlight even when behind others mobs/players")
-        @ConfigEditorBoolean
-        public boolean seeThrough = false;
-
-        @Expose
-        @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
-        @ConfigEditorBoolean
-        public boolean changeColorWhenCanSteak = true;
-
-        @Expose
-        @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
-        @ConfigEditorColour
-        public String steakColor = "0:255:255:0:88";
-
-
-        @Expose
-        @ConfigOption(name = "Blood Ichor", desc = "")
-        @Accordion
-        public BloodIchor bloodIchor = new BloodIchor();
-
-        public static class BloodIchor {
-            @Expose
-            @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor.")
-            @ConfigEditorBoolean
-            public boolean highlight = true;
-
-            @Expose
-            @ConfigOption(name = "Beacon Beam", desc = "Render a beacon beam where the Blood Ichor is.")
-            @ConfigEditorBoolean
-            public boolean renderBeam = true;
-
-            @Expose
-            @ConfigOption(name = "Color", desc = "Highlight color.")
-            @ConfigEditorColour
-            public String color = "0:199:100:0:88";
-        }
-
-        @Expose
-        @ConfigOption(name = "Killer Spring", desc = "")
-        @Accordion
-        public KillerSpring killerSpring = new KillerSpring();
-
-        public static class KillerSpring {
-            @Expose
-            @ConfigOption(name = "Highlight Killer Spring", desc = "Highlight the Killer Spring tower.")
-            @ConfigEditorBoolean
-            public boolean highlight = true;
-
-            @Expose
-            @ConfigOption(name = "Color", desc = "Highlight color.")
-            @ConfigEditorColour
-            public String color = "0:199:100:0:88";
-        }
-    }
-
-    @ConfigOption(name = "Living Metal Suit Progress", desc = "")
+            @ConfigOption(name = "Living Metal Suit Progress", desc = "")
             @Accordion
             public LivingMetalSuitProgress livingMetalSuitProgress = new LivingMetalSuitProgress();
 
