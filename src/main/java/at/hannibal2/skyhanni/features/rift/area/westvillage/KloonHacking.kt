@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.area.westvillage
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class KloonHacking {
+    private val config get() = RiftAPI.config.area.westVillageConfig.hacking
     private var wearingHelmet = false
     private var inTerminalInventory = false
     private var inColourInventory = false
@@ -42,7 +43,7 @@ class KloonHacking {
         inColourInventory = false
         nearestTerminal = null
         if (!RiftAPI.inRift()) return
-        if (!SkyHanniMod.feature.rift.hacking.solver) return
+        if (!config.solver) return
         if (event.inventoryName == "Hacking" || event.inventoryName == "Hacking (As seen on CSI)") {
             inTerminalInventory = true
             correctButtons.clear()
@@ -67,7 +68,7 @@ class KloonHacking {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!RiftAPI.inRift()) return
         if (inTerminalInventory) {
-            if (!SkyHanniMod.feature.rift.hacking.solver) return
+            if (!config.solver) return
             var i = 0
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.slotIndex == 11 + 10 * i) {
@@ -86,7 +87,7 @@ class KloonHacking {
             }
         }
         if (inColourInventory) {
-            if (!SkyHanniMod.feature.rift.hacking.colour) return
+            if (!config.colour) return
             val targetColour = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.stack.getLore().any { it.contains(targetColour?.name ?: "") }) {
@@ -105,7 +106,7 @@ class KloonHacking {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!RiftAPI.inRift()) return
-        if (!SkyHanniMod.feature.rift.hacking.waypoints) return
+        if (!config.waypoints) return
         if (!wearingHelmet) return
         val hidden = ProfileStorageData.profileSpecific?.rift ?: return
         for (terminal in KloonTerminal.values()) {
@@ -133,7 +134,7 @@ class KloonHacking {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!RiftAPI.inRift()) return
         if (!inTerminalInventory) return
-        if (!SkyHanniMod.feature.rift.hacking.solver) return
+        if (!config.solver) return
 
         val neededTooltips = listOf(0, 2, 3, 4, 5, 6, 8, 9, 26, 27, 44, 45)
         if (event.slot.slotIndex !in neededTooltips) {

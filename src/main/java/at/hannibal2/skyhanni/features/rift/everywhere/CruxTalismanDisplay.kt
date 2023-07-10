@@ -1,6 +1,5 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.everywhere
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -17,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CruxTalismanDisplay {
 
-    private val config get() = SkyHanniMod.feature.rift.cruxTalisman
+    private val config get() = RiftAPI.config.cruxTalisman
     private val partialName = "CRUX_TALISMAN"
     private var display = emptyList<List<Any>>()
     private val displayLine = mutableListOf<Crux>()
