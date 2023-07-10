@@ -410,9 +410,9 @@ public class RiftConfig {
     @Expose
     @ConfigOption(name = "Vampire Slayer Features", desc = "")
     @Accordion
-    public VampireSlayerFeatures vampireSlayerFeatures = new VampireSlayerFeatures();
+    public VampireSlayerConfig vampireSlayerConfig = new VampireSlayerConfig();
 
-    public static class VampireSlayerFeatures {
+    public static class VampireSlayerConfig {
 
         @Expose
         @ConfigOption(name = "Highlight your boss", desc = "Highlight your own vampire slayer boss.")

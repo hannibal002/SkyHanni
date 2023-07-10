@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class VampireSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.rift.vampireSlayerFeatures
+    private val config get() = SkyHanniMod.feature.rift.vampireSlayerConfig
     private val entityList = mutableListOf<EntityLivingBase>()
     private val taggedEntityList = mutableListOf<Int>()
     private val username = Minecraft.getMinecraft().session.username
