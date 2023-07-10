@@ -32,7 +32,7 @@ class VampireSlayerFeatures {
 
     private val config get() = SkyHanniMod.feature.rift.vampireSlayerFeatures
     private val entityList = mutableListOf<EntityLivingBase>()
-    private val taggedEntityList = mutableListOf<EntityOtherPlayerMP>()
+    private val taggedEntityList = mutableListOf<Int>()
     private val username = Minecraft.getMinecraft().session.username
     private val bloodIchorTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
     private val killerSpringTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdmN2E3YmM4YWM4NmYyM2NhN2JmOThhZmViNzY5NjAyMjdlMTgzMmZlMjA5YTMwMjZmNmNlYjhiZGU3NGY1NCJ9fX0="
@@ -71,7 +71,6 @@ class VampireSlayerFeatures {
     }
 
     private fun EntityOtherPlayerMP.process() {
-        val other = taggedEntityList.contains(this)
         if (name != "Bloodfiend ") return
         if (config.twinClawsTitle) {
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
@@ -90,8 +89,8 @@ class VampireSlayerFeatures {
                             contain
                         }
                     }
-                    if (containUser || containCoop || taggedEntityList.contains(this)) {
-                        val color = if (containUser) "§6" else if (taggedEntityList.contains(this)) "§c" else if (containCoop) "§3" else "§f"
+                    if (containUser || containCoop || taggedEntityList.contains(this.entityId)) {
+                        val color = if (containUser) "§6" else if (taggedEntityList.contains(this.entityId)) "§c" else if (containCoop) "§3" else "§f"
                         TitleUtils.sendTitle("$color§lTWINCLAWS", 300, 2.6)
                     }
                 }
@@ -100,15 +99,13 @@ class VampireSlayerFeatures {
         getAllNameTagsInRadiusWith("Spawned by").forEach {
             val coopList = config.coopsBossHighlight.coopMembers.split(",").toList()
             val containUser = it.name.contains(username)
-            val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                coopList.isNotEmpty() && config.coopsBossHighlight.highlight && coopList.any { it2 ->
-                    var contain = false
-                    if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                        val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
-                        contain = it2 == name
-                    }
-                    contain
+            val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
+                var contain = false
+                if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
+                    val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
+                    contain = it2 == name
                 }
+                contain
             }
             val neededHealth = when (baseMaxHealth) {
                 625 -> 125f // t1
@@ -119,10 +116,17 @@ class VampireSlayerFeatures {
             }
             val canUseSteak = health <= neededHealth
             val color = if (canUseSteak && config.changeColorWhenCanSteak) config.steakColor.toChromaColor().withAlpha(config.withAlpha) else config.highlightColor.toChromaColor().withAlpha(config.withAlpha)
-            val shouldRender = when (other) {
-                true -> config.highlightOthers && isEnabled() && it.name.contains("Spawned by") && !containUser && isNPC()
-                false -> config.highlightOwnBoss && isEnabled() && (containUser || containCoop) && isNPC()
+            /* val shouldRender = when (!containUser) {
+                 true -> config.highlightOthers && isEnabled() && taggedEntityList.contains(this) && isNPC()
+                 false -> config.highlightOwnBoss && isEnabled() && isNPC() || containCoop
+             }*/
+            if (containUser && taggedEntityList.contains(this.entityId)){
+                taggedEntityList.remove(this.entityId)
             }
+            val shouldRender = if (config.highlightOwnBoss && containUser && isNPC()) true
+            else if (config.highlightOthers && taggedEntityList.contains(this.entityId) && isNPC()) true
+            else config.coopsBossHighlight.highlight && containCoop && isNPC()
+
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
             if (shouldRender)
@@ -137,11 +141,11 @@ class VampireSlayerFeatures {
         if (event.clickedEntity !is EntityOtherPlayerMP) return
         if (!event.clickedEntity.isNPC()) return
         event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by").forEach {
-            if (!it.name.contains(username)) {
-                if (!taggedEntityList.contains(event.clickedEntity)) {
-                    taggedEntityList.add(event.clickedEntity)
-                }
+            if (it.name.contains(username)) return
+            if (!taggedEntityList.contains(event.clickedEntity.entityId)) {
+                taggedEntityList.add(event.clickedEntity.entityId)
             }
+
         }
     }
 
@@ -152,8 +156,8 @@ class VampireSlayerFeatures {
         if (entityList.contains(entity)) {
             entityList.remove(entity)
         }
-        if (taggedEntityList.contains(entity)) {
-            taggedEntityList.remove(entity)
+        if (taggedEntityList.contains(entity.entityId)) {
+            taggedEntityList.remove(entity.entityId)
         }
     }
 
@@ -189,9 +193,10 @@ class VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load){
+    fun onWorldChange(event: WorldEvent.Load) {
         if (!isEnabled()) return
-            entityList.clear()
+        entityList.clear()
+        taggedEntityList.clear()
     }
 
     fun isEnabled() = RiftAPI.inRift()
