@@ -28,7 +28,6 @@ class LivingMetalSuitProgress {
     }
 
     private fun update() {
-        println("update!")
         display = drawDisplay()
     }
 
