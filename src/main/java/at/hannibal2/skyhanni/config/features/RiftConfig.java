@@ -504,7 +504,20 @@ public class RiftConfig {
     public boolean highlightGuide = true;
 
     @Expose
-    @ConfigOption(name = "Show Motes Price", desc = "Show the Motes NPC price in the item lore.")
-    @ConfigEditorBoolean
-    public boolean showMotesPrice = true;
+    @ConfigOption(name = "", desc = "")
+    @Accordion
+    public Motes motes = new Motes();
+
+    public static class Motes {
+
+        @Expose
+        @ConfigOption(name = "Show Motes Price", desc = "Show the Motes NPC price in the item lore.")
+        @ConfigEditorBoolean
+        public boolean showPrice = true;
+
+        @Expose
+        @ConfigOption(name = "Burger Stacks", desc = "Set your McGrubber's burger stacks.")
+        @ConfigEditorSlider(minStep = 1, minValue =  0, maxValue = 5)
+        public int burgerStacks = 0;
+    }
 }
