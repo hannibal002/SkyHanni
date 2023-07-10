@@ -32,20 +32,32 @@ object DanceRoomHelper {
                 add("§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo")
             }
             for ((lineIndex, line) in instructions.withIndex()) {
-                if (line != null) {
-                    if (index < instructions.size && index == lineIndex) {
-                        add("${config.danceRoomFormatting.now.replace("&", "§")} ${line.format()} ${if (countdown != null) "${config.danceRoomFormatting.color.countdown.replace("&", "§")}$countdown" else ""}")
-                    } else if (index + 1 < instructions.size && index + 1 == lineIndex) {
-                        add("${config.danceRoomFormatting.next.replace("&", "§")} ${line.format()}")
-                    } else if (index + 2 < instructions.size && (index + 2..index + config.lineToShow).contains(lineIndex)) {
-                        add("${config.danceRoomFormatting.later.replace("&", "§")} ${line.format()}")
-                    }
-                }
+                addLine(lineIndex, line)?.let { add(it) }
             }
         }
     }
 
-    private fun String.format() = split(" ").joinToString(" ") { it.firstLetterUppercase().addColor().replace("&", "§") }
+    private fun addLine(lineIndex: Int, line: String) = with(config.danceRoomFormatting) {
+        val size = instructions.size
+        val format = line.format()
+
+        if (index < size && index == lineIndex) {
+            val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
+            "${now.formatColor()} $format $countdown"
+
+        } else if (index + 1 < size && index + 1 == lineIndex) {
+            "${next.formatColor()} $format"
+
+        } else if (index + 2 < size && (index + 2..index + config.lineToShow).contains(lineIndex)) {
+            "${later.formatColor()} $format"
+
+        } else null
+    }
+
+    private fun String.formatColor() = replace("&", "§")
+
+    private fun String.format() =
+        split(" ").joinToString(" ") { it.firstLetterUppercase().addColor().replace("&", "§") }
 
     private fun String.addColor() = when (this) {
         "Move" -> config.danceRoomFormatting.color.move
@@ -103,7 +115,7 @@ object DanceRoomHelper {
     fun onPacket(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
         val packet = event.packet
-        if (packet !is S45PacketTitle) return
+        if (packet !is S45PacketTitle) return // TODO add a title event
         if (config.hideOriginalTitle && inRoom) event.isCanceled = true
     }
 

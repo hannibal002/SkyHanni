@@ -180,7 +180,7 @@ class BlazeSlayerDaggerHelper {
 
         val packet = event.packet
 
-        if (packet !is S45PacketTitle) return
+        if (packet !is S45PacketTitle) return // TODO add a title event
         val message = packet.message ?: return
         val formattedText = message.formattedText
 
