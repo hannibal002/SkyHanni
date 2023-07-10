@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -15,77 +16,66 @@ class LivingMetalSuitProgress {
 
     private val config get() = SkyHanniMod.feature.rift.livingMetalSuitProgress
     private var display = emptyList<List<Any>>()
-    private val progressMap = linkedMapOf<ItemStack, Int>()
-    private var totalProgress = 0.0
+    private var progressMap = mapOf<ItemStack, Double?>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderStringsAndItems(
-                display,
-                posLabel = "Living Metal Armor Progress"
+            display,
+            posLabel = "Living Metal Armor Progress"
         )
     }
 
     private fun update() {
+        println("update!")
         display = drawDisplay()
     }
 
     fun drawDisplay(): List<List<Any>> = buildList {
-        val newDisplay = mutableListOf<List<Any>>()
-        var piecesMaxed = 0
-        var isMaxed = false
-        var percent = 0
+        val piecesMaxed = progressMap.values.filterNotNull().count { it >= 1 }
+        val isMaxed = piecesMaxed == 4
 
-        for ((_, progress) in progressMap)
-            if (progress >= 100) piecesMaxed++
-        if (piecesMaxed == 4)
-            isMaxed = true
+        if (progressMap.isEmpty()) return@buildList
 
-        if (!config.compactWhenMaxed && isMaxed) isMaxed = false
+        val totalProgress = progressMap.values.map { it ?: 1.0 }.average().roundToPrecision(1)
+        val formatPercentage = LorenzUtils.formatPercentage(totalProgress)
+        addAsSingletonList("§7Living Metal Suit Progress: ${if (isMaxed) "§a§lMAXED!" else "§a$formatPercentage"}")
 
-        if (progressMap.isNotEmpty()) {
-            newDisplay.addAsSingletonList("§7Living Metal Suit Progress: ${if (isMaxed) "§a§lMAXED!" else "§a$totalProgress%"}")
-            if (!isMaxed)
-                for ((stack, progress) in progressMap.entries.reversed()) {
-                    totalProgress += progress
-                    newDisplay.add(buildList {
-                        add("  §7- ")
-                        add(stack)
-                        add("${stack.displayName}: ")
-                        if (progress == -1) {
-                            add("§cStart upgrading it!")
-                        } else {
-                            add(drawProgressBar(progress, 100))
-                            add(" §b$progress%")
-                            percent += progress
-                        }
-                    })
-                }
+        if (config.compactWhenMaxed && isMaxed) return@buildList
+
+        for ((stack, progress) in progressMap.entries.reversed()) {
+            add(buildList {
+                add("  §7- ")
+                add(stack)
+                add("${stack.displayName}: ")
+                add(progress?.let {
+                    drawProgressBar(progress) + " §b${LorenzUtils.formatPercentage(progress)}"
+                } ?: "§cStart upgrading it!")
+            })
         }
-        totalProgress = ((percent.toDouble() / 400) * 100).roundToPrecision(1)
-        return newDisplay
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(20)) return
-        val armors = InventoryUtils.getArmor()
-        progressMap.clear()
-        for (armor in armors) {
-            armor?.let {
-                var progress = it.getLivingMetalProgress() ?: -1
-                if (progress > 100) progress = 100
-                progressMap.put(it, progress)
+        val old = progressMap
+        progressMap = buildMap {
+            for (armor in InventoryUtils.getArmor().filterNotNull()) {
+                put(armor, armor.getLivingMetalProgress()?.toDouble()?.let {
+                    it.coerceAtMost(100.0) / 100
+                })
             }
         }
-        update()
+        if (old != progressMap) {
+            update()
+        }
     }
 
-    private fun drawProgressBar(progress: Int, total: Int): String {
+    private fun drawProgressBar(percentage: Double): String {
         val progressBarLength = 20
-        val filledLength = (progress.toFloat() / total * progressBarLength).toInt()
+        val filledLength = (percentage * progressBarLength).toInt()
 
         val green = "§a"
         val grey = "§7"
