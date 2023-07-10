@@ -113,6 +113,15 @@ object SkyBlockItemModifierUtils {
         list.toList()
     }
 
+    fun ItemStack.getAttributes() = getExtraAttributes()
+        ?.takeIf { it.hasKey("attributes", 10) }
+        ?.getCompoundTag("attributes")
+        ?.let { attr ->
+            attr.keySet.map {
+                it.uppercase() to attr.getInteger(it)
+            }.sortedBy { it.first }
+        }
+
     fun ItemStack.getReforgeName() = getAttributeString("modifier")
 
     fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")
