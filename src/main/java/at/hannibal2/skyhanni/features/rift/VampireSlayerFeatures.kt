@@ -229,7 +229,6 @@ class VampireSlayerFeatures {
                 if (it.isEntityAlive) {
                     event.drawWaypointFilled(
                         it.position.toLorenzVec().add(0, -2, 0), config.bloodIchor.color.toChromaColor(),
-                        seeThroughBlocks = false,
                         beacon = true
                     )
                 }
