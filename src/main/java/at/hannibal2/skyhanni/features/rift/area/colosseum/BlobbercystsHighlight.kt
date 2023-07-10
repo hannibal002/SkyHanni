@@ -5,7 +5,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canSee
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -27,8 +30,8 @@ class BlobbercystsHighlight {
         if (!event.isMod(5)) return
         Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
             if (it.name == blobberName) {
-                RenderLivingEntityHelper.setEntityColor(it, Color.RED.withAlpha(80)) { true }
-                RenderLivingEntityHelper.setNoHurtTime(it) { true }
+                RenderLivingEntityHelper.setEntityColor(it, Color.RED.withAlpha(80)) { isEnabled() }
+                RenderLivingEntityHelper.setNoHurtTime(it) { isEnabled() }
                 entityList.add(it)
             }
         }
@@ -52,6 +55,7 @@ class BlobbercystsHighlight {
     fun pre(event: RenderLivingEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (event.entity.name != blobberName) return
+        if (!canSee(LocationUtils.playerEyeLocation(), event.entity.getLorenzVec())) return
         GlStateManager.disableDepth()
     }
 
@@ -59,6 +63,7 @@ class BlobbercystsHighlight {
     fun pre(event: RenderLivingEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (event.entity.name != blobberName) return
+        if (!canSee(LocationUtils.playerEyeLocation(), event.entity.getLorenzVec())) return
         GlStateManager.enableDepth()
     }
 
