@@ -51,21 +51,5 @@ class BlobbercystsHighlight {
         }
     }
 
-    @SubscribeEvent
-    fun pre(event: RenderLivingEvent.Pre<EntityOtherPlayerMP>) {
-        if (!isEnabled()) return
-        if (event.entity.name != blobberName) return
-        if (!canSee(LocationUtils.playerEyeLocation(), event.entity.getLorenzVec())) return
-        GlStateManager.disableDepth()
-    }
-
-    @SubscribeEvent
-    fun pre(event: RenderLivingEvent.Post<EntityOtherPlayerMP>) {
-        if (!isEnabled()) return
-        if (event.entity.name != blobberName) return
-        if (!canSee(LocationUtils.playerEyeLocation(), event.entity.getLorenzVec())) return
-        GlStateManager.enableDepth()
-    }
-
     fun isEnabled() = RiftAPI.inRift() && config.highlightBlobbercysts && LorenzUtils.skyBlockArea == "Colosseum"
 }
