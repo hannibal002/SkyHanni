@@ -155,7 +155,7 @@ class ItemAbilityCooldown {
         handleOldAbilities(message)
 
         if (message.contains("§lCASTING IN ")) {
-            if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.WHITE) {
+            if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown()) {
                 ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
             }
         } else if (message.contains("§lCASTING")) {
@@ -299,6 +299,9 @@ class ItemAbilityCooldown {
         }
         if (message == "§eYou §r§aaligned §r§eyourself!") {
             ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6_000)
+        }
+        if (message == "§cRagnarock was cancelled due to being hit!") {
+            ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
         }
     }
 

@@ -43,6 +43,7 @@ import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.roundToLong
 
 object EstimatedItemValue {
     private val config get() = SkyHanniMod.feature.misc
@@ -120,7 +121,7 @@ object EstimatedItemValue {
         if (basePrice == totalPrice) return listOf()
 
         val numberFormat = if (config.estimatedIemValueExactPrice) {
-            totalPrice.addSeparators()
+            totalPrice.roundToLong().addSeparators()
         } else {
             NumberUtil.format(totalPrice)
         }

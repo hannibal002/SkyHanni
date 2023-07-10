@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,15 +21,21 @@ class BazaarDataHolder {
         val list = mutableMapOf<String, Double>()
         try {
             val itemsData = APIUtil.getJSONResponse("https://api.hypixel.net/resources/skyblock/items")
+            val motesPrice = mutableMapOf<String, Double>()
             for (element in itemsData["items"].asJsonArray) {
                 val jsonObject = element.asJsonObject
-                if (jsonObject.has("npc_sell_price")) {
-                    val hypixelId = jsonObject["id"].asString
-                    val npcPrice = jsonObject["npc_sell_price"].asDouble
+                val hypixelId = jsonObject["id"].asString
+                jsonObject["npc_sell_price"]?.let {
                     val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
-                    list[neuItemId] = npcPrice
+                    list[neuItemId] = it.asDouble
+                }
+                jsonObject["motes_sell_price"]?.let {
+                    val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
+                    println("motes price: $neuItemId = $it")
+                    motesPrice[neuItemId] = it.asDouble
                 }
             }
+            RiftAPI.motesPrice = motesPrice
         } catch (e: Throwable) {
             e.printStackTrace()
             LorenzUtils.error("Error while trying to read bazaar item list from api: " + e.message)

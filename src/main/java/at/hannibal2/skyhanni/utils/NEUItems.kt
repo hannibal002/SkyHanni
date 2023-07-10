@@ -88,8 +88,9 @@ object NEUItems {
         }
 
         resolveEnchantmentByName(itemName)?.let {
-            itemNameCache[itemName] = it
-            return it
+            val enchantmentName = fixEnchantmentName(it)
+            itemNameCache[itemName] = enchantmentName
+            return enchantmentName
         }
         var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
@@ -101,6 +102,16 @@ object NEUItems {
 
         itemNameCache[lowercase] = internalName
         return internalName
+    }
+
+    private fun fixEnchantmentName(originalName: String): String {
+        // Workaround for duplex
+        "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern().matchMatcher(originalName) {
+            val tier = group("tier")
+            return "ULTIMATE_REITERATE;$tier"
+        }
+
+        return originalName
     }
 
     private fun turboCheck(text: String): String {
