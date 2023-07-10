@@ -8,7 +8,8 @@ import org.lwjgl.input.Keyboard;
 public class DevConfig {
 
     @Expose
-    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.")
+    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" +
+            "§cOnly disable this if you know what you are doing!")
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;
 
