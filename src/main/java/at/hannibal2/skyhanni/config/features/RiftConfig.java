@@ -504,7 +504,7 @@ public class RiftConfig {
     public boolean highlightGuide = true;
 
     @Expose
-    @ConfigOption(name = "", desc = "")
+    @ConfigOption(name = "Motes Sell Price", desc = "")
     @Accordion
     public Motes motes = new Motes();
 
