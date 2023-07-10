@@ -237,7 +237,6 @@ class VampireSlayerFeatures {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        if (!isEnabled()) return
         entityList.clear()
         taggedEntityList.clear()
     }
