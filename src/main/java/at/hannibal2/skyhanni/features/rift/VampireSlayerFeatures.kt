@@ -9,12 +9,15 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -54,12 +57,10 @@ class VampireSlayerFeatures {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
-                if (stand.hasSkullTexture(bloodIchorTexture) || stand.hasSkullTexture(killerSpringTexture)) {
-                    val isIchor = stand.hasSkullTexture(bloodIchorTexture)
-                    val color = if (isIchor) config.bloodIchor.color.toChromaColor().withAlpha(config.withAlpha)
-                    else if (stand.hasSkullTexture(killerSpringTexture)) config.killerSpring.color.toChromaColor()
-                        .withAlpha(config.withAlpha)
-                    else LorenzColor.WHITE.toColor().withAlpha(config.withAlpha)
+                val isIchor = stand.hasSkullTexture(bloodIchorTexture)
+                if (isIchor || stand.hasSkullTexture(killerSpringTexture)) {
+                    val color = (if (isIchor) config.bloodIchor.color else config.killerSpring.color)
+                        .toChromaColor().withAlpha(config.withAlpha)
                     RenderLivingEntityHelper.setEntityColor(
                         stand,
                         color
