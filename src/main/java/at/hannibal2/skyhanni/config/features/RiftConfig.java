@@ -267,6 +267,75 @@ public class RiftConfig {
             public boolean hidePlayers = false;
 
             @Expose
+            @ConfigOption(name = "Hide Title", desc = "Hide Instructions, \"§aIt's happening!\" §7and \"§aKeep it up!\" §7titles.")
+            @ConfigEditorBoolean
+            public boolean hideOriginalTitle = false;
+
+            @Expose
+            @ConfigOption(name = "Formatting", desc = "")
+            @Accordion
+            public DanceRoomFormatting danceRoomFormatting = new DanceRoomFormatting();
+
+            public static class DanceRoomFormatting {
+
+                @Expose
+                @ConfigOption(name = "Now", desc = "Formatting for \"Now:\"")
+                @ConfigEditorText
+                public String now = "&7Now:";
+
+                @Expose
+                @ConfigOption(name = "Next", desc = "Formatting for \"Next:\"")
+                @ConfigEditorText
+                public String next = "&7Next:";
+
+                @Expose
+                @ConfigOption(name = "Later", desc = "Formatting for \"Later:\"")
+                @ConfigEditorText
+                public String later = "&7Later:";
+
+                @Expose
+                @ConfigOption(name = "Color Option", desc = "")
+                @Accordion
+                public Color color = new Color();
+                public static class Color {
+                    @Expose
+                    @ConfigOption(name = "Move", desc = "Color for the Move instruction")
+                    @ConfigEditorText
+                    public String move = "&e";
+
+                    @Expose
+                    @ConfigOption(name = "Stand", desc = "Color for the Stand instruction")
+                    @ConfigEditorText
+                    public String stand = "&e";
+
+                    @Expose
+                    @ConfigOption(name = "Sneak", desc = "Color for the Sneak instruction")
+                    @ConfigEditorText
+                    public String sneak = "&5";
+
+                    @Expose
+                    @ConfigOption(name = "Jump", desc = "Color for the Jump instruction")
+                    @ConfigEditorText
+                    public String jump = "&b";
+
+                    @Expose
+                    @ConfigOption(name = "Punch", desc = "Color for the Punch instruction")
+                    @ConfigEditorText
+                    public String punch = "&d";
+
+                    @Expose
+                    @ConfigOption(name = "Countdown", desc = "Color for the Countdown")
+                    @ConfigEditorText
+                    public String countdown = "&f";
+
+                    @Expose
+                    @ConfigOption(name = "Default", desc = "Fallback color")
+                    @ConfigEditorText
+                    public String fallback = "&f";
+                }
+            }
+
+            @Expose
             public Position position = new Position(442, 239, false, true);
         }
 
