@@ -458,7 +458,7 @@ public class RiftConfig {
             public String highlightColor = "0:249:0:255:88";
 
             @Expose
-            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak your boss.")
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak the boss.")
             @ConfigEditorBoolean
             public boolean steakAlert = true;
 
@@ -490,12 +490,12 @@ public class RiftConfig {
             public String coopMembers = "";
 
             @Expose
-            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak your boss.")
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak the boss.")
             @ConfigEditorBoolean
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
         }

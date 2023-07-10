@@ -141,10 +141,8 @@ class VampireSlayerFeatures {
             else canUseSteak && config.coopsBossHighlight.steakAlert && containCoop
 
             if (shouldSendSteakTitle)
-                TitleUtils.sendTitle("§cSTEAK!", 300)
+                TitleUtils.sendTitle("§c§lSTEAK!", 300, 2.6)
 
-            println("shoulrender: $shouldRender")
-            println("contain coop: $containCoop")
 
             RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
             RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
