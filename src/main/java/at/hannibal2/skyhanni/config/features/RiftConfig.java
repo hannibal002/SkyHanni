@@ -428,4 +428,8 @@ public class RiftConfig {
     @ConfigEditorBoolean
     public boolean showMotesPrice = true;
 
+    @Expose
+    @ConfigOption(name = "Highlight Blobbercysts", desc = "Highlight Blobbercysts in Bacte fight.")
+    @ConfigEditorBoolean
+    public boolean highlightBlobbercysts = true;
 }

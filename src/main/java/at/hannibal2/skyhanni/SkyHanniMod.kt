@@ -323,6 +323,7 @@ class SkyHanniMod {
         loadModule(HighlightMiningCommissionMobs())
         loadModule(ShowMotesNpcSellPrice())
         loadModule(LivingMetalSuitProgress())
+        loadModule(HighlightBlobbercysts())
 
         init()
 
