@@ -15,7 +15,7 @@ enum class ItemAbility(
 ) {
     //TODO add into repo
 
-    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTREA"),
+    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA"),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
@@ -37,6 +37,7 @@ enum class ItemAbility(
     SWORD_OF_BAD_HEALTH(5),
     WITHER_CLOAK(10),
     HOLY_ICE(4),
+    VOODOO_DOLL_WILTED(3),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 30, "Ender Bow"),

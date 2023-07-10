@@ -429,7 +429,7 @@ class DamageIndicatorManager {
         return ""
     }
 
-    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String? {
+    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
         val shields = HellionShield.values()
         var found = false
         for (shield in shields) {

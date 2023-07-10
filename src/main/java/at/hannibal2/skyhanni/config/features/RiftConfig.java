@@ -169,11 +169,81 @@ public class RiftConfig {
 
     public static class MirrorVerse {
 
+        @ConfigOption(name = "Lava Maze", desc = "")
+        @Accordion
+        @Expose
+        public LavaMazeConfig lavaMazeConfig = new LavaMazeConfig();
+        public static class LavaMazeConfig {
+
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the mirror verse by showing the correct way.")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 30, minValue = 1)
+            public Property<Integer> lookAhead = Property.of(3);
+
+            @Expose
+            @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+            @ConfigEditorBoolean
+            public Property<Boolean> rainbowColor = Property.of(true);
+
+            @Expose
+            @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+            @ConfigEditorColour
+            public Property<String> monochromeColor = Property.of("0:60:0:0:255");
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
+        }
+
+
+        @ConfigOption(name = "Upside Down Parkour", desc = "")
+        @Accordion
+        @Expose
+        public UpsideDownParkour upsideDownParkour = new UpsideDownParkour();
+        public static class UpsideDownParkour {
+
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the mirror verse by showing the correct way.")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 9, minValue = 1)
+            public Property<Integer> lookAhead = Property.of(3);
+
+            @Expose
+            @ConfigOption(name = "Outline", desc = "Outlines the top edge of the platforms.")
+            @ConfigEditorBoolean
+            public boolean outline = true;
+
+            @Expose
+            @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+            @ConfigEditorBoolean
+            public Property<Boolean> rainbowColor = Property.of(true);
+
+            @Expose
+            @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+            @ConfigEditorColour
+            public Property<String> monochromeColor = Property.of("0:60:0:0:255");
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the upside down parkour.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
+        }
+
+
         @ConfigOption(name = "Dance Room Helper", desc = "")
         @Accordion
         @Expose
         public DanceRoomHelper danceRoomHelper = new DanceRoomHelper();
-
         public static class DanceRoomHelper {
 
             @Expose
@@ -197,15 +267,115 @@ public class RiftConfig {
             public boolean hidePlayers = false;
 
             @Expose
-            public Position position = new Position(442, 239, false, true);
+            @ConfigOption(name = "Hide Title", desc = "Hide Instructions, \"§aIt's happening!\" §7and \"§aKeep it up!\" §7titles.")
+            @ConfigEditorBoolean
+            public boolean hideOriginalTitle = false;
 
+            @Expose
+            @ConfigOption(name = "Formatting", desc = "")
+            @Accordion
+            public DanceRoomFormatting danceRoomFormatting = new DanceRoomFormatting();
+
+            public static class DanceRoomFormatting {
+
+                @Expose
+                @ConfigOption(name = "Now", desc = "Formatting for \"Now:\"")
+                @ConfigEditorText
+                public String now = "&7Now:";
+
+                @Expose
+                @ConfigOption(name = "Next", desc = "Formatting for \"Next:\"")
+                @ConfigEditorText
+                public String next = "&7Next:";
+
+                @Expose
+                @ConfigOption(name = "Later", desc = "Formatting for \"Later:\"")
+                @ConfigEditorText
+                public String later = "&7Later:";
+
+                @Expose
+                @ConfigOption(name = "Color Option", desc = "")
+                @Accordion
+                public Color color = new Color();
+                public static class Color {
+                    @Expose
+                    @ConfigOption(name = "Move", desc = "Color for the Move instruction")
+                    @ConfigEditorText
+                    public String move = "&e";
+
+                    @Expose
+                    @ConfigOption(name = "Stand", desc = "Color for the Stand instruction")
+                    @ConfigEditorText
+                    public String stand = "&e";
+
+                    @Expose
+                    @ConfigOption(name = "Sneak", desc = "Color for the Sneak instruction")
+                    @ConfigEditorText
+                    public String sneak = "&5";
+
+                    @Expose
+                    @ConfigOption(name = "Jump", desc = "Color for the Jump instruction")
+                    @ConfigEditorText
+                    public String jump = "&b";
+
+                    @Expose
+                    @ConfigOption(name = "Punch", desc = "Color for the Punch instruction")
+                    @ConfigEditorText
+                    public String punch = "&d";
+
+                    @Expose
+                    @ConfigOption(name = "Countdown", desc = "Color for the Countdown")
+                    @ConfigEditorText
+                    public String countdown = "&f";
+
+                    @Expose
+                    @ConfigOption(name = "Default", desc = "Fallback color")
+                    @ConfigEditorText
+                    public String fallback = "&f";
+                }
+            }
+
+            @Expose
+            public Position position = new Position(442, 239, false, true);
         }
 
-        @Expose
-        @ConfigOption(name = "Tubulator", desc = "Highlights the location of the invisible blocks (Laser Parkour).")
-        @ConfigEditorBoolean
-        public boolean laserParkour = true;
 
+        @ConfigOption(name = "Tubulator", desc = "")
+        @Accordion
+        @Expose
+        public TubulatorConfig tubulatorConfig = new TubulatorConfig();
+        public static class TubulatorConfig {
+
+            @Expose
+            @ConfigOption(name = "Enabled", desc = "Highlights the location of the invisible Tubulator blocks (Laser Parkour).")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Look Ahead", desc = "Change how many platforms should be shown in front of you.")
+            @ConfigEditorSlider(minStep = 1, maxValue = 30, minValue = 1)
+            public Property<Integer> lookAhead = Property.of(2);
+
+            @Expose
+            @ConfigOption(name = "Outline", desc = "Outlines the top edge of the platforms.")
+            @ConfigEditorBoolean
+            public boolean outline = true;
+
+            @Expose
+            @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+            @ConfigEditorBoolean
+            public Property<Boolean> rainbowColor = Property.of(true);
+
+            @Expose
+            @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+            @ConfigEditorColour
+            public Property<String> monochromeColor = Property.of("0:60:0:0:255");
+
+            @Expose
+            @ConfigOption(name = "Hide others players", desc = "Hide other players while doing the lava maze.")
+            @ConfigEditorBoolean
+            public boolean hidePlayers = false;
+        }
     }
 
     @ConfigOption(name = "Kloon Hacking", desc = "")
@@ -252,4 +422,10 @@ public class RiftConfig {
         @Expose
         public Position position = new Position(100, 100);
     }
+
+    @Expose
+    @ConfigOption(name = "Show Motes Price", desc = "Show the Motes NPC price in the item lore.")
+    @ConfigEditorBoolean
+    public boolean showMotesPrice = true;
+
 }

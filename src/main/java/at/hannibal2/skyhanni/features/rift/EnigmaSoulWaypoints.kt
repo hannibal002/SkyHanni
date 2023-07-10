@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object EnigmaSoulWaypoints {
     private val config get() = SkyHanniMod.feature.rift.enigmaSoulWaypoints
     private var inInventory = false
-    private val soulLocations = mutableMapOf<String, LorenzVec>()
+    private var soulLocations = mapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true
@@ -144,10 +144,11 @@ object EnigmaSoulWaypoints {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls") ?: return
         val areas = data.areas ?: error("'areas' is null in EnigmaSouls!")
-        soulLocations.clear()
-        for ((area, locations) in areas) {
-            for (location in locations) {
-                soulLocations[location.name] = location.position
+        soulLocations = buildMap {
+            for ((area, locations) in areas) {
+                for (location in locations) {
+                    this[location.name] = location.position
+                }
             }
         }
     }

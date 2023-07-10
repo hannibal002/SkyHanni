@@ -32,36 +32,25 @@ import kotlin.reflect.KProperty0
 
 object LorenzUtils {
 
-    val onHypixel: Boolean
-        get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
+    val onHypixel get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
 
-    val isOnAlphaServer: Boolean
-        get() = onHypixel && HypixelData.hypixelAlpha
+    val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
-    val inSkyBlock: Boolean
-        get() = onHypixel && HypixelData.skyBlock
+    val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
-    val inDungeons: Boolean
-        get() = inSkyBlock && DungeonData.inDungeon()
+    val inDungeons get() = inSkyBlock && DungeonData.inDungeon()
 
-    val skyBlockIsland: IslandType
-        get() = HypixelData.skyBlockIsland
+    val skyBlockIsland get() = HypixelData.skyBlockIsland
 
-    //TODO add cache
-    val skyBlockArea: String
-        get() = HypixelData.readSkyBlockArea()
+    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
 
-    val inKuudraFight: Boolean
-        get() = skyBlockIsland == IslandType.KUUDRA_ARENA
+    val inKuudraFight get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
-    val noTradeMode: Boolean
-        get() = HypixelData.noTrade
+    val noTradeMode get() = HypixelData.noTrade
 
-    val isBingoProfile: Boolean
-        get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
+    val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
-    val lastWorldSwitch: Long
-        get() = HypixelData.joinedWorld
+    val lastWorldSwitch get() = HypixelData.joinedWorld
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
@@ -380,6 +369,8 @@ object LorenzUtils {
 
     fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
 
+    fun IslandType.isInIsland() = inIsland(this)
+
     fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N) {
         val old = this[item] ?: 0
         val d = old.toDouble() + amount.toDouble()
@@ -389,4 +380,15 @@ object LorenzUtils {
 
     /** transfer string colors from the config to java.awt.Color */
     fun String.toChromaColor() = Color(SpecialColour.specialToChromaRGB(this), true)
+
+    fun <E> List<E>.getOrNull(index: Int): E? {
+        return if (index in indices) {
+            get(index)
+        } else null
+    }
+
+    fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {
+        if (this == null) return emptyList()
+        return listOf(this)
+    }
 }

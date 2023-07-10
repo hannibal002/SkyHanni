@@ -304,8 +304,8 @@ class EliteFarmingWeight {
         private fun specialMushroomWeight(weightPerCrop: MutableMap<CropType, Double>, totalWeight: Double): Double {
             val cactusWeight = weightPerCrop[CropType.CACTUS]!!
             val sugarCaneWeight = weightPerCrop[CropType.SUGAR_CANE]!!
-            val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight;
-            val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight;
+            val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight
+            val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight
 
             val mushroomFactor = CropType.MUSHROOM.getFactor()
             val mushroomCollection = CropType.MUSHROOM.getLocalCounter()

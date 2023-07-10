@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.misc.GhostCounter
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.XPInformation

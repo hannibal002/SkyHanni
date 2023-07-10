@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
@@ -42,6 +43,7 @@ import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.roundToLong
 
 object EstimatedItemValue {
     private val config get() = SkyHanniMod.feature.misc
@@ -119,7 +121,7 @@ object EstimatedItemValue {
         if (basePrice == totalPrice) return listOf()
 
         val numberFormat = if (config.estimatedIemValueExactPrice) {
-            totalPrice.addSeparators()
+            totalPrice.roundToLong().addSeparators()
         } else {
             NumberUtil.format(totalPrice)
         }
@@ -155,6 +157,7 @@ object EstimatedItemValue {
         totalPrice += addSilex(stack, list)
         totalPrice += addTransmissionTuners(stack, list)
         totalPrice += addManaDisintegrators(stack, list)
+        totalPrice += addPolarvoidBook(stack, list)
 
         // cosmetic
         totalPrice += addHelmetSkin(stack, list)
@@ -290,6 +293,15 @@ object EstimatedItemValue {
         val wtfHardcodedDumbFarmers = "FARMING_FOR_DUMMIES"
         val price = NEUItems.getPrice(wtfHardcodedDumbFarmers) * count
         list.add("§7Farming for Dummies: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
+        return price
+    }
+
+    private fun addPolarvoidBook(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getPolarvoidBookCount() ?: return 0.0
+
+        val broDilloMiningSoBad = "POLARVOID_BOOK"
+        val price = NEUItems.getPrice(broDilloMiningSoBad) * count
+        list.add("§7Polarvoid: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
         return price
     }
 

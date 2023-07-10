@@ -12,7 +12,7 @@ public class ModsJson {
     @Expose
     public Map<String, Mod> mods = new HashMap<>();
 
-    public class Mod {
+    public static class Mod {
         @Expose
         public List<String> description = new ArrayList<>();
 

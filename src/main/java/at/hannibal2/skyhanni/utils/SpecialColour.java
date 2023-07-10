@@ -6,21 +6,8 @@ import java.awt.*;
  * Taken from NotEnoughUpdates
  */
 public class SpecialColour {
-    public static String special(int chromaSpeed, int alpha, int rgb) {
-        return special(chromaSpeed, alpha, (rgb & 0xFF0000) >> 16, (rgb & 0x00FF00) >> 8, (rgb & 0x0000FF));
-    }
 
     private static final int RADIX = 10;
-
-    public static String special(int chromaSpeed, int alpha, int r, int g, int b) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Integer.toString(chromaSpeed, RADIX)).append(":");
-        sb.append(Integer.toString(alpha, RADIX)).append(":");
-        sb.append(Integer.toString(r, RADIX)).append(":");
-        sb.append(Integer.toString(g, RADIX)).append(":");
-        sb.append(Integer.toString(b, RADIX));
-        return sb.toString();
-    }
 
     private static int[] decompose(String csv) {
         String[] split = csv.split(":");
@@ -31,17 +18,6 @@ public class SpecialColour {
             arr[i] = Integer.parseInt(split[split.length - 1 - i], RADIX);
         }
         return arr;
-    }
-
-    public static int specialToSimpleRGB(String special) {
-        int[] d = decompose(special);
-        int r = d[2];
-        int g = d[1];
-        int b = d[0];
-        int a = d[3];
-        int chr = d[4];
-
-        return (a & 0xFF) << 24 | (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF);
     }
 
     public static int getSpeed(String special) {
