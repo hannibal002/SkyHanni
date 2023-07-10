@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift
 
-import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
