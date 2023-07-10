@@ -31,7 +31,6 @@ class BazaarDataHolder {
                 }
                 jsonObject["motes_sell_price"]?.let {
                     val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
-                    println("motes price: $neuItemId = $it")
                     motesPrice[neuItemId] = it.asDouble
                 }
             }

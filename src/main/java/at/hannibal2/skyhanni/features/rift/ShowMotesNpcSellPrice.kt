@@ -10,8 +10,6 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
-//        if (!SkyHanniMod.feature.dev.showInternalName) return
-
         if (!isEnabled()) return
 
         val itemStack = event.itemStack ?: return
