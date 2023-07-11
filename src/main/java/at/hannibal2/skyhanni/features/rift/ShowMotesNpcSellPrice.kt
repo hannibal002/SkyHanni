@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ShowMotesNpcSellPrice {
 
     private val config get() = SkyHanniMod.feature.rift.motes
-    val pattern = ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*".toPattern()
+    private val pattern = ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*".toPattern()
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
@@ -21,18 +21,15 @@ class ShowMotesNpcSellPrice {
 
         val itemStack = event.itemStack ?: return
 
-        val motesPerItem = itemStack.motesNpcPrice() ?: return
+        val baseMotes = itemStack.motesNpcPrice() ?: return
+        val motesPerItem = baseMotes + (config.burgerStacks * 5) * baseMotes / 100
+        val burgerText = if (config.burgerStacks > 0) "(${config.burgerStacks}x≡) " else ""
         val size = itemStack.stackSize
         if (size > 1) {
             val motes = motesPerItem * size
-            val withBurger = motes + (config.burgerStacks * 5) * motes / 100
-            val perWithBurger = motesPerItem + (config.burgerStacks * 5) * motesPerItem / 100
-            val burgerText = if(config.burgerStacks>0) "(${config.burgerStacks}x≡) " else ""
-            event.toolTip.add("§6NPC price: $burgerText§d${withBurger.addSeparators()} Motes §7($size x §d${perWithBurger.addSeparators()} Motes§7)")
+            event.toolTip.add("§6NPC price: $burgerText§d${motes.addSeparators()} Motes §7($size x §d${motesPerItem.addSeparators()} Motes§7)")
         } else {
-            val perWithBurger = motesPerItem + (config.burgerStacks * 5) * motesPerItem / 100
-            val burgerText = if(config.burgerStacks>0) "(${config.burgerStacks}x≡) " else ""
-            event.toolTip.add("§6NPC price: $burgerText§d${perWithBurger.addSeparators()} Motes")
+            event.toolTip.add("§6NPC price: $burgerText§d${motesPerItem.addSeparators()} Motes")
         }
     }
 
