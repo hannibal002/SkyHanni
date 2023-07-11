@@ -7,7 +7,7 @@ import io.github.moulberry.moulconfig.annotations.*;
 public class Slayer {
 
     @Expose
-    @ConfigOption(name = "Enderman", desc = "")
+    @ConfigOption(name = "Enderman Slayer Features", desc = "")
     @ConfigEditorAccordion(id = 0)
     public boolean enderman = false;
 
@@ -81,6 +81,162 @@ public class Slayer {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
     public boolean blazeClearView = false;
+
+    @Expose
+    @ConfigOption(name = "Vampire Slayer Features", desc = "")
+    @Accordion
+    public VampireSlayerConfig vampireSlayerConfig = new VampireSlayerConfig();
+
+    public static class VampireSlayerConfig {
+
+        @Expose
+        @ConfigOption(name = "Your Boss", desc = "")
+        @Accordion
+        public OwnBoss ownBoss = new OwnBoss();
+
+        public static class OwnBoss {
+
+            @Expose
+            @ConfigOption(name = "Highlight your boss", desc = "Highlight your own vampire slayer boss.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+            @ConfigEditorColour
+            public String highlightColor = "0:249:0:255:88";
+
+            @Expose
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak your boss.")
+            @ConfigEditorBoolean
+            public boolean steakAlert = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+            @ConfigEditorBoolean
+            public boolean twinClawsTitle = true;
+        }
+
+        @Expose
+        @ConfigOption(name = "Others Boss", desc = "")
+        @Accordion
+        public OthersBoss othersBoss = new OthersBoss();
+
+        public static class OthersBoss {
+
+            @Expose
+            @ConfigOption(name = "Highlight Others people boss", desc = "Highlight others players boss.\nYou need to hit them first.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+            @ConfigEditorColour
+            public String highlightColor = "0:249:0:255:88";
+
+            @Expose
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak the boss.")
+            @ConfigEditorBoolean
+            public boolean steakAlert = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsTitle = true;
+        }
+
+        @Expose
+        @ConfigOption(name = "Co-op Boss", desc = "")
+        @Accordion
+        public CoopBossHighlight coopsBossHighlight = new CoopBossHighlight();
+
+        public static class CoopBossHighlight {
+            @Expose
+            @ConfigOption(name = "Highlight Co-op Boss", desc = "Highlight boss of your co-op member.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+            @ConfigEditorColour
+            public String highlightColor = "0:249:0:255:88";
+
+            @Expose
+            @ConfigOption(name = "Co-op Members", desc = "Add your co-op member here.\n§eFormat: §7Name1,Name2,Name3")
+            @ConfigEditorText
+            public String coopMembers = "";
+
+            @Expose
+            @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak the boss.")
+            @ConfigEditorBoolean
+            public boolean steakAlert = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsTitle = true;
+        }
+
+        @Expose
+        @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
+        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 250)
+        public int withAlpha = 80;
+
+        @Expose
+        @ConfigOption(name = "See Through Blocs", desc = "Highlight even when behind others mobs/players")
+        @ConfigEditorBoolean
+        public boolean seeThrough = false;
+
+        @Expose
+        @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
+        @ConfigEditorBoolean
+        public boolean changeColorWhenCanSteak = true;
+
+        @Expose
+        @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
+        @ConfigEditorColour
+        public String steakColor = "0:255:255:0:88";
+
+
+        @Expose
+        @ConfigOption(name = "Blood Ichor", desc = "")
+        @Accordion
+        public BloodIchor bloodIchor = new BloodIchor();
+
+        public static class BloodIchor {
+            @Expose
+            @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Beacon Beam", desc = "Render a beacon beam where the Blood Ichor is.")
+            @ConfigEditorBoolean
+            public boolean renderBeam = true;
+
+            @Expose
+            @ConfigOption(name = "Color", desc = "Highlight color.")
+            @ConfigEditorColour
+            public String color = "0:199:100:0:88";
+        }
+
+        @Expose
+        @ConfigOption(name = "Killer Spring", desc = "")
+        @Accordion
+        public KillerSpring killerSpring = new KillerSpring();
+
+        public static class KillerSpring {
+            @Expose
+            @ConfigOption(name = "Highlight Killer Spring", desc = "Highlight the Killer Spring tower.")
+            @ConfigEditorBoolean
+            public boolean highlight = true;
+
+            @Expose
+            @ConfigOption(name = "Color", desc = "Highlight color.")
+            @ConfigEditorColour
+            public String color = "0:199:100:0:88";
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Item Profit Tracker", desc = "")

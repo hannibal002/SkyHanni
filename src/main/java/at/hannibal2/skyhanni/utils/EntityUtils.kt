@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.multiplayer.WorldClient
-import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
@@ -14,7 +13,7 @@ import net.minecraft.util.AxisAlignedBB
 
 object EntityUtils {
 
-    fun EntityLiving.hasNameTagWith(
+    fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
@@ -24,7 +23,7 @@ object EntityUtils {
         return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
     }
 
-    fun EntityLiving.getAllNameTagsWith(
+    fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
@@ -51,7 +50,23 @@ object EntityUtils {
         }
     }
 
-    fun EntityLiving.getNameTagWith(
+    fun EntityLivingBase.getAllNameTagsInRadiusWith(
+        contains: String,
+        radius: Double = 3.0,
+    ): List<EntityArmorStand> {
+        val center = getLorenzVec().add(0, 3, 0)
+        val a = center.add(-radius, -radius - 3, -radius).toBlocPos()
+        val b = center.add(radius, radius + 3, radius).toBlocPos()
+        val alignedBB = AxisAlignedBB(a, b)
+        val clazz = EntityArmorStand::class.java
+        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
+        return found.filter {
+            val result = it.name.contains(contains)
+            result
+        }
+    }
+
+    fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,

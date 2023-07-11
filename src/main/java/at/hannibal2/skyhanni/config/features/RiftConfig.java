@@ -447,6 +447,7 @@ public class RiftConfig {
 
         public static class LivingCaveConfig {
 
+
             @Expose
             @ConfigOption(name = "Living Metal Suit Progress", desc = "")
             @Accordion
