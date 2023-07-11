@@ -22,8 +22,9 @@ class ShowMotesNpcSellPrice {
         val itemStack = event.itemStack ?: return
 
         val baseMotes = itemStack.motesNpcPrice() ?: return
-        val motesPerItem = baseMotes + (config.burgerStacks * 5) * baseMotes / 100
-        val burgerText = if (config.burgerStacks > 0) "(${config.burgerStacks}x≡) " else ""
+        val burgerStacks = config.burgerStacks
+        val motesPerItem = baseMotes + (burgerStacks * 5) * baseMotes / 100
+        val burgerText = if (burgerStacks > 0) "(${burgerStacks}x≡) " else ""
         val size = itemStack.stackSize
         if (size > 1) {
             val motes = motesPerItem * size
