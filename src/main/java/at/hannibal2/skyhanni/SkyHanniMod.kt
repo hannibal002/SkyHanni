@@ -61,7 +61,25 @@ import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.rift.*
+import at.hannibal2.skyhanni.features.rift.RiftTimer
+import at.hannibal2.skyhanni.features.rift.ShowMotesNpcSellPrice
+import at.hannibal2.skyhanni.features.rift.VampireSlayerFeatures
+import at.hannibal2.skyhanni.features.rift.area.RiftLarva
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingMetalSuitProgress
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.DanceRoomHelper
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftLavaMazeParkour
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkour
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
+import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
+import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
+import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints
+import at.hannibal2.skyhanni.features.rift.everywhere.HighlightRiftGuide
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
@@ -97,7 +115,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.7",
+    version = "0.19.Beta.8",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -322,6 +340,10 @@ class SkyHanniMod {
         loadModule(RiftUpsideDownParkour())
         loadModule(RiftLavaMazeParkour())
         loadModule(HighlightMiningCommissionMobs())
+        loadModule(ShowMotesNpcSellPrice())
+        loadModule(LivingMetalSuitProgress())
+        loadModule(VampireSlayerFeatures())
+        loadModule(BlobbercystsHighlight())
 
         init()
 
@@ -343,7 +365,11 @@ class SkyHanniMod {
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
         repo = RepoManager(configManager.configDirectory)
-        repo.loadRepoInformation()
+        try {
+            repo.loadRepoInformation()
+        } catch (e: Exception) {
+            Exception("Error reading repo data", e).printStackTrace()
+        }
     }
 
     fun loadModule(obj: Any) {

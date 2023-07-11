@@ -48,7 +48,10 @@
 ## Inventory
 - Not Clickable Items 
   - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement.
-  - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI
+  - Works in:
+    - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
+    - bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, 
+    - chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
   - Option to allow/block clicks
 - Option to change the gray-out opacity for 'Not Clickable Items'.
 - Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and collection level)
@@ -168,6 +171,12 @@
   + Display number of bosses needed until the next RNG Meter item drops
   + Warn when no item is set in the RNG Meter
   + Hide the RNG Meter message from chat if the current item is selected
++ Vampire Slayer Features – HiZe
+  + Highlight your own boss (color can be changed)
+  + Change color when the boss is below 20% (can use steak) (can change color)
+  + Highlight other players' boss only if you hit them (can be toggled)
+  + Highlight Co-Op members' boss (you need to write their name in the config)
+  + Highlight Killer Spring and Blood Ichor, TwinClaws warning
 
 ### Diana
 + Show burrows near you.
@@ -310,18 +319,29 @@
   + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
   + Change how many tasks you should see
   + Hide other players inside the dance room
+  + Added timer before next instruction
+  + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
+  + Fully customize the description for now, next and later (with color)
 + **Upside Down** Parkour & **Lava Maze** - hannibal2
   + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
   + Change how many platforms should be shown in front of you
   + Rainbow color (optional) - nea
   + Hide other players while doing the parkour
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
++ Show the Motes NPC price in the item lore
+  + With Burgers multiplier - HiZe
++ Living Metal Suit Progress - HiZe
+  + Display progress Living Metal Suit (Default disabled)
+  + Option to show a compacted version of the overlay when the set is maxed
++ Added Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
 
 ## Mining
 + **Highlight Commission Mobs** - hannibal2
   + Highlight Mobs that are part of active commissions
 
 ## Commands
++ **/shcommands** 
+  + Show all commands in SkyHanni
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
 + **/shmarkplayer <player>** - marking a player with yellow color.
 + **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
@@ -352,7 +372,9 @@
 + Chicken Head Timer.
 + **rancher boots** speed display.
 + **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
-+ **Estimated Item Value** - Displays an estimated item value for the item you hover over.
++ **Estimated Item Value**
+  + Displays an estimated item value for the item you hover over.
+  + Works with Attributes. - nea
 + **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
 + Server Restart Title
 + **City Project Features**

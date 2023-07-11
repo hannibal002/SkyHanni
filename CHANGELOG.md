@@ -5,7 +5,8 @@
 #### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
-+ **Rift Highlight Guide**
++ **Rift 
++ Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + Added **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy is going to steal your time.
@@ -41,6 +42,9 @@
   + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
   + Change how many tasks you should see
   + Hide other players inside the dance room
+  + Added timer before next instruction
+  + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
+  + Fully customize the description for now, next and later (with color)
 + Added **Upside Down** Parkour & **Lava Maze** - hannibal2
   + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
   + Change how many platforms should be shown in front of you
@@ -50,6 +54,13 @@
 + Added Jinxed voodoo doll ability cooldown support - HiZe
 + Added Polarvoid Books to estimated item value - jani
 + Added Chumcap support for Chum Bucket Hider - jani
++ Added **Motes NPC** price in the item lore
+  + With Burgers multiplier - HiZe
++ Added Motes Grubber to Not Clickable Items feature
++ **Living Metal Suit** Progress - HiZe
+  + Display progress Living Metal Suit (Default disabled)
+  + Option to show a compacted version of the overlay when the set is maxed
++ Added Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -63,6 +74,9 @@
   + Supports line breaks `\n` - hannibal2
 + Added **Highlight Commission Mobs** - hannibal2
   + Highlight Mobs that are part of active commissions
++ Added command **/shcommands**
+  + Show all commands in SkyHanni
++ Added Attribute price support to Estimated Item Value - nea
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -74,6 +88,8 @@
   + Fixed names unnecessarily getting cut off when visiting an island in Location
   + Fewer crashes because of NEU Item Repo
 + Changed time for Trapper from 30 to 15 seconds while Finnegan is mayor – CalMWolfs
++ Added warning to not disable repo auto-update
++ Wither impact ability cooldown now only shows when all 3 scrolls are attached
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -211,12 +227,18 @@
   + Option "Profile" not only shows the profile name but also the profile type and SkyBlock level
   + Option "Dynamic" now also supports stacking enchantments
 + Highlight the item in bazaar search result inventory when clicking on an item list (Contributed by CalMWolfs)
++ Resetting Ragnarock ability cooldown when being hit during channeling
++ Hide Non God Pot Effect Display while inside the Rift
 
 ### Fixes
 + Fixed typos in Trevor Trapper texts (Contributed by CalMWolfs)
 + Fixed Hypixel bug that the equipment lore talks about "kills" instead of "visitors" (Contributed by CalMWolfs)
 + Fixed reforge stone 'warped' not detected in item price display
 + Hotkey to open SkyHanni Position Editor no longer works inside signs
++ Fixed non god pot effects display being wrong sometimes
++ Fixed duplex not working in Bazaar features
++ Fixed crashes with repo errors
++ If you touch water, the King Scent form Non God Pot Timer will now be correctly removed
 
 ### Removals
 - Removed Garden Recent Teleport Pads display

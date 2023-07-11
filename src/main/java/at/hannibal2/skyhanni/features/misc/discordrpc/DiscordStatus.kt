@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity

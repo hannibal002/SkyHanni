@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,37 +12,37 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class RiftLarva {
-    private val config get() = SkyHanniMod.feature.rift.larvas
-    private var hasHookInHand = false
-    val larvaSkullTexture =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTgzYjMwZTlkMTM1YjA1MTkwZWVhMmMzYWM2MWUyYWI1NWEyZDgxZTFhNThkYmIyNjk4M2ExNDA4MjY2NCJ9fX0="
+class RiftOdonata {
+    private val config get() = RiftAPI.config.area.wyldWoodsConfig.odonata
+    private var hasBottleInHand = false
+    val odonataSkullTexture =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWZkODA2ZGVmZGZkZjU5YjFmMjYwOWM4ZWUzNjQ2NjZkZTY2MTI3YTYyMzQxNWI1NDMwYzkzNThjNjAxZWY3YyJ9fX0="
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
         checkHand()
-        if (!hasHookInHand) return
+        if (!hasBottleInHand) return
 
         if (event.isMod(20)) {
-            findLarvas()
+            findOdonatas()
         }
     }
 
     private fun checkHand() {
-        hasHookInHand = InventoryUtils.getItemInHand()?.getInternalName() == "LARVA_HOOK"
+        hasBottleInHand = InventoryUtils.getItemInHand()?.getInternalName() == "EMPTY_ODONATA_BOTTLE"
     }
 
-    private fun findLarvas() {
+    private fun findOdonatas() {
 
         val list = Minecraft.getMinecraft().theWorld?.loadedEntityList ?: return
         for (stand in list.filterIsInstance<EntityArmorStand>()) {
-            if (stand.hasSkullTexture(larvaSkullTexture)) {
+            if (stand.hasSkullTexture(odonataSkullTexture)) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,
                     config.highlightColor.toChromaColor().withAlpha(1)
-                ) { isEnabled() && hasHookInHand }
+                ) { isEnabled() && hasBottleInHand }
             }
         }
     }

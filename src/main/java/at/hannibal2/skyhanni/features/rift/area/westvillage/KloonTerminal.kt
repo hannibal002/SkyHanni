@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.utils.LorenzVec
 
