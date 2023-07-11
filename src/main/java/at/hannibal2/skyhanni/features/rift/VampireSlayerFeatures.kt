@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -236,6 +238,29 @@ class VampireSlayerFeatures {
                     )
                 }
             }
+        val start = LocationUtils.playerLocation()
+
+        if (config.displayTier){
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
+                val vec = it.position.toLorenzVec()
+                val distance = start.distance(vec)
+                if (distance <= 25){
+                    if (it.name == "Bloodfiend ") {
+                        val tier = when (it.baseMaxHealth) {
+                            625 -> "§fTier I"
+                            1100 -> "§fTier II"
+                            1800 -> "§6Tier III"
+                            2400 -> "§cTier IV"
+                            else -> "§4Tier V"
+                        }
+                        val y = if (it.isRiding) 4.25 else 3.25
+                        event.drawDynamicText(it.position.add(0.0, y, 0.0).toLorenzVec(), tier, 1.2,
+                            hideTooCloseAt = 1.0,
+                            ignoreBlocks = false)
+                    }
+                }
+            }
+        }
     }
 
     @SubscribeEvent

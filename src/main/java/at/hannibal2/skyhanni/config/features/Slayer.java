@@ -197,6 +197,11 @@ public class Slayer {
         @ConfigEditorColour
         public String steakColor = "0:255:255:0:88";
 
+        @Expose
+        @ConfigOption(name = "Display Tier", desc = "Display the boss tier above his head.")
+        @ConfigEditorBoolean
+        public boolean displayTier = true;
+
 
         @Expose
         @ConfigOption(name = "Blood Ichor", desc = "")
