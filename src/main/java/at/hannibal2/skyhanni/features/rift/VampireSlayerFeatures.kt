@@ -150,10 +150,11 @@ class VampireSlayerFeatures {
                 TitleUtils.sendTitle("§c§lSTEAK!", 300, 2.6)
 
 
-            RenderLivingEntityHelper.setEntityColor(this, color) { shouldRender }
-            RenderLivingEntityHelper.setNoHurtTime(this) { shouldRender }
-            if (shouldRender)
+            if (shouldRender) {
+                RenderLivingEntityHelper.setEntityColor(this, color) { isEnabled() }
+                RenderLivingEntityHelper.setNoHurtTime(this) { isEnabled() }
                 entityList.add(this)
+            }
         }
     }
 
