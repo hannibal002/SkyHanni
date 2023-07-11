@@ -242,7 +242,8 @@ object GhostCounter {
                 val current = group("current")
                 if (current != lastXp) {
                     val res = if (current.contains(".")) {
-                        "(?:[0-9,]+){3,}".toRegex().find(current)?.groupValues?.get(1) ?: "0"
+                        // current.split(".")[0] ?: "0"
+                        "([0-9,]+).*".toRegex().find(current)?.groupValues?.get(1) ?: "0"
                     } else {
                         current.replace("\\D".toRegex(), "")
                     }
