@@ -468,6 +468,11 @@ public class RiftConfig {
                 @Expose
                 public Position position = new Position(100, 100);
             }
+
+            @Expose
+            @ConfigOption(name = "Defence Blocks", desc = "Show the defence blocks.")
+            @ConfigEditorBoolean
+            public boolean defenceBlocks = true;
         }
 
         @Expose

@@ -67,6 +67,7 @@ import at.hannibal2.skyhanni.features.rift.area.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveDefenceBlocks
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingMetalSuitProgress
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.DanceRoomHelper
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftLavaMazeParkour
@@ -343,6 +344,7 @@ class SkyHanniMod {
         loadModule(LivingMetalSuitProgress())
         loadModule(VampireSlayerFeatures())
         loadModule(BlobbercystsHighlight())
+        loadModule(LivingCaveDefenceBlocks())
 
         init()
 
