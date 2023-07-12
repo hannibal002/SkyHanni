@@ -69,7 +69,7 @@ class LivingCaveDefenseBlocks {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
                 entity = Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityOtherPlayerMP>(compareLocation, 2.0)
-                    .filter { it.name == "Autonull " || it.name == "Autoboots " }
+                    .filter { isCorrectMob(it.name) }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }
             }
@@ -81,6 +81,18 @@ class LivingCaveDefenseBlocks {
                 event.isCanceled = true
             }
         }
+    }
+
+    private fun isCorrectMob(name: String) = when (name) {
+        "Autonull ",
+            
+        "Autocap ",
+        "Autochest ",
+        "Autopants ",
+        "Autoboots ",
+        -> true
+
+        else -> false
     }
 
     @SubscribeEvent
