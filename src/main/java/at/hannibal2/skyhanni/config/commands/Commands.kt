@@ -126,12 +126,12 @@ object Commands {
         registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3"
-        ) { GhostCounter.importCTGhostCounterData() }
+        ) { GhostUtil.importCTGhostCounterData() }
         registerCommand(
             "shclearfarmingitems",
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
-        registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostCounter.reset() }
+        registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
     }
 
     private fun usersBugFix() {
