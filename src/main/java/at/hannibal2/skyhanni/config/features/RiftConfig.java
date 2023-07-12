@@ -567,4 +567,23 @@ public class RiftConfig {
         @ConfigEditorSlider(minStep = 1, minValue =  0, maxValue = 5)
         public int burgerStacks = 0;
     }
+
+    @Expose
+    @ConfigOption(name = "Motes Orbs", desc = "")
+    @Accordion
+    public MotesOrbsConfig motesOrbsConfig = new MotesOrbsConfig();
+
+    public static class MotesOrbsConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight Motes Orbs", desc = "Highlight flying Motes Orbs.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Particles", desc = "Hide normal motes orbs particles.")
+        @ConfigEditorBoolean
+        public boolean hideParticles = false;
+
+    }
 }

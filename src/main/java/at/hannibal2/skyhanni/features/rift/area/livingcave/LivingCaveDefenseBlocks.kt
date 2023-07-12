@@ -29,25 +29,11 @@ class LivingCaveDefenseBlocks {
     private val config get() = RiftAPI.config.area.livingCaveConfig.defenseBlockConfig
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
-//    private var helpLocation = emptyList<LorenzVec>()
 
     class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        val location = event.location.add(-0.5, 0.0, -0.5)
-
-//        if (event.type == EnumParticleTypes.CRIT_MAGIC) {
-//            helpLocation = helpLocation.editCopy { add(location) }
-//        }
-
-        // TODO remove
-        Minecraft.getMinecraft().thePlayer?.let {
-            if (it.isSneaking) {
-                staticBlocks = emptyList()
-//                helpLocation = emptyList()
-            }
-        }
         if (!isEnabled()) return
 
         movingBlocks = movingBlocks.editCopy {
@@ -55,6 +41,7 @@ class LivingCaveDefenseBlocks {
             keys.removeIf { staticBlocks.any { others -> others.location.distance(it.location) < 1.5 } }
         }
 
+        val location = event.location.add(-0.5, 0.0, -0.5)
 
         // Ignore particles around blocks
         if (staticBlocks.any { it.location.distance(location) < 3 }) {
@@ -148,11 +135,6 @@ class LivingCaveDefenseBlocks {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-//        for (location in helpLocation) {
-//            event.drawWaypointFilled(location, LorenzColor.GREEN.toColor())
-//            event.drawDynamicText(location, "§aTest", 1.5)
-//
-//        }
         if (!isEnabled()) return
 
 
@@ -172,15 +154,15 @@ class LivingCaveDefenseBlocks {
         }
         for (block in staticBlocks) {
             val location = block.location
+            event.drawDynamicText(location, "§bBreak!", 1.5, ignoreBlocks = false)
             event.drawWaypointFilled(location, color)
-            event.drawDynamicText(location, "§bBreak!", 1.5)
 
             event.draw3DLine(
                 block.entity.getLorenzVec().add(0.0, 0.5, 0.0),
                 location.add(0.5, 0.5, 0.5),
                 color,
                 3,
-                false
+                true,
             )
         }
     }

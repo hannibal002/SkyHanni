@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
+import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -81,25 +80,22 @@ class EndermanSlayerBeacon {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+    @SubscribeEvent
+    fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
 
-        val packet = event.packet
-        if (packet is S23PacketBlockChange) {
-            val location = packet.blockPosition.toLorenzVec()
-            if (packet.blockState?.block == Blocks.beacon) {
-                val armorStand = flyingBeacons.find { location.distance(it.getLorenzVec()) < 3 }
-                if (armorStand != null) {
-                    flyingBeacons.remove(armorStand)
-                    sittingBeacon.add(location)
-                    logger.log("Replaced flying beacon with sitting beacon at $location")
-                }
-            } else {
-                if (location in sittingBeacon) {
-                    logger.log("Removed sitting beacon $location")
-                    sittingBeacon.remove(location)
-                }
+        val location = event.location
+        if (event.new == "beacon") {
+            val armorStand = flyingBeacons.find { location.distance(it.getLorenzVec()) < 3 }
+            if (armorStand != null) {
+                flyingBeacons.remove(armorStand)
+                sittingBeacon.add(location)
+                logger.log("Replaced flying beacon with sitting beacon at $location")
+            }
+        } else {
+            if (location in sittingBeacon) {
+                logger.log("Removed sitting beacon $location")
+                sittingBeacon.remove(location)
             }
         }
     }

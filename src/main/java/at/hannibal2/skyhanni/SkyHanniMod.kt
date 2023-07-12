@@ -77,10 +77,7 @@ import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
-import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
-import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints
-import at.hannibal2.skyhanni.features.rift.everywhere.HighlightRiftGuide
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.everywhere.*
 import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
@@ -348,6 +345,7 @@ class SkyHanniMod {
         loadModule(BlobbercystsHighlight())
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())
+        loadModule(RiftMotesOrb())
 
         init()
 
