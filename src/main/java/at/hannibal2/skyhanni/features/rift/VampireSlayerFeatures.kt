@@ -9,15 +9,14 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -51,25 +50,6 @@ class VampireSlayerFeatures {
                 val distance = start.distance(vec)
                 if (distance <= 15)
                     it.process()
-            }
-        }
-        if (config.bloodIchor.highlight || config.killerSpring.highlight) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
-                val vec = stand.position.toLorenzVec()
-                val distance = start.distance(vec)
-                val isIchor = stand.hasSkullTexture(bloodIchorTexture)
-                if (isIchor || stand.hasSkullTexture(killerSpringTexture)) {
-                    val color = (if (isIchor) config.bloodIchor.color else config.killerSpring.color)
-                        .toChromaColor().withAlpha(config.withAlpha)
-                    if (distance <= 15) {
-                        RenderLivingEntityHelper.setEntityColor(
-                            stand,
-                            color
-                        ) { isEnabled() }
-                        if (isIchor)
-                            entityList.add(stand)
-                    }
-                }
             }
         }
     }
@@ -149,7 +129,6 @@ class VampireSlayerFeatures {
             if (shouldSendSteakTitle)
                 TitleUtils.sendTitle("§c§lSTEAK!", 300, 2.6)
 
-
             if (shouldRender) {
                 RenderLivingEntityHelper.setEntityColor(this, color) { isEnabled() }
                 RenderLivingEntityHelper.setNoHurtTime(this) { isEnabled() }
@@ -227,15 +206,45 @@ class VampireSlayerFeatures {
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
-        if (config.bloodIchor.renderBeam)
+        val start = LocationUtils.playerLocation()
+        if (config.bloodIchor.renderBeam) {
             entityList.filterIsInstance<EntityArmorStand>().forEach {
-                if (it.isEntityAlive) {
-                    event.drawWaypointFilled(
-                        it.position.toLorenzVec().add(0, -2, 0), config.bloodIchor.color.toChromaColor(),
-                        beacon = true
-                    )
+                if (it.hasSkullTexture(bloodIchorTexture)) {
+                    if (it.isEntityAlive) {
+                        event.drawWaypointFilled(
+                            it.position.toLorenzVec().add(0, -2, 0), config.bloodIchor.color.toChromaColor(),
+                            beacon = true
+                        )
+                    }
                 }
             }
+        }
+        if (config.bloodIchor.highlight || config.killerSpring.highlight) {
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
+                val vec = stand.position.toLorenzVec()
+                val distance = start.distance(vec)
+                val isIchor = stand.hasSkullTexture(bloodIchorTexture)
+                val isSpring = stand.hasSkullTexture(killerSpringTexture)
+                if (isIchor || isSpring) {
+                    val color = (if (isIchor) config.bloodIchor.color else config.killerSpring.color)
+                        .toChromaColor().withAlpha(config.withAlpha)
+                    if (distance <= 15) {
+                        RenderLivingEntityHelper.setEntityColor(
+                            stand,
+                            color
+                        ) { isEnabled() }
+                        if (isIchor) {
+                            event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
+                            event.drawString(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), "§4Ichor", true)
+                        }
+                        if (isSpring) {
+                            event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
+                            event.drawString(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), "§4Spring", true)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @SubscribeEvent
