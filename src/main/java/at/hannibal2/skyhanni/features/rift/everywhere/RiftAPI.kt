@@ -18,4 +18,5 @@ object RiftAPI {
     fun ItemStack.motesNpcPrice() = motesPrice[getInternalName()]
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
+    fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
 }

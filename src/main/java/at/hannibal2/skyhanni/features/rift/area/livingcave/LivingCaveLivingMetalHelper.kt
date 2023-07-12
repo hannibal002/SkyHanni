@@ -88,5 +88,5 @@ class LivingCaveLivingMetalHelper {
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inLivingCave() && config.enabled
+    fun isEnabled() = RiftAPI.inRift() && (RiftAPI.inLivingCave() || RiftAPI.inLivingStillness()) && config.enabled
 }
