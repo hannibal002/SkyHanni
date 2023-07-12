@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
 
-class ServerBlockChangeEvent(val pos: BlockPos, val blockState: IBlockState) : LorenzEvent() {
-    val location by lazy { pos.toLorenzVec() }
+class ServerBlockChangeEvent(private val blockPos: BlockPos, private val blockState: IBlockState) : LorenzEvent() {
+    val location by lazy { blockPos.toLorenzVec() }
     val old by lazy { location.getBlockAt().toString().getName() }
     val new by lazy { blockState.block.toString().getName() }
 

@@ -447,7 +447,6 @@ public class RiftConfig {
 
         public static class LivingCaveConfig {
 
-
             @Expose
             @ConfigOption(name = "Living Metal Suit Progress", desc = "")
             @Accordion
@@ -470,9 +469,37 @@ public class RiftConfig {
             }
 
             @Expose
-            @ConfigOption(name = "Defence Blocks", desc = "Show the defence blocks.")
-            @ConfigEditorBoolean
-            public boolean defenceBlocks = true;
+            @ConfigOption(name = "Living Metal Helper", desc = "")
+            @Accordion
+            public DefenceBlockConfig defenceBlockConfig = new DefenceBlockConfig();
+
+            public static class DefenceBlockConfig {
+
+                @Expose
+                @ConfigOption(name = "Defence Blocks", desc = "Show a line between the defence blocks and the mob and highlight the blocks.")
+                @ConfigEditorBoolean
+                public boolean enabled = false;
+
+                @Expose
+                @ConfigOption(name = "Color", desc = "Set the color of the lines, blocks and the entity.")
+                @ConfigEditorColour
+                public Property<String> color = Property.of("0:255:77:104:255");
+
+            }
+
+            @Expose
+            @ConfigOption(name = "Living Metal Helper", desc = "")
+            @Accordion
+            public LivingCaveLivingMetalConfig livingCaveLivingMetalConfig = new LivingCaveLivingMetalConfig();
+
+            public static class LivingCaveLivingMetalConfig {
+
+                @Expose
+                @ConfigOption(name = "Living Metal", desc = "Show the Living Metal.")
+                @ConfigEditorBoolean
+                public boolean enabled = true;
+
+            }
         }
 
         @Expose

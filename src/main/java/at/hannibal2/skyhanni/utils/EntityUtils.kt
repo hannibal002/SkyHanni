@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.multiplayer.WorldClient
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
@@ -123,6 +125,14 @@ object EntityUtils {
             ?.value
     }
 
+    inline fun <reified T : Entity> WorldClient.getEntitiesNextToPlayer(radius: Double): List<T> =
+        getEntitiesNearby(LocationUtils.playerLocation(), radius)
+
+    inline fun <reified T : Entity> WorldClient.getEntitiesNearby(location: LorenzVec, radius: Double): List<T> =
+        getLoadedEntityList().filterIsInstance<T>().filter { it.distanceTo(location) < radius }
+
+    fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
+
     fun WorldClient.getEntitiesNearby(
         clazz: Class<EntityBlaze>,
         location: LorenzVec,
@@ -140,5 +150,6 @@ object EntityUtils {
 
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 
-    fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? = if (this is EntityPlayer) inventory.armorInventory else null
+    fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
+        if (this is EntityPlayer) inventory.armorInventory else null
 }
