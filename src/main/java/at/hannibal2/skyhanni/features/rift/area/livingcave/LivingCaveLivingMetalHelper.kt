@@ -59,13 +59,15 @@ class LivingCaveLivingMetalHelper {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
         val (a, b) = pair ?: return
+        if (System.currentTimeMillis() > startTime + 5_000) return
+
         val maxTime = 500
         val diff = startTime + maxTime - System.currentTimeMillis()
         val location = if (diff > 0) {
             val percentage = diff.toDouble() / maxTime
             a.slope(b, 1 - percentage)
         } else b
-        event.drawWaypointFilled(location, LorenzColor.AQUA.toColor(), seeThroughBlocks = true)
+        event.drawWaypointFilled(location, LorenzColor.AQUA.toColor(), seeThroughBlocks = location.distanceToPlayer() < 10)
     }
 
     @SubscribeEvent
