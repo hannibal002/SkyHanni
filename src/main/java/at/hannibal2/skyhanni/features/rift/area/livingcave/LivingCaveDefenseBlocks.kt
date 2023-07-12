@@ -25,13 +25,13 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class LivingCaveDefenceBlocks {
-    private val config get() = RiftAPI.config.area.livingCaveConfig.defenceBlockConfig
-    private var movingBlocks = mapOf<DefenceBlock, Long>()
-    private var staticBlocks = emptyList<DefenceBlock>()
+class LivingCaveDefenseBlocks {
+    private val config get() = RiftAPI.config.area.livingCaveConfig.defenseBlockConfig
+    private var movingBlocks = mapOf<DefenseBlock, Long>()
+    private var staticBlocks = emptyList<DefenseBlock>()
 //    private var helpLocation = emptyList<LorenzVec>()
 
-    class DefenceBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
+    class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -58,15 +58,22 @@ class LivingCaveDefenceBlocks {
 
         // Ignore particles around blocks
         if (staticBlocks.any { it.location.distance(location) < 3 }) {
-            event.isCanceled = true
+            if (config.hideParticles) {
+                event.isCanceled = true
+            }
             return
+        }
+        if (config.hideParticles) {
+            if (movingBlocks.keys.any { it.location.distance(location) < 3 }) {
+                event.isCanceled = true
+            }
         }
 
         if (event.type == EnumParticleTypes.CRIT_MAGIC) {
             var entity: EntityOtherPlayerMP? = null
 
             // read old entity data
-            getNearestMovingDefenceBlock(location)?.let {
+            getNearestMovingDefenseBlock(location)?.let {
                 if (it.location.distance(location) < 0.5) {
                     movingBlocks = movingBlocks.editCopy {
                         it.hidden = true
@@ -84,10 +91,12 @@ class LivingCaveDefenceBlocks {
                     .minByOrNull { it.distanceTo(compareLocation) }
             }
 
-            val defenceBlock = entity?.let { DefenceBlock(it, location) } ?: return
+            val defenseBlock = entity?.let { DefenseBlock(it, location) } ?: return
 
-            movingBlocks = movingBlocks.editCopy { this[defenceBlock] = System.currentTimeMillis() + 250 }
-            event.isCanceled = true
+            movingBlocks = movingBlocks.editCopy { this[defenseBlock] = System.currentTimeMillis() + 250 }
+            if (config.hideParticles) {
+                event.isCanceled = true
+            }
         }
     }
 
@@ -114,9 +123,9 @@ class LivingCaveDefenceBlocks {
 
         // spawn block
         if (old == "air" && (new == "stained_glass" || new == "diamond_block")) {
-            val entity = getNearestMovingDefenceBlock(location)?.entity ?: return
+            val entity = getNearestMovingDefenseBlock(location)?.entity ?: return
             staticBlocks = staticBlocks.editCopy {
-                add(DefenceBlock(entity, location))
+                add(DefenseBlock(entity, location))
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
                     color.withAlpha(50)
@@ -125,16 +134,16 @@ class LivingCaveDefenceBlocks {
         }
 
         // despawn block
-        val nearestBlock = getNearestStaticDefenceBlock(location)
+        val nearestBlock = getNearestStaticDefenseBlock(location)
         if (new == "air" && location == nearestBlock?.location) {
             staticBlocks = staticBlocks.editCopy { remove(nearestBlock) }
         }
     }
 
-    private fun getNearestMovingDefenceBlock(location: LorenzVec) =
+    private fun getNearestMovingDefenseBlock(location: LorenzVec) =
         movingBlocks.keys.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
 
-    private fun getNearestStaticDefenceBlock(location: LorenzVec) =
+    private fun getNearestStaticDefenseBlock(location: LorenzVec) =
         staticBlocks.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
 
     @SubscribeEvent

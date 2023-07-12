@@ -471,14 +471,19 @@ public class RiftConfig {
             @Expose
             @ConfigOption(name = "Living Metal Helper", desc = "")
             @Accordion
-            public DefenceBlockConfig defenceBlockConfig = new DefenceBlockConfig();
+            public DefenseBlockConfig defenseBlockConfig = new DefenseBlockConfig();
 
-            public static class DefenceBlockConfig {
+            public static class DefenseBlockConfig {
 
                 @Expose
-                @ConfigOption(name = "Defence Blocks", desc = "Show a line between the defence blocks and the mob and highlight the blocks.")
+                @ConfigOption(name = "Defense Blocks", desc = "Show a line between Defense blocks and the mob and highlight the blocks.")
                 @ConfigEditorBoolean
-                public boolean enabled = false;
+                public boolean enabled = true;
+
+                @Expose
+                @ConfigOption(name = "Hide Particles", desc = "Hide particles around Defense Blocks")
+                @ConfigEditorBoolean
+                public boolean hideParticles = false;
 
                 @Expose
                 @ConfigOption(name = "Color", desc = "Set the color of the lines, blocks and the entity.")
