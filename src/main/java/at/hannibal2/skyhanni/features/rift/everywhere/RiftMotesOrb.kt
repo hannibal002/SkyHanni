@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -46,14 +45,6 @@ class RiftMotesOrb {
             orb.pickedUp = false
             if (config.hideParticles && orb.isOrb) {
                 event.isCanceled = true
-            }
-        }
-
-
-        // TODO remove
-        Minecraft.getMinecraft().thePlayer?.let {
-            if (it.isSneaking) {
-                motesOrbs = emptyList()
             }
         }
     }
