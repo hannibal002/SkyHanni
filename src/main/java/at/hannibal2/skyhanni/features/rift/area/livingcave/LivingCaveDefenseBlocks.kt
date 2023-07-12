@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -27,6 +28,15 @@ class LivingCaveDefenseBlocks {
     private var staticBlocks = emptyList<DefenseBlock>()
 
     class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
+
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        if (event.isMod(20)) {
+            staticBlocks = staticBlocks.editCopy { removeIf { it.entity.isDead } }
+        }
+    }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -68,10 +78,11 @@ class LivingCaveDefenseBlocks {
             if (entity == null) {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
-                entity = Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityOtherPlayerMP>(compareLocation, 2.0)
-                    .filter { isCorrectMob(it.name) }
-                    .filter { !it.isAtFullHealth() }
-                    .minByOrNull { it.distanceTo(compareLocation) }
+                entity =
+                    Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityOtherPlayerMP>(compareLocation, 2.0)
+                        .filter { isCorrectMob(it.name) }
+                        .filter { !it.isAtFullHealth() }
+                        .minByOrNull { it.distanceTo(compareLocation) }
             }
 
             val defenseBlock = entity?.let { DefenseBlock(it, location) } ?: return
@@ -122,7 +133,8 @@ class LivingCaveDefenseBlocks {
     }
 
     private fun getNearestMovingDefenseBlock(location: LorenzVec) =
-        movingBlocks.keys.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
+        movingBlocks.keys.filter { it.location.distance(location) < 15 }
+            .minByOrNull { it.location.distance(location) }
 
     private fun getNearestStaticDefenseBlock(location: LorenzVec) =
         staticBlocks.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
