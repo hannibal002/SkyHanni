@@ -469,14 +469,14 @@ public class RiftConfig {
             }
 
             @Expose
-            @ConfigOption(name = "Living Metal Helper", desc = "")
+            @ConfigOption(name = "Defense Blocks", desc = "")
             @Accordion
             public DefenseBlockConfig defenseBlockConfig = new DefenseBlockConfig();
 
             public static class DefenseBlockConfig {
 
                 @Expose
-                @ConfigOption(name = "Defense Blocks", desc = "Show a line between Defense blocks and the mob and highlight the blocks.")
+                @ConfigOption(name = "Enabled", desc = "Show a line between Defense blocks and the mob and highlight the blocks.")
                 @ConfigEditorBoolean
                 public boolean enabled = true;
 
@@ -500,9 +500,14 @@ public class RiftConfig {
             public static class LivingCaveLivingMetalConfig {
 
                 @Expose
-                @ConfigOption(name = "Living Metal", desc = "Show the Living Metal.")
+                @ConfigOption(name = "Living Metal", desc = "Show a moving animation between Living Metal and the next block.")
                 @ConfigEditorBoolean
                 public boolean enabled = true;
+
+                @Expose
+                @ConfigOption(name = "Hide Particles", desc = "Hide particles Living Metal")
+                @ConfigEditorBoolean
+                public boolean hideParticles = false;
 
             }
         }

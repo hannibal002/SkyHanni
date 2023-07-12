@@ -96,6 +96,8 @@ data class LorenzVec(
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
 
+    fun slope(other: LorenzVec, factor: Double) = add(other.subtract(this).scale(factor))
+
     fun roundLocation(): LorenzVec {
         val x = if (this.x < 0) x.toInt().toDouble() - 1 else x.toInt().toDouble()
         val y = y.toInt().toDouble() - 1
