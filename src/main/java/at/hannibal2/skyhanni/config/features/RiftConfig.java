@@ -505,7 +505,7 @@ public class RiftConfig {
                 public boolean enabled = true;
 
                 @Expose
-                @ConfigOption(name = "Hide Particles", desc = "Hide particles Living Metal")
+                @ConfigOption(name = "Hide Particles", desc = "Hide Living Metal particles.")
                 @ConfigEditorBoolean
                 public boolean hideParticles = false;
 
