@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
@@ -18,11 +17,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.network.play.server.S22PacketMultiBlockChange
-import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LivingCaveDefenseBlocks {
@@ -83,20 +79,6 @@ class LivingCaveDefenseBlocks {
             movingBlocks = movingBlocks.editCopy { this[defenseBlock] = System.currentTimeMillis() + 250 }
             if (config.hideParticles) {
                 event.isCanceled = true
-            }
-        }
-    }
-
-    // TODO move to somewhere else
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-
-        if (packet is S23PacketBlockChange) {
-            ServerBlockChangeEvent(packet.blockPosition, packet.blockState).postAndCatch()
-        } else if (packet is S22PacketMultiBlockChange) {
-            for (block in packet.changedBlocks) {
-                ServerBlockChangeEvent(block.pos, block.blockState).postAndCatch()
             }
         }
     }

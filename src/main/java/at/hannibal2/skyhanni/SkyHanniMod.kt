@@ -154,6 +154,7 @@ class SkyHanniMod {
         loadModule(GardenCropSpeed)
         loadModule(ProfileStorageData)
         loadModule(TitleData())
+        loadModule(BlockData())
 
         // APIs
         loadModule(BazaarApi())
