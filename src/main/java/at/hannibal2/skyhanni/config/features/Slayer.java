@@ -112,9 +112,14 @@ public class Slayer {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsSound = true;
         }
 
         @Expose
@@ -140,9 +145,14 @@ public class Slayer {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsSound = true;
         }
 
         @Expose
@@ -172,9 +182,14 @@ public class Slayer {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsSound = true;
         }
 
         @Expose
@@ -196,6 +211,11 @@ public class Slayer {
         @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
         @ConfigEditorColour
         public String steakColor = "0:255:255:0:88";
+
+        @Expose
+        @ConfigOption(name = "Twinclaws", desc = "Delay the sound and title of twinclaws alert for a given amount of milliseconds.")
+        @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 1000)
+        public int twinclawsDelay = 0;
 
 
         @Expose
@@ -329,7 +349,7 @@ public class Slayer {
     @Expose
     @ConfigOption(name = "Broken Wither Impact",
             desc = "Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp. " +
-            "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
+                    "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
     )
     @ConfigEditorBoolean
     public boolean brokenHyperion = true;

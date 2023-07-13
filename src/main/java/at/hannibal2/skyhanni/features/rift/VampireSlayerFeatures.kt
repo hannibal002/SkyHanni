@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -27,8 +29,9 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
-class VampireSlayerFeatures {
+object VampireSlayerFeatures {
 
     private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
     private val entityList = mutableListOf<EntityLivingBase>()
@@ -38,6 +41,7 @@ class VampireSlayerFeatures {
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
     private val killerSpringTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdmN2E3YmM4YWM4NmYyM2NhN2JmOThhZmViNzY5NjAyMjdlMTgzMmZlMjA5YTMwMjZmNmNlYjhiZGU3NGY1NCJ9fX0="
+    private var nextClawSend: Long = 0
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -56,6 +60,7 @@ class VampireSlayerFeatures {
 
     private fun EntityOtherPlayerMP.process() {
         if (name != "Bloodfiend ") return
+
         if (config.ownBoss.twinClawsTitle || config.othersBoss.twinClawsTitle || config.coopsBossHighlight.twinClawsTitle) {
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
                 if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) {
@@ -79,8 +84,24 @@ class VampireSlayerFeatures {
                         else if (containCoop && config.coopsBossHighlight.twinClawsTitle) true
                         else taggedEntityList.contains(this.entityId) && config.othersBoss.twinClawsTitle
 
-                    if (shouldSendTitle) {
-                        TitleUtils.sendTitle("§6§lTWINCLAWS", 300, 2.6)
+                    val shouldSendSound =
+                        if (containUser && config.ownBoss.twinClawsSound) true
+                        else if (containCoop && config.coopsBossHighlight.twinClawsSound) true
+                        else taggedEntityList.contains(this.entityId) && config.othersBoss.twinClawsSound
+
+                    if (shouldSendTitle || shouldSendSound) {
+                        SkyHanniMod.coroutineScope.launch {
+                            delay(config.twinclawsDelay.milliseconds)
+                            withContext(MinecraftDispatcher) {
+                                if (nextClawSend < System.currentTimeMillis()) {
+                                    if (shouldSendSound)
+                                        playTwinclawsSound()
+                                    if (shouldSendTitle)
+                                        TitleUtils.sendTitle("§6§lTWINCLAWS", (1750 - config.twinclawsDelay), 2.6)
+                                    nextClawSend = System.currentTimeMillis() + 5000
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -135,6 +156,19 @@ class VampireSlayerFeatures {
                 entityList.add(this)
             }
         }
+    }
+
+    private fun playTwinclawsSound() {
+        CoroutineScope(Dispatchers.Default).launch {
+            repeat(15) {
+                delay(50)
+                SoundUtils.createSound("random.orb", 0.5f).playSound()
+            }
+        }
+    }
+
+    private fun EntityOtherPlayerMP.isHighlighted(): Boolean {
+        return entityList.contains(this) || taggedEntityList.contains(this.entityId)
     }
 
     private fun String.color(): Int {
