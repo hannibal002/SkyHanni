@@ -247,7 +247,7 @@ public class Slayer {
             @Expose
             @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
             @ConfigEditorColour
-            public String linesColor = "0:199:100:0:88";
+            public String linesColor = "0:255:255:13:0";
 
         }
 
@@ -275,7 +275,7 @@ public class Slayer {
             @Expose
             @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
             @ConfigEditorColour
-            public String linesColor = "0:199:100:0:88";
+            public String linesColor = "0:255:255:13:0";
         }
     }
 
