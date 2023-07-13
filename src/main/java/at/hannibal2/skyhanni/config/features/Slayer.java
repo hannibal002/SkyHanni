@@ -238,6 +238,17 @@ public class Slayer {
             @ConfigOption(name = "Color", desc = "Highlight color.")
             @ConfigEditorColour
             public String color = "0:199:100:0:88";
+
+            @Expose
+            @ConfigOption(name = "Show lines", desc = "Draw lines that start from the head of the boss and end on the Blood Ichor.")
+            @ConfigEditorBoolean
+            public boolean showLines = false;
+
+            @Expose
+            @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
+            @ConfigEditorColour
+            public String linesColor = "0:199:100:0:88";
+
         }
 
         @Expose
@@ -255,6 +266,16 @@ public class Slayer {
             @ConfigOption(name = "Color", desc = "Highlight color.")
             @ConfigEditorColour
             public String color = "0:199:100:0:88";
+
+            @Expose
+            @ConfigOption(name = "Show lines", desc = "Draw lines that start from the head of the boss and end on the Killer Spring tower.")
+            @ConfigEditorBoolean
+            public boolean showLines = false;
+
+            @Expose
+            @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
+            @ConfigEditorColour
+            public String linesColor = "0:199:100:0:88";
         }
     }
 

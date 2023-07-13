@@ -5,18 +5,22 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
@@ -24,6 +28,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
@@ -36,6 +41,7 @@ object VampireSlayerFeatures {
     private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
     private val entityList = mutableListOf<EntityLivingBase>()
     private val taggedEntityList = mutableListOf<Int>()
+    private val standList = mutableMapOf<EntityArmorStand, EntityOtherPlayerMP>()
     private val username get() = LorenzUtils.getPlayerName()
     private val bloodIchorTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
@@ -46,15 +52,20 @@ object VampireSlayerFeatures {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(5)) return
-        val start = LocationUtils.playerLocation()
-        if (config.ownBoss.highlight || config.othersBoss.highlight || config.coopsBossHighlight.highlight) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
-                val vec = it.position.toLorenzVec()
-                val distance = start.distance(vec)
-                if (distance <= 15)
-                    it.process()
+        if (event.isMod(5)) {
+            val start = LocationUtils.playerLocation()
+            if (config.ownBoss.highlight || config.othersBoss.highlight || config.coopsBossHighlight.highlight) {
+                Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
+                    val vec = it.position.toLorenzVec()
+                    val distance = start.distance(vec)
+                    if (distance <= 15)
+                        it.process()
+                }
             }
+        }
+        if (event.isMod(20)) {
+            entityList.editCopy { removeIf { it.isDead } }
+            standList.editCopy { entries.removeIf { it.key.isDead } }
         }
     }
 
@@ -267,13 +278,25 @@ object VampireSlayerFeatures {
                             stand,
                             color
                         ) { isEnabled() }
-                        if (isIchor) {
-                            event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
-                            event.drawString(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), "§4Ichor", true)
-                        }
-                        if (isSpring) {
-                            event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
-                            event.drawString(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), "§4Spring", true)
+
+                        val linesColorStart = (if (isIchor) config.bloodIchor.linesColor else config.killerSpring.linesColor).toChromaColor()
+                        val linesColorEnd = (if (isIchor) config.bloodIchor.linesColor else config.killerSpring.linesColor).toChromaColor()
+                        val text = if (isIchor) "§4Ichor" else "§4Spring"
+                        event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
+                        event.drawDynamicText(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), text, 1.5, ignoreBlocks = false)
+                        val entityFrom = standList.getOrDefault(stand, null)
+                        if (entityFrom != null) {
+                            if (entityFrom.isHighlighted()) {
+                                val from = entityFrom.position.toLorenzVec().add(0.0, 1.5, 0.0)
+                                if (config.bloodIchor.showLines || config.killerSpring.showLines)
+                                    event.draw3DLine(
+                                        from,
+                                        stand.position.toLorenzVec().add(0.0, 1.5, 0.0),
+                                        linesColorStart,
+                                        3,
+                                        true,
+                                        linesColorEnd)
+                            }
                         }
                     }
                 }
@@ -281,11 +304,32 @@ object VampireSlayerFeatures {
         }
     }
 
+
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         entityList.clear()
         taggedEntityList.clear()
     }
 
-    fun isEnabled() = RiftAPI.inRift()
+
+    @SubscribeEvent
+    fun onBlockChange(event: ReceiveParticleEvent) {
+        if (!isEnabled()) return
+        val loc = event.location
+        Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0).forEach {
+            if (it.isHighlighted()) {
+                if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE) {
+                    Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
+                        if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
+                            if (!standList.contains(stand)) {
+                                standList[stand] = it
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau()
 }
