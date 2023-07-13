@@ -61,6 +61,12 @@
   + Display progress Living Metal Suit (Default disabled)
   + Option to show a compacted version of the overlay when the set is maxed
 + Added Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
++ Show a line between **Defense blocks** and the mob and highlight the blocks - hannibal2
+  + Hide particles around Defense Blocks
++ Show a moving animation between **Living Metal** and the next block - hannibal2
+  + Hide Living Metal particles
++ Highlight **flying Motes Orbs** - hannibal2
+  + Hide normal motes orbs particles
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)

@@ -812,7 +812,8 @@ object RenderUtils {
     }
 
     fun RenderWorldLastEvent.draw3DLine(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean, targetColor: Color? = null
+        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean, targetColor: Color? = null,
+        seeThroughBlocks: Boolean = true
     ) {
         val render = Minecraft.getMinecraft().renderViewEntity
         val worldRenderer = Tessellator.getInstance().worldRenderer
@@ -820,7 +821,9 @@ object RenderUtils {
         val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
         val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
         GlStateManager.pushMatrix()
-        GlStateManager.disableDepth()
+        if (!seeThroughBlocks) {
+            GlStateManager.disableDepth()
+        }
         GlStateManager.disableCull()
         GlStateManager.disableLighting()
         GlStateManager.translate(-realX, -realY, -realZ)
@@ -853,6 +856,9 @@ object RenderUtils {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
+        if (!seeThroughBlocks) {
+            GlStateManager.enableDepth()
+        }
     }
 
     fun RenderWorldLastEvent.exactLocation(entity: Entity): LorenzVec {
