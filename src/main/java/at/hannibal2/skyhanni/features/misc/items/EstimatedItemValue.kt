@@ -233,7 +233,7 @@ object EstimatedItemValue {
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
         return (1..10).mapNotNull { lowerLevel ->
             NEUItems.getPriceOrNull("$attributeName;$lowerLevel")
-                ?.let { it * (1 shl lowerLevel) / (1 shl level).toDouble() }
+                ?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
         }.minOrNull()
     }
 
