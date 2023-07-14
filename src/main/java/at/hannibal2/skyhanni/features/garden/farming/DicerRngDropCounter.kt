@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import com.sun.scenario.effect.Crop
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DicerRngDropCounter {
