@@ -51,7 +51,7 @@ class SackDisplay {
     )
 
     private val numPattern =
-            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
+            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)".toPattern()
     private val gemstonePattern =
             " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
 
@@ -80,6 +80,7 @@ class SackDisplay {
             val rune = Rune()
             val item = Item()
             loop@ for (line in lore) {
+                println("line: $line")
                 if (isGemstoneSack) {
                     gemstonePattern.matchMatcher(line) {
                         val rarity = group("gemrarity")
