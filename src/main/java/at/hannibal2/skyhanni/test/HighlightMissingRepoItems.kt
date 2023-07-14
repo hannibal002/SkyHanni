@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.jsonobjects.IgnoredItemsJson
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -15,6 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMissingRepoItems {
+    private var ignoredItems = mutableListOf<String>()
+    private var ignoredItemsJson: IgnoredItemsJson? = null
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -38,13 +42,20 @@ class HighlightMissingRepoItems {
             val internalName = slot.stack.getInternalName()
             if (internalName == "") continue
             if (!NEUItems.allInternalNames.contains(internalName)) {
+                if (ignoredItems.contains(internalName)) continue
                 slot highlight LorenzColor.RED
             }
         }
     }
 
     @SubscribeEvent
-    fun onRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
+    fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
         NEUItems.allItemsCache = NEUItems.readAllNeuItems()
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        ignoredItemsJson = event.getConstant<IgnoredItemsJson>("IgnoredItems")
+        ignoredItems = ignoredItemsJson?.items ?: mutableListOf()
     }
 }
