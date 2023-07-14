@@ -80,7 +80,6 @@ class SackDisplay {
             val rune = Rune()
             val item = Item()
             loop@ for (line in lore) {
-                println("line: $line")
                 if (isGemstoneSack) {
                     gemstonePattern.matchMatcher(line) {
                         val rarity = group("gemrarity")
