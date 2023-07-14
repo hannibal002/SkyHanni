@@ -22,6 +22,20 @@ object InventoryUtils {
         }
     }
 
+    fun getItemsInChest(guiChest: GuiChest) = buildList {
+        val inventorySlots = guiChest.inventorySlots.inventorySlots
+        val skipAt = inventorySlots.size - 9 * 4
+        var i = 0
+        for (slot in inventorySlots) {
+            val stack = slot.stack
+            if (stack != null) {
+                add(slot)
+            }
+            i++
+            if (i == skipAt) break
+        }
+    }
+
     fun openInventoryName() = Minecraft.getMinecraft().currentScreen.let {
          if (it is GuiChest) {
              val chest = it.inventorySlots as ContainerChest

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.config.features.Inventory
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import net.minecraft.item.ItemStack
 

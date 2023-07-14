@@ -255,7 +255,13 @@ public class MiscConfig {
     @ConfigOption(name = "Show Estimated Chest Value", desc = "Will show the total values of the items in a chest and the most expensive ones.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
-    public boolean estimatedChestValue = false;
+    public boolean estimatedItemValueChest = false;
+
+    @Expose
+    @ConfigOption(name = "Format Estimated Chest Value", desc = "Will format the chest values to things like 1.2K instead of 1,200")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean formatItemValueChest = true;
 
     @Expose
     public Position itemPriceDataPos = new Position(140, 90, false, true);
