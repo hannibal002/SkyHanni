@@ -6,5 +6,8 @@ import java.util.List;
 
 public class IgnoredItemsJson {
     @Expose
-    public List<String> items;
+    public List<String> exact;
+
+    @Expose
+    public List<String> contains;
 }

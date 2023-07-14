@@ -17,7 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMissingRepoItems {
-    private var ignoredItems = mutableListOf<String>()
+    private var ignoredExactItems = mutableListOf<String>()
+    private var ignoredContainsItems = mutableListOf<String>()
     private var ignoredItemsJson: IgnoredItemsJson? = null
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -43,7 +44,8 @@ class HighlightMissingRepoItems {
             if (internalName == "") continue
             if (!NEUItems.allInternalNames.contains(internalName)) {
                 var shouldHighlight = true
-                for (item in ignoredItems) {
+                if (internalName in ignoredExactItems) continue
+                for (item in ignoredContainsItems) {
                     if (internalName.contains(item)) {
                         shouldHighlight = false
                         break
@@ -62,6 +64,7 @@ class HighlightMissingRepoItems {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         ignoredItemsJson = event.getConstant<IgnoredItemsJson>("IgnoredItems")
-        ignoredItems = ignoredItemsJson?.items ?: mutableListOf()
+        ignoredExactItems = ignoredItemsJson?.exact ?: mutableListOf()
+        ignoredContainsItems = ignoredItemsJson?.contains ?: mutableListOf()
     }
 }
