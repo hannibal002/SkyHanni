@@ -321,9 +321,7 @@ object VampireSlayerFeatures {
                 if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE) {
                     Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
                         if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
-                            if (!standList.contains(stand)) {
-                                standList[stand] = it
-                            }
+                            standList[stand] = it
                         }
                     }
                 }
