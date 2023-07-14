@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
+import at.hannibal2.skyhanni.utils.Rarity.Companion.getRecombRarityIndex
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -202,14 +202,14 @@ object FortuneUpgrades {
         } ?: return
 
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity() + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getRecombRarityIndex(), FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(FortuneUpgrade("§7Recombobulate your ${item.displayName}",
             null, "RECOMBOBULATOR_3000", 1, increase))
     }
 
     private fun reforgeItem(item: ItemStack, reforge: FarmingReforges, list: MutableList<FortuneUpgrade>,copperPrice: Int? = null) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getRecombRarityIndex(), FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(FortuneUpgrade("§7Reforge your ${item.displayName} §7to ${reforge.reforgeName}",
             copperPrice, reforge.reforgeItem, 1, increase))
     }
