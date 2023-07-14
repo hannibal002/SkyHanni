@@ -204,6 +204,11 @@ class MobFinder {
                     return EntityResult(bossType = BossType.LEECH_SUPREME)
                 }
             }
+            if (entity is EntitySlime) {
+                if (entity.baseMaxHealth == 1_000) {
+                    return EntityResult(bossType = BossType.BACTE)
+                }
+            }
         } else {
             if (entity is EntityBlaze) {
                 if (entity.name != "Dinnerbone") {
