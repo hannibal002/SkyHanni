@@ -217,6 +217,23 @@ public class Slayer {
         @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 1000)
         public int twinclawsDelay = 0;
 
+        @Expose
+        @ConfigOption(name = "Draw line", desc = "Draw a line starting at your crosshair to the boss head")
+        @ConfigEditorBoolean
+        public boolean drawLine = false;
+
+        @Expose
+        @ConfigOption(name = "Line color", desc = "Color of the line")
+        @ConfigEditorColour
+        public String lineColor = "0:255:255:0:88";
+
+        @Expose
+        @ConfigOption(name = "Line Width", desc = "Width of the line")
+        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+        public int lineWidth = 1;
+
+
+
 
         @Expose
         @ConfigOption(name = "Blood Ichor", desc = "")

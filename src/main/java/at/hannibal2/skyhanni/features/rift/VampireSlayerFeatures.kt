@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
@@ -251,6 +252,21 @@ object VampireSlayerFeatures {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
         val start = LocationUtils.playerLocation()
+
+        if (config.drawLine) {
+            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
+                if (it.isHighlighted()) {
+                    val vec = it.position.toLorenzVec()
+                    val distance = start.distance(vec)
+                    if (distance <= 15) {
+                        val p = Minecraft.getMinecraft().thePlayer
+                        val add = if (p.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+                        event.draw3DLine(event.exactLocation(p).add(add), vec.add(0.0, 1.54, 0.0), config.lineColor.toChromaColor(), config.lineWidth, true)
+                    }
+                }
+            }
+        }
+
         if (config.bloodIchor.renderBeam) {
             entityList.filterIsInstance<EntityArmorStand>().forEach {
                 if (it.hasSkullTexture(bloodIchorTexture)) {
@@ -279,23 +295,18 @@ object VampireSlayerFeatures {
                         ) { isEnabled() }
 
                         val linesColorStart = (if (isIchor) config.bloodIchor.linesColor else config.killerSpring.linesColor).toChromaColor()
-                        val linesColorEnd = (if (isIchor) config.bloodIchor.linesColor else config.killerSpring.linesColor).toChromaColor()
                         val text = if (isIchor) "§4Ichor" else "§4Spring"
                         event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
                         event.drawDynamicText(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), text, 1.5, ignoreBlocks = false)
-                        val entityFrom = standList.getOrDefault(stand, null)
-                        if (entityFrom != null) {
-                            if (entityFrom.isHighlighted()) {
-                                val from = entityFrom.position.toLorenzVec().add(0.0, 1.5, 0.0)
-                                if (config.bloodIchor.showLines || config.killerSpring.showLines)
-                                    event.draw3DLine(
-                                        from,
-                                        stand.position.toLorenzVec().add(0.0, 1.5, 0.0),
-                                        linesColorStart,
-                                        3,
-                                        true,
-                                        linesColorEnd)
-                            }
+                        for ((player, stand2) in standList) {
+                            if (config.bloodIchor.showLines || config.killerSpring.showLines)
+                                event.draw3DLine(
+                                    event.exactLocation(player).add(0.0, 1.5, 0.0),
+                                    event.exactLocation(stand2).add(0.0, 1.5, 0.0),
+                                   // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
+                                    linesColorStart,
+                                    3,
+                                    true)
                         }
                     }
                 }
