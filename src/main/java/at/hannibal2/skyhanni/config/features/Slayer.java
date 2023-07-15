@@ -329,7 +329,7 @@ public class Slayer {
     @Expose
     @ConfigOption(name = "Broken Wither Impact",
             desc = "Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp. " +
-            "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
+                    "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
     )
     @ConfigEditorBoolean
     public boolean brokenHyperion = true;
@@ -353,4 +353,27 @@ public class Slayer {
     @ConfigOption(name = "Quest Warning Title", desc = "Sends a Title when warning.")
     @ConfigEditorBoolean
     public boolean questWarningTitle = true;
+
+    @Expose
+    @ConfigOption(name = "Boss spawn warning", desc = "")
+    @Accordion
+    public SlayerBossWarning slayerBossWarning = new SlayerBossWarning();
+
+    public static class SlayerBossWarning {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Send a title when your boss is about to spawn.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Percent", desc = "The percent at which the title and sound should be sent.")
+        @ConfigEditorSlider(minStep = 1, minValue = 50, maxValue = 90)
+        public int percent = 80;
+
+        @Expose
+        @ConfigOption(name = "Repeat", desc = "Resend the title and sound on every kill after reaching the configured percent value.")
+        @ConfigEditorBoolean
+        public boolean repeat = false;
+    }
 }
