@@ -65,7 +65,6 @@ object VampireSlayerFeatures {
         }
         if (event.isMod(20)) {
             entityList.editCopy { removeIf { it.isDead } }
-            standList.editCopy { entries.removeIf { it.key.isDead } }
         }
     }
 
@@ -309,11 +308,12 @@ object VampireSlayerFeatures {
     fun onWorldChange(event: WorldEvent.Load) {
         entityList.clear()
         taggedEntityList.clear()
+        standList.clear()
     }
 
 
     @SubscribeEvent
-    fun onBlockChange(event: ReceiveParticleEvent) {
+    fun onParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
         Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0).forEach {
