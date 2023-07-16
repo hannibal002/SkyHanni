@@ -110,9 +110,11 @@
 + Fixed **Dungeon Master Stars** calculation not working correctly sometimes – hannibal2 & Fix3dll
 + Fixed Discord Rich Presence detecting absorption hearts not correctly – NetheriteMiner
 + Fixed Reputation Helper **Kuudra Completions** not getting detected and adding T4 and T5 support - Cinshay
-  = Fixed Item Ability cooldown not working for Astraea - hannibal2
-  = Fixed a typo in the config - hannibal2
-  = Added a workaround for a crash when refusing a visitor - hannibal2
+  + Fixed Item Ability cooldown not working for Astraea - hannibal2
+  + Fixed a typo in the config - hannibal2
+  + Added a workaround for a crash when refusing a visitor - hannibal2
++ Added support for new counter drops to dicer rng counter - ReyMaratov
++ Fixed composter inventory numbers after Hypixel changes - hannibal2
 
 ## Version 0.18 (2023-06-19)
 
