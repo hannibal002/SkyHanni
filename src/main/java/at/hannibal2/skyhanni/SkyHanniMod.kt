@@ -347,6 +347,7 @@ class SkyHanniMod {
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
+        loadModule(ChestValue())
 
         init()
 
