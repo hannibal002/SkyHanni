@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -20,8 +21,7 @@ class ChestValue {
 
     private val config get() = SkyHanniMod.feature.misc.chestValueConfig
     private var display = emptyList<List<Any>>()
-    private val stacksList = mutableMapOf<Int, ItemStack>()
-    private val chestItems = mutableMapOf<Int, Item>()
+    private val chestItems = mutableMapOf<String, Item>()
     private val slotList = mutableListOf<Int>()
     private var inInventory = false
 
@@ -38,9 +38,9 @@ class ChestValue {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent){
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.isMod(5)){
+        if (event.isMod(5)) {
             update()
         }
     }
@@ -51,15 +51,12 @@ class ChestValue {
         val inventoryName = event.inventoryName
         inInventory = inventoryName == "Chest" || inventoryName == "Large Chest"
         if (inInventory) {
-            val stacks = event.inventoryItems
-            stacksList.putAll(stacks)
             update()
         }
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        stacksList.clear()
         chestItems.clear()
         slotList.clear()
         inInventory = false
@@ -97,17 +94,17 @@ class ChestValue {
             val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
 
             newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Rendering $amountShowing of ${sortedList.size} items)")
-            for ((index, stack, _, total, tips) in sortedList) {
-                totalPrice += total
+            for ((index, _, amount, stack, _, total, tips) in sortedList) {
+                totalPrice += total * stack.stackSize
                 if (rendered >= config.itemToShow) continue
-                if (total < config.hideBelow)  continue
+                if (total < config.hideBelow) continue
                 newDisplay.add(buildList {
                     val renderable = Renderable.clickAndHover(
-                        "${stack.displayName}: §b${total.formatPrice()}",
+                        "${stack.displayName} x$amount: §b${(total * stack.stackSize).formatPrice()}",
                         tips
                     ) {
                         for (slot in InventoryUtils.getItemsInOpenChest()) {
-                            if (index == slot.slotIndex) {
+                            if (index.contains(slot.slotIndex)) {
                                 if (slotList.contains(slot.slotIndex)) {
                                     slotList.remove(slot.slotIndex)
                                 } else {
@@ -116,7 +113,7 @@ class ChestValue {
                             }
                         }
                     }
-                    val dashColor = if (slotList.contains(index)) "§a" else "§7"
+                    val dashColor = if (slotList.containsAll(index)) "§a" else "§7"
                     add(" $dashColor- ")
                     add(stack)
                     add(renderable)
@@ -146,17 +143,39 @@ class ChestValue {
     }
 
     private fun init() {
-        for ((i, stack) in stacksList) {
-            val internalName = stack.getInternalName()
-            if (internalName != "") {
-                if (NEUItems.getItemStackOrNull(internalName) != null) {
-                    val list = mutableListOf<String>()
-                    val pair = EstimatedItemValue.getEstimatedItemPrice(stack, list)
-                    var (total, base) = pair
-                    if (stack.item == Items.enchanted_book)
-                        total /= 2
-                    if (total != 0.0)
-                        chestItems[i] = Item(i, stack, base, total, list)
+        val inventoryName = InventoryUtils.openInventoryName()
+        if (inventoryName == "Chest" || inventoryName == "Large Chest") {
+            val slots = InventoryUtils.getItemsInOpenChest()
+            val stacks = buildMap {
+                slots.forEach {
+                    put(it.slotIndex, it.stack)
+                }
+            }
+            chestItems.clear()
+            for ((i, stack) in stacks) {
+                val internalName = stack.getInternalName()
+                if (internalName != "") {
+                    if (NEUItems.getItemStackOrNull(internalName) != null) {
+                        val list = mutableListOf<String>()
+                        val pair = EstimatedItemValue.getEstimatedItemPrice(stack, list)
+                        var (total, base) = pair
+                        if (stack.item == Items.enchanted_book)
+                            total /= 2
+                        if (total != 0.0) {
+                            if (chestItems.contains(stack.getInternalName())) {
+                                val (oldIndex, oldInternalName, oldAmount, oldStack, oldBase, oldTotal, oldTips) = chestItems[stack.getInternalName()]
+                                    ?: return
+                                if (oldTotal == base){
+                                    oldIndex.add(i)
+                                    chestItems[oldInternalName] = Item(oldIndex, oldInternalName, oldAmount + stack.stackSize, oldStack, oldBase, oldTotal + total, oldTips)
+                                }else{
+                                    chestItems["$oldInternalName:${stack.getItemUuid()}"] = Item(mutableListOf(i), internalName, stack.stackSize, stack, base, total, list)
+                                }
+                            } else {
+                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.getInternalName(), stack.stackSize, stack, base, total, list)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -169,6 +188,7 @@ class ChestValue {
             else -> "0"
         }
     }
+
     private fun format(d: Double): String {
         val suffix = arrayOf("", "K", "M", "B", "T")
         var rep = 0
@@ -193,7 +213,9 @@ class ChestValue {
     }
 
     data class Item(
-        val index: Int,
+        val index: MutableList<Int>,
+        val internalName: String,
+        val amount: Int,
         val stack: ItemStack,
         val base: Double,
         val total: Double,
