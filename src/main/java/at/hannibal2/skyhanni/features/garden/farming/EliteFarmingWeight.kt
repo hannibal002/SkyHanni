@@ -319,12 +319,12 @@ class EliteFarmingWeight {
         private val factorPerCrop by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
-                CropType.CARROT to 300_000.0,
+                CropType.CARROT to 302_061.86,
                 CropType.POTATO to 300_000.0,
                 CropType.SUGAR_CANE to 200_000.0,
                 CropType.NETHER_WART to 250_000.0,
-                CropType.PUMPKIN to 90_066.27,
-                CropType.MELON to 450_324.6,
+                CropType.PUMPKIN to 98_284.71,
+                CropType.MELON to 485_308.47,
                 CropType.MUSHROOM to 90_178.06,
                 CropType.COCOA_BEANS to 267_174.04,
                 CropType.CACTUS to 177_254.45,
