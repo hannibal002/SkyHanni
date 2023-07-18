@@ -233,7 +233,7 @@ class EliteFarmingWeight {
         }
 
         private fun getExactWeight(): Double {
-            val values = calculateCollectionWeight(false).values
+            val values = calculateCollectionWeight().values
             return if (values.isNotEmpty()) {
                 values.sum()
             } else 0.0
@@ -298,14 +298,13 @@ class EliteFarmingWeight {
             LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats itself, please report it on Discord!")
         }
 
-        private fun calculateCollectionWeight(round: Boolean = true): MutableMap<CropType, Double> {
+        private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
             val weightPerCrop = mutableMapOf<CropType, Double>()
             var totalWeight = 0.0
             for (crop in CropType.values()) {
                 val weight = crop.getLocalCounter() / crop.getFactor()
-                val roundedWeight = weight.let { if (round) it.round(2) else it }
-                weightPerCrop[crop] = roundedWeight
-                totalWeight += roundedWeight
+                weightPerCrop[crop] = weight
+                totalWeight += weight
             }
             if (totalWeight > 0) {
                 weightPerCrop[CropType.MUSHROOM] = specialMushroomWeight(weightPerCrop, totalWeight)
