@@ -61,6 +61,12 @@
   + Display progress Living Metal Suit (Default disabled)
   + Option to show a compacted version of the overlay when the set is maxed
 + Added Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
++ Show a line between **Defense blocks** and the mob and highlight the blocks - hannibal2
+  + Hide particles around Defense Blocks
++ Show a moving animation between **Living Metal** and the next block - hannibal2
+  + Hide Living Metal particles
++ Highlight **flying Motes Orbs** - hannibal2
+  + Hide normal motes orbs particles
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -104,9 +110,11 @@
 + Fixed **Dungeon Master Stars** calculation not working correctly sometimes – hannibal2 & Fix3dll
 + Fixed Discord Rich Presence detecting absorption hearts not correctly – NetheriteMiner
 + Fixed Reputation Helper **Kuudra Completions** not getting detected and adding T4 and T5 support - Cinshay
-  = Fixed Item Ability cooldown not working for Astraea - hannibal2
-  = Fixed a typo in the config - hannibal2
-  = Added a workaround for a crash when refusing a visitor - hannibal2
+  + Fixed Item Ability cooldown not working for Astraea - hannibal2
+  + Fixed a typo in the config - hannibal2
+  + Added a workaround for a crash when refusing a visitor - hannibal2
++ Added support for new counter drops to dicer rng counter - ReyMaratov
++ Fixed composter inventory numbers after Hypixel changes - hannibal2
 
 ## Version 0.18 (2023-06-19)
 

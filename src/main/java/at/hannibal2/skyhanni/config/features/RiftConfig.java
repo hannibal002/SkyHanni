@@ -447,7 +447,6 @@ public class RiftConfig {
 
         public static class LivingCaveConfig {
 
-
             @Expose
             @ConfigOption(name = "Living Metal Suit Progress", desc = "")
             @Accordion
@@ -467,6 +466,49 @@ public class RiftConfig {
 
                 @Expose
                 public Position position = new Position(100, 100);
+            }
+
+            @Expose
+            @ConfigOption(name = "Defense Blocks", desc = "")
+            @Accordion
+            public DefenseBlockConfig defenseBlockConfig = new DefenseBlockConfig();
+
+            public static class DefenseBlockConfig {
+
+                @Expose
+                @ConfigOption(name = "Enabled", desc = "Show a line between Defense blocks and the mob and highlight the blocks.")
+                @ConfigEditorBoolean
+                public boolean enabled = true;
+
+                @Expose
+                @ConfigOption(name = "Hide Particles", desc = "Hide particles around Defense Blocks")
+                @ConfigEditorBoolean
+                public boolean hideParticles = false;
+
+                @Expose
+                @ConfigOption(name = "Color", desc = "Set the color of the lines, blocks and the entity.")
+                @ConfigEditorColour
+                public Property<String> color = Property.of("0:255:77:104:255");
+
+            }
+
+            @Expose
+            @ConfigOption(name = "Living Metal Helper", desc = "")
+            @Accordion
+            public LivingCaveLivingMetalConfig livingCaveLivingMetalConfig = new LivingCaveLivingMetalConfig();
+
+            public static class LivingCaveLivingMetalConfig {
+
+                @Expose
+                @ConfigOption(name = "Living Metal", desc = "Show a moving animation between Living Metal and the next block.")
+                @ConfigEditorBoolean
+                public boolean enabled = true;
+
+                @Expose
+                @ConfigOption(name = "Hide Particles", desc = "Hide Living Metal particles.")
+                @ConfigEditorBoolean
+                public boolean hideParticles = false;
+
             }
         }
 
@@ -524,5 +566,24 @@ public class RiftConfig {
         @ConfigOption(name = "Burger Stacks", desc = "Set your McGrubber's burger stacks.")
         @ConfigEditorSlider(minStep = 1, minValue =  0, maxValue = 5)
         public int burgerStacks = 0;
+    }
+
+    @Expose
+    @ConfigOption(name = "Motes Orbs", desc = "")
+    @Accordion
+    public MotesOrbsConfig motesOrbsConfig = new MotesOrbsConfig();
+
+    public static class MotesOrbsConfig {
+
+        @Expose
+        @ConfigOption(name = "Highlight Motes Orbs", desc = "Highlight flying Motes Orbs.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Particles", desc = "Hide normal motes orbs particles.")
+        @ConfigEditorBoolean
+        public boolean hideParticles = false;
+
     }
 }

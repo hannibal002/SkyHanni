@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.jsonobjects.DanceRoomInstructionsJson
 import kotlinx.coroutines.*
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -112,10 +111,8 @@ object DanceRoomHelper {
     }
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
-        val packet = event.packet
-        if (packet !is S45PacketTitle) return // TODO add a title event
         if (config.hideOriginalTitle && inRoom) event.isCanceled = true
     }
 

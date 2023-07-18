@@ -26,7 +26,7 @@ class ComposterInventoryNumbers {
         val slotNumber = event.slot.slotNumber
 
         // Composts Available
-        if (slotNumber == 22) {
+        if (slotNumber == 13) {
             for (line in stack.getLore()) {
                 compostsPattern.matchMatcher(line) {
                     val total = group("amount").replace(",", "").toInt()
@@ -55,7 +55,7 @@ class ComposterInventoryNumbers {
                         "§e"
                     } else {
                         // Fuel
-                        event.offsetY = -76
+                        event.offsetY = -41
                         event.offsetX = -20
                         "§a"
                     }
