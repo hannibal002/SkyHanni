@@ -42,6 +42,9 @@ class ItemAbilityCooldown {
             if (event.pitch == 0.61904764f && event.volume == 1f) {
                 ItemAbility.GYROKINETIC_WAND_LEFT.sound()
             }
+            if (event.pitch == 1f && event.volume == 1f){
+                ItemAbility.SHADOW_FURY.sound()
+            }
         }
         if (event.soundName == "random.anvil_land") {
             if (event.pitch == 0.4920635f && event.volume == 1f) {
