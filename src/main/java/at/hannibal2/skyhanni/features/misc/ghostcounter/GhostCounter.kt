@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
@@ -56,6 +57,7 @@ object GhostCounter {
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val bestiaryPattern = ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*".toPattern() //   &r&3&lBESTIARY &b&lGhost &89➜&b10&r
+    private val skillLevelPattern = ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*".toPattern()
     private val format = NumberFormat.getInstance()
     private var percent: Float = 0.0f
     private var totalSkillXp = 0
@@ -70,6 +72,8 @@ object GhostCounter {
     private var notifyCTModule = true
     var bestiaryCurrentKill = 0
     private var killETA = ""
+    private var currentSkill = ""
+    private var currentSkillLevel = -1
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -304,7 +308,7 @@ object GhostCounter {
                 var parse = true
                 if (skillPercent) {
                     percent = nf.parse(group("percent")).toFloat()
-                    val level = XPInformation.getInstance().getSkillInfo(skillName)?.level ?: 0
+                    val level = if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance().getSkillInfo(skillName)?.level ?: 0
                     if (level > 0) {
                         totalSkillXp = SkillExperience.getExpForNextLevel(level)
                         currentSkillXp = totalSkillXp * percent / 100
@@ -335,6 +339,16 @@ object GhostCounter {
         }
     }
 
+    @SubscribeEvent
+    fun onTabUpdate(event: TabListUpdateEvent){
+        if (!isEnabled()) return
+        for (line in event.tabList){
+            skillLevelPattern.matchMatcher(line){
+                currentSkill = group("skillName")
+                currentSkillLevel = group("skillLevel").toInt()
+            }
+        }
+    }
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
