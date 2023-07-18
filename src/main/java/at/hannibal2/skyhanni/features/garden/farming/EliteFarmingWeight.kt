@@ -132,8 +132,8 @@ class EliteFarmingWeight {
         private fun getLeaderboard(): String {
             if (!config.eliteFarmingWeightLeaderboard) return ""
 
-            // Fetching new leaderboard position every 10 minutes
-            if (System.currentTimeMillis() > lastLeaderboardUpdate + 600_000) {
+            // Fetching new leaderboard position every 10.5 minutes
+            if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
                 if (!isLoadingLeaderboard) {
                     isLoadingLeaderboard = true
                     SkyHanniMod.coroutineScope.launch {
