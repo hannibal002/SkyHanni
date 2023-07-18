@@ -7,12 +7,15 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
+import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,7 +25,7 @@ class ChestValue {
     private val config get() = SkyHanniMod.feature.misc.chestValueConfig
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<String, Item>()
-    private val slotList = mutableListOf<Int>()
+    private val slotList = mutableMapOf<Int, ItemStack>()
     private var inInventory = false
 
     @SubscribeEvent
@@ -75,6 +78,19 @@ class ChestValue {
         }
     }
 
+    @SubscribeEvent
+    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
+        if (!isEnabled()) return
+        val name = InventoryUtils.openInventoryName()
+        if (name == "Chest" || name == "Large Chest") {
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                if (slotList.contains(slot.slotIndex)) {
+                    slot drawIndex LorenzColor.WHITE
+                }
+            }
+        }
+    }
+
     private fun update() {
         display = drawDisplay()
     }
@@ -108,12 +124,12 @@ class ChestValue {
                                 if (slotList.contains(slot.slotIndex)) {
                                     slotList.remove(slot.slotIndex)
                                 } else {
-                                    slotList.add(slot.slotIndex)
+                                    slotList[slot.slotIndex] = stack
                                 }
                             }
                         }
                     }
-                    val dashColor = if (slotList.containsAll(index)) "§a" else "§7"
+                    val dashColor = if (slotList.keys.any { k -> index.contains(k) }) "§a" else "§7"
                     add(" $dashColor- ")
                     add(stack)
                     add(renderable)
@@ -165,14 +181,11 @@ class ChestValue {
                             if (chestItems.contains(stack.getInternalName())) {
                                 val (oldIndex, oldInternalName, oldAmount, oldStack, oldBase, oldTotal, oldTips) = chestItems[stack.getInternalName()]
                                     ?: return
-                                if (oldTotal == base){
-                                    oldIndex.add(i)
-                                    chestItems[oldInternalName] = Item(oldIndex, oldInternalName, oldAmount + stack.stackSize, oldStack, oldBase, oldTotal + total, oldTips)
-                                }else{
-                                    chestItems["$oldInternalName:${stack.getItemUuid()}"] = Item(mutableListOf(i), internalName, stack.stackSize, stack, base, total, list)
-                                }
+                                oldIndex.add(i)
+                                oldTips.addAll(list.editCopy { this[0] = "${get(0)} §o(id:$i)" })
+                                chestItems[oldInternalName] = Item(oldIndex, oldInternalName, oldAmount + stack.stackSize, oldStack, oldBase, oldTotal + total, oldTips)
                             } else {
-                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.getInternalName(), stack.stackSize, stack, base, total, list)
+                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.getInternalName(), stack.stackSize, stack, base, total, list.editCopy { this[0] = "${get(0)} §o(id:$i)" }.toMutableList())
                             }
                         }
                     }
@@ -210,6 +223,26 @@ class ChestValue {
         SHORT("Formatted"),
         LONG("Unformatted")
         ;
+    }
+
+    infix fun Slot.drawIndex(color: LorenzColor) {
+
+        val font = Minecraft.getMinecraft().fontRendererObj
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.disableBlend()
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate((this.xDisplayPosition).toFloat(), (this.yDisplayPosition).toFloat(), 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GlStateManager.scale(0.9, 0.9, 0.9)
+        font.drawStringWithShadow("${color.getChatColor()}${this.slotIndex}", 0f, 0f, 16777215)
+        val reverseScale = 1 / 0.7
+        GlStateManager.scale(reverseScale, reverseScale, reverseScale)
+        GlStateManager.popMatrix()
+
+        GlStateManager.enableLighting()
+        GlStateManager.enableDepth()
+
     }
 
     data class Item(
