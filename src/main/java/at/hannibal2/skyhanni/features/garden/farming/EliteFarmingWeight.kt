@@ -47,9 +47,8 @@ class EliteFarmingWeight {
         leaderboardPosition = -1
         dirtyCropWeight = true
         lastLeaderboardUpdate = 0
-        nextPlayerWeight = 0.0
-        nextPlayerName = ""
-        hasPassedNext = false
+
+        nextPlayers.clear()
         localCounter.clear()
     }
 
@@ -58,7 +57,7 @@ class EliteFarmingWeight {
         display = emptyList()
         profileId = ""
         weight = -2.0
-
+        nextPlayers.clear()
     }
 
     var tick = 0
@@ -86,9 +85,8 @@ class EliteFarmingWeight {
         private var isLoadingWeight = false
         private var isLoadingLeaderboard = false
 
-        private var nextPlayerName = ""
-        private var nextPlayerWeight = 0.0
-        private var hasPassedNext = false
+        private var nextPlayers = mutableListOf<UpcomingPlayer>()
+        private val nextPlayer get() = nextPlayers.firstOrNull()
 
         private fun update() {
             if (!GardenAPI.inGarden()) return
@@ -171,30 +169,40 @@ class EliteFarmingWeight {
 
         private fun getETA(): String {
             if (weight < 0) return ""
-            if (nextPlayerName.isEmpty()) return ""
 
-            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
+            var next = nextPlayer ?: return ""
+            var nextName = if (leaderboardPosition == -1) "#10000" else next.ign
+
             val totalWeight = (localWeight + weight)
-            val weightUntilOvertake = nextPlayerWeight - totalWeight
+            var weightUntilOvertake = next.amount - totalWeight
+
             if (weightUntilOvertake < 0) {
-                if (!hasPassedNext) {
-                    if (weightPerSecond > 0) {
-                        LorenzUtils.debug("weightPerSecond: '$weightPerSecond'")
-                        LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
-                    }
-                    if (leaderboardPosition == -1) {
-                        leaderboardPosition = 1000
-                    } else {
-                        leaderboardPosition--
-                    }
-                    hasPassedNext = true
+                if (weightPerSecond > 0) {
+                    LorenzUtils.debug("weightPerSecond: '$weightPerSecond'")
+                    LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
                 }
-                return "§cWaiting for leaderboard update..."
+
+                // Lower leaderboard position
+                if (leaderboardPosition == -1) {
+                    leaderboardPosition = 10000
+                } else {
+                    leaderboardPosition--
+                }
+
+                // Remove passed player to present the next one
+                nextPlayers.removeFirst()
+
+                // Display waiting message if nextPlayers list is empty
+                next = nextPlayer ?: return "§cWaiting for leaderboard update..."
+                // Update values to next player
+                nextName = next.ign
+                weightUntilOvertake = next.amount - totalWeight
             }
 
-            if (nextPlayerWeight == 0.0) {
+            if (next.amount == 0.0) {
                 return "§cRejoin the garden to show ETA!"
             }
+
             val timeFormat = if (weightPerSecond != -1.0) {
                 val timeTillOvertake = (weightUntilOvertake / weightPerSecond) * 1000
                 val format = TimeUtils.formatDuration(timeTillOvertake.toLong())
@@ -233,14 +241,18 @@ class EliteFarmingWeight {
 
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = LorenzUtils.getPlayerUuid()
-            val showNext = if (isEtaEnabled()) "?showNext=true" else ""
-            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId$showNext"
+            val includeUpcoming = if (isEtaEnabled()) "?includeUpcoming=true" else ""
+            val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming"
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
-                result["next"]?.asJsonObject?.let {
-                    nextPlayerName = it["ign"].asString
-                    nextPlayerWeight = it["amount"].asDouble
+                nextPlayers.clear()
+                // Array of 0-5 upcoming players (or possibly null)
+                result["upcomingPlayers"]?.asJsonArray?.let {
+                    for (player in it) {
+                        val playerData = player.asJsonObject
+                        nextPlayers.add(UpcomingPlayer(playerData["ign"].asString, playerData["amount"].asDouble))
+                    }
                 }
             }
 
@@ -253,16 +265,16 @@ class EliteFarmingWeight {
 
         private suspend fun loadWeight(localProfile: String) {
             val uuid = LorenzUtils.getPlayerUuid()
-            val url = "https://elitebot.dev/api/weight/$uuid"
+            val url = "https://api.elitebot.dev/weight/$uuid"
 
             try {
                 val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
-                for (profileEntry in result["profiles"].asJsonObject.entrySet()) {
-                    val profile = profileEntry.value.asJsonObject
-                    val profileName = profile["cute_name"].asString.lowercase()
+                for (profileEntry in result["profiles"].asJsonArray) {
+                    val profile = profileEntry.asJsonObject
+                    val profileName = profile["profileName"].asString.lowercase()
                     if (profileName == localProfile) {
-                        profileId = profileEntry.key
-                        weight = profile["farming"].asJsonObject["total"].asDouble
+                        profileId = profile["profileId"].asString
+                        weight = profile["totalWeight"].asDouble
 
                         localCounter.clear()
                         dirtyCropWeight = true
@@ -330,5 +342,7 @@ class EliteFarmingWeight {
                 CropType.CACTUS to 177_254.45,
             )
         }
+
+        data class UpcomingPlayer(val ign: String, val amount: Double)
     }
 }
