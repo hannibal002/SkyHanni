@@ -18,6 +18,18 @@ public class Slayer {
     public boolean slayerEndermanBeacon = false;
 
     @Expose
+    @ConfigOption(name = "Enderman Beacon Warnig", desc = "Displays a warning mid-screen then the enderman Slayer throws a Yang Glyph (beacon).")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean slayerEndermanBeaconWaring = false;
+
+    @Expose
+    @ConfigOption(name = "Enderman Highlight Nukekebi Skulls", desc = "Highlights the enderman Slayer Nukekebi Skulls.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean slayerEndermanHighlightNukekebiSkulls = false;
+
+    @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
