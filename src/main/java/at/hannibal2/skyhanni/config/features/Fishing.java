@@ -38,6 +38,12 @@ public class Fishing {
     public boolean trophyFishDuplicateHider = false;
 
     @Expose
+    @ConfigOption(name = "Show total amount", desc = "Show total amount of all rarities at the end of the chat message.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean trophyFishTotalAmount = false;
+
+    @Expose
     @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
