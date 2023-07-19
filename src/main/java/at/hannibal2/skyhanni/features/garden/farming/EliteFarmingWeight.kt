@@ -340,7 +340,7 @@ class EliteFarmingWeight {
                 CropType.CACTUS to 177_254.45,
             )
         }
-
-        data class UpcomingPlayer(val name: String, val weight: Double)
     }
+
+    class UpcomingPlayer(val name: String, val weight: Double)
 }
