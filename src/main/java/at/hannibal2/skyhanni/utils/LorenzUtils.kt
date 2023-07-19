@@ -274,20 +274,6 @@ object LorenzUtils {
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
         toMutableList().also { function(it) }.toList()
 
-    fun colorCodeToRarity(colorCode: Char): String {
-        return when (colorCode) {
-            'f' -> "Common"
-            'a' -> "Uncommon"
-            '9' -> "Rare"
-            '5' -> "Epic"
-            '6' -> "Legendary"
-            'd' -> "Mythic"
-            'b' -> "Divine"
-            '4' -> "Supreme" // legacy items
-            else -> "Special"
-        }
-    }
-
     fun <T> MutableList<List<Any>>.addSelector(
         prefix: String,
         values: Array<T>,
