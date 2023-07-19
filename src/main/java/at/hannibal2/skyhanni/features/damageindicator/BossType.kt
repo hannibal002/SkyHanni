@@ -51,6 +51,11 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     SLAYER_BLAZE_QUAZII_3("§cInferno Quazii 3", 9, "§cQuazii 3"),
     SLAYER_BLAZE_QUAZII_4("§cInferno Quazii 4", 9, "§cQuazii 4"),
 
+    SLAYER_BLOODFIEND_1("§aRiftstalker Bloodfiend 1", 23, "§aBlood 1", showDeathTime = true),
+    SLAYER_BLOODFIEND_2("§6Riftstalker Bloodfiend 2", 23, "§6Blood 2", showDeathTime = true),
+    SLAYER_BLOODFIEND_3("§cRiftstalker Bloodfiend 3", 23, "§cBlood 3", showDeathTime = true),
+    SLAYER_BLOODFIEND_4("§4Riftstalker Bloodfiend 4", 23, "§4Blood 4", showDeathTime = true),
+    SLAYER_BLOODFIEND_5("§5Riftstalker Bloodfiend 5", 23, "§5Blood 5", showDeathTime = true),
 
     HUB_HEADLESS_HORSEMAN("§6Headless Horseman", 10),
 
@@ -76,12 +81,6 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
 
     // The Rift
     LEECH_SUPREME("§cLeech Supreme", 22),
-
-    SLAYER_BLOODFIEND_1("§aRiftstalker Bloodfiend 1", 23, "§aBlood 1", showDeathTime = true),
-    SLAYER_BLOODFIEND_2("§6Riftstalker Bloodfiend 2", 23, "§6Blood 2", showDeathTime = true),
-    SLAYER_BLOODFIEND_3("§cRiftstalker Bloodfiend 3", 23, "§cBlood 3", showDeathTime = true),
-    SLAYER_BLOODFIEND_4("§4Riftstalker Bloodfiend 4", 23, "§4Blood 4", showDeathTime = true),
-    SLAYER_BLOODFIEND_5("§5Riftstalker Bloodfiend 5", 23, "§5Blood 5", showDeathTime = true),
 
     //TODO arachne
 
