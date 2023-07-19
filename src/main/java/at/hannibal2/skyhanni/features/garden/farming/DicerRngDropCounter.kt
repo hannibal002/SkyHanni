@@ -76,7 +76,8 @@ class DicerRngDropCounter {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!GardenAPI.inGarden()) return
+        if (!config.dicerCounterHideChat && !config.dicerCounterDisplay) return
 
         val message = event.message
         for (drop in itemDrops) {
