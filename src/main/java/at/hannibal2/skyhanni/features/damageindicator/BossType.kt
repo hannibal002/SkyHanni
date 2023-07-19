@@ -81,6 +81,7 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
 
     // The Rift
     LEECH_SUPREME("§cLeech Supreme", 22),
+    BACTE("§aBacte", 22),
 
     //TODO arachne
 
