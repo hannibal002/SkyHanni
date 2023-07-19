@@ -213,7 +213,7 @@ class SkyHanniMod {
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())
         loadModule(DungeonCopilot())
-        loadModule(EndermanSlayerBeacon())
+        loadModule(EndermanSlayerFeatures())
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
