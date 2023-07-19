@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -37,12 +38,14 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.moulconfig.internal.KeybindHelper
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.roundToLong
 
 object EstimatedItemValue {
     private val config get() = SkyHanniMod.feature.misc
@@ -72,7 +75,7 @@ object EstimatedItemValue {
 
         val item = event.stack
         val oldData = cache[item]
-        if (oldData != null) {
+        if (oldData != null && false) {
             display = oldData
             lastToolTipTime = System.currentTimeMillis()
             return
@@ -120,7 +123,7 @@ object EstimatedItemValue {
         if (basePrice == totalPrice) return listOf()
 
         val numberFormat = if (config.estimatedIemValueExactPrice) {
-            totalPrice.addSeparators()
+            totalPrice.roundToLong().addSeparators()
         } else {
             NumberUtil.format(totalPrice)
         }
@@ -137,6 +140,9 @@ object EstimatedItemValue {
         var totalPrice = 0.0
         val basePrice = addBaseItem(stack, list)
         totalPrice += basePrice
+
+        totalPrice += addAttributeCost(stack, list)
+
         totalPrice += addReforgeStone(stack, list)
 
         // once
@@ -169,6 +175,66 @@ object EstimatedItemValue {
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
         return Pair(totalPrice, basePrice)
+    }
+
+    private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
+        val attributes = stack.getAttributes() ?: return 0.0
+        var internalName = stack.getInternalName().removePrefix("VANQUISHED_")
+        val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
+        var genericName =  internalName
+        if (kuudraSets.any { internalName.contains(it) }
+            && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) }) {
+            for (prefix in listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")) {
+                internalName = internalName.removePrefix(prefix)
+            }
+            genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
+        }
+        if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
+            val price =
+                getPriceOrCompositePriceForAttribute(
+                    "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
+                    attributes[0].second
+                )
+            if (price != null) {
+                list.add(
+                    "§7Attribute §9${
+                        attributes[0].first.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                    } ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)"
+                )
+                return price
+            }
+        }
+        if (attributes.size != 2) return 0.0
+        val basePrice = NEUItems.getPriceOrNull(internalName) ?: 0.0
+        var subTotal = 0.0
+        val combo = internalName + "+ATTRIBUTE_" + attributes[0].first + "+ATTRIBUTE_" + attributes[1].first
+        val comboPrice = NEUItems.getPriceOrNull(combo)
+        if (comboPrice != null && comboPrice > basePrice) {
+            list.add("§7Attribute Combo: (§6${NumberUtil.format(comboPrice)}§7)")
+            subTotal += comboPrice - basePrice
+        } else {
+            list.add("§7Attributes:")
+        }
+        for (attr in attributes) {
+            val price =
+                getPriceOrCompositePriceForAttribute("$genericName+ATTRIBUTE_${attr.first}", attr.second)
+            if (price != null) {
+                subTotal += price
+            }
+            list.add(
+                "  §9${
+                    attr.first.split("_").joinToString(" ") { it.firstLetterUppercase() }
+                } ${attr.second}§7: §6${if (price != null) NumberUtil.format(price) else "Unknown"}"
+            )
+        }
+        return subTotal
+    }
+
+    private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
+        return (1..10).mapNotNull { lowerLevel ->
+            NEUItems.getPriceOrNull("$attributeName;$lowerLevel")
+                ?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
+        }.minOrNull()
     }
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {

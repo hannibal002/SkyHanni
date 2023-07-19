@@ -13,10 +13,12 @@ class TitleUtils {
     companion object {
         private var display = ""
         private var endTime = 0L
+        private var heightModifier = 1.8
 
-        fun sendTitle(text: String, duration: Int) {
+        fun sendTitle(text: String, duration: Int, height: Double = 1.8) {
             display = "§f$text"
             endTime = System.currentTimeMillis() + duration
+            heightModifier = height
         }
     }
 
@@ -38,7 +40,7 @@ class TitleUtils {
         val renderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.pushMatrix()
-        GlStateManager.translate((width / 2).toFloat(), (height / 1.8).toFloat(), 0.0f)
+        GlStateManager.translate((width / 2).toFloat(), (height / heightModifier).toFloat(), 0.0f)
         GlStateManager.scale(4.0f, 4.0f, 4.0f)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(display, renderer, 0f, 0f, false, 75, 0)
         GlStateManager.popMatrix()

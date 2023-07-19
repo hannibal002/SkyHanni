@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -76,6 +77,11 @@ class NonGodPotEffectDisplay {
             effectDuration[NonGodPotEffect.GOBLIN] = System.currentTimeMillis() + 1000 * 60 * 20
             update()
         }
+        if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
+            checkFooter = true
+            effectDuration.remove(NonGodPotEffect.GOBLIN)
+            update()
+        }
     }
 
     private fun update() {
@@ -144,7 +150,7 @@ class NonGodPotEffectDisplay {
         for (stack in event.inventoryItems.values) {
                 val name = stack.name ?: continue
                 for (effect in NonGodPotEffect.values()) {
-                    if (name == effect.displayName) continue
+                    if (name != effect.displayName) continue
                     for (line in stack.getLore()) {
                         if (line.contains("Remaining") &&
                             line != "§7Time Remaining: §aCompleted!" &&
@@ -203,6 +209,7 @@ class NonGodPotEffectDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (RiftAPI.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
             display,

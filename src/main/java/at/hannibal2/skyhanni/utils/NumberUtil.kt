@@ -59,7 +59,7 @@ object NumberUtil {
      * @link https://stackoverflow.com/a/22186845
      * @author jpdymond
      */
-    fun Double.roundToPrecision(precision: Int): Double {
+    fun Double.roundToPrecision(precision: Int): Double { // TODO is this the same as LorenzUtils.round() ?
         val scale = 10.0.pow(precision).toInt()
         return (this * scale).roundToInt().toDouble() / scale
     }

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -90,7 +91,16 @@ class GardenVisitorFeatures {
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }
-        val visitor = visitors[name]!!
+
+        val visitor = visitors[name]
+        if (visitor == null) {
+            println("visitors: $visitors")
+            println("name: $name")
+            println("npcItem.name: ${npcItem.name}")
+            CopyErrorCommand.logError(RuntimeException("visitor is null! '$name'"), "Error finding the visitor `$name§c`. Try to reopen the inventory")
+            return
+        }
+
         visitor.entityId = lastClickedNpc
         for (line in offerItem.getLore()) {
             if (line == "§7Items Required:") continue

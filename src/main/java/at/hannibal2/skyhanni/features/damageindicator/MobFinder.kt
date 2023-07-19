@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
@@ -202,6 +202,21 @@ class MobFinder {
             if (entity is EntityOtherPlayerMP) {
                 if (entity.name == "Leech Supreme") {
                     return EntityResult(bossType = BossType.LEECH_SUPREME)
+                }
+
+                if (entity.name == "Bloodfiend ") {
+                    when {
+                        entity.hasMaxHealth(625) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
+                        entity.hasMaxHealth(1_100) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
+                        entity.hasMaxHealth(1_800) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
+                        entity.hasMaxHealth(2_400) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
+                        entity.hasMaxHealth(3_000) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                    }
+                }
+            }
+            if (entity is EntitySlime) {
+                if (entity.baseMaxHealth == 1_000) {
+                    return EntityResult(bossType = BossType.BACTE)
                 }
             }
         } else {

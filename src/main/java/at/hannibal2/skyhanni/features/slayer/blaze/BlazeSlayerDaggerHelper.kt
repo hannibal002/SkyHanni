@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -18,7 +18,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -175,17 +174,12 @@ class BlazeSlayerDaggerHelper {
     }
 
     @SubscribeEvent
-    fun onReceiveCurrentShield(event: PacketEvent.ReceiveEvent) {
+    fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
 
-        val packet = event.packet
-
-        if (packet !is S45PacketTitle) return
-        val message = packet.message ?: return
-        val formattedText = message.formattedText
 
         for (shield in HellionShield.values()) {
-            if (shield.formattedName + "§r" == formattedText) {
+            if (shield.formattedName + "§r" == event.title) {
                 Dagger.values().filter { shield in it.shields }.forEach {
                     it.shields.forEach { shield -> shield.active = false }
                     it.updated = true

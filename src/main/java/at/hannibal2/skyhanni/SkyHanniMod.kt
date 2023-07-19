@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
@@ -60,7 +61,24 @@ import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.rift.*
+import at.hannibal2.skyhanni.features.rift.RiftTimer
+import at.hannibal2.skyhanni.features.rift.ShowMotesNpcSellPrice
+import at.hannibal2.skyhanni.features.rift.VampireSlayerFeatures
+import at.hannibal2.skyhanni.features.rift.area.RiftLarva
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveDefenseBlocks
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveLivingMetalHelper
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingMetalSuitProgress
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.DanceRoomHelper
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftLavaMazeParkour
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkour
+import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
+import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
+import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
+import at.hannibal2.skyhanni.features.rift.everywhere.*
 import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
@@ -96,7 +114,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.7",
+    version = "0.19.Beta.11",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -136,6 +154,8 @@ class SkyHanniMod {
         loadModule(GardenCropMilestoneAverage())
         loadModule(GardenCropSpeed)
         loadModule(ProfileStorageData)
+        loadModule(TitleData())
+        loadModule(BlockData())
 
         // APIs
         loadModule(BazaarApi())
@@ -194,7 +214,7 @@ class SkyHanniMod {
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())
         loadModule(DungeonCopilot())
-        loadModule(EndermanSlayerBeacon())
+        loadModule(EndermanSlayerFeatures())
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
@@ -321,6 +341,13 @@ class SkyHanniMod {
         loadModule(RiftUpsideDownParkour())
         loadModule(RiftLavaMazeParkour())
         loadModule(HighlightMiningCommissionMobs())
+        loadModule(ShowMotesNpcSellPrice())
+        loadModule(LivingMetalSuitProgress())
+        loadModule(VampireSlayerFeatures())
+        loadModule(BlobbercystsHighlight())
+        loadModule(LivingCaveDefenseBlocks())
+        loadModule(LivingCaveLivingMetalHelper())
+        loadModule(RiftMotesOrb())
 
         init()
 
@@ -342,7 +369,11 @@ class SkyHanniMod {
         initLogging()
         Runtime.getRuntime().addShutdownHook(Thread { configManager.saveConfig("shutdown-hook") })
         repo = RepoManager(configManager.configDirectory)
-        repo.loadRepoInformation()
+        try {
+            repo.loadRepoInformation()
+        } catch (e: Exception) {
+            Exception("Error reading repo data", e).printStackTrace()
+        }
     }
 
     fun loadModule(obj: Any) {

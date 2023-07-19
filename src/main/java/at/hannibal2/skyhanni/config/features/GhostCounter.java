@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostFormatting;
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -40,7 +42,8 @@ public class GhostCounter {
                     "  §bXP/h: 810,410",
                     "  §bKills/h: 420",
                     "  §bETA: 14d",
-                    "  §bMoney/h: 13,420,069"
+                    "  §bMoney/h: 13,420,069",
+                    "  §bMoney made: 14B"
             }
     )
     public List<Integer> ghostDisplayText = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12));
@@ -61,15 +64,15 @@ public class GhostCounter {
 
         @ConfigOption(name = "Reset Formatting", desc = "Reset formatting to default text.")
         @ConfigEditorButton(buttonText = "Reset")
-        public Runnable resetFormatting = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::resetFormatting;
+        public Runnable resetFormatting = GhostFormatting.INSTANCE::reset;
 
         @ConfigOption(name = "Export Formatting", desc = "Export current formatting to clipboard.")
         @ConfigEditorButton(buttonText = "Export")
-        public Runnable exportFormatting = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::exportFormatting;
+        public Runnable exportFormatting = GhostFormatting.INSTANCE::export;
 
         @ConfigOption(name = "Import Formatting", desc = "Import formatting from clipboard.")
         @ConfigEditorButton(buttonText = "Import")
-        public Runnable importFormatting = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::importFormatting;
+        public Runnable importFormatting = GhostFormatting.INSTANCE::importFormat;
 
         @Expose
         @ConfigOption(name = "Title", desc = "Title Line.")
@@ -294,6 +297,13 @@ public class GhostCounter {
                 "Calculated with your kill per hour and your average magic find.")
         @ConfigEditorText
         public String moneyHourFormat = "  &6$/h: &b%value%";
+
+        @Expose
+        @ConfigOption(name = "Money made", desc = "Calculate the money you made.\nInclude §eSorrow§7, §ePlasma§7, §eVolta§7, §e1M coins drop\n" +
+                "§eGhostly Boots§7, §eScavenger coins.\n" +
+                "§cUsing current Sell Offer value.")
+        @ConfigEditorText
+        public String moneyMadeFormat = "  &6Money made: &b%value%";
     }
 
     @Expose
@@ -325,9 +335,8 @@ public class GhostCounter {
 
     @ConfigOption(name = "Reset", desc = "Reset the counter.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetCounter = at.hannibal2.skyhanni.features.misc.GhostCounter.INSTANCE::reset;
+    public Runnable resetCounter = GhostUtil.INSTANCE::reset;
 
     @Expose
     public Position position = new Position(50, 50, false, true);
-
 }

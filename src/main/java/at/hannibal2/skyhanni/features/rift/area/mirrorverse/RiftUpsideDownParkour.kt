@@ -1,31 +1,29 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
-import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TubulatorParkour {
-    private val config get() = SkyHanniMod.feature.rift.mirrorVerse.tubulatorConfig
+class RiftUpsideDownParkour {
+    private val config get() = RiftAPI.config.area.mirrorVerseConfig.upsideDownParkour
     private var parkourHelper: ParkourHelper? = null
-    private val puzzleRoom = AxisAlignedBB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftTubulator") ?: return
+        val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour") ?: return
         parkourHelper = ParkourHelper(
-            data.locations,
+            data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
             data.shortCuts,
-            platformSize = 1.0,
-            detectionRange = 2.0,
+            platformSize = 2.0,
+            detectionRange = 2.0
         )
         updateConfig()
     }
@@ -39,6 +37,15 @@ class TubulatorParkour {
             if (it.inParkour()) {
                 event.isCanceled = true
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+
+        if (event.message == "§c§lOH NO! THE LAVA OOFED YOU BACK TO THE START!") {
+            parkourHelper?.reset()
         }
     }
 
@@ -65,6 +72,5 @@ class TubulatorParkour {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() =
-        RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled && puzzleRoom.isPlayerInside()
+    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled
 }

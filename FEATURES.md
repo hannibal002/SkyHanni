@@ -48,7 +48,10 @@
 ## Inventory
 - Not Clickable Items 
   - Mark items gray in your inventory when they are not supposed to be moved in certain GUIs, and make green lines around items that meet that requirement.
-  - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade, bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, chests on the private island, attribute fusion and equipment GUI
+  - Works in:
+    - In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
+    - bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag, 
+    - chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
   - Option to allow/block clicks
 - Option to change the gray-out opacity for 'Not Clickable Items'.
 - Set stack number for specific items (stars for crimson armor, minion tier, pet level, new year cake, for golden and diamond dungeon heads the floor number, the tier of master skull and master star, kuudra keys, skill level, and collection level)
@@ -111,15 +114,17 @@
 - Update Timer showing when the next api data update happens.
 
 ## Fishing
-- **Trophy Counter** - After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total.
++ **Trophy Counter**
+  + After fishing a new trophy fish, showing you in chat how many more trophies you have collected in total.
+  + **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - appable0
+  + **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - appable0
+  + Show total amount of all trophy fish rarities at the end of the chat message.
 - **Hide Bronze/Silver Duplicates** - Hiding chat message when catching a duplicate bronze/silver trophy fish.
 - **Shorten Fishing Message** (Replacing the green chat message when fishing a sea creature with a more clean format)
 - Highlight Thunder Sparks that spawn after killing a Thunder.
 - **Barn Timer** - Show the time and amount of sea creatures while fishing on the barn via hub.
 - **Shark Fish Counter** - Counts how many sharks have been caught.
 - **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
-+ **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - (Thanks appable0
-+ **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - (Thanks appable0)
 + Showing fished item names
 + **Chum/Chumcap Bucket Hider**
   + Hide the name tags of Chum/Chumcap Bucket of other players.
@@ -144,6 +149,8 @@
 + Hide poor slayer drop chat messages.
 + Highlight slayer miniboss in blue color.
 + Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
++ Warning when enderman slayer beacon spawns - dragon99z
++ Highlight enderman slayer Nukekebi (Skulls) - dragon99z
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.
 + Cooldown when the Fire Pillar from the Blaze Slayer will kill you.
 + Custom countdown sound for the Fire Pillar timer for the Blaze Slayer.
@@ -168,6 +175,12 @@
   + Display number of bosses needed until the next RNG Meter item drops
   + Warn when no item is set in the RNG Meter
   + Hide the RNG Meter message from chat if the current item is selected
++ Vampire Slayer Features – HiZe
+  + Highlight your own boss (color can be changed)
+  + Change color when the boss is below 20% (can use steak) (can change color)
+  + Highlight other players' boss only if you hit them (can be toggled)
+  + Highlight Co-Op members' boss (you need to write their name in the config)
+  + Highlight Killer Spring and Blood Ichor, TwinClaws warning
 
 ### Diana
 + Show burrows near you.
@@ -214,8 +227,10 @@
     + Also available to select directly in the rancher boots overlay (contributed by nea)
 + Desk shortcut in SkyBlock Menu.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
-+ **Farming Weight and Leaderboard**, provided by the elite skyblock farmers.
-+ Farming weight next leaderboard position eta.
++ **Farming Weight and Leaderboard**
+  + provided by the elite skyblock farmers.
+  + next leaderboard position eta.
+  + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
 + **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
 + **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
@@ -310,18 +325,35 @@
   + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
   + Change how many tasks you should see
   + Hide other players inside the dance room
+  + Added timer before next instruction
+  + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
+  + Fully customize the description for now, next and later (with color)
 + **Upside Down** Parkour & **Lava Maze** - hannibal2
   + Helps to solve the Upside Down Parkour and Lava Maze in the mirror verse by showing the correct way
   + Change how many platforms should be shown in front of you
   + Rainbow color (optional) - nea
   + Hide other players while doing the parkour
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
++ Show the Motes NPC price in the item lore
+  + With Burgers multiplier - HiZe
++ Living Metal Suit Progress - HiZe
+  + Display progress Living Metal Suit (Default disabled)
+  + Option to show a compacted version of the overlay when the set is maxed
++ Added Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
++ Show a line between **Defense blocks** and the mob and highlight the blocks - hannibal2
+  + Hide particles around Defense Blocks
++ Show a moving animation between **Living Metal** and the next block - hannibal2
+  + Hide Living Metal particles
++ Highlight **flying Motes Orbs** - hannibal2
+  + Hide normal motes orbs particles
 
 ## Mining
 + **Highlight Commission Mobs** - hannibal2
   + Highlight Mobs that are part of active commissions
 
 ## Commands
++ **/shcommands** 
+  + Show all commands in SkyHanni
 + **/wiki <search term>** - using hypixel-skyblock.fandom.com instead of Hypixel wiki.
 + **/shmarkplayer <player>** - marking a player with yellow color.
 + **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
@@ -352,7 +384,9 @@
 + Chicken Head Timer.
 + **rancher boots** speed display.
 + **CH Join** - Helps buy a Pass for accessing the Crystal Hollows if needed.
-+ **Estimated Item Value** - Displays an estimated item value for the item you hover over.
++ **Estimated Item Value**
+  + Displays an estimated item value for the item you hover over.
+  + Works with Attributes. - nea
 + **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
 + Server Restart Title
 + **City Project Features**

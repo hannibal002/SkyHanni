@@ -1,29 +1,31 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
+import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class RiftLavaMazeParkour {
-    private val config get() = SkyHanniMod.feature.rift.mirrorVerse.lavaMazeConfig
+class TubulatorParkour {
+    private val config get() = RiftAPI.config.area.mirrorVerseConfig.tubulatorConfig
     private var parkourHelper: ParkourHelper? = null
+    private val puzzleRoom = AxisAlignedBB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour") ?: return
+        val data = event.getConstant<ParkourJson>("RiftTubulator") ?: return
         parkourHelper = ParkourHelper(
             data.locations,
             data.shortCuts,
             platformSize = 1.0,
-            detectionRange = 1.0
+            detectionRange = 2.0,
         )
         updateConfig()
     }
@@ -41,15 +43,6 @@ class RiftLavaMazeParkour {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-
-        if (event.message == "§c§lEEK! THE LAVA OOFED YOU!") {
-            parkourHelper?.reset()
-        }
-    }
-
-    @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         LorenzUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
@@ -61,6 +54,7 @@ class RiftLavaMazeParkour {
             rainbowColor = config.rainbowColor.get()
             monochromeColor = config.monochromeColor.get().toChromaColor()
             lookAhead = config.lookAhead.get() + 1
+            outline = config.outline
         }
     }
 
@@ -71,5 +65,6 @@ class RiftLavaMazeParkour {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled
+    fun isEnabled() =
+        RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled && puzzleRoom.isPlayerInside()
 }

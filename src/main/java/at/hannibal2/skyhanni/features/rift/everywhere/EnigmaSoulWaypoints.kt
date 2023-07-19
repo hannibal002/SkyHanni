@@ -1,6 +1,5 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.rift.everywhere
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -24,7 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EnigmaSoulWaypoints {
-    private val config get() = SkyHanniMod.feature.rift.enigmaSoulWaypoints
+    private val config get() = RiftAPI.config.enigmaSoulWaypoints
     private var inInventory = false
     private var soulLocations = mapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
