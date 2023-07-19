@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
@@ -170,11 +169,11 @@ class EliteFarmingWeight {
         private fun getETA(): String {
             if (weight < 0) return ""
 
-            var next = nextPlayer ?: return ""
-            var nextName = if (leaderboardPosition == -1) "#10000" else next.ign
+            var nextPlayer = nextPlayer ?: return ""
+            var nextName = if (leaderboardPosition == -1) "#10000" else nextPlayer.name
 
             val totalWeight = (localWeight + weight)
-            var weightUntilOvertake = next.amount - totalWeight
+            var weightUntilOvertake = nextPlayer.weight - totalWeight
 
             if (weightUntilOvertake < 0) {
                 if (weightPerSecond > 0) {
@@ -193,13 +192,13 @@ class EliteFarmingWeight {
                 nextPlayers.removeFirst()
 
                 // Display waiting message if nextPlayers list is empty
-                next = nextPlayer ?: return "§cWaiting for leaderboard update..."
+                nextPlayer = this.nextPlayer ?: return "§cWaiting for leaderboard update..."
                 // Update values to next player
-                nextName = next.ign
-                weightUntilOvertake = next.amount - totalWeight
+                nextName = nextPlayer.name
+                weightUntilOvertake = nextPlayer.weight - totalWeight
             }
 
-            if (next.amount == 0.0) {
+            if (nextPlayer.weight == 0.0) {
                 return "§cRejoin the garden to show ETA!"
             }
 
@@ -342,6 +341,6 @@ class EliteFarmingWeight {
             )
         }
 
-        data class UpcomingPlayer(val ign: String, val amount: Double)
+        data class UpcomingPlayer(val name: String, val weight: Double)
     }
 }
