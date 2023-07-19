@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.fishing.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
@@ -71,6 +72,9 @@ public class Storage {
 
             @Expose
             public List<String> kuudraTiersDone = new ArrayList<>();
+
+            @Expose
+            public Map<String, Map<TrophyRarity, Integer>> trophyFishes = new HashMap<>();
         }
 
         @Expose
