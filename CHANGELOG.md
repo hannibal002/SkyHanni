@@ -67,6 +67,8 @@
   + Hide Living Metal particles
 + Highlight **flying Motes Orbs** - hannibal2
   + Hide normal motes orbs particles
++ Added bloodfiend (vampire slayer) to Damage Indicator - HiZe
++ Add Bacte to Damage Indicator
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -83,6 +85,8 @@
 + Added command **/shcommands**
   + Show all commands in SkyHanni
 + Added Attribute price support to Estimated Item Value - nea
++ Added warning when enderman slayer beacon spawns - dragon99z
++ Added Highlight enderman slayer Nukekebi (Skulls) - dragon99z
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -96,6 +100,9 @@
 + Changed time for Trapper from 30 to 15 seconds while Finnegan is mayor – CalMWolfs
 + Added warning to not disable repo auto-update
 + Wither impact ability cooldown now only shows when all 3 scrolls are attached
++ Show total amount of all trophy fish rarities at the end of the chat message
++ Changed **Elite farming weight** display - Kaeso
+  + Instantly showing the next player in the lb when passing someone on the leaderboard
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -115,6 +122,12 @@
   + Added a workaround for a crash when refusing a visitor - hannibal2
 + Added support for new counter drops to dicer rng counter - ReyMaratov
 + Fixed composter inventory numbers after Hypixel changes - hannibal2
++ Rng dicer chat hider now works without enabling drop counter
++ Server restart timer no longer shows all the time if over 2 minutes
++ Fixed crazy rare drops not counting properly - ReyMaratov
++ Fixed individual attribute prices in estimated item value - nea
++ Fixed sack display detection - hize
++ Fixed rare Ghost Counter bugs - hize
 
 ## Version 0.18 (2023-06-19)
 
