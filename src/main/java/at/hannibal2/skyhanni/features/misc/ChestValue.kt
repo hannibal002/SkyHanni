@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.inventory.Slot
@@ -27,10 +28,12 @@ class ChestValue {
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<String, Item>()
     private val slotList = mutableMapOf<Int, ItemStack>()
-    private var inInventory = false
+    private val inInventory get() = InventoryUtils.openInventoryName().isValidStorage()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+        if (!isEnabled()) return
+        if (InventoryUtils.openInventoryName() == "") return
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,
@@ -53,8 +56,6 @@ class ChestValue {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
-        val inventoryName = event.inventoryName
-        inInventory = inventoryName.isValidStorage()
         if (inInventory) {
             update()
         }
@@ -64,7 +65,6 @@ class ChestValue {
     fun onInventoryClose(event: InventoryCloseEvent) {
         chestItems.clear()
         slotList.clear()
-        inInventory = false
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -82,6 +82,7 @@ class ChestValue {
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!isEnabled()) return
+        InventoryUtils.inStorage()
         if (inInventory) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slotList.contains(slot.slotIndex)) {
@@ -248,10 +249,10 @@ class ChestValue {
     }
 
     private fun String.isValidStorage(): Boolean {
-        return (this == "Chest" ||
+        return Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
             this == "Large Chest") ||
             (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
-            this == "Personal Vault"
+            this == "Personal Vault")
     }
 
     data class Item(
