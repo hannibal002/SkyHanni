@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonObject
@@ -57,6 +58,22 @@ object SkyBlockItemModifierUtils {
             data.heldItem = getPetInfo()?.get("heldItem")?.asString
         }
         return data.heldItem
+    }
+
+    fun ItemStack.isRiftTransferable(): Boolean? {
+        val data = cachedData
+        if (data.riftTransferable == null) {
+            data.riftTransferable = getLore().any { it == "§5§kX§5 Rift-Transferable §kX" }
+        }
+        return data.riftTransferable
+    }
+
+    fun ItemStack.isRiftExportable(): Boolean? {
+        val data = cachedData
+        if (data.riftExportable == null) {
+            data.riftExportable = getLore().any { it == "§5§kX§5 Rift-Exportable §kX" }
+        }
+        return data.riftExportable
     }
 
     private fun ItemStack.getPetInfo() =
@@ -210,7 +227,7 @@ object SkyBlockItemModifierUtils {
         return getExtraAttributes()?.hasKey(label) ?: false
     }
 
-    private fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
+    fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
 
     class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
         fun getInternalName() = "${quality}_${type}_GEM"
