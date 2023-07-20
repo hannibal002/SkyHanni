@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.*
@@ -48,11 +49,12 @@ class ChestValue {
         }
     }
 
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
-        inInventory = inventoryName == "Chest" || inventoryName == "Large Chest"
+        inInventory = inventoryName.isValidStorage()
         if (inInventory) {
             update()
         }
@@ -68,8 +70,7 @@ class ChestValue {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        val name = InventoryUtils.openInventoryName()
-        if (name == "Chest" || name == "Large Chest") {
+        if (inInventory) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slotList.contains(slot.slotIndex)) {
                     slot highlight LorenzColor.GREEN
@@ -81,8 +82,7 @@ class ChestValue {
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!isEnabled()) return
-        val name = InventoryUtils.openInventoryName()
-        if (name == "Chest" || name == "Large Chest") {
+        if (inInventory) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slotList.contains(slot.slotIndex)) {
                     slot drawIndex LorenzColor.WHITE
@@ -159,9 +159,11 @@ class ChestValue {
     }
 
     private fun init() {
-        val inventoryName = InventoryUtils.openInventoryName()
-        if (inventoryName == "Chest" || inventoryName == "Large Chest") {
-            val slots = InventoryUtils.getItemsInOpenChest()
+        if (inInventory) {
+            val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
+            val slots = InventoryUtils.getItemsInOpenChest().filter {
+                it.hasStack && it.inventory != Minecraft.getMinecraft().thePlayer.inventory && (!isMinion  || it.slotNumber % 9 != 1)
+            }
             val stacks = buildMap {
                 slots.forEach {
                     put(it.slotIndex, it.stack)
@@ -225,7 +227,7 @@ class ChestValue {
         ;
     }
 
-    infix fun Slot.drawIndex(color: LorenzColor) {
+    private infix fun Slot.drawIndex(color: LorenzColor) {
 
         val font = Minecraft.getMinecraft().fontRendererObj
         GlStateManager.disableLighting()
@@ -243,6 +245,13 @@ class ChestValue {
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
 
+    }
+
+    private fun String.isValidStorage(): Boolean {
+        return (this == "Chest" ||
+            this == "Large Chest") ||
+            (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
+            this == "Personal Vault"
     }
 
     data class Item(
