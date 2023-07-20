@@ -89,7 +89,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Slayer", desc = "Slayer features.")
-    public Slayer slayer = new Slayer();
+    public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
     @Category(name = "Diana", desc = "Diana's mythological event.")
