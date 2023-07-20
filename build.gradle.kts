@@ -7,6 +7,7 @@ plugins {
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.8.20-RC"
+    kotlin("plugin.serialization") version "1.8.22"
 }
 
 group = "at.hannibal2.skyhanni"
@@ -82,6 +83,43 @@ dependencies {
     devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.4:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
+
+    shadowModImpl("com.github.Skytils:Hylin:3ad11efbc1") {
+        exclude(module = "kotlin-reflect")
+        exclude(module = "kotlin-stdlib-jdk8")
+        exclude(module = "kotlin-stdlib-jdk7")
+        exclude(module = "kotlin-stdlib")
+        exclude(module = "kotlinx-coroutines-core")
+    }
+    shadowModImpl("com.github.Skytils:AsmHelper:91ecc2bd9c") {
+        exclude(module = "kotlin-reflect")
+        exclude(module = "kotlin-stdlib-jdk8")
+        exclude(module = "kotlin-stdlib-jdk7")
+        exclude(module = "kotlin-stdlib")
+        exclude(module = "kotlinx-coroutines-core")
+    }
+
+    shadowModImpl(platform(kotlin("bom")))
+    shadowModImpl(platform(ktor("bom", "2.2.4", addSuffix = false)))
+
+    shadowModImpl(ktor("serialization-kotlinx-json"))
+    shadowModImpl(ktor("serialization-gson"))
+
+    shadowModImpl(ktorClient("core"))
+    shadowModImpl(ktorClient("cio"))
+    shadowModImpl(ktorClient("content-negotiation"))
+    shadowModImpl(ktorClient("encoding"))
+
+    shadowModImpl(ktorServer("core"))
+    shadowModImpl(ktorServer("cio"))
+    shadowModImpl(ktorServer("content-negotiation"))
+    shadowModImpl(ktorServer("compression"))
+    shadowModImpl(ktorServer("cors"))
+    shadowModImpl(ktorServer("conditional-headers"))
+    shadowModImpl(ktorServer("auto-head-response"))
+    shadowModImpl(ktorServer("default-headers"))
+    shadowModImpl(ktorServer("host-common"))
+    shadowModImpl(ktorServer("auth"))
 }
 kotlin {
     sourceSets.all {
@@ -181,3 +219,9 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
+fun DependencyHandler.ktor(module: String, version: String? = null, addSuffix: Boolean = true) =
+    "io.ktor:ktor-$module${if (addSuffix) "-jvm" else ""}${version?.let { ":$version" } ?: ""}"
+
+fun DependencyHandler.ktorClient(module: String, version: String? = null) = ktor("client-${module}", version)
+
+fun DependencyHandler.ktorServer(module: String, version: String? = null) = ktor("server-${module}", version)

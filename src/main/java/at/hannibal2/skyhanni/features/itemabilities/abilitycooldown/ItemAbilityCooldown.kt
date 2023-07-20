@@ -43,6 +43,9 @@ class ItemAbilityCooldown {
                 ItemAbility.GYROKINETIC_WAND_LEFT.sound()
             }
             if (event.pitch == 1f && event.volume == 1f){
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                if (internalName != "SHADOW_FURY") return
+
                 ItemAbility.SHADOW_FURY.sound()
             }
         }
