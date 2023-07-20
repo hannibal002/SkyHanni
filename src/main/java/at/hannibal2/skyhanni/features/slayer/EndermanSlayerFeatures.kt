@@ -2,14 +2,17 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.features.damageindicator.BossType
-import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.entity.item.EntityArmorStand
@@ -20,54 +23,73 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EndermanSlayerBeacon {
-
+class EndermanSlayerFeatures {
+    private val config get() = SkyHanniMod.feature.slayer
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private val flyingBeacons = mutableListOf<EntityArmorStand>()
+    private val nukekebiSkulls = mutableListOf<EntityArmorStand>()
     private val sittingBeacon = mutableListOf<LorenzVec>()
-    private val logger = LorenzLogger("slayer/voildgloom_beacon")
+    private val logger = LorenzLogger("slayer/enderman")
+    private val nukekebiSkulTexture =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0="
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!IslandType.THE_END.isInIsland()) return
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
         if (entity is EntityEnderman) {
-            if (hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                endermenWithBeacons.add(entity)
-                logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
+            if (config.slayerEndermanBeacon) {
+                if (hasBeaconInHand(entity) && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                    endermenWithBeacons.add(entity)
+                    logger.log("Added enderman with beacon at ${entity.getLorenzVec()}")
+                }
             }
         }
 
         if (entity is EntityArmorStand) {
-            val stack = entity.inventory[4] ?: return
-            if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
-                flyingBeacons.add(entity)
-                logger.log("Added flying beacons at ${entity.getLorenzVec()}")
+            if (config.slayerEndermanBeacon) {
+                val stack = entity.inventory[4] ?: return
+                if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
+                    flyingBeacons.add(entity)
+                    if (config.slayerEndermanBeaconWaring)
+                        TitleUtils.sendTitle("§4Beacon", 2_00)
+                    logger.log("Added flying beacons at ${entity.getLorenzVec()}")
+                }
+            }
+
+            if (config.endermanHighlightNukekebi) {
+                if (entity.inventory.any { it?.getSkullTexture() == nukekebiSkulTexture }) {
+                    nukekebiSkulls.add(entity)
+                    logger.log("Added nukekebi skulls at ${entity.getLorenzVec()}")
+                    nukekebiSkulls.also { it.removeAll { it.isDead } }
+                }
             }
         }
     }
 
-    private fun hasBeaconInHand(entity: EntityEnderman): Boolean {
-        val heldBlockState = entity.heldBlockState ?: return false
-        val block = heldBlockState.block ?: return false
-        return block == Blocks.beacon
-    }
+    private fun hasBeaconInHand(enderman: EntityEnderman) = enderman.getBlockInHand()?.block == Blocks.beacon
 
-    private fun canSee(a: LorenzVec, b: LorenzVec): Boolean = LocationUtils.canSee(a, b) || a.distance(b) < 15
+    private fun canSee(a: LorenzVec, b: LorenzVec) = LocationUtils.canSee(a, b) || a.distance(b) < 15
 
     @SubscribeEvent
     fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!isEnabled()) return
+        if (!IslandType.THE_END.isInIsland()) return
 
-        if (event.entity in flyingBeacons) {
+        if (config.slayerEndermanBeacon && event.entity in flyingBeacons) {
             event.color = LorenzColor.DARK_RED.toColor().withAlpha(1)
+        }
+
+        if (config.endermanHighlightNukekebi && event.entity in nukekebiSkulls) {
+            event.color = LorenzColor.GOLD.toColor().withAlpha(1)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!isEnabled()) return
+        if (!IslandType.THE_END.isInIsland()) return
+        if (!config.slayerEndermanBeacon) return
 
         endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
@@ -76,13 +98,16 @@ class EndermanSlayerBeacon {
 
         for (location in sittingBeacon.toMutableList()) {
             event.drawColor(location, LorenzColor.DARK_RED, alpha = 1f)
+            event.drawWaypointFilled(location, LorenzColor.RED.toColor(), true, true)
             event.drawString(location.add(0.5, 0.5, 0.5), "§4Beacon", true)
+
         }
     }
 
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!isEnabled()) return
+        if (!IslandType.THE_END.isInIsland()) return
+        if (!config.slayerEndermanBeacon) return
 
         val location = event.location
         if (event.new == "beacon") {
@@ -100,19 +125,11 @@ class EndermanSlayerBeacon {
         }
     }
 
-    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock &&
-            SkyHanniMod.feature.slayer.slayerEndermanBeacon &&
-            LorenzUtils.skyBlockIsland == IslandType.THE_END &&
-            DamageIndicatorManager.isBossSpawned(
-                BossType.SLAYER_ENDERMAN_2,
-                BossType.SLAYER_ENDERMAN_3,
-                BossType.SLAYER_ENDERMAN_4
-            )
-
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         endermenWithBeacons.clear()
         flyingBeacons.clear()
+        nukekebiSkulls.clear()
         sittingBeacon.clear()
         logger.log("Reset everything (world change)")
     }

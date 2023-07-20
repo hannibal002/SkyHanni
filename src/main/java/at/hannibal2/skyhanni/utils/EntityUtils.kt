@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
+import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
@@ -152,4 +153,6 @@ object EntityUtils {
 
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory else null
+
+    fun EntityEnderman.getBlockInHand() = heldBlockState
 }
