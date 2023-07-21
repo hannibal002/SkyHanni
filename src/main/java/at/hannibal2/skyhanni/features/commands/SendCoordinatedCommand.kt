@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.commands
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SendCoordsCommand {
+class SendCoordinatedCommand {
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
@@ -17,7 +15,11 @@ class SendCoordsCommand {
             val message = packet.message.lowercase()
             if (message == "/sendcoords") {
                 event.isCanceled = true
-                LorenzUtils.sendMessageToServer("x: "+ LocationUtils.playerLocation().x.toInt() + ", y: " + LocationUtils.playerLocation().y.toInt() + ", z: " + LocationUtils.playerLocation().z.toInt())
+                val location = LocationUtils.playerLocation()
+                val x = location.x.toInt()
+                val y = location.y.toInt()
+                val z = location.z.toInt()
+                LorenzUtils.sendMessageToServer("x: $x, y: $y, z: $z")
             }
         }
     }
