@@ -161,6 +161,10 @@ object Commands {
             "shconfig",
             "Search or reset config elements §c(warning, dangerous!)"
         ) { SkyHanniConfigSearchResetCommand.command(it) }
+        registerCommand(
+            "shdebugdata",
+            "Prints debug data in the clipboard"
+        ) { SkyHanniTestCommand.debugData(it) }
     }
 
     private fun developersDebugFeatures() {
