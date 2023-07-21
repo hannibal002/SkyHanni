@@ -21,6 +21,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
 import java.awt.Color
+import java.lang.reflect.Field
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -410,4 +411,6 @@ object LorenzUtils {
         if (this == null) return emptyList()
         return listOf(this)
     }
+
+    fun Field.makeAccessible() = also { isAccessible = true }
 }

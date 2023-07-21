@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.JsonElement
@@ -178,8 +179,7 @@ object SkyHanniConfigSearchResetCommand {
         val line = term.split(".").drop(1)
         var field: Field? = null
         for (entry in line) {
-            field = obj.javaClass.getField(entry)
-            field.isAccessible = true
+            field = obj.javaClass.getField(entry).makeAccessible()
             parentObject = obj
             obj = field.get(obj)
         }
@@ -201,8 +201,7 @@ object SkyHanniConfigSearchResetCommand {
 
             val name = field.name
             val fieldName = "$parentName.$name"
-            field.isAccessible = true
-            val newObj = field.get(obj)
+            val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
             if (newObj != null) {
                 if (newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double) {
@@ -242,8 +241,6 @@ object SkyHanniConfigSearchResetCommand {
             else -> name
         }
     }
-
-    private fun Field.makeAccessible() = also { isAccessible = true }
 
     private fun Any.getObjectName(): String {
         if (this is Position) {
