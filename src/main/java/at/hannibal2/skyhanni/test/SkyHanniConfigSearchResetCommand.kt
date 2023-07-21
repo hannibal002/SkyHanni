@@ -142,6 +142,7 @@ object SkyHanniConfigSearchResetCommand {
     }
 
     private fun Any.getClassName(): String {
+        // we do not use javaClass.simpleName since we want to catch edge cases
         val name = javaClass.name
         return when (name) {
             "at.hannibal2.skyhanni.config.core.config.Position" -> "Position"
