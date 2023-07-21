@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -20,20 +22,21 @@ class PatcherSendCoordinatesHighlight {
     private val patcherBeacon = mutableListOf<LorenzVec>()
     private val patcherName = mutableListOf<String>()
     private val logger = LorenzLogger("misc/patchercoords")
+    private val pattern = "(?<playerName>.*): x: (?<x>.*), y: (?<y>.*), z: (?<z>.*)".toPattern()
 
     @SubscribeEvent
-    fun onPatcherCoords(event: LorenzChatEvent) {
+    fun onPatcherCoordinates(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.misc.patcherSendCoordHighlight) return
 
-        var message = event.message.removeColor()
-        if (message.contains("x:") && message.contains("y:") && message.contains("z:")) {
-            val name = message.substringBefore("x:");
-            message = message.replaceBefore("x:", "")
-            message = message.replace("x: ", "").replace("y: ", "").replace("z: ", "")
-            val coords = message.split(",")
+        val message = event.message.removeColor()
+        pattern.matchMatcher(message) {
+            val playerName = group("playerName").split(" ").last()
+            val x = group("x").toInt()
+            val y = group("y").toInt()
+            val z = group("z").toInt()
 
-            patcherBeacon.add(LorenzVec(coords[0].trim().toInt(), coords[1].trim().toInt(), coords[2].trim().toInt()))
-            patcherName.add(name)
+            patcherBeacon.add(LorenzVec(x, y, z))
+            patcherName.add(playerName)
             logger.log("got patcher coords and username")
         }
     }
@@ -57,7 +60,7 @@ class PatcherSendCoordinatesHighlight {
 
         val player = event.player
         if (player.motionX > 0 || player.motionZ > 0) {
-            val location = LorenzVec(player.posX.toInt(), player.posY.toInt(), player.posZ.toInt())
+            val location = player.getLorenzVec()
             for (i in 0 until patcherBeacon.size) {
                 if (location.distanceIgnoreY(patcherBeacon[i]) < 5) {
                     patcherBeacon.removeAt(i)
