@@ -89,9 +89,7 @@ object NumberUtil {
         return this.toString() + this.ordinal()
     }
 
-    fun Number.addSeparators(): String {
-        return NumberFormat.getNumberInstance().format(this)
-    }
+    fun Number.addSeparators() = NumberFormat.getNumberInstance().format(this)
 
     fun String.romanToDecimalIfNeeded() = toIntOrNull() ?: romanToDecimal()
 

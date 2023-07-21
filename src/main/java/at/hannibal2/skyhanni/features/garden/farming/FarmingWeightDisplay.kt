@@ -20,12 +20,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 
-class EliteFarmingWeight {
+class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Elite Farming Weight")
+            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
         }
     }
 
@@ -105,9 +105,15 @@ class EliteFarmingWeight {
             if (weight == -1.0) {
                 if (!isLoadingWeight) {
                     val localProfile = HypixelData.profileName
-                    if (localProfile == "") return
+                    if (localProfile == "") {
+                        display = Collections.singletonList("§cError: profileName is empty!")
+                        return
+                    }
 
                     isLoadingWeight = true
+                    if (display.isEmpty()) {
+                        display = Collections.singletonList("§cLoading..")
+                    }
                     SkyHanniMod.coroutineScope.launch {
                         loadWeight(localProfile)
                         isLoadingWeight = false

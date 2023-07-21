@@ -5,4 +5,5 @@ data class CachedItemData(
     /** "" = not loaded */ var heldItem: String? = "",
     /** -1 = not loaded */ var sackInASack: Int? = -1,
     /** null = not loaded */ var riftTransferable: Boolean? = null,
+    /** null = not loaded */ var riftExportable: Boolean? = null,
 )

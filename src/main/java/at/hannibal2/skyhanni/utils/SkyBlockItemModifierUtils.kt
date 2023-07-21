@@ -68,6 +68,14 @@ object SkyBlockItemModifierUtils {
         return data.riftTransferable
     }
 
+    fun ItemStack.isRiftExportable(): Boolean? {
+        val data = cachedData
+        if (data.riftExportable == null) {
+            data.riftExportable = getLore().any { it == "§5§kX§5 Rift-Exportable §kX" }
+        }
+        return data.riftExportable
+    }
+
     private fun ItemStack.getPetInfo() =
         ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
 

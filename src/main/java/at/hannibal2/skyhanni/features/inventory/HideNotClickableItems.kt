@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
@@ -188,6 +189,12 @@ class HideNotClickableItems {
         val riftTransferable = stack.isRiftTransferable() ?: return true
         if (riftTransferable) {
             return false
+        }
+        if (RiftAPI.inRift()) {
+            val riftExportable = stack.isRiftExportable() ?: return true
+            if (riftExportable) {
+                return false
+            }
         }
 
         hideReason = "Not Rift-Transferable!"
