@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.JsonElement
 import io.github.moulberry.notenoughupdates.util.Shimmy
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
 object SkyHanniConfigSearchResetCommand {
     fun command(args: Array<String>) {
@@ -46,7 +47,7 @@ object SkyHanniConfigSearchResetCommand {
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {
             CopyErrorCommand.logError(e, "Could not reset config element '$term'")
-            "Could not reset config element '$term'"
+            "§cCould not reset config element '$term'"
         }
     }
 
@@ -57,7 +58,7 @@ object SkyHanniConfigSearchResetCommand {
             startSearch(args)
         } catch (e: Exception) {
             CopyErrorCommand.logError(e, "Error while trying to search config")
-            "Error while trying to search config"
+            "§cError while trying to search config"
         }
     }
 
@@ -86,7 +87,7 @@ object SkyHanniConfigSearchResetCommand {
             "§eChanged config element $term."
         } catch (e: Exception) {
             CopyErrorCommand.logError(e, "Could not change config element '$term' to '$rawJson'")
-            "Could not change config element '$term' to '$rawJson'"
+            "§cCould not change config element '$term' to '$rawJson'"
         }
     }
 
@@ -196,8 +197,7 @@ object SkyHanniConfigSearchResetCommand {
             return map
         }
         for (field in obj.javaClass.fields) {
-            // TODO add this maybe?
-//            val b = (field.modifiers & Modifiers.STATIC) == 0
+            if ((field.modifiers and Modifier.STATIC) == 0) continue
 
             val name = field.name
             val fieldName = "$parentName.$name"
