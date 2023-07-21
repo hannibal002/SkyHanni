@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
-import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
+
 import java.util.*;
 
 public class Storage {
@@ -54,6 +54,13 @@ public class Storage {
             @Expose
             public long lastClicked = -1;
 
+            @Override
+            public String toString() {
+                return "MinionConfig{" +
+                        "displayName='" + displayName + '\'' +
+                        ", lastClicked=" + lastClicked +
+                        '}';
+            }
         }
 
         @Expose

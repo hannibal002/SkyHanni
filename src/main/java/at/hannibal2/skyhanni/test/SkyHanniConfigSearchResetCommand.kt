@@ -178,9 +178,8 @@ object SkyHanniConfigSearchResetCommand {
                 val className = obj.getClassName()
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
-                if (objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") || objectName.startsWith(
-                        "at.hannibal2.skyhanni.config.Storage$"
-                    ))
+                if (objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
+                            objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
                 } else {
