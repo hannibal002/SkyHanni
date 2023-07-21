@@ -295,6 +295,26 @@ public class Storage {
                 public long totalAmount;
                 @Expose
                 public boolean hidden;
+
+                @Override
+                public String toString() {
+                    return "SlayerItemProfit{" +
+                            "internalName='" + internalName + '\'' +
+                            ", timesDropped=" + timesDropped +
+                            ", totalAmount=" + totalAmount +
+                            ", hidden=" + hidden +
+                            '}';
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "SlayerProfitList{" +
+                        "items=" + items +
+                        ", mobKillCoins=" + mobKillCoins +
+                        ", slayerSpawnCost=" + slayerSpawnCost +
+                        ", slayerCompletedCount=" + slayerCompletedCount +
+                        '}';
             }
         }
 
@@ -314,6 +334,16 @@ public class Storage {
 
             @Expose
             public String itemGoal = "?";
+
+            @Override
+            public String toString() {
+                return "SlayerRngMeterStorage{" +
+                        "currentMeter=" + currentMeter +
+                        ", gainPerBoss=" + gainPerBoss +
+                        ", goalNeeded=" + goalNeeded +
+                        ", itemGoal='" + itemGoal + '\'' +
+                        '}';
+            }
         }
     }
 }

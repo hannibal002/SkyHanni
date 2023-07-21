@@ -178,7 +178,7 @@ object SkyHanniConfigSearchResetCommand {
                 val className = obj.getClassName()
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
-                if (objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
+                if (obj !is Runnable && objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
                             objectName.startsWith("at.hannibal2.skyhanni.config.Storage"))
                 ) {
                     "<category>"
@@ -212,17 +212,23 @@ object SkyHanniConfigSearchResetCommand {
     }
 
     private fun loadAllFields(parentName: String, obj: Any, depth: Int = 0): Map<String, Any?> {
-        if (depth == 10) return emptyMap() // this is only a safety backup, needs increasing maybe someday
         val map = mutableMapOf<String, Any?>()
+        if (depth == 8) { // this is only a backup for safety, needs increasing someday maybe
+            map["$parentName.<end of depth>"] = null
+            return map
+        }
         for (field in obj.javaClass.fields) {
+            // TODO add this maybe?
+//            val b = (field.modifiers & Modifiers.STATIC) == 0
+
             val name = field.name
             val fieldName = "$parentName.$name"
             field.isAccessible = true
             val newObj = field.get(obj)
             map[fieldName] = newObj
             if (newObj != null) {
-                if (newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int) {
-                    if (newObj !is Position) {
+                if (newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double) {
+                    if (newObj !is Position && !newObj.javaClass.isEnum) {
                         map.putAll(loadAllFields(fieldName, newObj, depth + 1))
                     }
                 }
@@ -233,6 +239,14 @@ object SkyHanniConfigSearchResetCommand {
     }
 
     private fun Any.getClassName(): String {
+        if (this is io.github.moulberry.moulconfig.observer.Property<*>) {
+            val value = javaClass.getDeclaredField("value").makeAccessible().get(this)
+            val name = value.getClassName()
+            return "moulconfig.Property<$name>"
+        }
+
+        if (this is Runnable) return "Runnable"
+
         // we do not use javaClass.simpleName since we want to catch edge cases
         val name = javaClass.name
         return when (name) {
@@ -241,7 +255,9 @@ object SkyHanniConfigSearchResetCommand {
             "java.lang.Integer" -> "Int"
             "java.lang.Long" -> "Long"
             "java.lang.String" -> "String"
+            "java.lang.Double" -> "Double"
             "io.github.moulberry.moulconfig.observer.Property" -> "moulconfig.Property"
+            "com.google.gson.internal.LinkedTreeMap" -> "LinkedTreeMap"
             "java.util.ArrayList" -> "List"
             "java.util.HashMap" -> "Map"
 
@@ -257,6 +273,7 @@ object SkyHanniConfigSearchResetCommand {
             val y = javaClass.getDeclaredField("y").makeAccessible().get(this)
             return "($x, $y)"
         }
+
         if (this is String) {
             return if (toString() == "") {
                 "<empty string>"
@@ -264,13 +281,16 @@ object SkyHanniConfigSearchResetCommand {
                 "'$this'"
             }
         }
+
         if (this is io.github.moulberry.moulconfig.observer.Property<*>) {
             val value = javaClass.getDeclaredField("value").makeAccessible().get(this)
-            val name = value.getClassName()
-            return "moulconfig.Property<$name> = ${value.getObjectName()}"
+            return value.getObjectName()
         }
 
-        if (this is Int || this is Int) return addSeparators()
+        if (this is Int) return addSeparators()
+        if (this is Long) return addSeparators()
+
+        if (this is Runnable) return "<Runnable>"
 
         return toString()
     }
