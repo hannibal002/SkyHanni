@@ -16,8 +16,12 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
 object SkyHanniConfigSearchResetCommand {
+
+    private var lastCommand = emptyArray<String>()
+
     fun command(args: Array<String>) {
         LorenzUtils.chat(runCommand(args))
+        lastCommand = args
     }
 
     private fun runCommand(args: Array<String>): String {
@@ -43,6 +47,11 @@ object SkyHanniConfigSearchResetCommand {
         return try {
             val (field, defaultObject, _) = getComplexField(term, Features())
             val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
+            val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
+            if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
+                return "§cThis will change $affectedElements config elements! Use the command again to confirm."
+            }
+            println("size: $affectedElements")
             field.set(parent, defaultObject)
             "§eSuccessfully reset config element '$term'"
         } catch (e: Exception) {
@@ -78,6 +87,11 @@ object SkyHanniConfigSearchResetCommand {
         } else if (term.startsWith("profileSpecific")) {
             ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
         } else return "§cUnknown config location!"
+
+        val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
+        if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
+            return "§cThis will change $affectedElements config elements! Use the command again to confirm."
+        }
 
         val element = ConfigManager.gson.fromJson(rawJson, JsonElement::class.java)
         val list = term.split(".").drop(1)
@@ -197,7 +211,7 @@ object SkyHanniConfigSearchResetCommand {
             return map
         }
         for (field in obj.javaClass.fields) {
-            if ((field.modifiers and Modifier.STATIC) == 0) continue
+            if ((field.modifiers and Modifier.STATIC) != 0) continue
 
             val name = field.name
             val fieldName = "$parentName.$name"
