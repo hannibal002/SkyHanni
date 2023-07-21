@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import com.google.gson.JsonElement
+import io.github.moulberry.notenoughupdates.util.Shimmy
 import java.lang.reflect.Field
 
 object SkyHanniConfigSearchResetCommand {
@@ -21,6 +25,14 @@ object SkyHanniConfigSearchResetCommand {
                 return
             }
             val term = args[1]
+            if (term.startsWith("playerSpecific")) {
+                LorenzUtils.chat("§cCannot reset playerSpecific config elements. use §e/shconfig set §cinstead.")
+                return
+            }
+            if (term.startsWith("profileSpecific")) {
+                LorenzUtils.chat("§cCannot reset profileSpecific config elements. use §e/shconfig set §cinstead.")
+                return
+            }
             try {
                 val (field, defaultObject, _) = getComplexField(term, Features())
                 val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
@@ -35,17 +47,68 @@ object SkyHanniConfigSearchResetCommand {
                 LorenzUtils.chat("§c/shconfig search <config name> [class name]")
                 return
             }
-            Thread {
-                try {
-                    startSearch(args)
-                } catch (e: Exception) {
-                    CopyErrorCommand.logError(e, "Error while trying to search config")
+            try {
+                startSearch(args)
+            } catch (e: Exception) {
+                CopyErrorCommand.logError(e, "Error while trying to search config")
+            }
+            return
+        } else if (args[0] == "set") {
+            if (args.size < 3) {
+                LorenzUtils.chat("§c/shconfig set <config name> <json element>")
+                return
+            }
+            val term = args[1]
+            var rawJson = args.drop(2).joinToString(" ")
+            if (rawJson == "clipboard") {
+                val readFromClipboard = OSUtils.readFromClipboard()
+                if (readFromClipboard == null) {
+                    LorenzUtils.chat("§cClipboard has no string!")
+                    return
                 }
-            }.start()
+                rawJson = readFromClipboard
+            }
+
+            val root: Any
+            if (term.startsWith("config")) {
+                root = SkyHanniMod.feature
+            } else if (term.startsWith("playerSpecific")) {
+                val playerSpecific = ProfileStorageData.playerSpecific
+                if (playerSpecific != null) {
+                    root = playerSpecific
+                } else {
+                    LorenzUtils.chat("§cplayerSpecific is null!")
+                    return
+                }
+            } else if (term.startsWith("profileSpecific")) {
+                val profileSpecific = ProfileStorageData.profileSpecific
+                if (profileSpecific != null) {
+                    root = profileSpecific
+                } else {
+                    LorenzUtils.chat("§cprofileSpecific is null!")
+                    return
+                }
+            } else {
+                LorenzUtils.chat("§cUnknown config location!")
+                return
+            }
+
+            val element = ConfigManager.gson.fromJson(rawJson, JsonElement::class.java)
+            val shimmy = Shimmy.makeShimmy(root, term.split(".").drop(1))
+            if (shimmy == null) {
+                LorenzUtils.chat("§cCould not change config element '$term', not found!")
+                return
+            }
+            try {
+                shimmy.setJson(element)
+            } catch (e: Exception) {
+                CopyErrorCommand.logError(e, "Could not change config element '$term' to '$rawJson'")
+            }
+            LorenzUtils.chat("§eChanged config element $term.")
             return
         }
 
-        LorenzUtils.chat("§c/shconfig <search;reset>")
+        LorenzUtils.chat("§c/shconfig <search;reset;set>")
     }
 
     private fun createFilter(condition: Boolean, searchTerm: () -> String): Pair<(String) -> Boolean, String> {
@@ -82,14 +145,43 @@ object SkyHanniConfigSearchResetCommand {
         classFilter: (String) -> Boolean,
     ): MutableList<String> {
         val list = mutableListOf<String>()
-        for ((name, obj) in loadAllFields("config", Features())) {
+
+        val map = buildMap {
+            putAll(loadAllFields("config", SkyHanniMod.feature))
+
+            val playerSpecific = ProfileStorageData.playerSpecific
+            if (playerSpecific != null) {
+                putAll(loadAllFields("playerSpecific", playerSpecific))
+            } else {
+                this["playerSpecific"] = null
+            }
+
+            val profileSpecific = ProfileStorageData.profileSpecific
+            if (profileSpecific != null) {
+                putAll(loadAllFields("profileSpecific", profileSpecific))
+            } else {
+                this["profileSpecific"] = null
+            }
+        }
+
+        for ((name, obj) in map) {
             if (name == "config.DISCORD") continue
             if (name == "config.GITHUB") continue
+
+            // this is the old, unused storage area
+            if (name.startsWith("config.hidden")) continue
+
+            if (name == "config.storage.players") continue
+            if (name == "playerSpecific.profiles") continue
+
             val description = if (obj != null) {
                 val className = obj.getClassName()
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
-                if (objectName.startsWith(className) && objectName.startsWith("at.hannibal2.skyhanni.config.features.")) {
+                if (objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") || objectName.startsWith(
+                        "at.hannibal2.skyhanni.config.Storage$"
+                    ))
+                ) {
                     "<category>"
                 } else {
                     "$className = $objectName"
