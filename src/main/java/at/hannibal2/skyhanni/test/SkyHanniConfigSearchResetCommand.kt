@@ -15,100 +15,78 @@ import java.lang.reflect.Field
 
 object SkyHanniConfigSearchResetCommand {
     fun command(args: Array<String>) {
+        val result = runCommand(args)
+        LorenzUtils.chat(result)
+    }
+
+    fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
-            LorenzUtils.chat("§c[SkyHanni] This is a config-edit command, only use it if you know what you are doing!")
-            return
+            return "§c[SkyHanni] This is a config-edit command, only use it if you know what you are doing!"
         }
         if (args[0] == "reset") {
             if (args.size != 2) {
-                LorenzUtils.chat("§c/shconfig reset <config element>")
-                return
+                return "§c/shconfig reset <config element>"
             }
             val term = args[1]
             if (term.startsWith("playerSpecific")) {
-                LorenzUtils.chat("§cCannot reset playerSpecific config elements. use §e/shconfig set §cinstead.")
-                return
+                return "§cCannot reset playerSpecific config elements. use §e/shconfig set §cinstead."
             }
             if (term.startsWith("profileSpecific")) {
-                LorenzUtils.chat("§cCannot reset profileSpecific config elements. use §e/shconfig set §cinstead.")
-                return
+                return "§cCannot reset profileSpecific config elements. use §e/shconfig set §cinstead."
             }
             try {
                 val (field, defaultObject, _) = getComplexField(term, Features())
                 val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
                 field.set(parent, defaultObject)
-                LorenzUtils.chat("§eSuccessfully reset config element '$term'")
+                return "§eSuccessfully reset config element '$term'"
             } catch (e: Exception) {
                 CopyErrorCommand.logError(e, "Could not reset config element '$term'")
+                return "Could not reset config element '$term'"
             }
-            return
         } else if (args[0] == "search") {
             if (args.size == 1) {
-                LorenzUtils.chat("§c/shconfig search <config name> [class name]")
-                return
+                return "§c/shconfig search <config name> [class name]"
             }
             try {
                 startSearch(args)
             } catch (e: Exception) {
                 CopyErrorCommand.logError(e, "Error while trying to search config")
+                return "Error while trying to search config"
             }
-            return
         } else if (args[0] == "set") {
             if (args.size < 3) {
-                LorenzUtils.chat("§c/shconfig set <config name> <json element>")
-                return
+                return "§c/shconfig set <config name> <json element>"
             }
             val term = args[1]
             var rawJson = args.drop(2).joinToString(" ")
             if (rawJson == "clipboard") {
-                val readFromClipboard = OSUtils.readFromClipboard()
-                if (readFromClipboard == null) {
-                    LorenzUtils.chat("§cClipboard has no string!")
-                    return
-                }
+                val readFromClipboard = OSUtils.readFromClipboard() ?: return "§cClipboard has no string!"
                 rawJson = readFromClipboard
             }
 
-            val root: Any
-            if (term.startsWith("config")) {
-                root = SkyHanniMod.feature
+            val root: Any = if (term.startsWith("config")) {
+                SkyHanniMod.feature
             } else if (term.startsWith("playerSpecific")) {
-                val playerSpecific = ProfileStorageData.playerSpecific
-                if (playerSpecific != null) {
-                    root = playerSpecific
-                } else {
-                    LorenzUtils.chat("§cplayerSpecific is null!")
-                    return
-                }
+                ProfileStorageData.playerSpecific ?: return "§cplayerSpecific is null!"
             } else if (term.startsWith("profileSpecific")) {
-                val profileSpecific = ProfileStorageData.profileSpecific
-                if (profileSpecific != null) {
-                    root = profileSpecific
-                } else {
-                    LorenzUtils.chat("§cprofileSpecific is null!")
-                    return
-                }
+                ProfileStorageData.profileSpecific ?: return "§cprofileSpecific is null!"
             } else {
-                LorenzUtils.chat("§cUnknown config location!")
-                return
+                return "§cUnknown config location!"
             }
 
             val element = ConfigManager.gson.fromJson(rawJson, JsonElement::class.java)
-            val shimmy = Shimmy.makeShimmy(root, term.split(".").drop(1))
-            if (shimmy == null) {
-                LorenzUtils.chat("§cCould not change config element '$term', not found!")
-                return
-            }
-            try {
+            val list = term.split(".").drop(1)
+            val shimmy = Shimmy.makeShimmy(root, list) ?: return "§cCould not change config element '$term', not found!"
+            return try {
                 shimmy.setJson(element)
+                "§eChanged config element $term."
             } catch (e: Exception) {
                 CopyErrorCommand.logError(e, "Could not change config element '$term' to '$rawJson'")
+                "Could not change config element '$term' to '$rawJson'"
             }
-            LorenzUtils.chat("§eChanged config element $term.")
-            return
         }
 
-        LorenzUtils.chat("§c/shconfig <search;reset;set>")
+        return "§c/shconfig <search;reset;set>"
     }
 
     private fun createFilter(condition: Boolean, searchTerm: () -> String): Pair<(String) -> Boolean, String> {
