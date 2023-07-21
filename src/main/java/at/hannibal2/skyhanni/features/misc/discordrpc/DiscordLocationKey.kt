@@ -29,7 +29,7 @@ class DiscordLocationKey {
         "dark-thicket",
         "jungle-island",
         "gold-mine",
-        "slimehill"
+        "slimehill",
         "the-barn",
         "mushroom-desert",
         "the-end",
