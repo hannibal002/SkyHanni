@@ -266,7 +266,7 @@ class SkyHanniMod {
         loadModule(GardenOptimalSpeed())
         loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
-        loadModule(EliteFarmingWeight())
+        loadModule(FarmingWeightDisplay())
         loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
