@@ -32,7 +32,7 @@ class PatcherSendCoordinatesHighlight {
             val x = group("x").toInt()
             val y = group("y").toInt()
             val z = group("z").toInt()
-            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z),playerName,System.currentTimeMillis()/1000))
+            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), playerName, System.currentTimeMillis() / 1000))
             logger.log("got patcher coords and username")
         }
     }
@@ -52,12 +52,12 @@ class PatcherSendCoordinatesHighlight {
     @SubscribeEvent
     fun onEnterWaypoint(event: TickEvent.PlayerTickEvent) {
         val player = event.player
-        if(patcherBeacon.size > 0){
+        if (patcherBeacon.size > 0) {
             if (player.motionX > 0 || player.motionZ > 0) {
                 val location = player.getLorenzVec()
                 for (i in 0 until patcherBeacon.size) {
                     logger.log(patcherBeacon[i].time.toString())
-                    if(System.currentTimeMillis()/1000 > patcherBeacon[i].time+5){
+                    if (System.currentTimeMillis() / 1000 > patcherBeacon[i].time + 5) {
                         if (location.distanceIgnoreY(patcherBeacon[i].loc) < 5) {
                             patcherBeacon.removeAt(i)
                             logger.log("removed patcher beacon!")
@@ -66,7 +66,7 @@ class PatcherSendCoordinatesHighlight {
                     }
                 }
             }
-            if(System.currentTimeMillis()/1000 > patcherBeacon[0].time+60){
+            if (System.currentTimeMillis() / 1000 > patcherBeacon[0].time + 60) {
                 patcherBeacon.removeAt(0)
                 logger.log("removed patcher beacon after time!")
             }
