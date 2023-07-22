@@ -74,13 +74,7 @@ class HypixelData {
                     .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
                     ?.substring(5)?.removeColor()
                     ?: "?"
-                if (profileName.isEmpty()) {
-                    val text = TabListData.getTabList().first { it.contains("Profile:") }
-                    tabListProfilePattern.matchMatcher(text) {
-                        profileName = group("profile").lowercase()
-                        ProfileJoinEvent(profileName).postAndCatch()
-                    }
-                }
+                checkProfileName()
             }
         }
 
@@ -102,6 +96,17 @@ class HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+    }
+
+    private fun checkProfileName(): Boolean {
+        if (profileName.isEmpty()) {
+            val text = TabListData.getTabList().firstOrNull { it.contains("Profile:") } ?: return true
+            tabListProfilePattern.matchMatcher(text) {
+                profileName = group("profile").lowercase()
+                ProfileJoinEvent(profileName).postAndCatch()
+            }
+        }
+        return false
     }
 
     private fun checkHypixel() {
