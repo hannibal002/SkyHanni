@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -184,12 +185,15 @@ class SkyHanniTestCommand {
             builder.append("\n")
             builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
             builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
+            builder.append("repoAutoUpdate: ${SkyHanniMod.feature.dev.repoAutoUpdate}\n")
             builder.append("\n")
+
             builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
             val inSkyBlock = LorenzUtils.inSkyBlock
             builder.append("inSkyBlock: $inSkyBlock\n")
-            builder.append("\n")
+
             if (inSkyBlock) {
+                builder.append("\n")
                 builder.append("skyBlockIsland: ${LorenzUtils.skyBlockIsland}\n")
                 builder.append("skyBlockArea: '${LorenzUtils.skyBlockArea}'\n")
                 builder.append("profileName: '${HypixelData.profileName}'\n")
@@ -198,8 +202,15 @@ class SkyHanniTestCommand {
                 builder.append("stranded: ${HypixelData.stranded}\n")
                 builder.append("bingo: ${HypixelData.bingo}\n")
 
+                if (LorenzUtils.inDungeons) {
+                    builder.append("\n")
+                    builder.append("in dungeon!\n")
+                    builder.append(" dungeonFloor: ${DungeonData.dungeonFloor}\n")
+                    builder.append(" started: ${DungeonData.started}\n")
+                    builder.append(" inBossRoom: ${DungeonData.inBossRoom}\n")
+                }
+
             }
-            builder.append("\n")
             builder.append("```")
             OSUtils.copyToClipboard(builder.toString())
             LorenzUtils.chat("§eCopied SkyHanni debug data to clipboard.")

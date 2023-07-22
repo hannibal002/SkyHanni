@@ -16,8 +16,8 @@ class DungeonData {
 
     companion object {
         var dungeonFloor: String? = null
-        var inBossRoom = false
         var started = false
+        var inBossRoom = false
 
         fun inDungeon() = dungeonFloor != null
 
