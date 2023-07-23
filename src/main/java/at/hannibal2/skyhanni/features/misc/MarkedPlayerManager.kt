@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RenderMobColoredEvent
 import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -46,14 +47,12 @@ class MarkedPlayerManager {
         }
 
         private fun findPlayers() {
-            for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-                if (entity is EntityOtherPlayerMP) {
-                    if (entity in markedPlayers.values) continue
+            for (entity in EntityUtils.getAllEntities<EntityOtherPlayerMP>()) {
+                if (entity in markedPlayers.values) continue
 
-                    val name = entity.name.lowercase()
-                    if (name in playerNamesToMark) {
-                        markedPlayers[name] = entity
-                    }
+                val name = entity.name.lowercase()
+                if (name in playerNamesToMark) {
+                    markedPlayers[name] = entity
                 }
             }
         }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
@@ -131,7 +132,7 @@ object EntityUtils {
         getEntitiesNearby(LocationUtils.playerLocation(), radius)
 
     inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): List<T> =
-        getLoadedEntityList().filterIsInstance<T>().filter { it.distanceTo(location) < radius }
+        getEntities().filterIsInstance<T>().filter { it.distanceTo(location) < radius }
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
@@ -155,9 +156,13 @@ object EntityUtils {
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory else null
 
-    fun EntityEnderman.getBlockInHand() = heldBlockState
+    fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
-    inline fun <reified R: Entity> getEntities(): List<R> = getLoadedEntityList().filterIsInstance<R>()
+    inline fun <reified R: Entity> getAllEntities(): List<R> = getEntities().filterIsInstance<R>()
 
-    fun getLoadedEntityList(): List<Entity> = Minecraft.getMinecraft().theWorld.getLoadedEntityList()
+    inline fun <reified R: Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
+
+    fun getEntities(): List<Entity> = getAllEntitiesOrNull() ?: error("minecraft.world.loadedEntityList is null.")
+
+    fun getAllEntitiesOrNull(): List<Entity>? = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.toMutableList()
 }

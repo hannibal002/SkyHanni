@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.projectile.EntitySmallFireball
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -36,8 +36,7 @@ class ParticleHider {
 
         if (SkyHanniMod.feature.misc.hideFireballParticles) {
             if (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE) {
-                for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList.toMutableList()) {
-                    if (entity !is EntitySmallFireball) continue
+                for (entity in EntityUtils.getAllEntities<EntitySmallFireball>()) {
                     val distance = entity.getLorenzVec().distance(event.location)
                     if (distance < 5) {
                         event.isCanceled = true

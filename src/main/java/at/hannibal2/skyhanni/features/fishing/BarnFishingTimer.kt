@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -60,8 +59,7 @@ class BarnFishingTimer {
         }
     }
 
-    private fun countMobs() = Minecraft.getMinecraft().theWorld.loadedEntityList
-        .filterIsInstance<EntityArmorStand>()
+    private fun countMobs() = EntityUtils.getAllEntities<EntityArmorStand>()
         .map { it.name }
         .count { it.endsWith("§c❤") }
 
