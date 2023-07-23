@@ -171,6 +171,11 @@ public class Garden {
         @ConfigEditorBoolean
         public boolean preventRefusing = true;
 
+        @Expose
+        @ConfigOption(name = "Bypass Key", desc = "Hold that key to bypass the Prevent Refusing feature.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int bypassKey = Keyboard.KEY_NONE;
+
 
         /**
          * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
