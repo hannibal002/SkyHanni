@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ParticleHider {
 
-    fun inM7Boss() = LorenzUtils.inDungeons && DungeonData.dungeonFloor == "M7" && DungeonData.inBossRoom
+    private fun inM7Boss() = LorenzUtils.inDungeons && DungeonData.dungeonFloor == "M7" && DungeonData.inBossRoom
 
     @SubscribeEvent
     fun onHypExplosions(event: ReceiveParticleEvent) {

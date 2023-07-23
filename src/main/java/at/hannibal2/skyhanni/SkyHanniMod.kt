@@ -85,6 +85,8 @@ import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
+import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerFeatures
+import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerHideParticles
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -225,6 +227,7 @@ class SkyHanniMod {
         loadModule(HellionShieldHelper())
         loadModule(BlazeSlayerFirePitsWarning())
         loadModule(BlazeSlayerClearView())
+        loadModule(EndermanSlayerHideParticles())
         loadModule(PlayerChatFilter())
         loadModule(HideArmor())
         loadModule(SlayerQuestWarning())

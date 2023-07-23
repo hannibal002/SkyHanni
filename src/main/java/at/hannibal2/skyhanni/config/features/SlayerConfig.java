@@ -30,10 +30,16 @@ public class SlayerConfig {
     public boolean endermanHighlightNukekebi = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer in damage indcator.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanPhaseDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Particles", desc = "Hide particles around enderman slayer bosses and mini bosses.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean endermanHideParticles = false;
 
     @Expose
     @ConfigOption(name = "Blaze", desc = "")
