@@ -31,7 +31,7 @@ class SlayerItemsOnGround {
         if (!SlayerAPI.isInSlayerArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        for (entityItem in EntityUtils.getAllEntities<EntityItem>()) {
+        for (entityItem in EntityUtils.getEntities<EntityItem>()) {
             val location = event.exactLocation(entityItem).add(0.0, 0.8, 0.0)
             if (location.distance(LocationUtils.playerLocation()) > 15) continue
 

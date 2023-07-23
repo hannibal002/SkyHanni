@@ -26,7 +26,7 @@ class ThunderSparksHighlight {
         if (!isEnabled()) return
 
 
-        EntityUtils.getAllEntities<EntityArmorStand>().filter {
+        EntityUtils.getEntities<EntityArmorStand>().filter {
             it !in sparks && it.hasSkullTexture(texture)
         }.forEach { sparks.add(it) }
     }

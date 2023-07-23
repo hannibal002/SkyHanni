@@ -47,7 +47,7 @@ class MarkedPlayerManager {
         }
 
         private fun findPlayers() {
-            for (entity in EntityUtils.getAllEntities<EntityOtherPlayerMP>()) {
+            for (entity in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
                 if (entity in markedPlayers.values) continue
 
                 val name = entity.name.lowercase()

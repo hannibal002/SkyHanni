@@ -59,7 +59,7 @@ class BarnFishingTimer {
         }
     }
 
-    private fun countMobs() = EntityUtils.getAllEntities<EntityArmorStand>()
+    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
         .map { it.name }
         .count { it.endsWith("§c❤") }
 

@@ -37,7 +37,7 @@ class AshfangBlazes {
         }
 
         if (nearAshfang) {
-            for (entity in EntityUtils.getAllEntities<EntityBlaze>()
+            for (entity in EntityUtils.getEntities<EntityBlaze>()
                 .filter { it !in blazeColor.keys }) {
                 val list = entity.getAllNameTagsWith(2, "Ashfang")
                 if (list.size == 1) {
@@ -70,7 +70,7 @@ class AshfangBlazes {
     }
 
     private fun checkNearAshfang() {
-        nearAshfang = EntityUtils.getAllEntities<EntityArmorStand>().any { it.name.contains("Ashfang") }
+        nearAshfang = EntityUtils.getEntities<EntityArmorStand>().any { it.name.contains("Ashfang") }
     }
 
     @SubscribeEvent

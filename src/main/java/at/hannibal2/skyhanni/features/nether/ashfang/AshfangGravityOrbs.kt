@@ -23,7 +23,7 @@ class AshfangGravityOrbs {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        EntityUtils.getAllEntities<EntityArmorStand>()
+        EntityUtils.getEntities<EntityArmorStand>()
             .filter { it !in orbs && it.hasSkullTexture(texture) }
             .forEach { orbs.add(it) }
     }

@@ -300,7 +300,7 @@ class DamageIndicatorManager {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        for (entity in EntityUtils.getAllEntities<EntityLivingBase>()) {
+        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
             checkEntity(entity)
         }
     }

@@ -579,7 +579,7 @@ class MobFinder {
     private fun findGuardians() {
         guardians.clear()
 
-        for (entity in EntityUtils.getAllEntities<EntityGuardian>()) {
+        for (entity in EntityUtils.getEntities<EntityGuardian>()) {
             //F3
             if (entity.hasMaxHealth(1_000_000) || entity.hasMaxHealth(1_200_000)) {
                 guardians.add(entity)

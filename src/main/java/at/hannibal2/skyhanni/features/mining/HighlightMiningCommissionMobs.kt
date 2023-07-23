@@ -48,7 +48,7 @@ class HighlightMiningCommissionMobs {
         if (!isEnabled()) return
         if (!event.isMod(40)) return
 
-        val entities = EntityUtils.getAllEntities<EntityLivingBase>()
+        val entities = EntityUtils.getEntities<EntityLivingBase>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.YELLOW.toColor().withAlpha(127))

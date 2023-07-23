@@ -132,7 +132,7 @@ object EntityUtils {
         getEntitiesNearby(LocationUtils.playerLocation(), radius)
 
     inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): List<T> =
-        getEntities().filterIsInstance<T>().filter { it.distanceTo(location) < radius }
+        getAllEntities().filterIsInstance<T>().filter { it.distanceTo(location) < radius }
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
@@ -158,11 +158,11 @@ object EntityUtils {
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
-    inline fun <reified R: Entity> getAllEntities(): List<R> = getEntities().filterIsInstance<R>()
+    inline fun <reified R: Entity> getEntities(): List<R> = getAllEntities().filterIsInstance<R>()
 
     inline fun <reified R: Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
 
-    fun getEntities(): List<Entity> = getAllEntitiesOrNull() ?: error("minecraft.world.loadedEntityList is null.")
+    fun getAllEntities(): List<Entity> = getAllEntitiesOrNull() ?: error("minecraft.world.loadedEntityList is null.")
 
     fun getAllEntitiesOrNull(): List<Entity>? = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.toMutableList()
 }

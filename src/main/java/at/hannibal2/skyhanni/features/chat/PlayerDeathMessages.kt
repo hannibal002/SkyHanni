@@ -57,7 +57,7 @@ class PlayerDeathMessages {
 
     private fun checkOtherPlayers() {
         val location = LocationUtils.playerLocation()
-        for (otherPlayer in EntityUtils.getAllEntities<EntityOtherPlayerMP>()
+        for (otherPlayer in EntityUtils.getEntities<EntityOtherPlayerMP>()
             .filter { it.getLorenzVec().distance(location) < 25 }) {
             lastTimePlayerSeen[otherPlayer.name] = System.currentTimeMillis()
         }

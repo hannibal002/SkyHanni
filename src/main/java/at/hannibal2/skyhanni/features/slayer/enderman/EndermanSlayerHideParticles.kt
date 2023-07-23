@@ -20,7 +20,7 @@ class EndermanSlayerHideParticles {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        endermanLocations = EntityUtils.getAllEntities<EntityEnderman>().map { it.getLorenzVec() }
+        endermanLocations = EntityUtils.getEntities<EntityEnderman>().map { it.getLorenzVec() }
     }
 
     @SubscribeEvent

@@ -42,7 +42,7 @@ class VampireSlayerFeatures {
         if (!event.isMod(5)) return
         val start = LocationUtils.playerLocation()
         if (config.ownBoss.highlight || config.othersBoss.highlight || config.coopsBossHighlight.highlight) {
-            EntityUtils.getAllEntities<EntityOtherPlayerMP>().forEach {
+            EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
                 val vec = it.position.toLorenzVec()
                 val distance = start.distance(vec)
                 if (distance <= 15)
@@ -50,7 +50,7 @@ class VampireSlayerFeatures {
             }
         }
         if (config.bloodIchor.highlight || config.killerSpring.highlight) {
-            EntityUtils.getAllEntities<EntityArmorStand>().forEach { stand ->
+            EntityUtils.getEntities<EntityArmorStand>().forEach { stand ->
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(bloodIchorTexture)

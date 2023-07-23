@@ -600,7 +600,7 @@ class GardenVisitorFeatures {
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
-        for (entity in EntityUtils.getAllEntities<EntityArmorStand>()) {
+        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
 
             visitor.entityId = entity.entityId
@@ -610,7 +610,7 @@ class GardenVisitorFeatures {
 
     private fun findNametag(visitorName: String): EntityArmorStand? {
         val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in EntityUtils.getAllEntities<EntityArmorStand>()) {
+        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity.name.removeColor() == visitorName) {
                 foundVisitorNameTags.add(entity)
             }
@@ -621,7 +621,7 @@ class GardenVisitorFeatures {
             if (foundVisitorNameTags.size != 2) return null
 
             for (tag in foundVisitorNameTags.toMutableList()) {
-                for (entity in EntityUtils.getAllEntities<EntityArmorStand>()) {
+                for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
                     if (entity in foundVisitorNameTags) continue
                     val distance = entity.getLorenzVec().distance(tag.getLorenzVec())
                     if (distance < 1.5 && entity.name == "§bSam") {

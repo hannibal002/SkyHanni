@@ -37,7 +37,7 @@ object DungeonLividFinder {
         val dyeColor = blockLocation.getBlockStateAt().getValue(BlockStainedGlass.COLOR)
         val chatColor = dyeColor.toLorenzColor()?.getChatColor() ?: return
 
-        val lividEntity = EntityUtils.getAllEntities<EntityArmorStand>()
+        val lividEntity = EntityUtils.getEntities<EntityArmorStand>()
             .firstOrNull { it.name.startsWith("${chatColor}﴾ ${chatColor}§lLivid") } ?: return
 
         val aabb = with(lividEntity) {

@@ -24,7 +24,7 @@ class AshfangBlazingSouls {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!isEnabled()) return
 
-        EntityUtils.getAllEntities<EntityArmorStand>()
+        EntityUtils.getEntities<EntityArmorStand>()
             .filter { it !in souls && it.hasSkullTexture(texture)
         }.forEach { souls.add(it) }
     }

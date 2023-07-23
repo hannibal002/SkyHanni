@@ -36,7 +36,7 @@ class ParticleHider {
 
         if (SkyHanniMod.feature.misc.hideFireballParticles) {
             if (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE) {
-                for (entity in EntityUtils.getAllEntities<EntitySmallFireball>()) {
+                for (entity in EntityUtils.getEntities<EntitySmallFireball>()) {
                     val distance = entity.getLorenzVec().distance(event.location)
                     if (distance < 5) {
                         event.isCanceled = true

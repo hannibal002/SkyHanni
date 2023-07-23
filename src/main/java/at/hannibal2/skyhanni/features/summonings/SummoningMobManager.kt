@@ -75,7 +75,7 @@ class SummoningMobManager {
         }
 
         if (searchArmorStands) {
-            EntityUtils.getAllEntities<EntityArmorStand>().filter { it !in summoningMobNametags }
+            EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }
                 .forEach {
                     val name = it.displayName.unformattedText
                     healthPattern.matchMatcher(name) {
@@ -92,7 +92,7 @@ class SummoningMobManager {
 
         if (searchMobs) {
             val playerLocation = LocationUtils.playerLocation()
-            EntityUtils.getAllEntities<EntityLiving>().filter {
+            EntityUtils.getEntities<EntityLiving>().filter {
                 it !in summoningMobs.keys && it.getLorenzVec()
                     .distance(playerLocation) < 10 && it.ticksExisted < 2
             }.forEach {

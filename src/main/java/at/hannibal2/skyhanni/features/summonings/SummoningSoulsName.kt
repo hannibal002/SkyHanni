@@ -40,7 +40,7 @@ class SummoningSoulsName {
 
     private fun check() {
         val minecraft = Minecraft.getMinecraft()
-        for (entity in EntityUtils.getAllEntities<EntityArmorStand>()) {
+        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (souls.contains(entity)) continue
 
             if (entity.hasSkullTexture(texture)) {
@@ -59,7 +59,7 @@ class SummoningSoulsName {
             }
         }
 
-        for (entity in EntityUtils.getAllEntities<EntityLiving>()) {
+        for (entity in EntityUtils.getEntities<EntityLiving>()) {
             val consumer = entity.getNameTagWith(2, "§c❤")
             if (consumer != null) {
                 if (!consumer.name.contains("§e0")) {
@@ -69,7 +69,7 @@ class SummoningSoulsName {
             }
         }
 
-        val entityList = EntityUtils.getAllEntities<EntityArmorStand>()
+        val entityList = EntityUtils.getEntities<EntityArmorStand>()
         souls.keys.removeIf { it !in entityList }
         //TODO fix overhead!
 //        mobs.keys.removeIf { it !in world.loadedEntityList }
