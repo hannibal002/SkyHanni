@@ -77,10 +77,17 @@ object QuickModMenuSwitch {
     }
 
     private fun shouldShow(mods: List<Mod>): Boolean {
-        if (config.insideEscapeMenu && latestGuiPath == "net.minecraft.client.gui.GuiIngameMenu") return true
+        if (config.insideEscapeMenu && isEscapeMenu(latestGuiPath)) return true
         if (config.insidePlayerInventory && latestGuiPath == "net.minecraft.client.gui.inventory.GuiInventory") return true
 
         return mods.any { it.isInGui() }
+    }
+
+    private fun isEscapeMenu(path: String) = when (path) {
+        "net.minecraft.client.gui.GuiIngameMenu" -> true
+        "me.powns.togglesneak.gui.screens.GuiOptionsReplace" -> true
+
+        else -> false
     }
 
     private fun handleAbstractGuis(openGui: String): String {
