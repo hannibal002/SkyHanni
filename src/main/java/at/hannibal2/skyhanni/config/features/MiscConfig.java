@@ -167,6 +167,12 @@ public class MiscConfig {
     public boolean hideBlazeParticles = false;
 
     @Expose
+    @ConfigOption(name = "Enderman Particles", desc = "Hide enderman particles.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean hideEndermanParticles = false;
+
+    @Expose
     @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
