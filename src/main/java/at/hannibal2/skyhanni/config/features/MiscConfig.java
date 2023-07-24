@@ -252,7 +252,7 @@ public class MiscConfig {
     public boolean estimatedIemValueArmor = true;
 
     @Expose
-    @ConfigOption(name = "Show Estimated Chest Value", desc = "Will show the total values of the items in a chest and the most expensive ones.")
+    @ConfigOption(name = "Estimated Chest Value", desc = "Show the total value of all items in a chest and the most expensive ones.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedItemValueChest = false;
