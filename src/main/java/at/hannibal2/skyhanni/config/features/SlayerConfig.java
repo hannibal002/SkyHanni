@@ -130,12 +130,12 @@ public class SlayerConfig {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+            @ConfigOption(name = "Twinclaws Title", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws Sound", desc = "Play a sound when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsSound = true;
         }
@@ -163,12 +163,12 @@ public class SlayerConfig {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws Title", desc = "Send a title when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws Sound", desc = "Play a sound when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsSound = true;
         }
@@ -200,12 +200,12 @@ public class SlayerConfig {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws Title", desc = "Send a title when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws Sound", desc = "Play a sound when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsSound = true;
         }
@@ -231,7 +231,7 @@ public class SlayerConfig {
         public String steakColor = "0:255:255:0:88";
 
         @Expose
-        @ConfigOption(name = "Twinclaws", desc = "Delay the sound and title of twinclaws alert for a given amount in milliseconds.")
+        @ConfigOption(name = "Twinclaws", desc = "Delay the sound and title of Twinclaws alert for a given amount in milliseconds.")
         @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 1000)
         public int twinclawsDelay = 0;
 

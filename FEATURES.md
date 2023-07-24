@@ -181,6 +181,15 @@
   + Highlight other players' boss only if you hit them (can be toggled)
   + Highlight Co-Op members' boss (you need to write their name in the config)
   + Highlight Killer Spring and Blood Ichor, TwinClaws warning
+  + Sound for TwinClaws
+  + Option to delay c notification and sound (in millis, configurable)
+  + Draw line starting from the boss head to the Killer Spring/Blood Ichor (if the boss is highlighted)
+  + Draw line starting from your crosshair to the boss head
+  + Configurable to work only on your boss, on bosses hit, or on coop boss
++ Hide particles around enderman slayer bosses and mini bosses
++ Boss Spawn Warning - HiZe + hannibal2
+  + Send a title when your slayer boss is about to spawn
+  + Configurable percentage at which the title and sound should be sent
 
 ### Diana
 + Show burrows near you.
@@ -207,6 +216,7 @@
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** -  Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
++ Added option to hide the vanilla particles around enderman
 
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
@@ -348,6 +358,8 @@
   + Hide Living Metal particles
 + Highlight **flying Motes Orbs** - hannibal2
   + Hide normal motes orbs particles
++ Hide Not Rift-transferable items in Rift Transfer Chest as part of the hide not clickable items feature
++ Add npc motes sell value for current opened chest - HiZe
 
 ## Mining
 + **Highlight Commission Mobs** - hannibal2
@@ -425,3 +437,4 @@
   + Write fancy text into a gui element to show on your screen at all time
   + Supports color codes
   + Supports line breaks `\n` - hannibal2
++ Added /sendcoords sending, detecting and rendering - dragon99z

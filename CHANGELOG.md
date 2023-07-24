@@ -69,6 +69,14 @@
   + Hide normal motes orbs particles
 + Added bloodfiend (vampire slayer) to Damage Indicator - HiZe
 + Add Bacte to Damage Indicator
++ Hide Not Rift-transferable items in Rift Transfer Chest as part of the hide not clickable items feature
++ Add npc motes sell value for current opened chest - HiZe
++ Vampire Slayer Feature - HiZe
+  + Sound for twinclaws
+  + Option to delay twinclaws notification and sound (in millis, configurable)
+  + Draw line starting from the boss head to the Killer Spring/Blood Ichor (if the boss is highlighted)
+  + Draw line starting from your crosshair to the boss head
+  + Configurable to work only on your boss, on bosses hit, or on coop boss
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -87,6 +95,13 @@
 + Added Attribute price support to Estimated Item Value - nea
 + Added warning when enderman slayer beacon spawns - dragon99z
 + Added Highlight enderman slayer Nukekebi (Skulls) - dragon99z
++ Added option to hide the vanilla particles around enderman
++ Hide particles around enderman slayer bosses and mini bosses
++ Added support for Shadow Fury abilty cooldown - HiZe
++ Added /sendcoords sending, detecting and rendering - dragon99z
++ Boss Spawn Warning - HiZe + hannibal2
+  + Send a title when your slayer boss is about to spawn
+  + Configurable percentage at which the title and sound should be sent
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -103,6 +118,8 @@
 + Show total amount of all trophy fish rarities at the end of the chat message
 + Changed **Elite farming weight** display - Kaeso
   + Instantly showing the next player in the lb when passing someone on the leaderboard
++ Show in chat the total amount of sharks fished after the fishing contest
++ Custom text over Visitor name moves more smoothly now
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -128,6 +145,11 @@
 + Fixed individual attribute prices in estimated item value - nea
 + Fixed sack display detection - hize
 + Fixed rare Ghost Counter bugs - hize
++ Fixed a bug that farming weight display does not show up if you only have one profile
++ Fixed broken thorn damage indicator detection in dungeon F4/M4
++ Fixed togglesneak mod breaking escape menu open detection for quick mod menu switch
++ Fixed error with detecting hit phase during eman slayer in damage indicator
++ No longer double counting mob kill coins in slayer item profit tracker
 
 ## Version 0.18 (2023-06-19)
 
