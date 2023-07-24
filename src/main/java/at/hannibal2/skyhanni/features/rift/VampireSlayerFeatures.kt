@@ -53,19 +53,34 @@ object VampireSlayerFeatures {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.isMod(5)) {
-            val start = LocationUtils.playerLocation()
-            if (config.ownBoss.highlight || config.othersBoss.highlight || config.coopsBossHighlight.highlight) {
-                Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
-                    val vec = it.position.toLorenzVec()
-                    val distance = start.distance(vec)
-                    if (distance <= 15)
-                        it.process()
-                }
+        if (!event.isMod(5)) return
+        val start = LocationUtils.playerLocation()
+        if (config.ownBoss.highlight || config.othersBoss.highlight || config.coopsBossHighlight.highlight) {
+            EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
+                val vec = it.position.toLorenzVec()
+                val distance = start.distance(vec)
+                if (distance <= 15)
+                    it.process()
             }
         }
-        if (event.isMod(20)) {
-            entityList.editCopy { removeIf { it.isDead } }
+        if (config.bloodIchor.highlight || config.killerSpring.highlight) {
+            EntityUtils.getEntities<EntityArmorStand>().forEach { stand ->
+                val vec = stand.position.toLorenzVec()
+                val distance = start.distance(vec)
+                val isIchor = stand.hasSkullTexture(bloodIchorTexture)
+                if (isIchor || stand.hasSkullTexture(killerSpringTexture)) {
+                    val color = (if (isIchor) config.bloodIchor.color else config.killerSpring.color)
+                        .toChromaColor().withAlpha(config.withAlpha)
+                    if (distance <= 15) {
+                        RenderLivingEntityHelper.setEntityColor(
+                            stand,
+                            color
+                        ) { isEnabled() }
+                        if (isIchor)
+                            entityList.add(stand)
+                    }
+                }
+            }
         }
     }
 

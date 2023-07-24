@@ -9,7 +9,7 @@
 + Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + Added **Shy Warning** (Contributed by CalMWolfs)
-  + Shows a warning when a shy is going to steal your time.
+  + Shows a warning when a shy crux will steal your time.
   + Useful if you play without volume.
 + Added **Larvas Highlighter**
   + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
@@ -29,7 +29,7 @@
   + Click on the soul name inside Rift Guide to show/hide
 + Added **Kloon Hacking** (Contributed by CalMWolfs)
   + Highlights the correct button to click in the hacking inventory
-  + Tells you which colour to pick
+  + Tells you which color to pick
   + While wearing the helmet, waypoints will appear at each terminal location
 + Added **Crux Talisman Progress** Display - HiZe
   + Show bonuses you get from the talisman
@@ -67,6 +67,8 @@
   + Hide Living Metal particles
 + Highlight **flying Motes Orbs** - hannibal2
   + Hide normal motes orbs particles
++ Added bloodfiend (vampire slayer) to Damage Indicator - HiZe
++ Add Bacte to Damage Indicator
 
 ### Other Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -83,6 +85,8 @@
 + Added command **/shcommands**
   + Show all commands in SkyHanni
 + Added Attribute price support to Estimated Item Value - nea
++ Added warning when enderman slayer beacon spawns - dragon99z
++ Added Highlight enderman slayer Nukekebi (Skulls) - dragon99z
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -96,6 +100,9 @@
 + Changed time for Trapper from 30 to 15 seconds while Finnegan is mayor – CalMWolfs
 + Added warning to not disable repo auto-update
 + Wither impact ability cooldown now only shows when all 3 scrolls are attached
++ Show total amount of all trophy fish rarities at the end of the chat message
++ Changed **Elite farming weight** display - Kaeso
+  + Instantly showing the next player in the lb when passing someone on the leaderboard
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -110,9 +117,17 @@
 + Fixed **Dungeon Master Stars** calculation not working correctly sometimes – hannibal2 & Fix3dll
 + Fixed Discord Rich Presence detecting absorption hearts not correctly – NetheriteMiner
 + Fixed Reputation Helper **Kuudra Completions** not getting detected and adding T4 and T5 support - Cinshay
-  = Fixed Item Ability cooldown not working for Astraea - hannibal2
-  = Fixed a typo in the config - hannibal2
-  = Added a workaround for a crash when refusing a visitor - hannibal2
+  + Fixed Item Ability cooldown not working for Astraea - hannibal2
+  + Fixed a typo in the config - hannibal2
+  + Added a workaround for a crash when refusing a visitor - hannibal2
++ Added support for new counter drops to dicer rng counter - ReyMaratov
++ Fixed composter inventory numbers after Hypixel changes - hannibal2
++ Rng dicer chat hider now works without enabling drop counter
++ Server restart timer no longer shows all the time if over 2 minutes
++ Fixed crazy rare drops not counting properly - ReyMaratov
++ Fixed individual attribute prices in estimated item value - nea
++ Fixed sack display detection - hize
++ Fixed rare Ghost Counter bugs - hize
 
 ## Version 0.18 (2023-06-19)
 
@@ -166,7 +181,7 @@
 + City Project Daily Reminder
   + Remind every 24 hours to participate
 + Added Quick Mod Menu Switching (default disabled)
-  + Allows for easy navigation between one Mod Config and another
+  + Allows for fast navigation between one Mod Config and another
   + Default disabled
   + Detects your SkyBlock Mod automatically 
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
@@ -380,7 +395,8 @@
 + Added **FF for Contest**
   + Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory.
 + Added **yaw and pitch display**
-  + Shows yaw and pitch with customizable precision while holding a farm tool. Automatically fades out if there is no movement for a customizable duration (Contributed by Sefer)
+  + Shows yaw and pitch with customizable precision while holding a farm tool.
+  + Automatically fades out if no movement for a customizable duration (Contributed by Sefer)
 + Added warning when 6th visitors is ready (Contributed by CalMWolfs)
 
 ### Features from other Mods
@@ -393,7 +409,7 @@
 
 ### Changes
 + Reworked reputation helper design in the crimson isle.
-+ Moved the key setting for diana `warp to nearest burrow waypoint` from vanilla mc (esc -> config -> controls -> scroll all the way down to skyhanni category) to simply `/sh diana`
++ Moved the key setting for diana `warp to nearest burrow waypoint` from vanilla mc (esc -> config -> controls -> scroll all the way down to skyhanni category) to just `/sh diana`
 
 ### Fixed
 + Barbarian Duke Damage Indicator now only starts displaying after the player is getting close to him. (30 blocks)
@@ -482,7 +498,7 @@
 + Add two more chat filter categories: Powder Mining and Winter Gifts.
 + Add catacombs class level color to party finder.
 + Add wishing compass uses amount display.
-+ Saves missing items from cancelled buy orders to clipboard for faster re-entry.
++ Saves missing items from canceled buy orders to clipboard for faster re-entry.
 + Adds a visual highlight to the Croesus inventory that show what chests have not yet been opened.
 
 ### Removals
@@ -587,7 +603,7 @@
 + Links in player chat are clickable again
 
 ### Dungeon
-+ Added hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs in dungeon
++ Added hide the damage, ability damage and defense orbs that spawn when the healer is killing mobs in dungeon
 + Added hide the golden fairy that follows the healer in dungeon.
 + Added hidden music for the clean end of the dungeon
 
@@ -720,7 +736,7 @@
 - Fixed damage indicator f4 and m4 thorn support for Derpy
 - Added option to hide vanilla (or Skytils) damage splashes next to damage indicator
 - Added damage/healing over time display to damage indicator
-- Added training dummy (on personal island) to damage indicator
+- Added Training Dummy (on personal island) to damage indicator
 
 ### Other stuff
 + Added ashfang reset cooldown
@@ -735,7 +751,7 @@
 
 ## Version 0.1
 - Added damage indicator for some bosses who are outside dungeon (4 nether bosses: Ashfang, barbarian duke, mage outlaw and Bladesoul, slayers: Enderman 1-4, revenant 5, and untested support for vanquisher in nether, Enderdragon and Endstone protector in end)
-- Added item ability cooldown background display (over the whole slot, work in progress)
+- Added item ability cooldown background display (over the slot, work in progress)
 - Added Ashfang freeze cooldown (when you get hit by “anti ability” and slowness effect)
 - Changed “hot clickable items” to show items again, but only with dark gray overlay. Looks nicer
 - Made the GitHub repository public

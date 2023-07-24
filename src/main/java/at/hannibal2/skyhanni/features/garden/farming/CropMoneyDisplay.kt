@@ -239,7 +239,7 @@ object CropMoneyDisplay {
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!
-            // When only the NPC price is shown, display the price exclusively for the base item
+            // When only the NPC price is shown, display the price only for the base item
             if (onlyNpcPrice) {
                 if (amount != 1) continue
             } else {

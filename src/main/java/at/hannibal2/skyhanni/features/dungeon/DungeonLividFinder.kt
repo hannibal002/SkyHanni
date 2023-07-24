@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -36,8 +37,7 @@ object DungeonLividFinder {
         val dyeColor = blockLocation.getBlockStateAt().getValue(BlockStainedGlass.COLOR)
         val chatColor = dyeColor.toLorenzColor()?.getChatColor() ?: return
 
-        val world = Minecraft.getMinecraft().theWorld
-        val lividEntity = world.loadedEntityList.filterIsInstance<EntityArmorStand>()
+        val lividEntity = EntityUtils.getEntities<EntityArmorStand>()
             .firstOrNull { it.name.startsWith("${chatColor}﴾ ${chatColor}§lLivid") } ?: return
 
         val aabb = with(lividEntity) {
@@ -50,6 +50,7 @@ object DungeonLividFinder {
                 posZ + 0.5
             )
         }
+        val world = Minecraft.getMinecraft().theWorld
         livid = world.getEntitiesWithinAABB(EntityOtherPlayerMP::class.java, aabb)
             .takeIf { it.size == 1 }?.firstOrNull() ?: return
         livid?.let {

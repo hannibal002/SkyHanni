@@ -129,7 +129,7 @@ object GardenVisitorDropStatistics {
         //8
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
-        //9 - 14
+        //9 – 14
         for (reward in VisitorReward.values()) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons

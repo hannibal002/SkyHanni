@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
+import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
@@ -44,6 +45,7 @@ import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
@@ -83,6 +85,8 @@ import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
+import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerFeatures
+import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerHideParticles
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -113,7 +117,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.9",
+    version = "0.19.Beta.11",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -203,6 +207,7 @@ class SkyHanniMod {
         loadModule(RealTime())
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
+        loadModule(SendCoordinatedCommand())
         loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
@@ -213,7 +218,7 @@ class SkyHanniMod {
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())
         loadModule(DungeonCopilot())
-        loadModule(EndermanSlayerBeacon())
+        loadModule(EndermanSlayerFeatures())
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
@@ -222,6 +227,7 @@ class SkyHanniMod {
         loadModule(HellionShieldHelper())
         loadModule(BlazeSlayerFirePitsWarning())
         loadModule(BlazeSlayerClearView())
+        loadModule(EndermanSlayerHideParticles())
         loadModule(PlayerChatFilter())
         loadModule(HideArmor())
         loadModule(SlayerQuestWarning())
@@ -263,7 +269,7 @@ class SkyHanniMod {
         loadModule(GardenOptimalSpeed())
         loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
-        loadModule(EliteFarmingWeight())
+        loadModule(FarmingWeightDisplay())
         loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
@@ -278,6 +284,7 @@ class SkyHanniMod {
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())
         loadModule(PasteIntoSigns())
+        loadModule(PatcherSendCoordinatesHighlight())
         loadModule(EstimatedItemValue)
         loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
