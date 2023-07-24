@@ -5,11 +5,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
-import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
@@ -129,20 +127,20 @@ object EntityUtils {
     }
 
     inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): List<T> =
-        getEntitiesNearby(LocationUtils.playerLocation(), radius)
+        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius)
 
     inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): List<T> =
-        getAllEntities().filterIsInstance<T>().filter { it.distanceTo(location) < radius }
+        getEntities<T>().filter { it.distanceTo(location) < radius }
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
-    fun WorldClient.getEntitiesNearby(
-        clazz: Class<EntityBlaze>,
-        location: LorenzVec,
-        radius: Double
-    ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
-        entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
-    }
+//    fun WorldClient.getEntitiesNearby(
+//        clazz: Class<EntityBlaze>,
+//        location: LorenzVec,
+//        radius: Double
+//    ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
+//        entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
+//    }
 
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
         if (inventory == null) return false
@@ -158,9 +156,9 @@ object EntityUtils {
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
-    inline fun <reified R: Entity> getEntities(): List<R> = getAllEntities().filterIsInstance<R>()
+    inline fun <reified R : Entity> getEntities(): List<R> = getAllEntities().filterIsInstance<R>()
 
-    inline fun <reified R: Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
+    inline fun <reified R : Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
 
     fun getAllEntities(): List<Entity> = getAllEntitiesOrNull() ?: error("minecraft.world.loadedEntityList is null.")
 

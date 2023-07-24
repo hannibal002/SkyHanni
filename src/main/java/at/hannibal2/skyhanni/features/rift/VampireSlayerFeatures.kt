@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
-import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -40,6 +39,12 @@ import kotlin.time.Duration.Companion.milliseconds
 object VampireSlayerFeatures {
 
     private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
+    private val configOwnBoss get() = config.ownBoss
+    private val configOtherBoss get() = config.othersBoss
+    private val configCoopBoss get() = config.coopsBossHighlight
+    private val configBloodIcor get() = config.bloodIchor
+    private val configKillerSpring get() = config.killerSpring
+
     private val entityList = mutableListOf<EntityLivingBase>()
     private val taggedEntityList = mutableListOf<Int>()
     private val standList = mutableMapOf<EntityArmorStand, EntityOtherPlayerMP>()
@@ -48,14 +53,14 @@ object VampireSlayerFeatures {
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
     private val killerSpringTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdmN2E3YmM4YWM4NmYyM2NhN2JmOThhZmViNzY5NjAyMjdlMTgzMmZlMjA5YTMwMjZmNmNlYjhiZGU3NGY1NCJ9fX0="
-    private var nextClawSend: Long = 0
+    private var nextClawSend = 0L
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         val start = LocationUtils.playerLocation()
-        if (config.ownBoss.highlight || config.othersBoss.highlight || config.coopsBossHighlight.highlight) {
+        if (configOwnBoss.highlight || configOtherBoss.highlight || configCoopBoss.highlight) {
             EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
                 val vec = it.position.toLorenzVec()
                 val distance = start.distance(vec)
@@ -63,13 +68,13 @@ object VampireSlayerFeatures {
                     it.process()
             }
         }
-        if (config.bloodIchor.highlight || config.killerSpring.highlight) {
+        if (configBloodIcor.highlight || configKillerSpring.highlight) {
             EntityUtils.getEntities<EntityArmorStand>().forEach { stand ->
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(bloodIchorTexture)
                 if (isIchor || stand.hasSkullTexture(killerSpringTexture)) {
-                    val color = (if (isIchor) config.bloodIchor.color else config.killerSpring.color)
+                    val color = (if (isIchor) configBloodIcor.color else configKillerSpring.color)
                         .toChromaColor().withAlpha(config.withAlpha)
                     if (distance <= 15) {
                         RenderLivingEntityHelper.setEntityColor(
@@ -82,20 +87,23 @@ object VampireSlayerFeatures {
                 }
             }
         }
+        if (event.isMod(20)) {
+            entityList.editCopy { removeIf { it.isDead } }
+        }
     }
 
     private fun EntityOtherPlayerMP.process() {
         if (name != "Bloodfiend ") return
 
-        if (config.ownBoss.twinClawsTitle || config.othersBoss.twinClawsTitle || config.coopsBossHighlight.twinClawsTitle) {
+        if (configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle) {
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
                 if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) {
-                    val coopList = config.coopsBossHighlight.coopMembers.split(",").toList()
+                    val coopList = configCoopBoss.coopMembers.split(",").toList()
                     val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
                         it.name.contains(username)
                     }
                     val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                        coopList.isNotEmpty() && config.coopsBossHighlight.highlight && coopList.any { it2 ->
+                        coopList.isNotEmpty() && configCoopBoss.highlight && coopList.any { it2 ->
                             var contain = false
                             if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
                                 val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
@@ -106,14 +114,14 @@ object VampireSlayerFeatures {
                         }
                     }
                     val shouldSendTitle =
-                        if (containUser && config.ownBoss.twinClawsTitle) true
-                        else if (containCoop && config.coopsBossHighlight.twinClawsTitle) true
-                        else taggedEntityList.contains(this.entityId) && config.othersBoss.twinClawsTitle
+                        if (containUser && configOwnBoss.twinClawsTitle) true
+                        else if (containCoop && configCoopBoss.twinClawsTitle) true
+                        else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsTitle
 
                     val shouldSendSound =
-                        if (containUser && config.ownBoss.twinClawsSound) true
-                        else if (containCoop && config.coopsBossHighlight.twinClawsSound) true
-                        else taggedEntityList.contains(this.entityId) && config.othersBoss.twinClawsSound
+                        if (containUser && configOwnBoss.twinClawsSound) true
+                        else if (containCoop && configCoopBoss.twinClawsSound) true
+                        else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsSound
 
                     if (shouldSendTitle || shouldSendSound) {
                         SkyHanniMod.coroutineScope.launch {
@@ -133,7 +141,7 @@ object VampireSlayerFeatures {
             }
         }
         getAllNameTagsInRadiusWith("Spawned by").forEach {
-            val coopList = config.coopsBossHighlight.coopMembers.split(",").toList()
+            val coopList = configCoopBoss.coopMembers.split(",").toList()
             val containUser = it.name.contains(username)
             val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
                 var contain = false
@@ -155,23 +163,23 @@ object VampireSlayerFeatures {
                 taggedEntityList.remove(this.entityId)
             }
             val canUseSteak = health <= neededHealth
-            val ownBoss = config.ownBoss.highlight && containUser && isNPC()
-            val otherBoss = config.othersBoss.highlight && taggedEntityList.contains(this.entityId) && isNPC()
-            val coopBoss = config.coopsBossHighlight.highlight && containCoop && isNPC()
+            val ownBoss = configOwnBoss.highlight && containUser && isNPC()
+            val otherBoss = configOtherBoss.highlight && taggedEntityList.contains(this.entityId) && isNPC()
+            val coopBoss = configCoopBoss.highlight && containCoop && isNPC()
             val shouldRender = if (ownBoss) true else if (otherBoss) true else coopBoss
 
             val color =
                 if (canUseSteak && config.changeColorWhenCanSteak)
                     config.steakColor.color()
-                else if (ownBoss) config.ownBoss.highlightColor.color()
-                else if (otherBoss) config.othersBoss.highlightColor.color()
-                else if (coopBoss) config.coopsBossHighlight.highlightColor.color()
+                else if (ownBoss) configOwnBoss.highlightColor.color()
+                else if (otherBoss) configOtherBoss.highlightColor.color()
+                else if (coopBoss) configCoopBoss.highlightColor.color()
                 else 0
 
             val shouldSendSteakTitle =
-                if (canUseSteak && config.ownBoss.steakAlert && containUser) true
-                else if (canUseSteak && config.othersBoss.steakAlert && taggedEntityList.contains(this.entityId)) true
-                else canUseSteak && config.coopsBossHighlight.steakAlert && containCoop
+                if (canUseSteak && configOwnBoss.steakAlert && containUser) true
+                else if (canUseSteak && configOtherBoss.steakAlert && taggedEntityList.contains(this.entityId)) true
+                else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle)
                 TitleUtils.sendTitle("§c§lSTEAK!", 300, 2.6)
@@ -207,7 +215,7 @@ object VampireSlayerFeatures {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.clickedEntity !is EntityOtherPlayerMP) return
         if (!event.clickedEntity.isNPC()) return
-        val coopList = config.coopsBossHighlight.coopMembers.split(",").toList()
+        val coopList = configCoopBoss.coopMembers.split(",").toList()
         event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by").forEach {
             val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
                 var contain = false
@@ -282,26 +290,26 @@ object VampireSlayerFeatures {
             }
         }
 
-        if (config.bloodIchor.renderBeam) {
+        if (configBloodIcor.renderBeam) {
             entityList.filterIsInstance<EntityArmorStand>().forEach {
                 if (it.hasSkullTexture(bloodIchorTexture)) {
                     if (it.isEntityAlive) {
                         event.drawWaypointFilled(
-                            it.position.toLorenzVec().add(0, -2, 0), config.bloodIchor.color.toChromaColor(),
+                            it.position.toLorenzVec().add(0, -2, 0), configBloodIcor.color.toChromaColor(),
                             beacon = true
                         )
                     }
                 }
             }
         }
-        if (config.bloodIchor.highlight || config.killerSpring.highlight) {
+        if (configBloodIcor.highlight || configKillerSpring.highlight) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(bloodIchorTexture)
                 val isSpring = stand.hasSkullTexture(killerSpringTexture)
                 if (isIchor || isSpring) {
-                    val color = (if (isIchor) config.bloodIchor.color else config.killerSpring.color)
+                    val color = (if (isIchor) configBloodIcor.color else configKillerSpring.color)
                         .toChromaColor().withAlpha(config.withAlpha)
                     if (distance <= 15) {
                         RenderLivingEntityHelper.setEntityColor(
@@ -309,12 +317,12 @@ object VampireSlayerFeatures {
                             color
                         ) { isEnabled() }
 
-                        val linesColorStart = (if (isIchor) config.bloodIchor.linesColor else config.killerSpring.linesColor).toChromaColor()
+                        val linesColorStart = (if (isIchor) configBloodIcor.linesColor else configKillerSpring.linesColor).toChromaColor()
                         val text = if (isIchor) "§4Ichor" else "§4Spring"
                         event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
                         event.drawDynamicText(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), text, 1.5, ignoreBlocks = false)
                         for ((player, stand2) in standList) {
-                            if (config.bloodIchor.showLines || config.killerSpring.showLines)
+                            if (configBloodIcor.showLines || configKillerSpring.showLines)
                                 event.draw3DLine(
                                     event.exactLocation(player).add(0.0, 1.5, 0.0),
                                     event.exactLocation(stand2).add(0.0, 1.5, 0.0),
@@ -342,10 +350,10 @@ object VampireSlayerFeatures {
     fun onParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
-        Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0).forEach {
+        EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0).forEach {
             if (it.isHighlighted()) {
                 if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE) {
-                    Minecraft.getMinecraft().theWorld.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
+                    EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
                         if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
                             standList[stand] = it
                         }
