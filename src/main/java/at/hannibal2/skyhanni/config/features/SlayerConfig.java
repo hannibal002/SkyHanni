@@ -403,7 +403,7 @@ public class SlayerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Boss spawn warning", desc = "")
+    @ConfigOption(name = "Boss Spawn Warning", desc = "")
     @Accordion
     public SlayerBossWarning slayerBossWarning = new SlayerBossWarning();
 
@@ -415,7 +415,7 @@ public class SlayerConfig {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Percent", desc = "The percent at which the title and sound should be sent.")
+        @ConfigOption(name = "Percent", desc = "The percentage at which the title and sound should be sent.")
         @ConfigEditorSlider(minStep = 1, minValue = 50, maxValue = 90)
         public int percent = 80;
 
