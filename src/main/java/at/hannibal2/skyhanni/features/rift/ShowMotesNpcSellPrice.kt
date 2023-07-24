@@ -43,7 +43,7 @@ class ShowMotesNpcSellPrice {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isInventoryValueEnabled()) return
-        if (event.isMod(20))
+        if (event.isMod(10))
             processItems()
     }
 
@@ -77,12 +77,15 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isInventoryValueEnabled()) return
-        processItems()
+        reset()
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        reset()
+    }
+
+    private fun reset() {
         if (!isInventoryValueEnabled()) return
         itemMap.clear()
         slotList.clear()
@@ -109,12 +112,6 @@ class ShowMotesNpcSellPrice {
     }
 
     @SubscribeEvent
-    fun onInventoryChange(event: LateInventoryOpenEvent) {
-        if (!isInventoryValueEnabled()) return
-        update()
-    }
-
-    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
         pattern.matchMatcher(event.message) {
@@ -129,7 +126,7 @@ class ShowMotesNpcSellPrice {
 
     private fun drawDisplay() = buildList<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-        newDisplay.addAsSingletonList("§7Items Value:")
+        newDisplay.addAsSingletonList("§7Item Values:")
         val sorted = itemMap.toList().sortedByDescending { it.second.second }.toMap().toMutableMap()
 
         for ((internalName, pair) in sorted) {
