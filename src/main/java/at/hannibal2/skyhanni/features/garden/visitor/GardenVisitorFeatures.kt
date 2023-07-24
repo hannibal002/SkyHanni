@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -317,14 +318,16 @@ class GardenVisitorFeatures {
         if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
 
         for (visitor in visitors.values) {
-            visitor.getNameTagEntity()?.getLorenzVec()?.let {
+            visitor.getNameTagEntity()?.let {
+                val location = event.exactLocation(it)
                 if (it.distanceToPlayer() < 15) {
                     val text = visitor.status.displayName
-                    event.drawString(it.add(0.0, 2.23, 0.0), text)
+                    event.drawString(location.add(0.0, 2.23, 0.0), text)
                     if (config.visitorRewardWarning.showOverName) {
                         visitor.hasReward()?.let { reward ->
                             val name = reward.displayName
-                            event.drawString(it.add(0.0, 2.73, 0.0), "§c!$name§c!")
+
+                            event.drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
                         }
                     }
                 }
