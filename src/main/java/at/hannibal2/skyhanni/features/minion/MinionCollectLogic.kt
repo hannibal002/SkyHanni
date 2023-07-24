@@ -28,7 +28,7 @@ class MinionCollectLogic {
         return map
     }
 
-    // hypixel opens a new inventory after clicking on an item in minion inventory, InventoryCloseEvent is not usable here
+    // hypixel opens a new inventory after clicking on an item in minion inventory, InventoryCloseEvent isn't usable here
     @SubscribeEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         closeMinion()

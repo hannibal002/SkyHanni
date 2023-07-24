@@ -104,7 +104,7 @@ object GardenCropMilestoneDisplay {
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
                 val addedCounter = (counter - old).toInt()
-                EliteFarmingWeight.addCrop(crop, addedCounter)
+                FarmingWeightDisplay.addCrop(crop, addedCounter)
                 update()
                 crop.setCounter(
                     crop.getCounter() + if (GardenCropSpeed.finneganPerkActive()) {

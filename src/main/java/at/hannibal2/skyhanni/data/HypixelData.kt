@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
@@ -11,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 class HypixelData {
+    private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
 
     companion object {
         var hypixelLive = false
@@ -72,6 +74,7 @@ class HypixelData {
                     .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
                     ?.substring(5)?.removeColor()
                     ?: "?"
+                checkProfileName()
             }
         }
 
@@ -93,6 +96,17 @@ class HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+    }
+
+    private fun checkProfileName(): Boolean {
+        if (profileName.isEmpty()) {
+            val text = TabListData.getTabList().firstOrNull { it.contains("Profile:") } ?: return true
+            tabListProfilePattern.matchMatcher(text) {
+                profileName = group("profile").lowercase()
+                ProfileJoinEvent(profileName).postAndCatch()
+            }
+        }
+        return false
     }
 
     private fun checkHypixel() {

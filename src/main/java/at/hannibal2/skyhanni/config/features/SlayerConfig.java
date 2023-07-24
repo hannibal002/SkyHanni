@@ -30,10 +30,16 @@ public class SlayerConfig {
     public boolean endermanHighlightNukekebi = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer in damage indcator.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanPhaseDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Particles", desc = "Hide particles around enderman slayer bosses and mini bosses.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean endermanHideParticles = false;
 
     @Expose
     @ConfigOption(name = "Blaze", desc = "")
@@ -124,9 +130,14 @@ public class SlayerConfig {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
+            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.\nWork on others highlighted people boss.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsSound = true;
         }
 
         @Expose
@@ -152,15 +163,20 @@ public class SlayerConfig {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsSound = true;
         }
 
         @Expose
         @ConfigOption(name = "Co-op Boss", desc = "")
         @Accordion
-        public CoopBossHighlight coopsBossHighlight = new CoopBossHighlight();
+        public CoopBossHighlight coopBoss = new CoopBossHighlight();
 
         public static class CoopBossHighlight {
             @Expose
@@ -184,9 +200,14 @@ public class SlayerConfig {
             public boolean steakAlert = true;
 
             @Expose
-            @ConfigOption(name = "Twinclaws warning", desc = "Send a title when Twinclaws is about to happen.")
+            @ConfigOption(name = "Twinclaws title", desc = "Send a title when Twinclaws is about to happen.")
             @ConfigEditorBoolean
             public boolean twinClawsTitle = true;
+
+            @Expose
+            @ConfigOption(name = "Twinclaws sound", desc = "Play a sound when Twinclaws is about to happen.")
+            @ConfigEditorBoolean
+            public boolean twinClawsSound = true;
         }
 
         @Expose
@@ -209,6 +230,28 @@ public class SlayerConfig {
         @ConfigEditorColour
         public String steakColor = "0:255:255:0:88";
 
+        @Expose
+        @ConfigOption(name = "Twinclaws", desc = "Delay the sound and title of twinclaws alert for a given amount in milliseconds.")
+        @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 1000)
+        public int twinclawsDelay = 0;
+
+        @Expose
+        @ConfigOption(name = "Draw line", desc = "Draw a line starting at your crosshair to the boss head")
+        @ConfigEditorBoolean
+        public boolean drawLine = false;
+
+        @Expose
+        @ConfigOption(name = "Line color", desc = "Color of the line")
+        @ConfigEditorColour
+        public String lineColor = "0:255:255:0:88";
+
+        @Expose
+        @ConfigOption(name = "Line Width", desc = "Width of the line")
+        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+        public int lineWidth = 1;
+
+
+
 
         @Expose
         @ConfigOption(name = "Blood Ichor", desc = "")
@@ -230,6 +273,17 @@ public class SlayerConfig {
             @ConfigOption(name = "Color", desc = "Highlight color.")
             @ConfigEditorColour
             public String color = "0:199:100:0:88";
+
+            @Expose
+            @ConfigOption(name = "Show lines", desc = "Draw lines that start from the head of the boss and end on the Blood Ichor.")
+            @ConfigEditorBoolean
+            public boolean showLines = false;
+
+            @Expose
+            @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
+            @ConfigEditorColour
+            public String linesColor = "0:255:255:13:0";
+
         }
 
         @Expose
@@ -247,6 +301,16 @@ public class SlayerConfig {
             @ConfigOption(name = "Color", desc = "Highlight color.")
             @ConfigEditorColour
             public String color = "0:199:100:0:88";
+
+            @Expose
+            @ConfigOption(name = "Show lines", desc = "Draw lines that start from the head of the boss and end on the Killer Spring tower.")
+            @ConfigEditorBoolean
+            public boolean showLines = false;
+
+            @Expose
+            @ConfigOption(name = "Lines start color", desc = "Starting color of the lines.")
+            @ConfigEditorColour
+            public String linesColor = "0:255:255:13:0";
         }
     }
 
@@ -339,9 +403,32 @@ public class SlayerConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Boss Spawn Warning", desc = "")
+    @Accordion
+    public SlayerBossWarning slayerBossWarning = new SlayerBossWarning();
+
+    public static class SlayerBossWarning {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Send a title when your boss is about to spawn.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Percent", desc = "The percentage at which the title and sound should be sent.")
+        @ConfigEditorSlider(minStep = 1, minValue = 50, maxValue = 90)
+        public int percent = 80;
+
+        @Expose
+        @ConfigOption(name = "Repeat", desc = "Resend the title and sound on every kill after reaching the configured percent value.")
+        @ConfigEditorBoolean
+        public boolean repeat = false;
+    }
+
+    @Expose
     @ConfigOption(name = "Broken Wither Impact",
             desc = "Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp. " +
-            "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
+                    "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
     )
     @ConfigEditorBoolean
     public boolean brokenHyperion = true;

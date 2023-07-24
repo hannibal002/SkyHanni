@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.slayer
+package at.hannibal2.skyhanni.features.slayer.enderman
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType

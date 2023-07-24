@@ -255,7 +255,6 @@ object SlayerItemProfitTracker {
             )
         )
 
-        profit += mobKillCoins
         val profitFormat = NumberUtil.format(profit)
         val profitPrefix = if (profit < 0) "§c" else "§6"
 

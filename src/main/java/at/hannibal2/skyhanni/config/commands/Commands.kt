@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.*
@@ -156,6 +157,14 @@ object Commands {
             "shclearminiondata",
             "Reset data about minion profit and the name display on the private island"
         ) { MinionFeatures.clearMinionData() }
+        registerCommand(
+            "shconfig",
+            "Search or reset config elements §c(warning, dangerous!)"
+        ) { SkyHanniConfigSearchResetCommand.command(it) }
+        registerCommand(
+            "shdebugdata",
+            "Prints debug data in the clipboard"
+        ) { SkyHanniTestCommand.debugData(it) }
     }
 
     private fun developersDebugFeatures() {

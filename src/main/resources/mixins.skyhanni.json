@@ -6,6 +6,7 @@
     "AccessorGuiPlayerTabOverlay",
     "MixinBlockFire",
     "MixinEntityBlaze",
+    "MixinEntityEnderman",
     "MixinEntityFireball",
     "MixinEntityPlayerSP",
     "MixinItemStack",
