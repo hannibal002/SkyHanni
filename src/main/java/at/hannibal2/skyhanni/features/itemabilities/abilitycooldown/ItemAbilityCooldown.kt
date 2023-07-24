@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
@@ -41,6 +42,12 @@ class ItemAbilityCooldown {
         if (event.soundName == "mob.endermen.portal") {
             if (event.pitch == 0.61904764f && event.volume == 1f) {
                 ItemAbility.GYROKINETIC_WAND_LEFT.sound()
+            }
+            if (event.pitch == 1f && event.volume == 1f) {
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                if (!internalName.equalsOneOf("SHADOW_FURY", "STARRED_SHADOW_FURY")) return
+
+                ItemAbility.SHADOW_FURY.sound()
             }
         }
         if (event.soundName == "random.anvil_land") {

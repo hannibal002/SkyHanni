@@ -413,4 +413,13 @@ object LorenzUtils {
     }
 
     fun Field.makeAccessible() = also { isAccessible = true }
+
+    // Taken and modified from Skytils
+    @JvmStatic
+    fun Any.equalsOneOf(vararg other: Any): Boolean {
+        for (obj in other) {
+            if (this == obj) return true
+        }
+        return false
+    }
 }
