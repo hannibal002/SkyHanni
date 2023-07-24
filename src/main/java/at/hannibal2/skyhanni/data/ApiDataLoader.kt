@@ -46,7 +46,7 @@ class ApiDataLoader {
         val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
 
         if (jsonObject["success"]?.asBoolean == false) {
-            if (jsonObject["throttle"]?.asBoolean == true) return true // 429 Too Many Requests does not make an invalid key.
+            if (jsonObject["throttle"]?.asBoolean == true) return true // 429 Too Many Requests doesn't make an invalid key.
             val cause = jsonObject["cause"].asString
             if (cause == "Invalid API key") {
                 return false

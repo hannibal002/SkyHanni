@@ -586,7 +586,8 @@ class GardenVisitorFeatures {
                             color
                         ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
                     }
-                    if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity) // Have not gotten either of the known effected visitors (Vex and Leo) so cannot test for sure
+                    // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
+                    if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
                 }
             }
         }

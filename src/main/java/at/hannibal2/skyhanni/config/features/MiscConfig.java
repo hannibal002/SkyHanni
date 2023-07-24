@@ -476,7 +476,7 @@ public class MiscConfig {
     public static class QuickModMenuSwitch {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Adding a mod list, allowing to quickly switch between different mod menus")
+        @ConfigOption(name = "Enabled", desc = "Adding a mod list, allowing to fast switch between different mod menus")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
