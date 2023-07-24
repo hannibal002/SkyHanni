@@ -41,7 +41,7 @@ object VampireSlayerFeatures {
     private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
-    private val configCoopBoss get() = config.coopsBossHighlight
+    private val configCoopBoss get() = config.coopBoss
     private val configBloodIcor get() = config.bloodIchor
     private val configKillerSpring get() = config.killerSpring
 
@@ -279,7 +279,7 @@ object VampireSlayerFeatures {
         if (config.drawLine) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
                 if (it.isHighlighted()) {
-                    val vec = it.position.toLorenzVec()
+                    val vec = event.exactLocation(it)
                     val distance = start.distance(vec)
                     if (distance <= 15) {
                         val p = Minecraft.getMinecraft().thePlayer

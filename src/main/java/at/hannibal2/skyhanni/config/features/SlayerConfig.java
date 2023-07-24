@@ -176,7 +176,7 @@ public class SlayerConfig {
         @Expose
         @ConfigOption(name = "Co-op Boss", desc = "")
         @Accordion
-        public CoopBossHighlight coopsBossHighlight = new CoopBossHighlight();
+        public CoopBossHighlight coopBoss = new CoopBossHighlight();
 
         public static class CoopBossHighlight {
             @Expose
@@ -231,7 +231,7 @@ public class SlayerConfig {
         public String steakColor = "0:255:255:0:88";
 
         @Expose
-        @ConfigOption(name = "Twinclaws", desc = "Delay the sound and title of twinclaws alert for a given amount of milliseconds.")
+        @ConfigOption(name = "Twinclaws", desc = "Delay the sound and title of twinclaws alert for a given amount in milliseconds.")
         @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 1000)
         public int twinclawsDelay = 0;
 
