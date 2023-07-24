@@ -566,6 +566,27 @@ public class RiftConfig {
         @ConfigOption(name = "Burger Stacks", desc = "Set your McGrubber's burger stacks.")
         @ConfigEditorSlider(minStep = 1, minValue =  0, maxValue = 5)
         public int burgerStacks = 0;
+
+        @Expose
+        @ConfigOption(name = "Inventory value", desc = "")
+        @Accordion
+        public InventoryValue inventoryValue = new InventoryValue();
+
+        public static class InventoryValue {
+            @Expose
+            @ConfigOption(name = "Inventory value", desc = "Show total Motes NPC price for the current opened inventory.")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Number format type", desc = "Short: 1.2M\n" +
+                    "Long: 1,200,000")
+            @ConfigEditorDropdown(values = {"Short", "Long"})
+            public int formatType = 0;
+
+            @Expose
+            public Position position = new Position(126, 156, false, true);
+        }
     }
 
     @Expose
