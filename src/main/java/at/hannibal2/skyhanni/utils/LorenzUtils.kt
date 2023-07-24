@@ -410,4 +410,13 @@ object LorenzUtils {
         if (this == null) return emptyList()
         return listOf(this)
     }
+
+    // Taken and modified from Skytils
+    @JvmStatic
+    fun Any.equalsOneOf(vararg other: Any): Boolean {
+        for (obj in other) {
+            if (this == obj) return true
+        }
+        return false
+    }
 }
