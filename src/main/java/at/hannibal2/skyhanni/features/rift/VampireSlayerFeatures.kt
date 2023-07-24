@@ -9,16 +9,12 @@ import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
@@ -46,7 +42,7 @@ class VampireSlayerFeatures {
         if (!event.isMod(5)) return
         val start = LocationUtils.playerLocation()
         if (config.ownBoss.highlight || config.othersBoss.highlight || config.coopsBossHighlight.highlight) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
+            EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
                 val vec = it.position.toLorenzVec()
                 val distance = start.distance(vec)
                 if (distance <= 15)
@@ -54,7 +50,7 @@ class VampireSlayerFeatures {
             }
         }
         if (config.bloodIchor.highlight || config.killerSpring.highlight) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
+            EntityUtils.getEntities<EntityArmorStand>().forEach { stand ->
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(bloodIchorTexture)

@@ -167,6 +167,12 @@ public class MiscConfig {
     public boolean hideBlazeParticles = false;
 
     @Expose
+    @ConfigOption(name = "Enderman Particles", desc = "Hide enderman particles.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 9)
+    public boolean hideEndermanParticles = false;
+
+    @Expose
     @ConfigOption(name = "Fireball Particles", desc = "Hide fireball particles.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
@@ -653,6 +659,11 @@ public class MiscConfig {
     @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
     @ConfigEditorBoolean
     public boolean restorePieceOfWizardPortalLore = true;
+
+    @Expose
+    @ConfigOption(name = "Patcher Coords Highlight", desc = "Highlight the the coords sended form patcher.")
+    @ConfigEditorBoolean
+    public boolean patcherSendCoordHighlight = false;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

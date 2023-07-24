@@ -79,10 +79,8 @@ class ApiDataLoader {
             findApiCandidatesFromOtherMods().forEach { (modName, newApiKey) ->
                 if (tryUpdateProfileDataAndVerifyKey(newApiKey)) {
                     SkyHanniMod.feature.storage.apiKey = newApiKey
-                    LorenzUtils.chat("§e[SkyHanni] Imported valid new API key from $modName.")
+                    LorenzUtils.chat("§e[SkyHanni] Imported valid API key from $modName.")
                     return@launch
-                } else {
-                    LorenzUtils.error("§c[SkyHanni] Invalid API key from $modName")
                 }
             }
         }

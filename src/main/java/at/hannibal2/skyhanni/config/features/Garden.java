@@ -727,7 +727,7 @@ public class Garden {
     public Position gardenLevelPos = new Position(-375, -215, false, true);
 
     @Expose
-    @ConfigOption(name = "Elite Farming Weight", desc = "")
+    @ConfigOption(name = "Farming Weight", desc = "")
     @ConfigEditorAccordion(id = 11)
     public boolean eliteFarmingWeight = false;
 

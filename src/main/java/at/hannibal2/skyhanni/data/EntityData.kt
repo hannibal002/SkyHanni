@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -26,11 +27,8 @@ class EntityData {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
 
-        val minecraft = Minecraft.getMinecraft() ?: return
-        val theWorld = minecraft.theWorld ?: return
-        for (entity in theWorld.loadedEntityList) {
-            if (entity !is EntityLivingBase) continue
-
+        val entities = EntityUtils.getEntitiesOrNull<EntityLivingBase>() ?: return
+        for (entity in entities) {
             val maxHealth = entity.baseMaxHealth
             val oldMaxHealth = maxHealthMap.getOrDefault(entity, -1)
             if (oldMaxHealth != maxHealth) {

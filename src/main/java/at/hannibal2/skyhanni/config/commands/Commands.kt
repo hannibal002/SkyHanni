@@ -20,11 +20,12 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionCounter
-import at.hannibal2.skyhanni.features.misc.GhostCounter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.*
@@ -126,12 +127,12 @@ object Commands {
         registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3"
-        ) { GhostCounter.importCTGhostCounterData() }
+        ) { GhostUtil.importCTGhostCounterData() }
         registerCommand(
             "shclearfarmingitems",
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
-        registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostCounter.reset() }
+        registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
     }
 
     private fun usersBugFix() {
@@ -156,6 +157,14 @@ object Commands {
             "shclearminiondata",
             "Reset data about minion profit and the name display on the private island"
         ) { MinionFeatures.clearMinionData() }
+        registerCommand(
+            "shconfig",
+            "Search or reset config elements §c(warning, dangerous!)"
+        ) { SkyHanniConfigSearchResetCommand.command(it) }
+        registerCommand(
+            "shdebugdata",
+            "Prints debug data in the clipboard"
+        ) { SkyHanniTestCommand.debugData(it) }
     }
 
     private fun developersDebugFeatures() {

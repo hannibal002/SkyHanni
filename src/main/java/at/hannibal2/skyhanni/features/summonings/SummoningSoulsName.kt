@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,47 +35,42 @@ class SummoningSoulsName {
         if (!isEnabled()) return
 
         //TODO use packets instead of this
-            check()
+        check()
     }
 
     private fun check() {
         val minecraft = Minecraft.getMinecraft()
-        val world = minecraft.theWorld
-        for (entity in world.loadedEntityList) {
+        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (souls.contains(entity)) continue
 
-            if (entity is EntityArmorStand) {
-                if (entity.hasSkullTexture(texture)) {
-                    val soulLocation = entity.getLorenzVec()
+            if (entity.hasSkullTexture(texture)) {
+                val soulLocation = entity.getLorenzVec()
 
-                    val map = mutableMapOf<EntityLiving, Double>()
-                    for ((mob, loc) in mobsLastLocation) {
-                        val distance = loc.distance(soulLocation)
-                        map[mob] = distance
-                    }
+                val map = mutableMapOf<EntityLiving, Double>()
+                for ((mob, loc) in mobsLastLocation) {
+                    val distance = loc.distance(soulLocation)
+                    map[mob] = distance
+                }
 
-                    val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
-                    if (nearestMob != null) {
-                        souls[entity] = mobsName[nearestMob]!!
-                    }
-
+                val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
+                if (nearestMob != null) {
+                    souls[entity] = mobsName[nearestMob]!!
                 }
             }
         }
 
-        for (entity in world.loadedEntityList) {
-            if (entity is EntityLiving) {
-                val consumer = entity.getNameTagWith(2, "§c❤")
-                if (consumer != null) {
-                    if (!consumer.name.contains("§e0")) {
-                        mobsLastLocation[entity] = entity.getLorenzVec()
-                        mobsName[entity] = consumer.name
-                    }
+        for (entity in EntityUtils.getEntities<EntityLiving>()) {
+            val consumer = entity.getNameTagWith(2, "§c❤")
+            if (consumer != null) {
+                if (!consumer.name.contains("§e0")) {
+                    mobsLastLocation[entity] = entity.getLorenzVec()
+                    mobsName[entity] = consumer.name
                 }
             }
         }
 
-        souls.keys.removeIf { it !in world.loadedEntityList }
+        val entityList = EntityUtils.getEntities<EntityArmorStand>()
+        souls.keys.removeIf { it !in entityList }
         //TODO fix overhead!
 //        mobs.keys.removeIf { it !in world.loadedEntityList }
     }

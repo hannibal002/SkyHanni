@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
-public class Slayer {
+public class SlayerConfig {
 
     @Expose
     @ConfigOption(name = "Enderman Slayer Features", desc = "")
@@ -12,16 +12,34 @@ public class Slayer {
     public boolean enderman = false;
 
     @Expose
-    @ConfigOption(name = "Enderman Beacon", desc = "Highlight the enderman slayer Yang Glyph (Beacon) in red color. Supports beacon in hand and beacon flying.")
+    @ConfigOption(name = "Highlight Yang Glyph", desc = "Highlight the enderman slayer Yang Glyph (beacon) in red color. Supports beacon in hand and beacon flying.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean slayerEndermanBeacon = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer.")
+    @ConfigOption(name = "Beacon Warning", desc = "Displays a warning mid-screen then the enderman Slayer throws a Yang Glyph (beacon).")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean slayerEndermanBeaconWaring = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Nukekebi Skulls", desc = "Highlights the enderman Slayer Nukekebi Skulls.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean endermanHighlightNukekebi = false;
+
+    @Expose
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer in damage indcator.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanPhaseDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Particles", desc = "Hide particles around enderman slayer bosses and mini bosses.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean endermanHideParticles = false;
 
     @Expose
     @ConfigOption(name = "Blaze", desc = "")

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.fishing.TrophyRarity
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -29,7 +30,7 @@ class SackDisplay {
         var isRuneSack = false
         var isGemstoneSack = false
         var isTrophySack = false
-        var sackRarity = TrophyRarity.NONE
+        var sackRarity: TrophyRarity? = null
     }
 
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
@@ -51,7 +52,7 @@ class SackDisplay {
     )
 
     private val numPattern =
-            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)§7/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
+            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)".toPattern()
     private val gemstonePattern =
             " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
 
@@ -346,17 +347,13 @@ class SackDisplay {
         OBFUSCATED_2(40, 60),
         OBFUSCATED_3(400, 700);
 
-        fun convert(rarity: TrophyRarity, stored: String): String {
+        fun convert(rarity: TrophyRarity?, stored: String): String {
             return when (rarity) {
                 TrophyRarity.BRONZE -> (this.bronzeValue * stored.formatNumber().toInt()).toString()
                 TrophyRarity.SILVER -> (this.silverValue * stored.formatNumber().toInt()).toString()
-                TrophyRarity.NONE -> "0"
+                else -> "0"
             }
         }
-    }
-
-    enum class TrophyRarity {
-        BRONZE, SILVER, NONE
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
@@ -395,13 +392,12 @@ class SackDisplay {
         ;
     }
 
-    private fun String.getTrophyRarity(): TrophyRarity {
+    private fun String.getTrophyRarity(): TrophyRarity? {
         return if (this.startsWith("Bronze"))
             TrophyRarity.BRONZE
         else
             if (this.startsWith("Silver"))
                 TrophyRarity.SILVER
-            else
-                TrophyRarity.NONE
+            else null
     }
 }

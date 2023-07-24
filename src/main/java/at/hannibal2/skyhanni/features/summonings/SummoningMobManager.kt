@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -76,7 +75,7 @@ class SummoningMobManager {
         }
 
         if (searchArmorStands) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filter { it is EntityArmorStand && it !in summoningMobNametags }
+            EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }
                 .forEach {
                     val name = it.displayName.unformattedText
                     healthPattern.matchMatcher(name) {
@@ -93,11 +92,11 @@ class SummoningMobManager {
 
         if (searchMobs) {
             val playerLocation = LocationUtils.playerLocation()
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filter {
-                it is EntityLiving && it !in summoningMobs.keys && it.getLorenzVec()
+            EntityUtils.getEntities<EntityLiving>().filter {
+                it !in summoningMobs.keys && it.getLorenzVec()
                     .distance(playerLocation) < 10 && it.ticksExisted < 2
             }.forEach {
-                summoningMobs[it as EntityLiving] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+                summoningMobs[it] = SummoningMob(System.currentTimeMillis(), name = "Mob")
                 updateData()
                 if (summoningMobs.size == summoningsSpawned) {
                     searchMobs = false

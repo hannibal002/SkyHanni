@@ -21,6 +21,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
 import java.awt.Color
+import java.lang.reflect.Field
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -371,11 +372,30 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inIsland(this)
 
-    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N) {
+    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N): N {
         val old = this[item] ?: 0
-        val d = old.toDouble() + amount.toDouble()
+        val new = when (old) {
+            is Double -> old + amount.toDouble()
+            is Float -> old + amount.toFloat()
+            is Long -> old + amount.toLong()
+            else -> old.toInt() + amount.toInt()
+        }
         @Suppress("UNCHECKED_CAST")
-        this[item] = d as N
+        this[item] = new as N
+        return new
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
+        if (values.isEmpty()) {
+            return 0.0
+        }
+        return when (values.first()) {
+            is Double -> values.sumOf { it.toDouble() }
+            is Float -> values.sumOf { it.toDouble() }
+            is Long -> values.sumOf { it.toLong() }.toDouble()
+            else -> values.sumOf { it.toInt() }.toDouble()
+        }
     }
 
     /** transfer string colors from the config to java.awt.Color */
@@ -391,4 +411,6 @@ object LorenzUtils {
         if (this == null) return emptyList()
         return listOf(this)
     }
+
+    fun Field.makeAccessible() = also { isAccessible = true }
 }
