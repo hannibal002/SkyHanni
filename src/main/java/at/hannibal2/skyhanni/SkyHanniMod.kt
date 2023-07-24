@@ -354,6 +354,7 @@ class SkyHanniMod {
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
+        loadModule(SlayerBossSpawnSoon())
 
         init()
 

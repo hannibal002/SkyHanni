@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.slayer.SlayerType
@@ -118,6 +119,7 @@ object SlayerAPI {
 
         val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2) ?: ""
         if (latestSlayerProgress != slayerProgress) {
+            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
             latestSlayerProgress = slayerProgress
             latestProgressChangeTime = System.currentTimeMillis()
         }
