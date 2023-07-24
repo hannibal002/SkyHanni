@@ -623,7 +623,15 @@ class DamageIndicatorManager {
                 else -> 100
             }
             val name = armorStandHits.name.removeColor()
-            val hits = name.between("Seraph ", " Hit").toInt()
+
+            // TODO replace this super ugly workaround with regex
+            val text = name.between("Seraph ", " Hit")
+            val hits = try {
+                 text.toInt()
+            } catch (e: NumberFormatException) {
+                text.substring(2).toInt()
+            }
+
             return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
