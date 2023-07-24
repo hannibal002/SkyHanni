@@ -15,21 +15,10 @@ object RiftAPI {
     // internal name -> motes
     var motesPrice = emptyMap<String, Double>()
 
-    fun ItemStack.motesNpcPrice() = motesPrice[getInternalName()]
-
-    fun ItemStack.motesNpcPriceBurgers(): Double {
-        val base = motesNpcPrice() ?: 0.0
-        return if (config.motes.burgerStacks == 0) {
-            base
-        } else {
-            val burgerStacks = config.motes.burgerStacks
-            val motesPerItem = base + (burgerStacks * 5) * base / 100
-            if (stackSize > 1) {
-                motesPerItem * stackSize
-            } else {
-                motesPerItem
-            }
-        }
+    fun ItemStack.motesNpcPrice(): Double? {
+        val baseMotes = motesPrice[getInternalName()] ?: return null
+        val burgerStacks = config.motes.burgerStacks
+        return baseMotes + (burgerStacks * 5) * baseMotes / 100
     }
 
 

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI.motesNpcPriceBurgers
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -67,8 +67,7 @@ class ShowMotesNpcSellPrice {
 
         val itemStack = event.itemStack ?: return
 
-        val baseMotes = itemStack.motesNpcPriceBurgers()
-        if (baseMotes == 0.0) return
+        val baseMotes = itemStack.motesNpcPrice() ?: return
         val burgerStacks = config.burgerStacks
         val burgerText = if (burgerStacks > 0) "(${burgerStacks}x≡) " else ""
         val size = itemStack.stackSize
@@ -107,8 +106,7 @@ class ShowMotesNpcSellPrice {
         }
         itemMap.clear()
         for ((index, stack) in stacks) {
-            val itemValue = stack.motesNpcPriceBurgers()
-            if (itemValue == 0.0) continue
+            val itemValue = stack.motesNpcPrice() ?: continue
             if (itemMap.contains(stack.getInternalName())) {
                 val (oldIndex, oldValue) = itemMap[stack.getInternalName()] ?: return
                 oldIndex.add(index)
@@ -154,8 +152,7 @@ class ShowMotesNpcSellPrice {
                 val stack = NEUItems.getItemStack(internalName)
                 add(stack)
                 val price = value.formatPrice()
-                val debug = "${value / index.size}"
-                val valuePer = stack.motesNpcPriceBurgers()
+                val valuePer = stack.motesNpcPrice() ?: continue
                 val tips = buildList {
                     add("§eClick to highlight in the chest !")
                     add("§6Value per: §d$valuePer Motes")
