@@ -661,9 +661,9 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Patcher Coords Highlight", desc = "Highlight the the coords sended form patcher.")
+    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the the coords sended form patcher.")
     @ConfigEditorBoolean
-    public boolean patcherSendCoordHighlight = false;
+    public boolean patcherSendCoordWaypoint = false;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
