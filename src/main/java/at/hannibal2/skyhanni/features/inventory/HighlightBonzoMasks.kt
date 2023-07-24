@@ -21,7 +21,7 @@ class HighlightBonzoMasks {
 
     val maskTimers = mutableMapOf<String, CooldownTimer>()
 
-    // Technically this timer is overestimating since the cooldown is affected by mage level, however I do not care.
+    // Technically this timer is overestimating since mage level affects the cooldown, however I don't care.
     val bonzoMaskCooldown = 360.seconds
     val bonzoMaskMessage = "^Your (.*Bonzo's Mask) saved your life!$".toRegex()
 

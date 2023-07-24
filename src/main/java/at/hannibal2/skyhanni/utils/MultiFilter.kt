@@ -18,6 +18,7 @@ class MultiFilter {
         containsWord.clear()
 
         fill(hideNpcSell, "equals", equals)
+        fill(hideNpcSell, "exact", equals)
         fill(hideNpcSell, "startsWith", startsWith)
         fill(hideNpcSell, "endsWith", endsWith)
         fill(hideNpcSell, "contains", contains)

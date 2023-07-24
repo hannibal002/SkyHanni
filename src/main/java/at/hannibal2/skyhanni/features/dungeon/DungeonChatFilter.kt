@@ -148,7 +148,6 @@ class DungeonChatFilter {
         message == "§4[STATUE] Oruo the Omniscient§r§f: §r§fProve your knowledge by answering 3 questions and I shall reward you in ways that transcend time!" -> true
         message == "§4[STATUE] Oruo the Omniscient§r§f: §r§fAnswer incorrectly, and your moment of ineptitude will live on for generations." -> true
 
-//        message == "§4[STATUE] Oruo the Omniscient§r§f: §r§f2 questions §r§fleft...and§r§f you will have proven your worth to me!" -> true
         message == "§4[STATUE] Oruo the Omniscient§r§f: §r§f2 questions left... Then you will have proven your worth to me!" -> true
 
         message == "§4[STATUE] Oruo the Omniscient§r§f: §r§fOne more question!" -> true

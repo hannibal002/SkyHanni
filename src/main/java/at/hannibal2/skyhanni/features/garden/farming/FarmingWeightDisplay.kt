@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
@@ -21,12 +20,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 
-class EliteFarmingWeight {
+class FarmingWeightDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Elite Farming Weight")
+            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
         }
     }
 
@@ -47,9 +46,8 @@ class EliteFarmingWeight {
         leaderboardPosition = -1
         dirtyCropWeight = true
         lastLeaderboardUpdate = 0
-        nextPlayerWeight = 0.0
-        nextPlayerName = ""
-        hasPassedNext = false
+
+        nextPlayers.clear()
         localCounter.clear()
     }
 
@@ -58,7 +56,7 @@ class EliteFarmingWeight {
         display = emptyList()
         profileId = ""
         weight = -2.0
-
+        nextPlayers.clear()
     }
 
     var tick = 0
@@ -86,9 +84,8 @@ class EliteFarmingWeight {
         private var isLoadingWeight = false
         private var isLoadingLeaderboard = false
 
-        private var nextPlayerName = ""
-        private var nextPlayerWeight = 0.0
-        private var hasPassedNext = false
+        private var nextPlayers = mutableListOf<UpcomingPlayer>()
+        private val nextPlayer get() = nextPlayers.firstOrNull()
 
         private fun update() {
             if (!GardenAPI.inGarden()) return
@@ -108,9 +105,15 @@ class EliteFarmingWeight {
             if (weight == -1.0) {
                 if (!isLoadingWeight) {
                     val localProfile = HypixelData.profileName
-                    if (localProfile == "") return
+                    if (localProfile == "") {
+                        display = Collections.singletonList("§cError: profileName is empty!")
+                        return
+                    }
 
                     isLoadingWeight = true
+                    if (display.isEmpty()) {
+                        display = Collections.singletonList("§cLoading..")
+                    }
                     SkyHanniMod.coroutineScope.launch {
                         loadWeight(localProfile)
                         isLoadingWeight = false
@@ -134,8 +137,8 @@ class EliteFarmingWeight {
         private fun getLeaderboard(): String {
             if (!config.eliteFarmingWeightLeaderboard) return ""
 
-            // Fetching new leaderboard position every 10 minutes
-            if (System.currentTimeMillis() > lastLeaderboardUpdate + 600_000) {
+            // Fetching new leaderboard position every 10.5 minutes
+            if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
                 if (!isLoadingLeaderboard) {
                     isLoadingLeaderboard = true
                     SkyHanniMod.coroutineScope.launch {
@@ -171,30 +174,40 @@ class EliteFarmingWeight {
 
         private fun getETA(): String {
             if (weight < 0) return ""
-            if (nextPlayerName.isEmpty()) return ""
 
-            val nextName = if (leaderboardPosition == -1) "#1000" else nextPlayerName
+            var nextPlayer = nextPlayer ?: return ""
+            var nextName = if (leaderboardPosition == -1) "#10000" else nextPlayer.name
+
             val totalWeight = (localWeight + weight)
-            val weightUntilOvertake = nextPlayerWeight - totalWeight
+            var weightUntilOvertake = nextPlayer.weight - totalWeight
+
             if (weightUntilOvertake < 0) {
-                if (!hasPassedNext) {
-                    if (weightPerSecond > 0) {
-                        LorenzUtils.debug("weightPerSecond: '$weightPerSecond'")
-                        LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
-                    }
-                    if (leaderboardPosition == -1) {
-                        leaderboardPosition = 1000
-                    } else {
-                        leaderboardPosition--
-                    }
-                    hasPassedNext = true
+                if (weightPerSecond > 0) {
+                    LorenzUtils.debug("weightPerSecond: '$weightPerSecond'")
+                    LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
                 }
-                return "§cWaiting for leaderboard update..."
+
+                // Lower leaderboard position
+                if (leaderboardPosition == -1) {
+                    leaderboardPosition = 10000
+                } else {
+                    leaderboardPosition--
+                }
+
+                // Remove passed player to present the next one
+                nextPlayers.removeFirst()
+
+                // Display waiting message if nextPlayers list is empty
+                nextPlayer = this.nextPlayer ?: return "§cWaiting for leaderboard update..."
+                // Update values to next player
+                nextName = nextPlayer.name
+                weightUntilOvertake = nextPlayer.weight - totalWeight
             }
 
-            if (nextPlayerWeight == 0.0) {
+            if (nextPlayer.weight == 0.0) {
                 return "§cRejoin the garden to show ETA!"
             }
+
             val timeFormat = if (weightPerSecond != -1.0) {
                 val timeTillOvertake = (weightUntilOvertake / weightPerSecond) * 1000
                 val format = TimeUtils.formatDuration(timeTillOvertake.toLong())
@@ -225,7 +238,7 @@ class EliteFarmingWeight {
         }
 
         private fun getExactWeight(): Double {
-            val values = calculateCollectionWeight(false).values
+            val values = calculateCollectionWeight().values
             return if (values.isNotEmpty()) {
                 values.sum()
             } else 0.0
@@ -233,14 +246,18 @@ class EliteFarmingWeight {
 
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = LorenzUtils.getPlayerUuid()
-            val showNext = if (isEtaEnabled()) "?showNext=true" else ""
-            val url = "https://elitebot.dev/api/leaderboard/rank/weight/farming/$uuid/$profileId$showNext"
+            val includeUpcoming = if (isEtaEnabled()) "?includeUpcoming=true" else ""
+            val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming"
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
-                result["next"]?.asJsonObject?.let {
-                    nextPlayerName = it["ign"].asString
-                    nextPlayerWeight = it["amount"].asDouble
+                nextPlayers.clear()
+                // Array of 0-5 upcoming players (or possibly null)
+                result["upcomingPlayers"]?.asJsonArray?.let {
+                    for (player in it) {
+                        val playerData = player.asJsonObject
+                        nextPlayers.add(UpcomingPlayer(playerData["ign"].asString, playerData["amount"].asDouble))
+                    }
                 }
             }
 
@@ -253,16 +270,16 @@ class EliteFarmingWeight {
 
         private suspend fun loadWeight(localProfile: String) {
             val uuid = LorenzUtils.getPlayerUuid()
-            val url = "https://elitebot.dev/api/weight/$uuid"
+            val url = "https://api.elitebot.dev/weight/$uuid"
 
             try {
                 val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
-                for (profileEntry in result["profiles"].asJsonObject.entrySet()) {
-                    val profile = profileEntry.value.asJsonObject
-                    val profileName = profile["cute_name"].asString.lowercase()
+                for (profileEntry in result["profiles"].asJsonArray) {
+                    val profile = profileEntry.asJsonObject
+                    val profileName = profile["profileName"].asString.lowercase()
                     if (profileName == localProfile) {
-                        profileId = profileEntry.key
-                        weight = profile["farming"].asJsonObject["total"].asDouble
+                        profileId = profile["profileId"].asString
+                        weight = profile["totalWeight"].asDouble
 
                         localCounter.clear()
                         dirtyCropWeight = true
@@ -286,14 +303,13 @@ class EliteFarmingWeight {
             LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats itself, please report it on Discord!")
         }
 
-        private fun calculateCollectionWeight(round: Boolean = true): MutableMap<CropType, Double> {
+        private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
             val weightPerCrop = mutableMapOf<CropType, Double>()
             var totalWeight = 0.0
             for (crop in CropType.values()) {
                 val weight = crop.getLocalCounter() / crop.getFactor()
-                val roundedWeight = weight.let { if (round) it.round(2) else it }
-                weightPerCrop[crop] = roundedWeight
-                totalWeight += roundedWeight
+                weightPerCrop[crop] = weight
+                totalWeight += weight
             }
             if (totalWeight > 0) {
                 weightPerCrop[CropType.MUSHROOM] = specialMushroomWeight(weightPerCrop, totalWeight)
@@ -319,16 +335,18 @@ class EliteFarmingWeight {
         private val factorPerCrop by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
-                CropType.CARROT to 300_000.0,
+                CropType.CARROT to 302_061.86,
                 CropType.POTATO to 300_000.0,
                 CropType.SUGAR_CANE to 200_000.0,
                 CropType.NETHER_WART to 250_000.0,
-                CropType.PUMPKIN to 90_066.27,
-                CropType.MELON to 450_324.6,
+                CropType.PUMPKIN to 98_284.71,
+                CropType.MELON to 485_308.47,
                 CropType.MUSHROOM to 90_178.06,
                 CropType.COCOA_BEANS to 267_174.04,
                 CropType.CACTUS to 177_254.45,
             )
         }
     }
+
+    class UpcomingPlayer(val name: String, val weight: Double)
 }

@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.features.fishing.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
-import at.hannibal2.skyhanni.features.misc.GhostCounter.Option;
+import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
@@ -53,6 +54,13 @@ public class Storage {
             @Expose
             public long lastClicked = -1;
 
+            @Override
+            public String toString() {
+                return "MinionConfig{" +
+                        "displayName='" + displayName + '\'' +
+                        ", lastClicked=" + lastClicked +
+                        '}';
+            }
         }
 
         @Expose
@@ -71,6 +79,9 @@ public class Storage {
 
             @Expose
             public List<String> kuudraTiersDone = new ArrayList<>();
+
+            @Expose
+            public Map<String, Map<TrophyRarity, Integer>> trophyFishes = new HashMap<>();
         }
 
         @Expose
@@ -215,7 +226,7 @@ public class Storage {
         public static class GhostCounter {
 
             @Expose
-            public Map<Option, Double> data = new HashMap<>();
+            public Map<GhostData.Option, Double> data = new HashMap<>();
 
             @Expose
             public boolean ctDataImported = false;
@@ -284,6 +295,26 @@ public class Storage {
                 public long totalAmount;
                 @Expose
                 public boolean hidden;
+
+                @Override
+                public String toString() {
+                    return "SlayerItemProfit{" +
+                            "internalName='" + internalName + '\'' +
+                            ", timesDropped=" + timesDropped +
+                            ", totalAmount=" + totalAmount +
+                            ", hidden=" + hidden +
+                            '}';
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "SlayerProfitList{" +
+                        "items=" + items +
+                        ", mobKillCoins=" + mobKillCoins +
+                        ", slayerSpawnCost=" + slayerSpawnCost +
+                        ", slayerCompletedCount=" + slayerCompletedCount +
+                        '}';
             }
         }
 
@@ -303,6 +334,16 @@ public class Storage {
 
             @Expose
             public String itemGoal = "?";
+
+            @Override
+            public String toString() {
+                return "SlayerRngMeterStorage{" +
+                        "currentMeter=" + currentMeter +
+                        ", gainPerBoss=" + gainPerBoss +
+                        ", goalNeeded=" + goalNeeded +
+                        ", itemGoal='" + itemGoal + '\'' +
+                        '}';
+            }
         }
     }
 }

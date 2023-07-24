@@ -155,7 +155,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                 returnNum = "0$num".toInt()
                 /**
                  * and this is so that if the minute value is ever
-                 * a single digit (0 after being floored), it displays as 00 because 12:0pm just looks bad
+                 * a single digit (0 after being floored), it displays as 00 because 12:0pm looks bad
                  */
             }
             return returnNum
@@ -193,7 +193,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
         val fruit = HypixelData.profileName.firstLetterUppercase()
         if (fruit == "") profile =
-            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit has not loaded in yet
+            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit hasn't loaded in yet
         else profile += fruit
 
         lastKnownDisplayStrings[PROFILE] = profile

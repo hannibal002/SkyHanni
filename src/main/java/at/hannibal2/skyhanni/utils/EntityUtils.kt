@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import net.minecraft.client.multiplayer.WorldClient
+import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityBlaze
+import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
@@ -125,21 +126,21 @@ object EntityUtils {
             ?.value
     }
 
-    inline fun <reified T : Entity> WorldClient.getEntitiesNextToPlayer(radius: Double): List<T> =
-        getEntitiesNearby(LocationUtils.playerLocation(), radius)
+    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): List<T> =
+        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius)
 
-    inline fun <reified T : Entity> WorldClient.getEntitiesNearby(location: LorenzVec, radius: Double): List<T> =
-        getLoadedEntityList().filterIsInstance<T>().filter { it.distanceTo(location) < radius }
+    inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): List<T> =
+        getEntities<T>().filter { it.distanceTo(location) < radius }
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
-    fun WorldClient.getEntitiesNearby(
-        clazz: Class<EntityBlaze>,
-        location: LorenzVec,
-        radius: Double
-    ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
-        entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
-    }
+//    fun WorldClient.getEntitiesNearby(
+//        clazz: Class<EntityBlaze>,
+//        location: LorenzVec,
+//        radius: Double
+//    ): MutableList<EntityBlaze> = getEntities(clazz) { entity ->
+//        entity?.getLorenzVec()?.let { it.distance(location) < radius } ?: false
+//    }
 
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
         if (inventory == null) return false
@@ -152,4 +153,14 @@ object EntityUtils {
 
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory else null
+
+    fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
+
+    inline fun <reified R : Entity> getEntities(): List<R> = getAllEntities().filterIsInstance<R>()
+
+    inline fun <reified R : Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
+
+    fun getAllEntities(): List<Entity> = getAllEntitiesOrNull() ?: error("minecraft.world.loadedEntityList is null.")
+
+    fun getAllEntitiesOrNull(): List<Entity>? = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.toMutableList()
 }

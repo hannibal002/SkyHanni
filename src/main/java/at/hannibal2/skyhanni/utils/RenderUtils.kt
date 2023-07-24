@@ -404,7 +404,7 @@ object RenderUtils {
             pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
 
 
-        //7 - 25
+        //7 – 25
 
         val translate = LorenzVec(x, y, z)
         val length = translate.length().toFloat()
@@ -413,19 +413,13 @@ object RenderUtils {
         var factor = 1f
         var finalScale = scale
         if (debug) {
-//            if (tick++ % 60 == 0) {
             finalText = "$text ${length.toInt()}"
-//                println("translate: $length")
-//            }
             if (length < 8) {
                 factor = 8 / length
-//            translate = translate.multiply(8 / length)
             }
             if (length > 15) {
                 factor = 15 / length
-//            translate = translate.multiply(15 / length)
             }
-//        val finalScale = scale * (1 / factor)
             finalScale = scale * sqrt(factor.toDouble()).toFloat()
         }
 

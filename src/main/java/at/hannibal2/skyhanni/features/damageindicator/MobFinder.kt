@@ -6,17 +6,13 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
@@ -202,6 +198,21 @@ class MobFinder {
             if (entity is EntityOtherPlayerMP) {
                 if (entity.name == "Leech Supreme") {
                     return EntityResult(bossType = BossType.LEECH_SUPREME)
+                }
+
+                if (entity.name == "Bloodfiend ") {
+                    when {
+                        entity.hasMaxHealth(625) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_1)
+                        entity.hasMaxHealth(1_100) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_2)
+                        entity.hasMaxHealth(1_800) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_3)
+                        entity.hasMaxHealth(2_400) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_4)
+                        entity.hasMaxHealth(3_000) -> return EntityResult(bossType = BossType.SLAYER_BLOODFIEND_5)
+                    }
+                }
+            }
+            if (entity is EntitySlime) {
+                if (entity.baseMaxHealth == 1_000) {
+                    return EntityResult(bossType = BossType.BACTE)
                 }
             }
         } else {
@@ -568,17 +579,15 @@ class MobFinder {
     private fun findGuardians() {
         guardians.clear()
 
-        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-            if (entity is EntityGuardian) {
-                //F3
-                if (entity.hasMaxHealth(1_000_000) || entity.hasMaxHealth(1_200_000)) {
-                    guardians.add(entity)
-                }
+        for (entity in EntityUtils.getEntities<EntityGuardian>()) {
+            //F3
+            if (entity.hasMaxHealth(1_000_000) || entity.hasMaxHealth(1_200_000)) {
+                guardians.add(entity)
+            }
 
-                //M3
-                if (entity.hasMaxHealth(120_000_000) || entity.hasMaxHealth(240_000_000)) {
-                    guardians.add(entity)
-                }
+            //M3
+            if (entity.hasMaxHealth(120_000_000) || entity.hasMaxHealth(240_000_000)) {
+                guardians.add(entity)
             }
         }
     }

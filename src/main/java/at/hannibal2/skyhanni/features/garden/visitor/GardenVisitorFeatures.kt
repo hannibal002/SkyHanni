@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -317,14 +318,16 @@ class GardenVisitorFeatures {
         if (config.visitorHighlightStatus != 1 && config.visitorHighlightStatus != 2) return
 
         for (visitor in visitors.values) {
-            visitor.getNameTagEntity()?.getLorenzVec()?.let {
+            visitor.getNameTagEntity()?.let {
+                val location = event.exactLocation(it)
                 if (it.distanceToPlayer() < 15) {
                     val text = visitor.status.displayName
-                    event.drawString(it.add(0.0, 2.23, 0.0), text)
+                    event.drawString(location.add(0.0, 2.23, 0.0), text)
                     if (config.visitorRewardWarning.showOverName) {
                         visitor.hasReward()?.let { reward ->
                             val name = reward.displayName
-                            event.drawString(it.add(0.0, 2.73, 0.0), "§c!$name§c!")
+
+                            event.drawString(location.add(0.0, 2.73, 0.0), "§c!$name§c!")
                         }
                     }
                 }
@@ -586,7 +589,8 @@ class GardenVisitorFeatures {
                             color
                         ) { config.visitorHighlightStatus == 0 || config.visitorHighlightStatus == 2 }
                     }
-                    if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity) // Have not gotten either of the known effected visitors (Vex and Leo) so cannot test for sure
+                    // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
+                    if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
                 }
             }
         }
@@ -600,20 +604,17 @@ class GardenVisitorFeatures {
     }
 
     private fun findEntity(nameTag: EntityArmorStand, visitor: Visitor) {
-        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-            if (entity is EntityArmorStand) continue
+        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity.getLorenzVec().distanceIgnoreY(nameTag.getLorenzVec()) != 0.0) continue
 
-            visitor.entityId = entity?.entityId ?: 0
+            visitor.entityId = entity.entityId
             visitor.nameTagEntityId = nameTag.entityId
         }
     }
 
     private fun findNametag(visitorName: String): EntityArmorStand? {
         val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-            if (entity !is EntityArmorStand) continue
-
+        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity.name.removeColor() == visitorName) {
                 foundVisitorNameTags.add(entity)
             }
@@ -624,8 +625,7 @@ class GardenVisitorFeatures {
             if (foundVisitorNameTags.size != 2) return null
 
             for (tag in foundVisitorNameTags.toMutableList()) {
-                for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-                    if (entity !is EntityArmorStand) continue
+                for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
                     if (entity in foundVisitorNameTags) continue
                     val distance = entity.getLorenzVec().distance(tag.getLorenzVec())
                     if (distance < 1.5 && entity.name == "§bSam") {
