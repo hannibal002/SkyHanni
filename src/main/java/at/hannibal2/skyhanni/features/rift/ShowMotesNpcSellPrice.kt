@@ -30,8 +30,7 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.inventoryValue.enabled) return
+        if (!isInventoryValueEnabled()) return
         if (inInventory) {
             config.inventoryValue.position.renderStringsAndItems(
                 display,
@@ -43,16 +42,14 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-        if (!config.inventoryValue.enabled) return
+        if (!isInventoryValueEnabled()) return
         if (event.isMod(20))
             processItems()
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawSelectedTemplate(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
-        if (!config.inventoryValue.enabled) return
+        if (!isInventoryValueEnabled()) return
         val name = InventoryUtils.openInventoryName()
         if (!name.contains("Rift Storage")) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
@@ -63,7 +60,7 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onItemTooltipLow(event: ItemTooltipEvent) {
-        if (!isEnabled()) return
+        if (!isShowPriceEnabled()) return
 
         val itemStack = event.itemStack ?: return
 
@@ -80,16 +77,13 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
-        if (!config.inventoryValue.enabled)
+        if (!isInventoryValueEnabled()) return
         processItems()
-
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!isEnabled()) return
-        if (!config.inventoryValue.enabled)
+        if (!isInventoryValueEnabled()) return
         itemMap.clear()
         slotList.clear()
         inInventory = false
@@ -98,12 +92,7 @@ class ShowMotesNpcSellPrice {
     private fun processItems() {
         val inventoryName = InventoryUtils.openInventoryName()
         if (!inventoryName.contains("Rift Storage")) return
-        val slots = InventoryUtils.getItemsInOpenChest()
-        val stacks = buildMap {
-            slots.forEach {
-                put(it.slotIndex, it.stack)
-            }
-        }
+        val stacks = InventoryUtils.getItemsInOpenChest().map { it.slotIndex to it.stack }
         itemMap.clear()
         for ((index, stack) in stacks) {
             val itemValue = stack.motesNpcPrice() ?: continue
@@ -121,8 +110,7 @@ class ShowMotesNpcSellPrice {
 
     @SubscribeEvent
     fun onInventoryChange(event: LateInventoryOpenEvent) {
-        if (!isEnabled()) return
-        if (!config.inventoryValue.enabled) return
+        if (!isInventoryValueEnabled()) return
         update()
     }
 
@@ -171,9 +159,7 @@ class ShowMotesNpcSellPrice {
                 })
             })
         }
-        val total = itemMap.values.fold(0.0) { acc, pair ->
-            acc + pair.second
-        }.formatPrice()
+        val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         newDisplay.addAsSingletonList("§7Total price: §b$total")
         val name = FormatType.values()[config.inventoryValue.formatType].type
         newDisplay.addAsSingletonList("§7Price format: §c$name")
@@ -192,13 +178,13 @@ class ShowMotesNpcSellPrice {
         LONG("Long")
     }
 
-    private fun Double.formatPrice(): String {
-        return when (config.inventoryValue.formatType) {
-            0 -> NumberUtil.format(this)
-            1 -> this.addSeparators()
-            else -> "0"
-        }
+    private fun Double.formatPrice(): String = when (config.inventoryValue.formatType) {
+        0 -> NumberUtil.format(this)
+        1 -> this.addSeparators()
+        else -> "0"
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.showPrice
+    private fun isShowPriceEnabled() = RiftAPI.inRift() && config.showPrice
+
+    private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
 }
