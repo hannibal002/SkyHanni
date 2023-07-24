@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.PatcherBeacon
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -18,7 +17,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PatcherSendCoordinatesHighlight {
+class PatcherSendCoordinates {
 
     private val patcherBeacon = mutableListOf<PatcherBeacon>()
     private val logger = LorenzLogger("misc/patchercoords")
@@ -69,4 +68,6 @@ class PatcherSendCoordinatesHighlight {
         patcherBeacon.clear()
         logger.log("Reset everything (world change)")
     }
+
+    data class PatcherBeacon(val location: LorenzVec, val name: String, val time: Long)
 }

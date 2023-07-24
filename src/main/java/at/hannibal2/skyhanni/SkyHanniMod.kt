@@ -284,7 +284,7 @@ class SkyHanniMod {
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())
         loadModule(PasteIntoSigns())
-        loadModule(PatcherSendCoordinatesHighlight())
+        loadModule(PatcherSendCoordinates())
         loadModule(EstimatedItemValue)
         loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
