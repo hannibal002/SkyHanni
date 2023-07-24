@@ -364,7 +364,7 @@ public class Slayer {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Send a title when your boss is about to spawn.")
         @ConfigEditorBoolean
-        public boolean enabled = true;
+        public boolean enabled = false;
 
         @Expose
         @ConfigOption(name = "Percent", desc = "The percent at which the title and sound should be sent.")
