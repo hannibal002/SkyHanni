@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.event.world.WorldEvent
@@ -21,15 +22,7 @@ class DungeonData {
 
         fun inDungeon() = dungeonFloor != null
 
-        fun isOneOf(vararg floors: String): Boolean {
-            for (floor in floors) {
-                if (dungeonFloor == floor) {
-                    return true
-                }
-            }
-
-            return false
-        }
+        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(floors) == true
 
         fun handleBossMessage(rawMessage: String) {
             if (!inDungeon()) return
