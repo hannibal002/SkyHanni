@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.jsonobjects.RiftEffingesJson
+import at.hannibal2.skyhanni.utils.jsonobjects.RiftEffigiesJson
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class RiftBloodEffigies {
     private val config get() = RiftAPI.config.area.stillgoreChateauConfig.bloodEffigies
     private var locations: List<LorenzVec> = emptyList()
-    private var effingesTime = mapOf(
+    private var effigiesTimes = mapOf(
         0 to -1L,
         1 to -1L,
         2 to -1L,
@@ -32,7 +32,7 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onWorldSwitch(event: LorenzWorldSwitchEvent) {
-        effingesTime = mapOf(
+        effigiesTimes = mapOf(
             0 to -1L,
             1 to -1L,
             2 to -1L,
@@ -44,9 +44,9 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        event.getConstant<RiftEffingesJson>("RiftEffinges")?.locations?.let {
+        event.getConstant<RiftEffigiesJson>("RiftEffigies")?.locations?.let {
             if (it.size != 6) {
-                error("Invalid rift effinges size: ${it.size} (expeced 6)")
+                error("Invalid rift effigies size: ${it.size} (expeced 6)")
             }
             locations = it
         }
@@ -63,19 +63,19 @@ class RiftBloodEffigies {
 
         val split = hearts.split("§").drop(1)
         for ((index, s) in split.withIndex()) {
-            val time = effingesTime[index]!!
+            val time = effigiesTimes[index]!!
             val diff = time - System.currentTimeMillis()
             if (diff < 0L) {
                 if (s == "7") {
                     if (time != 0L) {
                         LorenzUtils.chat("§e[SkyHanni] Effigies #${index + 1} respawned!")
-                        effingesTime = effingesTime.editCopy { this[index] = 0L }
+                        effigiesTimes = effigiesTimes.editCopy { this[index] = 0L }
                     }
                 } else {
                     if (time != -1L) {
                         LorenzUtils.chat("§e[SkyHanni] Effigies #${index + 1} got killed!")
                         val endTime = System.currentTimeMillis() + 1_000 * 60 * 10
-                        effingesTime = effingesTime.editCopy { this[index] = endTime }
+                        effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
                     }
                 }
             }
@@ -94,7 +94,7 @@ class RiftBloodEffigies {
 
                 val string = group("time")
                 val time = TimeUtils.getMillis(string)
-                effingesTime = effingesTime.editCopy { this[index] = System.currentTimeMillis() + time }
+                effigiesTimes = effigiesTimes.editCopy { this[index] = System.currentTimeMillis() + time }
             }
         }
     }
@@ -105,7 +105,7 @@ class RiftBloodEffigies {
 
         for ((index, location) in locations.withIndex()) {
             val name = "Effigies #${index + 1}"
-            val duration = effingesTime[index]!!
+            val duration = effigiesTimes[index]!!
 
             if (duration == -1L) {
                 if (config.unknownTime) {
