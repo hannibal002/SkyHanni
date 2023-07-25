@@ -245,13 +245,8 @@ object GhostCounter {
                 val gained = group("gained").formatNumber().toDouble()
                 val current = group("current")
                 if (current != lastXp) {
-                    val res = if (current.contains(".")) {
-                        // current.split(".")[0] ?: "0"
-                        "([0-9,]+).*".toRegex().find(current)?.groupValues?.get(1) ?: "0"
-                    } else {
-                        current.replace("\\D".toRegex(), "")
-                    }
-                    gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
+                    val res = current.formatNumber()
+                    gain = (res - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
                     if (gained in 150.0..450.0) {
                         if (lastXp != "0") {
