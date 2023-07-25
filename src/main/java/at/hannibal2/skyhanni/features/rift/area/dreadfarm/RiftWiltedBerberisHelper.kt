@@ -29,7 +29,7 @@ class RiftWiltedBerberisHelper {
     class WiltedBerberis(var currentParticles: LorenzVec) {
         var previous: LorenzVec? = null
         var moving = true
-        var y = 72.0
+        var y = 0.0
         var lastTime = System.currentTimeMillis()
     }
 
@@ -115,17 +115,18 @@ class RiftWiltedBerberisHelper {
 
         if (config.onlyOnFarmland && !isOnFarmland) return
 
-        for (wiltedBerberis in list) {
-            with(wiltedBerberis) {
-                if (currentParticles.distanceToPlayer() > 15) continue
+        for (berberis in list) {
+            with(berberis) {
+                if (currentParticles.distanceToPlayer() > 20) continue
+                if (y == 0.0) continue
 
-                val location = currentParticles.fixLocation(wiltedBerberis)
+                val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
                     event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
-                    event.drawDynamicText(location, "§eWilted Berberis", 1.5)
+                    event.drawDynamicText(location.add(0, 1, 0), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
                     event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
-                    previous?.fixLocation(wiltedBerberis)?.let {
+                    previous?.fixLocation(berberis)?.let {
                         event.drawWaypointFilled(it, LorenzColor.DARK_GRAY.toColor())
                         event.draw3DLine(it.add(0.5, 0.5, 0.5), location.add(0.5, 0.5, 0.5), Color.WHITE, 3, false)
                     }
