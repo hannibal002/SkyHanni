@@ -903,6 +903,18 @@ public class Garden {
     public boolean nextJacobContestOtherGuis = false;
 
     @Expose
+    @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch contests from elitebot.dev for the current year if they're uploaded already.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestsFetchAutomatically = true;
+
+    @Expose
+    @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming contests to elitebot.dev for everyone else to then fetch automatically.")
+    @ConfigEditorDropdown(values = { "Ask When Needed", "Share Automatically", "Disabled" })
+    @ConfigAccordionId(id = 14)
+    public int nextJacobContestsShareAutomatically = 0;
+
+    @Expose
     @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's contest starts.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
