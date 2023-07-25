@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -30,6 +28,11 @@ class MinecraftData {
         ) {
             event.isCanceled = true
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        LorenzWorldSwitchEvent().postAndCatch()
     }
 
     @SubscribeEvent(receiveCanceled = true)

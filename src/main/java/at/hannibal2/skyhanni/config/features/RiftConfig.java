@@ -525,14 +525,45 @@ public class RiftConfig {
             public boolean highlightBlobbercysts = true;
         }
 
-//        @Expose
-//        @ConfigOption(name = "Stillgore Chateau", desc = "")
-//        @Accordion
-//        public StillgoreChateauConfig stillgoreChateauConfig = new StillgoreChateauConfig();
-//
-//        public static class StillgoreChateauConfig {
-//
-//        }
+        @Expose
+        @ConfigOption(name = "Stillgore Chateau", desc = "")
+        @Accordion
+        public StillgoreChateauConfig stillgoreChateauConfig = new StillgoreChateauConfig();
+
+        public static class StillgoreChateauConfig {
+
+            @Expose
+            @ConfigOption(name = "Blood Effigies", desc = "")
+            @Accordion
+            public EffigiesConfig bloodEffigies = new EffigiesConfig();
+
+            public static class EffigiesConfig {
+
+                @Expose
+                @ConfigOption(name = "Enabled", desc = "Show locations of inactive Blood Effigy.")
+                @ConfigEditorBoolean
+                public boolean enabled = false;
+
+                @Expose
+                @ConfigOption(name = "Respawning Soon", desc = "Show effigies that are about to respawn.")
+                @ConfigEditorBoolean
+                public boolean respawningSoon = false;
+
+                @Expose
+                @ConfigOption(name = "Respawning Time", desc = "Time before effigies respawn to show.")
+                @ConfigEditorSlider(
+                        minValue = 1,
+                        maxValue = 15,
+                        minStep = 1
+                )
+                public int respwningSoonTime = 3;
+
+                @Expose
+                @ConfigOption(name = "Unknown Times", desc = "Show effigies without known time.")
+                @ConfigEditorBoolean
+                public boolean unknownTime = false;
+            }
+        }
 
 //        @Expose
 //        @ConfigOption(name = "Mountaintop", desc = "")
