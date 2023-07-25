@@ -438,7 +438,7 @@ class GardenNextJacobContest {
         val formatted = mutableMapOf<Long, List<String>>()
 
         for ((endTime, contest) in contests) {
-            formatted[(endTime - contestDuration) / 1000] = contest.crops.map {
+            formatted[endTime / 1000] = contest.crops.map {
                 it.cropName
             }
         }
