@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.moulconfig.internal.KeybindHelper
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
@@ -269,6 +270,10 @@ class GardenVisitorFeatures {
 
             visitor.hasReward()?.let {
                 if (config.visitorRewardWarning.preventRefusing) {
+                    if (KeybindHelper.isKeyDown(config.visitorRewardWarning.bypassKey)) {
+                        LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        return
+                    }
                     event.isCanceled = true
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     Minecraft.getMinecraft().thePlayer.closeScreen()
