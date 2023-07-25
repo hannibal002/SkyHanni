@@ -6,6 +6,9 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.entity.ContentType
+import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
@@ -78,6 +81,43 @@ object APIUtil {
             client.close()
         }
         return JsonObject()
+    }
+
+    fun postJSONIsSuccessful(urlString: String, body: String, silentError: Boolean = false): Boolean {
+        val client = builder.build()
+        try {
+            val method = HttpPost(urlString)
+            method.entity = StringEntity(body, ContentType.APPLICATION_JSON)
+
+            client.execute(method).use { response ->
+                val status = response.statusLine
+
+
+
+                val message = response.entity?.toString() ?: ""
+
+                println("POST request to '$urlString' returned status ${status.statusCode}")
+                println("Body text: $message")
+                LorenzUtils.error("SkyHanni ran into an error whilst sending data. $message")
+
+                if (status.statusCode >= 200 || status.statusCode < 300) {
+                    return true
+                }
+
+                return false
+            }
+        } catch (throwable: Throwable) {
+            if (silentError) {
+                throw throwable
+            } else {
+                throwable.printStackTrace()
+                LorenzUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource. See logs for more details.")
+            }
+        } finally {
+            client.close()
+        }
+
+        return false
     }
 
     fun readFile(file: File): BufferedReader {
