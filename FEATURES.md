@@ -300,6 +300,12 @@
   + Change the Edit mode in the bottom right corner in the Configure Plots inventory
 + Show a warning when finding a **visitor with a rare reward**
   + Show message in chat, over the visitor and prevents refusing
++ **Refusal Bypass Key** - HiZe
+  + Hold a custom key to bypass the Prevent Refusing feature for visitors
++ **Farming Weight ETA Goal** - Kaeso
+  + Override the Overtake ETA to show when you will reach the specified rank
+  + If not there yet
+  + Default: #10k
 
 ## The Rift
 + **Rift Timer**
@@ -360,6 +366,12 @@
   + Hide normal motes orbs particles
 + Hide Not Rift-transferable items in Rift Transfer Chest as part of the hide not clickable items feature
 + Add npc motes sell value for current opened chest - HiZe
++ Show locations of inactive **Blood Effigy**
+  + Show effigies that are about to respawn
+  + Show effigies without known time
++ **Wilted Berberis** Helper
+  + Option to only show the helper while standing on Farmland blocks
+  + Option to hide the wilted berberis particles
 
 ## Mining
 + **Highlight Commission Mobs** - hannibal2
@@ -401,7 +413,8 @@
 + **Estimated Item Value**
   + Displays an estimated item value for the item you hover over.
   + Works with Attributes. - nea
-+ **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
++ **Discord RPC** - NetheriteMiner
+  + Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence.
 + Server Restart Title
 + **City Project Features**
   + Show missing items to contribute inside the inventory
@@ -438,3 +451,4 @@
   + Supports color codes
   + Supports line breaks `\n` - hannibal2
 + Added /sendcoords sending, detecting and rendering - dragon99z
++ Add Dungeon Potion level as item stack size - HiZe

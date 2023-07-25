@@ -77,8 +77,14 @@
   + Draw line starting from the boss head to the Killer Spring/Blood Ichor (if the boss is highlighted)
   + Draw line starting from your crosshair to the boss head
   + Configurable to work only on your boss, on bosses hit, or on coop boss
++ Show locations of inactive Blood Effigy
+  + Show effigies that are about to respawn
+  + Show effigies without known time
++ Wilted Berberis Helper
+  + Option to only show the helper while standing on Farmland blocks
+  + Option to hide the wilted berberis particles
 
-### Other Features
+### Other New Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
   + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
   + Show Ice per hour
@@ -99,9 +105,16 @@
 + Hide particles around enderman slayer bosses and mini bosses
 + Added support for Shadow Fury abilty cooldown - HiZe
 + Added /sendcoords sending, detecting and rendering - dragon99z
-+ Boss Spawn Warning - HiZe + hannibal2
++ Added **Boss Spawn Warning** - HiZe + hannibal2
   + Send a title when your slayer boss is about to spawn
   + Configurable percentage at which the title and sound should be sent
++ Added **Refusal Bypass Key** - HiZe
+  + Hold a custom key to bypass the Prevent Refusing feature for visitors
++ Added **Farming Weight ETA Goal** - Kaeso
+  + Override the Overtake ETA to show when you will reach the specified rank
+  + If not there yet
+  + Default: #10k
++ Added **Dungeon Potion level as item stack size - HiZe
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -120,6 +133,7 @@
   + Instantly showing the next player in the lb when passing someone on the leaderboard
 + Show in chat the total amount of sharks fished after the fishing contest
 + Custom text over Visitor name moves more smoothly now
++ Discord Rich Presence now supports Motes in the rift and the garden plot number - NetheriteMiner
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -150,6 +164,8 @@
 + Fixed togglesneak mod breaking escape menu open detection for quick mod menu switch
 + Fixed error with detecting hit phase during eman slayer in damage indicator
 + No longer double counting mob kill coins in slayer item profit tracker
++ Fixed jacob contest time chat message chat shows one second too long
++ Fix farming contest calendar reading going above 100% - Contrabass26
 
 ## Version 0.18 (2023-06-19)
 

@@ -73,7 +73,7 @@ class RiftBloodEffigies {
                     }
                 } else {
                     if (time != -1L) {
-                        LorenzUtils.chat("§e[SkyHanni] Effigies #${index + 1} got killed!")
+                        LorenzUtils.chat("§e[SkyHanni] Effigies #${index + 1} is broken!")
                         val endTime = System.currentTimeMillis() + 1_000 * 60 * 20
                         effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
                     }
@@ -117,7 +117,7 @@ class RiftBloodEffigies {
                 val diff = duration - System.currentTimeMillis()
                 if (duration <= 0L) {
                     event.drawWaypointFilled(location, LorenzColor.RED.toColor(), seeThroughBlocks = true)
-                    event.drawDynamicText(location, "§c$name is Alive! Break it!", 1.5)
+                    event.drawDynamicText(location, "§cBreak $name!", 1.5)
                     continue
                 }
 
@@ -125,7 +125,7 @@ class RiftBloodEffigies {
                     if (diff < 60_000 * config.respwningSoonTime) {
                         val time = TimeUtils.formatDuration(diff - 999)
                         event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
-                        event.drawDynamicText(location, "§e$name is respawning $time", 1.5)
+                        event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
                         continue
                     }
                 }
