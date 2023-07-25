@@ -3,17 +3,17 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -122,18 +122,20 @@ class RiftWiltedBerberisHelper {
 
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
-                    event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW, 0.7f)
                     event.drawDynamicText(location.add(0, 1, 0), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
-                    event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {
-                        event.drawWaypointFilled(it, LorenzColor.DARK_GRAY.toColor())
-                        event.draw3DLine(it.add(0.5, 0.5, 0.5), location.add(0.5, 0.5, 0.5), Color.WHITE, 3, false)
+                        event.drawFilledBoundingBox(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
+                        event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE, 3, false)
                     }
                 }
             }
         }
     }
+
+    private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
     fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
         val x = x - 0.5
