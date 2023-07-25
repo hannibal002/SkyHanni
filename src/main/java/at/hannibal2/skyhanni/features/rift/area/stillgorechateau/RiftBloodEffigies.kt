@@ -74,7 +74,7 @@ class RiftBloodEffigies {
                 } else {
                     if (time != -1L) {
                         LorenzUtils.chat("§e[SkyHanni] Effigies #${index + 1} got killed!")
-                        val endTime = System.currentTimeMillis() + 1_000 * 60 * 10
+                        val endTime = System.currentTimeMillis() + 1_000 * 60 * 20
                         effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
                     }
                 }
