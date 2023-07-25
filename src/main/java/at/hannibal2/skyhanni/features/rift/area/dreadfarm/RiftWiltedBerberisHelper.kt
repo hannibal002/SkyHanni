@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -20,102 +22,121 @@ import java.awt.Color
 
 class RiftWiltedBerberisHelper {
     private val config get() = RiftAPI.config.area.dreadfarmConfig.wiltedBerberis
+    private var isOnFarmland = false
+    private var hasFarmingToolInHand = false
+    private var list = listOf<WiltedBerberis>()
 
-    private var currentParticles: LorenzVec? = null
-    private var previous: LorenzVec? = null
-    private var moving = true
-    private var isOnFarmland = true
-    private var playerY = 72.0
+    class WiltedBerberis(var currentParticles: LorenzVec) {
+        var previous: LorenzVec? = null
+        var moving = true
+        var y = 72.0
+        var lastTime = System.currentTimeMillis()
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.isMod(5)) {
-            if (Minecraft.getMinecraft().thePlayer.onGround) {
-                val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
-                val currentY = LocationUtils.playerLocation().y
-                isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
-                if (isOnFarmland) {
-                    playerY = currentY
-                }
-            }
-        }
+        if (!event.isMod(5)) return
+
+        list = list.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 500 } }
+
+        hasFarmingToolInHand = hasFarmingWandInHand()
+
+        if (!Minecraft.getMinecraft().thePlayer.onGround) return
+
+        val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
+        val currentY = LocationUtils.playerLocation().y
+        isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
+    }
+
+    fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
+        return list.filter { it.currentParticles.distanceSq(location) < 8 }
+            .sortedBy { it.currentParticles.distanceSq(location) }.firstOrNull()
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
+        if (!hasFarmingToolInHand) return
 
-        if (event.distanceToPlayer > 10) return
+//        if (event.distanceToPlayer > 10) return
+
+        val location = event.location
+        val berberis = nearestBerberis(location)
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
             if (config.hideparticles) {
-                if (currentParticles != null) {
+                if (berberis != null) {
                     event.isCanceled = true
                 }
             }
             return
         }
 
-        currentParticles = if (hasFarmingWandInHand()) {
-            null
-        } else {
-            if (config.hideparticles) {
-                event.isCanceled = true
-            }
-            val isMoving = currentParticles != event.location
+        if (config.hideparticles) {
+            event.isCanceled = true
+        }
+
+        if (berberis == null) {
+            list = list.editCopy { add(WiltedBerberis(location)) }
+            return
+        }
+
+        with(berberis) {
+            val isMoving = currentParticles != location
             if (isMoving) {
-                currentParticles?.let {
-                    if (it.distance(event.location) > 3) {
-                        previous = null
-                        moving = true
-                    }
+                if (currentParticles.distance(location) > 3) {
+                    previous = null
+                    moving = true
                 }
                 if (!moving) {
                     previous = currentParticles
                 }
             }
-            moving = isMoving
+            if (!isMoving) {
+                y = location.y - 1
+            }
 
-            event.location
+            moving = isMoving
+            currentParticles = location
+            lastTime = System.currentTimeMillis()
         }
     }
 
-    private fun hasFarmingWandInHand(): Boolean {
-        val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return false
+    private fun hasFarmingWandInHand() = InventoryUtils.getItemInHand()?.getInternalName()?.let {
+        it == "FARMING_WAND"
+    } ?: false
 
-        return internalName != "FARMING_WAND"
-    }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
+        if (!hasFarmingToolInHand) return
 
         if (config.onlyOnFarmland && !isOnFarmland) return
 
-        val location = currentParticles?.fixLocation() ?: return
+        for (wiltedBerberis in list) {
+            with(wiltedBerberis) {
+                if (currentParticles.distanceToPlayer() > 15) continue
 
-        if (!moving) {
-            event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
-            event.drawDynamicText(location, "§eWilted Berberis", 1.5)
-        } else {
-            event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
-            previous?.let {
-                event.drawWaypointFilled(location, LorenzColor.GRAY.toColor())
-                event.draw3DLine(
-                    it.fixLocation().add(0.5, 0.5, 0.5),
-                    location.add(0.5, 0.5, 0.5),
-                    Color.WHITE,
-                    3,
-                    false
-                )
+                val location = currentParticles.fixLocation(wiltedBerberis)
+                if (!moving) {
+                    event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
+                    event.drawDynamicText(location, "§eWilted Berberis", 1.5)
+                } else {
+                    event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+                    previous?.fixLocation(wiltedBerberis)?.let {
+                        event.drawWaypointFilled(it, LorenzColor.DARK_GRAY.toColor())
+                        event.draw3DLine(it.add(0.5, 0.5, 0.5), location.add(0.5, 0.5, 0.5), Color.WHITE, 3, false)
+                    }
+                }
             }
         }
     }
 
-    fun LorenzVec.fixLocation(): LorenzVec {
+    fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
         val x = x - 0.5
-        val y = playerY
+        val y = wiltedBerberis.y
         val z = z - 0.5
         return LorenzVec(x, y, z)
     }
