@@ -768,6 +768,12 @@ public class Garden {
     public boolean eliteFarmingWeightOvertakeETAAlways = true;
 
     @Expose
+    @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10000\")")
+    @ConfigEditorText
+    @ConfigAccordionId(id = 11)
+    public String eliteFarmingWeightETAGoalRank = "10000";
+
+    @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
     @ConfigEditorAccordion(id = 12)
     public boolean dicerCounter = false;
