@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -13,8 +14,11 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import com.google.gson.Gson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -40,6 +44,13 @@ class GardenNextJacobContest {
     private val maxContestsPerYear = 124
     private val contestDuration = 1_000 * 60 * 20
     private var lastWarningTime = 0L
+    private var loadedContestsYear = -1
+    private var nextContestsAvailableAt = -1L
+
+    private var lastFetchAttempted = 0L
+    private var isFetchingContests = false
+    private var fetchedFromElite = false
+    private var isSendingContests = false
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -104,16 +115,21 @@ class GardenNextJacobContest {
     }
 
     private fun readCalendar(items: Collection<ItemStack>, year: Int, month: Int) {
-        if (contests.isNotEmpty()) {
-            val contest = contests.values.first()
-            val endTime = contest.endTime
-            val lastYear = SkyBlockTime.fromInstant(Instant.ofEpochMilli(endTime)).year
-            if (year != lastYear) {
-                contests.clear()
-                LorenzUtils.chat("§e[SkyHanni] New year detected, open all calendar months again!")
+        // Reset contests if a new year has passed
+        if (contests.isNotEmpty() && loadedContestsYear != year) {
+            contests.clear()
+
+            // Contests are available now, make sure system knows this
+            if (nextContestsAvailableAt > System.currentTimeMillis()) {
+                nextContestsAvailableAt = System.currentTimeMillis() - 1
+                fetchContestsIfAble()
             }
         }
 
+        // Skip if contests are already loaded for this year
+        if (contests.size == maxContestsPerYear) return
+
+        // Manually loading contests
         for (item in items) {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
@@ -124,14 +140,24 @@ class GardenNextJacobContest {
 
             val day = matcherDay.group("day").toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()
+
             val crops = mutableListOf<CropType>()
             for (line in lore) {
                 val matcherCrop = patternCrop.matcher(line)
                 if (!matcherCrop.matches()) continue
                 crops.add(CropType.getByName(matcherCrop.group("crop")))
             }
-            val contest = FarmingContest(startTime + contestDuration, crops)
-            contests[startTime] = contest
+
+            contests[startTime] = FarmingContest(startTime + contestDuration, crops)
+        }
+
+        // If contests were just fully saved
+        if (contests.size == maxContestsPerYear && isSendEnabled()) {
+
+            if (!askToSendContests()) {
+                sendContests();
+            }
+
         }
 
         update()
@@ -141,15 +167,32 @@ class GardenNextJacobContest {
     private fun saveConfig() {
         val map = SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes
         map.clear()
+
+        val currentYear = SkyBlockTime.now().year
         for (contest in contests.values) {
+            // Ensure all stored contests are really from the current year
+            if (SkyBlockTime.fromInstant(Instant.ofEpochMilli(contest.endTime)).year != currentYear) continue
+
             map[contest.endTime] = contest.crops
         }
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        for ((time, crops) in SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes) {
-            contests[time] = FarmingContest(time, crops)
+        val savedContests = SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes
+        val year = savedContests.firstNotNullOfOrNull {
+            val endTime = it.key
+
+            SkyBlockTime.fromInstant(Instant.ofEpochMilli(endTime)).year
+        }
+
+        // Clear contests if from previous year
+        if (year != SkyBlockTime.now().year) {
+            savedContests.clear()
+        } else {
+            for ((time, crops) in savedContests) {
+                contests[time] = FarmingContest(time, crops)
+            }
         }
     }
 
@@ -157,7 +200,22 @@ class GardenNextJacobContest {
 
     private fun update() {
         nextContestCrops.clear()
-        display = drawDisplay()
+
+        if (nextContestsAvailableAt == -1L) {
+            val currentDate = SkyBlockTime.now()
+            val nextYear = if (currentDate.month <= 1 && currentDate.day <= 1) currentDate.year else currentDate.year + 1
+
+            nextContestsAvailableAt = SkyBlockTime(nextYear, 1, 1).toMillis()
+
+            SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes.clear()
+        }
+
+        display = if (isFetchingContests) {
+            listOf("§cFetching this years jacob contests...")
+        } else {
+            fetchContestsIfAble() // Will only run when needed/enabled
+            drawDisplay()
+        }
     }
 
     private fun drawDisplay(): List<Any> {
@@ -173,22 +231,26 @@ class GardenNextJacobContest {
         }
 
         if (contests.isEmpty()) {
-            return emptyList()
+            list.add("§cOpen calendar to read jacob contest times!")
+            return list
         }
 
         val nextContest =
             contests.filter { it.value.endTime > System.currentTimeMillis() }.toSortedMap()
                 .firstNotNullOfOrNull { it.value }
-        if (nextContest == null) {
-            if (contests.size == maxContestsPerYear) {
-                list.add("§cNew SkyBlock Year! Open calendar again!")
-            } else {
-                list.add("§cOpen calendar to read jacob contest times!")
-            }
-            return list
+        // Show next contest
+        if (nextContest != null) return drawNextContest(nextContest, list)
+
+        if (contests.size == maxContestsPerYear) {
+            list.add("§cNew SkyBlock Year! Open calendar again!")
+        } else {
+            list.add("§cOpen calendar to read jacob contest times!")
         }
 
-        return drawNextContest(nextContest, list)
+        fetchedFromElite = false
+        contests.clear()
+
+        return list
     }
 
     private fun drawNextContest(
@@ -300,6 +362,103 @@ class GardenNextJacobContest {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.nextJacobContestDisplay
             && (GardenAPI.inGarden() || config.nextJacobContestEverywhere)
+
+    private fun isFetchEnabled() = isEnabled() && config.nextJacobContestsFetchAutomatically
+    private fun isSendEnabled() = isFetchEnabled() && config.nextJacobContestsShareAutomatically != 2 // 2 = Disabled
+    private fun askToSendContests() = config.nextJacobContestsShareAutomatically == 0 // 0 = Ask, 1 = Send (Only call if isSendEnabled())
+
+    private fun fetchContestsIfAble() {
+        if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return
+        // Allows retries every 10 minutes when it's after 1 day into the new year
+        val currentMills = System.currentTimeMillis()
+        if (lastFetchAttempted + 600_000 > currentMills || currentMills < nextContestsAvailableAt) return
+
+        isFetchingContests = true
+
+        SkyHanniMod.coroutineScope.launch {
+            contests = fetchUpcomingContests() ?: contests
+            lastFetchAttempted = System.currentTimeMillis()
+            isFetchingContests = false
+            loadedContestsYear = SkyBlockTime.now().year
+        }
+    }
+
+    private suspend fun fetchUpcomingContests() = try {
+        val url = "https://api.elitebot.dev/contests/at/now"
+        val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+
+        val newContests = mutableMapOf<Long, FarmingContest>()
+
+        val complete = result["complete"].asBoolean
+        if (complete) {
+            for (entry in result["contests"].asJsonObject.entrySet()) {
+                val timestamp = entry.key.toLongOrNull() ?: continue
+                timestamp * 1_000 // Seconds to milliseconds
+
+                val crops = entry.value.asJsonArray.map {
+                    CropType.getByName(it.asString)
+                }
+
+                if (crops.size != 3) continue
+
+                newContests[timestamp + contestDuration] = FarmingContest(timestamp + contestDuration, crops)
+            }
+        } else {
+            LorenzUtils.chat("§e[SkyHanni] This years contests aren't available to fetch automatically yet, please load them from your calender or wait 10 minutes!")
+        }
+
+        if (newContests.count() == maxContestsPerYear) {
+            LorenzUtils.chat("§e[SkyHanni] Successfully loaded this years contests from elitebot.dev automatically!")
+        }
+
+        fetchedFromElite = true
+        nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 1).toMillis()
+
+        saveConfig()
+
+        newContests
+    } catch (e: Exception) {
+        e.printStackTrace()
+        LorenzUtils.error("[SkyHanni] Failed to fetch upcoming contests. Please report this error if it continues to occur.")
+        null
+    }
+
+    private fun sendContests() {
+        if (isSendingContests || contests.size != maxContestsPerYear) return
+
+        isSendingContests = true
+
+        SkyHanniMod.coroutineScope.launch {
+            submitContestsToElite()
+            isSendingContests = false
+        }
+    }
+
+    private suspend fun submitContestsToElite() = try {
+        val formatted = mutableMapOf<Long, List<String>>()
+
+        for ((endTime, contest) in contests) {
+            formatted[(endTime - contestDuration) / 1000] = contest.crops.map {
+                it.cropName
+            }
+        }
+
+        val url = "https://api.elitebot.dev/contests/at/now"
+        val body = Gson().toJson(formatted);
+        println(body)
+
+        val result = withContext(Dispatchers.IO) { APIUtil.postJSONIsSuccessful(url, body) }
+
+        if (result) {
+            LorenzUtils.chat("§c[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+        } else {
+            LorenzUtils.error("[SkyHanni] Something went wrong submitting upcoming contests!")
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        LorenzUtils.error("[SkyHanni] Failed to submit upcoming contests. Please report this error if it continues to occur.")
+        null
+    }
 
     companion object {
         private val config get() = SkyHanniMod.feature.garden
