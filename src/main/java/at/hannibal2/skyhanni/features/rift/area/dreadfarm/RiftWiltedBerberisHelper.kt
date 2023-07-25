@@ -40,13 +40,15 @@ class RiftWiltedBerberisHelper {
 
         list = list.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 500 } }
 
-        hasFarmingToolInHand = hasFarmingWandInHand()
+        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName()?.let {
+            it == "FARMING_WAND"
+        } ?: false
 
-        if (!Minecraft.getMinecraft().thePlayer.onGround) return
-
-        val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
-        val currentY = LocationUtils.playerLocation().y
-        isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
+        if (Minecraft.getMinecraft().thePlayer.onGround) {
+            val block = LocationUtils.playerLocation().add(0, -1, 0).getBlockAt().toString()
+            val currentY = LocationUtils.playerLocation().y
+            isOnFarmland = block == "Block{minecraft:farmland}" && (currentY % 1 == 0.0)
+        }
     }
 
     fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
@@ -103,10 +105,6 @@ class RiftWiltedBerberisHelper {
         }
     }
 
-    private fun hasFarmingWandInHand() = InventoryUtils.getItemInHand()?.getInternalName()?.let {
-        it == "FARMING_WAND"
-    } ?: false
-
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
@@ -137,13 +135,13 @@ class RiftWiltedBerberisHelper {
 
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
-    fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
+    private fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
         val x = x - 0.5
         val y = wiltedBerberis.y
         val z = z - 0.5
         return LorenzVec(x, y, z)
     }
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
+    private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
 
 }
