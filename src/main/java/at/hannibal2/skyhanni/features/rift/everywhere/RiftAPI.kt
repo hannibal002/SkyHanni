@@ -18,9 +18,9 @@ object RiftAPI {
     fun ItemStack.motesNpcPrice(): Double? {
         val baseMotes = motesPrice[getInternalName()] ?: return null
         val burgerStacks = config.motes.burgerStacks
-        return baseMotes + (burgerStacks * 5) * baseMotes / 100
+        val pricePer = baseMotes + (burgerStacks * 5) * baseMotes / 100
+        return pricePer * stackSize
     }
-
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
