@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class PurseAPI {
     private val pattern = "(Piggy|Purse): §6(?<coins>[\\d,]*).*".toPattern()
@@ -20,8 +20,7 @@ class PurseAPI {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val newPurse = pattern.matchMatcher(line) {

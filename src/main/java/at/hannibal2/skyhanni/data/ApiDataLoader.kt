@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -10,7 +11,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.util.*
 
@@ -20,7 +20,7 @@ class ApiDataLoader {
     private var currentProfileId = ""
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
         thePlayer.worldObj ?: return
 

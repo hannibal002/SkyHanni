@@ -38,7 +38,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.round
 
 private val config get() = SkyHanniMod.feature.garden
@@ -47,7 +46,6 @@ class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
     private var display = emptyList<List<Any>>()
     private var lastClickedNpc = 0
-    private var tick = 0
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
@@ -419,11 +417,11 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
-        if (tick++ % 10 != 0) return
-//        if (tick++ % 300 != 0) return
+            if (!event.isMod(10)) return
+//            if (!event.isMod(300)) return
 
         if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
             checkVisitorsReady()

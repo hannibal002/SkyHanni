@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class DungeonData {
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
@@ -51,8 +50,7 @@ class DungeonData {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (dungeonFloor == null) {
             for (line in ScoreboardData.sidebarLinesFormatted) {
                 floorPattern.matchMatcher(line) {

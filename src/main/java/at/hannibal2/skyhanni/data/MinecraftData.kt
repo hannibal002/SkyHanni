@@ -60,7 +60,6 @@ class MinecraftData {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
         Minecraft.getMinecraft().thePlayer ?: return
         tick++
         LorenzTickEvent(tick).postAndCatch()

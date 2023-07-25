@@ -17,7 +17,6 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -30,7 +29,6 @@ import javax.swing.UIManager
 class GardenNextJacobContest {
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
-    private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
     private val patternDay = "§aDay (?<day>.*)".toPattern()
@@ -66,9 +64,9 @@ class GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (tick++ % (40) != 0) return
+        if (!event.isMod(40)) return
 
         if (inCalendar) return
         update()

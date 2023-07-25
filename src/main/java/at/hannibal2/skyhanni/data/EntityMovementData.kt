@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.EntityMoveEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class EntityMovementData {
 
@@ -22,7 +22,7 @@ class EntityMovementData {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         for (entity in entityLocation.keys) {

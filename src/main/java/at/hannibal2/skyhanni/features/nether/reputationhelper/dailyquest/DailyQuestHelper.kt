@@ -21,14 +21,12 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     private val townBoardMage = LorenzVec(-138, 92, -755)
     private val townBoardBarbarian = LorenzVec(-572, 100, -687)
 
-    private var tick = 0
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     private val sacksCache = mutableMapOf<String, Long>()
@@ -50,15 +48,14 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        tick++
-        if (tick % 20 == 0) {
+        if (event.isMod(20)) {
             checkInventoryForTrophyFish()
         }
 
-        if (tick % 60 == 0) {
+        if (event.isMod(60)) {
             checkInventoryForFetchItem()
         }
     }

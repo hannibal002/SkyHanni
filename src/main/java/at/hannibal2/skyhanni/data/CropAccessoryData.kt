@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,7 +12,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompressedStreamTools
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.ByteArrayInputStream
 import java.util.*
 
@@ -88,8 +84,8 @@ class CropAccessoryData {
 
     // Handle inventory detection
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || ticks++ % 20 != 0) return
+    fun onTick(event: LorenzTickEvent) {
+        if (!event.isMod(20)) return
         if (!LorenzUtils.inSkyBlock) return
         accessoryInInventory = bestCropAccessory(InventoryUtils.getItemsInOwnInventory())
         if (accessoryInInventory == CropAccessory.NONE) return

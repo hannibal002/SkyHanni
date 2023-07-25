@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,11 +16,9 @@ import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class MinionCraftHelper {
     private var minionNamePattern = "(?<name>.*) Minion (?<number>.*)".toPattern()
-    private var tick = 0
     private var display = emptyList<String>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
@@ -38,19 +33,16 @@ class MinionCraftHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!SkyHanniMod.feature.bingo.minionCraftHelperEnabled) return
 
-        tick++
-
-        if (tick % 10 == 0) {
+        if (event.isMod(10)) {
             val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
             hasMinionInInventory = mainInventory.mapNotNull { it?.name }.any { isMinionName(it) }
         }
 
-        if (tick % (60 * 2) == 0) {
+        if (event.isMod(60 * 2)) {
             val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
             hasItemsForMinion = loadFromInventory(mainInventory).first.isNotEmpty()
         }
@@ -60,8 +52,8 @@ class MinionCraftHelper {
             return
         }
 
-        if (tick % 3 != 0) return
-//        if (tick % 60 != 0) return
+        if (!event.isMod(3)) return
+//        if (!event.isMod(60)) return
 
         val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
 

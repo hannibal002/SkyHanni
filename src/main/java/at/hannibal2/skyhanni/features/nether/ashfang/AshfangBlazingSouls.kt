@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
 
 class AshfangBlazingSouls {
@@ -21,7 +21,7 @@ class AshfangBlazingSouls {
     private val souls = mutableListOf<EntityArmorStand>()
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
         EntityUtils.getEntities<EntityArmorStand>()

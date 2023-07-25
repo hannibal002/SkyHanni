@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class MarkedPlayerManager {
 
@@ -72,13 +71,11 @@ class MarkedPlayerManager {
         }
     }
 
-    var tick = 0
-
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (tick++ % 20 == 0) {
+        if (event.isMod(20)) {
             findPlayers()
         }
     }

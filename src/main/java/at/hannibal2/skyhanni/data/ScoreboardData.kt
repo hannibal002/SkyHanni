@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
 import net.minecraft.client.Minecraft
@@ -7,7 +8,6 @@ import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class ScoreboardData {
 
@@ -52,8 +52,7 @@ class ScoreboardData {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
 
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }

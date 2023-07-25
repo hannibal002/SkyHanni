@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.tiarelay
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -9,11 +10,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class TiaRelayHelper {
-
-    private var tick = 0
     private var inInventory = false
 
     private var lastClickSlot = 0
@@ -52,14 +50,11 @@ class TiaRelayHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.tiaRelayHelper) return
 
-        tick++
-
-        if (tick % 20 == 0) {
+        if (event.isMod(20)) {
             if (InventoryUtils.openInventoryName().contains("Network Relay")) {
                 inInventory = true
             } else {

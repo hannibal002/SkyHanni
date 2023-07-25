@@ -16,11 +16,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class ItemAbilityCooldown {
     private var lastAbility = ""
-    var tick = 0
     var items = mapOf<ItemStack, List<ItemText>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
 
@@ -203,11 +201,10 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        tick++
-        if (tick % 2 == 0) {
+        if (event.isMod(2)) {
             checkHotBar()
         }
     }

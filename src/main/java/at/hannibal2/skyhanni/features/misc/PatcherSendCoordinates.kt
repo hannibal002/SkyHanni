@@ -52,7 +52,7 @@ class PatcherSendCoordinates {
     }
 
     @SubscribeEvent
-    fun onEnterWaypoint(event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()

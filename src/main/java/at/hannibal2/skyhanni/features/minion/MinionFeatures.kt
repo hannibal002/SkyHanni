@@ -26,7 +26,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
 
@@ -140,7 +139,7 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (coinsPerDay != "") return
 

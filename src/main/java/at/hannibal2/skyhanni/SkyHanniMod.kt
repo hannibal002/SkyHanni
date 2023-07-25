@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
@@ -108,7 +109,6 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -393,7 +393,7 @@ class SkyHanniMod {
     }
 
     @SubscribeEvent
-    fun onClientTick(event: ClientTickEvent?) {
+    fun onTick(event: LorenzTickEvent) {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {

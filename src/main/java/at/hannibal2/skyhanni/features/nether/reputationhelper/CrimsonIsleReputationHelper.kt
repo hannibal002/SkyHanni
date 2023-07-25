@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
@@ -30,7 +30,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     private var display = emptyList<List<Any>>()
     private var dirty = true
-    private var tick = 0
 
     init {
         skyHanniMod.loadModule(questHelper)
@@ -60,7 +59,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
@@ -69,8 +68,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             updateRender()
         }
 
-        tick++
-        if (tick % 60 == 0) {
+        if (event.isMod(60)) {
             TabListData.getTabList()
                 .filter { it.contains("Reputation:") }
                 .forEach {

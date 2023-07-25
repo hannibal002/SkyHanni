@@ -4,10 +4,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -20,7 +17,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 
 object InquisitorWaypointShare {
@@ -36,7 +32,6 @@ object InquisitorWaypointShare {
     private var lastInquisitor = -1
     private var lastShareTime = 0L
     private var inquisitorsNearby = emptyList<EntityOtherPlayerMP>()
-    private var tick = 0
 
     private val logger = LorenzLogger("diana/waypoints")
 
@@ -50,11 +45,10 @@ object InquisitorWaypointShare {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (tick++ % 60 == 0) {
+        if (event.isMod(60)) {
             inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
         }
     }

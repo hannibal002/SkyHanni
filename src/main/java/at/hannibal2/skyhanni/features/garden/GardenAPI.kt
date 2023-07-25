@@ -27,7 +27,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
@@ -39,7 +38,6 @@ object GardenAPI {
     val onBarnPlot get() = inBarn && inGarden()
     val config get() = ProfileStorageData.profileSpecific?.garden
 
-    var tick = 0
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     @SubscribeEvent
@@ -56,11 +54,9 @@ object GardenAPI {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!inGarden()) return
-        tick++
-        if (tick % 10 == 0) {
+        if (event.isMod(10)) {
             inBarn = barnArea.isPlayerInside()
 
             // We ignore random hypixel moments

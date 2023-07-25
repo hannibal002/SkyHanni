@@ -12,7 +12,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class SummoningMobManager {
 
@@ -61,14 +60,12 @@ class SummoningMobManager {
         }
     }
 
-    var tick = 0
-
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
         if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
-            if (tick++ % 20 == 0) {
+            if (event.isMod(20)) {
                 updateData()
             }
         }

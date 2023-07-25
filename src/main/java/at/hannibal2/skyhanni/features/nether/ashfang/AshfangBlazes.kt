@@ -14,7 +14,6 @@ import net.minecraft.entity.monster.EntityBlaze
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class AshfangBlazes {
 
@@ -22,13 +21,12 @@ class AshfangBlazes {
     private val blazeArmorStand = mutableMapOf<EntityBlaze, EntityArmorStand>()
 
     var nearAshfang = false
-    var tick = 0
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (tick++ % 20 == 0) {
+        if (event.isMod(20)) {
             checkNearAshfang()
         }
 

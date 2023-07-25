@@ -5,10 +5,7 @@ import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
@@ -21,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.ceil
 
 class SlayerRngMeterDisplay {
@@ -32,16 +28,11 @@ class SlayerRngMeterDisplay {
     private val changedItemPattern = "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!".toPattern()
     private var lastItemDroppedTime = 0L
 
-    private var tick = 0
-
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        tick++
 
-        if (tick % 20 == 0) {
+        if (event.isMod(20)) {
             if (lastItemDroppedTime != 0L) {
                 if (System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
                     lastItemDroppedTime = 0L
