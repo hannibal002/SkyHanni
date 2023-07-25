@@ -92,17 +92,12 @@ object APIUtil {
             client.execute(method).use { response ->
                 val status = response.statusLine
 
-
-
-                val message = response.entity?.toString() ?: ""
-
-                println("POST request to '$urlString' returned status ${status.statusCode}")
-                println("Body text: $message")
-                LorenzUtils.error("SkyHanni ran into an error whilst sending data. $message")
-
                 if (status.statusCode >= 200 || status.statusCode < 300) {
                     return true
                 }
+
+                println("POST request to '$urlString' returned status ${status.statusCode}")
+                LorenzUtils.error("SkyHanni ran into an error whilst sending data. Status: ${status.statusCode}")
 
                 return false
             }

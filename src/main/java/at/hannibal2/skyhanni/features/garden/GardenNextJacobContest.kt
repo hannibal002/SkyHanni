@@ -450,7 +450,7 @@ class GardenNextJacobContest {
         val result = withContext(Dispatchers.IO) { APIUtil.postJSONIsSuccessful(url, body) }
 
         if (result) {
-            LorenzUtils.chat("§c[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+            LorenzUtils.chat("§e[SkyHanni] Successfully submitted this years upcoming contests, thank you for helping everyone out!")
         } else {
             LorenzUtils.error("[SkyHanni] Something went wrong submitting upcoming contests!")
         }
