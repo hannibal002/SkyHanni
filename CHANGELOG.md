@@ -165,7 +165,7 @@
 + Fixed error with detecting hit phase during eman slayer in damage indicator
 + No longer double counting mob kill coins in slayer item profit tracker
 + Fixed jacob contest time chat message chat shows one second too long
-+ Fix farming contest calendar reading going above 100% - Contrabass26
++ Fixed farming contest calendar reading going above 100% - Contrabass26
 
 ## Version 0.18 (2023-06-19)
 
