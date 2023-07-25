@@ -31,8 +31,8 @@ class MinecraftData {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
-        LorenzWorldSwitchEvent().postAndCatch()
+    fun onWorldChange(event: WorldEvent.Load) {
+        LorenzWorldChangeEvent().postAndCatch()
     }
 
     @SubscribeEvent(receiveCanceled = true)

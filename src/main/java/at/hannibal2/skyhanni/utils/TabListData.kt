@@ -75,7 +75,7 @@ class TabListData {
 //    class TabListPlayer(var displayName: String, var internalName: String)
 
 //    @SubscribeEvent
-//    fun onWorldChange(event: WorldEvent.Load) {
+//    fun onWorldChange(event: LorenzWorldChangeEvent) {
 //        uuidMap.clear()
 //        tabListMap.clear()
 //    }

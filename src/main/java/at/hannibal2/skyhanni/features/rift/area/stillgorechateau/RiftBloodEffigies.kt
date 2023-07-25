@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldSwitchEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
@@ -31,7 +31,7 @@ class RiftBloodEffigies {
     private val effigiesTimerPattern = "§eRespawn §c(?<time>.*) §7\\(or click!\\)".toPattern()
 
     @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldSwitchEvent) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         effigiesTimes = mapOf(
             0 to -1L,
             1 to -1L,
