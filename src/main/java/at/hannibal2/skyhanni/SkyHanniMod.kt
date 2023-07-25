@@ -69,6 +69,7 @@ import at.hannibal2.skyhanni.features.rift.VampireSlayerFeatures
 import at.hannibal2.skyhanni.features.rift.area.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveDefenseBlocks
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveLivingMetalHelper
@@ -356,8 +357,9 @@ class SkyHanniMod {
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
         loadModule(SlayerBossSpawnSoon())
-        //
         loadModule(RiftBloodEffigies())
+        loadModule(RiftWiltedBerberisHelper())
+        //
 
 
         init()
