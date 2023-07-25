@@ -208,6 +208,30 @@ public class RiftConfig {
                 @ConfigEditorBoolean
                 public boolean voltMoodMeter = false;
             }
+
+            @ConfigOption(name = "Wilted Berberis", desc = "")
+            @Accordion
+            @Expose
+            public WiltedBerberisConfig wiltedBerberis = new WiltedBerberisConfig();
+
+            public static class WiltedBerberisConfig {
+
+                @Expose
+                @ConfigOption(name = "Enabled", desc = "Show Wilted Berberis helper.")
+                @ConfigEditorBoolean
+                public boolean enabled = true;
+
+                @Expose
+                @ConfigOption(name = "Only on Farmland", desc = "Only show the helper while standing on Farmland blocks.")
+                @ConfigEditorBoolean
+                public boolean onlyOnFarmland = false;
+
+                @Expose
+                @ConfigOption(name = "Hide Particles", desc = "Hide the wilted berberis particles.")
+                @ConfigEditorBoolean
+                public boolean hideparticles = false;
+
+            }
         }
 
         @ConfigOption(name = "Mirror Verse", desc = "")
