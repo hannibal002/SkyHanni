@@ -207,7 +207,7 @@ class GardenNextJacobContest {
 
             nextContestsAvailableAt = SkyBlockTime(nextYear, 1, 1).toMillis()
 
-            SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes.clear()
+            // SkyHanniMod.feature.storage.gardenJacobFarmingContestTimes.clear()
         }
 
         display = if (isFetchingContests) {
@@ -445,7 +445,7 @@ class GardenNextJacobContest {
 
         val url = "https://api.elitebot.dev/contests/at/now"
         val body = Gson().toJson(formatted);
-        println(body)
+        // println(body)
 
         val result = withContext(Dispatchers.IO) { APIUtil.postJSONIsSuccessful(url, body) }
 
