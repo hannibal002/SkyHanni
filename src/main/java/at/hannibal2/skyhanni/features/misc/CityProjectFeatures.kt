@@ -38,7 +38,7 @@ class CityProjectFeatures {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             checkDailyReminder()
         }
     }

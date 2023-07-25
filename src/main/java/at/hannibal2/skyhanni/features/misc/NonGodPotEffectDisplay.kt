@@ -128,7 +128,7 @@ class NonGodPotEffectDisplay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(20)) return
+        if (!event.repeatSeconds(1)) return
 
         update()
     }

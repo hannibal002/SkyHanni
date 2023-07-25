@@ -68,7 +68,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             updateRender()
         }
 
-        if (event.isMod(60)) {
+        if (event.repeatSeconds(3)) {
             TabListData.getTabList()
                 .filter { it.contains("Reputation:") }
                 .forEach {

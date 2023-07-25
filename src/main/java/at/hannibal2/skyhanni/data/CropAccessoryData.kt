@@ -85,7 +85,7 @@ class CropAccessoryData {
     // Handle inventory detection
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(20)) return
+        if (!event.repeatSeconds(1)) return
         if (!LorenzUtils.inSkyBlock) return
         accessoryInInventory = bestCropAccessory(InventoryUtils.getItemsInOwnInventory())
         if (accessoryInInventory == CropAccessory.NONE) return

@@ -32,7 +32,7 @@ class LivingCaveDefenseBlocks {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             staticBlocks = staticBlocks.editCopy { removeIf { it.entity.isDead } }
         }
     }

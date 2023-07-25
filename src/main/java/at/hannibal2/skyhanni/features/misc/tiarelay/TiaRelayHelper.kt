@@ -54,7 +54,7 @@ class TiaRelayHelper {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.tiaRelayHelper) return
 
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             if (InventoryUtils.openInventoryName().contains("Network Relay")) {
                 inInventory = true
             } else {

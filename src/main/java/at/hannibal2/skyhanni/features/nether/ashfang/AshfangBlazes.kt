@@ -26,7 +26,7 @@ class AshfangBlazes {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             checkNearAshfang()
         }
 

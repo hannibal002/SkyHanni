@@ -19,7 +19,7 @@ class AshfangHideParticles {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (event.isMod(60)) {
+        if (event.repeatSeconds(3)) {
             nearAshfang = DamageIndicatorManager.getDistanceTo(BossType.NETHER_ASHFANG) < 40
         }
     }

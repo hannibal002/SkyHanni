@@ -32,7 +32,7 @@ class MayorElection {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.onHypixel) return
 
-        if (event.isMod(60)) {
+        if (event.repeatSeconds(3)) {
             check()
         }
     }

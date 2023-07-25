@@ -66,7 +66,7 @@ class GardenNextJacobContest {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(40)) return
+        if (!event.repeatSeconds(2)) return
 
         if (inCalendar) return
         update()

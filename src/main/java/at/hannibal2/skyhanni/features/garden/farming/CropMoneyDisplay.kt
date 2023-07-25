@@ -67,7 +67,7 @@ object CropMoneyDisplay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(20 * 5)) return
+        if (!event.repeatSeconds(5)) return
 
         if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.moneyPerHourAlwaysOn) return
 

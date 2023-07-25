@@ -48,7 +48,7 @@ object InquisitorWaypointShare {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (event.isMod(60)) {
+        if (event.repeatSeconds(3)) {
             inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
         }
     }

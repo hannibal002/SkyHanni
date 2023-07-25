@@ -84,7 +84,7 @@ class RiftBloodEffigies {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(20)) return
+        if (!event.repeatSeconds(1)) return
         if (!isEnabled()) return
 
         for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 6.0)) {

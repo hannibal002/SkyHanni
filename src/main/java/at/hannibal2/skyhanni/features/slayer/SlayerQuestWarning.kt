@@ -66,7 +66,7 @@ class SlayerQuestWarning {
         if (!(LorenzUtils.inSkyBlock)) return
 
         if (dirtySidebar) {
-            if (event.isMod(60)) {
+            if (event.repeatSeconds(3)) {
                 checkSidebar()
             }
         }

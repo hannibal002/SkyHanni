@@ -23,7 +23,7 @@ class BarnFishingTimer {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.barnTimer) return
 
-        if (event.isMod(60)) checkIsland()
+        if (event.repeatSeconds(3)) checkIsland()
 
         if (!rightLocation) return
 

@@ -18,7 +18,7 @@ class ServerRestartTitle {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.serverRestartTitle) return
 
-        if (!event.isMod(20)) return
+        if (!event.repeatSeconds(1)) return
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             pattern.matchMatcher(line) {

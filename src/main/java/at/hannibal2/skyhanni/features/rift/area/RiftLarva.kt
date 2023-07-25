@@ -25,7 +25,7 @@ class RiftLarva {
         checkHand()
         if (!hasHookInHand) return
 
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             findLarvas()
         }
     }

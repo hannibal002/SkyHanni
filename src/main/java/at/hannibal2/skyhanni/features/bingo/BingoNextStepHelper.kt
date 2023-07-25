@@ -112,7 +112,7 @@ class BingoNextStepHelper {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             update()
             updateIslandsVisited()
         }

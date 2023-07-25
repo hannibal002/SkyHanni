@@ -24,7 +24,7 @@ class PlayerDeathMessages {
     fun onTick(event: LorenzTickEvent) {
         if (!isHideFarDeathsEnabled()) return
 
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             checkOtherPlayers()
         }
     }

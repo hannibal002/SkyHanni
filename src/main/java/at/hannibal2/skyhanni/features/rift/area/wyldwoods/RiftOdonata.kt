@@ -25,7 +25,7 @@ class RiftOdonata {
         checkHand()
         if (!hasBottleInHand) return
 
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             findOdonatas()
         }
     }

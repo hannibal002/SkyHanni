@@ -42,7 +42,7 @@ class MinionCraftHelper {
             hasMinionInInventory = mainInventory.mapNotNull { it?.name }.any { isMinionName(it) }
         }
 
-        if (event.isMod(60 * 2)) {
+        if (event.repeatSeconds(2)) {
             val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
             hasItemsForMinion = loadFromInventory(mainInventory).first.isNotEmpty()
         }

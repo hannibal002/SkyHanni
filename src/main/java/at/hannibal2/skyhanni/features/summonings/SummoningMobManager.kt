@@ -65,7 +65,7 @@ class SummoningMobManager {
         if (!isEnabled()) return
 
         if (SkyHanniMod.feature.summonings.summoningMobDisplay) {
-            if (event.isMod(20)) {
+            if (event.repeatSeconds(1)) {
                 updateData()
             }
         }

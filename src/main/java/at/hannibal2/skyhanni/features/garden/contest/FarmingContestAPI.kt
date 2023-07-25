@@ -24,7 +24,7 @@ object FarmingContestAPI {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             if (!LorenzUtils.inSkyBlock) return
             if (!GardenAPI.inGarden()) return
 

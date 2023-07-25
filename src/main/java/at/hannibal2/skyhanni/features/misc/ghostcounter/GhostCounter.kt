@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
@@ -240,7 +239,7 @@ object GhostCounter {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             skillXPPattern.matchMatcher(skillText) {
                 val gained = group("gained").formatNumber().toDouble()
                 val current = group("current")
@@ -278,7 +277,7 @@ object GhostCounter {
             inMist = Minecraft.getMinecraft().thePlayer.posY <= 110 // some area don't show as 'The Mist' in the scoreboard
             update()
         }
-        if (event.isMod(40)) {
+        if (event.repeatSeconds(2)) {
             calculateXP()
             calculateETA()
         }

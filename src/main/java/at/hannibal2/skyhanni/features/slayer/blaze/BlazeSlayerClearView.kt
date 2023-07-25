@@ -16,7 +16,7 @@ class BlazeSlayerClearView {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.isMod(60)) {
+        if (event.repeatSeconds(3)) {
             nearBlaze = DamageIndicatorManager.getDistanceTo(
                 BossType.SLAYER_BLAZE_1,
                 BossType.SLAYER_BLAZE_2,

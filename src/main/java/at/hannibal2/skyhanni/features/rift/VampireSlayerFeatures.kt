@@ -83,7 +83,7 @@ object VampireSlayerFeatures {
                 }
             }
         }
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             entityList.editCopy { removeIf { it.isDead } }
         }
     }
