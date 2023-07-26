@@ -12,9 +12,12 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
@@ -376,9 +379,13 @@ class DamageIndicatorManager {
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
             BossType.SLAYER_ENDERMAN_4,
-            -> {
-                return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
-            }
+            -> return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
+
+            BossType.SLAYER_BLOODFIEND_1,
+            BossType.SLAYER_BLOODFIEND_2,
+            BossType.SLAYER_BLOODFIEND_3,
+            BossType.SLAYER_BLOODFIEND_4,
+            -> return checkVampireSlayer(entity as EntityOtherPlayerMP, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
@@ -390,13 +397,14 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_TYPHOEUS_2,
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
-            -> {
-                return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
-            }
+            -> return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
 
-            BossType.NETHER_MAGMA_BOSS -> {
-                return checkMagmaCube(entity as EntityMagmaCube, entityData, health.toInt(), maxHealth.toInt())
-            }
+            BossType.NETHER_MAGMA_BOSS -> return checkMagmaCube(
+                entity as EntityMagmaCube,
+                entityData,
+                health.toInt(),
+                maxHealth.toInt()
+            )
 
             BossType.SLAYER_ZOMBIE_5 -> {
                 if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
@@ -549,7 +557,6 @@ class DamageIndicatorManager {
         health: Int,
         maxHealth: Int,
     ): String? {
-
         var calcHealth = health
         val calcMaxHealth: Int
         entityData.namePrefix = when (entityData.bossType) {
@@ -622,7 +629,7 @@ class DamageIndicatorManager {
             // TODO replace this super ugly workaround with regex
             val text = name.between("Seraph ", " Hit")
             val hits = try {
-                 text.toInt()
+                text.toInt()
             } catch (e: NumberFormatException) {
                 text.substring(2).toInt()
             }
@@ -645,6 +652,44 @@ class DamageIndicatorManager {
         }
 
         return result
+    }
+
+    private fun checkVampireSlayer(
+        entity: EntityOtherPlayerMP,
+        entityData: EntityData,
+        health: Int,
+        maxHealth: Int,
+    ): String? {
+        val config = SkyHanniMod.feature.damageIndicator.vampireSlayer
+
+        if (config.percentage) {
+            val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
+            entityData.nameSuffix = " §e$percentage"
+        }
+
+        if (config.maniaCircles) {
+            entity.ridingEntity?.let {
+                val existed = it.ticksExisted
+                if (existed > 40) {
+                    val end = (20 * 26) - existed
+                    val time = end.toDouble() / 20
+                    entityData.nameAbove = "Mania Circles: §b${time.round(1)}s"
+                    return ""
+                }
+            }
+        }
+
+        if (config.hpTillSteak) {
+            val rest = maxHealth * 0.2
+            val showHealth = health - rest
+            if (showHealth < 300) {
+                entityData.nameAbove = if (showHealth > 0) {
+                    "§cHP till Steak: ${showHealth.addSeparators()}"
+                } else "§cSteak!"
+            }
+        }
+
+        return ""
     }
 
     private fun checkThorn(realHealth: Long, realMaxHealth: Long): String? {
