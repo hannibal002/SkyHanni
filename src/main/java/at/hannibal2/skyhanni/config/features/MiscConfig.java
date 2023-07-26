@@ -661,7 +661,7 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the the coords sended form patcher.")
+    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coords sended form patcher.")
     @ConfigEditorBoolean
     public boolean patcherSendCoordWaypoint = false;
 
