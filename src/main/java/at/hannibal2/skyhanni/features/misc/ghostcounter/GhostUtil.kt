@@ -92,16 +92,18 @@ object GhostUtil {
     }
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
+        val maxLevel = if (GhostCounter.bestiaryUpdate) "25" else "46"
         return Utils.chromaStringByColourCode(
             this.replace("%currentKill%", if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
                 .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
                 .replace("%killNeeded%", NumberUtil.format(killNeeded))
-                .replace("%currentLevel%", if (GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! < 0) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! - 1}")
-                .replace("%nextLevel%", if (GhostCounter.config.showMax) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!!}")
+                .replace("%currentLevel%", if (GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! < 0) maxLevel else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! - 1}")
+                .replace("%nextLevel%", if (GhostCounter.config.showMax) maxLevel else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!!}")
                 .replace("&", "§"))
     }
 
     private fun percent(number: Double): String {
-        return "${((number / 3_000_000) * 100).roundToPrecision(4)}"
+        val max = if (GhostCounter.bestiaryUpdate) 3_000_000 else 100_000
+        return "${((number / max) * 100).roundToPrecision(4)}"
     }
 }

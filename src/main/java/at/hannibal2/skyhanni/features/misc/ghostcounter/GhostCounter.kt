@@ -75,6 +75,8 @@ object GhostCounter {
     private var currentSkill = ""
     private var currentSkillLevel = -1
 
+    var bestiaryUpdate = false
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -152,8 +154,10 @@ object GhostCounter {
         }
 
         val etaFormatting = config.textFormatting.etaFormatting
+        //TODO: update
+        val max = if (bestiaryUpdate) 100_000 else 3_000_000
         val remaining: Int = when (config.showMax) {
-            true -> 3_000_000 - bestiaryCurrentKill
+            true -> max - bestiaryCurrentKill
             false -> killNeeded - currentKill
         }
 
@@ -392,11 +396,12 @@ object GhostCounter {
         //replace with BestiaryLevelUpEvent ?
         bestiaryPattern.matchMatcher(event.message.removeColor()) {
             val currentLevel = group("newLevel").toInt()
-
-            when (val nextLevel = if (currentLevel >= 46) 47 else currentLevel + 1) {
-                47 -> {
+            val max = if (bestiaryUpdate) 100_000.0 else 3_000_000.0
+            val maxLevel = if (bestiaryUpdate) 26 else 47
+            when (val nextLevel = if (currentLevel >= maxLevel-1) maxLevel else currentLevel + 1) {
+                maxLevel -> {
                     hidden?.bestiaryNextLevel = -1.0
-                    hidden?.bestiaryCurrentKill = 3_000_000.0
+                    hidden?.bestiaryCurrentKill = max
                     hidden?.bestiaryKillNeeded = 0.0
                 }
 
@@ -424,9 +429,11 @@ object GhostCounter {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = event.inventoryName
-        if (inventoryName != "Bestiary ➜ Deep Caverns") return
+        val name = if (bestiaryUpdate) "Bestiary ➜ Dwarven Mines" else "Bestiary ➜ Deep Caverns"
+        if (inventoryName != name) return
         val stacks = event.inventoryItems
-        val ghostStack = stacks[13] ?: return
+        val stack = if (bestiaryUpdate) 10 else 13
+        val ghostStack = stacks[stack] ?: return
         val bestiaryNextLevel = if (ghostStack.displayName == "§cGhost") 1 else Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
         hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         for (line in ghostStack.getLore()) {
@@ -436,6 +443,12 @@ object GhostCounter {
             }
         }
         update()
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val const = event.getConstant("GhostCounter")!!
+        bestiaryUpdate = const["useBestiaryUpdate"].asBoolean
     }
 
     fun isEnabled(): Boolean {
