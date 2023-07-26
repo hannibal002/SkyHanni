@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ExpBottleOnGroundHider {
+class ExpOrbsOnGroundHider {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {

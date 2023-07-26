@@ -41,7 +41,7 @@ object OSUtils {
         }
     }
 
-    fun KeyBinding.isActive() : Boolean {
+    fun KeyBinding.isActive(): Boolean {
         if (!Keyboard.isCreated()) return false
         try {
             if (Keyboard.isKeyDown(this.keyCode)) return true

@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
-// SkyblockAddons code, adapted for SkyHanni
+// SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.*
+import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
 import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -27,6 +31,7 @@ var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
 
 val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
+val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
 val stackingEnchants = mapOf(
@@ -74,12 +79,11 @@ val stackingEnchants = mapOf(
 
 private fun getVisitingName(): String {
     val tabData = getTabList()
-    val ownerRegex = Pattern.compile(".*Owner: (?<username>\\w+).*")
+    val ownerRegex = Regex(".*Owner: (\\w+).*")
     for (line in tabData) {
         val colorlessLine = line.removeColor()
-        val ownerMatcher = ownerRegex.matcher(colorlessLine)
-        if (ownerMatcher.matches()) {
-            return ownerMatcher.group("username")
+        if (ownerRegex.matches(colorlessLine)) {
+            return ownerRegex.find(colorlessLine)!!.groupValues[1]
         }
     }
     return "Someone"
@@ -92,10 +96,22 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     LOCATION({
         var location = LorenzUtils.skyBlockArea
         val island = LorenzUtils.skyBlockIsland
+
         if (location == "Your Island") location = "Private Island"
         if (island == IslandType.PRIVATE_ISLAND_GUEST) lastKnownDisplayStrings[LOCATION] =
             "${getVisitingName()}'s Island"
-        else if (location != "None" && location != "invalid") {
+        else if (island == IslandType.GARDEN) {
+            if (location.startsWith("Plot: ")) {
+                lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
+            } else {
+                lastKnownDisplayStrings[LOCATION] = "Personal Garden"
+            }
+        } else if (island == IslandType.GARDEN_GUEST) {
+            lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
+            if (location.startsWith("Plot: ")) {
+                lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
+            } // "MelonKingDe's Garden (Plot: 8)"
+        } else if (location != "None" && location != "invalid") {
             lastKnownDisplayStrings[LOCATION] = location
         }
         lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
@@ -107,10 +123,17 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
             purseRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
+        val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
+            motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+        }
         if (coins == "1") {
             lastKnownDisplayStrings[PURSE] = "1 Coin"
         } else if (coins != "" && coins != null) {
             lastKnownDisplayStrings[PURSE] = "$coins Coins"
+        } else if (motes == "1") {
+            lastKnownDisplayStrings[PURSE] = "1 Mote"
+        } else if (motes != "" && motes != null) {
+            lastKnownDisplayStrings[PURSE] = "$motes Motes"
         }
         lastKnownDisplayStrings[PURSE] ?: ""
     }),
@@ -155,7 +178,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
                 returnNum = "0$num".toInt()
                 /**
                  * and this is so that if the minute value is ever
-                 * a single digit (0 after being floored), it displays as 00 because 12:0pm just looks bad
+                 * a single digit (0 after being floored), it displays as 00 because 12:0pm looks bad
                  */
             }
             return returnNum
@@ -193,7 +216,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
 
         val fruit = HypixelData.profileName.firstLetterUppercase()
         if (fruit == "") profile =
-            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit has not loaded in yet
+            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit hasn't loaded in yet
         else profile += fruit
 
         lastKnownDisplayStrings[PROFILE] = profile

@@ -1,15 +1,11 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
-import at.hannibal2.skyhanni.events.DungeonEnterEvent
-import at.hannibal2.skyhanni.events.DungeonStartEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class DungeonData {
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
@@ -21,15 +17,7 @@ class DungeonData {
 
         fun inDungeon() = dungeonFloor != null
 
-        fun isOneOf(vararg floors: String): Boolean {
-            for (floor in floors) {
-                if (dungeonFloor == floor) {
-                    return true
-                }
-            }
-
-            return false
-        }
+        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(floors) == true
 
         fun handleBossMessage(rawMessage: String) {
             if (!inDungeon()) return
@@ -62,8 +50,7 @@ class DungeonData {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (dungeonFloor == null) {
             for (line in ScoreboardData.sidebarLinesFormatted) {
                 floorPattern.matchMatcher(line) {
@@ -76,7 +63,7 @@ class DungeonData {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         dungeonFloor = null
         started = false
         inBossRoom = false

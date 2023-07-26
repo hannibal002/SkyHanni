@@ -3,37 +3,32 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BarnFishingTimer {
 
     private val barnLocation = LorenzVec(108, 89, -252)
 
-    private var tick = 0
     private var rightLocation = false
     private var currentCount = 0
     private var startTime = 0L
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
 
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.barnTimer) return
 
-        tick++
-
-        if (tick % 60 == 0) checkIsland()
+        if (event.repeatSeconds(3)) checkIsland()
 
         if (!rightLocation) return
 
-        if (tick % 5 == 0) checkMobs()
-        if (tick % 7 == 0) tryPlaySound()
+        if (event.isMod(5)) checkMobs()
+        if (event.isMod(7)) tryPlaySound()
     }
 
     private fun tryPlaySound() {
@@ -60,8 +55,7 @@ class BarnFishingTimer {
         }
     }
 
-    private fun countMobs() = Minecraft.getMinecraft().theWorld.loadedEntityList
-        .filterIsInstance<EntityArmorStand>()
+    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
         .map { it.name }
         .count { it.endsWith("§c❤") }
 

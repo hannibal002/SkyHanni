@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 object CropMoneyDisplay {
     var multipliers = mapOf<String, Int>()
@@ -40,7 +40,6 @@ object CropMoneyDisplay {
 
     private var display = emptyList<List<Any>>()
     private val config get() = SkyHanniMod.feature.garden
-    private var tick = 0
     private var loaded = false
     private var ready = false
     private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
@@ -66,9 +65,9 @@ object CropMoneyDisplay {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (tick++ % (20 * 5) != 0) return
+        if (!event.repeatSeconds(5)) return
 
         if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.moneyPerHourAlwaysOn) return
 
@@ -239,7 +238,7 @@ object CropMoneyDisplay {
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
             val crop = cropNames[internalName]!!
-            // When only the NPC price is shown, display the price exclusively for the base item
+            // When only the NPC price is shown, display the price only for the base item
             if (onlyNpcPrice) {
                 if (amount != 1) continue
             } else {

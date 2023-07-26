@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.features.bingo.nextstep.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,13 +16,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-
-
 
 class BingoNextStepHelper {
     private val config get() = SkyHanniMod.feature.bingo.bingoCard
-    private var tick = 0
     private var dirty = true
 
     private val crystalObtainedPattern = " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal".toPattern()
@@ -111,17 +108,15 @@ class BingoNextStepHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
-        if (event.phase != TickEvent.Phase.START) return
 
-        tick++
-        if (tick % 20 == 0) {
+        if (event.repeatSeconds(1)) {
             update()
             updateIslandsVisited()
         }
-        if (tick % 5 == 0) {
+        if (event.isMod(5)) {
             updateCurrentSteps()
         }
     }

@@ -208,6 +208,30 @@ public class RiftConfig {
                 @ConfigEditorBoolean
                 public boolean voltMoodMeter = false;
             }
+
+            @ConfigOption(name = "Wilted Berberis", desc = "")
+            @Accordion
+            @Expose
+            public WiltedBerberisConfig wiltedBerberis = new WiltedBerberisConfig();
+
+            public static class WiltedBerberisConfig {
+
+                @Expose
+                @ConfigOption(name = "Enabled", desc = "Show Wilted Berberis helper.")
+                @ConfigEditorBoolean
+                public boolean enabled = true;
+
+                @Expose
+                @ConfigOption(name = "Only on Farmland", desc = "Only show the helper while standing on Farmland blocks.")
+                @ConfigEditorBoolean
+                public boolean onlyOnFarmland = false;
+
+                @Expose
+                @ConfigOption(name = "Hide Particles", desc = "Hide the wilted berberis particles.")
+                @ConfigEditorBoolean
+                public boolean hideparticles = false;
+
+            }
         }
 
         @ConfigOption(name = "Mirror Verse", desc = "")
@@ -525,14 +549,45 @@ public class RiftConfig {
             public boolean highlightBlobbercysts = true;
         }
 
-//        @Expose
-//        @ConfigOption(name = "Stillgore Chateau", desc = "")
-//        @Accordion
-//        public StillgoreChateauConfig stillgoreChateauConfig = new StillgoreChateauConfig();
-//
-//        public static class StillgoreChateauConfig {
-//
-//        }
+        @Expose
+        @ConfigOption(name = "Stillgore Chateau", desc = "")
+        @Accordion
+        public StillgoreChateauConfig stillgoreChateauConfig = new StillgoreChateauConfig();
+
+        public static class StillgoreChateauConfig {
+
+            @Expose
+            @ConfigOption(name = "Blood Effigies", desc = "")
+            @Accordion
+            public EffigiesConfig bloodEffigies = new EffigiesConfig();
+
+            public static class EffigiesConfig {
+
+                @Expose
+                @ConfigOption(name = "Enabled", desc = "Show locations of inactive Blood Effigy.")
+                @ConfigEditorBoolean
+                public boolean enabled = false;
+
+                @Expose
+                @ConfigOption(name = "Respawning Soon", desc = "Show effigies that are about to respawn.")
+                @ConfigEditorBoolean
+                public boolean respawningSoon = false;
+
+                @Expose
+                @ConfigOption(name = "Respawning Time", desc = "Time before effigies respawn to show.")
+                @ConfigEditorSlider(
+                        minValue = 1,
+                        maxValue = 15,
+                        minStep = 1
+                )
+                public int respwningSoonTime = 3;
+
+                @Expose
+                @ConfigOption(name = "Unknown Times", desc = "Show effigies without known time.")
+                @ConfigEditorBoolean
+                public boolean unknownTime = false;
+            }
+        }
 
 //        @Expose
 //        @ConfigOption(name = "Mountaintop", desc = "")
@@ -544,11 +599,6 @@ public class RiftConfig {
 //        }
 
     }
-
-    @Expose
-    @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
-    @ConfigEditorBoolean
-    public boolean highlightGuide = true;
 
     @Expose
     @ConfigOption(name = "Motes Sell Price", desc = "")
@@ -566,6 +616,27 @@ public class RiftConfig {
         @ConfigOption(name = "Burger Stacks", desc = "Set your McGrubber's burger stacks.")
         @ConfigEditorSlider(minStep = 1, minValue =  0, maxValue = 5)
         public int burgerStacks = 0;
+
+        @Expose
+        @ConfigOption(name = "Inventory value", desc = "")
+        @Accordion
+        public InventoryValue inventoryValue = new InventoryValue();
+
+        public static class InventoryValue {
+            @Expose
+            @ConfigOption(name = "Inventory value", desc = "Show total Motes NPC price for the current opened inventory.")
+            @ConfigEditorBoolean
+            public boolean enabled = true;
+
+            @Expose
+            @ConfigOption(name = "Number format type", desc = "Short: 1.2M\n" +
+                    "Long: 1,200,000")
+            @ConfigEditorDropdown(values = {"Short", "Long"})
+            public int formatType = 0;
+
+            @Expose
+            public Position position = new Position(126, 156, false, true);
+        }
     }
 
     @Expose
@@ -586,4 +657,14 @@ public class RiftConfig {
         public boolean hideParticles = false;
 
     }
+
+    @Expose
+    @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
+    @ConfigEditorBoolean
+    public boolean highlightGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Horsezooka Hider", desc = "Hide horses while holding the Horsezooka in the hand.")
+    @ConfigEditorBoolean
+    public boolean horsezookaHider = false;
 }

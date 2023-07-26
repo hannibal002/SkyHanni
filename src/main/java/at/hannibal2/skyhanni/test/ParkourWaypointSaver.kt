@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -10,7 +11,6 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 
 class ParkourWaypointSaver {
@@ -20,7 +20,7 @@ class ParkourWaypointSaver {
     private var parkourHelper: ParkourHelper? = null
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!Keyboard.getEventKeyState()) return
         if (NEUItems.neuHasFocus()) return
@@ -74,7 +74,7 @@ class ParkourWaypointSaver {
         } else {
             for (location in locations) {
                 val aabb = location.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
-                event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toColor(), 1f)
+                event.drawFilledBoundingBox_nea(aabb, LorenzColor.GREEN.toColor(), 1f)
             }
         }
     }

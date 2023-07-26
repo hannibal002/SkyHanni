@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftTimer {
@@ -18,7 +18,7 @@ class RiftTimer {
     private val changes = mutableMapOf<Long, String>()
 
     @SubscribeEvent
-    fun onJoinWorld(ignored: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         display = emptyList()
         maxTime = 0
         latestTime = 0

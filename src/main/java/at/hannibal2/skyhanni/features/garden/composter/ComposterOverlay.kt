@@ -26,7 +26,6 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 import kotlin.math.ceil
 import kotlin.time.Duration
@@ -94,7 +93,7 @@ class ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (inComposterUpgrades) {
             if (extraComposterUpgrade != null) {

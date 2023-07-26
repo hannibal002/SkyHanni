@@ -1,16 +1,13 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -28,14 +25,12 @@ object CopyNearbyEntitiesCommand {
             searchRadius = args[0].toInt()
         }
 
-        val minecraft = Minecraft.getMinecraft()
         val start = LocationUtils.playerLocation()
-        val world = minecraft.theWorld
 
         val resultList = mutableListOf<String>()
         var counter = 0
 
-        for (entity in world.loadedEntityList) {
+        for (entity in EntityUtils.getAllEntities()) {
             val position = entity.position
             val vec = position.toLorenzVec()
             val distance = start.distance(vec)
@@ -96,7 +91,7 @@ object CopyNearbyEntitiesCommand {
 
                     is EntityEnderman -> {
                         resultList.add("EntityEnderman:")
-                        val heldBlockState = entity.heldBlockState
+                        val heldBlockState = entity.getBlockInHand()
                         resultList.add("-  heldBlockState: $heldBlockState")
                         if (heldBlockState != null) {
                             val block = heldBlockState.block

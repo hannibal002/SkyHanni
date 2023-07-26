@@ -40,7 +40,7 @@
 - Option to hide key pickup and door open messages in dungeon.
 - Hide Skeleton Skulls lying around in dungeon.
 - Highlight Skeleton Skulls in dungeon when combining into a skeleton in orange color (not useful combined with feature Hide Skeleton Skull)
-- Hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs.
+- Hide the damage, ability damage and defense orbs that spawn when the healer is killing mobs.
 - Hide the golden fairy that follows the healer in dungeon.
 - Catacombs class level color in party finder inventory.
 - Visual highlight chests that have not yet been opened in the Croesus inventory.
@@ -62,7 +62,7 @@
 + Show the tuning stats in the Thaumaturgy inventory.
 + Show the amount of selected tuning points in the stats tuning inventory.
 + Highlight the selected template in the stats tuning inventory.
-+ Show the type of stats for the tuning point templates.
++ Show the stats for the tuning point templates.
 + Highlight depleted Bonzo's Masks in your inventory.
 + Highlight stuff that is missing in the skyblock level guide inventory.
 + **Auction Highlighter** - Highlight own items that are sold in green and that are expired in red.
@@ -110,7 +110,7 @@
 ## Bazaar
 - Showing colors in the order inventory for outbid or fully bought/sold items.
 - Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
-- Saves missing items from cancelled buy orders to clipboard for faster re-entry.
+- Saves missing items from canceled buy orders to clipboard for faster re-entry.
 - Update Timer showing when the next api data update happens.
 
 ## Fishing
@@ -127,7 +127,7 @@
 - **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + Showing fished item names
 + **Chum/Chumcap Bucket Hider**
-  + Hide the name tags of Chum/Chumcap Bucket of other players.
+  + Hide the name tags of Chum/Chumcap Bucket from other players.
   + Hide the Chum/Chumcap Bucket.
   + Hides your own Chum/Chumcap Bucket.
 
@@ -143,7 +143,13 @@
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 - Hide the vanilla nametag of damage indicator bosses.
-- **Time to Kill** - Show the time it takes to kill the Slayer boss.
+- **Time to Kill**
+  - Show the time it takes to kill the Slayer boss.
++ **Vampire Slayer**
+  + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
+  + Show a timer until the boss leaves the invicible Mania Circles state.
+  + Show the percentage of HP next to the HP.
+
 
 ## Slayer
 + Hide poor slayer drop chat messages.
@@ -172,7 +178,7 @@
   + Only works while doing slayer
 + Title warning when picking up an expensive slayer item
 + **RNG Meter Display**
-  + Display number of bosses needed until the next RNG Meter item drops
+  + Display amount of bosses needed until the next RNG Meter item drops
   + Warn when no item is set in the RNG Meter
   + Hide the RNG Meter message from chat if the current item is selected
 + Vampire Slayer Features – HiZe
@@ -181,6 +187,15 @@
   + Highlight other players' boss only if you hit them (can be toggled)
   + Highlight Co-Op members' boss (you need to write their name in the config)
   + Highlight Killer Spring and Blood Ichor, TwinClaws warning
+  + Sound for TwinClaws
+  + Option to delay c notification and sound (in millis, configurable)
+  + Draw line starting from the boss head to the Killer Spring/Blood Ichor (if the boss is highlighted)
+  + Draw line starting from your crosshair to the boss head
+  + Configurable to work only on your boss, on bosses hit, or on coop boss
++ Hide particles around enderman slayer bosses and mini bosses
++ Boss Spawn Warning - HiZe + hannibal2
+  + Send a title when your slayer boss is about to spawn
+  + Configurable percentage at which the title and sound should be sent
 
 ### Diana
 + Show burrows near you.
@@ -207,13 +222,14 @@
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** -  Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
++ Added option to hide the vanilla particles around enderman
 
 ## Garden Features
 + **Copper Price** - Show copper to coin prices inside the Sky Mart inventory.
 + **Visitor Display** - Show all items needed for the visitors.
 + **Visitor Highlight** - Highlight visitor when the required items are in the inventory or the visitor is new and needs to checked what items it needs.
 + **Show Price** - Show the bazaar price of the items required for the visitors.
-+ **Crop Milestone** Number - Show the number of the crop milestone in the inventory.
++ **Crop Milestone** Number - Show the number of crop milestone in the inventory.
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 + **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
@@ -263,7 +279,9 @@
 + Hide chat messages from the visitors in garden. (Except Beth and Spaceman)
 + Show the average crop milestone in the crop milestone inventory.
 + **FF for Contest** - Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory.
-+ **yaw and pitch display** - Shows yaw and pitch with customizable precision while holding a farm tool. Automatically fades out if there is no movement for a customizable duration (Contributed by Sefer)
++ **yaw and pitch display**
+  + Shows yaw and pitch with customizable precision while holding a farm tool.
+    Automatically fades out if no movement for a customizable duration (Contributed by Sefer)
 + Warning when 6th visitors is ready (Contributed by CalMWolfs)
 + **Contest Time Needed** - Show the time and missing FF for every crop inside Jacob's Farming Contest inventory.
 + **Garden Start Location**
@@ -288,6 +306,12 @@
   + Change the Edit mode in the bottom right corner in the Configure Plots inventory
 + Show a warning when finding a **visitor with a rare reward**
   + Show message in chat, over the visitor and prevents refusing
++ **Refusal Bypass Key** - HiZe
+  + Hold a custom key to bypass the Prevent Refusing feature for visitors
++ **Farming Weight ETA Goal** - Kaeso
+  + Override the Overtake ETA to show when you will reach the specified rank
+  + If not there yet
+  + Default: #10k
 
 ## The Rift
 + **Rift Timer**
@@ -295,7 +319,7 @@
 + **Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + **Shy Warning** (Contributed by CalMWolfs)
-  + Shows a warning when a shy is going to steal your time.
+  + Shows a warning when a shy will steal your time.
   + Useful if you play without volume.
 + **Larvas Highlighter**
   + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
@@ -314,7 +338,7 @@
   + Click on the soul name inside Rift Guide to show/hide
 + **Kloon Hacking** (Contributed by CalMWolfs)
   + Highlights the correct button to click in the hacking inventory
-  + Tells you which colour to pick
+  + Tells you which color to pick
   + While wearing the helmet, waypoints will appear at each terminal location
   + Hide already completed kloon terminal waypoints
 + **Crux Talisman Progress** Display - HiZe
@@ -346,6 +370,14 @@
   + Hide Living Metal particles
 + Highlight **flying Motes Orbs** - hannibal2
   + Hide normal motes orbs particles
++ Hide Not Rift-transferable items in Rift Transfer Chest as part of the hide not clickable items feature
++ Add npc motes sell value for current opened chest - HiZe
++ Show locations of inactive **Blood Effigy**
+  + Show effigies that are about to respawn
+  + Show effigies without known time
++ **Wilted Berberis** Helper
+  + Option to only show the helper while standing on Farmland blocks
+  + Option to hide the wilted berberis particles
 
 ## Mining
 + **Highlight Commission Mobs** - hannibal2
@@ -387,7 +419,8 @@
 + **Estimated Item Value**
   + Displays an estimated item value for the item you hover over.
   + Works with Attributes. - nea
-+ **Discord RPC** - Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence. - (contributed by NetheriteMiner)
++ **Discord RPC** - NetheriteMiner
+  + Showing stats like Location, Purse, Bits, Purse or Held Item at Discord Rich Presence.
 + Server Restart Title
 + **City Project Features**
   + Show missing items to contribute inside the inventory
@@ -401,7 +434,7 @@
   + Supports VIP /visit suggestions (e.g. PortalHub or Hubportal) 
 + Piece of Wizard Portal show earned by player name (Contributed by HiZe)
 + Quick Mod Menu Switching (default disabled)
-  + Allows for easy navigation between one Mod Config and another
+  + Allows for fast navigation between one Mod Config and another
   + Default disabled
   + Detects your SkyBlock Mod automatically
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
@@ -423,3 +456,5 @@
   + Write fancy text into a gui element to show on your screen at all time
   + Supports color codes
   + Supports line breaks `\n` - hannibal2
++ Added /sendcoords sending, detecting and rendering - dragon99z
++ Add Dungeon Potion level as item stack size - HiZe

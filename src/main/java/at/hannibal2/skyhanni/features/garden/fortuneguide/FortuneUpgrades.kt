@@ -81,7 +81,7 @@ object FortuneUpgrades {
         val visitors = GardenAPI.config?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in equipment) {
             val item = piece.getItem()
-            //todo tell them to purchase the missing item
+            //todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getEnchantments() ?: emptyMap()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
@@ -226,7 +226,7 @@ object FortuneUpgrades {
 
     private val cropUpgrades = listOf(5, 10, 20, 50, 100, 500, 1000, 5000, 10000)
 
-    // If they unlock in a weird order e.g. getting a corner before a cheaper one won't work properly
+    // If they unlock in a weird order for example getting a corner before a cheaper one won't work properly
     private val compostNeeded = listOf(1, 2, 4, 8, 16, 24, 32, 48, 64, 96, 128, 160, 160,
         320, 320, 480, 480, 640, 800, 1120, 1280, 1600, 1920, 2400)
 

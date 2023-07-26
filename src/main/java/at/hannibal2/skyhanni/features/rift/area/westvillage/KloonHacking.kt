@@ -28,7 +28,7 @@ class KloonHacking {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!RiftAPI.inRift()) return
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             checkHelmet()
         }
     }

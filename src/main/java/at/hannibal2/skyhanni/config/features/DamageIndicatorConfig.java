@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.config.features;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,4 +86,28 @@ public class DamageIndicatorConfig {
     @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.")
     @ConfigEditorBoolean
     public boolean timeToKillSlayer = true;
+
+
+
+    @Expose
+    @ConfigOption(name = "Vampire Slayer", desc = "")
+    @Accordion
+    public VampireSlayerConfig vampireSlayer = new VampireSlayerConfig();
+
+    public static class VampireSlayerConfig {
+        @Expose
+        @ConfigOption(name = "HP untill Steak", desc = "Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.")
+        @ConfigEditorBoolean
+        public boolean hpTillSteak = false;
+
+        @Expose
+        @ConfigOption(name = "Mania Circles", desc = "Show a timer until the boss leaves the invicible Mania Circles state.")
+        @ConfigEditorBoolean
+        public boolean maniaCircles = false;
+
+        @Expose
+        @ConfigOption(name = "Percentage HP", desc = "Show the percentage of HP next to the HP.")
+        @ConfigEditorBoolean
+        public boolean percentage = false;
+    }
 }

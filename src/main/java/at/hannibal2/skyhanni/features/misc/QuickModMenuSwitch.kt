@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -13,12 +14,10 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 object QuickModMenuSwitch {
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
     private var display = emptyList<List<Any>>()
-    private var tick = 0
     private var latestGuiPath = ""
 
     private var mods: List<Mod>? = null
@@ -44,10 +43,10 @@ object QuickModMenuSwitch {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (tick++ % 5 == 0) {
+        if (event.isMod(5)) {
             update()
         }
     }
@@ -77,10 +76,17 @@ object QuickModMenuSwitch {
     }
 
     private fun shouldShow(mods: List<Mod>): Boolean {
-        if (config.insideEscapeMenu && latestGuiPath == "net.minecraft.client.gui.GuiIngameMenu") return true
+        if (config.insideEscapeMenu && isEscapeMenu(latestGuiPath)) return true
         if (config.insidePlayerInventory && latestGuiPath == "net.minecraft.client.gui.inventory.GuiInventory") return true
 
         return mods.any { it.isInGui() }
+    }
+
+    private fun isEscapeMenu(path: String) = when (path) {
+        "net.minecraft.client.gui.GuiIngameMenu" -> true
+        "me.powns.togglesneak.gui.screens.GuiOptionsReplace" -> true
+
+        else -> false
     }
 
     private fun handleAbstractGuis(openGui: String): String {

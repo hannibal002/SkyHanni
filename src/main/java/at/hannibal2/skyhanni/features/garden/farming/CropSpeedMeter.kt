@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,13 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CropSpeedMeter {
     private var display = emptyList<String>()
     private var currentCrop: CropType? = null
     private var currentBlocks = 0
-    private var tick = 0
     private var snapshot = emptyList<String>()
 
     @SubscribeEvent
@@ -36,9 +35,9 @@ class CropSpeedMeter {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (tick++ % 30 != 0) return
+        if (!event.isMod(30)) return
 
         updateDisplay()
     }

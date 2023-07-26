@@ -17,7 +17,6 @@ import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -30,7 +29,6 @@ import javax.swing.UIManager
 class GardenNextJacobContest {
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
-    private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
     private val patternDay = "§aDay (?<day>.*)".toPattern()
@@ -66,9 +64,9 @@ class GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (tick++ % (40) != 0) return
+        if (!event.repeatSeconds(2)) return
 
         if (inCalendar) return
         update()
@@ -114,24 +112,26 @@ class GardenNextJacobContest {
             }
         }
 
-        for (item in items) {
-            val lore = item.getLore()
-            if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
+        if (contests.size < maxContestsPerYear) {
+            for (item in items) {
+                val lore = item.getLore()
+                if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-            val name = item.name ?: continue
-            val matcherDay = patternDay.matcher(name)
-            if (!matcherDay.matches()) continue
+                val name = item.name ?: continue
+                val matcherDay = patternDay.matcher(name)
+                if (!matcherDay.matches()) continue
 
-            val day = matcherDay.group("day").toInt()
-            val startTime = SkyBlockTime(year, month, day).toMillis()
-            val crops = mutableListOf<CropType>()
-            for (line in lore) {
-                val matcherCrop = patternCrop.matcher(line)
-                if (!matcherCrop.matches()) continue
-                crops.add(CropType.getByName(matcherCrop.group("crop")))
+                val day = matcherDay.group("day").toInt()
+                val startTime = SkyBlockTime(year, month, day).toMillis()
+                val crops = mutableListOf<CropType>()
+                for (line in lore) {
+                    val matcherCrop = patternCrop.matcher(line)
+                    if (!matcherCrop.matches()) continue
+                    crops.add(CropType.getByName(matcherCrop.group("crop")))
+                }
+                val contest = FarmingContest(startTime + contestDuration, crops)
+                contests[startTime] = contest
             }
-            val contest = FarmingContest(startTime + contestDuration, crops)
-            contests[startTime] = contest
         }
 
         update()

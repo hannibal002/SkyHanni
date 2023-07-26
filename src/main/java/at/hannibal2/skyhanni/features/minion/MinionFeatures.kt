@@ -4,10 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -26,11 +23,9 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
 
@@ -144,7 +139,7 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (coinsPerDay != "") return
 
@@ -190,7 +185,7 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastClickedEntity = null
         lastMinion = null
         lastMinionOpened = 0L

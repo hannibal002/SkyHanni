@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -24,10 +22,8 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import kotlin.concurrent.fixedRateTimer
 
@@ -193,7 +189,7 @@ class TrevorFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!config.warpToTrapper) return
         if (!onFarmingIsland()) return
         if (!Keyboard.getEventKeyState()) return
@@ -223,7 +219,7 @@ class TrevorFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         TrevorSolver.resetLocation()
         currentStatus = TrapperStatus.READY
         currentLabel = "§2Ready"

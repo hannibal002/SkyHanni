@@ -38,6 +38,7 @@ enum class ItemAbility(
     WITHER_CLOAK(10),
     HOLY_ICE(4),
     VOODOO_DOLL_WILTED(3),
+    SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 30, "Ender Bow"),
