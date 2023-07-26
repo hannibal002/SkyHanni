@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -90,7 +91,11 @@ class ItemAbilityCooldown {
         }
         if (event.soundName == "mob.wolf.howl") {
             if (event.volume == 0.5f) {
-                ItemAbility.WEIRD_TUBA.sound()
+                if (!RiftAPI.inRift()) {
+                    ItemAbility.WEIRD_TUBA.sound()
+                } else {
+                    ItemAbility.WEIRDER_TUBA.sound()
+                }
             }
         }
         if (event.soundName == "mob.zombie.unfect") {
