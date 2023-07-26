@@ -83,6 +83,10 @@
 + Wilted Berberis Helper
   + Option to only show the helper while standing on Farmland blocks
   + Option to hide the wilted berberis particles
++ **Vampire Slayer** features in Damage Indicator
+  + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
+  + Show a timer until the boss leaves the invicible Mania Circles state.
+  + Show the percentage of HP next to the HP.
 
 ### Other New Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)

@@ -143,7 +143,13 @@
 - Option to show the health of Voidgloom Seraph 4 during the laser phase (useful when trying to phase skip)
 - Show when Revenant Horror 5 is about to BOOM.
 - Hide the vanilla nametag of damage indicator bosses.
-- **Time to Kill** - Show the time it takes to kill the Slayer boss.
+- **Time to Kill**
+  - Show the time it takes to kill the Slayer boss.
++ **Vampire Slayer**
+  + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
+  + Show a timer until the boss leaves the invicible Mania Circles state.
+  + Show the percentage of HP next to the HP.
+
 
 ## Slayer
 + Hide poor slayer drop chat messages.
