@@ -121,7 +121,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
-    public GhostCounter ghostCounter = new GhostCounter();
+    public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
