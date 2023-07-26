@@ -92,13 +92,20 @@ object GhostUtil {
     }
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
+        val bestiaryNextLevel = GhostCounter.hidden?.bestiaryNextLevel
+        val currentLevel =
+            bestiaryNextLevel?.let { if (it.toInt() < 0) "46" else "${it.toInt() - 1}" } ?: "§cNo Bestiary Level Data!"
+        val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) "46" else "${it.toInt()}" }
+            ?: "§cNo Bestiary Level data!"
+
         return Utils.chromaStringByColourCode(
             this.replace("%currentKill%", if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators())
                 .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
                 .replace("%killNeeded%", NumberUtil.format(killNeeded))
-                .replace("%currentLevel%", if (GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! < 0) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!! - 1}")
-                .replace("%nextLevel%", if (GhostCounter.config.showMax) "46" else "${GhostCounter.hidden?.bestiaryNextLevel?.toInt()!!}")
-                .replace("&", "§"))
+                .replace("%currentLevel%", currentLevel)
+                .replace("%nextLevel%", nextLevel)
+                .replace("&", "§")
+        )
     }
 
     private fun percent(number: Double): String {
