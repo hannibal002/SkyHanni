@@ -360,6 +360,7 @@ class SkyHanniMod {
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
+        loadModule(GriffinPetWarning())
         //
 
 
