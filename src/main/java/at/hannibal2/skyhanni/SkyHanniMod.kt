@@ -182,7 +182,7 @@ class SkyHanniMod {
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures())
         loadModule(CurrentPetDisplay())
-        loadModule(ExpBottleOnGroundHider())
+        loadModule(ExpOrbsOnGroundHider())
         loadModule(DamageIndicatorManager())
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())
@@ -359,6 +359,7 @@ class SkyHanniMod {
         loadModule(SlayerBossSpawnSoon())
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())
+        loadModule(RiftHorsezookaHider())
         //
 
 
