@@ -44,7 +44,7 @@ public class Fishing {
     public boolean trophyFishTotalAmount = false;
 
     @Expose
-    @ConfigOption(name = "Trophy Info", desc = "Show information and stats about a trophy fish when hovering over a catch message in chat.")
+    @ConfigOption(name = "Trophy Fish Info", desc = "Show information and stats about a trophy fish when hovering over a catch message in chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean trophyFishTooltip = true;

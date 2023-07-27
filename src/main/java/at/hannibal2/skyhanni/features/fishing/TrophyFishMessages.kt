@@ -36,7 +36,7 @@ class TrophyFishMessages {
         val amount = trophyFishCounts.addOrPut(rarity, 1)
         event.blockedReason = "trophy_fish"
 
-        if (config.trophyDesign == 0 && amount == 1) {
+        if (config.trophyCounter && config.trophyDesign == 0 && amount == 1) {
             LorenzUtils.chat("§6§lTROPHY FISH! §c§lFIRST §r$displayRarity $displayName")
             return
         }
@@ -55,7 +55,7 @@ class TrophyFishMessages {
                 else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b.$totalText"
             }
         } else event.message)
-        
+
         if (config.trophyFishTooltip) {
             TrophyFishManager.getInfo(internalName)?.let {
                 component.chatStyle = it.getTooltip(trophyFishCounts)
