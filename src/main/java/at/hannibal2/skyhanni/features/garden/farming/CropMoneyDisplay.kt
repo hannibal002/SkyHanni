@@ -110,8 +110,16 @@ object CropMoneyDisplay {
             toolHasBountiful?.put(it, reforgeName == "bountiful")
 
             if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM) {
-                val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
-                val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
+                val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
+                    val redPrice = BazaarApi.getBazaarDataByInternalName("ENCHANTED_RED_MUSHROOM")?.npcPrice ?: 160.0 / 160
+                    val brownPrice = BazaarApi.getBazaarDataByInternalName("ENCHANTED_BROWN_MUSHROOM")?.npcPrice ?: 160.0 / 160
+                    redPrice to brownPrice
+                } else {
+                    val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
+                    val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
+                    redPrice to brownPrice
+                }
+
                 val mushroomPrice = (redPrice + brownPrice) / 2
                 val perSecond = 20.0 * it.multiplier * mushroomPrice
                 extraMushroomCowPerk = perSecond * 60 * 60

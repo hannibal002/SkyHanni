@@ -30,11 +30,19 @@ class PatcherSendCoordinates {
 
         val message = event.message.removeColor()
         pattern.matchMatcher(message) {
-            val playerName = group("playerName").split(" ").last()
+            var description = group("playerName").split(" ").last()
             val x = group("x").toInt()
             val y = group("y").toInt()
-            val z = group("z").toInt()
-            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), playerName, System.currentTimeMillis() / 1000))
+
+            val end = group("z")
+            val z = if (end.contains(" ")) {
+                val split = end.split(" ")
+                val extra = split.drop(1).joinToString(" ")
+                description += " " + extra
+
+                split.first().toInt()
+            } else end.toInt()
+            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
             logger.log("got patcher coords and username")
         }
     }

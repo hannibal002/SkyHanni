@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.client.Minecraft
@@ -63,5 +65,22 @@ class MinecraftData {
         Minecraft.getMinecraft().thePlayer ?: return
         tick++
         LorenzTickEvent(tick).postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val hand = InventoryUtils.getItemInHand()
+        val newItem = hand?.getInternalName() ?: ""
+        if (newItem != InventoryUtils.itemInHandId) {
+            ItemInHandChangeEvent(newItem, hand).postAndCatch()
+            InventoryUtils.itemInHandId = newItem
+            InventoryUtils.latestItemInHand = hand
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        InventoryUtils.itemInHandId = ""
     }
 }

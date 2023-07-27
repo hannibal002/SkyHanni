@@ -601,11 +601,6 @@ public class RiftConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
-    @ConfigEditorBoolean
-    public boolean highlightGuide = true;
-
-    @Expose
     @ConfigOption(name = "Motes Sell Price", desc = "")
     @Accordion
     public Motes motes = new Motes();
@@ -662,4 +657,14 @@ public class RiftConfig {
         public boolean hideParticles = false;
 
     }
+
+    @Expose
+    @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")
+    @ConfigEditorBoolean
+    public boolean highlightGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Horsezooka Hider", desc = "Hide horses while holding the Horsezooka in the hand.")
+    @ConfigEditorBoolean
+    public boolean horsezookaHider = false;
 }

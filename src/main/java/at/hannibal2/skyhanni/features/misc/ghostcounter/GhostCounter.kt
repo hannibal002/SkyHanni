@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -431,7 +432,9 @@ object GhostCounter {
         if (inventoryName != "Bestiary ➜ Deep Caverns") return
         val stacks = event.inventoryItems
         val ghostStack = stacks[13] ?: return
-        val bestiaryNextLevel = if (ghostStack.displayName == "§cGhost") 1 else Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
+        val bestiaryNextLevel = if (ghostStack.displayName == "§cGhost") 1 else {
+            ghostStack.displayName.substring(8).romanToDecimal() + 1
+        }
         hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         for (line in ghostStack.getLore()) {
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {

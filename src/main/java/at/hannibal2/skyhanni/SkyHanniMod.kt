@@ -119,7 +119,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.13",
+    version = "0.19.Beta.14",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -182,7 +182,7 @@ class SkyHanniMod {
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures())
         loadModule(CurrentPetDisplay())
-        loadModule(ExpBottleOnGroundHider())
+        loadModule(ExpOrbsOnGroundHider())
         loadModule(DamageIndicatorManager())
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())
@@ -361,6 +361,8 @@ class SkyHanniMod {
         loadModule(SlayerBossSpawnSoon())
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())
+        loadModule(RiftHorsezookaHider())
+        loadModule(GriffinPetWarning())
         //
 
 

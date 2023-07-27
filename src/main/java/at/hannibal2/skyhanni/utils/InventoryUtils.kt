@@ -7,6 +7,9 @@ import net.minecraft.item.ItemStack
 
 object InventoryUtils {
 
+    var itemInHandId = ""
+    var latestItemInHand: ItemStack? = null
+
     fun getItemsInOpenChest() = buildList {
         val guiChest = Minecraft.getMinecraft().currentScreen as GuiChest
         val inventorySlots = guiChest.inventorySlots.inventorySlots
