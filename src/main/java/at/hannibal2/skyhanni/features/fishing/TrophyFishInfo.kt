@@ -7,7 +7,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 
-data class TrophyFishInfo (
+data class TrophyFishInfo(
     @Expose
     val displayName: String,
     @Expose

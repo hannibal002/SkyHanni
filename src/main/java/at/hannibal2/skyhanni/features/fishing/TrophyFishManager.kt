@@ -55,8 +55,8 @@ class TrophyFishManager {
 
         private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
 
-        fun getInfo(internalName: String): TrophyFishInfo? {
-            return trophyFishInfo[internalName]
-        }
+        fun getInfo(internalName: String) = trophyFishInfo[internalName]
+
+        fun getInfoByName(name: String) = trophyFishInfo.values.find { it.displayName == name }
     }
 }

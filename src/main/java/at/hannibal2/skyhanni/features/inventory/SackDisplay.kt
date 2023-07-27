@@ -127,7 +127,7 @@ class SackDisplay {
                         if (isTrophySack) {
                             val trophyName = internalName.lowercase()
                                 .substringBeforeLast("_").replace("_", "")
-                            val filletValue = TrophyFishManager.getInfo(trophyName)?.getFilletValue(sackRarity!!) ?: 0
+                            val filletValue = TrophyFishManager.getInfoByName(trophyName)?.getFilletValue(sackRarity!!) ?: 0
                             val storedNumber = stored.formatNumber().toInt()
                             item.price = calculatePrice("MAGMA_FISH", (filletValue * storedNumber).toString())
                         } else {
