@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -13,6 +15,7 @@ class TrophyFishFillet {
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
+        if (!isEnabled()) return
         if (event.slot.inventory.name.contains("Sack")) return
         val internalName = event.itemStack.getInternalName()
         val trophyFishName = internalName.substringBeforeLast("_")
@@ -25,4 +28,7 @@ class TrophyFishFillet {
         val filletPrice = filletValue * NEUItems.getPrice("MAGMA_FISH")
         event.toolTip.add("§7Fillet: §8${filletValue.addSeparators()} Magmafish §7(§6${NumberUtil.format(filletPrice)}§7)")
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.fishing.trophyFilletTooltip
+
 }

@@ -44,6 +44,12 @@ public class Fishing {
     public boolean trophyFishTotalAmount = false;
 
     @Expose
+    @ConfigOption(name = "Trophy Info", desc = "Show information and stats about a trophy fish when hovering over a catch message in chat.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean trophyFishTooltip = true;
+
+    @Expose
     @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze trophy fishes from chat.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -54,6 +60,12 @@ public class Fishing {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean trophyFishSilverHider = false;
+
+    @Expose
+    @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of trophy fish in tooltip.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean trophyFilletTooltip = true;
 
     @Expose
     @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.")

@@ -20,7 +20,7 @@ class TrophyFishMessages {
 
     @SubscribeEvent
     fun onStatusBar(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.trophyCounter) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val match = trophyFishPattern.matchEntire(event.message)?.groups ?: return
         val displayName = match["displayName"]!!.value.replace("§k", "")
@@ -48,15 +48,18 @@ class TrophyFishMessages {
             " §7(${total.addSeparators()}. total)"
         } else ""
 
-        val trophyMessage = "§6§lTROPHY FISH! " + when (config.trophyDesign) {
-            0 -> "§7$amount. §r$displayRarity $displayName$totalText"
-            1 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})$totalText"
-            else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b.$totalText"
-        }
-
-        val component = ChatComponentText(trophyMessage)
-        TrophyFishManager.getInfo(internalName)?.let {
-            component.chatStyle = it.getTooltip(trophyFishCounts)
+        val component = ChatComponentText(if (config.trophyCounter) {
+            "§6§lTROPHY FISH! " + when (config.trophyDesign) {
+                0 -> "§7$amount. §r$displayRarity $displayName$totalText"
+                1 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})$totalText"
+                else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b.$totalText"
+            }
+        } else event.message)
+        
+        if (config.trophyFishTooltip) {
+            TrophyFishManager.getInfo(internalName)?.let {
+                component.chatStyle = it.getTooltip(trophyFishCounts)
+            }
         }
 
         Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(
