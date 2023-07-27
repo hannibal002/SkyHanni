@@ -208,7 +208,7 @@ public class MiscConfig {
     public boolean chickenHeadTimer = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the cooldown until the next time you can lay an egg with the chicken head.")
+    @ConfigOption(name = "Enabled", desc = "Show the cooldown until the next time you can lay an egg with the Chicken Head.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 10)
     public boolean chickenHeadTimerDisplay = false;
@@ -399,7 +399,7 @@ public class MiscConfig {
         public boolean showMaterials = true;
 
         @Expose
-        @ConfigOption(name = "Show Ready", desc = "Mark Contributions that are ready to participate.")
+        @ConfigOption(name = "Show Ready", desc = "Mark contributions that are ready to participate.")
         @ConfigEditorBoolean
         public boolean showReady = true;
 
@@ -458,7 +458,7 @@ public class MiscConfig {
     public static class PocketSackInASack {
 
         @Expose
-        @ConfigOption(name = "Show in Overlay", desc = "Show numbers of Pocket Sack-In-A-Sack applied on a sack icon as overlay.")
+        @ConfigOption(name = "Show in Overlay", desc = "Show number of Pocket Sack-In-A-Sack applied on a sack icon as an overlay.")
         @ConfigEditorBoolean
         public boolean showOverlay = false;
 
@@ -476,17 +476,17 @@ public class MiscConfig {
     public static class QuickModMenuSwitch {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Adding a mod list, allowing to fast switch between different mod menus")
+        @ConfigOption(name = "Enabled", desc = "Adding a mod list, allowing to quickly switch between different mod menus.")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Inside Escape Menu", desc = "Show the mod list while inside the Escape menu")
+        @ConfigOption(name = "Inside Escape Menu", desc = "Show the mod list while inside the Escape menu.")
         @ConfigEditorBoolean
         public boolean insideEscapeMenu = true;
 
         @Expose
-        @ConfigOption(name = "Inside Inventory", desc = "Show the mod list while inside the player inventory (no chest inventory)")
+        @ConfigOption(name = "Inside Inventory", desc = "Show the mod list while inside the player inventory (no chest inventory).")
         @ConfigEditorBoolean
         public boolean insidePlayerInventory = false;
 
@@ -504,8 +504,8 @@ public class MiscConfig {
         @Expose
         @ConfigOption(
                 name = "Enabled",
-                desc = "Tracks all of your drops from frozen treasure in the Glacial Caves\n" +
-                        "§eIce calculations are an estimate but are relatively accurate"
+                desc = "Tracks all of your drops from frozen treasure in the Glacial Caves.\n" +
+                        "§eIce calculations are an estimate but are relatively accurate."
         )
         @ConfigEditorBoolean
         public boolean enabled = true;
@@ -550,7 +550,7 @@ public class MiscConfig {
         public boolean showAsDrops = false;
 
         @Expose
-        @ConfigOption(name = "Hide Chat messages", desc = "Hides the chat messages from frozen treasures.")
+        @ConfigOption(name = "Hide Chat messages", desc = "Hides the chat messages from Frozen Treasures.")
         @ConfigEditorBoolean
         public boolean hideMessages = false;
 
@@ -603,7 +603,7 @@ public class MiscConfig {
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the Item names directly inside the Brewing Stand")
+    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the Item names directly inside the Brewing Stand.")
     @ConfigEditorBoolean
     public boolean brewingStandOverlay = true;
 
@@ -628,12 +628,12 @@ public class MiscConfig {
     public boolean crystalHollowsJoin = true;
 
     @Expose
-    @ConfigOption(name = "Fire Overlay Hider", desc = "Hide the fire overlay (Like in Skytils)")
+    @ConfigOption(name = "Fire Overlay Hider", desc = "Hide the fire overlay (Like in Skytils).")
     @ConfigEditorBoolean
     public boolean hideFireOverlay = false;
 
     @Expose
-    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into signs when you press Ctrl + V")
+    @ConfigOption(name = "Paste Into Signs", desc = "Allows you to paste the clipboard into signs when you press Ctrl + V.")
     @ConfigEditorBoolean
     public boolean pasteIntoSigns = true;
 
@@ -646,12 +646,12 @@ public class MiscConfig {
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
-    @ConfigOption(name = "Pet Candy Used", desc = "Show numbers of pet candies used on a pet.")
+    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of pet candies used on a pet.")
     @ConfigEditorBoolean
     public boolean petCandyUsed = true;
 
     @Expose
-    @ConfigOption(name = "Server Restart Title", desc = "Show an title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
+    @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     public boolean serverRestartTitle = true;
 
@@ -661,7 +661,7 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coordinates sent by patcher.")
+    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coordinates sent by Patcher.")
     @ConfigEditorBoolean
     public boolean patcherSendCoordWaypoint = false;
 
