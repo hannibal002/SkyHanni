@@ -30,7 +30,7 @@ data class TrophyFishInfo (
             |${TrophyRarity.SILVER.formattedString}: ${formatCount(counts, TrophyRarity.SILVER)}
             |${TrophyRarity.BRONZE.formattedString}: ${formatCount(counts, TrophyRarity.BRONZE)}
             |
-            |§7Total: ${bestFishObtained.formatCode}${counts.values.sum()}
+            |§7Total: ${bestFishObtained.formatCode}${counts.values.sum().addSeparators()}
         """.trimMargin()
         return ChatStyle().setChatHoverEvent(
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(display))
