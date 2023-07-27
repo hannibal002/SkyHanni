@@ -2,15 +2,19 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
+import com.google.gson.annotations.Expose
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 
 data class TrophyFishInfo (
-    val internalName: String,
+    @Expose
     val displayName: String,
+    @Expose
     private val description: String,
+    @Expose
     private val rate: Int?,
+    @Expose
     private val fillet: Map<TrophyRarity, Int>
 ) {
 

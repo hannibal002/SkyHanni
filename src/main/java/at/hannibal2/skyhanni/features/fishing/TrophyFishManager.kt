@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.fishing
+
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.jsonobjects.TrophyFishJson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
@@ -34,26 +36,10 @@ class TrophyFishManager {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        trophyFishInfo.clear()
         try {
-            val data = event.getConstant("TrophyFish")!!
-            for ((internalName, value) in data.entrySet()) {
-                val trophyFish = value.asJsonObject
-                val displayName = trophyFish["displayName"].asString
-                val description = trophyFish["description"].asString
-                val rate = trophyFish["rate"].runCatching { this.asInt }.getOrNull()
-                val filletObject = trophyFish["fillet"].asJsonObject
-                val filletValues = filletObject.entrySet().associate { (rarity, value) ->
-                    Pair(TrophyRarity.getByName(rarity)!!, value.asInt)
-                }
-                trophyFishInfo[internalName] = TrophyFishInfo(
-                    internalName,
-                    displayName,
-                    description,
-                    rate,
-                    filletValues
-                )
-            }
+            val json = event.getConstant<TrophyFishJson>("TrophyFish")
+                ?: error("Could not read repo data from TrophyFish.json")
+            trophyFishInfo = json.trophy_fish
             LorenzUtils.debug("Loaded trophy fish from repo")
         } catch (e: Exception) {
             e.printStackTrace()
@@ -67,7 +53,7 @@ class TrophyFishManager {
         val fishes: MutableMap<String, MutableMap<TrophyRarity, Int>>?
             get() = ProfileStorageData.profileSpecific?.crimsonIsle?.trophyFishes
 
-        private val trophyFishInfo = mutableMapOf<String, TrophyFishInfo>()
+        private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
 
         fun getInfo(internalName: String): TrophyFishInfo? {
             return trophyFishInfo[internalName]
