@@ -214,7 +214,7 @@ public class MiscConfig {
     public boolean chickenHeadTimerDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You lay an egg' chat message.")
+    @ConfigOption(name = "Hide Chat", desc = "Hide the 'You laid an egg!' chat message.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 10)
     public boolean chickenHeadTimerHideChat = true;
