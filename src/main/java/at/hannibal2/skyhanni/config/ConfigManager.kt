@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.fishing.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -43,6 +44,16 @@ class ConfigManager {
                 override fun read(reader: JsonReader): LorenzVec {
                     val (x, y, z) = reader.nextString().split(":").map { it.toDouble() }
                     return LorenzVec(x, y, z)
+                }
+            }.nullSafe())
+            .registerTypeAdapter(TrophyRarity::class.java, object : TypeAdapter<TrophyRarity>() {
+                override fun write(out: JsonWriter, value: TrophyRarity) {
+                    value.run { out.value(value.name) }
+                }
+
+                override fun read(reader: JsonReader): TrophyRarity {
+                    val text = reader.nextString()
+                    return TrophyRarity.getByName(text) ?: error("Could not parse TrophyRarity from '$text'")
                 }
             }.nullSafe())
             .registerTypeAdapter(ItemStack::class.java, object : TypeAdapter<ItemStack>() {
