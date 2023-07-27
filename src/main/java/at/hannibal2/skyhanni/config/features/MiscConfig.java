@@ -666,6 +666,11 @@ public class MiscConfig {
     public boolean patcherSendCoordWaypoint = false;
 
     @Expose
+    @ConfigOption(name = "Harp Keybinds", desc = "Press harp buttons with your number row on the keyboard instead of clicking.")
+    @ConfigEditorBoolean
+    public boolean harpKeybinds = false;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
