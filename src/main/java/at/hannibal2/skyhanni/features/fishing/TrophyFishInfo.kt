@@ -37,9 +37,7 @@ data class TrophyFishInfo(
         )
     }
 
-    fun getFilletValue(rarity: TrophyRarity): Int {
-        return fillet.getOrDefault(rarity, -1)
-    }
+    fun getFilletValue(rarity: TrophyRarity) = fillet.getOrDefault(rarity, -1)
 
     private fun formatCount(counts: Map<TrophyRarity, Int>, rarity: TrophyRarity): String {
         val count = counts.getOrDefault(rarity, 0)
