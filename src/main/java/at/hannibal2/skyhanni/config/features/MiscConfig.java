@@ -458,7 +458,7 @@ public class MiscConfig {
     public static class PocketSackInASack {
 
         @Expose
-        @ConfigOption(name = "Show in Overlay", desc = "Show number of Pocket Sack-In-A-Sack applied on a sack icon as an overlay.")
+        @ConfigOption(name = "Show in Overlay", desc = "Show the number of Pocket Sack-In-A-Sack applied on a sack icon as an overlay.")
         @ConfigEditorBoolean
         public boolean showOverlay = false;
 
