@@ -33,10 +33,10 @@ class EstimatedWardrobePrice {
         toolTip.add(index++, "")
         toolTip.add(index++, "§aEstimated Armor Value:")
 
-        var totalPrice = 0.0
+        var totalPrice = 0L
         for (item in items) {
             val name = item.name
-            val price = EstimatedItemValue.getEstimatedItemPrice(item, mutableListOf()).first
+            val price = EstimatedItemValue.getEstimatedItemPrice(item) ?: continue
             totalPrice += price
 
             toolTip.add(index++, "  §7- $name: §6${NumberUtil.format(price)}")
@@ -54,8 +54,7 @@ class EstimatedWardrobePrice {
 
         for ((slot, item) in event.inventoryItems) {
             item.getInternalNameOrNull() ?: continue
-            val price = EstimatedItemValue.getEstimatedItemPrice(item, mutableListOf()).first
-            if (price == 0.0) continue
+            EstimatedItemValue.getEstimatedItemPrice(item) ?: continue
             val id = slot % 9
             val list = map.getOrPut(id) { mutableListOf() }
             list.add(item)

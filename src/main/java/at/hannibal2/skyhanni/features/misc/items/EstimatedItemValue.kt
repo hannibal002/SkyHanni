@@ -117,7 +117,7 @@ object EstimatedItemValue {
 
         val list = mutableListOf<String>()
         list.add("§aEstimated Item Value:")
-        val pair = getEstimatedItemPrice(stack, list)
+        val pair = getData(stack, list)
         val (totalPrice, basePrice) = pair
 
         if (basePrice == totalPrice) return listOf()
@@ -136,7 +136,13 @@ object EstimatedItemValue {
         return newDisplay
     }
 
-    fun getEstimatedItemPrice(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
+    fun getEstimatedItemPrice(stack: ItemStack): Long? {
+        val price = getData(stack, mutableListOf()).first
+        if (price == 0.0) return null
+        return price.toLong()
+    }
+
+    fun getData(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         var totalPrice = 0.0
         val basePrice = addBaseItem(stack, list)
         totalPrice += basePrice

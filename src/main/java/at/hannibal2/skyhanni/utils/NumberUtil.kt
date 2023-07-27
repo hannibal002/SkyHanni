@@ -91,6 +91,8 @@ object NumberUtil {
 
     fun Number.addSeparators() = NumberFormat.getNumberInstance().format(this)
 
+    fun Number.addFormatting() = format(this)
+
     fun String.romanToDecimalIfNeeded() = toIntOrNull() ?: romanToDecimal()
 
     /**
