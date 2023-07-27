@@ -307,7 +307,8 @@ object GhostCounter {
                 var parse = true
                 if (skillPercent) {
                     percent = nf.parse(group("percent")).toFloat()
-                    val level = if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance().getSkillInfo(skillName)?.level ?: 0
+                    val level = if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance().getSkillInfo(skillName)?.level
+                        ?: 0
                     if (level > 0) {
                         totalSkillXp = SkillExperience.getExpForNextLevel(level)
                         currentSkillXp = totalSkillXp * percent / 100
@@ -339,15 +340,16 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: TabListUpdateEvent){
+    fun onTabUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
-        for (line in event.tabList){
-            skillLevelPattern.matchMatcher(line){
+        for (line in event.tabList) {
+            skillLevelPattern.matchMatcher(line) {
                 currentSkill = group("skillName")
                 currentSkillLevel = group("skillLevel").toInt()
             }
         }
     }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
@@ -398,7 +400,7 @@ object GhostCounter {
             val currentLevel = group("newLevel").toInt()
             val max = if (bestiaryUpdate) 100_000.0 else 3_000_000.0
             val maxLevel = if (bestiaryUpdate) 26 else 47
-            when (val nextLevel = if (currentLevel >= maxLevel-1) maxLevel else currentLevel + 1) {
+            when (val nextLevel = if (currentLevel >= maxLevel - 1) maxLevel else currentLevel + 1) {
                 maxLevel -> {
                     hidden?.bestiaryNextLevel = -1.0
                     hidden?.bestiaryCurrentKill = max
