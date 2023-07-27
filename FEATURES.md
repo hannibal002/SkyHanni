@@ -119,6 +119,8 @@
   + **Trophy Counter Design** - Change the way trophy fish messages gets displayed in the chat. - appable0
   + **Hide Repeated Catches** - Delete past catches of the same trophy fish from chat. - appable0
   + Show total amount of all trophy fish rarities at the end of the chat message.
+  + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish. - appable0
+  + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value. - appable0
 - **Hide Bronze/Silver Duplicates** - Hiding chat message when catching a duplicate bronze/silver trophy fish.
 - **Shorten Fishing Message** (Replacing the green chat message when fishing a sea creature with a more clean format)
 - Highlight Thunder Sparks that spawn after killing a Thunder.
@@ -202,6 +204,8 @@
 + Uses Soopy's Guess Logic to find the next burrow. Does not require SoopyV2 or chat triggers to be installed.
 + Show the way from one burrow to another smoothly.
 + Warps to the nearest warp point on the hub, if closer to the next burrow.
++ **Griffin Pet Warning**
+  + Warn when holding an Ancestral Spade while no Griffin pet is selected.
 
 ## Marked Players
 + Adding or removing players as marked with command /shmarkplayer
@@ -378,6 +382,8 @@
 + **Wilted Berberis** Helper
   + Option to only show the helper while standing on Farmland blocks
   + Option to hide the wilted berberis particles
++ **Horsezooka Hider**
+  + Hide horses while holding the Horsezooka in the hand.
 
 ## Mining
 + **Highlight Commission Mobs** - hannibal2

@@ -80,13 +80,15 @@
 + Show locations of inactive Blood Effigy
   + Show effigies that are about to respawn
   + Show effigies without known time
-+ Wilted Berberis Helper
++ Added **Wilted Berberis Helper**
   + Option to only show the helper while standing on Farmland blocks
   + Option to hide the wilted berberis particles
-+ **Vampire Slayer** features in Damage Indicator
++ Added **Vampire Slayer** features in Damage Indicator
   + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
   + Show a timer until the boss leaves the invicible Mania Circles state.
   + Show the percentage of HP next to the HP.
++ Added **Horsezooka Hider**
+  + Hide horses while holding the Horsezooka in the hand.
 
 ### Other New Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
@@ -115,10 +117,15 @@
 + Added **Refusal Bypass Key** - HiZe
   + Hold a custom key to bypass the Prevent Refusing feature for visitors
 + Added **Farming Weight ETA Goal** - Kaeso
-  + Override the Overtake ETA to show when you will reach the specified rank
+  + Override the Overtake ETA to show when you will reach the specified rank.
   + If not there yet
   + Default: #10k
 + Added **Dungeon Potion level as item stack size - HiZe
++ Added **Griffin Pet Warning**
+  + Warn when holding an Ancestral Spade while no Griffin pet is selected.
++ More **Trophy Fish** features - appable0
+  + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish.
+  + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value.
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
@@ -138,6 +145,7 @@
 + Show in chat the total amount of sharks fished after the fishing contest
 + Custom text over Visitor name moves more smoothly now
 + Discord Rich Presence now supports Motes in the rift and the garden plot number - NetheriteMiner
++ Crop money display: Using npc price for mushroom cow pet calculation when on ironman, stranded or bingo
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -170,6 +178,7 @@
 + No longer double counting mob kill coins in slayer item profit tracker
 + Fixed jacob contest time chat message chat shows one second too long
 + Fixed farming contest calendar reading going above 100% - Contrabass26
++ Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
 
 ## Version 0.18 (2023-06-19)
 
