@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import com.google.gson.annotations.Expose
@@ -37,7 +38,13 @@ data class TrophyFishInfo(
         )
     }
 
-    fun getFilletValue(rarity: TrophyRarity) = fillet.getOrDefault(rarity, -1)
+    fun getFilletValue(rarity: TrophyRarity): Int {
+        if (fillet == null) {
+            CopyErrorCommand.logError(Error("fillet is null for '$displayName'"), "Error trying to read trophy fish info")
+            return -1
+        }
+        return fillet.getOrDefault(rarity, -1)
+    }
 
     private fun formatCount(counts: Map<TrophyRarity, Int>, rarity: TrophyRarity): String {
         val count = counts.getOrDefault(rarity, 0)
