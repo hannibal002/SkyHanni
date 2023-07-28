@@ -13,9 +13,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.*
-import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
-import at.hannibal2.skyhanni.features.chat.ChatFilter
-import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.*
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
@@ -363,6 +361,7 @@ class SkyHanniMod {
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
+        loadModule(PatternHiderManager(this))
         //
 
 

@@ -12,7 +12,7 @@ class ChatFilter {
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
         if (!LorenzUtils.onHypixel) return
-
+        if (event.blockedReason != "") return
         val blockReason = block(event.message)
         if (blockReason != "") {
             event.blockedReason = blockReason
@@ -27,9 +27,7 @@ class ChatFilter {
         isGuildExp(message) && config.guildExp -> "guild_exp"
         friendJoin(message) && config.friendJoinLeft -> "friend_join"
         killCombo(message) && config.killCombo -> "kill_combo"
-        watchdogAnnouncement(message) && config.watchDog -> "watchdog"
         profileJoin(message) && config.profileJoin -> "profile_join"
-
         bazaarAndAHMiniMessages(message) && config.others -> "bz_ah_minis"
         slayer(message) && config.others -> "slayer"
         slayerDrop(message) && config.others -> "slayer_drop"
@@ -40,7 +38,6 @@ class ChatFilter {
         winterIsland(message) && config.others -> "winter_island"
         uselessWarning(message) && config.others -> "useless_warning"
         annoyingSpam(message) && config.others -> "annoying_spam"
-
         isWinterGift(message) && config.winterGift -> "winter_gift"
         isPowderMining(message) && config.powderMining -> "powder_mining"
 
@@ -219,13 +216,7 @@ class ChatFilter {
         return false
     }
 
-    private fun watchdogAnnouncement(message: String) = when {
-        message == "§4[WATCHDOG ANNOUNCEMENT]" -> true
-        message.matchRegex("§fWatchdog has banned §r§c§l(.*)§r§f players in the last 7 days.") -> true
-        message.matchRegex("§fStaff have banned an additional §r§c§l(.*)§r§f in the last 7 days.") -> true
-        message == "§cBlacklisted modifications are a bannable offense!" -> true
-        else -> false
-    }
+
 
     private fun profileJoin(message: String) = when {
         message.startsWith("§aYou are playing on profile: §e") -> true
