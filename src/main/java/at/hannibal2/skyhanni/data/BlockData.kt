@@ -12,9 +12,12 @@ class BlockData {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onChatPacket(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
+        if (packet == null) return
 
         if (packet is S23PacketBlockChange) {
-            ServerBlockChangeEvent(packet.blockPosition, packet.blockState).postAndCatch()
+            val blockPos = packet.blockPosition ?: return
+            val blockState = packet.blockState ?: return
+            ServerBlockChangeEvent(blockPos, blockState).postAndCatch()
         } else if (packet is S22PacketMultiBlockChange) {
             for (block in packet.changedBlocks) {
                 ServerBlockChangeEvent(block.pos, block.blockState).postAndCatch()
