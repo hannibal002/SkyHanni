@@ -409,11 +409,6 @@ class HideNotClickableItems {
 
         val name = stack.cleanName()
 
-        if (ItemUtils.isSack(name)) {
-            hideReason = "Sacks cannot be put into the storage!"
-            return true
-        }
-
         val result = hideInStorageFilter.match(name)
 
         if (result) hideReason = "Bags cannot be put into the storage!"
