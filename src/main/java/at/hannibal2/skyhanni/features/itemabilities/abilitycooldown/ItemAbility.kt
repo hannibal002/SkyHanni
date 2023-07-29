@@ -32,12 +32,14 @@ enum class ItemAbility(
     STAFF_OF_THE_VOLCANO(30),
     STARLIGHT_WAND(2),
     VOODOO_DOLL(5),
-    WEIRD_TUBA(20, "WEIRDER_TUBA"),
+    WEIRD_TUBA(20),
+    WEIRDER_TUBA(30),
     FIRE_FREEZE_STAFF(10),
     SWORD_OF_BAD_HEALTH(5),
     WITHER_CLOAK(10),
     HOLY_ICE(4),
     VOODOO_DOLL_WILTED(3),
+    SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 30, "Ender Bow"),

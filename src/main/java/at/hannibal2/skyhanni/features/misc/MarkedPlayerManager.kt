@@ -1,17 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class MarkedPlayerManager {
 
@@ -46,14 +42,12 @@ class MarkedPlayerManager {
         }
 
         private fun findPlayers() {
-            for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-                if (entity is EntityOtherPlayerMP) {
-                    if (entity in markedPlayers.values) continue
+            for (entity in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
+                if (entity in markedPlayers.values) continue
 
-                    val name = entity.name.lowercase()
-                    if (name in playerNamesToMark) {
-                        markedPlayers[name] = entity
-                    }
+                val name = entity.name.lowercase()
+                if (name in playerNamesToMark) {
+                    markedPlayers[name] = entity
                 }
             }
         }
@@ -77,13 +71,11 @@ class MarkedPlayerManager {
         }
     }
 
-    var tick = 0
-
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (tick++ % 20 == 0) {
+        if (event.repeatSeconds(1)) {
             findPlayers()
         }
     }
@@ -111,7 +103,7 @@ class MarkedPlayerManager {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (Minecraft.getMinecraft().thePlayer == null) return
 
         markedPlayers.clear()

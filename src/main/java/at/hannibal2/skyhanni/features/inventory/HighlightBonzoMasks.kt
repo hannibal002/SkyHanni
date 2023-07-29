@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.*
@@ -21,7 +21,7 @@ class HighlightBonzoMasks {
 
     val maskTimers = mutableMapOf<String, CooldownTimer>()
 
-    // Technically this timer is overestimating since the cooldown is affected by mage level, however I do not care.
+    // Technically this timer is overestimating since mage level affects the cooldown, however I don't care.
     val bonzoMaskCooldown = 360.seconds
     val bonzoMaskMessage = "^Your (.*Bonzo's Mask) saved your life!$".toRegex()
 
@@ -65,7 +65,7 @@ class HighlightBonzoMasks {
     }
 
     @SubscribeEvent
-    fun onJoinWorld(ignored: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         maskTimers.clear()
     }
 

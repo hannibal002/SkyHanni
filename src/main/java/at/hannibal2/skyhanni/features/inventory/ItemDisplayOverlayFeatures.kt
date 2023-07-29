@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -170,6 +171,21 @@ class ItemDisplayOverlayFeatures {
                             amount > 4 -> "§a$amount"
                             amount > 2 -> "§e$amount"
                             else -> "§c$amount"
+                        }
+                    }
+                }
+            }
+        }
+
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13)) {
+            if (item.getInternalName() == "POTION") {
+                item.name?.let {
+                    "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
+                        return when (val level = group("level").romanToDecimal()) {
+                            in 1..2 -> "§f$level"
+                            in 3..4 -> "§a$level"
+                            in 5..6 -> "§9$level"
+                            else -> "§5$level"
                         }
                     }
                 }

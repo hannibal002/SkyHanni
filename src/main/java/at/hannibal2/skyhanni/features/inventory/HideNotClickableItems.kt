@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
@@ -16,6 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -172,15 +175,34 @@ class HideNotClickableItems {
             hideYourEquipment(chestName, stack) -> true
             hideComposter(chestName, stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
+            hideRiftTransferChest(chestName, stack) -> true
             else -> {
                 false
             }
         }
     }
 
-    private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
-//        if (!RiftAPI.inRift()) return false
+    private fun hideRiftTransferChest(chestName: String, stack: ItemStack): Boolean {
+        if (chestName != "Rift Transfer Chest") return false
 
+        reverseColor = true
+        val riftTransferable = stack.isRiftTransferable() ?: return true
+        if (riftTransferable) {
+            return false
+        }
+        if (RiftAPI.inRift()) {
+            val riftExportable = stack.isRiftExportable() ?: return true
+            if (riftExportable) {
+                return false
+            }
+        }
+
+        hideReason = "Not Rift-Transferable!"
+        return true
+    }
+
+    private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
+        if (!RiftAPI.inRift()) return false
         if (chestName != "Motes Grubber") return false
 
         reverseColor = true

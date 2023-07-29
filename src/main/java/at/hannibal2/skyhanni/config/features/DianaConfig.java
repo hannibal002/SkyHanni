@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
-public class Diana {
+public class DianaConfig {
 
     @Expose
     @ConfigOption(name = "Soopy Guess", desc = "Uses §eSoopy's Guess Logic §7to find the next burrow. Does not require SoopyV2 or ChatTriggers to be installed.")
@@ -60,4 +60,8 @@ public class Diana {
         public int keyBindShare = Keyboard.KEY_Y;
     }
 
+    @Expose
+    @ConfigOption(name = "Griffin Pet Warning", desc = "Warn when holding an Ancestral Spade while no Griffin pet is selected.")
+    @ConfigEditorBoolean
+    public boolean petWarning = true;
 }

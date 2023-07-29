@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -10,7 +11,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.util.*
 
@@ -20,7 +20,7 @@ class ApiDataLoader {
     private var currentProfileId = ""
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
         thePlayer.worldObj ?: return
 
@@ -46,7 +46,7 @@ class ApiDataLoader {
         val jsonObject = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }
 
         if (jsonObject["success"]?.asBoolean == false) {
-            if (jsonObject["throttle"]?.asBoolean == true) return true // 429 Too Many Requests does not make an invalid key.
+            if (jsonObject["throttle"]?.asBoolean == true) return true // 429 Too Many Requests doesn't make an invalid key.
             val cause = jsonObject["cause"].asString
             if (cause == "Invalid API key") {
                 return false
@@ -79,10 +79,8 @@ class ApiDataLoader {
             findApiCandidatesFromOtherMods().forEach { (modName, newApiKey) ->
                 if (tryUpdateProfileDataAndVerifyKey(newApiKey)) {
                     SkyHanniMod.feature.storage.apiKey = newApiKey
-                    LorenzUtils.chat("§e[SkyHanni] Imported valid new API key from $modName.")
+                    LorenzUtils.chat("§e[SkyHanni] Imported valid API key from $modName.")
                     return@launch
-                } else {
-                    LorenzUtils.error("§c[SkyHanni] Invalid API key from $modName")
                 }
             }
         }

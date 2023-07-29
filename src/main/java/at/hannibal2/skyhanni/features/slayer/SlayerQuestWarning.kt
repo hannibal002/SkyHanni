@@ -6,15 +6,15 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class SlayerQuestWarning {
     private val config get() = SkyHanniMod.feature.slayer
@@ -22,7 +22,6 @@ class SlayerQuestWarning {
     private var lastWarning = 0L
     private var currentReason = ""
     private var dirtySidebar = false
-    private var tick = 0
     private var activeSlayer: SlayerType? = null
 
     //TODO add check if player has clicked on an item, before mobs around you gets damage
@@ -63,11 +62,11 @@ class SlayerQuestWarning {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
 
         if (dirtySidebar) {
-            if (tick++ % 60 == 0) {
+            if (event.repeatSeconds(3)) {
                 checkSidebar()
             }
         }
@@ -116,7 +115,7 @@ class SlayerQuestWarning {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (!needSlayerQuest) {
             dirtySidebar = true
         }

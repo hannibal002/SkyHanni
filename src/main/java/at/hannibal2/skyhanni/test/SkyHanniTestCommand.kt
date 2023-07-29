@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -166,6 +168,53 @@ class SkyHanniTestCommand {
 
             OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
         }
+
+        fun debugData(args: Array<String>) {
+            if (args.size == 2) {
+                if (args[0] == "profileName") {
+                    HypixelData.profileName = args[1].lowercase()
+                    LorenzUtils.chat("§eManually set profileName to '${HypixelData.profileName}'")
+                    return
+                }
+            }
+            val builder = StringBuilder()
+            builder.append("```\n")
+            builder.append("= Debug Information = \n")
+            builder.append("\n")
+            builder.append("SkyHanni ${SkyHanniMod.version}\n")
+            builder.append("\n")
+            builder.append("player name: '${LorenzUtils.getPlayerName()}'\n")
+            builder.append("player uuid: '${LorenzUtils.getPlayerUuid()}'\n")
+            builder.append("repoAutoUpdate: ${SkyHanniMod.feature.dev.repoAutoUpdate}\n")
+            builder.append("\n")
+
+            builder.append("onHypixel: ${LorenzUtils.onHypixel}\n")
+            val inSkyBlock = LorenzUtils.inSkyBlock
+            builder.append("inSkyBlock: $inSkyBlock\n")
+
+            if (inSkyBlock) {
+                builder.append("\n")
+                builder.append("skyBlockIsland: ${LorenzUtils.skyBlockIsland}\n")
+                builder.append("skyBlockArea: '${LorenzUtils.skyBlockArea}'\n")
+                builder.append("profileName: '${HypixelData.profileName}'\n")
+                builder.append("\n")
+                builder.append("ironman: ${HypixelData.ironman}\n")
+                builder.append("stranded: ${HypixelData.stranded}\n")
+                builder.append("bingo: ${HypixelData.bingo}\n")
+
+                if (LorenzUtils.inDungeons) {
+                    builder.append("\n")
+                    builder.append("in dungeon!\n")
+                    builder.append(" dungeonFloor: ${DungeonData.dungeonFloor}\n")
+                    builder.append(" started: ${DungeonData.started}\n")
+                    builder.append(" inBossRoom: ${DungeonData.inBossRoom}\n")
+                }
+
+            }
+            builder.append("```")
+            OSUtils.copyToClipboard(builder.toString())
+            LorenzUtils.chat("§eCopied SkyHanni debug data to clipboard.")
+        }
     }
 
     @SubscribeEvent
@@ -189,7 +238,9 @@ class SkyHanniTestCommand {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dev.debugEnabled) return
 
-        SkyHanniMod.feature.dev.debugPos.renderString(displayLine, posLabel = "Test")
+        if (displayLine.isNotEmpty()) {
+            SkyHanniMod.feature.dev.debugPos.renderString("test: $displayLine", posLabel = "Test")
+        }
         SkyHanniMod.feature.dev.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 

@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.SlayerChangeEvent
-import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -15,12 +13,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.concurrent.TimeUnit
 
 object SlayerAPI {
-
-    var tick = 0
 
     private var nameCache =
         CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build<Pair<String, Int>, Pair<String, Double>>()
@@ -102,8 +97,7 @@ object SlayerAPI {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         // wait with sending SlayerChangeEvent until profile is detected
@@ -118,11 +112,12 @@ object SlayerAPI {
 
         val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2) ?: ""
         if (latestSlayerProgress != slayerProgress) {
+            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
             latestSlayerProgress = slayerProgress
             latestProgressChangeTime = System.currentTimeMillis()
         }
 
-        if (tick++ % 5 == 0) {
+        if (event.isMod(5)) {
             isInSlayerArea = SlayerType.getByArea(LorenzUtils.skyBlockArea) != null
         }
     }

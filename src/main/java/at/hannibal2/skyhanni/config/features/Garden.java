@@ -171,6 +171,11 @@ public class Garden {
         @ConfigEditorBoolean
         public boolean preventRefusing = true;
 
+        @Expose
+        @ConfigOption(name = "Bypass Key", desc = "Hold that key to bypass the Prevent Refusing feature.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int bypassKey = Keyboard.KEY_NONE;
+
 
         /**
          * Sync up with {at.hannibal2.skyhanni.features.garden.visitor.VisitorReward}
@@ -727,7 +732,7 @@ public class Garden {
     public Position gardenLevelPos = new Position(-375, -215, false, true);
 
     @Expose
-    @ConfigOption(name = "Elite Farming Weight", desc = "")
+    @ConfigOption(name = "Farming Weight", desc = "")
     @ConfigEditorAccordion(id = 11)
     public boolean eliteFarmingWeight = false;
 
@@ -761,6 +766,12 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean eliteFarmingWeightOvertakeETAAlways = true;
+
+    @Expose
+    @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10000\")")
+    @ConfigEditorText
+    @ConfigAccordionId(id = 11)
+    public String eliteFarmingWeightETAGoalRank = "10000";
 
     @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")

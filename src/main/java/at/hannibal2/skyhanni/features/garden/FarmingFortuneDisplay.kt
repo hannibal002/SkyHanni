@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.floor
 import kotlin.math.log10
 
@@ -34,7 +33,6 @@ class FarmingFortuneDisplay {
     private var accessoryProgressDisplay = ""
 
     private var lastToolSwitch: Long = 0
-    private var ticks: Int = 0
 
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
@@ -88,8 +86,8 @@ class FarmingFortuneDisplay {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || ticks++ % 5 != 0) return
+    fun onTick(event: LorenzTickEvent) {
+        if (!event.isMod(5)) return
         val displayCrop = currentCrop ?: return
 
         val updatedDisplay = mutableListOf<List<Any>>()

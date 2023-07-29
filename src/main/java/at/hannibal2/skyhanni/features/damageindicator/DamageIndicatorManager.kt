@@ -2,23 +2,22 @@ package at.hannibal2.skyhanni.features.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.BossHealthChangeEvent
-import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
-import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
-import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
@@ -30,10 +29,8 @@ import net.minecraft.entity.passive.EntityWolf
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 import kotlin.math.max
 
@@ -85,7 +82,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         mobFinder = MobFinder()
         data.clear()
     }
@@ -299,12 +296,10 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList) {
-            if (entity is EntityLivingBase) {
-                checkEntity(entity)
-            }
+        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
+            checkEntity(entity)
         }
     }
 
@@ -371,15 +366,26 @@ class DamageIndicatorManager {
     ): String? {
 
         when (entityData.bossType) {
-            BossType.DUNGEON_F4_THORN -> return checkThorn(health)
+            BossType.DUNGEON_F4_THORN -> {
+                val thorn = checkThorn(health, maxHealth)
+                if (thorn == null) {
+                    val floor = DungeonData.dungeonFloor
+                    LorenzUtils.error("problems with thorn detection! ($floor, $health/$maxHealth)")
+                }
+                return thorn
+            }
 
             BossType.SLAYER_ENDERMAN_1,
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
             BossType.SLAYER_ENDERMAN_4,
-            -> {
-                return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
-            }
+            -> return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
+
+            BossType.SLAYER_BLOODFIEND_1,
+            BossType.SLAYER_BLOODFIEND_2,
+            BossType.SLAYER_BLOODFIEND_3,
+            BossType.SLAYER_BLOODFIEND_4,
+            -> return checkVampireSlayer(entity as EntityOtherPlayerMP, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
@@ -391,13 +397,14 @@ class DamageIndicatorManager {
             BossType.SLAYER_BLAZE_TYPHOEUS_2,
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
-            -> {
-                return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
-            }
+            -> return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
 
-            BossType.NETHER_MAGMA_BOSS -> {
-                return checkMagmaCube(entity as EntityMagmaCube, entityData, health.toInt(), maxHealth.toInt())
-            }
+            BossType.NETHER_MAGMA_BOSS -> return checkMagmaCube(
+                entity as EntityMagmaCube,
+                entityData,
+                health.toInt(),
+                maxHealth.toInt()
+            )
 
             BossType.SLAYER_ZOMBIE_5 -> {
                 if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
@@ -550,7 +557,6 @@ class DamageIndicatorManager {
         health: Int,
         maxHealth: Int,
     ): String? {
-
         var calcHealth = health
         val calcMaxHealth: Int
         entityData.namePrefix = when (entityData.bossType) {
@@ -619,7 +625,15 @@ class DamageIndicatorManager {
                 else -> 100
             }
             val name = armorStandHits.name.removeColor()
-            val hits = name.between("Seraph ", " Hit").toInt()
+
+            // TODO replace this super ugly workaround with regex
+            val text = name.between("Seraph ", " Hit")
+            val hits = try {
+                text.toInt()
+            } catch (e: NumberFormatException) {
+                text.substring(2).toInt()
+            }
+
             return NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
@@ -640,52 +654,107 @@ class DamageIndicatorManager {
         return result
     }
 
-    private fun checkThorn(realHealth: Long): String? {
+    private fun checkVampireSlayer(
+        entity: EntityOtherPlayerMP,
+        entityData: EntityData,
+        health: Int,
+        maxHealth: Int,
+    ): String? {
+        val config = SkyHanniMod.feature.damageIndicator.vampireSlayer
+
+        if (config.percentage) {
+            val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
+            entityData.nameSuffix = " §e$percentage"
+        }
+
+        if (config.maniaCircles) {
+            entity.ridingEntity?.let {
+                val existed = it.ticksExisted
+                if (existed > 40) {
+                    val end = (20 * 26) - existed
+                    val time = end.toDouble() / 20
+                    entityData.nameAbove = "Mania Circles: §b${time.round(1)}s"
+                    return ""
+                }
+            }
+        }
+
+        if (config.hpTillSteak) {
+            val rest = maxHealth * 0.2
+            val showHealth = health - rest
+            if (showHealth < 300) {
+                entityData.nameAbove = if (showHealth > 0) {
+                    "§cHP till Steak: ${showHealth.addSeparators()}"
+                } else "§cSteak!"
+            }
+        }
+
+        return ""
+    }
+
+    private fun checkThorn(realHealth: Long, realMaxHealth: Long): String? {
         val maxHealth: Int
+        println(" ")
+        println("realHealth: $realHealth")
+        println("realMaxHealth: $realMaxHealth")
         val health = if (DungeonData.isOneOf("F4")) {
             maxHealth = 4
-            when (realHealth.toInt()) {
-                300_000, 600_000 -> 4
-                222_000, 444_000 -> 3
-                144_000, 288_000 -> 2
-                66_000, 132_000 -> 1
-                1 -> 0
-                else -> {
-                    LorenzUtils.error(
-                        "Unexpected health of thorn in f4! (${
-                            LorenzUtils.formatInteger(realHealth)
-                        })"
-                    )
-                    return null
+
+            if (realMaxHealth == 300_000L) {
+                // no derpy
+                when {
+                    realHealth == 1L -> 0
+                    realHealth <= 66_000 -> 1
+                    realHealth <= 144_000 -> 2
+                    realHealth <= 222_000 -> 3
+                    realHealth <= 300_000 -> 4
+
+                    else -> return null
+                }
+            } else {
+                // derpy
+                when {
+                    realHealth == 1L -> 0
+                    realHealth <= 132_000 -> 1
+                    realHealth <= 288_000 -> 2
+                    realHealth <= 444_000 -> 3
+                    realHealth <= 600_000 -> 4
+
+                    else -> return null
                 }
             }
         } else if (DungeonData.isOneOf("M4")) {
             maxHealth = 6
-            when (realHealth.toInt()) {
-                //TODO test all non derpy values!
-                1_800_000 / 2, 1_800_000 -> 6
-                1_494_000 / 2, 1_494_000 -> 5
-                1_188_000 / 2, 1_188_000 -> 4
-                882_000 / 2, 882_000 -> 3
-                576_000 / 2, 576_000 -> 2
-                270_000 / 2, 270_000 -> 1
-                1 -> 0
-                else -> {
-                    SkyHanniTestCommand.displayLine = "thorn has ${LorenzUtils.formatDouble(realHealth.toDouble())} hp!"
-                    LorenzUtils.error(
-                        "Unexpected health of thorn in m4! (${
-                            LorenzUtils.formatDouble(
-                                LorenzUtils.formatDouble(
-                                    realHealth.toDouble()
-                                ).toDouble()
-                            )
-                        })"
-                    )
-                    return null
+
+            if (realMaxHealth == 900_000L) {
+                // no derpy
+                when {
+                    realHealth == 1L -> 0
+                    realHealth <= 135_000 -> 1
+                    realHealth <= 288_000 -> 2
+                    realHealth <= 441_000 -> 3
+                    realHealth <= 594_000 -> 4
+                    realHealth <= 747_000 -> 5
+                    realHealth <= 900_000L -> 6
+
+                    else -> return null
+                }
+            } else {
+                // derpy
+                when {
+                    realHealth == 1L -> 0
+                    realHealth <= 270_000 -> 1
+                    realHealth <= 576_000 -> 2
+                    realHealth <= 882_000 -> 3
+                    realHealth <= 1_188_000 -> 4
+                    realHealth <= 1_494_000 -> 5
+                    realHealth <= 1_800_000 -> 6
+
+                    else -> return null
                 }
             }
         } else {
-            LorenzUtils.error("Invalid thorn floor!")
+            LorenzUtils.error("Invalid/impossible thorn floor!")
             return null
         }
         val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong())
@@ -717,12 +786,12 @@ class DamageIndicatorManager {
         val entityResult = mobFinder?.tryAdd(entity) ?: return null
 
         val entityData = EntityData(
-                entity,
-                entityResult.ignoreBlocks,
-                entityResult.delayedStart,
-                entityResult.finalDungeonBoss,
-                entityResult.bossType,
-                foundTime = System.currentTimeMillis()
+            entity,
+            entityResult.ignoreBlocks,
+            entityResult.delayedStart,
+            entityResult.finalDungeonBoss,
+            entityResult.bossType,
+            foundTime = System.currentTimeMillis()
         )
         DamageIndicatorDetectedEvent(entityData).postAndCatch()
         return entityData

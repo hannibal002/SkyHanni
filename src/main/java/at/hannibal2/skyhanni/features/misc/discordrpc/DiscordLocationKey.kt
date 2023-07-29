@@ -29,7 +29,7 @@ class DiscordLocationKey {
         "dark-thicket",
         "jungle-island",
         "gold-mine",
-        "slimehill"
+        "slimehill",
         "the-barn",
         "mushroom-desert",
         "the-end",
@@ -44,7 +44,7 @@ class DiscordLocationKey {
         "village-plaza",
         "wyld-woods"
     )
-    // list of tokens where the name can just be lowercased and spaces can be replaced with dashes
+    // list of tokens where the name can be lowercased and spaces can be replaced with dashes
 
     private val specialRPC = mapOf(
         "Fisherman's Hut" to "fishermans-hut",

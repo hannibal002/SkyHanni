@@ -21,6 +21,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
 import java.awt.Color
+import java.lang.reflect.Field
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -409,5 +410,16 @@ object LorenzUtils {
     fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {
         if (this == null) return emptyList()
         return listOf(this)
+    }
+
+    fun Field.makeAccessible() = also { isAccessible = true }
+
+    // Taken and modified from Skytils
+    @JvmStatic
+    fun Any.equalsOneOf(vararg other: Any): Boolean {
+        for (obj in other) {
+            if (this == obj) return true
+        }
+        return false
     }
 }

@@ -93,7 +93,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Diana", desc = "Diana's mythological event.")
-    public Diana diana = new Diana();
+    public DianaConfig diana = new DianaConfig();
 
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
@@ -121,7 +121,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
-    public GhostCounter ghostCounter = new GhostCounter();
+    public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")

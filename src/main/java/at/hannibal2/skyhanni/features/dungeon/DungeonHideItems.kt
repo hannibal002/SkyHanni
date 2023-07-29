@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DungeonHideItems {
@@ -234,7 +233,7 @@ class DungeonHideItems {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         hideParticles.clear()
         movingSkeletonSkulls.clear()
     }

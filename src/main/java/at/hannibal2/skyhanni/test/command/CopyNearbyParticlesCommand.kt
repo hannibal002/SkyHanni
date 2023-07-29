@@ -7,7 +7,7 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-// note: Each particle is copied anywhere between 1-3 times. Different each time. Should not affect using this for debugging or developing
+// Note: Each particle is copied anywhere between 1-3 times. Different each time. Shouldn't affect using this for debugging or developing
 object CopyNearbyParticlesCommand {
     private var searchRadius = 0
     private var saveNextTick = false

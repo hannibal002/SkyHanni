@@ -2,19 +2,20 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class SharkFishCounter {
     private var counter = 0
     private var display = ""
-    private var tick = 0
     private var hasWaterRodInHand = false
 
     @SubscribeEvent
@@ -24,21 +25,35 @@ class SharkFishCounter {
         val displayName = event.seaCreature.displayName
         if (displayName.contains("Shark")) {
             counter++
-            display = "$counter sharks caught"
+            display = "§7Sharks caught: §e${counter.addSeparators()}"
         }
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
-        tick++
-
-        if (tick % 10 == 0) {
+        if (event.isMod(10)) {
             hasWaterRodInHand = isWaterFishingRod()
+        }
+    }
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        if (event.message == "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!") {
+            val funnyComment = when {
+                counter == 0 -> return
+                counter < 50 -> "Well done!"
+                counter < 100 -> "Nice!"
+                counter < 150 -> "Really nice!"
+                counter < 200 -> "Super cool!"
+                counter < 250 -> "Mega cool!"
+                counter < 350 -> "Like a pro!"
+                else -> "How???"
+            }
+            LorenzUtils.chat("§e[SkyHanni] You caught ${counter.addSeparators()} sharks during this fishing contest. $funnyComment")
+            counter = 0
         }
     }
 

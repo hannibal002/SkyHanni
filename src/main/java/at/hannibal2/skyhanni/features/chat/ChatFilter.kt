@@ -314,7 +314,7 @@ class ChatFilter {
         message == "§7Finding player..." -> true
         message == "§7Sending a visit request..." -> true
 
-        //warp portals on public islands (canvas room - flower house, election room - community center, void sepulture - the end)
+        //warp portals on public islands (canvas room – flower house, election room – community center, void sepulture – the end)
         message.matchRegex("§dWarped to (.*)§r§d!") -> true
         else -> false
     }

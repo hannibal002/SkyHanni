@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
+import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
@@ -67,6 +69,7 @@ import at.hannibal2.skyhanni.features.rift.VampireSlayerFeatures
 import at.hannibal2.skyhanni.features.rift.area.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveDefenseBlocks
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveLivingMetalHelper
@@ -75,6 +78,7 @@ import at.hannibal2.skyhanni.features.rift.area.mirrorverse.DanceRoomHelper
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftLavaMazeParkour
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkour
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
+import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
@@ -84,6 +88,8 @@ import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
+import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerFeatures
+import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerHideParticles
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -104,7 +110,6 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -114,7 +119,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.11",
+    version = "0.19.Beta.15",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -177,7 +182,7 @@ class SkyHanniMod {
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures())
         loadModule(CurrentPetDisplay())
-        loadModule(ExpBottleOnGroundHider())
+        loadModule(ExpOrbsOnGroundHider())
         loadModule(DamageIndicatorManager())
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())
@@ -186,6 +191,8 @@ class SkyHanniMod {
         loadModule(DungeonCleanEnd())
         loadModule(DungeonBossMessages())
         loadModule(DungeonBossHideDamageSplash())
+        loadModule(TrophyFishManager())
+        loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
         loadModule(BazaarBestSellMethod())
         loadModule(AnvilCombineHelper())
@@ -204,6 +211,7 @@ class SkyHanniMod {
         loadModule(RealTime())
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
+        loadModule(SendCoordinatedCommand())
         loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
@@ -223,6 +231,7 @@ class SkyHanniMod {
         loadModule(HellionShieldHelper())
         loadModule(BlazeSlayerFirePitsWarning())
         loadModule(BlazeSlayerClearView())
+        loadModule(EndermanSlayerHideParticles())
         loadModule(PlayerChatFilter())
         loadModule(HideArmor())
         loadModule(SlayerQuestWarning())
@@ -264,7 +273,7 @@ class SkyHanniMod {
         loadModule(GardenOptimalSpeed())
         loadModule(GardenDeskInSBMenu())
         loadModule(GardenLevelDisplay())
-        loadModule(EliteFarmingWeight())
+        loadModule(FarmingWeightDisplay())
         loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
@@ -279,6 +288,7 @@ class SkyHanniMod {
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())
         loadModule(PasteIntoSigns())
+        loadModule(PatcherSendCoordinates())
         loadModule(EstimatedItemValue)
         loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
@@ -343,11 +353,18 @@ class SkyHanniMod {
         loadModule(HighlightMiningCommissionMobs())
         loadModule(ShowMotesNpcSellPrice())
         loadModule(LivingMetalSuitProgress())
-        loadModule(VampireSlayerFeatures())
+        loadModule(VampireSlayerFeatures)
         loadModule(BlobbercystsHighlight())
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
+        loadModule(SlayerBossSpawnSoon())
+        loadModule(RiftBloodEffigies())
+        loadModule(RiftWiltedBerberisHelper())
+        loadModule(RiftHorsezookaHider())
+        loadModule(GriffinPetWarning())
+        //
+
 
         init()
 
@@ -382,7 +399,7 @@ class SkyHanniMod {
     }
 
     @SubscribeEvent
-    fun onClientTick(event: ClientTickEvent?) {
+    fun onTick(event: LorenzTickEvent) {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {
