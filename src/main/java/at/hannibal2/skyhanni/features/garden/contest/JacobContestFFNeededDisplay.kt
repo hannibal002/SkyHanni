@@ -71,12 +71,16 @@ class JacobContestFFNeededDisplay {
         }
         addAsSingletonList("")
 
-        val blocksPerSecond = crop.getLatestBlocksPerSecond()
+        var blocksPerSecond = crop.getLatestBlocksPerSecond()
         if (blocksPerSecond == null) {
             add(listOf("§cNo ", crop.icon, "§cblocks/second data,"))
-            addAsSingletonList("§cassuming 20.")
+            addAsSingletonList("§cassuming 19.9 instead.")
         } else {
-            add(listOf("§7Using latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.round(2)}"))
+            if (blocksPerSecond < 15.0) {
+                add(listOf("§7Your latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.round(2)}"))
+                add(listOf("§cThis is too low, showing 19.9 Blocks/second instead!"))
+                blocksPerSecond = 19.9
+            }
             if (blocksPerSecond < 1) {
                 addAsSingletonList("§cLow blocks per second!")
                 addAsSingletonList("§cFarm this crop for couple more seconds!")
@@ -113,7 +117,7 @@ class JacobContestFFNeededDisplay {
 
     private fun getLine(bracket: ContestBracket, map: Map<ContestBracket, Int>, crop: CropType): String {
         val counter = map[bracket]!!
-        val blocksPerSecond = crop.getLatestBlocksPerSecond() ?: 20.0
+        val blocksPerSecond = crop.getRealBlocksPerSecond()
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
         val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)
         return " ${bracket.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
@@ -128,4 +132,11 @@ class JacobContestFFNeededDisplay {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest
+}
+
+private fun CropType.getRealBlocksPerSecond(): Double {
+    val bps = getLatestBlocksPerSecond() ?: 20.0
+    return if (bps < 15.0) {
+        return 19.9
+    } else bps
 }
