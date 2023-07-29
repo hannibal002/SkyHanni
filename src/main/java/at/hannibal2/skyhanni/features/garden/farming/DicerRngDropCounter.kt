@@ -22,6 +22,7 @@ class DicerRngDropCounter {
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.UNCOMMON, "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a2x §r§aEnchanted Melon§r§e!"))
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.RARE, "§9§lRARE DROP! §r§eDicer dropped §r§a6x §r§aEnchanted Melon§r§e!"))
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.CRAZY_RARE, "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a75x §r§aEnchanted Melon§r§e!"))
+        itemDrops.add(ItemDrop(CropType.MELON, DropRarity.CRAZY_RARE, "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a64x §r§aEnchanted Melon§r§e!"))                       //supporting the value for the drop message that differs from the wiki data
         itemDrops.add(ItemDrop(CropType.MELON, DropRarity.PRAY_TO_RNGESUS, "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§93x §r§9Enchanted Melon Block§r§e!"))
 
         //Melon Dicer 2.0 drops
@@ -41,6 +42,7 @@ class DicerRngDropCounter {
         itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.RARE, "§9§lRARE DROP! §r§eDicer dropped §r§a2x §r§aEnchanted Pumpkin§r§e!"))
         itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.CRAZY_RARE, "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a18x §r§aEnchanted Pumpkin§r§e!"))
         itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.PRAY_TO_RNGESUS, "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§a80x §r§aEnchanted Pumpkin§r§e!"))
+        itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.PRAY_TO_RNGESUS, "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§a64x §r§aEnchanted Pumpkin§r§e!"))         //supporting the value for the drop message that differs from the wiki data
 
         //Pumpkin Dicer 2.0 drops
         itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.UNCOMMON, "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a2x §r§aEnchanted Pumpkin§r§e!"))
