@@ -146,6 +146,9 @@
 + Custom text over Visitor name moves more smoothly now
 + Discord Rich Presence now supports Motes in the rift and the garden plot number - NetheriteMiner
 + Crop money display: Using npc price for mushroom cow pet calculation when on ironman, stranded or bingo
++ Sacks no longer get blocked from moving in storage (not clickable items feature)
++ Using 19.9 bps if bps is too low for jacob contest ff needed display
++ Better default positions for some guis
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
