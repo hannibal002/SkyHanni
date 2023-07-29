@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.tabcomplete
 
+import at.hannibal2.skyhanni.features.misc.CollectionCounter
+
 object TabComplete {
 
     @JvmStatic
@@ -9,7 +11,7 @@ object TabComplete {
             var command = splits.first().lowercase()
             if (command.startsWith("/")) {
                 command = command.substring(1)
-                customTabComplete(command, originalArray)?.let {
+                customTabComplete(command)?.let {
                     return buildResponse(splits, it).toSet().toTypedArray()
                 }
             }
@@ -17,9 +19,10 @@ object TabComplete {
         return null
     }
 
-    private fun customTabComplete(command: String, originalArray: Array<String>): List<String>? {
+    private fun customTabComplete(command: String): List<String>? {
         WarpTabComplete.handleTabComplete(command)?.let { return it }
-        PlayerTabComplete.handleTabComplete(command, originalArray)?.let { return it }
+        PlayerTabComplete.handleTabComplete(command)?.let { return it }
+        CollectionCounter.handleTabComplete(command)?.let { return it }
 
         return null
     }

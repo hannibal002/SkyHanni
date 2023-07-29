@@ -5,14 +5,16 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 
 class CollectionCounter {
 
@@ -20,10 +22,10 @@ class CollectionCounter {
 
     companion object {
 
-        private var display = ""
+        private var display = emptyList<List<Any>>()
 
         private var itemName = ""
-        private var internalName = ""
+        private var internalName: NEUInternalName? = null
         private var itemAmount = -1L
 
         private var lastAmountInInventory = -1
@@ -33,7 +35,7 @@ class CollectionCounter {
 
         fun command(args: Array<String>) {
             if (args.isEmpty()) {
-                if (internalName == "") {
+                if (internalName == null) {
                     LorenzUtils.chat("§c/shtrackcollection <item name>")
                     return
                 }
@@ -42,7 +44,7 @@ class CollectionCounter {
                 return
             }
 
-            val rawName = fixTypo(args.joinToString(" ").lowercase())
+            val rawName = fixTypo(args.joinToString(" ").lowercase().replace("_", " "))
             if (rawName == "gemstone") {
                 LorenzUtils.chat("§c[SkyHanni] Gemstone collection is not supported!")
 //                setNewCollection("GEMSTONE_COLLECTION", "Gemstone")
@@ -53,7 +55,13 @@ class CollectionCounter {
                 return
             }
 
-            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName) ?: rawName.replace(" ", "_")
+//            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName) ?: rawName.replace(" ", "_")
+            val foundInternalName = NEUItems.getInternalNameOrNullIgnoreCase(rawName)
+            if (foundInternalName == null) {
+                LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
+                return
+            }
+
             val stack = NEUItems.getItemStackOrNull(foundInternalName)
             if (stack == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
@@ -63,7 +71,7 @@ class CollectionCounter {
         }
 
         private fun fixTypo(rawName: String) = when (rawName) {
-            "carrot" -> "carrots"
+            "carrots" -> "carrot"
             "melons" -> "melon"
             "seed" -> "seeds"
             "iron" -> "iron ingot"
@@ -78,11 +86,13 @@ class CollectionCounter {
             "stone" -> "cobblestone"
             "red mushroom", "brown mushroom", "mushrooms" -> "mushroom"
             "gemstones" -> "gemstone"
+            "caducous" -> "caducous stem"
+            "agaricus" -> "agaricus cap"
 
             else -> rawName
         }
 
-        private fun setNewCollection(internalName: String, name: String) {
+        private fun setNewCollection(internalName: NEUInternalName, name: String) {
             val foundAmount = CollectionAPI.getCollectionCounter(internalName)
             if (foundAmount == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (Maybe the API is disabled or try to open the collection inventory)")
@@ -99,10 +109,10 @@ class CollectionCounter {
 
         private fun resetData() {
             itemAmount = -1
-            internalName = ""
+            internalName = null
 
             lastAmountInInventory = -1
-            display = ""
+            display = emptyList()
 
             recentGain = 0
         }
@@ -115,11 +125,23 @@ class CollectionCounter {
                 gainText = "§a+" + LorenzUtils.formatInteger(recentGain)
             }
 
-            display = "$itemName collection: §e$format $gainText"
+            display = Collections.singletonList(buildList {
+                internalName?.let {
+                    add(NEUItems.getItemStack(it))
+                }
+                add("$itemName collection: §e$format $gainText")
+            })
         }
 
         private fun countCurrentlyInInventory() =
-            InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+            InventoryUtils.countItemsInLowerInventory { it.getInternalName_new() == internalName }
+
+        fun handleTabComplete(command: String): List<String>? {
+            if (command != "shtrackcollection") return null
+
+            return CollectionAPI.collectionValue.keys.mapNotNull { NEUItems.getItemStackOrNull(it) }
+                .map { it.displayName.removeColor().replace(" ", "_") }
+        }
     }
 
     @SubscribeEvent
@@ -171,6 +193,6 @@ class CollectionCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        SkyHanniMod.feature.misc.collectionCounterPos.renderString(display, posLabel = "Collection Counter")
+        SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Counter")
     }
 }

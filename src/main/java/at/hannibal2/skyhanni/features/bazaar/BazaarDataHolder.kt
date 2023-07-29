@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlinx.coroutines.launch
@@ -13,15 +14,15 @@ import kotlin.concurrent.fixedRateTimer
 class BazaarDataHolder {
 
     companion object {
-        private val bazaarData = mutableMapOf<String, BazaarData>()
-        private var npcPrices = mapOf<String, Double>()
+        private val bazaarData = mutableMapOf<NEUInternalName, BazaarData>()
+        private var npcPrices = mapOf<NEUInternalName, Double>()
     }
 
-    private fun loadNpcPrices(): MutableMap<String, Double> {
-        val list = mutableMapOf<String, Double>()
+    private fun loadNpcPrices(): MutableMap<NEUInternalName, Double> {
+        val list = mutableMapOf<NEUInternalName, Double>()
         try {
             val itemsData = APIUtil.getJSONResponse("https://api.hypixel.net/resources/skyblock/items")
-            val motesPrice = mutableMapOf<String, Double>()
+            val motesPrice = mutableMapOf<NEUInternalName, Double>()
             for (element in itemsData["items"].asJsonArray) {
                 val jsonObject = element.asJsonObject
                 val hypixelId = jsonObject["id"].asString
@@ -52,10 +53,10 @@ class BazaarDataHolder {
         }
     }
 
-    fun getData(internalName: String) = bazaarData[internalName] ?: createNewData(internalName)
+    fun getData(internalName: NEUInternalName) = bazaarData[internalName] ?: createNewData(internalName)
 
-    private fun createNewData(internalName: String): BazaarData? {
-        val stack = NEUItems.getItemStackOrNull(internalName)
+    private fun createNewData(internalName: NEUInternalName): BazaarData? {
+        val stack = NEUItems.getItemStackOrNull(internalName.asString())
         if (stack == null) {
             LorenzUtils.debug("Bazaar data is null: '$internalName'")
             return null
@@ -65,14 +66,14 @@ class BazaarDataHolder {
         val buyPrice = NEUItems.getPrice(internalName, false)
         val npcPrice = npcPrices[internalName].let {
             if (it == null) {
-                if (!ignoreNoNpcPrice(internalName)) {
+                if (!ignoreNoNpcPrice(internalName.asString())) {
                     LorenzUtils.debug("NPC price not found for item '$internalName'")
                 }
                 0.0
             } else it
         }
 
-        val data = BazaarData(internalName, displayName, sellPrice, buyPrice, npcPrice)
+        val data = BazaarData(displayName, sellPrice, buyPrice, npcPrice)
         bazaarData[internalName] = data
         return data
     }

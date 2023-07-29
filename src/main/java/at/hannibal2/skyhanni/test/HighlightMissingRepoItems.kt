@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull_new
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
@@ -37,9 +37,9 @@ class HighlightMissingRepoItems {
     private fun highlightItems(slots: Iterable<Slot>) {
         if (NEUItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
-            val internalName = slot.stack?.getInternalNameOrNull() ?: continue
+            val internalName = slot.stack?.getInternalNameOrNull_new() ?: continue
             if (NEUItems.allInternalNames.contains(internalName)) continue
-            if (ignoreItems.match(internalName)) continue
+            if (ignoreItems.match(internalName.asString())) continue
 
             slot highlight LorenzColor.RED
         }
