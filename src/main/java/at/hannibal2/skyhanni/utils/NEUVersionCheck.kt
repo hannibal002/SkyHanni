@@ -39,9 +39,9 @@ object NEUVersionCheck {
         }
         neuWarning(
             "NotEnoughUpdates is outdated!\n" +
+                    "You currently need NEU version 2.1.1-Alpha-19 or later.\n" +
                     "NEU 2.1 is NOT the latest version.\n\n" +
                     "NEU 2.1.1 is NOT on the NEU GitHub.\n\n" +
-                    "You currently need NEU version 2.1.1-Alpha-19 or later.\n" +
                     "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
                     "Or in the #neu-updates channel in the SkyHanni discord\n" +
                     "Use these links to download the latest version:"
@@ -54,7 +54,7 @@ object NEUVersionCheck {
             Pair("Join SkyHanni Discord", "https://discord.com/invite/8DXVN4BJz3"),
             Pair("Open SkyHanni GitHub", "https://github.com/hannibal002/SkyHanni"),
             Pair("Join NEU Discord", "https://discord.gg/moulberry"),
-            Pair("Open NEU GitHub", "https://github.com/NotEnoughUpdates/NotEnoughUpdates"),
+            Pair("NEU GitHub (Mod isn't here)", "https://github.com/NotEnoughUpdates/NotEnoughUpdates"),
         )
         closeMinecraft()
     }
