@@ -241,7 +241,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowHelper)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
-        loadModule(CollectionCounter())
+        loadModule(CollectionTracker())
         loadModule(HighlightBonzoMasks())
         loadModule(DungeonLevelColor())
         loadModule(BazaarCancelledBuyOrderClipboard())

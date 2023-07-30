@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.tabcomplete
 
-import at.hannibal2.skyhanni.features.misc.CollectionCounter
+import at.hannibal2.skyhanni.features.misc.CollectionTracker
 
 object TabComplete {
 
@@ -22,7 +22,7 @@ object TabComplete {
     private fun customTabComplete(command: String): List<String>? {
         WarpTabComplete.handleTabComplete(command)?.let { return it }
         PlayerTabComplete.handleTabComplete(command)?.let { return it }
-        CollectionCounter.handleTabComplete(command)?.let { return it }
+        CollectionTracker.handleTabComplete(command)?.let { return it }
 
         return null
     }
