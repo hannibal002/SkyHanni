@@ -39,7 +39,8 @@ object NEUVersionCheck {
         }
         neuWarning(
             "NotEnoughUpdates is outdated!\n" +
-                    "NEU 2.1 is NOT the latest version.\n\n\n" +
+                    "NEU 2.1 is NOT the latest version.\n\n" +
+                    "NEU 2.1.1 is NOT on the NEU GitHub.\n\n" +
                     "You currently need NEU version 2.1.1-Alpha-19 or later.\n" +
                     "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
                     "Or in the #neu-updates channel in the SkyHanni discord\n" +
