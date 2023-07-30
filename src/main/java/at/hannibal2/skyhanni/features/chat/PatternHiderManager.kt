@@ -2,14 +2,38 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.util.IChatComponent
 
 class PatternHiderManager(skyHanniMod: SkyHanniMod) {
-    private val watchdogHider = PatternHider("watchdog", watchdogPattern) {
-        LorenzUtils.onHypixel && SkyHanniMod.feature.chat.watchDog
-    }
+
+    private val referenceCounter = mutableListOf<Counter>()
 
     init {
+        val watchdogHider = PatternHider(this, "watchdog", watchdogPattern) {
+            LorenzUtils.onHypixel && SkyHanniMod.feature.chat.watchDog
+        }
         skyHanniMod.loadModule(watchdogHider)
+    }
+
+    fun storeChat(chat: IChatComponent) {
+        val counter = referenceCounter.find { it.chat == chat } ?: run {
+            val stored = Counter(chat)
+            referenceCounter.add(stored)
+            stored
+        }
+        counter.references++
+    }
+
+    fun removeChat(chat: IChatComponent, restoreBlockedChat: Boolean) {
+        val counter = referenceCounter.find { it.chat == chat }!!
+        counter.references--
+        if (counter.references == 0) {
+            referenceCounter.remove(counter)
+            if (restoreBlockedChat) {
+                Minecraft.getMinecraft().thePlayer.addChatMessage(counter.chat)
+            }
+        }
     }
 
     companion object {
@@ -23,3 +47,5 @@ class PatternHiderManager(skyHanniMod: SkyHanniMod) {
         )
     }
 }
+
+data class Counter(val chat: IChatComponent, var references: Int = 0)
