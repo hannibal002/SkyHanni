@@ -97,11 +97,16 @@ class DamageIndicatorManager {
         val player = Minecraft.getMinecraft().thePlayer
 
         //TODO config to define between 100ms and 5 sec
-        for (uuid in data.filter {
+        val filter = data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
             (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
-        }.map { it.key }) {
-            data.editCopy { remove(uuid) }
+        }
+        if (filter.isNotEmpty()) {
+            data = data.editCopy {
+                for (entry in filter) {
+                    remove(entry.key)
+                }
+            }
         }
 
         val sizeHealth: Double
@@ -345,7 +350,7 @@ class DamageIndicatorManager {
                 entityData.healthText = color.getChatColor() + NumberUtil.format(health)
             }
             entityData.timeLastTick = System.currentTimeMillis()
-            data.editCopy { this[entity.uniqueID] = entityData }
+            data = data.editCopy { this[entity.uniqueID] = entityData }
 
 
         } catch (e: Throwable) {
