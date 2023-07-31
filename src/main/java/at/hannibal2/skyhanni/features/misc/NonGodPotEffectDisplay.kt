@@ -13,17 +13,14 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class NonGodPotEffectDisplay {
     private val config get() = SkyHanniMod.feature.misc
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Long>()
     private var display = emptyList<String>()
-    private var lastTick = 0L
 
     enum class NonGodPotEffect(val apiName: String, val displayName: String, val isMixin: Boolean = false) {
         SMOLDERING("smoldering_polarization", "§aSmoldering Polarization I"),
@@ -129,16 +126,15 @@ class NonGodPotEffectDisplay {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (lastTick + 1_000 > System.currentTimeMillis()) return
-        lastTick = System.currentTimeMillis()
+        if (!event.repeatSeconds(1)) return
 
         update()
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         checkFooter = true
     }
 

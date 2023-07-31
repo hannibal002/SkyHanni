@@ -113,7 +113,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         miniBosses.clear()
 
         //Repo
-        val repoData = reputationHelper.repoData
+        val repoData = reputationHelper.repoData ?: return
         val jsonElement = repoData["MINIBOSS"]
         for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
             val data = extraData.asJsonObject

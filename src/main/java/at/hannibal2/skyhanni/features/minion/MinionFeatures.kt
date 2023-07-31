@@ -4,14 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -26,11 +24,9 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import java.awt.Color
 
@@ -107,9 +103,11 @@ class MinionFeatures {
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
         if (!minions.contains(entity)) {
-            minions[entity] = Storage.ProfileSpecific.MinionConfig().apply {
-                displayName = name
-                lastClicked = 0
+            MinionFeatures.minions = minions.editCopy {
+                this[entity] = Storage.ProfileSpecific.MinionConfig().apply {
+                    displayName = name
+                    lastClicked = 0
+                }
             }
         } else {
             if (minions[entity]!!.displayName != name) {
@@ -125,7 +123,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!minionInventoryOpen) return
-        val minions = minions ?: return
+        var minions = minions ?: return
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
@@ -139,12 +137,12 @@ class MinionFeatures {
         }
 
         if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
-            minions.remove(location)
+            MinionFeatures.minions = minions.editCopy { remove(location) }
         }
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
         if (coinsPerDay != "") return
 
@@ -190,7 +188,7 @@ class MinionFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastClickedEntity = null
         lastMinion = null
         lastMinionOpened = 0L
@@ -289,10 +287,16 @@ class MinionFeatures {
     }
 
     companion object {
-        private val minions get() = ProfileStorageData.profileSpecific?.minions
+        private var minions: Map<LorenzVec, Storage.ProfileSpecific.MinionConfig>?
+            get() {
+                return ProfileStorageData.profileSpecific?.minions
+            }
+            set(value) {
+                ProfileStorageData.profileSpecific?.minions = value
+            }
 
         fun clearMinionData() {
-            minions?.clear()
+            minions = mutableMapOf()
             LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
         }
     }

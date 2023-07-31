@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.update
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
@@ -12,7 +13,6 @@ import moe.nea.libautoupdate.*
 import net.minecraft.client.Minecraft
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.concurrent.CompletableFuture
 
 object UpdateManager {
@@ -41,8 +41,8 @@ object UpdateManager {
     }
 
     @SubscribeEvent
-    fun onPlayerAvailableOnce(event: TickEvent.ClientTickEvent) {
-        val p = Minecraft.getMinecraft().thePlayer ?: return
+    fun onTick(event: LorenzTickEvent) {
+        Minecraft.getMinecraft().thePlayer ?: return
         MinecraftForge.EVENT_BUS.unregister(this)
         if (config.autoUpdates)
             checkUpdate()

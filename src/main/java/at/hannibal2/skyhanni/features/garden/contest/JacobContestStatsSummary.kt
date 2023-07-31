@@ -39,11 +39,11 @@ class JacobContestStatsSummary {
             }
             FarmingContestPhase.STOP -> {
                 val duration = System.currentTimeMillis() - startTime
-                val durationInSeconds = duration / 1000
+                val durationInSeconds = duration.toDouble() / 1000
                 val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
                 val cropName = event.crop.cropName
                 LorenzUtils.chat("§e[SkyHanni] Stats for $cropName Contest:")
-                val time = TimeUtils.formatDuration(duration)
+                val time = TimeUtils.formatDuration(duration - 999)
                 LorenzUtils.chat("§e[SkyHanni] §7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
                 val color = getBlocksPerSecondColor(blocksPerSecond)
                 LorenzUtils.chat("§e[SkyHanni] §7Average Blocks Per Second: $color$blocksPerSecond")

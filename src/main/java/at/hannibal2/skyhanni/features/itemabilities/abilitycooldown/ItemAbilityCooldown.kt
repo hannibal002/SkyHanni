@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -10,16 +11,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class ItemAbilityCooldown {
     private var lastAbility = ""
-    var tick = 0
     var items = mapOf<ItemStack, List<ItemText>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
 
@@ -41,6 +41,12 @@ class ItemAbilityCooldown {
         if (event.soundName == "mob.endermen.portal") {
             if (event.pitch == 0.61904764f && event.volume == 1f) {
                 ItemAbility.GYROKINETIC_WAND_LEFT.sound()
+            }
+            if (event.pitch == 1f && event.volume == 1f) {
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                if (!internalName.equalsOneOf("SHADOW_FURY", "STARRED_SHADOW_FURY")) return
+
+                ItemAbility.SHADOW_FURY.sound()
             }
         }
         if (event.soundName == "random.anvil_land") {
@@ -85,7 +91,11 @@ class ItemAbilityCooldown {
         }
         if (event.soundName == "mob.wolf.howl") {
             if (event.volume == 0.5f) {
-                ItemAbility.WEIRD_TUBA.sound()
+                if (!RiftAPI.inRift()) {
+                    ItemAbility.WEIRD_TUBA.sound()
+                } else {
+                    ItemAbility.WEIRDER_TUBA.sound()
+                }
             }
         }
         if (event.soundName == "mob.zombie.unfect") {
@@ -196,11 +206,10 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        tick++
-        if (tick % 2 == 0) {
+        if (event.isMod(2)) {
             checkHotBar()
         }
     }

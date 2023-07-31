@@ -77,7 +77,7 @@ public class Minions {
     public boolean hopperProfitDisplay = true;
 
     @Expose
-    public Position hopperProfitPos = new Position(10, 10, false, true);
+    public Position hopperProfitPos = new Position(360, 90, false, true);
 
     @Expose
     @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions.")

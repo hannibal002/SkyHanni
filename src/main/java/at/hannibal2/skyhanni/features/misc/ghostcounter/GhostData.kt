@@ -20,22 +20,44 @@ object GhostData {
     )
 
     val bestiaryData = mutableMapOf<Int, Int>().apply {
-        val commonValue = 100_000
-        for (i in 1..46) {
-            this[i] = when (i) {
-                1 -> 10
-                2 -> 15
-                3 -> 75
-                4 -> 150
-                5 -> 250
-                6 -> 500
-                7 -> 1_500
-                8 -> 2_500
-                9 -> 5_000
-                10 -> 15_000
-                11 -> 25_000
-                12 -> 50_000
-                else -> commonValue
+
+        if (GhostCounter.bestiaryUpdate) {
+            val commonValue = 100_000
+            for (i in 1..46) {
+                this[i] = when (i) {
+                    1 -> 10
+                    2 -> 15
+                    3 -> 75
+                    4 -> 150
+                    5 -> 250
+                    6 -> 500
+                    7 -> 1_500
+                    8 -> 2_500
+                    9 -> 5_000
+                    10 -> 15_000
+                    11 -> 25_000
+                    12 -> 50_000
+                    else -> commonValue
+                }
+            }
+        } else {
+            val commonValue = 100_000
+            for (i in 1..46) {
+                this[i] = when (i) {
+                    1 -> 10
+                    2 -> 15
+                    3 -> 75
+                    4 -> 150
+                    5 -> 250
+                    6 -> 500
+                    7 -> 1_500
+                    8 -> 2_500
+                    9 -> 5_000
+                    10 -> 15_000
+                    11 -> 25_000
+                    12 -> 50_000
+                    else -> commonValue
+                }
             }
         }
     }

@@ -2,14 +2,13 @@
 
 ## Version 0.19 (unreleased)
 
-#### Rift Features
+### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
-+ **Rift 
-+ Highlight Guide**
++ **Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + Added **Shy Warning** (Contributed by CalMWolfs)
-  + Shows a warning when a shy is going to steal your time.
+  + Shows a warning when a shy crux will steal your time.
   + Useful if you play without volume.
 + Added **Larvas Highlighter**
   + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
@@ -29,7 +28,7 @@
   + Click on the soul name inside Rift Guide to show/hide
 + Added **Kloon Hacking** (Contributed by CalMWolfs)
   + Highlights the correct button to click in the hacking inventory
-  + Tells you which colour to pick
+  + Tells you which color to pick
   + While wearing the helmet, waypoints will appear at each terminal location
 + Added **Crux Talisman Progress** Display - HiZe
   + Show bonuses you get from the talisman
@@ -53,7 +52,6 @@
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
 + Added Jinxed voodoo doll ability cooldown support - HiZe
 + Added Polarvoid Books to estimated item value - jani
-+ Added Chumcap support for Chum Bucket Hider - jani
 + Added **Motes NPC** price in the item lore
   + With Burgers multiplier - HiZe
 + Added Motes Grubber to Not Clickable Items feature
@@ -69,8 +67,28 @@
   + Hide normal motes orbs particles
 + Added bloodfiend (vampire slayer) to Damage Indicator - HiZe
 + Add Bacte to Damage Indicator
++ Hide Not Rift-transferable items in Rift Transfer Chest as part of the hide not clickable items feature
++ Add npc motes sell value for current opened chest - HiZe
++ Vampire Slayer Feature - HiZe
+  + Sound for twinclaws
+  + Option to delay twinclaws notification and sound (in millis, configurable)
+  + Draw line starting from the boss head to the Killer Spring/Blood Ichor (if the boss is highlighted)
+  + Draw line starting from your crosshair to the boss head
+  + Configurable to work only on your boss, on bosses hit, or on coop boss
++ Show locations of inactive Blood Effigy
+  + Show effigies that are about to respawn
+  + Show effigies without known time
++ Added **Wilted Berberis Helper**
+  + Option to only show the helper while standing on Farmland blocks
+  + Option to hide the wilted berberis particles
++ Added **Vampire Slayer** features in Damage Indicator
+  + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
+  + Show a timer until the boss leaves the invicible Mania Circles state.
+  + Show the percentage of HP next to the HP.
++ Added **Horsezooka Hider**
+  + Hide horses while holding the Horsezooka in the hand.
 
-### Other Features
+### Other New Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
   + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
   + Show Ice per hour
@@ -87,8 +105,29 @@
 + Added Attribute price support to Estimated Item Value - nea
 + Added warning when enderman slayer beacon spawns - dragon99z
 + Added Highlight enderman slayer Nukekebi (Skulls) - dragon99z
++ Added option to hide the vanilla particles around enderman
++ Hide particles around enderman slayer bosses and mini bosses
++ Added support for Shadow Fury abilty cooldown - HiZe
++ Added /sendcoords sending, detecting and rendering - dragon99z
++ Added **Boss Spawn Warning** - HiZe + hannibal2
+  + Send a title when your slayer boss is about to spawn
+  + Configurable percentage at which the title and sound should be sent
++ Added **Refusal Bypass Key** - HiZe
+  + Hold a custom key to bypass the Prevent Refusing feature for visitors
++ Added **Farming Weight ETA Goal** - Kaeso
+  + Override the Overtake ETA to show when you will reach the specified rank.
+  + If not there yet
+  + Default: #10k
++ Added **Dungeon Potion level as item stack size - HiZe
++ Added **Griffin Pet Warning**
+  + Warn when holding an Ancestral Spade while no Griffin pet is selected.
++ More **Trophy Fish** features - appable0
+  + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish.
+  + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value.
++ Added Chumcap support for Chum Bucket Hider - jani
 
 ### Changes
++ SkyHanni no longer requires Patcher to start! (Big thanks nea)
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
 + Added option to show exact prices in estimated item value
@@ -103,6 +142,13 @@
 + Show total amount of all trophy fish rarities at the end of the chat message
 + Changed **Elite farming weight** display - Kaeso
   + Instantly showing the next player in the lb when passing someone on the leaderboard
++ Show in chat the total amount of sharks fished after the fishing contest
++ Custom text over Visitor name moves more smoothly now
++ Discord Rich Presence now supports Motes in the rift and the garden plot number - NetheriteMiner
++ Crop money display: Using npc price for mushroom cow pet calculation when on ironman, stranded or bingo
++ Sacks no longer get blocked from moving in storage (not clickable items feature)
++ Using 19.9 bps if bps is too low for jacob contest ff needed display
++ Better default positions for some guis
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -128,6 +174,15 @@
 + Fixed individual attribute prices in estimated item value - nea
 + Fixed sack display detection - hize
 + Fixed rare Ghost Counter bugs - hize
++ Fixed a bug that farming weight display does not show up if you only have one profile
++ Fixed broken thorn damage indicator detection in dungeon F4/M4
++ Fixed togglesneak mod breaking escape menu open detection for quick mod menu switch
++ Fixed error with detecting hit phase during eman slayer in damage indicator
++ No longer double counting mob kill coins in slayer item profit tracker
++ Fixed jacob contest time chat message chat shows one second too long
++ Fixed farming contest calendar reading going above 100% - Contrabass26
++ Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
++ Fixed rare bug with Damage Indicator
 
 ## Version 0.18 (2023-06-19)
 
@@ -181,7 +236,7 @@
 + City Project Daily Reminder
   + Remind every 24 hours to participate
 + Added Quick Mod Menu Switching (default disabled)
-  + Allows for easy navigation between one Mod Config and another
+  + Allows for fast navigation between one Mod Config and another
   + Default disabled
   + Detects your SkyBlock Mod automatically 
   + Does detect Chat Triggers and OneConfig itself, but no single mods that require these libraries
@@ -395,7 +450,8 @@
 + Added **FF for Contest**
   + Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest inventory.
 + Added **yaw and pitch display**
-  + Shows yaw and pitch with customizable precision while holding a farm tool. Automatically fades out if there is no movement for a customizable duration (Contributed by Sefer)
+  + Shows yaw and pitch with customizable precision while holding a farm tool.
+  + Automatically fades out if no movement for a customizable duration (Contributed by Sefer)
 + Added warning when 6th visitors is ready (Contributed by CalMWolfs)
 
 ### Features from other Mods
@@ -408,7 +464,7 @@
 
 ### Changes
 + Reworked reputation helper design in the crimson isle.
-+ Moved the key setting for diana `warp to nearest burrow waypoint` from vanilla mc (esc -> config -> controls -> scroll all the way down to skyhanni category) to simply `/sh diana`
++ Moved the key setting for diana `warp to nearest burrow waypoint` from vanilla mc (esc -> config -> controls -> scroll all the way down to skyhanni category) to just `/sh diana`
 
 ### Fixed
 + Barbarian Duke Damage Indicator now only starts displaying after the player is getting close to him. (30 blocks)
@@ -497,7 +553,7 @@
 + Add two more chat filter categories: Powder Mining and Winter Gifts.
 + Add catacombs class level color to party finder.
 + Add wishing compass uses amount display.
-+ Saves missing items from cancelled buy orders to clipboard for faster re-entry.
++ Saves missing items from canceled buy orders to clipboard for faster re-entry.
 + Adds a visual highlight to the Croesus inventory that show what chests have not yet been opened.
 
 ### Removals
@@ -602,7 +658,7 @@
 + Links in player chat are clickable again
 
 ### Dungeon
-+ Added hide the damage, ability damage and defence orbs that spawn when the healer is killing mobs in dungeon
++ Added hide the damage, ability damage and defense orbs that spawn when the healer is killing mobs in dungeon
 + Added hide the golden fairy that follows the healer in dungeon.
 + Added hidden music for the clean end of the dungeon
 
@@ -735,7 +791,7 @@
 - Fixed damage indicator f4 and m4 thorn support for Derpy
 - Added option to hide vanilla (or Skytils) damage splashes next to damage indicator
 - Added damage/healing over time display to damage indicator
-- Added training dummy (on personal island) to damage indicator
+- Added Training Dummy (on personal island) to damage indicator
 
 ### Other stuff
 + Added ashfang reset cooldown
@@ -750,7 +806,7 @@
 
 ## Version 0.1
 - Added damage indicator for some bosses who are outside dungeon (4 nether bosses: Ashfang, barbarian duke, mage outlaw and Bladesoul, slayers: Enderman 1-4, revenant 5, and untested support for vanquisher in nether, Enderdragon and Endstone protector in end)
-- Added item ability cooldown background display (over the whole slot, work in progress)
+- Added item ability cooldown background display (over the slot, work in progress)
 - Added Ashfang freeze cooldown (when you get hit by “anti ability” and slowness effect)
 - Changed “hot clickable items” to show items again, but only with dark gray overlay. Looks nicer
 - Made the GitHub repository public

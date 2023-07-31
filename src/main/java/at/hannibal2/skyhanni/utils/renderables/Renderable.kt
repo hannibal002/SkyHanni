@@ -31,7 +31,7 @@ interface Renderable {
                 && Utils.getMouseY() in (posY..posY + height) // TODO: adjust for variable height?
 
     /**
-     * N.B.: the offset is absolute, not relative to the position and should not be used for rendering
+     * N.B.: the offset is absolute, not relative to the position and shouldn't be used for rendering
      * (the GL matrix stack should already be pre transformed)
      */
     fun render(posX: Int, posY: Int)

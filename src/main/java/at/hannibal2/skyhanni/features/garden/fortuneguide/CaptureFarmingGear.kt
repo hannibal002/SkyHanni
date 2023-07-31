@@ -108,7 +108,7 @@ class CaptureFarmingGear {
             }
         }
         if (event.inventoryName.contains("Pets")) {
-            // If they have 2 of same pet, one will be overwritten
+            // If they've 2 of same pet, one will be overwritten
             farmingItems[FarmingItems.ELEPHANT] = FFGuideGUI.getFallbackItem(FarmingItems.ELEPHANT)
             farmingItems[FarmingItems.MOOSHROOM_COW] = FFGuideGUI.getFallbackItem(FarmingItems.MOOSHROOM_COW)
             farmingItems[FarmingItems.RABBIT] = FFGuideGUI.getFallbackItem(FarmingItems.RABBIT)

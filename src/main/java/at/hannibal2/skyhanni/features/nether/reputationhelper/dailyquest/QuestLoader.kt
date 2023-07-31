@@ -77,7 +77,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             }
         }
 
-        for (entry in dailyQuestHelper.reputationHelper.repoData.entrySet()) {
+        val repoData = dailyQuestHelper.reputationHelper.repoData ?: return UnknownQuest(name)
+        for (entry in repoData.entrySet()) {
             val categoryName = entry.key
             val category = entry.value.asJsonObject
             for ((entryName, extraData) in category.entrySet()) {
@@ -139,7 +140,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
-        for (text in storage.quests) {
+        for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
             val state = QuestState.valueOf(split[1])

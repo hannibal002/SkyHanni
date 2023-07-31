@@ -6,11 +6,11 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.8.20-RC"
+    kotlin("jvm") version "1.9.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.19.Beta.11"
+version = "0.19.Beta.18"
 
 // Toolchains:
 java {
@@ -68,20 +68,23 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.4-SNAPSHOT")
 
     implementation(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") {
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
         exclude(group = "org.jetbrains.kotlin")
     }
 
     // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
+    @Suppress("VulnerableLibrariesLocal")
     implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    @Suppress("VulnerableLibrariesLocal")
     devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
 
-    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.4")
-    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.4:test")
+    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.5")
+    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.5:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
+    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 }
 kotlin {
     sourceSets.all {
@@ -163,6 +166,7 @@ tasks.shadowJar {
             println("Config: ${it.files}")
         }
     }
+    exclude("META-INF/versions/**")
 
     relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")

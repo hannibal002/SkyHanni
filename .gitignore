@@ -2,6 +2,7 @@
 .vscode/
 run/
 build/
+bin/
 
 # gradle
 build
