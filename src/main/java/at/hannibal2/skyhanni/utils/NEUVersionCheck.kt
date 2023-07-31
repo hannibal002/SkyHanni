@@ -20,7 +20,7 @@ object NEUVersionCheck {
             neuWarning(
                 "NotEnoughUpdates is missing!\n" +
                         "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
-                        "You currently need NEU version 2.1.1-Alpha-17.1 or later.\n" +
+                        "You currently need NEU version 2.1.1-Alpha-19 or later.\n" +
                         "NEU 2.1 is NOT the latest version.\n" +
                         "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
                         "Or in the #neu-updates channel in the SkyHanni discord\n" +
@@ -39,9 +39,9 @@ object NEUVersionCheck {
         }
         neuWarning(
             "NotEnoughUpdates is outdated!\n" +
-                    "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
-                    "You currently need NEU version 2.1.1-Alpha-17.1 or later.\n" +
-                    "NEU 2.1 is NOT the latest version.\n" +
+                    "You currently need NEU version 2.1.1-Alpha-19 or later.\n\n" +
+                    "NEU 2.1 is NOT the latest version.\n\n" +
+                    "NEU 2.1.1 is NOT on the NEU GitHub.\n\n" +
                     "It is ONLY in the #neu-alphas channel in the NEU discord\n" +
                     "Or in the #neu-updates channel in the SkyHanni discord\n" +
                     "Use these links to download the latest version:"
@@ -54,7 +54,7 @@ object NEUVersionCheck {
             Pair("Join SkyHanni Discord", "https://discord.com/invite/8DXVN4BJz3"),
             Pair("Open SkyHanni GitHub", "https://github.com/hannibal002/SkyHanni"),
             Pair("Join NEU Discord", "https://discord.gg/moulberry"),
-            Pair("Open NEU GitHub", "https://github.com/NotEnoughUpdates/NotEnoughUpdates"),
+            Pair("NEU GitHub (Mod isn't here)", "https://github.com/NotEnoughUpdates/NotEnoughUpdates"),
         )
         closeMinecraft()
     }
