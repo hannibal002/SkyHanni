@@ -5,8 +5,7 @@
 ### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
-+ **Rift 
-+ Highlight Guide**
++ **Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + Added **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy crux will steal your time.
