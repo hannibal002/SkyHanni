@@ -161,7 +161,7 @@ class SkyHanniMod {
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
-        loadModule(BestiarySlotHighlight())
+        loadModule(BestiaryData())
 
         // APIs
         loadModule(BazaarApi())

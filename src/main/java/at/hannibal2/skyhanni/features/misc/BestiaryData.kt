@@ -23,15 +23,15 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
-class BestiarySlotHighlight {
+class BestiaryData {
 
     private val config get() = SkyHanniMod.feature.misc.bestiarySlotHighlightConfig
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private val progressPattern = "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+$)".toPattern()
-    private val BESTIARY_GUI_TITLE_PATTERN = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
-    private val namePattern = "(?<name>[A-z ]+) (?<level>[IVX0-9]+$)".toPattern()
+    private val titlePattern = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
+    private var lastclicked = 0L
     private var inInventory = false
     private var indexes = listOf(
         10, 11, 12, 13, 14, 15, 16,
@@ -227,7 +227,7 @@ class BestiarySlotHighlight {
             }
             newDisplay.addButton(
                 prefix = "§7Number Format: ",
-                getName = FormatType.values()[config.numberFormat].type,
+                getName = FormatType.entries[config.numberFormat].type,
                 onChange = {
                     config.numberFormat = (config.numberFormat + 1) % 2
                     update()
@@ -235,7 +235,7 @@ class BestiarySlotHighlight {
 
             newDisplay.addButton(
                 prefix = "§7Sorting Type: ",
-                getName = SortingType.values()[config.sortingType].type,
+                getName = SortingType.entries[config.sortingType].type,
                 onChange = {
                     config.sortingType = (config.sortingType + 1) % 4
                     update()
@@ -243,7 +243,7 @@ class BestiarySlotHighlight {
 
             newDisplay.addButton(
                 prefix = "§7Display Type: ",
-                getName = DisplayType.values()[config.displayType].type,
+                getName = DisplayType.entries[config.displayType].type,
                 onChange = {
                     config.displayType = (config.displayType + 1) % 4
                     update()
@@ -251,7 +251,7 @@ class BestiarySlotHighlight {
         }
         newDisplay.addButton(
             prefix = "§7Hide Maxed: ",
-            getName = HideMaxed.values()[config.hideMaxed.toInt()].b,
+            getName = HideMaxed.entries[config.hideMaxed.toInt()].b,
             onChange = {
                 config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
                 update()
@@ -262,7 +262,7 @@ class BestiarySlotHighlight {
 
     private fun isBestiaryGui(stack: ItemStack?, name: String): Boolean {
         if (stack == null) return false
-        val bestiaryGuiTitleMatcher = BESTIARY_GUI_TITLE_PATTERN.matcher(name)
+        val bestiaryGuiTitleMatcher = titlePattern.matcher(name)
         if (bestiaryGuiTitleMatcher.matches()) {
             if ("Bestiary" != bestiaryGuiTitleMatcher.group(1)) {
                 var loreContainsFamiliesFound = false
@@ -345,8 +345,6 @@ class BestiarySlotHighlight {
         }
     }
 
-
-    var lastclicked = 0L
     private fun MutableList<List<Any>>.addButton(
         prefix: String,
         getName: String,
