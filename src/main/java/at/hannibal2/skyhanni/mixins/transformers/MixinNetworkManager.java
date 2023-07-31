@@ -15,6 +15,8 @@ public abstract class MixinNetworkManager extends SimpleChannelInboundHandler<Pa
 
     @Inject(method = "channelRead0", at = @At("HEAD"), cancellable = true)
     private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
-        NetworkManagerHookKt.onReceivePacket(context, packet, ci);
+        if (packet != null) {
+            NetworkManagerHookKt.onReceivePacket(context, packet, ci);
+        }
     }
 }

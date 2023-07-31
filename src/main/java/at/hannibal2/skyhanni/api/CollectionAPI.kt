@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -24,12 +26,12 @@ class CollectionAPI {
         val asJsonObject = jsonElement.asJsonObject ?: return
         for ((hypixelId, rawCounter) in asJsonObject.entrySet()) {
             val counter = rawCounter.asLong
-            val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
+            val internalName = NEUItems.transHypixelNameToInternalName(hypixelId)
 
-            // MUSHROOM_COLLECTION, GEMSTONE_COLLECTION
-             BazaarApi.getBazaarDataByInternalName(neuItemId)?.displayName ?: continue
+            // MUSHROOM_COLLECTION,
+            NEUItems.getItemStackOrNull(internalName)?.displayName ?: continue
 
-            collectionValue[neuItemId] = counter
+            collectionValue[internalName] = counter
         }
 
         CollectionUpdateEvent().postAndCatch()
@@ -49,7 +51,8 @@ class CollectionAPI {
                 singleCounterPattern.matchMatcher(line) {
                     val counter = group("amount").replace(",", "").toLong()
                     val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                    collectionValue[name] = counter
+                    val internalName = NEUItems.getInternalNameOrNull_new(name) ?: continue
+                    collectionValue[internalName] = counter
                 }
             }
             CollectionUpdateEvent().postAndCatch()
@@ -72,7 +75,8 @@ class CollectionAPI {
                 for (line in lore) {
                     counterPattern.matchMatcher(line) {
                         val counter = group("amount").replace(",", "").toLong()
-                        collectionValue[name] = counter
+                        val internalName = NEUItems.getInternalNameOrNull_new(name) ?: continue
+                        collectionValue[internalName] = counter
                     }
                 }
             }
@@ -81,33 +85,25 @@ class CollectionAPI {
     }
 
     companion object {
-        private val collectionValue = mutableMapOf<String, Long>()
+        val collectionValue = mutableMapOf<NEUInternalName, Long>()
         private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
-        fun getCollectionCounter(searchName: String): Long? {
-            for ((collectionName, counter) in collectionValue) {
-                if (collectionName.equals(searchName, true)) {
-                    return counter
-                }
-            }
-            return null
-        }
+        fun getCollectionCounter(itemName: String) = getCollectionCounter(NEUItems.getInternalName_new(itemName))
+
+        fun getCollectionCounter(internalName: NEUInternalName) = collectionValue[internalName]
 
         // TODO add support for replenish (higher collection than actual items in inv)
-        fun addFromInventory(internalName: String, amount: Int) {
-            val stack = NEUItems.getItemStackOrNull(internalName)
+        fun addFromInventory(internalNameRaw: String, amount: Int) {
+            val stack = NEUItems.getItemStackOrNull(internalNameRaw)
             if (stack == null) {
-                LorenzUtils.debug("CollectionAPI.addFromInventory: internalName is null for '$internalName'")
+                LorenzUtils.debug("CollectionAPI.addFromInventory: internalName is null for '$internalNameRaw'")
                 return
             }
+            val internalName = stack.getInternalName_new()
 
-            val name = stack.name!!.removeColor()
-            val oldValue = collectionValue[name] ?: return
-
-            val newValue = oldValue + amount
-            collectionValue[name] = newValue
+            collectionValue.addOrPut(internalName, amount.toLong())
         }
     }
 }

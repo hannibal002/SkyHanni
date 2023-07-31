@@ -24,7 +24,7 @@ public class MiscConfig {
     public boolean petDisplay = false;
 
     @Expose
-    public Position petDisplayPos = new Position(-111, 221, false, true);
+    public Position petDisplayPos = new Position(-330, -15, false, true);
 
     @Expose
     @ConfigOption(name = "Time", desc = "")

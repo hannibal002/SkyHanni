@@ -96,6 +96,13 @@ data class LorenzVec(
 
     fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
 
+    fun roundLocationToBlock(): LorenzVec {
+        val x = (x - .499999).round(0)
+        val y = (y - .499999).round(0)
+        val z = (z - .499999).round(0)
+        return LorenzVec(x, y, z)
+    }
+
     fun slope(other: LorenzVec, factor: Double) = add(other.subtract(this).scale(factor))
 
     fun roundLocation(): LorenzVec {
@@ -127,6 +134,8 @@ data class LorenzVec(
             val (x, y, z) = string.split(":").map { it.toDouble() }
             return LorenzVec(x, y, z)
         }
+
+        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().add(0.0, -1.0, 0.0)
     }
 }
 

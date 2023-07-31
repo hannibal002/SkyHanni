@@ -119,7 +119,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.15",
+    version = "0.19.Beta.18",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -242,7 +242,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowHelper)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
-        loadModule(CollectionCounter())
+        loadModule(CollectionTracker())
         loadModule(HighlightBonzoMasks())
         loadModule(DungeonLevelColor())
         loadModule(BazaarCancelledBuyOrderClipboard())

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -102,9 +103,11 @@ class MinionFeatures {
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
         if (!minions.contains(entity)) {
-            minions[entity] = Storage.ProfileSpecific.MinionConfig().apply {
-                displayName = name
-                lastClicked = 0
+            MinionFeatures.minions = minions.editCopy {
+                this[entity] = Storage.ProfileSpecific.MinionConfig().apply {
+                    displayName = name
+                    lastClicked = 0
+                }
             }
         } else {
             if (minions[entity]!!.displayName != name) {
@@ -120,7 +123,7 @@ class MinionFeatures {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!minionInventoryOpen) return
-        val minions = minions ?: return
+        var minions = minions ?: return
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
@@ -134,7 +137,7 @@ class MinionFeatures {
         }
 
         if (System.currentTimeMillis() - lastMinionPickedUp < 2_000) {
-            minions.remove(location)
+            MinionFeatures.minions = minions.editCopy { remove(location) }
         }
     }
 
@@ -284,10 +287,16 @@ class MinionFeatures {
     }
 
     companion object {
-        private val minions get() = ProfileStorageData.profileSpecific?.minions
+        private var minions: Map<LorenzVec, Storage.ProfileSpecific.MinionConfig>?
+            get() {
+                return ProfileStorageData.profileSpecific?.minions
+            }
+            set(value) {
+                ProfileStorageData.profileSpecific?.minions = value
+            }
 
         fun clearMinionData() {
-            minions?.clear()
+            minions = mutableMapOf()
             LorenzUtils.chat("§e[SkyHanni] Manually reset all private island minion location data!")
         }
     }
