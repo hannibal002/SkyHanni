@@ -301,7 +301,7 @@ public class MiscConfig {
 
 
         @Expose
-        public Position position = new Position(100, 100, false, true);
+        public Position position = new Position(107, 141, false, true);
     }
 
     @ConfigOption(name = "Discord Rich Presence", desc = "")
