@@ -27,7 +27,6 @@ class ChestValue {
     private val config get() = SkyHanniMod.feature.misc.chestValueConfig
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<String, Item>()
-    private val slotList = mutableMapOf<Int, ItemStack>()
     private val inInventory get() = InventoryUtils.openInventoryName().isValidStorage()
 
     @SubscribeEvent
@@ -63,24 +62,17 @@ class ChestValue {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         chestItems.clear()
-        slotList.clear()
         Renderable.list.clear()
     }
-
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inInventory) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slotList.contains(slot.slotIndex)) {
-                    slot highlight LorenzColor.GREEN
-                }
-            }
             for ((_, indexes) in Renderable.list) {
-                for (s in InventoryUtils.getItemsInOpenChest()) {
-                    if (indexes.contains(s.slotIndex)) {
-                        s highlight LorenzColor.GREEN
+                for (slot in InventoryUtils.getItemsInOpenChest()) {
+                    if (indexes.contains(slot.slotIndex)) {
+                        slot highlight LorenzColor.GREEN
                     }
                 }
             }
@@ -116,18 +108,16 @@ class ChestValue {
                         tips,
                         stack = stack,
                         indexes = index)
-                    val dashColor = if (slotList.keys.any { k -> index.contains(k) }) "§a" else "§7"
-                    add(" $dashColor- ")
+                    add(" §7- ")
                     add(stack)
                     add(renderable)
-
                 })
                 rendered++
             }
 
-            val sortingType = SortType.values()[config.sortingType].longName
+            val sortingType = SortType.entries[config.sortingType].longName
             newDisplay.addAsSingletonList("§7Sorted By: §c$sortingType")
-            newDisplay.addSelector(" ", SortType.values(),
+            newDisplay.addSelector(" ", SortType.entries.toTypedArray(),
                 getName = { type -> type.shortName },
                 isCurrent = { it.ordinal == config.sortingType },
                 onChange = {
@@ -135,7 +125,7 @@ class ChestValue {
                     update()
                 })
             newDisplay.addAsSingletonList("§6Total value : §b${totalPrice.formatPrice()}")
-            newDisplay.addSelector(" ", FormatType.values(),
+            newDisplay.addSelector(" ", FormatType.entries.toTypedArray(),
                 getName = { type -> type.type },
                 isCurrent = { it.ordinal == config.formatType },
                 onChange = {
