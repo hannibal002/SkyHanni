@@ -54,7 +54,6 @@ object NEUVersionCheck {
             Pair("Join SkyHanni Discord", "https://discord.com/invite/8DXVN4BJz3"),
             Pair("Open SkyHanni GitHub", "https://github.com/hannibal002/SkyHanni"),
             Pair("Join NEU Discord", "https://discord.gg/moulberry"),
-            Pair("NEU GitHub (Mod isn't here)", "https://github.com/NotEnoughUpdates/NotEnoughUpdates"),
         )
         closeMinecraft()
     }
