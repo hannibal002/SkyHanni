@@ -581,6 +581,41 @@ public class MiscConfig {
         public Position position = new Position(10, 80, false, true);
     }
 
+     @Expose
+     @ConfigOption(name = "", desc = "")
+     @Accordion
+    public BestiarySlotHighlightConfig bestiarySlotHighlightConfig = new BestiarySlotHighlightConfig();
+
+    public static class BestiarySlotHighlightConfig {
+        @Expose
+        @ConfigOption(name = "", desc = "")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "number format", desc = "")
+        @ConfigEditorDropdown(values = {"Short", "Long"})
+        public int numberFormat = 0;
+
+        @Expose
+        @ConfigOption(name = "sortingType", desc = "")
+        @ConfigEditorDropdown(values = {"Lowest Kills", "Highest Kills", "Lowest %", "Highest %", "Lowest Kills Needed", "Highest Kills Needed"})
+        public int sortingType = 0;
+
+        @Expose
+        @ConfigOption(name = "displayType", desc = "")
+        @ConfigEditorDropdown(values = {"Maxed", "Tier", "Kills for maxed", "Kills for next tier"})
+        public int displayType = 0;
+
+        @Expose
+        @ConfigOption(name = "Hide maxed", desc = "")
+        @ConfigEditorBoolean
+        public boolean hideMaxed = false;
+
+        @Expose
+        public Position position = new Position(100, 100, false, true);
+    }
+
     @Expose
     @ConfigOption(name = "Mining", desc = "")
     @Accordion
