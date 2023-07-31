@@ -33,7 +33,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 object VampireSlayerFeatures {
-
     private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
@@ -43,7 +42,7 @@ object VampireSlayerFeatures {
 
     private val entityList = mutableListOf<EntityLivingBase>()
     private val taggedEntityList = mutableListOf<Int>()
-    private val standList = mutableMapOf<EntityArmorStand, EntityOtherPlayerMP>()
+    private var standList = mapOf<EntityArmorStand, EntityOtherPlayerMP>()
     private val username get() = LorenzUtils.getPlayerName()
     private val bloodIchorTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
@@ -338,7 +337,7 @@ object VampireSlayerFeatures {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         entityList.clear()
         taggedEntityList.clear()
-        standList.clear()
+        standList = mutableMapOf()
     }
 
 
@@ -351,7 +350,7 @@ object VampireSlayerFeatures {
                 if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE) {
                     EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
                         if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
-                            standList[stand] = it
+                            standList = standList.editCopy { this[stand] = it }
                         }
                     }
                 }
