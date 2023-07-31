@@ -153,6 +153,21 @@ object ItemUtils {
         }
     }
 
+    fun ItemStack.getItemCharRarity(): Char {
+        return when (this.getLore().lastOrNull()?.take(4)) {
+            "§f§l" -> 'f'
+            "§a§l" -> 'a'
+            "§9§l" -> '9'
+            "§5§l" -> '5'
+            "§6§l" -> '6'
+            "§d§l" -> 'd'
+            "§b§l" -> 'b'
+            "§4§l" -> '4'
+            "§c§l" -> 'c'
+            else -> 'c'
+        }
+    }
+
     //extra method for shorter name and kotlin nullability logic
     var ItemStack.name: String?
         get() = this.displayName

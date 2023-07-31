@@ -255,13 +255,13 @@ public class MiscConfig {
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @Expose
-    @ConfigOption(name = "Cool thing", desc = "")
+    @ConfigOption(name = "Chest Value", desc = "")
     @Accordion
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
-    public static class ChestValueConfig {
 
+    public static class ChestValueConfig {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "yes")
+        @ConfigOption(name = "Enabled", desc = "Enabled estimated value of chest")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
@@ -296,7 +296,6 @@ public class MiscConfig {
 
         @Expose
         public Position position = new Position(100, 100, false, true);
-
     }
 
     @ConfigOption(name = "Discord Rich Presence", desc = "")

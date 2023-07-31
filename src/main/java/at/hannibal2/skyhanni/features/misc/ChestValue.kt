@@ -52,7 +52,6 @@ class ChestValue {
         }
     }
 
-
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
@@ -65,7 +64,9 @@ class ChestValue {
     fun onInventoryClose(event: InventoryCloseEvent) {
         chestItems.clear()
         slotList.clear()
+        Renderable.list.clear()
     }
+
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -76,17 +77,11 @@ class ChestValue {
                     slot highlight LorenzColor.GREEN
                 }
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        if (!isEnabled()) return
-        InventoryUtils.inStorage()
-        if (inInventory) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slotList.contains(slot.slotIndex)) {
-                    slot drawIndex LorenzColor.WHITE
+            for ((_, indexes) in Renderable.list) {
+                for (s in InventoryUtils.getItemsInOpenChest()) {
+                    if (indexes.contains(s.slotIndex)) {
+                        s highlight LorenzColor.GREEN
+                    }
                 }
             }
         }
@@ -96,7 +91,7 @@ class ChestValue {
         display = drawDisplay()
     }
 
-    fun drawDisplay(): List<List<Any>> {
+    private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
         var totalPrice = 0.0
         var rendered = 0
@@ -116,24 +111,16 @@ class ChestValue {
                 if (rendered >= config.itemToShow) continue
                 if (total < config.hideBelow) continue
                 newDisplay.add(buildList {
-                    val renderable = Renderable.clickAndHover(
+                    val renderable = Renderable.hoverTips(
                         "${stack.displayName} x$amount: §b${(total * stack.stackSize).formatPrice()}",
-                        tips
-                    ) {
-                        for (slot in InventoryUtils.getItemsInOpenChest()) {
-                            if (index.contains(slot.slotIndex)) {
-                                if (slotList.contains(slot.slotIndex)) {
-                                    slotList.remove(slot.slotIndex)
-                                } else {
-                                    slotList[slot.slotIndex] = stack
-                                }
-                            }
-                        }
-                    }
+                        tips,
+                        stack = stack,
+                        indexes = index)
                     val dashColor = if (slotList.keys.any { k -> index.contains(k) }) "§a" else "§7"
                     add(" $dashColor- ")
                     add(stack)
                     add(renderable)
+
                 })
                 rendered++
             }
@@ -163,7 +150,7 @@ class ChestValue {
         if (inInventory) {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             val slots = InventoryUtils.getItemsInOpenChest().filter {
-                it.hasStack && it.inventory != Minecraft.getMinecraft().thePlayer.inventory && (!isMinion  || it.slotNumber % 9 != 1)
+                it.hasStack && it.inventory != Minecraft.getMinecraft().thePlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
             }
             val stacks = buildMap {
                 slots.forEach {
@@ -185,10 +172,9 @@ class ChestValue {
                                 val (oldIndex, oldInternalName, oldAmount, oldStack, oldBase, oldTotal, oldTips) = chestItems[stack.getInternalName()]
                                     ?: return
                                 oldIndex.add(i)
-                                oldTips.addAll(list.editCopy { this[0] = "${get(0)} §o(id:$i)" })
                                 chestItems[oldInternalName] = Item(oldIndex, oldInternalName, oldAmount + stack.stackSize, oldStack, oldBase, oldTotal + total, oldTips)
                             } else {
-                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.getInternalName(), stack.stackSize, stack, base, total, list.editCopy { this[0] = "${get(0)} §o(id:$i)" }.toMutableList())
+                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.getInternalName(), stack.stackSize, stack, base, total, list)
                             }
                         }
                     }
@@ -228,26 +214,6 @@ class ChestValue {
         ;
     }
 
-    private infix fun Slot.drawIndex(color: LorenzColor) {
-
-        val font = Minecraft.getMinecraft().fontRendererObj
-        GlStateManager.disableLighting()
-        GlStateManager.disableDepth()
-        GlStateManager.disableBlend()
-
-        GlStateManager.pushMatrix()
-        GlStateManager.translate((this.xDisplayPosition).toFloat(), (this.yDisplayPosition).toFloat(), 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        GlStateManager.scale(0.9, 0.9, 0.9)
-        font.drawStringWithShadow("${color.getChatColor()}${this.slotIndex}", 0f, 0f, 16777215)
-        val reverseScale = 1 / 0.7
-        GlStateManager.scale(reverseScale, reverseScale, reverseScale)
-        GlStateManager.popMatrix()
-
-        GlStateManager.enableLighting()
-        GlStateManager.enableDepth()
-
-    }
-
     private fun String.isValidStorage(): Boolean {
         return Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
             this == "Large Chest") ||
@@ -265,6 +231,5 @@ class ChestValue {
         val tips: MutableList<String>
     )
 
-
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
