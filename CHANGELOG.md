@@ -127,6 +127,7 @@
 + Added Chumcap support for Chum Bucket Hider - jani
 
 ### Changes
++ SkyHanni no longer requires Patcher to start! (Big thanks nea)
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
 + Added option to show exact prices in estimated item value
@@ -181,6 +182,7 @@
 + Fixed jacob contest time chat message chat shows one second too long
 + Fixed farming contest calendar reading going above 100% - Contrabass26
 + Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
++ Fixed rare bug with Damage Indicator
 
 ## Version 0.18 (2023-06-19)
 
