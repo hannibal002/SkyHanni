@@ -157,6 +157,7 @@ class ChestValue {
                         var (total, base) = pair
                         if (stack.item == Items.enchanted_book)
                             total /= 2
+                        list.add("§aTotal: §6§l${total.formatPrice()}")
                         if (total != 0.0) {
                             if (chestItems.contains(stack.getInternalName())) {
                                 val (oldIndex, oldInternalName, oldAmount, oldStack, oldBase, oldTotal, oldTips) = chestItems[stack.getInternalName()]
