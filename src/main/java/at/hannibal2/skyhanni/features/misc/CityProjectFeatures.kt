@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.utils.*
@@ -23,12 +20,10 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class CityProjectFeatures {
     private var display = emptyList<List<Any>>()
     private var inInventory = false
-    private var tick = 0
     private var lastReminderSend = 0L
     private val contributeAgainPattern = "§7Contribute again: §e(?<time>.*)".toPattern()
 
@@ -41,11 +36,9 @@ class CityProjectFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.phase != TickEvent.Phase.START) return
-        tick++
-        if (tick % 20 == 0) {
+        if (event.repeatSeconds(1)) {
             checkDailyReminder()
         }
     }

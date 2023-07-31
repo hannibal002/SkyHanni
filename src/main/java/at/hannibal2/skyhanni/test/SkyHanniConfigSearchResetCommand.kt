@@ -238,7 +238,7 @@ object SkyHanniConfigSearchResetCommand {
 
         if (this is Runnable) return "Runnable"
 
-        // we do not use javaClass.simpleName since we want to catch edge cases
+        // we don't use javaClass.simpleName since we want to catch edge cases
         val name = javaClass.name
         return when (name) {
             "at.hannibal2.skyhanni.config.core.config.Position" -> "Position"

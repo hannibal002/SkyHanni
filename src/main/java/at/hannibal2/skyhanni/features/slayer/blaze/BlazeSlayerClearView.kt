@@ -2,23 +2,21 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.projectile.EntityFireball
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BlazeSlayerClearView {
-
-    private var tick = 0
     private var nearBlaze = false
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (tick++ % 60 == 0) {
+        if (event.repeatSeconds(3)) {
             nearBlaze = DamageIndicatorManager.getDistanceTo(
                 BossType.SLAYER_BLAZE_1,
                 BossType.SLAYER_BLAZE_2,

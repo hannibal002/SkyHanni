@@ -29,12 +29,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
@@ -56,7 +56,7 @@ object GhostCounter {
     private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
-    private val bestiaryPattern = ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*".toPattern() //   &r&3&lBESTIARY &b&lGhost &89➜&b10&r
+    private val bestiaryPattern = ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*".toPattern() //   &3&lBESTIARY &b&lGhost &89➜&b10
     private val skillLevelPattern = ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*".toPattern()
     private val format = NumberFormat.getInstance()
     private var percent: Float = 0.0f
@@ -74,6 +74,8 @@ object GhostCounter {
     private var killETA = ""
     private var currentSkill = ""
     private var currentSkillLevel = -1
+
+    var bestiaryUpdate = false
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -152,8 +154,10 @@ object GhostCounter {
         }
 
         val etaFormatting = config.textFormatting.etaFormatting
+        //TODO: update
+        val max = if (bestiaryUpdate) 100_000 else 3_000_000
         val remaining: Int = when (config.showMax) {
-            true -> 3_000_000 - bestiaryCurrentKill
+            true -> max - bestiaryCurrentKill
             false -> killNeeded - currentKill
         }
 
@@ -240,17 +244,12 @@ object GhostCounter {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             skillXPPattern.matchMatcher(skillText) {
                 val gained = group("gained").formatNumber().toDouble()
                 val current = group("current")
                 if (current != lastXp) {
-                    val res = if (current.contains(".")) {
-                        // current.split(".")[0] ?: "0"
-                        "([0-9,]+).*".toRegex().find(current)?.groupValues?.get(1) ?: "0"
-                    } else {
-                        current.replace("\\D".toRegex(), "")
-                    }
+                    val res = current.formatNumber().toString()
                     gain = (res.toLong() - lastXp.toLong()).toDouble().roundToInt()
                     num = (gain.toDouble() / gained)
                     if (gained in 150.0..450.0) {
@@ -278,7 +277,7 @@ object GhostCounter {
             inMist = Minecraft.getMinecraft().thePlayer.posY <= 110 // some area don't show as 'The Mist' in the scoreboard
             update()
         }
-        if (event.isMod(40)) {
+        if (event.repeatSeconds(2)) {
             calculateXP()
             calculateETA()
         }
@@ -308,7 +307,8 @@ object GhostCounter {
                 var parse = true
                 if (skillPercent) {
                     percent = nf.parse(group("percent")).toFloat()
-                    val level = if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance().getSkillInfo(skillName)?.level ?: 0
+                    val level = if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance().getSkillInfo(skillName)?.level
+                        ?: 0
                     if (level > 0) {
                         totalSkillXp = SkillExperience.getExpForNextLevel(level)
                         currentSkillXp = totalSkillXp * percent / 100
@@ -340,15 +340,16 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: TabListUpdateEvent){
+    fun onTabUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
-        for (line in event.tabList){
-            skillLevelPattern.matchMatcher(line){
+        for (line in event.tabList) {
+            skillLevelPattern.matchMatcher(line) {
                 currentSkill = group("skillName")
                 currentSkillLevel = group("skillLevel").toInt()
             }
         }
     }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
@@ -397,11 +398,12 @@ object GhostCounter {
         //replace with BestiaryLevelUpEvent ?
         bestiaryPattern.matchMatcher(event.message.removeColor()) {
             val currentLevel = group("newLevel").toInt()
-
-            when (val nextLevel = if (currentLevel >= 46) 47 else currentLevel + 1) {
-                47 -> {
+            val max = if (bestiaryUpdate) 100_000.0 else 3_000_000.0
+            val maxLevel = if (bestiaryUpdate) 26 else 47
+            when (val nextLevel = if (currentLevel >= maxLevel - 1) maxLevel else currentLevel + 1) {
+                maxLevel -> {
                     hidden?.bestiaryNextLevel = -1.0
-                    hidden?.bestiaryCurrentKill = 3_000_000.0
+                    hidden?.bestiaryCurrentKill = max
                     hidden?.bestiaryKillNeeded = 0.0
                 }
 
@@ -429,10 +431,12 @@ object GhostCounter {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = event.inventoryName
-        if (inventoryName != "Bestiary ➜ Deep Caverns") return
+        val name = if (bestiaryUpdate) "Bestiary ➜ Dwarven Mines" else "Bestiary ➜ Deep Caverns"
+        if (inventoryName != name) return
         val stacks = event.inventoryItems
-        val ghostStack = stacks[13] ?: return
-        val bestiaryNextLevel = if (ghostStack.displayName == "§cGhost") 1 else Utils.parseIntOrRomanNumeral(ghostStack.displayName.substring(8)) + 1
+        val stack = if (bestiaryUpdate) 10 else 13
+        val ghostStack = stacks[stack] ?: return
+        val bestiaryNextLevel = if (ghostStack.displayName == "§cGhost") 1 else ghostStack.displayName.substring(8).romanToDecimal() + 1
         hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         for (line in ghostStack.getLore()) {
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {

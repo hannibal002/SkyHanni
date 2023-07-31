@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GhostCounter {
+public class GhostCounterConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable ghost counter.")

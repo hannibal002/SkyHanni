@@ -1,24 +1,19 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsWith
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class AshfangBlazes {
 
@@ -26,18 +21,17 @@ class AshfangBlazes {
     private val blazeArmorStand = mutableMapOf<EntityBlaze, EntityArmorStand>()
 
     var nearAshfang = false
-    var tick = 0
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (tick++ % 20 == 0) {
+        if (event.repeatSeconds(1)) {
             checkNearAshfang()
         }
 
         if (nearAshfang) {
-            for (entity in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityBlaze>()
+            for (entity in EntityUtils.getEntities<EntityBlaze>()
                 .filter { it !in blazeColor.keys }) {
                 val list = entity.getAllNameTagsWith(2, "Ashfang")
                 if (list.size == 1) {
@@ -70,8 +64,7 @@ class AshfangBlazes {
     }
 
     private fun checkNearAshfang() {
-        nearAshfang = Minecraft.getMinecraft().theWorld.loadedEntityList
-            .any { it is EntityArmorStand && it.name.contains("Ashfang") }
+        nearAshfang = EntityUtils.getEntities<EntityArmorStand>().any { it.name.contains("Ashfang") }
     }
 
     @SubscribeEvent
@@ -107,7 +100,7 @@ class AshfangBlazes {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         blazeColor.clear()
         blazeArmorStand.clear()
     }

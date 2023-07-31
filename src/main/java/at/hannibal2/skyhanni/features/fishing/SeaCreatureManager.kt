@@ -12,7 +12,7 @@ class SeaCreatureManager {
         var counter = 0
 
         try {
-            val data = event.getConstant("SeaCreatures")!!
+            val data = event.getConstant("SeaCreatures") ?: return
 
             for (variant in data.entrySet().map { it.value.asJsonObject }) {
                 val chatColor = variant["chat_color"].asString

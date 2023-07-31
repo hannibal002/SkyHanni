@@ -46,7 +46,7 @@ object NumberUtil {
         //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1)
         if (value < 0) return "-" + format(-value)
-        if (value < 1000) return value.toString() //deal with easy case
+        if (value < 1000) return value.toString() //deal with small numbers
         val (divideBy, suffix) = suffixes.floorEntry(value)
         val truncated = value / (divideBy / 10) //the number part of the output times 10
         val truncatedAt = if (suffix == "M") 1000 else 100

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SoopyGuessBurrowEvent
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.*
 
@@ -37,7 +37,7 @@ class SoopyGuessBurrow {
     var distance2: Double? = null
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastDing = 0L
         lastDingPitch = 0f
         firstPitch = 0f

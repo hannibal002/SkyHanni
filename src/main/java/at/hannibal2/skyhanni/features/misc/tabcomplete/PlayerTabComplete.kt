@@ -25,7 +25,7 @@ object PlayerTabComplete {
         ISLAND_PLAYERS,
     }
 
-    fun handleTabComplete(command: String, originalArray: Array<String>): List<String>? {
+    fun handleTabComplete(command: String): List<String>? {
         val commands = mapOf(
             "p" to listOf(PlayerCategory.PARTY),
             "party" to listOf(PlayerCategory.PARTY),

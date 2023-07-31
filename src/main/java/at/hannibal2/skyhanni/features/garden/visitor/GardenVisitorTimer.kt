@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
-import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.events.VisitorArrivalEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -13,7 +10,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.math.roundToLong
@@ -150,7 +146,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastVisitors = -1
         GardenAPI.config?.nextSixthVisitorArrival?.let {
             sixthVisitorArrivalTime = it

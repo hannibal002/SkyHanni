@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEndermite
 import net.minecraft.entity.monster.EntityIronGolem
@@ -46,9 +46,9 @@ class HighlightMiningCommissionMobs {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(40)) return
+        if (!event.repeatSeconds(2)) return
 
-        val entities = Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityLivingBase>()
+        val entities = EntityUtils.getEntities<EntityLivingBase>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.YELLOW.toColor().withAlpha(127))

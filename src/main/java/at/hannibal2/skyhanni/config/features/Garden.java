@@ -70,7 +70,7 @@ public class Garden {
     public boolean visitorTimerSixthVisitorWarning = true;
 
     @Expose
-    public Position visitorTimerPos = new Position(-373, -203, false, true);
+    public Position visitorTimerPos = new Position(390, 65, false, true);
 
     @Expose
     @ConfigOption(name = "Visitor Items Needed", desc = "")
@@ -85,7 +85,7 @@ public class Garden {
     public boolean visitorNeedsDisplay = true;
 
     @Expose
-    public Position visitorNeedsPos = new Position(155, -57, false, true);
+    public Position visitorNeedsPos = new Position(180, 170, false, true);
 
     @Expose
     @ConfigOption(name = "Only when Close", desc = "Only show the needed items when close to the visitors.")
@@ -170,6 +170,11 @@ public class Garden {
         @ConfigOption(name = "Prevent Refusing", desc = "Prevent the refusal of a visitor with reward.")
         @ConfigEditorBoolean
         public boolean preventRefusing = true;
+
+        @Expose
+        @ConfigOption(name = "Bypass Key", desc = "Hold that key to bypass the Prevent Refusing feature.")
+        @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+        public int bypassKey = Keyboard.KEY_NONE;
 
 
         /**
@@ -293,7 +298,7 @@ public class Garden {
         public boolean onlyOnBarn = true;
 
         @Expose
-        public Position visitorDropPos = new Position(10, 80, false, true);
+        public Position visitorDropPos = new Position(5, 20, false, true);
     }
 
     @Expose
@@ -406,7 +411,7 @@ public class Garden {
     public int blocksBrokenResetTime = 5;
 
     @Expose
-    public Position cropMilestoneProgressDisplayPos = new Position(376, 19, false, true);
+    public Position cropMilestoneProgressDisplayPos = new Position(-400, -200, false, true);
 
     @Expose
     @ConfigOption(name = "Best Crop", desc = "")
@@ -474,7 +479,7 @@ public class Garden {
 
 
     @Expose
-    public Position cropMilestoneNextDisplayPos = new Position(-112, -143, false, true);
+    public Position cropMilestoneNextDisplayPos = new Position(-200, -200, false, true);
 
     @Expose
     @ConfigOption(name = "Mushroom Pet Perk", desc = "")
@@ -627,7 +632,7 @@ public class Garden {
     public boolean optimalSpeedSignEnabled = true;
 
     @Expose
-    public Position optimalSpeedSignPosition = new Position(-450, 119, false, true);
+    public Position optimalSpeedSignPosition = new Position(20, -195, false, true);
 
     @Expose
     @ConfigOption(name = "Custom Speed", desc = "Change the exact speed for every single crop.")
@@ -710,7 +715,7 @@ public class Garden {
     }
 
     @Expose
-    public Position optimalSpeedPos = new Position(188, -105, false, true);
+    public Position optimalSpeedPos = new Position(5, -200, false, true);
 
     @Expose
     @ConfigOption(name = "Garden Level", desc = "")
@@ -724,7 +729,7 @@ public class Garden {
     public boolean gardenLevelDisplay = true;
 
     @Expose
-    public Position gardenLevelPos = new Position(-375, -215, false, true);
+    public Position gardenLevelPos = new Position(390, 40, false, true);
 
     @Expose
     @ConfigOption(name = "Farming Weight", desc = "")
@@ -740,7 +745,7 @@ public class Garden {
     public boolean eliteFarmingWeightDisplay = true;
 
     @Expose
-    public Position eliteFarmingWeightPos = new Position(-370, -167, false, true);
+    public Position eliteFarmingWeightPos = new Position(180, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +
@@ -761,6 +766,12 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean eliteFarmingWeightOvertakeETAAlways = true;
+
+    @Expose
+    @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10000\")")
+    @ConfigEditorText
+    @ConfigAccordionId(id = 11)
+    public String eliteFarmingWeightETAGoalRank = "10000";
 
     @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
@@ -877,7 +888,7 @@ public class Garden {
     public boolean moneyPerHourHideTitle = false;
 
     @Expose
-    public Position moneyPerHourPos = new Position(16, -232, false, true);
+    public Position moneyPerHourPos = new Position(-330, 170, false, true);
 
     @Expose
     @ConfigOption(name = "Next Jacob's Contest", desc = "")
@@ -925,7 +936,7 @@ public class Garden {
     public boolean nextJacobContestWarnPopup = false;
 
     @Expose
-    public Position nextJacobContestPos = new Position(-278, 11, false, true);
+    public Position nextJacobContestPos = new Position(-200, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Farming Armor Drops", desc = "")
@@ -1085,7 +1096,7 @@ public class Garden {
     public int composterNotifyLowFuel = 10_000;
 
     @Expose
-    public Position composterDisplayPos = new Position(-363, 13, false, true);
+    public Position composterDisplayPos = new Position(-390, 10, false, true);
 
     @Expose
     public Position composterOutsideGardenPos = new Position(-363, 13, false, true);
@@ -1119,7 +1130,7 @@ public class Garden {
     public Runnable positions = Commands::openFortuneGuide;
 
     @Expose
-    public Position farmingFortunePos = new Position(-375, -200, false, true);
+    public Position farmingFortunePos = new Position(5, -180, false, true);
 
     @Expose
     @ConfigOption(name = "Tooltip Tweaks", desc = "")

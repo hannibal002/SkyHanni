@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import com.google.gson.JsonObject
@@ -13,9 +15,7 @@ import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
 import com.jagrosh.discordipc.entities.RichPresence
 import kotlinx.coroutines.launch
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.*
 import java.util.concurrent.Executors
@@ -151,7 +151,7 @@ object DiscordRPCManager : IPCListener {
     private fun isEnabled() = config.enabled.get()
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins skyblock but only running it again once they join and leave.
         if (LorenzUtils.inSkyBlock) {
             start()
@@ -160,7 +160,7 @@ object DiscordRPCManager : IPCListener {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
         executor.schedule(
             {

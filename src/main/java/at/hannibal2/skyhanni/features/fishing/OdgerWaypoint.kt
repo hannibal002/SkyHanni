@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -12,22 +13,18 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class OdgerWaypoint {
     private val location = LorenzVec(-373, 207, -808)
 
-    private var tick = 0
     private var hasLavaRodInHand = false
     private var trophyFishInInv = false
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        tick++
-        if (tick % 10 == 0) {
+        if (event.isMod(10)) {
             hasLavaRodInHand = isLavaFishingRod()
 
             trophyFishInInv = InventoryUtils.getItemsInOwnInventory().map { it.getLore() }

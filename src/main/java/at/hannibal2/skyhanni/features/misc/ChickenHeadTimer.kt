@@ -3,25 +3,24 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class ChickenHeadTimer {
-    private var tick = 0
     private var hasChickenHead = false
     private var lastTime = 0L
     private val config get() = SkyHanniMod.feature.misc
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (tick++ % 5 != 0) return
+        if (!event.isMod(5)) return
 
         val itemStack = InventoryUtils.getArmor()[3]
         val name = itemStack?.name ?: ""
@@ -29,7 +28,7 @@ class ChickenHeadTimer {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastTime = System.currentTimeMillis()
     }
 

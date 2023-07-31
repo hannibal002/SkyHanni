@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -44,8 +45,8 @@ object TrevorSolver {
 
     fun findMob() {
         var canSee = false
-        val world = Minecraft.getMinecraft().theWorld ?: return
-        for (entity in world.getLoadedEntityList()) {
+        val entities = EntityUtils.getAllEntitiesOrNull() ?: return
+        for (entity in entities) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
