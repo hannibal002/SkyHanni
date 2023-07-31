@@ -2,7 +2,7 @@
 
 ## Version 0.19 (unreleased)
 
-#### Rift Features
+### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
 + **Rift 
