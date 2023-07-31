@@ -53,7 +53,6 @@
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
 + Added Jinxed voodoo doll ability cooldown support - HiZe
 + Added Polarvoid Books to estimated item value - jani
-+ Added Chumcap support for Chum Bucket Hider - jani
 + Added **Motes NPC** price in the item lore
   + With Burgers multiplier - HiZe
 + Added Motes Grubber to Not Clickable Items feature
@@ -126,6 +125,7 @@
 + More **Trophy Fish** features - appable0
   + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish.
   + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value.
++ Added Chumcap support for Chum Bucket Hider - jani
 
 ### Changes
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
