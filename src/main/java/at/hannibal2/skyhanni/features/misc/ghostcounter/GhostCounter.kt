@@ -447,12 +447,6 @@ object GhostCounter {
         update()
     }
 
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val const = event.getConstant("GhostCounter")!!
-        bestiaryUpdate = const["useBestiaryUpdate"].asBoolean
-    }
-
     fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.enabled && LorenzUtils.skyBlockIsland == IslandType.DWARVEN_MINES
     }
