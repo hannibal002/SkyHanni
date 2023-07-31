@@ -421,7 +421,7 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        garden = event.getConstant<GardenJson>("Garden")!!
+        garden = event.getConstant<GardenJson>("Garden")
         updateOrganicMatterFactors()
     }
 

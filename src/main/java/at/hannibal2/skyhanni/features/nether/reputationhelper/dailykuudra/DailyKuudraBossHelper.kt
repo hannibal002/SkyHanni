@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -104,7 +103,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         kuudraTiers.clear()
 
         //Repo
-        val repoData = reputationHelper.repoData
+        val repoData = reputationHelper.repoData ?: return
         val jsonElement = repoData["KUUDRA"]
         var tier = 1
         for ((displayName, extraData) in jsonElement.asJsonObject.entrySet()) {
