@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
+import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
@@ -119,7 +120,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.16",
+    version = "0.19",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -212,6 +213,7 @@ class SkyHanniMod {
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
+        loadModule(WarpIsCommand())
         loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
@@ -241,7 +243,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowHelper)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
-        loadModule(CollectionCounter())
+        loadModule(CollectionTracker())
         loadModule(HighlightBonzoMasks())
         loadModule(DungeonLevelColor())
         loadModule(BazaarCancelledBuyOrderClipboard())

@@ -92,10 +92,11 @@ object GhostUtil {
     }
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
+        val maxLevel = if (GhostCounter.bestiaryUpdate) "25" else "46"
         val bestiaryNextLevel = GhostCounter.hidden?.bestiaryNextLevel
         val currentLevel =
-            bestiaryNextLevel?.let { if (it.toInt() < 0) "46" else "${it.toInt() - 1}" } ?: "§cNo Bestiary Level Data!"
-        val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) "46" else "${it.toInt()}" }
+            bestiaryNextLevel?.let { if (it.toInt() < 0) maxLevel else "${it.toInt() - 1}" } ?: "§cNo Bestiary Level Data!"
+        val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) maxLevel else "${it.toInt()}" }
             ?: "§cNo Bestiary Level data!"
 
         return Utils.chromaStringByColourCode(
@@ -109,6 +110,7 @@ object GhostUtil {
     }
 
     private fun percent(number: Double): String {
-        return "${((number / 3_000_000) * 100).roundToPrecision(4)}"
+        val max = if (GhostCounter.bestiaryUpdate) 3_000_000 else 100_000
+        return "${((number / max) * 100).roundToPrecision(4)}"
     }
 }

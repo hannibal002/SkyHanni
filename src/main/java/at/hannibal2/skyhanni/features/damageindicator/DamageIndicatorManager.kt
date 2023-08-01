@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -41,12 +42,10 @@ class DamageIndicatorManager {
     private val config get() = SkyHanniMod.feature.damageIndicator
 
     companion object {
-        private var data = mutableMapOf<UUID, EntityData>()
+        private var data = mapOf<UUID, EntityData>()
         private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
-        fun isBoss(entity: EntityLivingBase): Boolean {
-            return data.values.any { it.entity == entity }
-        }
+        fun isBoss(entity: EntityLivingBase) = data.values.any { it.entity == entity }
 
         fun isDamageSplash(entity: EntityLivingBase): Boolean {
             if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
@@ -57,13 +56,9 @@ class DamageIndicatorManager {
             return damagePattern.matcher(name).matches()
         }
 
-        fun isBossSpawned(type: BossType): Boolean {
-            return data.entries.find { it.value.bossType == type } != null
-        }
+        fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
 
-        fun isBossSpawned(vararg types: BossType): Boolean {
-            return types.any { isBossSpawned(it) }
-        }
+        fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 
         fun getDistanceTo(vararg types: BossType): Double {
             val playerLocation = LocationUtils.playerLocation()
@@ -84,7 +79,7 @@ class DamageIndicatorManager {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         mobFinder = MobFinder()
-        data.clear()
+        data = emptyMap()
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -102,11 +97,16 @@ class DamageIndicatorManager {
         val player = Minecraft.getMinecraft().thePlayer
 
         //TODO config to define between 100ms and 5 sec
-        for (uuid in data.filter {
+        val filter = data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
             (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
-        }.map { it.key }) {
-            data.remove(uuid)
+        }
+        if (filter.isNotEmpty()) {
+            data = data.editCopy {
+                for (entry in filter) {
+                    remove(entry.key)
+                }
+            }
         }
 
         val sizeHealth: Double
@@ -350,7 +350,7 @@ class DamageIndicatorManager {
                 entityData.healthText = color.getChatColor() + NumberUtil.format(health)
             }
             entityData.timeLastTick = System.currentTimeMillis()
-            data[entity.uniqueID] = entityData
+            data = data.editCopy { this[entity.uniqueID] = entityData }
 
 
         } catch (e: Throwable) {

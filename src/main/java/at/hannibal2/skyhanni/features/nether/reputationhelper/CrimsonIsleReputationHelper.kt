@@ -25,7 +25,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val miniBossHelper = DailyMiniBossHelper(this)
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
-    var repoData: JsonObject = JsonObject()
+    var repoData: JsonObject? = null
     var factionType = FactionType.NONE
 
     private var display = emptyList<List<Any>>()
@@ -39,7 +39,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        repoData = event.getConstant("CrimsonIsleReputation")!!
+        repoData = event.getConstant("CrimsonIsleReputation") ?: return
 
         tryLoadConfig()
         update()

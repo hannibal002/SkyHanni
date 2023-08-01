@@ -13,13 +13,13 @@ class GardenVisitorColorNames {
         try {
             val mapColor = mutableMapOf<String, String>()
             val mapItems = mutableMapOf<String, List<String>>()
-            val garden = event.getConstant("Garden")!!
-            for ((name, element) in garden["visitors"].asJsonObject.entrySet()) {
-                val jsonObject = element.asJsonObject
-                val rarity = jsonObject["rarity"].asString
-                mapColor[name] = getColor(rarity)
-                mapItems[name] = jsonObject["need_items"].asJsonArray.map { it.asString }
-
+            event.getConstant("Garden")?.let { garden ->
+                for ((name, element) in garden["visitors"].asJsonObject.entrySet()) {
+                    val jsonObject = element.asJsonObject
+                    val rarity = jsonObject["rarity"].asString
+                    mapColor[name] = getColor(rarity)
+                    mapItems[name] = jsonObject["need_items"].asJsonArray.map { it.asString }
+                }
             }
             visitorColor = mapColor
             visitorItems = mapItems

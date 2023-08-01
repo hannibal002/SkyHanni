@@ -40,7 +40,7 @@ class ItemStars {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
-            val items = event.getConstant("Items")!!
+            val items = event.getConstant("Items") ?: return
             if (items.has("crimson_armors")) {
                 armorNames.clear()
                 armorNames.addAll(items.getAsJsonArray("crimson_armors").map { it.asString })

@@ -16,7 +16,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 
-class CollectionCounter {
+class CollectionTracker {
 
     private val RECENT_GAIN_TIME = 1_500
 
@@ -88,6 +88,8 @@ class CollectionCounter {
             "gemstones" -> "gemstone"
             "caducous" -> "caducous stem"
             "agaricus" -> "agaricus cap"
+            "quartz" -> "nether quartz"
+            "glowstone" -> "glowstone dust"
 
             else -> rawName
         }
@@ -193,6 +195,6 @@ class CollectionCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Counter")
+        SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")
     }
 }
