@@ -157,6 +157,7 @@ object EntityUtils {
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
     inline fun <reified R : Entity> getEntities(): List<R> = getAllEntities().filterIsInstance<R>()
+    inline fun <reified R : Entity> getEntitiesSequence(): Sequence<R> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.asSequence()?.filterIsInstance<R>() ?: emptySequence()
 
     inline fun <reified R : Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
 

@@ -297,15 +297,18 @@ class DamageIndicatorManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
-            checkEntity(entity)
+        if (!isEnabled()) return
+        data = data.editCopy {
+            EntityUtils.getEntitiesSequence<EntityLivingBase>().mapNotNull(::checkEntity)
+                .forEach { (uuid, entityData) ->
+                    this[uuid] = entityData
+                }
         }
     }
 
-    private fun checkEntity(entity: EntityLivingBase) {
+    private fun checkEntity(entity: EntityLivingBase): Pair<UUID, EntityData>? {
         try {
-            val entityData = grabData(entity) ?: return
+            val entityData = grabData(entity) ?: return null
             if (LorenzUtils.inDungeons) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
@@ -331,7 +334,7 @@ class DamageIndicatorManager {
                 }
                 "§cDead"
             } else {
-                getCustomHealth(entityData, health, entity, maxHealth) ?: return
+                getCustomHealth(entityData, health, entity, maxHealth) ?: return null
             }
 
             if (data.containsKey(entity.uniqueID)) {
@@ -350,11 +353,10 @@ class DamageIndicatorManager {
                 entityData.healthText = color.getChatColor() + NumberUtil.format(health)
             }
             entityData.timeLastTick = System.currentTimeMillis()
-            data = data.editCopy { this[entity.uniqueID] = entityData }
-
-
+            return entity.uniqueID to entityData
         } catch (e: Throwable) {
             e.printStackTrace()
+            return null
         }
     }
 
