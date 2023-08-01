@@ -243,6 +243,9 @@ public class Storage {
             @Expose
             public double totalMF = 0;
 
+            @Expose
+            public int configUpdateVersion = 0;
+
         }
 
         @Expose
