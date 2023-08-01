@@ -13,13 +13,11 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
@@ -173,7 +171,11 @@ object GardenCropMilestoneDisplay {
 
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
         val speed = GardenCropSpeed.averageBlocksPerSecond
-        val farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
+        var farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
+        if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true) {
+            if (crop == CropType.MELON) farmingFortuneSpeed += GardenCropSpeed.latestMelonDicer.toInt()
+            if (crop == CropType.PUMPKIN) farmingFortuneSpeed += GardenCropSpeed.latestPumpkinDicer.toInt()
+        }
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
