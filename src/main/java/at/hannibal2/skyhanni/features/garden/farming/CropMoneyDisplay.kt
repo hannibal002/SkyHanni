@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -25,12 +22,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CropMoneyDisplay {
     var multipliers = mapOf<String, Int>()
-    var showCalculation = false
+    private var showCalculation = false
+    private val melonDicer = mutableListOf<Int>()
+    private val pumpkinDicer = mutableListOf<Int>()
+
 
     fun toggleShowCalculation() {
         showCalculation = !showCalculation
@@ -111,8 +112,8 @@ object CropMoneyDisplay {
 
             if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM) {
                 val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
-                    val redPrice = BazaarApi.getBazaarDataByInternalName("ENCHANTED_RED_MUSHROOM")?.npcPrice ?: 160.0 / 160
-                    val brownPrice = BazaarApi.getBazaarDataByInternalName("ENCHANTED_BROWN_MUSHROOM")?.npcPrice ?: 160.0 / 160
+                    val redPrice = (BazaarApi.getBazaarDataByInternalName("ENCHANTED_RED_MUSHROOM")?.npcPrice ?: 160.0) / 160
+                    val brownPrice = (BazaarApi.getBazaarDataByInternalName("ENCHANTED_BROWN_MUSHROOM")?.npcPrice ?: 160.0) / 160
                     redPrice to brownPrice
                 } else {
                     val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
@@ -343,6 +344,36 @@ object CropMoneyDisplay {
             } else {
                 arrayOf(sellOffer)
             }
+        }
+    }
+
+    private fun calculateAverageDicer(dicerList: MutableList<Int>, dropsJson: JsonObject) {
+        dicerList.clear()
+        val totalChance = dropsJson["total chance"].asDouble
+        val dropTypes = dropsJson["drops"].asJsonArray
+        for (dropType in dropTypes) {
+            val dropJson = dropType.asJsonObject
+            val chance = (dropJson["chance"].asDouble / totalChance)
+            dropJson["amount"].asJsonArray.forEachIndexed { index, element ->
+                val amount = element.asInt * chance * 60 * 60
+                if (index < dicerList.size) {
+                    dicerList[index] += amount.toInt()
+                } else {
+                    dicerList.add(amount.toInt())
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        try {
+            val dicerJson = event.getConstant("DicerDrops")!!
+            calculateAverageDicer(melonDicer, dicerJson["MELON"].asJsonObject)
+            calculateAverageDicer(pumpkinDicer, dicerJson["PUMPKIN"].asJsonObject)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            LorenzUtils.error("error in RepositoryReloadEvent")
         }
     }
 
