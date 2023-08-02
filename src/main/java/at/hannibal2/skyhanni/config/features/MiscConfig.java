@@ -599,7 +599,7 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(name = "sortingType", desc = "")
-        @ConfigEditorDropdown(values = {"Lowest Kills", "Highest Kills", "Lowest %", "Highest %", "Lowest Kills Needed", "Highest Kills Needed"})
+        @ConfigEditorDropdown(values = {"Lowest Kills", "Highest Kills", "Lowest %", "Highest %", "Kills Needed", "Kills Needed"})
         public int sortingType = 0;
 
         @Expose

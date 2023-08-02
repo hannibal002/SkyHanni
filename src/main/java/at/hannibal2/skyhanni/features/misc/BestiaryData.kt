@@ -340,8 +340,8 @@ object BestiaryData {
     enum class DisplayType(val type: String) {
         MAX("To Maxed"),
         TIER("To Next Tier"),
-        FEWEST_MAX("Fewest kills to max"),
-        FEWEST_TIER("Fewest kills to next tier")
+        FEWEST_MAX("Kills to max"),
+        FEWEST_TIER("Kills to next tier")
     }
 
     enum class HideMaxed(val b: String) {
