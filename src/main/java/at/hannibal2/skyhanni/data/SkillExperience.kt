@@ -74,7 +74,6 @@ class SkillExperience {
                         val overflow = rawNumber.formatNumber()
                         val experience = baseExp + overflow
                         skillExp[skillName] = experience
-                        println("skill exp: $skillName -> $experience")
                     }
                     next = false
                 }
