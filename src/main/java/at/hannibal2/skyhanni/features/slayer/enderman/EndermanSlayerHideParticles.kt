@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EndermanSlayerHideParticles {
 
-    private var endermanLocations = listOf<LorenzVec>()
+    private var endermanLocations = sequenceOf<LorenzVec>()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
