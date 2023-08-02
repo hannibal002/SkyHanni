@@ -407,9 +407,6 @@ object BestiaryData {
         add(newList)
     }
 
-    fun isInt(v: Any): Boolean{
-        return v is Int
-    }
     fun Any.getNextLevel(): String {
         return when (this) {
             is Int -> {
