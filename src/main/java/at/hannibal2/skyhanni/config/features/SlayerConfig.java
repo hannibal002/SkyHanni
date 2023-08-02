@@ -2,7 +2,15 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 public class SlayerConfig {
 
@@ -262,7 +270,7 @@ public class SlayerConfig {
             @Expose
             @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor.")
             @ConfigEditorBoolean
-            public boolean highlight = true;
+            public boolean highlight = false;
 
             @Expose
             @ConfigOption(name = "Beacon Beam", desc = "Render a beacon beam where the Blood Ichor is.")
@@ -295,7 +303,7 @@ public class SlayerConfig {
             @Expose
             @ConfigOption(name = "Highlight Killer Spring", desc = "Highlight the Killer Spring tower.")
             @ConfigEditorBoolean
-            public boolean highlight = true;
+            public boolean highlight = false;
 
             @Expose
             @ConfigOption(name = "Color", desc = "Highlight color.")

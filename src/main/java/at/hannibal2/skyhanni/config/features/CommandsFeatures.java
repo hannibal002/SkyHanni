@@ -16,4 +16,9 @@ public class CommandsFeatures {
             "§7SkyBlock command §e/pt §7to check the play time still works.")
     @ConfigEditorBoolean
     public boolean usePartyTransferAlias = true;
+
+    @Expose
+    @ConfigOption(name = "Replace Warp Is", desc = "Replaces §e/warp is §7with §e/is§7. Idk why. Ask §cKaeso")
+    @ConfigEditorBoolean
+    public boolean replaceWarpIs = false;
 }

@@ -361,13 +361,19 @@ class ComposterOverlay {
         bigList: MutableList<List<Any>>,
         factors: Map<String, Double>,
         missing: Double,
-        testOffset: Int = 0,
+        testOffset_: Int = 0,
         onClick: (String) -> Unit,
     ): String {
         val map = mutableMapOf<String, Double>()
         for ((internalName, factor) in factors) {
             map[internalName] = factor / getPrice(internalName)
         }
+
+        val testOffset = if (testOffset_ > map.size) {
+            LorenzUtils.chat("§cSkyHanni] Invalid Composter Overlay Offset! $testOffset cannot be greather than ${map.size}!")
+            ComposterOverlay.testOffset = 0
+            0
+        } else testOffset_
 
         var i = 0
         var first: String? = null
@@ -384,6 +390,9 @@ class ComposterOverlay {
             val totalPrice = itemsNeeded * price
 
             val list = mutableListOf<Any>()
+            if (testOffset != 0) {
+                list.add("#$i ")
+            }
             list.add(item)
             val format = NumberUtil.format(totalPrice)
             val selected =
@@ -402,8 +411,14 @@ class ComposterOverlay {
 
             if (i == 10 + testOffset) break
         }
+        if (testOffset != 0) {
+            bigList.addAsSingletonList(Renderable.link("testOffset = $testOffset") {
+                ComposterOverlay.testOffset = 0
+                update()
+            })
+        }
 
-        return first!!
+        return first ?: error("First is empty!")
     }
 
     private fun getPrice(internalName: String): Double {
@@ -421,7 +436,7 @@ class ComposterOverlay {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        garden = event.getConstant<GardenJson>("Garden")!!
+        garden = event.getConstant<GardenJson>("Garden")
         updateOrganicMatterFactors()
     }
 
@@ -447,6 +462,7 @@ class ComposterOverlay {
             if (internalName.endsWith("_CHESTPLATE")) continue
             if (internalName.endsWith("_LEGGINGS")) continue
             if (internalName == "SPEED_TALISMAN") continue
+            if (internalName == "SIMPLE_CARROT_CANDY") continue
             val (newId, amount) = NEUItems.getMultiplier(internalName)
             if (amount <= 9) continue
             val finalAmount =

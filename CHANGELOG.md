@@ -1,12 +1,11 @@
 # SkyHanni - Change Log
 
-## Version 0.19 (unreleased)
+## Version 0.19 (2023-08-01)
 
-#### Rift Features
+### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
-+ **Rift 
-+ Highlight Guide**
++ **Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + Added **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy crux will steal your time.
@@ -53,7 +52,6 @@
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
 + Added Jinxed voodoo doll ability cooldown support - HiZe
 + Added Polarvoid Books to estimated item value - jani
-+ Added Chumcap support for Chum Bucket Hider - jani
 + Added **Motes NPC** price in the item lore
   + With Burgers multiplier - HiZe
 + Added Motes Grubber to Not Clickable Items feature
@@ -126,8 +124,10 @@
 + More **Trophy Fish** features - appable0
   + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish.
   + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value.
++ Added Chumcap support for Chum Bucket Hider - jani
 
 ### Changes
++ SkyHanni no longer requires Patcher to start! (Big thanks nea)
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
 + Added option to show exact prices in estimated item value
@@ -146,6 +146,9 @@
 + Custom text over Visitor name moves more smoothly now
 + Discord Rich Presence now supports Motes in the rift and the garden plot number - NetheriteMiner
 + Crop money display: Using npc price for mushroom cow pet calculation when on ironman, stranded or bingo
++ Sacks no longer get blocked from moving in storage (not clickable items feature)
++ Using 19.9 bps if bps is too low for jacob contest ff needed display
++ Better default positions for some guis
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -179,6 +182,7 @@
 + Fixed jacob contest time chat message chat shows one second too long
 + Fixed farming contest calendar reading going above 100% - Contrabass26
 + Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
++ Fixed rare bug with Damage Indicator
 
 ## Version 0.18 (2023-06-19)
 

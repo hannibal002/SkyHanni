@@ -16,9 +16,13 @@ public class Bingo {
 
     public static class BingoCard {
         @Expose
-        @ConfigOption(name = "Enable", desc = "Displays the bingo card. Toggle by sneaking with SkyBlock menu in hand.")
+        @ConfigOption(name = "Enable", desc = "Displays the bingo card.")
         @ConfigEditorBoolean
         public boolean enabled = true;
+        @Expose
+        @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the bingo card or the step helper by sneaking with SkyBlock menu in hand.")
+        @ConfigEditorBoolean
+        public boolean quickToggle = true;
 
         @Expose
         @ConfigOption(name = "Bingo Steps", desc = "Show help with the next step in bingo instead of the bingo card. " +

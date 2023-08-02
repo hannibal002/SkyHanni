@@ -2,7 +2,15 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -24,7 +32,7 @@ public class MiscConfig {
     public boolean petDisplay = false;
 
     @Expose
-    public Position petDisplayPos = new Position(-111, 221, false, true);
+    public Position petDisplayPos = new Position(-330, -15, false, true);
 
     @Expose
     @ConfigOption(name = "Time", desc = "")
@@ -592,6 +600,13 @@ public class MiscConfig {
         @ConfigEditorBoolean
         public boolean highlightCommissionMobs = false;
 
+        @Expose
+        @ConfigOption(name = "King Talisman Helper", desc = "Show kings you have not talked to yet, and when the next missing king will appear.")
+        @ConfigEditorBoolean
+        public boolean kingTalismanHelper = false;
+
+        @Expose
+        public Position kingTalismanHelperPos = new Position(-400, 220, false, true);
     }
 
     @Expose

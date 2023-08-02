@@ -36,7 +36,7 @@ class ParkourWaypointSaver {
             update()
         }
         if (config.saveKey == key) {
-            val newLocation = LocationUtils.playerLocation().roundLocation()
+            val newLocation = LorenzVec.getBlockBelowPlayer()
             if (locations.isNotEmpty()) {
                 if (newLocation == locations.last()) return
             }
@@ -69,7 +69,7 @@ class ParkourWaypointSaver {
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (locations.size > 2) {
+        if (locations.size > 1) {
             parkourHelper?.render(event)
         } else {
             for (location in locations) {

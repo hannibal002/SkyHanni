@@ -117,7 +117,11 @@ object ItemUtils {
 
     fun ItemStack.getInternalNameOrNull() = getInternalName().takeIf { it != "" }
 
-    fun ItemStack.getInternalName(): String {
+    fun ItemStack.getInternalNameOrNull_new() = getInternalName_new().takeIf { it.asString() != "" }
+
+    fun ItemStack.getInternalName_new() = NEUInternalName.from(getInternalName())
+
+        fun ItemStack.getInternalName(): String {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return "WISP_POTION"
         }
