@@ -681,7 +681,7 @@ public class MiscConfig {
     public boolean patcherSendCoordWaypoint = false;
 
     @Expose
-    @ConfigOption(name = "Harp Keybinds", desc = "Press harp buttons with your number row on the keyboard instead of clicking.")
+    @ConfigOption(name = "Harp Keybinds", desc = "In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.")
     @ConfigEditorBoolean
     public boolean harpKeybinds = false;
 
