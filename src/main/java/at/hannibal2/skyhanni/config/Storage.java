@@ -13,7 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class Storage {
 
@@ -344,6 +348,15 @@ public class Storage {
                         ", itemGoal='" + itemGoal + '\'' +
                         '}';
             }
+        }
+
+        @Expose
+        public MiningConfig mining = new MiningConfig();
+
+        public static class MiningConfig {
+
+            @Expose
+            public List<String> kingsTalkedTo = new ArrayList<>();
         }
     }
 }
