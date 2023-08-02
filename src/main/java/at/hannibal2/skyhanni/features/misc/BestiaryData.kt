@@ -136,6 +136,8 @@ object BestiaryData {
                 when (config.displayType) {
                     0 -> it.totalKills
                     1 -> it.currentKillToNextLevel
+                    2 -> it.killNeededToMax()
+                    3 -> it.killNeededToNextLevel()
                     else -> it.totalKills
                 }
             }.toMutableList()
@@ -144,42 +146,11 @@ object BestiaryData {
                 when (config.displayType) {
                     0 -> it.totalKills
                     1 -> it.currentKillToNextLevel
+                    2 -> it.killNeededToMax()
+                    3 -> it.killNeededToNextLevel()
                     else -> it.totalKills
                 }
             }.toMutableList()
-
-            2 -> mobList.sortedBy {
-                when (config.displayType) {
-                    0 -> it.percentToMax()
-                    1 -> it.percentToTier()
-                    else -> it.percentToMax()
-                }
-            }.toMutableList()
-
-            3 -> mobList.sortedByDescending {
-                when (config.displayType) {
-                    0 -> it.percentToMax()
-                    1 -> it.percentToTier()
-                    else -> it.percentToMax()
-                }
-            }.toMutableList()
-
-            4 -> mobList.sortedBy {
-                when (config.displayType) {
-                    0 -> it.killNeededToMax()
-                    1 -> it.killNeededToNextLevel()
-                    else -> it.killNeededToMax()
-                }
-            }.toMutableList()
-
-            5 -> mobList.sortedByDescending {
-                when (config.displayType) {
-                    0 -> it.killNeededToMax()
-                    1 -> it.killNeededToNextLevel()
-                    else -> it.killNeededToMax()
-                }
-            }.toMutableList()
-
             else -> mobList.sortedBy {
                 when (config.displayType) {
                     0 -> it.totalKills
@@ -230,8 +201,8 @@ object BestiaryData {
 
                         } else if (displayType == 2 || displayType == 3) {
                             val l = when (displayType) {
-                                2 -> if (mob.killNeededToMax() > 0) "§b${mob.killNeededToMax()} kills needed to max" else "§c§lMAXED!"
-                                3 -> if (mob.killNeededToNextLevel() > 0) "§b${mob.killNeededToNextLevel()} kills needed to next tier" else "§c§lMAXED!"
+                                2 -> if (mob.killNeededToMax() > 0) "§b${mob.killNeededToMax()} kills needed to max level" else "§c§lMAXED!"
+                                3 -> if (mob.killNeededToNextLevel() > 0) "§b${mob.killNeededToNextLevel()} kills needed to level ${mob.getNextLevel()}" else "§c§lMAXED!"
                                 else -> "..."
                             }
                             text += l
@@ -256,7 +227,7 @@ object BestiaryData {
                     })
                 } else {
                     newDisplay.add(buildList {
-                        add("  §7- ")
+                        add(" §7- ")
                         add("${mob.name}: §cNot unlocked!")
                     })
                 }
@@ -273,13 +244,14 @@ object BestiaryData {
                 prefix = "§7Sorting Type: ",
                 getName = SortingType.entries[config.sortingType].type,
                 onChange = {
-                    config.sortingType = (config.sortingType + 1) % 4
+                    config.sortingType = (config.sortingType + 1) % 2
                     update()
                 })
 
-            newDisplay.addButton(
+            newDisplay.addButtonWithTips(
                 prefix = "§7Display Type: ",
                 getName = DisplayType.entries[config.displayType].type,
+                tips = DisplayType.entries[config.displayType].tips,
                 onChange = {
                     config.displayType = (config.displayType + 1) % 4
                     update()
@@ -329,19 +301,15 @@ object BestiaryData {
     }
 
     enum class SortingType(val type: String) {
-        LOWEST_KILLS("Lowest Kills"),
-        HIGHEST_KILLS("Highest Kills"),
-        LOWEST_PERCENT("Lowest %"),
-        HIGHEST_PERCENT("Highest %"),
-        LOWEST_NEEDED_KILL("Lowest Kills Needed"),
-        HIGHEST_NEEDED_KILL("Highest Kills Needed")
+        LOWEST("Lowest"),
+        HIGHEST("Highest"),
     }
 
-    enum class DisplayType(val type: String) {
-        MAX("To Maxed"),
-        TIER("To Next Tier"),
-        FEWEST_MAX("Kills to max"),
-        FEWEST_TIER("Kills to next tier")
+    enum class DisplayType(val type: String, val tips: List<String>) {
+        MAX("To Maxed", listOf("§6Show progress to max the bestiary.","§bFormat: - Ghost (100/200) 50.00%")),
+        TIER("To Next Tier", listOf("§6Show progress to the next level.","§bFormat: - Ghost (100/200) 50.00% to level X")),
+        FEWEST_MAX("Kills to max", listOf("§6Show needed kills to max the bestiary.","§bFormat: - Ghost 100 kills needed to max")),
+        FEWEST_TIER("Kills to next tier", listOf("§6Show needed kills to reach the next level.","§bFormat: - Ghost 10 kills needed for level X"))
     }
 
     enum class HideMaxed(val b: String) {
@@ -406,6 +374,26 @@ object BestiaryData {
         })
     }
 
+    private fun MutableList<List<Any>>.addButtonWithTips(
+        prefix: String,
+        getName: String,
+        tips: List<String>,
+        onChange: () -> Unit,
+    ) {
+        add(buildList {
+            add(prefix)
+            add("§a[")
+            add(Renderable.clickAndHover("§e$getName", tips, false) {
+                if ((System.currentTimeMillis() - lastclicked) > 100) { //funny thing happen if i don't do that
+                    onChange()
+                    SoundUtils.playClickSound()
+                    lastclicked = System.currentTimeMillis()
+                }
+            })
+            add("§a]")
+        })
+    }
+
     fun Any.getNextLevel(): String {
         return when (this) {
             is Int -> {
@@ -413,11 +401,15 @@ object BestiaryData {
             }
 
             is String -> {
-                val intValue = Utils.parseRomanNumeral(this)
-                if (intValue != null) {
-                    (intValue + 1).toRoman()
+                if (this == "0") {
+                    "I"
                 } else {
-                    "Invalid Roman numeral"
+                    val intValue = Utils.parseRomanNumeral(this)
+                    if (intValue != null) {
+                        (intValue + 1).toRoman()
+                    } else {
+                        "Invalid Roman numeral"
+                    }
                 }
             }
 
