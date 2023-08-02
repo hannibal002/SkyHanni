@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -297,15 +298,15 @@ class DamageIndicatorManager {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
-            checkEntity(entity)
+        if (!isEnabled()) return
+        data = data.editCopy {
+            EntityUtils.getEntities<EntityLivingBase>().mapNotNull(::checkEntity).forEach { this put it }
         }
     }
 
-    private fun checkEntity(entity: EntityLivingBase) {
+    private fun checkEntity(entity: EntityLivingBase): Pair<UUID, EntityData>? {
         try {
-            val entityData = grabData(entity) ?: return
+            val entityData = grabData(entity) ?: return null
             if (LorenzUtils.inDungeons) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
@@ -331,7 +332,7 @@ class DamageIndicatorManager {
                 }
                 "§cDead"
             } else {
-                getCustomHealth(entityData, health, entity, maxHealth) ?: return
+                getCustomHealth(entityData, health, entity, maxHealth) ?: return null
             }
 
             if (data.containsKey(entity.uniqueID)) {
@@ -350,11 +351,10 @@ class DamageIndicatorManager {
                 entityData.healthText = color.getChatColor() + NumberUtil.format(health)
             }
             entityData.timeLastTick = System.currentTimeMillis()
-            data = data.editCopy { this[entity.uniqueID] = entityData }
-
-
+            return entity.uniqueID to entityData
         } catch (e: Throwable) {
             e.printStackTrace()
+            return null
         }
     }
 

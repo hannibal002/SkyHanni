@@ -422,4 +422,8 @@ object LorenzUtils {
         }
         return false
     }
+
+    infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
+        this[pairs.first] = pairs.second
+    }
 }
