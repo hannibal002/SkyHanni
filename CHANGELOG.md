@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.19
+## Version 0.19 (2023-08-01)
 
 ### Rift Features
 + Added **Rift Timer**
