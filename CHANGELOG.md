@@ -1,6 +1,27 @@
 # SkyHanni - Change Log
 
-## Version 0.19 (2023-08-01)
+## Version 0.20 (Unreleased)
+
+### New Features
++ Replacing command `/warp is` with `/is`.
++ Added command `/shbingotoggle` to toggle the bingo card. 
++ Added option to disable quick bingo card toggle with sneaking.
++ **King Talisman Helper**
+  + Show kings you have not talked to yet, and when the next missing king will appear.
++ **Harp Keybinds** - NetheriteMiner
+  + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
++ **Ender Node Tracker** - ericpretzel
+  + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
+
+###
++ Added option to disable quick bingo card toggle with sneaking.
++ Made damage indicator more performant. - nea
++ Ghost bestiary update. - HiZe
+
+### Fixes
++ Removed `Simple Carrot Candy` from composter overlay.
+
+## Version 0.19
 
 ### Rift Features
 + Added **Rift Timer**
