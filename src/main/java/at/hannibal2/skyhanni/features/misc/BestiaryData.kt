@@ -71,6 +71,7 @@ object BestiaryData {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         val inventoryName = event.inventoryName
+        if (inventoryName == "Bestiary ➜ Fishing") return
         if (isBestiaryGui(event.inventoryItems[4], inventoryName)) {
             stackList.putAll(event.inventoryItems)
             update()
