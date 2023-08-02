@@ -367,6 +367,7 @@ class SkyHanniMod {
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
         loadModule(KingTalismanHelper())
+        loadModule(HarpKeybinds())
         //
 
 
