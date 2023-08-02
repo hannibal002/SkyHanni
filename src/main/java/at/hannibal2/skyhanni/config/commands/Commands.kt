@@ -133,6 +133,7 @@ object Commands {
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
+        registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
     }
 
     private fun usersBugFix() {

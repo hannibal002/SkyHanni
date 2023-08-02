@@ -21,7 +21,6 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardDisplay {
-    private val config get() = SkyHanniMod.feature.bingo.bingoCard
 
     private val MAX_PERSONAL_GOALS = 20
     private val MAX_COMMUNITY_GOALS = 5
@@ -34,6 +33,8 @@ class BingoCardDisplay {
     }
 
     companion object {
+        private val config get() = SkyHanniMod.feature.bingo.bingoCard
+        private var displayMode = 0
         val personalGoals = mutableListOf<PersonalGoal>()
         private val communityGoals = mutableListOf<CommunityGoal>()
 
@@ -44,6 +45,25 @@ class BingoCardDisplay {
         private fun reload() {
             personalGoals.clear()
             communityGoals.clear()
+        }
+
+        fun toggleCommand() {
+            if (!LorenzUtils.isBingoProfile) {
+                LorenzUtils.chat("§cThis command only works on a bingo profile!")
+                return
+            }
+            if (!config.enabled) {
+                LorenzUtils.chat("§cBingo Card is disabled in the config!")
+                return
+            }
+            toggleMode()
+        }
+
+        private fun toggleMode() {
+            displayMode++
+            if (displayMode == 3) {
+                displayMode = 0
+            }
         }
     }
 
@@ -116,21 +136,19 @@ class BingoCardDisplay {
     }
 
     private var lastSneak = false
-    private var displayMode = 0
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
-        if (ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
-            val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
-            if (lastSneak != sneaking) {
-                lastSneak = sneaking
-                if (sneaking) {
-                    displayMode++
-                    if (displayMode == 3) {
-                        displayMode = 0
+        if (config.quickToggle) {
+            if (ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
+                val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+                if (lastSneak != sneaking) {
+                    lastSneak = sneaking
+                    if (sneaking) {
+                        toggleMode()
                     }
                 }
             }
