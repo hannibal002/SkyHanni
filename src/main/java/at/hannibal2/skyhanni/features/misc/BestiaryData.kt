@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.lang.NumberFormatException
 
 
 object BestiaryData {
@@ -253,7 +252,7 @@ object BestiaryData {
                                 "§7More infos thing"), false) {
                             true
                         }
-                        add (rendered)
+                        add(rendered)
                     })
                 } else {
                     newDisplay.add(buildList {
@@ -383,7 +382,7 @@ object BestiaryData {
             return 100.0.coerceAtMost((currentKillToNextLevel.toDouble() / killNeededForNextLevel) * 100).roundToPrecision(2)
         }
 
-        fun getNextLevel(): String{
+        fun getNextLevel(): String {
             return level.getNextLevel()
         }
     }
@@ -393,18 +392,18 @@ object BestiaryData {
         getName: String,
         onChange: () -> Unit,
     ) {
-        val newList = mutableListOf<Any>()
-        newList.add(prefix)
-        newList.add("§a[")
-        newList.add(Renderable.link("§e$getName") {
-            if ((System.currentTimeMillis() - lastclicked) > 100) {
-                onChange()
-                SoundUtils.playClickSound()
-                lastclicked = System.currentTimeMillis()
-            }
+        add(buildList {
+            add(prefix)
+            add("§a[")
+            add(Renderable.link("§e$getName") {
+                if ((System.currentTimeMillis() - lastclicked) > 100) { //funny thing happen if i don't do that
+                    onChange()
+                    SoundUtils.playClickSound()
+                    lastclicked = System.currentTimeMillis()
+                }
+            })
+            add("§a]")
         })
-        newList.add("§a]")
-        add(newList)
     }
 
     fun Any.getNextLevel(): String {
@@ -412,6 +411,7 @@ object BestiaryData {
             is Int -> {
                 (this + 1).toString()
             }
+
             is String -> {
                 val intValue = Utils.parseRomanNumeral(this)
                 if (intValue != null) {
@@ -420,10 +420,10 @@ object BestiaryData {
                     "Invalid Roman numeral"
                 }
             }
+
             else -> {
                 "Unsupported type: ${this::class.simpleName}"
             }
         }
     }
-
 }
