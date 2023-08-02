@@ -10,6 +10,7 @@ class WarpIsCommand {
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.commands.replaceWarpIs) return
 
         val packet = event.packet
