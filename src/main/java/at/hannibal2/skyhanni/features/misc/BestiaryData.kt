@@ -13,17 +13,20 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.lang.NumberFormatException
 
 
-class BestiaryData {
+object BestiaryData {
 
     private val config get() = SkyHanniMod.feature.misc.bestiarySlotHighlightConfig
     private var display = emptyList<List<Any>>()
@@ -92,14 +95,19 @@ class BestiaryData {
             if (stack.displayName == " ") continue
             if (indexes.contains(index)) {
                 inInventory = true
-                val name = stack.displayName
+                val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
+                val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
                 var totalKillToMax: Long = 0
                 var currentTotalKill: Long = 0
                 var totalKillToTier: Long = 0
                 var currentKillToTier: Long = 0
-
+                var actualRealTotalKill: Long = 0
                 for ((lineIndex, line) in stack.getLore().withIndex()) {
                     val loreLine = line.removeColor()
+                    if (loreLine.startsWith("Kills: ")) {
+                        actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
+                            ?: 0
+                    }
                     if (loreLine.startsWith("                    ")) {
                         val previousLine = stack.getLore()[lineIndex - 1]
                         val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
@@ -116,7 +124,7 @@ class BestiaryData {
                         }
                     }
                 }
-                mobList.add(BestiaryMob(name, totalKillToMax, currentTotalKill, totalKillToTier, currentKillToTier))
+                mobList.add(BestiaryMob(name, level, totalKillToMax, currentTotalKill, totalKillToTier, currentKillToTier, actualRealTotalKill))
             }
         }
     }
@@ -191,8 +199,10 @@ class BestiaryData {
                     if (isMaxed && config.hideMaxed) continue
                     newDisplay.add(buildList {
                         val displayType = config.displayType
-                        add("  §7- ")
-                        add("${mob.name} ")
+                        var text = ""
+                        //add("  §7- ")
+                        text += " §7- "
+                        text += "${mob.name} "
                         if (displayType == 0 || displayType == 1) {
                             val currentKill = when (displayType) {
                                 0 -> mob.totalKills
@@ -204,19 +214,46 @@ class BestiaryData {
                                 1 -> mob.killNeededForNextLevel
                                 else -> 0
                             }
-                            add(if (isMaxed) "§c§lMAXED!" else {
+                            text += if (isMaxed) {
+                                "§c§lMAXED!"
+                            } else {
                                 val curr = if (currentKill > killNeeded) killNeeded else currentKill
-                                "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6%"
-                            })
+                                //"§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6%"
+                                "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
+                            }
+
+
+                            /* add(if (isMaxed) "§c§lMAXED!" else {
+                                 val curr = if (currentKill > killNeeded) killNeeded else currentKill
+                                 "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6%"
+                                 text += ""
+                             })*/
 
                         } else if (displayType == 2 || displayType == 3) {
                             val l = when (displayType) {
-                                2 -> "§b${mob.killNeededToMax()} kills needed to max"
-                                3 -> "§b${mob.killNeededToNextLevel()} kills needed to next tier"
+                                2 -> if (mob.killNeededToMax() > 0) "§b${mob.killNeededToMax()} kills needed to max" else "§c§lMAXED!"
+                                3 -> if (mob.killNeededToNextLevel() > 0) "§b${mob.killNeededToNextLevel()} kills needed to next tier" else "§c§lMAXED!"
                                 else -> "..."
                             }
-                            add(l)
+                            text += l
                         }
+                        val rendered = Renderable.hoverTips(text,
+                            listOf(
+                                "§6Name: §b${mob.name}",
+                                "§6Level: §b${mob.level}",
+                                "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
+                                "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
+                                "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
+                                "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
+                                "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
+                                "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
+                                "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
+                                "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
+                                "",
+                                "§7More infos thing"), false) {
+                            true
+                        }
+                        add (rendered)
                     })
                 } else {
                     newDisplay.add(buildList {
@@ -323,10 +360,12 @@ class BestiaryData {
     private fun Boolean.toInt() = if (!this) 0 else 1
 
     data class BestiaryMob(var name: String,
+                           var level: String,
                            var killToMax: Long,
                            var totalKills: Long,
                            var killNeededForNextLevel: Long,
-                           var currentKillToNextLevel: Long) {
+                           var currentKillToNextLevel: Long,
+                           var actualRealTotalKill: Long) {
 
         fun killNeededToMax(): Long {
             return 0L.coerceAtLeast(killToMax - totalKills)
@@ -342,6 +381,10 @@ class BestiaryData {
 
         fun percentToTier(): Double {
             return 100.0.coerceAtMost((currentKillToNextLevel.toDouble() / killNeededForNextLevel) * 100).roundToPrecision(2)
+        }
+
+        fun getNextLevel(): String{
+            return level.getNextLevel()
         }
     }
 
@@ -363,4 +406,27 @@ class BestiaryData {
         newList.add("§a]")
         add(newList)
     }
+
+    fun isInt(v: Any): Boolean{
+        return v is Int
+    }
+    fun Any.getNextLevel(): String {
+        return when (this) {
+            is Int -> {
+                (this + 1).toString()
+            }
+            is String -> {
+                val intValue = Utils.parseRomanNumeral(this)
+                if (intValue != null) {
+                    (intValue + 1).toRoman()
+                } else {
+                    "Invalid Roman numeral"
+                }
+            }
+            else -> {
+                "Unsupported type: ${this::class.simpleName}"
+            }
+        }
+    }
+
 }

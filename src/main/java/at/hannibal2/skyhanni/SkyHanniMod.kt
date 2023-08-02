@@ -161,7 +161,6 @@ class SkyHanniMod {
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
-        loadModule(BestiaryData())
 
         // APIs
         loadModule(BazaarApi())
@@ -364,6 +363,7 @@ class SkyHanniMod {
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
+        loadModule(BestiaryData)
         //
 
 
