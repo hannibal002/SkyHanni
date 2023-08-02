@@ -411,6 +411,14 @@ public class Garden {
     public int blocksBrokenResetTime = 5;
 
     @Expose
+    @ConfigOption(
+            name = "Include Dicer Estimate",
+            desc = "Includes the estimate of how many crops your dicers give you.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean cropMilestoneIncludeDicer = true;
+
+    @Expose
     public Position cropMilestoneProgressDisplayPos = new Position(-400, -200, false, true);
 
     @Expose
@@ -878,6 +886,30 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourMergeSeeds = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Bountiful",
+            desc = "Includes the coins from bountiful in the calculation.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourBountiful = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Mooshroom Cow",
+            desc = "Includes the coins you get from selling the mushrooms from your mooshroom cow pet.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourMooshroom = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Dicer Drops",
+            desc = "Includes the average coins/hr from your melon or pumpkin dicer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourDicer = true;
 
     @Expose
     @ConfigOption(

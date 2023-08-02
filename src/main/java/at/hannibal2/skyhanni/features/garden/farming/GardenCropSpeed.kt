@@ -115,9 +115,9 @@ object GardenCropSpeed {
                         }
                         if (tier != -1 && melonDicer.size > 0 && pumpkinDicer.size > 0) {
                             if (it == CropType.MELON) {
-                                latestMelonDicer = melonDicer[tier] * averageBlocksPerSecond
+                                latestMelonDicer = melonDicer[tier]
                             } else if (it == CropType.PUMPKIN){
-                                latestPumpkinDicer = pumpkinDicer[tier] * averageBlocksPerSecond
+                                latestPumpkinDicer = pumpkinDicer[tier]
                             }
                         }
                     }
@@ -156,6 +156,17 @@ object GardenCropSpeed {
         } catch (e: Exception) {
             e.printStackTrace()
             LorenzUtils.error("error in RepositoryReloadEvent")
+        }
+    }
+
+    fun getRecentBPS(): Double {
+        val size = blocksSpeedList.size
+        return if (size <= 1) {
+            0.0
+        } else {
+            val startIndex = if (size >= 6) size - 5 else 0
+            val validValues = blocksSpeedList.subList(startIndex, size - 1)
+            validValues.average()
         }
     }
 

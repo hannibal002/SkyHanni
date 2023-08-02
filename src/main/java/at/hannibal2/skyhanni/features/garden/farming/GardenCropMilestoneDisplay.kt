@@ -58,14 +58,12 @@ object GardenCropMilestoneDisplay {
         if (GardenAPI.hideExtraGuis()) return
 
         config.cropMilestoneProgressDisplayPos.renderStringsAndItems(
-            progressDisplay,
-            posLabel = "Crop Milestone Progress"
+            progressDisplay, posLabel = "Crop Milestone Progress"
         )
 
         if (config.cropMilestoneMushroomPetPerkEnabled) {
             config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(
-                mushroomCowPerkDisplay,
-                posLabel = "Mushroom Cow Perk"
+                mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk"
             )
         }
 
@@ -172,13 +170,15 @@ object GardenCropMilestoneDisplay {
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune(true)
         val speed = GardenCropSpeed.averageBlocksPerSecond
         var farmingFortuneSpeed = (farmingFortune * crop.baseDrops * speed / 100).round(1).toInt()
-        if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true) {
-            if (crop == CropType.MELON) farmingFortuneSpeed += GardenCropSpeed.latestMelonDicer.toInt()
-            if (crop == CropType.PUMPKIN) farmingFortuneSpeed += GardenCropSpeed.latestPumpkinDicer.toInt()
-        }
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
+            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.cropMilestoneIncludeDicer) {
+                var dicerDrops = 0.0
+                if (crop == CropType.MELON) dicerDrops = GardenCropSpeed.latestMelonDicer
+                if (crop == CropType.PUMPKIN) dicerDrops = GardenCropSpeed.latestPumpkinDicer
+                farmingFortuneSpeed *= (dicerDrops * GardenCropSpeed.getRecentBPS()).toInt()
+            }
             if (crop.isMaxed()) {
                 lineMap[3] = listOf("§7In §bMaxed")
             } else {
