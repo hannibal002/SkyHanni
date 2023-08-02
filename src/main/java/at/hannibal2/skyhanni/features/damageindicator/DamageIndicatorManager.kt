@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -299,10 +300,7 @@ class DamageIndicatorManager {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         data = data.editCopy {
-            EntityUtils.getEntitiesSequence<EntityLivingBase>().mapNotNull(::checkEntity)
-                .forEach { (uuid, entityData) ->
-                    this[uuid] = entityData
-                }
+            EntityUtils.getEntitiesSequence<EntityLivingBase>().mapNotNull(::checkEntity).forEach { this put it }
         }
     }
 
