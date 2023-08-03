@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
+import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
@@ -63,8 +64,13 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 )
             }
             if (mouseX in 0..w && mouseY in 0..(size * 10) && (isMouseButtonDown && !wasMouseButtonDown)) {
-                OSUtils.copyToClipboard(msg.message.formattedText)
-                LorenzUtils.chat("Copied to clipboard")
+                if (LorenzUtils.isShiftKeyDown()) {
+                    OSUtils.copyToClipboard(IChatComponent.Serializer.componentToJson(msg.message))
+                    LorenzUtils.chat("Copied structured chat line to clipboard")
+                } else {
+                    OSUtils.copyToClipboard(msg.message.formattedText)
+                    LorenzUtils.chat("Copied chat line to clipboard")
+                }
             }
             mouseY -= size * 10
         }
