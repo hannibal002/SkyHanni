@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -91,9 +90,11 @@ class ItemAbilityCooldown {
         }
         if (event.soundName == "mob.wolf.howl") {
             if (event.volume == 0.5f) {
-                if (!RiftAPI.inRift()) {
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if ("WEIRD_TUBA" in recentItems) {
                     ItemAbility.WEIRD_TUBA.sound()
-                } else {
+                }
+                if ("WEIRDER_TUBA" in recentItems) {
                     ItemAbility.WEIRDER_TUBA.sound()
                 }
             }
