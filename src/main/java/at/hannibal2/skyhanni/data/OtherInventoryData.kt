@@ -89,6 +89,7 @@ object OtherInventoryData {
 
     private fun done(inventory: Inventory) {
         InventoryFullyOpenedEvent(inventory).postAndCatch()
+        InventoryUpdatedEvent(inventory).postAndCatch()
         acceptItems = false
     }
 

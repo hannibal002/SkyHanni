@@ -380,6 +380,7 @@ class SkyHanniMod {
         loadModule(PacketTest())
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
+        loadModule(TestCopyBestiaryValues)
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
     }
