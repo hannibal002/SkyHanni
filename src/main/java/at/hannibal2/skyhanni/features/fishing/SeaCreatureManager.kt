@@ -14,6 +14,7 @@ class SeaCreatureManager {
         try {
             val data = event.getConstant("SeaCreatures") ?: return
 
+            val fishingMobNames = mutableListOf<String>()
             for (variant in data.entrySet().map { it.value.asJsonObject }) {
                 val chatColor = variant["chat_color"].asString
                 for ((displayName, value) in variant["sea_creatures"].asJsonObject.entrySet()) {
@@ -26,9 +27,11 @@ class SeaCreatureManager {
                     } else false
 
                     seaCreatureMap[chatMessage] = SeaCreature(displayName, fishingExperience, chatColor, rare)
+                    fishingMobNames.add(displayName)
                     counter++
                 }
             }
+            allFishingMobNames = fishingMobNames
             LorenzUtils.debug("Loaded $counter sea creatures from repo")
 
         } catch (e: Exception) {
@@ -39,6 +42,7 @@ class SeaCreatureManager {
 
     companion object {
         private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
+        var allFishingMobNames = emptyList<String>()
 
         fun getSeaCreature(message: String): SeaCreature? {
             return seaCreatureMap.getOrDefault(message, null)
