@@ -300,7 +300,7 @@ class DamageIndicatorManager {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         data = data.editCopy {
-            EntityUtils.getEntitiesSequence<EntityLivingBase>().mapNotNull(::checkEntity).forEach { this put it }
+            EntityUtils.getEntities<EntityLivingBase>().mapNotNull(::checkEntity).forEach { this put it }
         }
     }
 
