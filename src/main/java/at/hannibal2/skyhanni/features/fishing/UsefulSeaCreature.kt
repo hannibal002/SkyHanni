@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing
 
-data class SeaCreature(
+data class UsefulSeaCreature(
     val displayName: String,
     val fishingExperience: Int,
     val chatColor: String,

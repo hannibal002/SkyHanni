@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.jsonobjects.SeaCreatures
+import at.hannibal2.skyhanni.utils.jsonobjects.SeaCreatures.SeaCreature
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SeaCreatureManager {
@@ -12,26 +14,22 @@ class SeaCreatureManager {
         var counter = 0
 
         try {
-            val data = event.getConstant("SeaCreatures") ?: return
+            seaCreatures = event.getConstant<Map<String, SeaCreatures>>("SeaCreatures") ?: return
 
-            val fishingMobNames = mutableListOf<String>()
-            for (variant in data.entrySet().map { it.value.asJsonObject }) {
-                val chatColor = variant["chat_color"].asString
-                for ((displayName, value) in variant["sea_creatures"].asJsonObject.entrySet()) {
-                    val seaCreature = value.asJsonObject
-                    val chatMessage = seaCreature["chat_message"].asString
-                    val fishingExperience = seaCreature["fishing_experience"].asInt
+            val fishingMobs = mutableMapOf<String, SeaCreature>()
+            for ((_, variant) in seaCreatures) {
+                val chatColor = variant.chat_color
+                for ((displayName, seaCreature) in variant.sea_creatures) {
+                    fishingMobs[displayName] = seaCreature
+                    val chatMessage = seaCreature.chat_message
+                    val fishingExperience = seaCreature.fishing_experience
+                    val rare = seaCreature.rare
 
-                    val rare = if (seaCreature.has("rare")) {
-                         seaCreature["rare"].asBoolean
-                    } else false
-
-                    seaCreatureMap[chatMessage] = SeaCreature(displayName, fishingExperience, chatColor, rare)
-                    fishingMobNames.add(displayName)
+                    seaCreatureMap[chatMessage] = UsefulSeaCreature(displayName, fishingExperience, chatColor, rare)
                     counter++
                 }
             }
-            allFishingMobNames = fishingMobNames
+            allFishingMobNames = allFishingMobs.map { it.value.displayName }
             LorenzUtils.debug("Loaded $counter sea creatures from repo")
 
         } catch (e: Exception) {
@@ -41,10 +39,12 @@ class SeaCreatureManager {
     }
 
     companion object {
-        private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
+        var seaCreatures = emptyMap<String, SeaCreatures>()
+        var allFishingMobs = mutableMapOf<String, UsefulSeaCreature>()
+        private val seaCreatureMap = mutableMapOf<String, UsefulSeaCreature>()
         var allFishingMobNames = emptyList<String>()
 
-        fun getSeaCreature(message: String): SeaCreature? {
+        fun getSeaCreature(message: String): UsefulSeaCreature? {
             return seaCreatureMap.getOrDefault(message, null)
         }
     }
