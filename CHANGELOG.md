@@ -10,16 +10,22 @@
   + Show kings you have not talked to yet, and when the next missing king will appear.
 + **Harp Keybinds** - NetheriteMiner
   + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
-+ **Ender Node Tracker** - ericpretzel
++ **Ender Node Tracker** - pretz
   + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
 
-###
+### Changes
 + Added option to disable quick bingo card toggle with sneaking.
 + Made damage indicator more performant. - nea
 + Ghost bestiary update. - HiZe
++ Api error messages are now formatted more helpful.
++ Added option to only show the reputation helper while pressing a hotkey.
 
 ### Fixes
 + Removed `Simple Carrot Candy` from composter overlay.
++ Fixed croesus highlight unopened chest not working anymore. (ty hypixel)
++ Should not crash anymore if a file in repo is missing.
++ Fixed Killer Spring tower still highlighting even with the feature turned off. - HiZe
++ Fixed weird tuba ability cooldown not working in rift.
 
 ## Version 0.19
 
