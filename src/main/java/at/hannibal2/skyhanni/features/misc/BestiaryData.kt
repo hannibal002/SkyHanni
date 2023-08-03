@@ -132,7 +132,7 @@ object BestiaryData {
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
         init()
-        val sortedMobList = when (config.sortingType) {
+        val ss = when (config.displayType) {
             0 -> mobList.sortedBy {
                 when (config.displayType) {
                     0 -> it.totalKills
@@ -152,6 +152,7 @@ object BestiaryData {
                     else -> it.totalKills
                 }
             }.toMutableList()
+
             else -> mobList.sortedBy {
                 when (config.displayType) {
                     0 -> it.totalKills
@@ -160,6 +161,18 @@ object BestiaryData {
                 }
             }.toMutableList()
         }
+
+        val sortedMobList = when (config.displayType) {
+            0 -> mobList.sortedBy { it.percentToMax() }
+            1 -> mobList.sortedBy { it.percentToTier() }
+            2 -> mobList.sortedBy { it.totalKills }
+            3 -> mobList.sortedByDescending { it.totalKills }
+            4 -> mobList.sortedBy { it.killNeededToMax() }
+            5 -> mobList.sortedByDescending { it.killNeededToMax() }
+            6 -> mobList.sortedBy { it.killNeededToNextLevel() }
+            7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
+            else -> mobList.sortedBy { it.totalKills }
+        }.toMutableList()
 
         if (sortedMobList.isNotEmpty()) {
             newDisplay.addAsSingletonList("§7Bestiary Data")
@@ -173,8 +186,42 @@ object BestiaryData {
                         var text = ""
                         //add("  §7- ")
                         text += " §7- "
-                        text += "${mob.name} "
-                        if (displayType == 0 || displayType == 1) {
+                        text += "${mob.name} ${mob.level.romanOrInt()} "
+                        text += if (isMaxed) {
+                            "§c§lMAXED! §7(§b${mob.actualRealTotalKill.addSeparators()}§7 kills)"
+                        } else {
+                            when (displayType) {
+                                0, 1 -> {
+                                    val currentKill = when (displayType) {
+                                        0 -> mob.totalKills
+                                        1 -> mob.currentKillToNextLevel
+                                        else -> 0
+                                    }
+                                    val killNeeded = when (displayType) {
+                                        0 -> mob.killToMax
+                                        1 -> mob.killNeededForNextLevel
+                                        else -> 0
+                                    }
+                                    "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
+                                }
+
+                                2, 3 -> { // lowest total kills
+
+                                    "§6${mob.totalKills.formatNumber()} §7total kills"
+                                }
+
+                                4, 5 -> {//lowest kills needed to max
+                                    "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
+                                }
+
+                                6, 7 -> {//lowest kills needed to next tier
+                                    "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
+                                }
+
+                                else -> "§cYou are not supposed to see this, please report it to @HiZe on discord!"
+                            }
+                        }
+                        /*if (displayType == 0 || displayType == 1) {
                             val currentKill = when (displayType) {
                                 0 -> mob.totalKills
                                 1 -> mob.currentKillToNextLevel
@@ -194,11 +241,11 @@ object BestiaryData {
                             }
 
 
-                            /* add(if (isMaxed) "§c§lMAXED!" else {
+                            *//* add(if (isMaxed) "§c§lMAXED!" else {
                                  val curr = if (currentKill > killNeeded) killNeeded else currentKill
                                  "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6%"
                                  text += ""
-                             })*/
+                             })*//*
 
                         } else if (displayType == 2 || displayType == 3) {
                             val l = when (displayType) {
@@ -207,11 +254,11 @@ object BestiaryData {
                                 else -> "..."
                             }
                             text += l
-                        }
+                        }*/
                         val rendered = Renderable.hoverTips(text,
                             listOf(
                                 "§6Name: §b${mob.name}",
-                                "§6Level: §b${mob.level}",
+                                "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
                                 "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
                                 "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
                                 "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
@@ -241,22 +288,23 @@ object BestiaryData {
                     update()
                 })
 
-            newDisplay.addButton(
-                prefix = "§7Sorting Type: ",
-                getName = SortingType.entries[config.sortingType].type,
+            newDisplay.addButtonWithTips(
+                prefix = "§7Display Type: ",
+                getName = Type.entries[config.displayType].type,
+                tips = Type.entries[config.displayType].tips,
                 onChange = {
-                    config.sortingType = (config.sortingType + 1) % 2
+                    config.displayType = (config.displayType + 1) % 8
                     update()
                 })
 
-            newDisplay.addButtonWithTips(
-                prefix = "§7Display Type: ",
-                getName = DisplayType.entries[config.displayType].type,
-                tips = DisplayType.entries[config.displayType].tips,
+            newDisplay.addButton(
+                prefix = "§7Number Type: ",
+                getName = NumberType.entries[config.replaceRoman.toInt()].type,
                 onChange = {
-                    config.displayType = (config.displayType + 1) % 4
+                    config.replaceRoman = ((config.replaceRoman.toInt() + 1) % 2).toBoolean()
                     update()
-                })
+                }
+            )
         }
         newDisplay.addButton(
             prefix = "§7Hide Maxed: ",
@@ -301,16 +349,20 @@ object BestiaryData {
         LONG("Long")
     }
 
-    enum class SortingType(val type: String) {
-        LOWEST("Lowest"),
-        HIGHEST("Highest"),
+    enum class NumberType(val type: String) {
+        INT("Normal (1, 2, 3)"),
+        ROMAN("Roman (I, II, III")
     }
 
-    enum class DisplayType(val type: String, val tips: List<String>) {
-        MAX("To Maxed", listOf("§6Show progress to max the bestiary.","§bFormat: - Ghost (100/200) 50.00%")),
-        TIER("To Next Tier", listOf("§6Show progress to the next level.","§bFormat: - Ghost (100/200) 50.00% to level X")),
-        FEWEST_MAX("Kills to max", listOf("§6Show needed kills to max the bestiary.","§bFormat: - Ghost 100 kills needed to max")),
-        FEWEST_TIER("Kills to next tier", listOf("§6Show needed kills to reach the next level.","§bFormat: - Ghost 10 kills needed for level X"))
+    enum class Type(val type: String, val tips: List<String>) {
+        GLOBAL_MAX("Global display (to max)", listOf()),
+        GLOBAL_TIER("Global display (to next tier)", listOf()),
+        LOWEST_TOTAL("Lowest total kills", listOf()),
+        HIGHEST_TOTAL("Highest total kills", listOf()),
+        LOWEST_NEEDED_MAX("Lowest kills needed to max", listOf()),
+        HIGHEST_NEEDED_MAX("Highest kills needed to max", listOf()),
+        LOWEST_NEEDED_TIER("Lowest kills needed to next tier", listOf()),
+        HIGHEST_NEEDED_TIER("Highest kills needed to next tier", listOf()),
     }
 
     enum class HideMaxed(val b: String) {
@@ -395,19 +447,25 @@ object BestiaryData {
         })
     }
 
+    fun String.romanOrInt(): String = if (!config.replaceRoman && isRoman()) Utils.parseRomanNumeral(this).toString() else this
+
+    fun String.isRoman(): Boolean {
+        return Utils.parseRomanNumeral(this) != null
+    }
+
     fun Any.getNextLevel(): String {
         return when (this) {
             is Int -> {
-                (this + 1).toString()
+                (this + 1).toString().romanOrInt()
             }
 
             is String -> {
                 if (this == "0") {
-                    "I"
+                    "I".romanOrInt()
                 } else {
                     val intValue = Utils.parseRomanNumeral(this)
                     if (intValue != null) {
-                        (intValue + 1).toRoman()
+                        (intValue + 1).toRoman().romanOrInt()
                     } else {
                         "Invalid Roman numeral"
                     }

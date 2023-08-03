@@ -581,9 +581,9 @@ public class MiscConfig {
         public Position position = new Position(10, 80, false, true);
     }
 
-     @Expose
-     @ConfigOption(name = "", desc = "")
-     @Accordion
+    @Expose
+    @ConfigOption(name = "", desc = "")
+    @Accordion
     public BestiarySlotHighlightConfig bestiarySlotHighlightConfig = new BestiarySlotHighlightConfig();
 
     public static class BestiarySlotHighlightConfig {
@@ -597,20 +597,30 @@ public class MiscConfig {
         @ConfigEditorDropdown(values = {"Short", "Long"})
         public int numberFormat = 0;
 
-        @Expose
-        @ConfigOption(name = "sortingType", desc = "")
-        @ConfigEditorDropdown(values = {"Lowest", "Highest"})
-        public int sortingType = 0;
 
         @Expose
         @ConfigOption(name = "displayType", desc = "")
-        @ConfigEditorDropdown(values = {"Maxed", "Tier", "Kills for maxed", "Kills for next tier"})
+        @ConfigEditorDropdown(values = {
+                "Global to max",
+                "Global to next tier",
+                "Lowest total kills",
+                "Highest total kills",
+                "Lowest kills needed to max",
+                "Highest kills needed to max",
+                "Lowest kills needed to next tier",
+                "Highest kills needed to next tier"
+        })
         public int displayType = 0;
 
         @Expose
         @ConfigOption(name = "Hide maxed", desc = "")
         @ConfigEditorBoolean
         public boolean hideMaxed = false;
+
+        @Expose
+        @ConfigOption(name = "replace roman", desc = "")
+        @ConfigEditorBoolean
+        public boolean replaceRoman = false;
 
         @Expose
         public Position position = new Position(100, 100, false, true);
@@ -620,6 +630,7 @@ public class MiscConfig {
     @ConfigOption(name = "Mining", desc = "")
     @Accordion
     public MiningConfig mining = new MiningConfig();
+
     public static class MiningConfig {
 
         @Expose
