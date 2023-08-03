@@ -368,6 +368,7 @@ class SkyHanniMod {
         loadModule(GriffinPetWarning())
         loadModule(KingTalismanHelper())
         loadModule(HarpKeybinds())
+        loadModule(EnderNodeTracker())
         //
 
 
