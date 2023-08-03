@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
@@ -135,7 +136,7 @@ class ItemAbilityCooldown {
             }
         }
         if (event.soundName == "random.drink") {
-            if (event.pitch == 1.8888888f && event.volume == 1.0f) {
+            if (event.pitch.round(1).toDouble() == 1.8 && event.volume == 1.0f) {
                 ItemAbility.HOLY_ICE.sound()
             }
         }

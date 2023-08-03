@@ -116,6 +116,12 @@ object LorenzUtils {
         return kotlin.math.round(this * multiplier) / multiplier
     }
 
+    fun Float.round(decimals: Int): Double {
+        var multiplier = 1.0
+        repeat(decimals) { multiplier *= 10 }
+        return kotlin.math.round(this * multiplier) / multiplier
+    }
+
     // TODO replace all calls with regex
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
