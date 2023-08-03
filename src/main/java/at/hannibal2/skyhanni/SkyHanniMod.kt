@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.*
 import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
+import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
@@ -373,7 +374,7 @@ class SkyHanniMod {
         loadModule(KingTalismanHelper())
         loadModule(HarpKeybinds())
         loadModule(EnderNodeTracker())
-        //
+        loadModule(CompactBestiaryChatMessage())
 
 
         init()

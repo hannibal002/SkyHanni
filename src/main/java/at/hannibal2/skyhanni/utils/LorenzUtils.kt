@@ -22,6 +22,7 @@ import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -222,9 +223,21 @@ object LorenzUtils {
 
     fun clickableChat(message: String, command: String) {
         val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/$command")
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /$command"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /${command.removePrefix("/")}"))
+        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+    }
+
+    fun hoverableChat(message: String, hover: List<String>, command: String? = null) {
+        val text = ChatComponentText(message)
+        text.chatStyle.chatHoverEvent =
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
+
+        if (command != null) {
+            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        }
+
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
@@ -431,5 +444,10 @@ object LorenzUtils {
 
     infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
         this[pairs.first] = pairs.second
+    }
+
+    fun Field.removeFinal(): Field {
+        javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
+        return this
     }
 }
