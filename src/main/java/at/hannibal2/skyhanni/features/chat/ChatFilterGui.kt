@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
-import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
@@ -31,23 +30,18 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         GlStateManager.pushMatrix()
         val l = (width / 2.0 - w / 2.0).toInt()
         val t = (height / 2.0 - h / 2.0).toInt()
-        val sr = ScaledResolution(mc)
         GlStateManager.translate(l + 0.0, t + 0.0, 0.0)
         RenderUtils.drawFloatingRectDark(0, 0, w, h)
         GlStateManager.translate(5.0, 5.0 - scroll, 0.0)
-        var mouseX = mouseX - (l)
-        val isMouseButtonDown = if (mouseX in 0..w && mouseY in t..(t + h))
-            Mouse.isButtonDown(0)
-        else false
+        var mouseX = mouseX - l
+        val isMouseButtonDown = if (mouseX in 0..w && mouseY in t..(t + h)) Mouse.isButtonDown(0) else false
         var mouseY = mouseY - (t - scroll).toInt()
-        GlStateManager.color(1f, 1f, 1f, 1f)
+        val sr = ScaledResolution(mc)
         GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)
 
         for (msg in history) {
             drawString(mc.fontRendererObj, msg.actionKind.renderedString, 0, 0, -1)
-            GlStateManager.color(1f, 1f, 1f, 1f)
             drawString(mc.fontRendererObj, msg.actionReason, ChatManager.ActionKind.maxLength + 5, 0, -1)
-            GlStateManager.color(1f, 1f, 1f, 1f)
             var size = drawMultiLineText(
                 msg.message,
                 ChatManager.ActionKind.maxLength + reasonMaxLength + 10,
@@ -77,9 +71,10 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         GlScissorStack.pop(sr)
         wasMouseButtonDown = isMouseButtonDown
         GlStateManager.popMatrix()
+        GlStateManager.color(1f, 1f, 1f, 1f)
     }
 
-    fun splitLine(comp: IChatComponent): MutableList<IChatComponent> {
+    fun splitLine(comp: IChatComponent): List<IChatComponent> {
         return GuiUtilRenderComponents.splitText(
             comp,
             w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10),
@@ -110,7 +105,6 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 0,
                 -1
             )
-            GlStateManager.color(1f, 1f, 1f, 1f)
             GlStateManager.translate(0F, 10F, 0F)
         }
         return modifiedSplitText.size

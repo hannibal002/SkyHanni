@@ -23,7 +23,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
-import java.util.LinkedHashMap
 
 object ChatManager {
 
@@ -39,9 +38,7 @@ object ChatManager {
             }
         }
 
-    fun getRecentMessageHistory(): List<MessageFilteringResult> {
-        return messageHistory.toList().map { it.second }
-    }
+    fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
 
     enum class ActionKind(format: Any) {
         BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
@@ -154,7 +151,7 @@ object ChatManager {
     }
 
     fun openChatFilterGUI() {
-        SkyHanniMod.screenToOpen = (ChatFilterGui(getRecentMessageHistory()))
+        SkyHanniMod.screenToOpen = ChatFilterGui(getRecentMessageHistory())
     }
 
     val chatLinesField by lazy {
@@ -167,12 +164,13 @@ object ChatManager {
     fun retractMessage(message: IChatComponent?, reason: String) {
         if (message == null) return
         val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
+        @Suppress("UNCHECKED_CAST")
         val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine>
-        if (chatLines.removeIf { it.chatComponent === message }) {
-            val history = messageHistory[IdentityCharacteristics(message)]
-            history?.actionKind = ActionKind.RETRACTED
-            history?.actionReason = reason.uppercase()
-        }
+        if (!chatLines.removeIf { it.chatComponent === message }) return
         chatGUI.refreshChat()
+
+        val history = messageHistory[IdentityCharacteristics(message)] ?: return
+        history.actionKind = ActionKind.RETRACTED
+        history.actionReason = reason.uppercase()
     }
 }
