@@ -112,6 +112,19 @@ public class MiscConfig {
     public boolean crimsonIsleReputationHelper = true;
 
     @Expose
+    @ConfigOption(name = "Use Hotkey", desc = "Only show the reputation helper while pressing the hotkey.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean reputationHelperUseHotkey = false;
+
+    @Expose
+    @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the reputation helper.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 6)
+    public int reputationHelperHotkey = Keyboard.KEY_NONE;
+
+
+    @Expose
     public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
 
     @Expose
