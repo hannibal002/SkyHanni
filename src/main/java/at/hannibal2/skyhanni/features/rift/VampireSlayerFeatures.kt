@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 object VampireSlayerFeatures {
+
     private val config get() = SkyHanniMod.feature.slayer.vampireSlayerConfig
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
@@ -284,26 +285,13 @@ object VampireSlayerFeatures {
                 }
             }
         }
-
-        if (configBloodIcor.renderBeam) {
-            entityList.filterIsInstance<EntityArmorStand>().forEach {
-                if (it.hasSkullTexture(bloodIchorTexture)) {
-                    if (it.isEntityAlive) {
-                        event.drawWaypointFilled(
-                            it.position.toLorenzVec().add(0, -2, 0), configBloodIcor.color.toChromaColor(),
-                            beacon = true
-                        )
-                    }
-                }
-            }
-        }
         if (configBloodIcor.highlight || configKillerSpring.highlight) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(bloodIchorTexture)
                 val isSpring = stand.hasSkullTexture(killerSpringTexture)
-                if (isIchor || isSpring) {
+                if ((isIchor && config.bloodIchor.highlight) || (isSpring && config.killerSpring.highlight)) {
                     val color = (if (isIchor) configBloodIcor.color else configKillerSpring.color)
                         .toChromaColor().withAlpha(config.withAlpha)
                     if (distance <= 15) {
@@ -317,14 +305,23 @@ object VampireSlayerFeatures {
                         event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
                         event.drawDynamicText(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), text, 1.5, ignoreBlocks = false)
                         for ((player, stand2) in standList) {
-                            if (configBloodIcor.showLines || configKillerSpring.showLines)
+                            if ((configBloodIcor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
                                 event.draw3DLine(
                                     event.exactLocation(player).add(0.0, 1.5, 0.0),
                                     event.exactLocation(stand2).add(0.0, 1.5, 0.0),
-                                   // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
+                                    // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
                                     linesColorStart,
                                     3,
                                     true)
+                        }
+                    }
+                    if (configBloodIcor.renderBeam && isIchor) {
+                        if (stand.isEntityAlive) {
+                            event.drawWaypointFilled(
+                                event.exactLocation(stand).add(0, -2, 0),
+                                configBloodIcor.color.toChromaColor(),
+                                beacon = true
+                            )
                         }
                     }
                 }
