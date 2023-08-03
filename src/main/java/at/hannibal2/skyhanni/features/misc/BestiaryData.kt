@@ -184,7 +184,6 @@ object BestiaryData {
                     newDisplay.add(buildList {
                         val displayType = config.displayType
                         var text = ""
-                        //add("  §7- ")
                         text += " §7- "
                         text += "${mob.name} ${mob.level.romanOrInt()} "
                         text += if (isMaxed) {
@@ -205,56 +204,22 @@ object BestiaryData {
                                     "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
                                 }
 
-                                2, 3 -> { // lowest total kills
+                                2, 3 -> {
 
                                     "§6${mob.totalKills.formatNumber()} §7total kills"
                                 }
 
-                                4, 5 -> {//lowest kills needed to max
+                                4, 5 -> {
                                     "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
                                 }
 
-                                6, 7 -> {//lowest kills needed to next tier
+                                6, 7 -> {
                                     "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
                                 }
 
                                 else -> "§cYou are not supposed to see this, please report it to @HiZe on discord!"
                             }
                         }
-                        /*if (displayType == 0 || displayType == 1) {
-                            val currentKill = when (displayType) {
-                                0 -> mob.totalKills
-                                1 -> mob.currentKillToNextLevel
-                                else -> 0
-                            }
-                            val killNeeded = when (displayType) {
-                                0 -> mob.killToMax
-                                1 -> mob.killNeededForNextLevel
-                                else -> 0
-                            }
-                            text += if (isMaxed) {
-                                "§c§lMAXED!"
-                            } else {
-                                val curr = if (currentKill > killNeeded) killNeeded else currentKill
-                                //"§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6%"
-                                "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
-                            }
-
-
-                            *//* add(if (isMaxed) "§c§lMAXED!" else {
-                                 val curr = if (currentKill > killNeeded) killNeeded else currentKill
-                                 "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((curr.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6%"
-                                 text += ""
-                             })*//*
-
-                        } else if (displayType == 2 || displayType == 3) {
-                            val l = when (displayType) {
-                                2 -> if (mob.killNeededToMax() > 0) "§b${mob.killNeededToMax()} kills needed to max level" else "§c§lMAXED!"
-                                3 -> if (mob.killNeededToNextLevel() > 0) "§b${mob.killNeededToNextLevel()} kills needed to level ${mob.getNextLevel()}" else "§c§lMAXED!"
-                                else -> "..."
-                            }
-                            text += l
-                        }*/
                         val rendered = Renderable.hoverTips(text,
                             listOf(
                                 "§6Name: §b${mob.name}",
