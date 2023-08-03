@@ -160,9 +160,5 @@ object EntityUtils {
     inline fun <reified R : Entity> getEntitiesSequence(): Sequence<R> =
         Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.asSequence()?.filterIsInstance<R>() ?: emptySequence()
 
-    inline fun <reified R : Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
-
-    fun getAllEntities(): List<Entity> = getAllEntitiesOrNull() ?: emptyList()
-
-    fun getAllEntitiesOrNull(): List<Entity>? = Minecraft.getMinecraft()?.theWorld?.loadedEntityList
+    fun getAllEntities(): List<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.toMutableList() ?: emptyList()
 }

@@ -45,7 +45,8 @@ object TrevorSolver {
 
     fun findMob() {
         var canSee = false
-        val entities = EntityUtils.getAllEntitiesOrNull() ?: return
+        val entities = EntityUtils.getAllEntities()
+        if (entities.isEmpty()) return
         for (entity in entities) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
