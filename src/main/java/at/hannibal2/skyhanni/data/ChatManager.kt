@@ -7,9 +7,13 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
+import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ChatLine
+import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.event.HoverEvent
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.EnumChatFormatting
@@ -17,6 +21,8 @@ import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher.ReflectionHelper
+import java.lang.invoke.MethodHandles
 import java.util.LinkedHashMap
 
 object ChatManager {
@@ -26,11 +32,12 @@ object ChatManager {
     private val loggerAllowed = LorenzLogger("chat/allowed")
     private val loggerModified = LorenzLogger("chat/modified")
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
-    private val messageHistory = object : LinkedHashMap<Object, MessageFilteringResult>() {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Object, MessageFilteringResult>?): Boolean {
-            return size > 100
+    private val messageHistory =
+        object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?): Boolean {
+                return size > 100
+            }
         }
-    }
 
     fun getRecentMessageHistory(): List<MessageFilteringResult> {
         return messageHistory.toList().map { it.second }
@@ -38,6 +45,7 @@ object ChatManager {
 
     enum class ActionKind(format: Any) {
         BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
+        RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
         MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
         ALLOWED(EnumChatFormatting.GREEN),
         ;
@@ -53,8 +61,8 @@ object ChatManager {
 
     data class MessageFilteringResult(
         val message: IChatComponent,
-        val actionKind: ActionKind,
-        val actionReason: String?,
+        var actionKind: ActionKind,
+        var actionReason: String?,
         val modified: IChatComponent?
     )
 
@@ -79,7 +87,7 @@ object ChatManager {
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
         if (message.startsWith("§f{\"server\":\"")) return
-
+        val key = IdentityCharacteristics(original)
         val chatEvent = LorenzChatEvent(message, original)
         if (!isSoopyMessage(event.message)) {
             chatEvent.postAndCatch()
@@ -92,7 +100,7 @@ object ChatManager {
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
-            messageHistory.put(Object(), MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null))
+            messageHistory.put(key, MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null))
             return
         }
 
@@ -104,9 +112,9 @@ object ChatManager {
             loggerModified.log(" ")
             loggerModified.log("[original] " + original.formattedText)
             loggerModified.log("[modified] " + modified.formattedText)
-            messageHistory.put(Object(), MessageFilteringResult(original, ActionKind.MODIFIED, null, modified))
+            messageHistory.put(key, MessageFilteringResult(original, ActionKind.MODIFIED, null, modified))
         } else {
-            messageHistory.put(Object(), MessageFilteringResult(original, ActionKind.ALLOWED, null, null))
+            messageHistory.put(key, MessageFilteringResult(original, ActionKind.ALLOWED, null, null))
         }
     }
 
@@ -147,5 +155,24 @@ object ChatManager {
 
     fun openChatFilterGUI() {
         SkyHanniMod.screenToOpen = (ChatFilterGui(getRecentMessageHistory()))
+    }
+
+    val chatLinesField by lazy {
+        MethodHandles.publicLookup().unreflectGetter(
+            ReflectionHelper.findField(GuiNewChat::class.java, "chatLines", "field_146252_h", "h")
+                .makeAccessible()
+        )
+    }
+
+    fun retractMessage(message: IChatComponent?, reason: String) {
+        if (message == null) return
+        val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
+        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine>
+        if (chatLines.removeIf { it.chatComponent === message }) {
+            val history = messageHistory[IdentityCharacteristics(message)]
+            history?.actionKind = ActionKind.RETRACTED
+            history?.actionReason = reason.uppercase()
+        }
+        chatGUI.refreshChat()
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
@@ -41,13 +42,8 @@ class CompactBestiaryChatMessage {
 
         if (message == titleMessage) {
             event.blockedReason = "bestiary"
-            val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
-            val chatLinesField = ReflectionHelper.findField(chatGUI.javaClass, "chatLines")
-            val chatLines = chatLinesField.makeAccessible().get(chatGUI) as MutableList<ChatLine>
-
-            lastBorder?.let { chat -> chatLines.removeIf { it.chatComponent === chat } }
-            lastEmpty?.let { chat -> chatLines.removeIf { it.chatComponent === chat } }
-            chatGUI.refreshChat()
+            ChatManager.retractMessage(lastBorder, "bestiary")
+            ChatManager.retractMessage(lastEmpty, "bestiary")
 
             lastBorder = null
             lastEmpty = null
