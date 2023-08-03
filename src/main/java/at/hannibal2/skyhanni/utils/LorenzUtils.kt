@@ -315,22 +315,22 @@ object LorenzUtils {
         isCurrent: (T) -> Boolean,
         onChange: (T) -> Unit,
     ) {
-        val newList = mutableListOf<Any>()
-        newList.add(prefix)
-        for (entry in values) {
-            val display = getName(entry)
-            if (isCurrent(entry)) {
-                newList.add("§a[$display]")
-            } else {
-                newList.add("§e[")
-                newList.add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
-                newList.add("§e]")
+        add(buildList {
+            add(prefix)
+            for (entry in values) {
+                val display = getName(entry)
+                if (isCurrent(entry)) {
+                    add("§a[$display]")
+                } else {
+                    add("§e[")
+                    add(Renderable.link("§e$display") {
+                        onChange(entry)
+                    })
+                    add("§e]")
+                }
+                add(" ")
             }
-            newList.add(" ")
-        }
-        add(newList)
+        })
     }
 
     // TODO nea?
