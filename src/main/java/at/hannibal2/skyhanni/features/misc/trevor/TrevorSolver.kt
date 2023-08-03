@@ -45,20 +45,22 @@ object TrevorSolver {
 
     fun findMob() {
         var canSee = false
-        val entities = EntityUtils.getAllEntities()
-        if (entities.isEmpty()) return
-        for (entity in entities) {
+        Minecraft.getMinecraft().theWorld ?: return
+        for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
-            currentMob = TrevorMobs.values().firstOrNull {it.mobName.contains(name)}
-            if (animalHealths.any { it == entityHealth } ) {
+            currentMob = TrevorMobs.values().firstOrNull { it.mobName.contains(name) }
+            if (animalHealths.any { it == entityHealth }) {
                 if (currentMob != null) {
                     if (foundID == entity.entityId) {
                         val dist = entity.position.toLorenzVec().distanceToPlayer()
                         if ((currentMob == TrevorMobs.RABBIT || currentMob == TrevorMobs.SHEEP) && mobLocation == CurrentMobArea.OASIS) {
                             println("This is unfortunate")
-                        } else canSee = LocationUtils.canSee(LocationUtils.playerEyeLocation(), entity.position.toLorenzVec().add(0.0, 0.5, 0.0)) && dist < currentMob!!.renderDistance
+                        } else canSee = LocationUtils.canSee(
+                            LocationUtils.playerEyeLocation(),
+                            entity.position.toLorenzVec().add(0.0, 0.5, 0.0)
+                        ) && dist < currentMob!!.renderDistance
 
                         if (!canSee) {
                             val nameTagEntity = Minecraft.getMinecraft().theWorld.getEntityByID(foundID + 1)
