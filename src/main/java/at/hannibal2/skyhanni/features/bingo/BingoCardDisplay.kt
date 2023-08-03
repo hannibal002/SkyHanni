@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.bingo.card.CommunityGoal
 import at.hannibal2.skyhanni.features.bingo.card.PersonalGoal
@@ -68,7 +68,7 @@ class BingoCardDisplay {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return

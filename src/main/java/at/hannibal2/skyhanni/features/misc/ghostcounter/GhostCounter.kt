@@ -428,7 +428,7 @@ object GhostCounter {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = event.inventoryName
         val name = if (bestiaryUpdate) "Bestiary ➜ Dwarven Mines" else "Bestiary ➜ Deep Caverns"

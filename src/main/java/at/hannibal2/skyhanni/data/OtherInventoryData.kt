@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object OtherInventoryData {
     private var currentInventory: Inventory? = null
     private var acceptItems = false
-    private var lateEvent: LateInventoryOpenEvent? = null
+    private var lateEvent: InventoryUpdatedEvent? = null
 
     @SubscribeEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
@@ -60,7 +60,7 @@ object OtherInventoryData {
                         val itemStack = packet.func_149174_e()
                         if (itemStack != null) {
                             it.items[slot] = itemStack
-                            lateEvent = LateInventoryOpenEvent(it)
+                            lateEvent = InventoryUpdatedEvent(it)
                         }
                     }
                 }
@@ -88,7 +88,7 @@ object OtherInventoryData {
     }
 
     private fun done(inventory: Inventory) {
-        InventoryOpenEvent(inventory).postAndCatch()
+        InventoryFullyOpenedEvent(inventory).postAndCatch()
         acceptItems = false
     }
 

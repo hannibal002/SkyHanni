@@ -34,7 +34,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         questLoader.checkInventory(event)

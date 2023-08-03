@@ -76,7 +76,7 @@ class ShowMotesNpcSellPrice {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         reset()
     }
 

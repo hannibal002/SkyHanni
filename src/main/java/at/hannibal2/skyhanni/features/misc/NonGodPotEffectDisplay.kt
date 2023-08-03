@@ -139,7 +139,7 @@ class NonGodPotEffectDisplay {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.inventoryName.endsWith("Active Effects")) return
 

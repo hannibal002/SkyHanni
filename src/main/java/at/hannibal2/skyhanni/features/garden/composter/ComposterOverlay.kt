@@ -107,7 +107,7 @@ class ComposterOverlay {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.composterOverlay) return
         inComposter = event.inventoryName == "Composter"

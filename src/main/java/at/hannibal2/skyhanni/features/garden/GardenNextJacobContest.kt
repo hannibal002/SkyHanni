@@ -81,7 +81,7 @@ class GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.nextJacobContestDisplay) return
 
         val backItem = event.inventoryItems[48] ?: return
