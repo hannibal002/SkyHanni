@@ -173,20 +173,20 @@ class EnderNodeTracker {
         for (item in EnderNode.entries.subList(0, 11)) {
             val count = (lootCount[item] ?: 0).addSeparators()
             val profit = format(lootProfit[item] ?: 0.0)
-            addAsSingletonList("§b$count ${item.displayName} §f(§6$profit§f)")
+            addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         addAsSingletonList(" ")
         addAsSingletonList("§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                "§f(§6${format(totalEnderArmor * 10_000)}§f)")
+                "§7(§6${format(totalEnderArmor * 10_000)}§7)")
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (lootCount[item] ?: 0).addSeparators()
             val profit = format(lootProfit[item] ?: 0.0)
-            addAsSingletonList("§b$count ${item.displayName} §f(§6$profit§f)")
+            addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         // enderman pet rarities
         val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (lootCount[it] ?: 0).addSeparators() }
         val profit = format(EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 })
-        addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §f(§6$profit§f)")
+        addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
