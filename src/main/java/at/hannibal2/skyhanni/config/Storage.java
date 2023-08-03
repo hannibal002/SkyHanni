@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.misc.EnderNode;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
@@ -261,6 +262,20 @@ public class Storage {
 
             @Expose
             public Map<FrozenTreasure, Integer> treasureCount = new HashMap<>();
+        }
+
+        @Expose
+        public EnderNodeTracker enderNodeTracker = new EnderNodeTracker();
+
+        public static class EnderNodeTracker {
+            @Expose
+            public int totalNodesMined = 0;
+
+            @Expose
+            public int totalEndermiteNests = 0;
+
+            @Expose
+            public Map<EnderNode, Integer> lootCount = new HashMap<>();
         }
 
         @Expose
