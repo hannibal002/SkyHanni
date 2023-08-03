@@ -135,7 +135,7 @@ class SkyHanniMod {
 
         // utils
         loadModule(this)
-        loadModule(ChatManager())
+        loadModule(ChatManager)
         loadModule(HypixelData())
         loadModule(DungeonData())
         loadModule(ScoreboardData())

@@ -1,26 +1,62 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.client.Minecraft
 import net.minecraft.event.HoverEvent
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.LinkedHashMap
 
-class ChatManager {
+object ChatManager {
 
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
     private val loggerAllowed = LorenzLogger("chat/allowed")
     private val loggerModified = LorenzLogger("chat/modified")
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
+    private val messageHistory = object : LinkedHashMap<Object, MessageFilteringResult>() {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Object, MessageFilteringResult>?): Boolean {
+            return size > 100
+        }
+    }
+
+    fun getRecentMessageHistory(): List<MessageFilteringResult> {
+        return messageHistory.toList().map { it.second }
+    }
+
+    enum class ActionKind(format: Any) {
+        BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
+        MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
+        ALLOWED(EnumChatFormatting.GREEN),
+        ;
+
+        val renderedString = "$format$name"
+
+        companion object {
+            val maxLength by lazy {
+                entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.renderedString) }
+            }
+        }
+    }
+
+    data class MessageFilteringResult(
+        val message: IChatComponent,
+        val actionKind: ActionKind,
+        val actionReason: String?,
+        val modified: IChatComponent?
+    )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
@@ -56,6 +92,7 @@ class ChatManager {
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
+            messageHistory.put(Object(), MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null))
             return
         }
 
@@ -67,6 +104,9 @@ class ChatManager {
             loggerModified.log(" ")
             loggerModified.log("[original] " + original.formattedText)
             loggerModified.log("[modified] " + modified.formattedText)
+            messageHistory.put(Object(), MessageFilteringResult(original, ActionKind.MODIFIED, null, modified))
+        } else {
+            messageHistory.put(Object(), MessageFilteringResult(original, ActionKind.ALLOWED, null, null))
         }
     }
 
@@ -103,5 +143,9 @@ class ChatManager {
 
         val seaCreature = SeaCreatureManager.getSeaCreature(chatEvent.message) ?: return
         SeaCreatureFishEvent(seaCreature, chatEvent).postAndCatch()
+    }
+
+    fun openChatFilterGUI() {
+        SkyHanniMod.screenToOpen = (ChatFilterGui(getRecentMessageHistory()))
     }
 }
