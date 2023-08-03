@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.fishing.TrophyFishManager.Companion.fishes
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.Companion.fishes
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.sumAllValues
