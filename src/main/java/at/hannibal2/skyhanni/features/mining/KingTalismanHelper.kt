@@ -36,7 +36,7 @@ class KingTalismanHelper {
     private var farDisplay = ""
     private var display = emptyList<String>()
 
-    fun isNearby() = LorenzUtils.skyBlockArea == "Royal Palace" && kingLocation.distanceToPlayer() > 10
+    fun isNearby() = LorenzUtils.skyBlockArea == "Royal Palace" && kingLocation.distanceToPlayer() < 10
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -48,7 +48,7 @@ class KingTalismanHelper {
         }
 
         update()
-        display = if (!isNearby()) allKingsDisplay else Collections.singletonList(farDisplay)
+        display = if (isNearby()) allKingsDisplay else Collections.singletonList(farDisplay)
     }
 
     fun isEnabled() = config.kingTalismanHelper && IslandType.DWARVEN_MINES.isInIsland()
@@ -97,7 +97,6 @@ class KingTalismanHelper {
                     "§7(§bin $time§7)"
                 }
 
-
                 val currentString = if (current) "§6King " else ""
                 if (missing && current) {
                     farDisplay_ = "§cNext missing king: §7$king §eNow $missingTimeFormat"
@@ -124,9 +123,9 @@ class KingTalismanHelper {
         val oneSbDay = 1000 * 60 * 20
         val oneCircleTime = oneSbDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
-        for ((index, king) in kingCircles.withIndex()) {
+        for ((index, king) in kingCircles.reversed().withIndex()) {
 
-            val startTime = SkyBlockTime(day = index - 1)
+            val startTime = SkyBlockTime(day = index + 1)
             var timeNext = startTime.toMillis()
             while (timeNext < System.currentTimeMillis()) {
                 timeNext += oneCircleTime
