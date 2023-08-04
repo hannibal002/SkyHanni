@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase

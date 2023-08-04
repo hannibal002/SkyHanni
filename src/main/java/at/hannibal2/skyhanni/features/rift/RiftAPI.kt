@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.everywhere
+package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.RiftConfig

@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.features.rift
+package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
