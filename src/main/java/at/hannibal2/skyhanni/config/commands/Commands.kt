@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
@@ -225,6 +226,7 @@ object Commands {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
+        registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
     }
 
     private fun commandHelp(args: Array<String>) {
