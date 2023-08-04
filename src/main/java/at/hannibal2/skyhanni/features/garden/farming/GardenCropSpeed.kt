@@ -100,8 +100,6 @@ object GardenCropSpeed {
                 blocksSpeedList.dropLast(1).average()
             } else 0.0
             GardenAPI.getCurrentlyFarmedCrop()?.let {
-                latestPumpkinDicer = 0.0
-                latestMelonDicer = 0.0
                 val heldTool = InventoryUtils.getItemInHand()
                 val toolName = heldTool?.getInternalName()
                 if (toolName?.contains("DICER") == true) {
@@ -164,9 +162,9 @@ object GardenCropSpeed {
         return if (size <= 1) {
             0.0
         } else {
-            val startIndex = if (size >= 6) size - 5 else 0
-            val validValues = blocksSpeedList.subList(startIndex, size - 1)
-            validValues.average()
+            val startIndex = if (size >= 6) size - 6 else 0
+            val validValues = blocksSpeedList.subList(startIndex, size)
+            validValues.dropLast(1).average()
         }
     }
 
