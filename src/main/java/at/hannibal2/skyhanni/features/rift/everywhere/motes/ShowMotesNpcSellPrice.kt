@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.everywhere
+package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.rift.RiftAPI
