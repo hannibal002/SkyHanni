@@ -138,8 +138,6 @@ object CropMoneyDisplay {
                 if (it == CropType.PUMPKIN) {
                     dicerDrops = GardenCropSpeed.latestPumpkinDicer
                     bazaarData = BazaarApi.getBazaarDataByInternalName("ENCHANTED_PUMPKIN")
-                    println(dicerDrops)
-                    println(bazaarData)
                 }
                 if (bazaarData != null) {
                     val price = if (LorenzUtils.noTradeMode) bazaarData.npcPrice / 160 else (bazaarData.sellPrice + bazaarData.buyPrice) / 320
