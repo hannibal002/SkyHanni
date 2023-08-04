@@ -70,7 +70,7 @@ class CityProjectFeatures {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return

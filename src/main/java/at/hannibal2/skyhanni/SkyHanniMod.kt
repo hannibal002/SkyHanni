@@ -15,16 +15,22 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.*
 import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
+import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
+import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
 import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fishing.*
+import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
 import at.hannibal2.skyhanni.features.garden.*
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers
@@ -42,6 +48,7 @@ import at.hannibal2.skyhanni.features.inventory.*
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
+import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
@@ -119,7 +126,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.18",
+    version = "0.20.Beta.2",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -128,7 +135,7 @@ class SkyHanniMod {
 
         // utils
         loadModule(this)
-        loadModule(ChatManager())
+        loadModule(ChatManager)
         loadModule(HypixelData())
         loadModule(DungeonData())
         loadModule(ScoreboardData())
@@ -212,6 +219,7 @@ class SkyHanniMod {
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
+        loadModule(WarpIsCommand())
         loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
@@ -364,6 +372,11 @@ class SkyHanniMod {
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
+        loadModule(KingTalismanHelper())
+        loadModule(HarpKeybinds())
+        loadModule(EnderNodeTracker())
+        loadModule(CompactBestiaryChatMessage())
+
 
         init()
 
@@ -374,6 +387,7 @@ class SkyHanniMod {
         loadModule(PacketTest())
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
+        loadModule(TestCopyBestiaryValues)
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
     }

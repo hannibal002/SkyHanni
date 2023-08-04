@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.fishing
+package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent

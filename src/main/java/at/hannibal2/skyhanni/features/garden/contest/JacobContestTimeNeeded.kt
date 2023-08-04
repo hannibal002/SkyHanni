@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LateInventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getLatestTrueFarmingFortune
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
@@ -25,7 +25,7 @@ class JacobContestTimeNeeded {
     private var currentBracket = ContestBracket.GOLD
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onLateInventoryOpen(event: LateInventoryOpenEvent) {
+    fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
         if (FarmingContestAPI.inInventory) {
             update()
         }

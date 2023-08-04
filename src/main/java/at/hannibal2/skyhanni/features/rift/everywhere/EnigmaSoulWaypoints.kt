@@ -52,7 +52,7 @@ object EnigmaSoulWaypoints {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!event.inventoryName.contains("Enigma Souls")) return
         inInventory = true

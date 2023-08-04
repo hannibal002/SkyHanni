@@ -141,6 +141,14 @@ object ItemUtils {
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
 
+    fun ItemStack.getSkullOwner(): String? {
+        if (item != Items.skull) return null
+        if (tagCompound == null) return null
+        val nbt = tagCompound
+        if (!nbt.hasKey("SkullOwner")) return null
+        return nbt.getCompoundTag("SkullOwner").getString("Id")
+    }
+
     fun ItemStack.getItemRarity(): Int {
         //todo make into an enum in future
         return when (this.getLore().lastOrNull()?.take(4)) {
