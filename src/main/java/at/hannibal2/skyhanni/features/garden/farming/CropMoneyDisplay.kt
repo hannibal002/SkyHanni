@@ -128,7 +128,8 @@ object CropMoneyDisplay {
                 extraMushroomCowPerk = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.cropMilestoneIncludeDicer) {
+            // need to make this the diff crop types
+            if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.moneyPerHourDicer) {
                 var dicerDrops = 0.0
                 if (it == CropType.MELON) dicerDrops = GardenCropSpeed.latestMelonDicer
                 if (it == CropType.PUMPKIN) dicerDrops = GardenCropSpeed.latestPumpkinDicer
@@ -197,11 +198,12 @@ object CropMoneyDisplay {
             val moneyArray = moneyPerHourData[internalName]!!
 
             for (price in moneyArray) {
-                val finalPrice = price + extraMushroomCowPerk
+                val finalPrice = price + extraMushroomCowPerk + extraDicerDrops
                 val format = format(finalPrice)
                 if (debug) {
                     newDisplay.addAsSingletonList(" price: ${price.addSeparators()}")
                     newDisplay.addAsSingletonList(" extraMushroomCowPerk: ${extraMushroomCowPerk.addSeparators()}")
+                    newDisplay.addAsSingletonList(" extraDicerDrops: ${extraDicerDrops.addSeparators()}")
                     newDisplay.addAsSingletonList(" finalPrice: ${finalPrice.addSeparators()}")
                 }
                 list.add("$coinsColor$format")

@@ -411,14 +411,6 @@ public class Garden {
     public int blocksBrokenResetTime = 5;
 
     @Expose
-    @ConfigOption(
-            name = "Include Dicer Estimate",
-            desc = "Includes the estimate of how many crops your dicers give you.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 6)
-    public boolean cropMilestoneIncludeDicer = true;
-
-    @Expose
     public Position cropMilestoneProgressDisplayPos = new Position(-400, -200, false, true);
 
     @Expose
