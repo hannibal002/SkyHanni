@@ -660,9 +660,9 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "", desc = "")
     @Accordion
-    public BestiarySlotHighlightConfig bestiarySlotHighlightConfig = new BestiarySlotHighlightConfig();
+    public BestiaryDataConfig bestiaryData = new BestiaryDataConfig();
 
-    public static class BestiarySlotHighlightConfig {
+    public static class BestiaryDataConfig {
         @Expose
         @ConfigOption(name = "", desc = "")
         @ConfigEditorBoolean

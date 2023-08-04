@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BestiaryData {
 
-    private val config get() = SkyHanniMod.feature.misc.bestiarySlotHighlightConfig
+    private val config get() = SkyHanniMod.feature.misc.bestiaryData
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
@@ -277,7 +277,7 @@ object BestiaryData {
 
             newDisplay.addButton(
                 prefix = "§7Display Type: ",
-                getName = Type.entries[config.displayType].type,
+                getName = DisplayType.entries[config.displayType].type,
                 onChange = {
                     config.displayType = (config.displayType + 1) % 8
                     update()
@@ -340,7 +340,7 @@ object BestiaryData {
         ROMAN("Roman (I, II, III")
     }
 
-    enum class Type(val type: String) {
+    enum class DisplayType(val type: String) {
         GLOBAL_MAX("Global display (to max)"),
         GLOBAL_TIER("Global display (to next tier)"),
         LOWEST_TOTAL("Lowest total kills"),
