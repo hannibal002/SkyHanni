@@ -128,15 +128,22 @@ object CropMoneyDisplay {
                 extraMushroomCowPerk = perSecond * 60 * 60
             }
 
-            // need to make this the diff crop types
             if (InventoryUtils.getItemInHand()?.getInternalName()?.contains("DICER") == true && config.moneyPerHourDicer) {
                 var dicerDrops = 0.0
-                if (it == CropType.MELON) dicerDrops = GardenCropSpeed.latestMelonDicer
-                if (it == CropType.PUMPKIN) dicerDrops = GardenCropSpeed.latestPumpkinDicer
-                if (LorenzUtils.noTradeMode) {
-                    extraDicerDrops = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops // times npc
-                } else {
-                    extraDicerDrops = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops // times bz
+                var bazaarData: BazaarData? = null
+                if (it == CropType.MELON) {
+                    dicerDrops = GardenCropSpeed.latestMelonDicer
+                    bazaarData = BazaarApi.getBazaarDataByInternalName("ENCHANTED_MELON")
+                }
+                if (it == CropType.PUMPKIN) {
+                    dicerDrops = GardenCropSpeed.latestPumpkinDicer
+                    bazaarData = BazaarApi.getBazaarDataByInternalName("ENCHANTED_PUMPKIN")
+                    println(dicerDrops)
+                    println(bazaarData)
+                }
+                if (bazaarData != null) {
+                    val price = if (LorenzUtils.noTradeMode) bazaarData.npcPrice / 160 else (bazaarData.sellPrice + bazaarData.buyPrice) / 320
+                    extraDicerDrops = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
                 }
             }
         }
