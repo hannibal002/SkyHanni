@@ -132,8 +132,6 @@ object GardenNextJacobContest {
             }
         }
 
-        // Reset contests if a new year has passed (need better detection for this)
-
         // Skip if contests are already loaded for this year
         if (contests.size == maxContestsPerYear) return
 
