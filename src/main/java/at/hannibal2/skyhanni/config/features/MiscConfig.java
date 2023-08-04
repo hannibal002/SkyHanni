@@ -12,6 +12,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
+import io.github.moulberry.notenoughupdates.core.config.annotations.ConfigEditorSlider;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
