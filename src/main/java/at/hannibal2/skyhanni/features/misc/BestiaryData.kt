@@ -275,10 +275,9 @@ object BestiaryData {
                     update()
                 })
 
-            newDisplay.addButtonWithTips(
+            newDisplay.addButton(
                 prefix = "§7Display Type: ",
                 getName = Type.entries[config.displayType].type,
-                tips = Type.entries[config.displayType].tips,
                 onChange = {
                     config.displayType = (config.displayType + 1) % 8
                     update()
@@ -341,15 +340,15 @@ object BestiaryData {
         ROMAN("Roman (I, II, III")
     }
 
-    enum class Type(val type: String, val tips: List<String>) {
-        GLOBAL_MAX("Global display (to max)", listOf()),
-        GLOBAL_TIER("Global display (to next tier)", listOf()),
-        LOWEST_TOTAL("Lowest total kills", listOf()),
-        HIGHEST_TOTAL("Highest total kills", listOf()),
-        LOWEST_NEEDED_MAX("Lowest kills needed to max", listOf()),
-        HIGHEST_NEEDED_MAX("Highest kills needed to max", listOf()),
-        LOWEST_NEEDED_TIER("Lowest kills needed to next tier", listOf()),
-        HIGHEST_NEEDED_TIER("Highest kills needed to next tier", listOf()),
+    enum class Type(val type: String) {
+        GLOBAL_MAX("Global display (to max)"),
+        GLOBAL_TIER("Global display (to next tier)"),
+        LOWEST_TOTAL("Lowest total kills"),
+        HIGHEST_TOTAL("Highest total kills"),
+        LOWEST_NEEDED_MAX("Lowest kills needed to max"),
+        HIGHEST_NEEDED_MAX("Highest kills needed to max"),
+        LOWEST_NEEDED_TIER("Lowest kills needed to next tier"),
+        HIGHEST_NEEDED_TIER("Highest kills needed to next tier"),
     }
 
     enum class HideMaxed(val b: String) {
