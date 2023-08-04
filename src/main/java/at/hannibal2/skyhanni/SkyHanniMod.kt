@@ -273,7 +273,7 @@ class SkyHanniMod {
         loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
-        loadModule(GardenNextJacobContest())
+        loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())

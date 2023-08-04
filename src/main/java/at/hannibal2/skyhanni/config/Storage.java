@@ -21,6 +21,9 @@ public class Storage {
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
+    public Boolean contestSendingAsked = false;
+
+    @Expose
     public String apiKey = "";
 
     @Expose
