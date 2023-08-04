@@ -658,24 +658,24 @@ public class MiscConfig {
     }
 
     @Expose
-    @ConfigOption(name = "", desc = "")
+    @ConfigOption(name = "Bestiary Data", desc = "")
     @Accordion
     public BestiaryDataConfig bestiaryData = new BestiaryDataConfig();
 
     public static class BestiaryDataConfig {
         @Expose
-        @ConfigOption(name = "", desc = "")
+        @ConfigOption(name = "Enable", desc = "Show bestiary data overlay in the bestiary menu.")
         @ConfigEditorBoolean
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "number format", desc = "")
+        @ConfigOption(name = "Number format", desc = "Short: 1.1k\nLong: 1.100")
         @ConfigEditorDropdown(values = {"Short", "Long"})
         public int numberFormat = 0;
 
 
         @Expose
-        @ConfigOption(name = "displayType", desc = "")
+        @ConfigOption(name = "Display type", desc = "Choose what the display should show")
         @ConfigEditorDropdown(values = {
                 "Global to max",
                 "Global to next tier",
@@ -689,12 +689,12 @@ public class MiscConfig {
         public int displayType = 0;
 
         @Expose
-        @ConfigOption(name = "Hide maxed", desc = "")
+        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs")
         @ConfigEditorBoolean
         public boolean hideMaxed = false;
 
         @Expose
-        @ConfigOption(name = "replace roman", desc = "")
+        @ConfigOption(name = "Replace romans", desc = "Replace romans numeral (IX) with regular number (9)")
         @ConfigEditorBoolean
         public boolean replaceRoman = false;
 
