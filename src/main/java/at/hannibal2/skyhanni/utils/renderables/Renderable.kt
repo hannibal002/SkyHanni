@@ -10,6 +10,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -83,7 +84,16 @@ interface Renderable {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
-                            renderToolTips(posX, posY, tips)
+//                            renderToolTips(posX, posY, tips)
+                            val scaledresolution = ScaledResolution(Minecraft.getMinecraft())
+                            val scaledWidth = scaledresolution.scaledWidth
+                            val scaledHeight = scaledresolution.scaledHeight
+//                            Utils.drawHoveringText(getTooltip(mouseObject), mouseX, mouseY, scaledWidth, scaledHeight, -1, )
+
+                            GlStateManager.pushMatrix()
+                            GlStateManager.translate(0f, 0f, 2f)
+                            Utils.drawHoveringText(tips, posX, posY, scaledWidth, scaledHeight, -1, Minecraft.getMinecraft().fontRendererObj)
+                            GlStateManager.popMatrix()
                         }
                     }
                 }
