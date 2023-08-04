@@ -69,7 +69,7 @@ object FarmingContestAPI {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName == "Your Contests") {
             inInventory = true
         }

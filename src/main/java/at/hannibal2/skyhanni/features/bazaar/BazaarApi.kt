@@ -53,7 +53,7 @@ class BazaarApi {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
     }
 
@@ -100,7 +100,7 @@ class BazaarApi {
         }
     }
 
-    private fun checkIfInBazaar(event: InventoryOpenEvent): Boolean {
+    private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val returnItem = event.inventorySize - 5
         for ((slot, item) in event.inventoryItems) {
             if (slot == returnItem) {

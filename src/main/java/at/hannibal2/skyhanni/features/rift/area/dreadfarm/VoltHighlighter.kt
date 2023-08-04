@@ -3,11 +3,15 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -44,8 +48,7 @@ class VoltHighlighter {
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!RiftAPI.inRift() || !(config.voltRange || config.voltMoodMeter)) return
-        val list = EntityUtils.getEntitiesOrNull<EntityLivingBase>() ?: return
-        for (entity in list) {
+        for (entity in getEntities<EntityLivingBase>()) {
             val state = getVoltState(entity)
             if (state == VoltState.NO_VOLT) continue
 

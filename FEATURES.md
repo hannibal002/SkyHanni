@@ -464,3 +464,7 @@
   + Supports line breaks `\n` - hannibal2
 + Added /sendcoords sending, detecting and rendering - dragon99z
 + Add Dungeon Potion level as item stack size - HiZe
++ **Ender Node Tracker** - pretz
+  + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
++ **Harp Keybinds** - NetheriteMiner
+  + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.

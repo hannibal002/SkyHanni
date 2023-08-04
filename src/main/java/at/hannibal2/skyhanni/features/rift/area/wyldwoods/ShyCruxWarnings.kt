@@ -20,8 +20,7 @@ class ShyCruxWarnings {
     }
 
     private fun checkForShy() {
-        val list = EntityUtils.getAllEntitiesOrNull() ?: return
-        if (list.any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
+        if (EntityUtils.getAllEntities().any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
             TitleUtils.sendTitle("§eLook away!", 150)
         }
     }

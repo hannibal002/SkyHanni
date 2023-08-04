@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -49,7 +49,7 @@ class SkillExperience {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
@@ -74,7 +74,6 @@ class SkillExperience {
                         val overflow = rawNumber.formatNumber()
                         val experience = baseExp + overflow
                         skillExp[skillName] = experience
-                        println("skill exp: $skillName -> $experience")
                     }
                     next = false
                 }

@@ -118,6 +118,8 @@ object GardenAPI {
 
         if (internalName.startsWith("ROOKIE_HOE")) return true
 
+        if (internalName.startsWith("BINGHOE")) return true
+
         return false
     }
 

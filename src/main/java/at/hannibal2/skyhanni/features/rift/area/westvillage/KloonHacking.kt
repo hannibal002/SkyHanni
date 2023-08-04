@@ -38,7 +38,7 @@ class KloonHacking {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inTerminalInventory = false
         inColourInventory = false
         nearestTerminal = null

@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.config.features;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
-public class Chat {
+public class ChatConfig {
 
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
@@ -128,6 +132,11 @@ public class Chat {
     @ConfigOption(name = "Compact Potion Message", desc = "Shorten chat messages about player potion effects.")
     @ConfigEditorBoolean
     public boolean compactPotionMessage = true;
+
+    @Expose
+    @ConfigOption(name = "Compact Bestiary Message", desc = "Shorten the bestiary level up message, showing additional information when hovering.")
+    @ConfigEditorBoolean
+    public boolean compactBestiaryMessage = true;
 
     @Expose
     @ConfigOption(name = "Arachne Hider", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")

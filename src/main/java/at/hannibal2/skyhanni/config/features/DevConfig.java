@@ -2,7 +2,12 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class DevConfig {
@@ -65,10 +70,21 @@ public class DevConfig {
     public boolean copyRngMeter = false;
 
     @Expose
+    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the besiary data from the inventory as json in clipboard.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean copyBestiaryData = false;
+
+    @Expose
     @ConfigOption(name = "Highlight Missing Repo Items", desc = "Highlights each item in the current inventory that is not in your current NEU repo.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean highlightMissingRepo = false;
+
+    @Expose
+    @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int showSlotNumberKey = Keyboard.KEY_NONE;
 
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion

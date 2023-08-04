@@ -21,8 +21,7 @@ class EntityData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        val entities = EntityUtils.getEntitiesOrNull<EntityLivingBase>() ?: return
-        for (entity in entities) {
+        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
             val maxHealth = entity.baseMaxHealth
             val oldMaxHealth = maxHealthMap.getOrDefault(entity, -1)
             if (oldMaxHealth != maxHealth) {

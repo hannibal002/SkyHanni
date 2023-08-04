@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -12,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
@@ -91,9 +91,11 @@ class ItemAbilityCooldown {
         }
         if (event.soundName == "mob.wolf.howl") {
             if (event.volume == 0.5f) {
-                if (!RiftAPI.inRift()) {
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if ("WEIRD_TUBA" in recentItems) {
                     ItemAbility.WEIRD_TUBA.sound()
-                } else {
+                }
+                if ("WEIRDER_TUBA" in recentItems) {
                     ItemAbility.WEIRDER_TUBA.sound()
                 }
             }
@@ -134,7 +136,7 @@ class ItemAbilityCooldown {
             }
         }
         if (event.soundName == "random.drink") {
-            if (event.pitch == 1.8888888f && event.volume == 1.0f) {
+            if (event.pitch.round(1).toDouble() == 1.8 && event.volume == 1.0f) {
                 ItemAbility.HOLY_ICE.sound()
             }
         }

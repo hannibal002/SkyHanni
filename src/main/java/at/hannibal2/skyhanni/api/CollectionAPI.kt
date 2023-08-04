@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
@@ -43,7 +43,7 @@ class CollectionAPI {
     }
 
     @SubscribeEvent
-    fun onTick(event: InventoryOpenEvent) {
+    fun onTick(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
             val stack = event.inventoryItems[4] ?: return

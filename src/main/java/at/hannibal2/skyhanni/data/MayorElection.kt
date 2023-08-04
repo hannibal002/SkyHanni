@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.jsonobjects.MayorJson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
@@ -74,8 +75,4 @@ class MayorElection {
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
     private fun List<MayorJson.Candidate>.bestCandidate() = maxBy { it.votes }
-
-    private infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
-        this[pairs.first] = pairs.second
-    }
 }

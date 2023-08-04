@@ -5,18 +5,15 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -31,10 +28,12 @@ object BestiaryData {
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
+    private val catList = mutableListOf<Category>()
     private val progressPattern = "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+$)".toPattern()
     private val titlePattern = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
     private var lastclicked = 0L
     private var inInventory = false
+    private var isCategory = false
     private var indexes = listOf(
         10, 11, 12, 13, 14, 15, 16,
         19, 20, 21, 22, 23, 24, 25,
@@ -44,6 +43,7 @@ object BestiaryData {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+        if (!isEnabled()) return
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,
@@ -56,13 +56,16 @@ object BestiaryData {
 
     @SubscribeEvent
     fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        val inventoryName = InventoryUtils.openInventoryName()
-        if (inventoryName.contains("Bestiary ➜") || inventoryName == "Bestiary") {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                val stack = slot.stack
-                val lore = stack.getLore()
-                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100§6% §7(§c§lMAX!§7)" }) {
-                    slot highlight LorenzColor.GREEN
+        if (!isEnabled()) return
+        if (inInventory) {
+            val inventoryName = InventoryUtils.openInventoryName()
+            if (isBestiaryGui(InventoryUtils.getItemsInOpenChest()[4].stack, inventoryName)) {
+                for (slot in InventoryUtils.getItemsInOpenChest()) {
+                    val stack = slot.stack
+                    val lore = stack.getLore()
+                    if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100§6% §7(§c§lMAX!§7)" }) {
+                        slot highlight LorenzColor.GREEN
+                    }
                 }
             }
         }
@@ -70,9 +73,10 @@ object BestiaryData {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!isEnabled()) return
         val inventoryName = event.inventoryName
-        if (inventoryName == "Bestiary ➜ Fishing") return
-        if (isBestiaryGui(event.inventoryItems[4], inventoryName)) {
+        if ((inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") || isBestiaryGui(event.inventoryItems[4], inventoryName)) {
+            isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
             stackList.putAll(event.inventoryItems)
             update()
         }
@@ -91,40 +95,72 @@ object BestiaryData {
 
     private fun init() {
         mobList.clear()
-        for ((index, stack) in stackList) {
-            if (stack.displayName == " ") continue
-            if (indexes.contains(index)) {
-                inInventory = true
-                val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
-                val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
-                var totalKillToMax: Long = 0
-                var currentTotalKill: Long = 0
-                var totalKillToTier: Long = 0
-                var currentKillToTier: Long = 0
-                var actualRealTotalKill: Long = 0
-                for ((lineIndex, line) in stack.getLore().withIndex()) {
-                    val loreLine = line.removeColor()
-                    if (loreLine.startsWith("Kills: ")) {
-                        actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
-                            ?: 0
-                    }
-                    if (loreLine.startsWith("                    ")) {
-                        val previousLine = stack.getLore()[lineIndex - 1]
-                        val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
-                        if (previousLine.contains("Progress to Tier")) {
-                            progressPattern.matchMatcher(progress) {
-                                totalKillToTier = group("needed").formatNumber()
-                                currentKillToTier = group("current").formatNumber()
-                            }
-                        } else if (previousLine.contains("Overall Progress")) {
-                            progressPattern.matchMatcher(progress) {
-                                totalKillToMax = group("needed").formatNumber()
-                                currentTotalKill = group("current").formatNumber()
+        catList.clear()
+        if (isCategory) {
+            for ((index, stack) in stackList) {
+                if (stack.displayName == " ") continue
+                if (indexes.contains(index)) {
+                    inInventory = true
+                    val name = stack.displayName
+                    var familiesFound: Long = 0
+                    var totalFamilies: Long = 0
+                    var familiesCompleted: Long = 0
+                    for ((lineIndex, loreLine) in stack.getLore().withIndex()) {
+                        val line = loreLine.removeColor()
+                        if (line.startsWith("                    ")) {
+                            val previousLine = stack.getLore()[lineIndex - 1]
+                            val progress = line.substring(line.lastIndexOf(' ') + 1)
+                            if (previousLine.contains("Families Found")) {
+                                progressPattern.matchMatcher(progress) {
+                                    familiesFound = group("current").formatNumber()
+                                    totalFamilies = group("needed").formatNumber()
+                                }
+                            } else if (previousLine.contains("Families Completed")) {
+                                progressPattern.matchMatcher(progress) {
+                                    familiesCompleted = group("current").formatNumber()
+                                }
                             }
                         }
                     }
+                    catList.add(Category(name, familiesFound, totalFamilies, familiesCompleted))
                 }
-                mobList.add(BestiaryMob(name, level, totalKillToMax, currentTotalKill, totalKillToTier, currentKillToTier, actualRealTotalKill))
+            }
+        } else {
+            for ((index, stack) in stackList) {
+                if (stack.displayName == " ") continue
+                if (indexes.contains(index)) {
+                    inInventory = true
+                    val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
+                    val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
+                    var totalKillToMax: Long = 0
+                    var currentTotalKill: Long = 0
+                    var totalKillToTier: Long = 0
+                    var currentKillToTier: Long = 0
+                    var actualRealTotalKill: Long = 0
+                    for ((lineIndex, line) in stack.getLore().withIndex()) {
+                        val loreLine = line.removeColor()
+                        if (loreLine.startsWith("Kills: ")) {
+                            actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
+                                ?: 0
+                        }
+                        if (loreLine.startsWith("                    ")) {
+                            val previousLine = stack.getLore()[lineIndex - 1]
+                            val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
+                            if (previousLine.contains("Progress to Tier")) {
+                                progressPattern.matchMatcher(progress) {
+                                    totalKillToTier = group("needed").formatNumber()
+                                    currentKillToTier = group("current").formatNumber()
+                                }
+                            } else if (previousLine.contains("Overall Progress")) {
+                                progressPattern.matchMatcher(progress) {
+                                    totalKillToMax = group("needed").formatNumber()
+                                    currentTotalKill = group("current").formatNumber()
+                                }
+                            }
+                        }
+                    }
+                    mobList.add(BestiaryMob(name, level, totalKillToMax, currentTotalKill, totalKillToTier, currentKillToTier, actualRealTotalKill))
+                }
             }
         }
     }
@@ -132,49 +168,28 @@ object BestiaryData {
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
         init()
-        val ss = when (config.displayType) {
-            0 -> mobList.sortedBy {
-                when (config.displayType) {
-                    0 -> it.totalKills
-                    1 -> it.currentKillToNextLevel
-                    2 -> it.killNeededToMax()
-                    3 -> it.killNeededToNextLevel()
-                    else -> it.totalKills
-                }
-            }.toMutableList()
 
-            1 -> mobList.sortedByDescending {
-                when (config.displayType) {
-                    0 -> it.totalKills
-                    1 -> it.currentKillToNextLevel
-                    2 -> it.killNeededToMax()
-                    3 -> it.killNeededToNextLevel()
-                    else -> it.totalKills
-                }
-            }.toMutableList()
-
-            else -> mobList.sortedBy {
-                when (config.displayType) {
-                    0 -> it.totalKills
-                    1 -> it.killNeededForNextLevel
-                    else -> it.totalKills
-                }
-            }.toMutableList()
+        if (catList.isNotEmpty()) {
+            newDisplay.addAsSingletonList("§7Category")
+            for (cat in catList) {
+                newDisplay.add(buildList {
+                    add(" §7- §b${cat.name}§7: §b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed")
+                })
+            }
         }
 
-        val sortedMobList = when (config.displayType) {
-            0 -> mobList.sortedBy { it.percentToMax() }
-            1 -> mobList.sortedBy { it.percentToTier() }
-            2 -> mobList.sortedBy { it.totalKills }
-            3 -> mobList.sortedByDescending { it.totalKills }
-            4 -> mobList.sortedBy { it.killNeededToMax() }
-            5 -> mobList.sortedByDescending { it.killNeededToMax() }
-            6 -> mobList.sortedBy { it.killNeededToNextLevel() }
-            7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
-            else -> mobList.sortedBy { it.totalKills }
-        }.toMutableList()
-
-        if (sortedMobList.isNotEmpty()) {
+        if (mobList.isNotEmpty()) {
+            val sortedMobList = when (config.displayType) {
+                0 -> mobList.sortedBy { it.percentToMax() }
+                1 -> mobList.sortedBy { it.percentToTier() }
+                2 -> mobList.sortedBy { it.totalKills }
+                3 -> mobList.sortedByDescending { it.totalKills }
+                4 -> mobList.sortedBy { it.killNeededToMax() }
+                5 -> mobList.sortedByDescending { it.killNeededToMax() }
+                6 -> mobList.sortedBy { it.killNeededToNextLevel() }
+                7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
+                else -> mobList.sortedBy { it.totalKills }
+            }.toMutableList()
             newDisplay.addAsSingletonList("§7Bestiary Data")
             for (mob in sortedMobList) {
                 val isUnlocked = mob.totalKills != 0.toLong()
@@ -270,14 +285,14 @@ object BestiaryData {
                     update()
                 }
             )
+            newDisplay.addButton(
+                prefix = "§7Hide Maxed: ",
+                getName = HideMaxed.entries[config.hideMaxed.toInt()].b,
+                onChange = {
+                    config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
+                    update()
+                })
         }
-        newDisplay.addButton(
-            prefix = "§7Hide Maxed: ",
-            getName = HideMaxed.entries[config.hideMaxed.toInt()].b,
-            onChange = {
-                config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
-                update()
-            })
 
         return newDisplay
     }
@@ -343,6 +358,11 @@ object BestiaryData {
 
     private fun Int.toBoolean() = this != 0
     private fun Boolean.toInt() = if (!this) 0 else 1
+
+    data class Category(val name: String,
+                        val familiesFound: Long,
+                        val totalFamilies: Long,
+                        val familiesCompleted: Long)
 
     data class BestiaryMob(var name: String,
                            var level: String,
@@ -442,4 +462,7 @@ object BestiaryData {
             }
         }
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
 }
