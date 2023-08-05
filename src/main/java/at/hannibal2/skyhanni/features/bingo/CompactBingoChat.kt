@@ -15,7 +15,6 @@ class CompactBingoChat {
     private var inCollectionLevelUp = false
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0//0 = nothing, 1 = after first message, 2 = after second message
-    private var inBestiarity = false
     private val healthPattern = "   §r§7§8\\+§a.* §c❤ Health".toPattern()
     private val strengthPattern = "   §r§7§8\\+§a. §c❁ Strength".toPattern()
 
@@ -31,7 +30,6 @@ class CompactBingoChat {
             inSkillLevelUp = false
             inSkyblockLevelUp = false
             inCollectionLevelUp = false
-            inBestiarity = false
             if (config.hideBorder) {
                 event.blockedReason = "compact_bingo_border"
             }
@@ -42,7 +40,6 @@ class CompactBingoChat {
         if (onSkyBlockLevelUp(message)) event.blockedReason = "compact_skyblock_level_up"
         if (onCollectionLevelUp(message)) event.blockedReason = "compact_collection_level_up"
         if (onNewAreaDiscovered(message)) event.blockedReason = "compact_new_area_discovered"
-        if (onBestiarityUpgrade(message)) event.blockedReason = "compact_skill_level_up"
     }
 
     private fun onSkillLevelUp(message: String): Boolean {
@@ -129,16 +126,5 @@ class CompactBingoChat {
             }
         }
         return false
-    }
-
-    private fun onBestiarityUpgrade(message: String): Boolean {
-        if (message.startsWith("  §r§3§lBESTIARY §b§l")) {
-            inBestiarity = true
-            return false
-        }
-
-        if (message.contains("§r§6§lBESTIARY MILESTONE")) return false
-
-        return inBestiarity
     }
 }
