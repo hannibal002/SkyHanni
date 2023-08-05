@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LateInventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -37,7 +37,7 @@ class JacobFarmingContestsInventory {
     }
 
     @SubscribeEvent
-    fun onLateInventoryOpen(event: LateInventoryOpenEvent) {
+    fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Your Contests") return
 

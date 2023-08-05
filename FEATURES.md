@@ -22,6 +22,7 @@
 - Compact Potion Effect Messages
 - **Arachne Chat Hider**
   - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
++ Option to shorten the **bestiary level-up** message.
 
 ## Dungeon
 - Clicked Blocks (Showing the block behind walls AFTER clicked on a chest, wither essence or a lever)
@@ -124,7 +125,9 @@
 - **Hide Bronze/Silver Duplicates** - Hiding chat message when catching a duplicate bronze/silver trophy fish.
 - **Shorten Fishing Message** (Replacing the green chat message when fishing a sea creature with a more clean format)
 - Highlight Thunder Sparks that spawn after killing a Thunder.
-- **Barn Timer** - Show the time and amount of sea creatures while fishing on the barn via hub.
+- **Barn Timer**
+  - Show the time and amount of sea creatures while fishing on the barn via hub.
+  - Works in crystal hollows too (worm fishing)
 - **Shark Fish Counter** - Counts how many sharks have been caught.
 - **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + Showing fished item names
@@ -214,7 +217,7 @@
 + Mark the own player name.
 
 ## Bingo
-+ Shortens chat messages about skill level ups, collection gains, new area discoveries, and bestiarity upgrades while on bingo.
++ Shortens chat messages about skill level ups, collection gains and new area discoveries while on bingo.
 + Bingo Card
 
 ## Mobs
@@ -464,3 +467,7 @@
   + Supports line breaks `\n` - hannibal2
 + Added /sendcoords sending, detecting and rendering - dragon99z
 + Add Dungeon Potion level as item stack size - HiZe
++ **Ender Node Tracker** - pretz
+  + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
++ **Harp Keybinds** - NetheriteMiner
+  + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.

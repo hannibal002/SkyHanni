@@ -1,7 +1,30 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.features.*;
+import at.hannibal2.skyhanni.config.features.About;
+import at.hannibal2.skyhanni.config.features.Ashfang;
+import at.hannibal2.skyhanni.config.features.Bazaar;
+import at.hannibal2.skyhanni.config.features.Bingo;
+import at.hannibal2.skyhanni.config.features.ChatConfig;
+import at.hannibal2.skyhanni.config.features.CommandsFeatures;
+import at.hannibal2.skyhanni.config.features.DamageIndicatorConfig;
+import at.hannibal2.skyhanni.config.features.DevConfig;
+import at.hannibal2.skyhanni.config.features.DianaConfig;
+import at.hannibal2.skyhanni.config.features.Dungeon;
+import at.hannibal2.skyhanni.config.features.Fishing;
+import at.hannibal2.skyhanni.config.features.GUI;
+import at.hannibal2.skyhanni.config.features.Garden;
+import at.hannibal2.skyhanni.config.features.GhostCounterConfig;
+import at.hannibal2.skyhanni.config.features.Inventory;
+import at.hannibal2.skyhanni.config.features.ItemAbilities;
+import at.hannibal2.skyhanni.config.features.MarkedPlayers;
+import at.hannibal2.skyhanni.config.features.Minions;
+import at.hannibal2.skyhanni.config.features.MiscConfig;
+import at.hannibal2.skyhanni.config.features.Mobs;
+import at.hannibal2.skyhanni.config.features.OldHidden;
+import at.hannibal2.skyhanni.config.features.RiftConfig;
+import at.hannibal2.skyhanni.config.features.SlayerConfig;
+import at.hannibal2.skyhanni.config.features.Summonings;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
@@ -49,7 +72,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")
-    public Chat chat = new Chat();
+    public ChatConfig chat = new ChatConfig();
 
     @Expose
     @Category(name = "Dungeon", desc = "Features that change the dungeon experience in catacombs.")

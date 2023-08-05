@@ -111,8 +111,8 @@ object CropMoneyDisplay {
 
             if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM) {
                 val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
-                    val redPrice = BazaarApi.getBazaarDataByInternalName("ENCHANTED_RED_MUSHROOM")?.npcPrice ?: 160.0 / 160
-                    val brownPrice = BazaarApi.getBazaarDataByInternalName("ENCHANTED_BROWN_MUSHROOM")?.npcPrice ?: 160.0 / 160
+                    val redPrice = (BazaarApi.getBazaarDataByInternalName("ENCHANTED_RED_MUSHROOM")?.npcPrice ?: 160.0) / 160
+                    val brownPrice = (BazaarApi.getBazaarDataByInternalName("ENCHANTED_BROWN_MUSHROOM")?.npcPrice ?: 160.0) / 160
                     redPrice to brownPrice
                 } else {
                     val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160

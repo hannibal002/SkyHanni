@@ -45,7 +45,7 @@ class CropAccessoryData {
 
     // Handle accessory bag detection
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
 
         // handling accessory bags with only one page
         if (event.inventoryName == "Accessory Bag") {

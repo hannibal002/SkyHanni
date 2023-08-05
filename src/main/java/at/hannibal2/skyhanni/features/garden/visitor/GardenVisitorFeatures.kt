@@ -67,7 +67,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[13] ?: return
         val lore = npcItem.getLore()

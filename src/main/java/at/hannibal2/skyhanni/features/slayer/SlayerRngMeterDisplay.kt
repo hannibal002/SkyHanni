@@ -109,7 +109,7 @@ class SlayerRngMeterDisplay {
     private fun getCurrentSlayer() = SlayerAPI.latestSlayerCategory.removeWordsAtEnd(1).removeColor()
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         val name = inventoryNamePattern.matchMatcher(event.inventoryName) {

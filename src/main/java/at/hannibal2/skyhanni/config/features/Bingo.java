@@ -16,9 +16,13 @@ public class Bingo {
 
     public static class BingoCard {
         @Expose
-        @ConfigOption(name = "Enable", desc = "Displays the bingo card. Toggle by sneaking with SkyBlock menu in hand.")
+        @ConfigOption(name = "Enable", desc = "Displays the bingo card.")
         @ConfigEditorBoolean
         public boolean enabled = true;
+        @Expose
+        @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the bingo card or the step helper by sneaking with SkyBlock menu in hand.")
+        @ConfigEditorBoolean
+        public boolean quickToggle = true;
 
         @Expose
         @ConfigOption(name = "Bingo Steps", desc = "Show help with the next step in bingo instead of the bingo card. " +
@@ -53,7 +57,7 @@ public class Bingo {
 
         @Expose
         @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
-                "new area discoveries, bestiary upgrades and skyblock level up messages while on bingo.")
+                "new area discoveries and skyblock level up messages while on bingo.")
         @ConfigEditorBoolean
         public boolean enabled = true;
 

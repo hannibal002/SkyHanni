@@ -3,15 +3,16 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
 object InventoryUtils {
-
     var itemInHandId = ""
+    var recentItemsInHand = mutableMapOf<Long, String>()
     var latestItemInHand: ItemStack? = null
 
-    fun getItemsInOpenChest() = buildList {
-        val guiChest = Minecraft.getMinecraft().currentScreen as GuiChest
+    fun getItemsInOpenChest() = buildList<Slot> {
+        val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
         val inventorySlots = guiChest.inventorySlots.inventorySlots
         val skipAt = inventorySlots.size - 9 * 4
         var i = 0

@@ -20,46 +20,29 @@ object GhostData {
     )
 
     val bestiaryData = mutableMapOf<Int, Int>().apply {
-
-        if (GhostCounter.bestiaryUpdate) {
-            val commonValue = 100_000
-            for (i in 1..46) {
+            for (i in 1..25) {
                 this[i] = when (i) {
-                    1 -> 10
-                    2 -> 15
-                    3 -> 75
-                    4 -> 150
-                    5 -> 250
-                    6 -> 500
-                    7 -> 1_500
-                    8 -> 2_500
-                    9 -> 5_000
-                    10 -> 15_000
-                    11 -> 25_000
-                    12 -> 50_000
-                    else -> commonValue
+                    1 -> 5
+                    2 -> 5
+                    3 -> 5
+                    4 -> 10
+                    5 -> 25
+                    6 -> 50
+                    7 -> 100
+                    8 -> 150
+                    9 -> 150
+                    10 -> 250
+                    11 -> 750
+                    12 -> 1_500
+                    13 -> 2_000
+                    14,15,16,17 -> 2_500
+                    18 -> 3_000
+                    19,20 -> 3_500
+                    21 -> 25_000
+                    22,23,24,25 -> 50_000
+                    else -> 0
                 }
             }
-        } else {
-            val commonValue = 100_000
-            for (i in 1..46) {
-                this[i] = when (i) {
-                    1 -> 10
-                    2 -> 15
-                    3 -> 75
-                    4 -> 150
-                    5 -> 250
-                    6 -> 500
-                    7 -> 1_500
-                    8 -> 2_500
-                    9 -> 5_000
-                    10 -> 15_000
-                    11 -> 25_000
-                    12 -> 50_000
-                    else -> commonValue
-                }
-            }
-        }
     }
 
     enum class Option(val pattern: Pattern? = null) {

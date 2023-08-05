@@ -23,13 +23,12 @@ class CroesusUnopenedChestTracker {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
                 val lore = stack.getLore()
-                if (lore.any { it.contains("Click to view") }) {
-                    if (!lore.any { it.contains("Chests have been opened!") }) {
+                if ("§eClick to view chests!" in lore) {
+                    if ("§aNo more Chests to open!" !in lore) {
                         slot highlight LorenzColor.DARK_PURPLE
                     }
                 }
             }
         }
-
     }
 }

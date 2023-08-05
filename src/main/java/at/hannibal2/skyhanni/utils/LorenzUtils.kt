@@ -22,6 +22,7 @@ import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -111,6 +112,12 @@ object LorenzUtils {
     }
 
     fun Double.round(decimals: Int): Double {
+        var multiplier = 1.0
+        repeat(decimals) { multiplier *= 10 }
+        return kotlin.math.round(this * multiplier) / multiplier
+    }
+
+    fun Float.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
         return kotlin.math.round(this * multiplier) / multiplier
@@ -216,9 +223,21 @@ object LorenzUtils {
 
     fun clickableChat(message: String, command: String) {
         val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/$command")
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /$command"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /${command.removePrefix("/")}"))
+        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+    }
+
+    fun hoverableChat(message: String, hover: List<String>, command: String? = null) {
+        val text = ChatComponentText(message)
+        text.chatStyle.chatHoverEvent =
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hover.joinToString("\n")))
+
+        if (command != null) {
+            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        }
+
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
@@ -296,22 +315,22 @@ object LorenzUtils {
         isCurrent: (T) -> Boolean,
         onChange: (T) -> Unit,
     ) {
-        val newList = mutableListOf<Any>()
-        newList.add(prefix)
-        for (entry in values) {
-            val display = getName(entry)
-            if (isCurrent(entry)) {
-                newList.add("§a[$display]")
-            } else {
-                newList.add("§e[")
-                newList.add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
-                newList.add("§e]")
+        add(buildList {
+            add(prefix)
+            for (entry in values) {
+                val display = getName(entry)
+                if (isCurrent(entry)) {
+                    add("§a[$display]")
+                } else {
+                    add("§e[")
+                    add(Renderable.link("§e$display") {
+                        onChange(entry)
+                    })
+                    add("§e]")
+                }
+                add(" ")
             }
-            newList.add(" ")
-        }
-        add(newList)
+        })
     }
 
     // TODO nea?
@@ -421,5 +440,14 @@ object LorenzUtils {
             if (this == obj) return true
         }
         return false
+    }
+
+    infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
+        this[pairs.first] = pairs.second
+    }
+
+    fun Field.removeFinal(): Field {
+        javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
+        return this
     }
 }

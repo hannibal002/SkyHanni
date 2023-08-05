@@ -74,6 +74,11 @@ class MinecraftData {
         val newItem = hand?.getInternalName() ?: ""
         if (newItem != InventoryUtils.itemInHandId) {
             ItemInHandChangeEvent(newItem, hand).postAndCatch()
+
+            InventoryUtils.recentItemsInHand.keys.removeIf { it + 30_000 > System.currentTimeMillis() }
+            if (newItem != "") {
+                InventoryUtils.recentItemsInHand[System.currentTimeMillis()] = newItem
+            }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
         }
@@ -82,5 +87,6 @@ class MinecraftData {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         InventoryUtils.itemInHandId = ""
+        InventoryUtils.recentItemsInHand.clear()
     }
 }

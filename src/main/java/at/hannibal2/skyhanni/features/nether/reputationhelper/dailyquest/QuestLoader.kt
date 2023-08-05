@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.Storage
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -110,7 +110,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         return dailyQuestHelper.quests.firstOrNull { it.internalName == name }
     }
 
-    fun checkInventory(event: InventoryOpenEvent) {
+    fun checkInventory(event: InventoryFullyOpenedEvent) {
         val inMageRegion = LorenzUtils.skyBlockArea == "Community Center"
         val inBarbarianRegion = LorenzUtils.skyBlockArea == "Dragontail"
         if (!inMageRegion && !inBarbarianRegion) return
