@@ -2,7 +2,13 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
 public class RiftConfig {
@@ -636,6 +642,26 @@ public class RiftConfig {
 
             @Expose
             public Position position = new Position(126, 156, false, true);
+        }
+
+        @Expose
+        @ConfigOption(name = "Motes Stats", desc = "")
+        @Accordion
+        public MotesStatsConfig motesStats = new MotesStatsConfig();
+
+        public static class MotesStatsConfig {
+            @Expose
+            @ConfigOption(name = "Show at Leave", desc = "Show the summary of all motes gained/lost and their reason when leaving the rift.")
+            @ConfigEditorBoolean
+            public boolean showAtLeave = true;
+            @Expose
+            @ConfigOption(name = "Show Always", desc = "Show total Motes NPC price for the current opened inventory.")
+            @ConfigEditorBoolean
+            public boolean showAllTheTime = true;
+
+            @Expose
+            public Position position = new Position(10, 10, false, true);
+
         }
     }
 
