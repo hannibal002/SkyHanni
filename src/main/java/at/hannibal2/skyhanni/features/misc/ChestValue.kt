@@ -8,16 +8,13 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
-import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -100,13 +97,13 @@ class ChestValue {
             val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
 
             newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Rendering $amountShowing of ${sortedList.size} items)")
-            for ((index, _, amount, stack, _, total, tips) in sortedList) {
-                totalPrice += total * stack.stackSize
+            for ((index, amount, stack, total, tips) in sortedList) {
+                totalPrice += total
                 if (rendered >= config.itemToShow) continue
                 if (total < config.hideBelow) continue
                 newDisplay.add(buildList {
                     val renderable = Renderable.hoverTips(
-                        "${stack.displayName} x$amount: §b${(total * stack.stackSize).formatPrice()}",
+                        "${stack.displayName} x$amount: §b${(total).formatPrice()}",
                         tips,
                         stack = stack,
                         indexes = index)
@@ -162,12 +159,12 @@ class ChestValue {
                         list.add("§aTotal: §6§l${total.formatPrice()}")
                         if (total != 0.0) {
                             if (chestItems.contains(stack.getInternalName())) {
-                                val (oldIndex, oldInternalName, oldAmount, oldStack, oldBase, oldTotal, oldTips) = chestItems[stack.getInternalName()]
+                                val (oldIndex, oldAmount, oldStack, oldTotal, oldTips) = chestItems[stack.getInternalName()]
                                     ?: return
                                 oldIndex.add(i)
-                                chestItems[oldInternalName] = Item(oldIndex, oldInternalName, oldAmount + stack.stackSize, oldStack, oldBase, oldTotal + total, oldTips)
+                                chestItems[stack.getInternalName()] = Item(oldIndex, oldAmount + stack.stackSize, oldStack, oldTotal + (total * stack.stackSize), oldTips)
                             } else {
-                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.getInternalName(), stack.stackSize, stack, base, total, list)
+                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.stackSize, stack, (total * stack.stackSize), list)
                             }
                         }
                     }
@@ -216,10 +213,8 @@ class ChestValue {
 
     data class Item(
         val index: MutableList<Int>,
-        val internalName: String,
         val amount: Int,
         val stack: ItemStack,
-        val base: Double,
         val total: Double,
         val tips: MutableList<String>
     )

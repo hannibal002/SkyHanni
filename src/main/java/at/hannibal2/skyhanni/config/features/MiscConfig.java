@@ -275,7 +275,7 @@ public class MiscConfig {
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @Expose
-    @ConfigOption(name = "Chest Value", desc = "")
+    @ConfigOption(name = "Chest Value h", desc = "")
     @Accordion
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
 
