@@ -76,15 +76,7 @@ object GhostCounter {
     private var killETA = ""
     private var currentSkill = ""
     private var currentSkillLevel = -1
-    private val configUpdateVersion = 1
-
-    init {
-        if (hidden?.configUpdateVersion == 0){
-            config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
-            chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
-            hidden?.configUpdateVersion = configUpdateVersion
-        }
-    }
+    private const val configUpdateVersion = 1
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -152,6 +144,7 @@ object GhostCounter {
                     bestiaryCurrentKill = cKill
                     bestiaryFormatting.showMax_progress
                 }
+
                 else -> bestiaryFormatting.openMenu
             }
         } else {
@@ -213,7 +206,7 @@ object GhostCounter {
         addAsSingletonList(config.textFormatting.killComboFormat.formatText(KILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
         addAsSingletonList(config.textFormatting.highestKillComboFormat.formatText(MAXKILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
         addAsSingletonList(config.textFormatting.skillXPGainFormat.formatText(SKILLXPGAINED.get(), SKILLXPGAINED.get(true)))
-        addAsSingletonList(bestiaryFormatting.base.preFormat(bestiary,nextLevel-1, nextLevel).formatBestiary(currentKill, killNeeded))
+        addAsSingletonList(bestiaryFormatting.base.preFormat(bestiary, nextLevel - 1, nextLevel).formatBestiary(currentKill, killNeeded))
 
         addAsSingletonList(xpHourFormatting.base.formatText(xp))
         addAsSingletonList(killHourFormatting.base.formatText(killHour))
@@ -445,15 +438,24 @@ object GhostCounter {
         var kills = 0.0
         for (line in ghostStack.getLore()) {
             val l = line.removeColor().trim()
-            if (l.startsWith("Kills: ")){
+            if (l.startsWith("Kills: ")) {
                 kills = "Kills: (.*)".toRegex().find(l)?.groupValues?.get(1)?.formatNumber()?.toDouble() ?: 0.0
             }
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {
-                hidden?.bestiaryCurrentKill = if (kills>0) kills else group("current").formatNumber().toDouble()
+                hidden?.bestiaryCurrentKill = if (kills > 0) kills else group("current").formatNumber().toDouble()
                 hidden?.bestiaryKillNeeded = group("total").formatNumber().toDouble()
             }
         }
         update()
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        if (hidden?.configUpdateVersion == 0) {
+            config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
+            chat("§e[SkyHanni] Your GhostCounter config has been automatically adjusted.")
+            hidden?.configUpdateVersion = configUpdateVersion
+        }
     }
 
     fun isEnabled(): Boolean {
