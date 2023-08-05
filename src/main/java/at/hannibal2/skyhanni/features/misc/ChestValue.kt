@@ -21,6 +21,7 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 
 class ChestValue {
 
@@ -68,11 +69,12 @@ class ChestValue {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
+        if (!config.enableHighlight) return
         if (inInventory) {
             for ((_, indexes) in Renderable.list) {
                 for (slot in InventoryUtils.getItemsInOpenChest()) {
                     if (indexes.contains(slot.slotIndex)) {
-                        slot highlight LorenzColor.GREEN
+                        slot highlight Color(SpecialColour.specialToChromaRGB(config.highlightColor), true)
                     }
                 }
             }
