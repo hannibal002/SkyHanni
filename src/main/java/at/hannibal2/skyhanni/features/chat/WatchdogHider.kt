@@ -4,16 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.relauncher.ReflectionHelper
 
 class WatchdogHider {
 
     private var inWatchdog = false
+    private var blockedLines = 0
     private var startLineComponent: IChatComponent? = null
 
     @SubscribeEvent
@@ -23,6 +20,7 @@ class WatchdogHider {
         when (event.message) {
             watchdogStartLine -> {
                 startLineComponent = event.chatComponent
+                blockedLines = 0
             }
             watchdogAnnouncementLine -> {
                 ChatManager.retractMessage(startLineComponent, "watchdog")
@@ -37,6 +35,11 @@ class WatchdogHider {
 
         if (inWatchdog) {
             event.blockedReason = "watchdog"
+            blockedLines++
+            if (blockedLines > 10) {
+                blockedLines = 0
+                inWatchdog = false
+            }
         }
     }
 
