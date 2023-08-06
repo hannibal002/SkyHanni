@@ -99,7 +99,8 @@ dependencies {
 
 tasks.withType(Test::class) {
     useJUnitPlatform()
-    this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    workingDir(file("run"))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
 }
 
