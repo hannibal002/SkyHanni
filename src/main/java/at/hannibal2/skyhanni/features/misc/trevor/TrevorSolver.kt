@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -11,6 +12,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.passive.EntityChicken
 
 object TrevorSolver {
     private val animalHealths = intArrayOf(100, 200, 400, 500, 1000, 2000, 5000, 10000, 20000) //future proofing for Derpy :)
@@ -51,6 +53,14 @@ object TrevorSolver {
             val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
             currentMob = TrevorMobs.values().firstOrNull { it.mobName.contains(name) }
+            if (currentMob == TrevorMobs.CHICKEN) {
+                if (entity is EntityChicken) {
+                    if (entity.hasMaxHealth(20_000)) {
+                        // raider of the sea
+                        currentMob = null
+                    }
+                }
+            }
             if (animalHealths.any { it == entityHealth }) {
                 if (currentMob != null) {
                     if (foundID == entity.entityId) {
