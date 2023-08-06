@@ -103,7 +103,7 @@ class ChestValue {
                 if (total < config.hideBelow) continue
                 newDisplay.add(buildList {
                     val renderable = Renderable.hoverTips(
-                        "${stack.displayName} x$amount: §b${(total).formatPrice()}",
+                        "${stack.displayName} §7x$amount: §b${(total).formatPrice()}",
                         tips,
                         stack = stack,
                         indexes = index)

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
-import io.github.moulberry.notenoughupdates.core.config.annotations.ConfigEditorSlider;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
