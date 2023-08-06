@@ -4,12 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.makeAccessible
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.relauncher.ReflectionHelper
 
 class CompactBestiaryChatMessage {
 
@@ -17,6 +13,7 @@ class CompactBestiaryChatMessage {
     var bestiaryDescription = mutableListOf<String>()
     var acceptMoreDescription = true
     var command = ""
+    private var blockedLines = 0
 
     var lastBorder: IChatComponent? = null
     var lastEmpty: IChatComponent? = null
@@ -56,9 +53,15 @@ class CompactBestiaryChatMessage {
                 }
             }
             inBestiary = true
+            blockedLines = 0
             bestiaryDescription.add(message.trim())
         } else if (inBestiary) {
             event.blockedReason = "bestiary"
+            blockedLines++
+            if (blockedLines > 10) {
+                blockedLines = 0
+                inBestiary = false
+            }
             if (message == border) {
                 inBestiary = false
 

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

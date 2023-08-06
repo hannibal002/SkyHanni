@@ -172,7 +172,8 @@ public class GhostCounterConfig {
                     "§e%nextLevel% §7is replaced with your current bestiary level +1.\n" +
                     "§e%value% §7is replaced with one of the text below.")
             @ConfigEditorText
-            public String base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
+           // public String base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
+            public String base = "  &6Bestiary %display%: &b%value%";
 
             @Expose
             @ConfigOption(name = "No Data", desc = "Text to show when you need to open the\nBestiary Menu to gather data.")
@@ -189,7 +190,7 @@ public class GhostCounterConfig {
             @ConfigOption(name = "Progress to Max", desc = "Text to show progress when the §eMaxed Bestiary §7option is §aON\n" +
                     "§e%currentKill% §7is replaced with your current total kill.")
             @ConfigEditorText
-            public String showMax_progress = "%currentKill%/3M (%percentNumber%%)";
+            public String showMax_progress = "%currentKill%/250k (%percentNumber%%)";
 
             @Expose
             @ConfigOption(name = "Progress", desc = "Text to show progress when the §eMaxed Bestiary§7 option is §cOFF\n" +

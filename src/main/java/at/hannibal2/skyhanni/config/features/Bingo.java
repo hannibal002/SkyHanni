@@ -57,7 +57,7 @@ public class Bingo {
 
         @Expose
         @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
-                "new area discoveries, bestiary upgrades and skyblock level up messages while on bingo.")
+                "new area discoveries and skyblock level up messages while on bingo.")
         @ConfigEditorBoolean
         public boolean enabled = true;
 
