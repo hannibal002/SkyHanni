@@ -58,7 +58,7 @@ class CompactBestiaryChatMessage {
         } else if (inBestiary) {
             event.blockedReason = "bestiary"
             blockedLines++
-            if (blockedLines > 10) {
+            if (blockedLines > 12) {
                 blockedLines = 0
                 inBestiary = false
             }
