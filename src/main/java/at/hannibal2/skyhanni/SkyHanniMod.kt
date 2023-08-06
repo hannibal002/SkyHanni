@@ -165,6 +165,7 @@ class SkyHanniMod {
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
+        loadModule(DungeonRoomDetection)
 
         // APIs
         loadModule(BazaarApi())

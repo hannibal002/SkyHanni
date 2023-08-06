@@ -118,6 +118,19 @@ data class LorenzVec(
         return LorenzVec(scalar * x, scalar * y, scalar * z)
     }
 
+    fun rotate(degrees: Double, round: Int = 5): LorenzVec {
+        val radians = Math.toRadians(degrees)
+        val cosTheta = cos(radians)
+        val sinTheta = sin(radians)
+
+        val rotatedX = x * cosTheta - z * sinTheta
+        val rotatedZ = x * sinTheta + z * cosTheta
+
+        return LorenzVec(rotatedX, y, rotatedZ).round(round)
+    }
+
+    fun Double.toRadians() = this * Math.PI / 180.0
+
     companion object {
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
