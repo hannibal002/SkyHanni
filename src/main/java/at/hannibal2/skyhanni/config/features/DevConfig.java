@@ -64,6 +64,12 @@ public class DevConfig {
     public boolean showItemUuid = false;
 
     @Expose
+    @ConfigOption(name = "Copy NBT data", desc = "Copies compressed NBT data on key press in a GUI")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 0)
+    public int copyNBTDataCompressed = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(name = "Copy Rng Meter", desc = "Copies internal names and maxed xp needed from rng meter inventories in json format into the clipboard.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)

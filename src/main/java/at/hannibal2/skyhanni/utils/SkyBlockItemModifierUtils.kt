@@ -154,7 +154,7 @@ object SkyBlockItemModifierUtils {
     // TODO untested
     fun ItemStack.hasBookOfStats() = getAttributeBoolean("stats_book")
 
-    fun ItemStack.hasArtOfPiece() = getAttributeBoolean("artOfPeaceApplied")
+    fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
