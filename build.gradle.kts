@@ -7,6 +7,7 @@ plugins {
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.9.0"
+    id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
 }
 
 group = "at.hannibal2.skyhanni"
@@ -76,16 +77,33 @@ dependencies {
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
     @Suppress("VulnerableLibrariesLocal")
-    implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    modImplementation("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
     @Suppress("VulnerableLibrariesLocal")
-    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
 
     shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.5")
     devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.5:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+
+//    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 }
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    workingDir(file("run"))
+    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+}
+
 kotlin {
     sourceSets.all {
         languageSettings {
