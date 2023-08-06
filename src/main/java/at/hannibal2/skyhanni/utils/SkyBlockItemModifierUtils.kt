@@ -38,11 +38,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
-    fun ItemStack.getDungeonStarCount() = getAttributeInt("dungeon_item_level")?.let {
-        getAttributeInt("upgrade_level")?.let { upgradeLevel ->
-            return it.coerceAtLeast(upgradeLevel)
-        } ?: it
-    }
+    fun ItemStack.getDungeonStarCount() =
+        getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
