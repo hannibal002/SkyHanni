@@ -100,6 +100,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.*
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
 import kotlinx.coroutines.CoroutineName
@@ -141,6 +142,7 @@ class SkyHanniMod {
         loadModule(ItemRenderBackground())
         loadModule(EntityData())
         loadModule(EntityMovementData())
+        loadModule(TestExportTools)
         loadModule(ItemClickData())
         loadModule(MinecraftData())
         loadModule(TitleUtils())

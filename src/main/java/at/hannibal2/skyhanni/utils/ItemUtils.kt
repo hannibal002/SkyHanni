@@ -122,7 +122,7 @@ object ItemUtils {
     fun ItemStack.getInternalName_new() = NEUInternalName.from(getInternalName())
 
         fun ItemStack.getInternalName(): String {
-        if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
+        if (tagCompound?.getCompoundTag("display")?.getString("Name") == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return "WISP_POTION"
         }
         return NEUItems.getInternalName(this)
