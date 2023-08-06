@@ -12,6 +12,8 @@
   + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
 + **Ender Node Tracker** - pretz
   + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
++ **Fishing timer** now works in **Crystal Hollows** as well. (Worm fishing)
++ Option to shorten the **bestiary level-up message**.
 
 ### Changes
 + Added option to disable quick bingo card toggle with sneaking.
@@ -26,6 +28,10 @@
 + Should not crash anymore if a file in repo is missing.
 + Fixed Killer Spring tower still highlighting even with the feature turned off. - HiZe
 + Fixed weird tuba ability cooldown not working in rift.
+  = Fixed holy ice cooldown sometimes not working.
+  = Fixed a rare startup crash.
+  = Fixed Ghost stats after bestiary update. - HiZe
+  = Watchdog hider now correctly hides empty lines as well, even when empty line hider is disabled. - appable0
 
 ## Version 0.19
 

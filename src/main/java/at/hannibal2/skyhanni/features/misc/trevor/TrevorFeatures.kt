@@ -50,9 +50,11 @@ class TrevorFeatures {
         fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
             Minecraft.getMinecraft().addScheduledTask {
                 try {
-                    if (onFarmingIsland()) {
-                        updateTrapper()
-                        TrevorSolver.findMob()
+                    if (config.trapperSolver) {
+                        if (onFarmingIsland()) {
+                            updateTrapper()
+                            TrevorSolver.findMob()
+                        }
                     }
                 } catch (error: Throwable) {
                     CopyErrorCommand.logError(error, "Encountered an error when updating the trapper solver")
