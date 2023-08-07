@@ -226,13 +226,9 @@ object BestiaryData {
                 continue
             }
             if (isMaxed && config.hideMaxed) continue
-            newDisplay.add(addOneMob(mob, isMaxed))
-        }
-    }
-
-    private fun addOneMob(mob: BestiaryMob, isMaxed: Boolean): List<Any> {
-        return buildList<Any> {
-            add(Renderable.hoverTips(getMobLine(mob, isMaxed), getMobHover(mob), false) { true })
+            val text = getMobLine(mob, isMaxed)
+            val tips = getMobHover(mob)
+            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips, false) { true })
         }
     }
 
