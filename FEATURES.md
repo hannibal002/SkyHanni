@@ -272,7 +272,6 @@
 + Farming armor drops counter
 + **Colored Name** - Show the visitor name in the color of the rarity.
 + **Visitor Item Preview** - Show the base type for the required items next to new visitors (Note that some visitors may require any crop)
-+ **Teleport Pad Compact Name** - Hide the 'Warp to' and 'No Destination' texts over teleport pads.
 + **Money per Hour Advanced stats** - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (Suggestion: Enable Compact Price as well for this)
 + **Anita Medal Profit** - Helps to identify profitable items to buy at the Anita item shop and potential profit from selling the item at the auction house.
 + **Composter Compact Display** - Displays the compost data from the tab list in a compact form as gui element.
@@ -286,7 +285,6 @@
 + **Tooltip Tweaks Tooltip Format** - Show crop-specific farming fortune in tooltip. (contributed by appable)
 + **Compost Low Notification** - Shows a notification as title when organic matter/fuel is low.
 + **Jacob's Contest Warning** - Show a warning shortly before a new jacob contest starts.
-+ **Inventory Numbers** - Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
 + **Composter Overlay** - Show the cheapest items for organic matter and fuel, show profit per compost/hour/day and time per compost
 + **Composter Upgrades Overlay** - Show an overview of all composter stats, including time till organic matter and fuel is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the composter inventory
@@ -412,10 +410,11 @@
   + SkyBlock Command `/tp` to check the play time still works
 
 ## Misc
-+ Allow to copy, paste, and mark selected text in signs (not visual, but it's working still)
++ Allow to paste text from clipboard in signs
 + Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with auto-pet support)
 + Hiding exp Bottles lying on the ground.
-+ **Real Time** - Display the current computer time, a handy feature when playing in full-screen mode.
++ **Real Time**
+  + Display the current computer time, a handy feature when playing in full-screen mode.
 + Highlight the voidling extremist in pink color.
 + Highlight millenia aged blaze color in red
 + Option to hide all damage splashes, from anywhere in Skyblock.
@@ -479,3 +478,9 @@
   + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
 + **Harp Keybinds** - NetheriteMiner
   + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
++ **Teleport Pad Compact Name**
+  + Hide the 'Warp to' and 'No Destination' texts over teleport pads.
+  + Only on Private island.
++ **Inventory Numbers**
+  + Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
+  + Only on Private island.
