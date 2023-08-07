@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -99,6 +100,10 @@ class EnderNodeTracker {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
+        config.textFormat.afterChange {
+            saveAndUpdate()
+        }
+
         val hidden = ProfileStorageData.profileSpecific?.enderNodeTracker ?: return
         totalNodesMined = hidden.totalNodesMined
         totalEndermiteNests = hidden.totalEndermiteNests
@@ -191,7 +196,7 @@ class EnderNodeTracker {
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
-        for (index in config.textFormat) {
+        for (index in config.textFormat.get()) {
             newList.add(map[index])
         }
         return newList
