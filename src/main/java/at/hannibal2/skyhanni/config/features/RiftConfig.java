@@ -614,7 +614,7 @@ public class RiftConfig {
 
         @Expose
         @ConfigOption(name = "Burger Stacks", desc = "Set your McGrubber's burger stacks.")
-        @ConfigEditorSlider(minStep = 1, minValue =  0, maxValue = 5)
+        @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 5)
         public int burgerStacks = 0;
 
         @Expose

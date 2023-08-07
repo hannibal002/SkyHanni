@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.config.features;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
+@SuppressWarnings("deprecation")
 public class ChatConfig {
 
     @Expose
