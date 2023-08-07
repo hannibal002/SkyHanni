@@ -231,6 +231,32 @@ object BestiaryData {
     }
 
     private fun addOneMob(mob: BestiaryMob, isMaxed: Boolean) = buildList<Any> {
+        val rendered = Renderable.hoverTips(
+            getMobLine(mob, isMaxed),
+            listOf(
+                "§6Name: §b${mob.name}",
+                "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
+                "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
+                "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
+                "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
+                "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
+                "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
+                "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
+                "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
+                "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
+                "",
+                "§7More infos thing"
+            ), false
+        ) {
+            true
+        }
+        add(rendered)
+    }
+
+    private fun getMobLine(
+        mob: BestiaryMob,
+        isMaxed: Boolean
+    ): String {
         val displayType = config.displayType
         var text = ""
         text += " §7- "
@@ -273,26 +299,7 @@ object BestiaryData {
                 else -> "§cYou are not supposed to see this, please report it to @HiZe on discord!"
             }
         }
-        val rendered = Renderable.hoverTips(
-            text,
-            listOf(
-                "§6Name: §b${mob.name}",
-                "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
-                "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
-                "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
-                "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
-                "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
-                "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
-                "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
-                "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
-                "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
-                "",
-                "§7More infos thing"
-            ), false
-        ) {
-            true
-        }
-        add(rendered)
+        return text
     }
 
     private fun addButtons(newDisplay: MutableList<List<Any>>) {
