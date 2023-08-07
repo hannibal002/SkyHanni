@@ -371,6 +371,7 @@ class SkyHanniMod {
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
+        loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
         loadModule(HarpKeybinds())
         loadModule(EnderNodeTracker())
