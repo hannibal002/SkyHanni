@@ -12,7 +12,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
-public class Fishing {
+public class FishingConfig {
 
     @ConfigOption(name = "Trophy Fishing", desc = "")
     @ConfigEditorAccordion(id = 0)
