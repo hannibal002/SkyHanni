@@ -170,138 +170,143 @@ object BestiaryData {
         val newDisplay = mutableListOf<List<Any>>()
         init()
 
+        addCategories(newDisplay)
+
+        if (mobList.isEmpty()) return newDisplay
+
+        val sortedMobList = when (config.displayType) {
+            0 -> mobList.sortedBy { it.percentToMax() }
+            1 -> mobList.sortedBy { it.percentToTier() }
+            2 -> mobList.sortedBy { it.totalKills }
+            3 -> mobList.sortedByDescending { it.totalKills }
+            4 -> mobList.sortedBy { it.killNeededToMax() }
+            5 -> mobList.sortedByDescending { it.killNeededToMax() }
+            6 -> mobList.sortedBy { it.killNeededToNextLevel() }
+            7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
+            else -> mobList.sortedBy { it.totalKills }
+        }.toMutableList()
+
+        newDisplay.addAsSingletonList("§7Bestiary Data")
+        for (mob in sortedMobList) {
+            val isUnlocked = mob.totalKills != 0.toLong()
+            val isMaxed = mob.percentToMax() == 100.0
+            if (isUnlocked) {
+                if (isMaxed && config.hideMaxed) continue
+                newDisplay.add(buildList {
+                    val displayType = config.displayType
+                    var text = ""
+                    text += " §7- "
+                    text += "${mob.name} ${mob.level.romanOrInt()} "
+                    text += if (isMaxed) {
+                        "§c§lMAXED! §7(§b${mob.actualRealTotalKill.addSeparators()}§7 kills)"
+                    } else {
+                        when (displayType) {
+                            0, 1 -> {
+                                val currentKill = when (displayType) {
+                                    0 -> mob.totalKills
+                                    1 -> mob.currentKillToNextLevel
+                                    else -> 0
+                                }
+                                val killNeeded = when (displayType) {
+                                    0 -> mob.killToMax
+                                    1 -> mob.killNeededForNextLevel
+                                    else -> 0
+                                }
+                                "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
+                            }
+
+                            2, 3 -> {
+
+                                "§6${mob.totalKills.formatNumber()} §7total kills"
+                            }
+
+                            4, 5 -> {
+                                "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
+                            }
+
+                            6, 7 -> {
+                                "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
+                            }
+
+                            else -> "§cYou are not supposed to see this, please report it to @HiZe on discord!"
+                        }
+                    }
+                    val rendered = Renderable.hoverTips(text,
+                        listOf(
+                            "§6Name: §b${mob.name}",
+                            "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
+                            "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
+                            "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
+                            "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
+                            "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
+                            "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
+                            "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
+                            "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
+                            "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
+                            "",
+                            "§7More infos thing"), false) {
+                        true
+                    }
+                    add(rendered)
+                })
+            } else {
+                newDisplay.add(buildList {
+                    add(" §7- ")
+                    add("${mob.name}: §cNot unlocked!")
+                })
+            }
+        }
+        newDisplay.addButton(
+            prefix = "§7Number Format: ",
+            getName = FormatType.entries[config.numberFormat].type,
+            onChange = {
+                config.numberFormat = (config.numberFormat + 1) % 2
+                update()
+            })
+
+        newDisplay.addButton(
+            prefix = "§7Display Type: ",
+            getName = DisplayType.entries[config.displayType].type,
+            onChange = {
+                config.displayType = (config.displayType + 1) % 8
+                update()
+            })
+
+        newDisplay.addButton(
+            prefix = "§7Number Type: ",
+            getName = NumberType.entries[config.replaceRoman.toInt()].type,
+            onChange = {
+                config.replaceRoman = ((config.replaceRoman.toInt() + 1) % 2).toBoolean()
+                update()
+            }
+        )
+        newDisplay.addButton(
+            prefix = "§7Hide Maxed: ",
+            getName = HideMaxed.entries[config.hideMaxed.toInt()].b,
+            onChange = {
+                config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
+                update()
+            })
+
+        return newDisplay
+    }
+
+    private fun addCategories(newDisplay: MutableList<List<Any>>) {
         if (catList.isNotEmpty()) {
             newDisplay.addAsSingletonList("§7Category")
             for (cat in catList) {
                 newDisplay.add(buildList {
                     add(" §7- ${cat.name}§7: ")
-                    if (cat.familiesCompleted == cat.totalFamilies){
+                    if (cat.familiesCompleted == cat.totalFamilies) {
                         add("§c§lCompleted!")
-                    }else if(cat.familiesFound == cat.totalFamilies){
+                    } else if (cat.familiesFound == cat.totalFamilies) {
                         add("§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed")
-                    }else if(cat.familiesFound < cat.totalFamilies){
+                    } else if (cat.familiesFound < cat.totalFamilies) {
                         add("§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed")
                     }
                 })
             }
         }
-
-        if (mobList.isNotEmpty()) {
-            val sortedMobList = when (config.displayType) {
-                0 -> mobList.sortedBy { it.percentToMax() }
-                1 -> mobList.sortedBy { it.percentToTier() }
-                2 -> mobList.sortedBy { it.totalKills }
-                3 -> mobList.sortedByDescending { it.totalKills }
-                4 -> mobList.sortedBy { it.killNeededToMax() }
-                5 -> mobList.sortedByDescending { it.killNeededToMax() }
-                6 -> mobList.sortedBy { it.killNeededToNextLevel() }
-                7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
-                else -> mobList.sortedBy { it.totalKills }
-            }.toMutableList()
-            newDisplay.addAsSingletonList("§7Bestiary Data")
-            for (mob in sortedMobList) {
-                val isUnlocked = mob.totalKills != 0.toLong()
-                val isMaxed = mob.percentToMax() == 100.0
-                if (isUnlocked) {
-                    if (isMaxed && config.hideMaxed) continue
-                    newDisplay.add(buildList {
-                        val displayType = config.displayType
-                        var text = ""
-                        text += " §7- "
-                        text += "${mob.name} ${mob.level.romanOrInt()} "
-                        text += if (isMaxed) {
-                            "§c§lMAXED! §7(§b${mob.actualRealTotalKill.addSeparators()}§7 kills)"
-                        } else {
-                            when (displayType) {
-                                0, 1 -> {
-                                    val currentKill = when (displayType) {
-                                        0 -> mob.totalKills
-                                        1 -> mob.currentKillToNextLevel
-                                        else -> 0
-                                    }
-                                    val killNeeded = when (displayType) {
-                                        0 -> mob.killToMax
-                                        1 -> mob.killNeededForNextLevel
-                                        else -> 0
-                                    }
-                                    "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
-                                }
-
-                                2, 3 -> {
-
-                                    "§6${mob.totalKills.formatNumber()} §7total kills"
-                                }
-
-                                4, 5 -> {
-                                    "§6${mob.killNeededToMax().formatNumber()} §7kills needed"
-                                }
-
-                                6, 7 -> {
-                                    "§6${mob.killNeededToNextLevel().formatNumber()} §7kills needed"
-                                }
-
-                                else -> "§cYou are not supposed to see this, please report it to @HiZe on discord!"
-                            }
-                        }
-                        val rendered = Renderable.hoverTips(text,
-                            listOf(
-                                "§6Name: §b${mob.name}",
-                                "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
-                                "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
-                                "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
-                                "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
-                                "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
-                                "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
-                                "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
-                                "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
-                                "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
-                                "",
-                                "§7More infos thing"), false) {
-                            true
-                        }
-                        add(rendered)
-                    })
-                } else {
-                    newDisplay.add(buildList {
-                        add(" §7- ")
-                        add("${mob.name}: §cNot unlocked!")
-                    })
-                }
-            }
-            newDisplay.addButton(
-                prefix = "§7Number Format: ",
-                getName = FormatType.entries[config.numberFormat].type,
-                onChange = {
-                    config.numberFormat = (config.numberFormat + 1) % 2
-                    update()
-                })
-
-            newDisplay.addButton(
-                prefix = "§7Display Type: ",
-                getName = DisplayType.entries[config.displayType].type,
-                onChange = {
-                    config.displayType = (config.displayType + 1) % 8
-                    update()
-                })
-
-            newDisplay.addButton(
-                prefix = "§7Number Type: ",
-                getName = NumberType.entries[config.replaceRoman.toInt()].type,
-                onChange = {
-                    config.replaceRoman = ((config.replaceRoman.toInt() + 1) % 2).toBoolean()
-                    update()
-                }
-            )
-            newDisplay.addButton(
-                prefix = "§7Hide Maxed: ",
-                getName = HideMaxed.entries[config.hideMaxed.toInt()].b,
-                onChange = {
-                    config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
-                    update()
-                })
-        }
-
-        return newDisplay
     }
 
     private fun isBestiaryGui(stack: ItemStack?, name: String): Boolean {
