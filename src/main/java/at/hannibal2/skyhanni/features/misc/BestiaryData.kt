@@ -101,82 +101,86 @@ object BestiaryData {
         mobList.clear()
         catList.clear()
         if (isCategory) {
-            for ((index, stack) in stackList) {
-                if (stack.displayName == " ") continue
-                if (indexes.contains(index)) {
-                    inInventory = true
-                    val name = stack.displayName
-                    var familiesFound: Long = 0
-                    var totalFamilies: Long = 0
-                    var familiesCompleted: Long = 0
-                    for ((lineIndex, loreLine) in stack.getLore().withIndex()) {
-                        val line = loreLine.removeColor()
-                        if (line.startsWith("                    ")) {
-                            val previousLine = stack.getLore()[lineIndex - 1]
-                            val progress = line.substring(line.lastIndexOf(' ') + 1)
-                            if (previousLine.contains("Families Found")) {
-                                progressPattern.matchMatcher(progress) {
-                                    familiesFound = group("current").formatNumber()
-                                    totalFamilies = group("needed").formatNumber()
-                                }
-                            } else if (previousLine.contains("Families Completed")) {
-                                progressPattern.matchMatcher(progress) {
-                                    familiesCompleted = group("current").formatNumber()
-                                }
-                            }
-                        }
-                    }
-                    catList.add(Category(name, familiesFound, totalFamilies, familiesCompleted))
-                }
-            }
+            inCategory()
         } else {
-            for ((index, stack) in stackList) {
-                if (stack.displayName == " ") continue
-                if (indexes.contains(index)) {
-                    inInventory = true
-                    val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
-                    val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
-                    var totalKillToMax: Long = 0
-                    var currentTotalKill: Long = 0
-                    var totalKillToTier: Long = 0
-                    var currentKillToTier: Long = 0
-                    var actualRealTotalKill: Long = 0
-                    for ((lineIndex, line) in stack.getLore().withIndex()) {
-                        val loreLine = line.removeColor()
-                        if (loreLine.startsWith("Kills: ")) {
-                            actualRealTotalKill =
-                                "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
-                                    ?: 0
-                        }
-                        if (loreLine.startsWith("                    ")) {
-                            val previousLine = stack.getLore()[lineIndex - 1]
-                            val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
-                            if (previousLine.contains("Progress to Tier")) {
-                                progressPattern.matchMatcher(progress) {
-                                    totalKillToTier = group("needed").formatNumber()
-                                    currentKillToTier = group("current").formatNumber()
-                                }
-                            } else if (previousLine.contains("Overall Progress")) {
-                                progressPattern.matchMatcher(progress) {
-                                    totalKillToMax = group("needed").formatNumber()
-                                    currentTotalKill = group("current").formatNumber()
-                                }
-                            }
-                        }
+            notInCategory()
+        }
+    }
+
+    private fun inCategory() {
+        for ((index, stack) in stackList) {
+            if (stack.displayName == " ") continue
+            if (!indexes.contains(index)) continue
+            inInventory = true
+            val name = stack.displayName
+            var familiesFound: Long = 0
+            var totalFamilies: Long = 0
+            var familiesCompleted: Long = 0
+            for ((lineIndex, loreLine) in stack.getLore().withIndex()) {
+                val line = loreLine.removeColor()
+                if (!line.startsWith("                    ")) continue
+                val previousLine = stack.getLore()[lineIndex - 1]
+                val progress = line.substring(line.lastIndexOf(' ') + 1)
+                if (previousLine.contains("Families Found")) {
+                    progressPattern.matchMatcher(progress) {
+                        familiesFound = group("current").formatNumber()
+                        totalFamilies = group("needed").formatNumber()
                     }
-                    mobList.add(
-                        BestiaryMob(
-                            name,
-                            level,
-                            totalKillToMax,
-                            currentTotalKill,
-                            totalKillToTier,
-                            currentKillToTier,
-                            actualRealTotalKill
-                        )
-                    )
+                } else if (previousLine.contains("Families Completed")) {
+                    progressPattern.matchMatcher(progress) {
+                        familiesCompleted = group("current").formatNumber()
+                    }
                 }
             }
+            catList.add(Category(name, familiesFound, totalFamilies, familiesCompleted))
+        }
+    }
+
+    private fun notInCategory() {
+        for ((index, stack) in stackList) {
+            if (stack.displayName == " ") continue
+            if (!indexes.contains(index)) continue
+            inInventory = true
+            val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
+            val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
+            var totalKillToMax: Long = 0
+            var currentTotalKill: Long = 0
+            var totalKillToTier: Long = 0
+            var currentKillToTier: Long = 0
+            var actualRealTotalKill: Long = 0
+            for ((lineIndex, line) in stack.getLore().withIndex()) {
+                val loreLine = line.removeColor()
+                if (loreLine.startsWith("Kills: ")) {
+                    actualRealTotalKill =
+                        "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
+                            ?: 0
+                }
+                if (!loreLine.startsWith("                    ")) continue
+                val previousLine = stack.getLore()[lineIndex - 1]
+                val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
+                if (previousLine.contains("Progress to Tier")) {
+                    progressPattern.matchMatcher(progress) {
+                        totalKillToTier = group("needed").formatNumber()
+                        currentKillToTier = group("current").formatNumber()
+                    }
+                } else if (previousLine.contains("Overall Progress")) {
+                    progressPattern.matchMatcher(progress) {
+                        totalKillToMax = group("needed").formatNumber()
+                        currentTotalKill = group("current").formatNumber()
+                    }
+                }
+            }
+            mobList.add(
+                BestiaryMob(
+                    name,
+                    level,
+                    totalKillToMax,
+                    currentTotalKill,
+                    totalKillToTier,
+                    currentKillToTier,
+                    actualRealTotalKill
+                )
+            )
         }
     }
 
