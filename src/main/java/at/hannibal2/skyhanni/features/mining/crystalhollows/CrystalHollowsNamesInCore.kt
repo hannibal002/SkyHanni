@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreYSq
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerSqIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -27,7 +28,7 @@ class CrystalHollowsNamesInCore {
 
         if (event.isMod(10)) {
             val center = LorenzVec(514.3, 106.0, 514.3)
-            showWaypoints = center.distanceToPlayerIgnoreYSq() < 1100
+            showWaypoints = center.distanceToPlayerSqIgnoreY() < 1100 && LocationUtils.playerLocation().y > 65
         }
     }
 
