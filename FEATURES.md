@@ -75,6 +75,9 @@
 + **Estimated Armor Value display**
   + Shows the price of all 4 armor pieces combined inside the wardrobe
 + Show numbers of Pocket Sack-In-A-Sack applied on a sack (Default disabled, contributed by HiZe)
++ **Bestiary overlay** - HiZe
+  + Options for change number format, display time, number type and hide maxed.
+  + Highlight maxed bestiaries.
 
 ## Item Abilities
 - Show the cooldown of items in the inventory.
@@ -122,14 +125,16 @@
   + Show total amount of all trophy fish rarities at the end of the chat message.
   + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish. - appable0
   + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value. - appable0
-- **Hide Bronze/Silver Duplicates** - Hiding chat message when catching a duplicate bronze/silver trophy fish.
-- **Shorten Fishing Message** (Replacing the green chat message when fishing a sea creature with a more clean format)
-- Highlight Thunder Sparks that spawn after killing a Thunder.
-- **Barn Timer**
-  - Show the time and amount of sea creatures while fishing on the barn via hub.
-  - Works in crystal hollows too (worm fishing)
-- **Shark Fish Counter** - Counts how many sharks have been caught.
-- **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
++ **Hide Bronze/Silver Duplicates** - Hiding chat message when catching a duplicate bronze/silver trophy fish.
++ **Shorten Fishing Message**
+  + Replacing the green chat message when fishing a sea creature with a more clean format
+  + Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0
++ Highlight Thunder Sparks that spawn after killing a Thunder.
++ **Barn Timer**
+  + Show the time and amount of sea creatures while fishing on the barn via hub.
+  + Works in crystal hollows too (worm fishing)
++ **Shark Fish Counter** - Counts how many sharks have been caught.
++ **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + Showing fished item names
 + **Chum/Chumcap Bucket Hider**
   + Hide the name tags of Chum/Chumcap Bucket from other players.
@@ -256,7 +261,9 @@
   + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
 + **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for switching to a different pet for leveling.
-+ **Money per Hour** - Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
++ **Money per Hour**
+  + Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
+  + Suppports the dicer drops from melon and pumpkins as well. - CalMWolfs
 + Farming contest timer.
 + Wrong fungi cutter mode warning.
 + Show the price per garden experience inside the visitor gui.
@@ -391,6 +398,7 @@
 ## Mining
 + **Highlight Commission Mobs** - hannibal2
   + Highlight Mobs that are part of active commissions
++ Show the names of the **4 areas** while in the center of **crystal Hollows**.
 
 ## Commands
 + **/shcommands** 
