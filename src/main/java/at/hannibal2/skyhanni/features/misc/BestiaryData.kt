@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -234,7 +233,7 @@ object BestiaryData {
 
     private fun getMobHover(mob: BestiaryMob) = listOf(
         "§6Name: §b${mob.name}",
-        "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
+        "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${mob.level.romanToDecimalIfNeeded()})" else ""}",
         "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
         "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
         "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
@@ -490,12 +489,8 @@ object BestiaryData {
                 if (this == "0") {
                     "I".romanOrInt()
                 } else {
-                    val intValue = Utils.parseRomanNumeral(this)
-                    if (intValue != null) {
-                        (intValue + 1).toRoman().romanOrInt()
-                    } else {
-                        "Invalid Roman numeral"
-                    }
+                    val intValue = romanToDecimalIfNeeded()
+                    (intValue + 1).toRoman().romanOrInt()
                 }
             }
 
