@@ -64,6 +64,7 @@ object RepoUtils {
         }
     }
 
+    @Suppress("NAME_SHADOWING")
     @Throws(IOException::class)
     private fun isInTree(rootDirectory: File, file: File): Boolean {
         var rootDirectory = rootDirectory
@@ -78,21 +79,23 @@ object RepoUtils {
     }
 
     fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?): T? {
-        if (repo.exists()) {
-            val jsonFile = File(repo, "constants/$constant.json")
-            if (!jsonFile.isFile) {
-                CopyErrorCommand.logError(Error("File '$jsonFile' not found!"), "File in repo missing! ($jsonFile). Try §e/shupdaterepo")
-                return null
-            }
-            BufferedReader(
-                InputStreamReader(
-                    FileInputStream(jsonFile),
-                    StandardCharsets.UTF_8
-                )
-            ).use { reader ->
-                return gson.fromJson(reader, clazz)
-            }
+        if (!repo.exists()) return null
+
+        val jsonFile = File(repo, "constants/$constant.json")
+        if (!jsonFile.isFile) {
+            CopyErrorCommand.logError(
+                Error("File '$jsonFile' not found!"),
+                "File in repo missing! ($jsonFile). Try §e/shupdaterepo"
+            )
+            return null
         }
-        return null
+        BufferedReader(
+            InputStreamReader(
+                FileInputStream(jsonFile),
+                StandardCharsets.UTF_8
+            )
+        ).use { reader ->
+            return gson.fromJson(reader, clazz)
+        }
     }
 }

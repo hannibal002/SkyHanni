@@ -73,7 +73,7 @@ class ScoreboardData {
         return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 }.joinToString(separator = "")
     }
 
-    fun fetchScoreboardLines(): List<String> {
+    private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)

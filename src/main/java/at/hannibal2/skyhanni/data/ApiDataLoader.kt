@@ -25,7 +25,7 @@ class ApiDataLoader {
     fun onRepositoryReload(event: RepositoryReloadEvent) {
         usePlayerApiKey = false
         event.getConstant("DisabledFeatures")?.let {
-            if (it.asJsonObject["user_api_keys"]?.asBoolean ?: false) {
+            if (it.asJsonObject["user_api_keys"]?.asBoolean == true) {
                 usePlayerApiKey = true
             }
         }
