@@ -39,19 +39,56 @@ object NumberUtil {
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
+
     @JvmStatic
-    fun format(value: Number): String {
+    fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
         //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
-        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1)
-        if (value < 0) return "-" + format(-value)
+        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
+        if (value < 0) return "-" + format(-value, preciseBillions)
         if (value < 1000) return value.toString() //deal with small numbers
+
         val (divideBy, suffix) = suffixes.floorEntry(value)
-        val truncated = value / (divideBy / 10) //the number part of the output times 10
-        val truncatedAt = if (suffix == "M") 1000 else 100
+
+        var truncated = value / (divideBy / 10) //the number part of the output times 10
+
+        val truncatedAt = if (suffix == "M") 1000 else if (suffix == "B") 1000000 else 100
+
         val hasDecimal = truncated < truncatedAt && truncated / 10.0 != (truncated / 10).toDouble()
-        return if (hasDecimal) (truncated / 10.0).toString() + suffix else (truncated / 10).toString() + suffix
+
+        return if (value > 1_000_000_000 && hasDecimal && preciseBillions) {
+            val decimalPart = (value % 1_000_000_000) / 1_000_000
+            "${truncated / 10}.$decimalPart$suffix"
+        } else {
+            if (hasDecimal) (truncated / 10.0).toString() + suffix else (truncated / 10).toString() + suffix
+        }
+    }
+
+    @JvmStatic
+    fun format3(value: Number, digit: Int): String {
+        @Suppress("NAME_SHADOWING")
+        val value = value.toLong()
+        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        if (value == Long.MIN_VALUE) return format3(Long.MIN_VALUE + 1, digit)
+        if (value < 0) return "-" + format3(-value, digit)
+        if (value < 1000) return value.toString() //deal with small numbers
+
+        val (divideBy, suffix) = suffixes.floorEntry(value)
+
+        var truncated = value / (divideBy / 10) //the number part of the output times 10
+
+        val truncatedAt = if (suffix == "M") 1000 else if (suffix == "B") 1000000 else 100
+
+        val hasDecimal = truncated < truncatedAt && truncated / 10.0 != (truncated / 10).toDouble()
+
+        // Add check for value greater than 1000000000 (1 Billion)
+        return if (value > 1000000000 && hasDecimal) {
+            val decimalPart = (value % 1000000000) / 1000000 // Extract 3 digits after the decimal point
+            "${(truncated / 10).toDouble().toString().take(digit + 2)}$suffix"
+        } else {
+            if (hasDecimal) (truncated / 10.0).toString().take(digit + 2) + suffix else (truncated / 10).toString() + suffix
+        }
     }
 
     /**

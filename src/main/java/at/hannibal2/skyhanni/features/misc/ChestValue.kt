@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -149,32 +150,29 @@ class ChestValue {
             chestItems.clear()
             for ((i, stack) in stacks) {
                 val internalName = stack.getInternalName()
-                if (internalName != "") {
-                    if (NEUItems.getItemStackOrNull(internalName) != null) {
-                        val list = mutableListOf<String>()
-                        val pair = EstimatedItemValue.getEstimatedItemPrice(stack, list)
-                        var (total, base) = pair
-                        if (stack.item == Items.enchanted_book)
-                            total /= 2
-                        list.add("§aTotal: §6§l${total.formatPrice()}")
-                        if (total != 0.0) {
-                            if (chestItems.contains(stack.getInternalName())) {
-                                val (oldIndex, oldAmount, oldStack, oldTotal, oldTips) = chestItems[stack.getInternalName()]
-                                    ?: return
-                                oldIndex.add(i)
-                                chestItems[stack.getInternalName()] = Item(
-                                    oldIndex,
-                                    oldAmount + stack.stackSize,
-                                    oldStack,
-                                    oldTotal + (total * stack.stackSize),
-                                    oldTips
-                                )
-                            } else {
-                                chestItems[stack.getInternalName()] =
-                                    Item(mutableListOf(i), stack.stackSize, stack, (total * stack.stackSize), list)
-                            }
-                        }
-                    }
+                if (internalName == "") continue
+                if (NEUItems.getItemStackOrNull(internalName) == null) continue
+                val list = mutableListOf<String>()
+                val pair = EstimatedItemValue.getEstimatedItemPrice(stack, list)
+                var (total, _) = pair
+                if (stack.item == Items.enchanted_book)
+                    total /= 2
+                list.add("§aTotal: §6§l${total.formatPrice()}")
+                if (total == 0.0) continue
+                if (chestItems.contains(stack.getInternalName())) {
+                    val (oldIndex, oldAmount, oldStack, oldTotal, oldTips) = chestItems[stack.getInternalName()]
+                        ?: return
+                    oldIndex.add(i)
+                    chestItems[stack.getInternalName()] = Item(
+                        oldIndex,
+                        oldAmount + stack.stackSize,
+                        oldStack,
+                        oldTotal + (total * stack.stackSize),
+                        oldTips
+                    )
+                } else {
+                    chestItems[stack.getInternalName()] =
+                        Item(mutableListOf(i), stack.stackSize, stack, (total * stack.stackSize), list)
                 }
             }
         }
@@ -182,21 +180,10 @@ class ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            0 -> if (this > 1_000_000_000) format(this) else NumberUtil.format(this)
+            0 -> if (this > 1_000_000_000) NumberUtil.format2(this, true) else NumberUtil.format2(this)
             1 -> this.addSeparators()
             else -> "0"
         }
-    }
-
-    private fun format(d: Double): String {
-        val suffix = arrayOf("", "K", "M", "B", "T")
-        var rep = 0
-        var num = d
-        while (num >= 1000) {
-            num /= 1000.0
-            rep++
-        }
-        return String.format("%.3f%s", num, suffix[rep]).replace(",", ".")
     }
 
     enum class SortType(val shortName: String, val longName: String) {
@@ -212,9 +199,9 @@ class ChestValue {
     }
 
     private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
-            this == "Large Chest") ||
-            (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
-            this == "Personal Vault")
+        this == "Large Chest") ||
+        (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
+        this == "Personal Vault")
 
     data class Item(
         val index: MutableList<Int>,

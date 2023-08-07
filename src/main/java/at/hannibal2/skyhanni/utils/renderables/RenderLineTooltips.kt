@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCharRarity
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -18,7 +18,8 @@ object RenderLineTooltips {
             var textLines = tips
             val x = Utils.getMouseX() + 12 - posX
             val y = Utils.getMouseY() - 10 - posY
-            val color: Char = stack?.getItemCharRarity() ?: Utils.getPrimaryColourCode(textLines[0])
+            val color: Char = stack?.getLore()?.lastOrNull()?.take(4)?.get(1)
+                ?: Utils.getPrimaryColourCode(textLines[0])
             val colourInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(color)
             val borderColorStart = Color(colourInt).darker().rgb and 0x00FFFFFF or (200 shl 24)
             val font = Minecraft.getMinecraft().fontRendererObj
