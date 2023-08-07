@@ -100,6 +100,7 @@ object GhostCounter {
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
+        val textFormatting = config.textFormatting
         val ghostKillPerSorrow: Int = when (SORROWCOUNT.get()) {
             0.0 -> 0
             else -> "${((((KILLS.get() / SORROWCOUNT.get()) + Math.ulp(1.0)) * 100) / 100).roundToInt()}".toInt()
@@ -109,7 +110,7 @@ object GhostCounter {
             else -> "${((((hidden?.totalMF!! / TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100).roundToPrecision(2)}"
         }
 
-        val xpHourFormatting = config.textFormatting.xpHourFormatting
+        val xpHourFormatting = textFormatting.xpHourFormatting
         val xpInterp: Float
         val xp = if (xpGainHourLast == xpGainHour && xpGainHour <= 0) {
             xpHourFormatting.noData
@@ -119,7 +120,7 @@ object GhostCounter {
             "$part ${if (isKilling) "" else xpHourFormatting.paused}"
         }
 
-        val killHourFormatting = config.textFormatting.killHourFormatting
+        val killHourFormatting = textFormatting.killHourFormatting
         val killHour: String
         var killInterp: Long = 0
         if (killGainHourLast == killGainHour && killGainHour <= 0) {
@@ -129,7 +130,7 @@ object GhostCounter {
             killHour = "${format.format(killInterp)} ${if (_isKilling) "" else killHourFormatting.paused}"
         }
 
-        val bestiaryFormatting = config.textFormatting.bestiaryFormatting
+        val bestiaryFormatting = textFormatting.bestiaryFormatting
         val currentKill = hidden?.bestiaryCurrentKill?.toInt() ?: 0
         val killNeeded = hidden?.bestiaryKillNeeded?.toInt() ?: 0
         val nextLevel = hidden?.bestiaryNextLevel?.toInt() ?: -1
@@ -154,7 +155,7 @@ object GhostCounter {
             }
         }
 
-        val etaFormatting = config.textFormatting.etaFormatting
+        val etaFormatting = textFormatting.etaFormatting
         val remaining: Int = when (config.showMax) {
             true -> 250_000 - bestiaryCurrentKill
             false -> killNeeded - currentKill
@@ -191,20 +192,20 @@ object GhostCounter {
             }
         }
 
-        addAsSingletonList(Utils.chromaStringByColourCode(config.textFormatting.titleFormat.replace("&", "§")))
-        addAsSingletonList(config.textFormatting.ghostKilledFormat.formatText(KILLS.getInt(), KILLS.getInt(true)))
-        addAsSingletonList(config.textFormatting.sorrowsFormat.formatText(SORROWCOUNT.getInt(), SORROWCOUNT.getInt(true)))
-        addAsSingletonList(config.textFormatting.ghostSinceSorrowFormat.formatText(GHOSTSINCESORROW.getInt()))
-        addAsSingletonList(config.textFormatting.ghostKillPerSorrowFormat.formatText(ghostKillPerSorrow))
-        addAsSingletonList(config.textFormatting.voltasFormat.formatText(VOLTACOUNT.getInt(), VOLTACOUNT.getInt(true)))
-        addAsSingletonList(config.textFormatting.plasmasFormat.formatText(PLASMACOUNT.getInt(), PLASMACOUNT.getInt(true)))
-        addAsSingletonList(config.textFormatting.ghostlyBootsFormat.formatText(GHOSTLYBOOTS.getInt(), GHOSTLYBOOTS.getInt(true)))
-        addAsSingletonList(config.textFormatting.bagOfCashFormat.formatText(BAGOFCASH.getInt(), BAGOFCASH.getInt(true)))
-        addAsSingletonList(config.textFormatting.avgMagicFindFormat.formatText(avgMagicFind))
-        addAsSingletonList(config.textFormatting.scavengerCoinsFormat.formatText(SCAVENGERCOINS.getInt(), SCAVENGERCOINS.getInt(true)))
-        addAsSingletonList(config.textFormatting.killComboFormat.formatText(KILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
-        addAsSingletonList(config.textFormatting.highestKillComboFormat.formatText(MAXKILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
-        addAsSingletonList(config.textFormatting.skillXPGainFormat.formatText(SKILLXPGAINED.get(), SKILLXPGAINED.get(true)))
+        addAsSingletonList(Utils.chromaStringByColourCode(textFormatting.titleFormat.replace("&", "§")))
+        addAsSingletonList(textFormatting.ghostKilledFormat.formatText(KILLS.getInt(), KILLS.getInt(true)))
+        addAsSingletonList(textFormatting.sorrowsFormat.formatText(SORROWCOUNT.getInt(), SORROWCOUNT.getInt(true)))
+        addAsSingletonList(textFormatting.ghostSinceSorrowFormat.formatText(GHOSTSINCESORROW.getInt()))
+        addAsSingletonList(textFormatting.ghostKillPerSorrowFormat.formatText(ghostKillPerSorrow))
+        addAsSingletonList(textFormatting.voltasFormat.formatText(VOLTACOUNT.getInt(), VOLTACOUNT.getInt(true)))
+        addAsSingletonList(textFormatting.plasmasFormat.formatText(PLASMACOUNT.getInt(), PLASMACOUNT.getInt(true)))
+        addAsSingletonList(textFormatting.ghostlyBootsFormat.formatText(GHOSTLYBOOTS.getInt(), GHOSTLYBOOTS.getInt(true)))
+        addAsSingletonList(textFormatting.bagOfCashFormat.formatText(BAGOFCASH.getInt(), BAGOFCASH.getInt(true)))
+        addAsSingletonList(textFormatting.avgMagicFindFormat.formatText(avgMagicFind))
+        addAsSingletonList(textFormatting.scavengerCoinsFormat.formatText(SCAVENGERCOINS.getInt(), SCAVENGERCOINS.getInt(true)))
+        addAsSingletonList(textFormatting.killComboFormat.formatText(KILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
+        addAsSingletonList(textFormatting.highestKillComboFormat.formatText(MAXKILLCOMBO.getInt(), MAXKILLCOMBO.getInt(true)))
+        addAsSingletonList(textFormatting.skillXPGainFormat.formatText(SKILLXPGAINED.get(), SKILLXPGAINED.get(true)))
         addAsSingletonList(bestiaryFormatting.base.preFormat(bestiary, nextLevel - 1, nextLevel).formatBestiary(currentKill, killNeeded))
 
         addAsSingletonList(xpHourFormatting.base.formatText(xp))
@@ -234,10 +235,10 @@ object GhostCounter {
             add("§eClick to copy to clipboard!")
         }
         val moneyMadeWithClickableTips = Renderable.clickAndHover(
-            config.textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
+            textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
             moneyMadeTips
         ) { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
-        addAsSingletonList(config.textFormatting.moneyHourFormat.formatText(final))
+        addAsSingletonList(textFormatting.moneyHourFormat.formatText(final))
         addAsSingletonList(moneyMadeWithClickableTips)
     }
 
