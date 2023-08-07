@@ -2,13 +2,21 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Inventory {
+public class InventoryConfig {
 
     @ConfigOption(name = "Not Clickable Items", desc = "")
     @ConfigEditorAccordion(id = 0)
@@ -190,6 +198,62 @@ public class Inventory {
 
         @Expose
         public Position position = new Position(144, 139, false, true);
+    }
+
+    @Expose
+    @ConfigOption(name = "Chest Value", desc = "")
+    @Accordion
+    public ChestValueConfig chestValueConfig = new ChestValueConfig();
+
+    public static class ChestValueConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enabled estimated value of chest")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
+        @ConfigEditorBoolean
+        public boolean enableHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight color", desc = "Choose the highlight color.")
+        @ConfigEditorColour
+        public String highlightColor = "0:249:0:255:88";
+
+        @Expose
+        @ConfigOption(name = "Sorting Type", desc = "Price sorting type.")
+        @ConfigEditorDropdown(values = {"Descending", "Ascending"})
+        public int sortingType = 0;
+
+        @Expose
+        @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
+        @ConfigEditorDropdown(values = {"Short", "Long"})
+        public int formatType = 0;
+
+        @Expose
+        @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed.\n" +
+                "All items in the chest are still counted for the total value.")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 54,
+                minStep = 1
+        )
+        public int itemToShow = 15;
+
+        @Expose
+        @ConfigOption(name = "Hide below", desc = "Item item value below configured amount.\n" +
+                "Items are still counted for the total value.")
+        @ConfigEditorSlider(
+                minValue = 50_000,
+                maxValue = 10_000_000,
+                minStep = 50_000
+        )
+        public int hideBelow = 100_000;
+
+
+        @Expose
+        public Position position = new Position(107, 141, false, true);
     }
 
     @Expose
