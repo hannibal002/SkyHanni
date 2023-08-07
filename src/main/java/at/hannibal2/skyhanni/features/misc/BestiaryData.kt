@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -403,45 +404,29 @@ object BestiaryData {
         prefix: String,
         getName: String,
         onChange: () -> Unit,
+        tips: List<String> = emptyList(),
     ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - lastclicked) > 100) { //funny thing happen if i don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                lastclicked = System.currentTimeMillis()
+            }
+        }
         add(buildList {
             add(prefix)
             add("§a[")
-            add(Renderable.link("§e$getName") {
-                if ((System.currentTimeMillis() - lastclicked) > 100) { //funny thing happen if i don't do that
-                    onChange()
-                    SoundUtils.playClickSound()
-                    lastclicked = System.currentTimeMillis()
-                }
-            })
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
             add("§a]")
         })
     }
 
-    private fun MutableList<List<Any>>.addButtonWithTips(
-        prefix: String,
-        getName: String,
-        tips: List<String>,
-        onChange: () -> Unit,
-    ) {
-        add(buildList {
-            add(prefix)
-            add("§a[")
-            add(Renderable.clickAndHover("§e$getName", tips, false) {
-                if ((System.currentTimeMillis() - lastclicked) > 100) { //funny thing happen if i don't do that
-                    onChange()
-                    SoundUtils.playClickSound()
-                    lastclicked = System.currentTimeMillis()
-                }
-            })
-            add("§a]")
-        })
-    }
-
-    fun String.romanOrInt(): String = if (!config.replaceRoman && isRoman()) Utils.parseRomanNumeral(this).toString() else this
-
-    fun String.isRoman(): Boolean {
-        return Utils.parseRomanNumeral(this) != null
+    fun String.romanOrInt() = romanToDecimalIfNeeded().let {
+        if (config.replaceRoman) it.toString() else it.toRoman()
     }
 
     fun Any.getNextLevel(): String {
