@@ -216,7 +216,7 @@ object BestiaryData {
         newDisplay.addAsSingletonList("§7Bestiary Data")
         for (mob in sortedMobList) {
             val isUnlocked = mob.totalKills != 0.toLong()
-            val isMaxed = mob.percentToMax() == 100.0
+            val isMaxed = mob.percentToMax() >= 1
             if (!isUnlocked) {
                 newDisplay.add(buildList {
                     add(" §7- ")
@@ -240,8 +240,8 @@ object BestiaryData {
         "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
         "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
         "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
-        "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
-        "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
+        "§6Percent to max: §b${mob.percentToMaxFormatted()}",
+        "§6Percent to tier: §b${mob.percentToTierFormatted()}",
         "",
         "§7More infos thing"
     )
@@ -436,14 +436,13 @@ object BestiaryData {
             return 0L.coerceAtLeast(killNeededForNextLevel - currentKillToNextLevel)
         }
 
-        fun percentToMax(): Double {
-            return 100.0.coerceAtMost((totalKills.toDouble() / killToMax) * 100).roundToPrecision(2)
-        }
+        fun percentToMax() = totalKills.toDouble() / killToMax
 
-        fun percentToTier(): Double {
-            return 100.0.coerceAtMost((currentKillToNextLevel.toDouble() / killNeededForNextLevel) * 100)
-                .roundToPrecision(2)
-        }
+        fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
+
+        fun percentToTier() = currentKillToNextLevel.toDouble() / killNeededForNextLevel
+
+        fun percentToTierFormatted() = LorenzUtils.formatPercentage(percentToTier())
 
         fun getNextLevel() = level.getNextLevel()
     }
