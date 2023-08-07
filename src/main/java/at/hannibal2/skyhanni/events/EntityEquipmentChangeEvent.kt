@@ -11,10 +11,10 @@ data class EntityEquipmentChangeEvent(
     val isHead get() = equipmentSlot == EQUIPMENT_SLOT_HEAD
 
     companion object {
-        val EQUIPMENT_SLOT_HEAD = 4
-        val EQUIPMENT_SLOT_CHEST = 3
-        val EQUIPMENT_SLOT_LEGGINGS = 2
-        val EQUIPMENT_SLOT_FEET = 1
-        val EQUIPMENT_SLOT_HAND = 0
+        const val EQUIPMENT_SLOT_HEAD = 4
+        const val EQUIPMENT_SLOT_CHEST = 3
+        const val EQUIPMENT_SLOT_LEGGINGS = 2
+        const val EQUIPMENT_SLOT_FEET = 1
+        const val EQUIPMENT_SLOT_HAND = 0
     }
 }
