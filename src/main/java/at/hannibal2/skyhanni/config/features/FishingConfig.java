@@ -188,4 +188,9 @@ public class FishingConfig {
     @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of sea creature you have fished.")
     @ConfigEditorBoolean
     public boolean shortenFishingMessage = false;
+
+    @Expose
+    @ConfigOption(name = "Compact Double Hook Message", desc = "Adds Double Hook to the sea creature chat message instead of in a previous line.")
+    @ConfigEditorBoolean
+    public boolean compactDoubleHook = false;
 }
