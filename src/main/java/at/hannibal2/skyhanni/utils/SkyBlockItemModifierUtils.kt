@@ -239,7 +239,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
-            fun getByName(name: String) = GemstoneQuality.values().firstOrNull { it.name == name }
+            fun getByName(name: String) = entries.firstOrNull { it.name == name }
         }
     }
 
@@ -255,7 +255,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
-            fun getByName(name: String) = values().firstOrNull { it.name == name }
+            fun getByName(name: String) = entries.firstOrNull { it.name == name }
         }
     }
 }

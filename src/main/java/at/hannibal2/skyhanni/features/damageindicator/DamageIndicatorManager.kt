@@ -437,9 +437,8 @@ class DamageIndicatorManager {
     }
 
     private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
-        val shields = HellionShield.values()
         var found = false
-        for (shield in shields) {
+        for (shield in HellionShield.entries) {
             val armorStand = entity.getNameTagWith(3, shield.name)
             if (armorStand != null) {
                 val number = armorStand.name.split(" ♨")[1].substring(0, 1)

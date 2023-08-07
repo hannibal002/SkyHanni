@@ -18,12 +18,12 @@ class GardenCropMilestoneAverage {
         if (!SkyHanniMod.feature.garden.numberAverageCropMilestone) return
 
         val tiers = mutableListOf<Double>()
-        for (cropType in CropType.values()) {
+        for (cropType in CropType.entries) {
             val counter = cropType.getCounter()
             val tier = GardenCropMilestones.getTierForCrops(counter)
             tiers.add(tier.toDouble())
         }
-        average = (tiers.sum() / CropType.values().size).round(2)
+        average = (tiers.sum() / CropType.entries.size).round(2)
     }
 
     @SubscribeEvent

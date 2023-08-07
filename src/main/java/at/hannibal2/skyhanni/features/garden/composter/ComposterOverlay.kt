@@ -122,7 +122,7 @@ class ComposterOverlay {
     fun onTooltip(event: ItemTooltipEvent) {
         if (inComposterUpgrades) {
             update()
-            for (upgrade in ComposterUpgrade.values()) {
+            for (upgrade in ComposterUpgrade.entries) {
                 event.itemStack?.name?.let {
                     if (it.contains(upgrade.displayName)) {
                         maxLevel = ComposterUpgrade.regex.matchMatcher(it) {
@@ -276,13 +276,15 @@ class ComposterOverlay {
         val fuelItem = currentFuelItem ?: return
         if (organicMatterItem == "" || fuelItem == "") return
 
-        newList.addSelector("§7Per ", TimeType.values(),
+        newList.addSelector<TimeType>(
+            "§7Per ",
             getName = { type -> type.display },
             isCurrent = { it == currentTimeType },
             onChange = {
                 currentTimeType = it
                 update()
-            })
+            }
+        )
 
         val list = mutableListOf<Any>()
         list.add("§7Using: ")

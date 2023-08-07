@@ -14,6 +14,7 @@ import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
@@ -308,16 +309,15 @@ object LorenzUtils {
         }
     }
 
-    fun <T> MutableList<List<Any>>.addSelector(
+    inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
-        values: Array<T>,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        onChange: (T) -> Unit,
+        crossinline onChange: (T) -> Unit,
     ) {
         add(buildList {
             add(prefix)
-            for (entry in values) {
+            for (entry in enumValues<T>()) {
                 val display = getName(entry)
                 if (isCurrent(entry)) {
                     add("§a[$display]")

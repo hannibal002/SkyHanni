@@ -78,12 +78,12 @@ class BurrowWarpHelper {
         }
 
         private fun getNearestWarpPoint(location: LorenzVec): WarpPoint {
-            val map = WarpPoint.values().filter { it.enabled }.map { it to it.distance(location) }
+            val map = WarpPoint.entries.filter { it.enabled }.map { it to it.distance(location) }
             return map.sorted().first().first
         }
 
         fun resetDisabledWarps() {
-            WarpPoint.values().forEach { it.enabled = true }
+            WarpPoint.entries.forEach { it.enabled = true }
             LorenzUtils.chat("§e[SkyHanni] Reset disabled burrow warps.")
         }
     }
