@@ -232,28 +232,24 @@ object BestiaryData {
 
     private fun addOneMob(mob: BestiaryMob, isMaxed: Boolean): List<Any> {
         return buildList<Any> {
-            val rendered = Renderable.hoverTips(getMobLine(mob, isMaxed), getMobHover(mob), false) { true }
-            add(rendered)
+            add(Renderable.hoverTips(getMobLine(mob, isMaxed), getMobHover(mob), false) { true })
         }
     }
 
-    private fun getMobHover(mob: BestiaryMob): List<String> {
-        val list = listOf(
-            "§6Name: §b${mob.name}",
-            "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
-            "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
-            "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
-            "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
-            "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
-            "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
-            "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
-            "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
-            "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
-            "",
-            "§7More infos thing"
-        )
-        return list
-    }
+    private fun getMobHover(mob: BestiaryMob) = listOf(
+        "§6Name: §b${mob.name}",
+        "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
+        "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
+        "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
+        "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
+        "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
+        "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
+        "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
+        "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
+        "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
+        "",
+        "§7More infos thing"
+    )
 
     private fun getMobLine(
         mob: BestiaryMob,
