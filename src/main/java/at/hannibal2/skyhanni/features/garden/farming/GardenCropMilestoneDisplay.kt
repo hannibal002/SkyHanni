@@ -60,14 +60,12 @@ object GardenCropMilestoneDisplay {
         if (GardenAPI.hideExtraGuis()) return
 
         config.cropMilestoneProgressDisplayPos.renderStringsAndItems(
-            progressDisplay,
-            posLabel = "Crop Milestone Progress"
+            progressDisplay, posLabel = "Crop Milestone Progress"
         )
 
         if (config.cropMilestoneMushroomPetPerkEnabled) {
             config.cropMilestoneMushroomPetPerkPos.renderStringsAndItems(
-                mushroomCowPerkDisplay,
-                posLabel = "Mushroom Cow Perk"
+                mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk"
             )
         }
 

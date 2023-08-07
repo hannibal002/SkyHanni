@@ -801,7 +801,7 @@ public class Garden {
     @Expose
     @ConfigOption(name = "Show money per Hour",
             desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
-                    "Supports Bountiful and Mushroom Cow Perk.")
+                    "Supports Bountiful, Mushroom Cow Perk and Dicer drops. Thier toggles are below.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourDisplay = true;
@@ -878,6 +878,30 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourMergeSeeds = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Bountiful",
+            desc = "Includes the coins from bountiful in the calculation.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourBountiful = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Mooshroom Cow",
+            desc = "Includes the coins you get from selling the mushrooms from your mooshroom cow pet.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourMooshroom = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Dicer Drops",
+            desc = "Includes the average coins/hr from your melon or pumpkin dicer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourDicer = true;
 
     @Expose
     @ConfigOption(
