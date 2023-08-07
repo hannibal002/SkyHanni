@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.config.features.Fishing;
 import at.hannibal2.skyhanni.config.features.GUI;
 import at.hannibal2.skyhanni.config.features.Garden;
 import at.hannibal2.skyhanni.config.features.GhostCounterConfig;
-import at.hannibal2.skyhanni.config.features.Inventory;
+import at.hannibal2.skyhanni.config.features.InventoryConfig;
 import at.hannibal2.skyhanni.config.features.ItemAbilities;
 import at.hannibal2.skyhanni.config.features.MarkedPlayers;
 import at.hannibal2.skyhanni.config.features.Minions;
@@ -80,7 +80,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Inventory", desc = "Changing the behavior around items and the inventory.")
-    public Inventory inventory = new Inventory();
+    public InventoryConfig inventory = new InventoryConfig();
 
     @Expose
     @Category(name = "Item Abilities", desc = "Stuff about item abilities.")

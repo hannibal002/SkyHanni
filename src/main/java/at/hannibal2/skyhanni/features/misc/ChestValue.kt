@@ -22,7 +22,7 @@ import java.awt.Color
 
 class ChestValue {
 
-    private val config get() = SkyHanniMod.feature.misc.chestValueConfig
+    private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<String, Item>()
     private val inInventory get() = InventoryUtils.openInventoryName().isValidStorage()
@@ -96,7 +96,7 @@ class ChestValue {
             }
             val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
 
-            newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Rendering $amountShowing of ${sortedList.size} items)")
+            newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Showing $amountShowing of ${sortedList.size} items)")
             for ((index, amount, stack, total, tips) in sortedList) {
                 totalPrice += total
                 if (rendered >= config.itemToShow) continue
@@ -162,9 +162,16 @@ class ChestValue {
                                 val (oldIndex, oldAmount, oldStack, oldTotal, oldTips) = chestItems[stack.getInternalName()]
                                     ?: return
                                 oldIndex.add(i)
-                                chestItems[stack.getInternalName()] = Item(oldIndex, oldAmount + stack.stackSize, oldStack, oldTotal + (total * stack.stackSize), oldTips)
+                                chestItems[stack.getInternalName()] = Item(
+                                    oldIndex,
+                                    oldAmount + stack.stackSize,
+                                    oldStack,
+                                    oldTotal + (total * stack.stackSize),
+                                    oldTips
+                                )
                             } else {
-                                chestItems[stack.getInternalName()] = Item(mutableListOf(i), stack.stackSize, stack, (total * stack.stackSize), list)
+                                chestItems[stack.getInternalName()] =
+                                    Item(mutableListOf(i), stack.stackSize, stack, (total * stack.stackSize), list)
                             }
                         }
                     }
@@ -204,12 +211,10 @@ class ChestValue {
         ;
     }
 
-    private fun String.isValidStorage(): Boolean {
-        return Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
+    private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
             this == "Large Chest") ||
             (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
             this == "Personal Vault")
-    }
 
     data class Item(
         val index: MutableList<Int>,
