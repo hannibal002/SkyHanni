@@ -445,9 +445,7 @@ object BestiaryData {
                 .roundToPrecision(2)
         }
 
-        fun getNextLevel(): String {
-            return level.getNextLevel()
-        }
+        fun getNextLevel() = level.getNextLevel()
     }
 
     private fun MutableList<List<Any>>.addButton(
