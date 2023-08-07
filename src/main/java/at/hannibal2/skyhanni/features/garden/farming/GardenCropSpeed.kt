@@ -148,7 +148,7 @@ object GardenCropSpeed {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
-            val dicerJson = event.getConstant("DicerDrops")!!
+            val dicerJson = event.getConstant("DicerDrops") ?: error("DicerDrops not found in repo")
             calculateAverageDicer(melonDicer, dicerJson["MELON"].asJsonObject)
             calculateAverageDicer(pumpkinDicer, dicerJson["PUMPKIN"].asJsonObject)
         } catch (e: Exception) {
