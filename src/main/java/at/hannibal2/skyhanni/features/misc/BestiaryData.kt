@@ -76,7 +76,11 @@ object BestiaryData {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
-        if ((inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") || isBestiaryGui(event.inventoryItems[4], inventoryName)) {
+        if ((inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") || isBestiaryGui(
+                event.inventoryItems[4],
+                inventoryName
+            )
+        ) {
             isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
             stackList.putAll(event.inventoryItems)
             update()
@@ -141,8 +145,9 @@ object BestiaryData {
                     for ((lineIndex, line) in stack.getLore().withIndex()) {
                         val loreLine = line.removeColor()
                         if (loreLine.startsWith("Kills: ")) {
-                            actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
-                                ?: 0
+                            actualRealTotalKill =
+                                "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatNumber()
+                                    ?: 0
                         }
                         if (loreLine.startsWith("                    ")) {
                             val previousLine = stack.getLore()[lineIndex - 1]
@@ -160,7 +165,17 @@ object BestiaryData {
                             }
                         }
                     }
-                    mobList.add(BestiaryMob(name, level, totalKillToMax, currentTotalKill, totalKillToTier, currentKillToTier, actualRealTotalKill))
+                    mobList.add(
+                        BestiaryMob(
+                            name,
+                            level,
+                            totalKillToMax,
+                            currentTotalKill,
+                            totalKillToTier,
+                            currentKillToTier,
+                            actualRealTotalKill
+                        )
+                    )
                 }
             }
         }
@@ -174,6 +189,14 @@ object BestiaryData {
 
         if (mobList.isEmpty()) return newDisplay
 
+        addList(newDisplay)
+
+        addButtons(newDisplay)
+
+        return newDisplay
+    }
+
+    private fun sortMobList(): MutableList<BestiaryMob> {
         val sortedMobList = when (config.displayType) {
             0 -> mobList.sortedBy { it.percentToMax() }
             1 -> mobList.sortedBy { it.percentToTier() }
@@ -185,6 +208,11 @@ object BestiaryData {
             7 -> mobList.sortedByDescending { it.killNeededToNextLevel() }
             else -> mobList.sortedBy { it.totalKills }
         }.toMutableList()
+        return sortedMobList
+    }
+
+    private fun addList(newDisplay: MutableList<List<Any>>) {
+        val sortedMobList = sortMobList()
 
         newDisplay.addAsSingletonList("§7Bestiary Data")
         for (mob in sortedMobList) {
@@ -192,7 +220,7 @@ object BestiaryData {
             val isMaxed = mob.percentToMax() == 100.0
             if (isUnlocked) {
                 if (isMaxed && config.hideMaxed) continue
-                newDisplay.add(buildList {
+                newDisplay.add(buildList<Any> {
                     val displayType = config.displayType
                     var text = ""
                     text += " §7- "
@@ -212,7 +240,11 @@ object BestiaryData {
                                     1 -> mob.killNeededForNextLevel
                                     else -> 0
                                 }
-                                "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(2)}§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
+                                "§7(§b${currentKill.formatNumber()}§7/§b${killNeeded.formatNumber()}§7) §a${
+                                    ((currentKill.toDouble() / killNeeded) * 100).roundToPrecision(
+                                        2
+                                    )
+                                }§6% ${if (displayType == 1) "§ato level ${mob.getNextLevel()}" else ""}"
                             }
 
                             2, 3 -> {
@@ -231,7 +263,8 @@ object BestiaryData {
                             else -> "§cYou are not supposed to see this, please report it to @HiZe on discord!"
                         }
                     }
-                    val rendered = Renderable.hoverTips(text,
+                    val rendered = Renderable.hoverTips(
+                        text,
                         listOf(
                             "§6Name: §b${mob.name}",
                             "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${Utils.parseRomanNumeral(mob.level)})" else ""}",
@@ -244,7 +277,9 @@ object BestiaryData {
                             "§6Percent to max: §b${mob.percentToMax().addSeparators()}",
                             "§6Percent to tier: §b${mob.percentToTier().addSeparators()}",
                             "",
-                            "§7More infos thing"), false) {
+                            "§7More infos thing"
+                        ), false
+                    ) {
                         true
                     }
                     add(rendered)
@@ -256,6 +291,9 @@ object BestiaryData {
                 })
             }
         }
+    }
+
+    private fun addButtons(newDisplay: MutableList<List<Any>>) {
         newDisplay.addButton(
             prefix = "§7Number Format: ",
             getName = FormatType.entries[config.numberFormat].type,
@@ -286,9 +324,8 @@ object BestiaryData {
             onChange = {
                 config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
                 update()
-            })
-
-        return newDisplay
+            }
+        )
     }
 
     private fun addCategories(newDisplay: MutableList<List<Any>>) {
@@ -329,7 +366,8 @@ object BestiaryData {
         } else if (name == "Search Results") {
             val loreList = stack.getLore()
             if (loreList.size >= 2 && loreList[0].startsWith("§7Query: §a")
-                && loreList[1].startsWith("§7Results: §a")) {
+                && loreList[1].startsWith("§7Results: §a")
+            ) {
                 return true
             }
         }
@@ -371,18 +409,22 @@ object BestiaryData {
     private fun Int.toBoolean() = this != 0
     private fun Boolean.toInt() = if (!this) 0 else 1
 
-    data class Category(val name: String,
-                        val familiesFound: Long,
-                        val totalFamilies: Long,
-                        val familiesCompleted: Long)
+    data class Category(
+        val name: String,
+        val familiesFound: Long,
+        val totalFamilies: Long,
+        val familiesCompleted: Long
+    )
 
-    data class BestiaryMob(var name: String,
-                           var level: String,
-                           var killToMax: Long,
-                           var totalKills: Long,
-                           var killNeededForNextLevel: Long,
-                           var currentKillToNextLevel: Long,
-                           var actualRealTotalKill: Long) {
+    data class BestiaryMob(
+        var name: String,
+        var level: String,
+        var killToMax: Long,
+        var totalKills: Long,
+        var killNeededForNextLevel: Long,
+        var currentKillToNextLevel: Long,
+        var actualRealTotalKill: Long
+    ) {
 
         fun killNeededToMax(): Long {
             return 0L.coerceAtLeast(killToMax - totalKills)
@@ -397,7 +439,8 @@ object BestiaryData {
         }
 
         fun percentToTier(): Double {
-            return 100.0.coerceAtMost((currentKillToNextLevel.toDouble() / killNeededForNextLevel) * 100).roundToPrecision(2)
+            return 100.0.coerceAtMost((currentKillToNextLevel.toDouble() / killNeededForNextLevel) * 100)
+                .roundToPrecision(2)
         }
 
         fun getNextLevel(): String {
