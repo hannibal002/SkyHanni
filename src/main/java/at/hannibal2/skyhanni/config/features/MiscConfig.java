@@ -661,7 +661,6 @@ public class MiscConfig {
     @ConfigOption(name = "Mining", desc = "")
     @Accordion
     public MiningConfig mining = new MiningConfig();
-
     public static class MiningConfig {
 
         @Expose
