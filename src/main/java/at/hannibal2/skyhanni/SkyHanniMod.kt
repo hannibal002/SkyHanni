@@ -214,7 +214,7 @@ class SkyHanniMod {
         loadModule(AshfangHideDamageIndicator())
         loadModule(ItemStars())
         loadModule(MinionFeatures())
-        loadModule(RealTime())
+        loadModule(RealTimeFeatures())
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())

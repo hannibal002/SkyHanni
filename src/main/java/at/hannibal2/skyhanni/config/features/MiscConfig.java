@@ -48,6 +48,15 @@ public class MiscConfig {
     @Expose
     public Position realTimePos = new Position(10, 10, false, true);
 
+    @Expose
+    @ConfigOption(name = "Time on SkyBlock", desc = "Show the time on SkyBLock for this session.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 1)
+    public boolean timeOnSkyBlockSession = false;
+
+    @Expose
+    public Position timeOnSkyBlockSessionPos = new Position(30, 10, false, true);
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
@@ -582,9 +591,9 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Ender Node Tracker", desc = "")
     @Accordion
-    public EnderNodeTracker enderNodeTracker = new EnderNodeTracker();
+    public EnderNodeTrackerConfig enderNodeTracker = new EnderNodeTrackerConfig();
 
-    public static class EnderNodeTracker {
+    public static class EnderNodeTrackerConfig {
         @Expose
         @ConfigOption(
                 name = "Enabled",

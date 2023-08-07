@@ -30,6 +30,8 @@ class HypixelData {
         var joinedWorld = 0L
 
         var skyBlockArea = "?"
+
+        var wasOnSkyBlock = false
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -95,6 +97,9 @@ class HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+        if (skyBlock) {
+            wasOnSkyBlock = true
+        }
     }
 
     private fun checkProfileName(): Boolean {
@@ -187,7 +192,14 @@ class HypixelData {
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
-        return scoreboardTitle.contains("SKYBLOCK") ||
-                scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+        val isSkyBlock = scoreboardTitle.contains("SKYBLOCK") ||
+                scoreboardTitle.contains("SKIBLOCK")
+        if (!isSkyBlock) {
+            if (wasOnSkyBlock) {
+                wasOnSkyBlock = false
+                SkyBlockLeaveEvent().postAndCatch()
+            }
+        }
+        return isSkyBlock // April 1st jokes are so funny
     }
 }
