@@ -170,8 +170,8 @@ class EnderNodeTracker {
 
     private fun drawDisplay() = buildList<List<Any>> {
         addAsSingletonList("§5§lEnder Node Tracker")
-        addAsSingletonList("§d${totalNodesMined.addSeparators()} Ender Nodes Mined")
-        addAsSingletonList("§6${format(lootProfit.values.sum())} Coins Made")
+        addAsSingletonList("§d${totalNodesMined.addSeparators()} Ender Nodes mined")
+        addAsSingletonList("§6${format(lootProfit.values.sum())} Coins made")
         addAsSingletonList(" ")
         addAsSingletonList("§b${totalEndermiteNests.addSeparators()} §cEndermite Nest")
 
