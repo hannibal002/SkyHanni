@@ -54,8 +54,8 @@ object GhostCounter {
     val hidden get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
     var ghostCounterV3File = File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
-    private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:\\/(?<total>[0-9,.]+))?\\)".toPattern()
-    private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?:(?:(?:(?<current>[0-9.,]+)\\/(?<total>[0-9.,]+))|(?:(?<percent>[0-9.]+)%))))\\).*".toPattern()
+    private val skillXPPattern = "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)".toPattern()
+    private val combatSectionPattern = ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*".toPattern()
     private val killComboExpiredPattern = "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!".toPattern()
     private val ghostXPPattern = "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)\\/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)".toPattern()
     private val bestiaryPattern = ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*".toPattern() //   &3&lBESTIARY &b&lGhost &89➜&b10
@@ -110,14 +110,13 @@ object GhostCounter {
         }
 
         val xpHourFormatting = config.textFormatting.xpHourFormatting
-        val xp: String
         val xpInterp: Float
-        if (xpGainHourLast == xpGainHour && xpGainHour <= 0) {
-            xp = xpHourFormatting.noData
+        val xp = if (xpGainHourLast == xpGainHour && xpGainHour <= 0) {
+            xpHourFormatting.noData
         } else {
             xpInterp = interp(xpGainHour, xpGainHourLast, lastUpdate)
             val part = "([0-9]{3,}[^,]+)".toRegex().find(format.format(xpInterp))?.groupValues?.get(1) ?: "N/A"
-            xp = "$part ${if (isKilling) "" else xpHourFormatting.paused}"
+            "$part ${if (isKilling) "" else xpHourFormatting.paused}"
         }
 
         val killHourFormatting = config.textFormatting.killHourFormatting
