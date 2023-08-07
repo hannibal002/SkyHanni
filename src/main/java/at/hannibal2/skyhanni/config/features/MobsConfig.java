@@ -6,7 +6,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class Mobs {
+public class MobsConfig {
 
     @Expose
     @ConfigOption(name = "Highlighters", desc = "")

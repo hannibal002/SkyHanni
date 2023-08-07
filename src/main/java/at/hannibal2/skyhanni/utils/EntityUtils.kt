@@ -105,6 +105,8 @@ object EntityUtils {
         //Derpy
         if (maxHealth == health * 2) return true
 
+        // TODO runic support
+
         if (!boss) {
             //Corrupted
             if (maxHealth == health * 3) return true

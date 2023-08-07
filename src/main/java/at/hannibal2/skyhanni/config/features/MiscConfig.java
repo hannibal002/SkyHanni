@@ -675,6 +675,11 @@ public class MiscConfig {
 
         @Expose
         public Position kingTalismanHelperPos = new Position(-400, 220, false, true);
+
+        @Expose
+        @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of crystal hollows.")
+        @ConfigEditorBoolean
+        public boolean crystalHollowsNamesInCore = false;
     }
 
     @Expose
