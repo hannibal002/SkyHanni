@@ -231,7 +231,7 @@ object BestiaryData {
             if (isMaxed && config.hideMaxed) continue
             val text = getMobLine(mob, isMaxed)
             val tips = getMobHover(mob)
-            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips, false) { true })
+            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips) { true })
         }
     }
 

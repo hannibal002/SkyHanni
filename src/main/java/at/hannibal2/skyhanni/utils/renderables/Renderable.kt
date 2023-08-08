@@ -119,7 +119,7 @@ interface Renderable {
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             list[Pair(posX, posY)] = indexes
-                                RenderLineTooltips.drawHoveringText(posX, posY, tips, stack)
+                            RenderLineTooltips.drawHoveringText(posX, posY, tips, stack)
                         }
                     } else {
                         if (list.contains(Pair(posX, posY))) {
