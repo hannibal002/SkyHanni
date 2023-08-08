@@ -180,7 +180,7 @@ class ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            0 -> if (this > 1_000_000_000) NumberUtil.format2(this, true) else NumberUtil.format2(this)
+            0 -> if (this > 1_000_000_000) NumberUtil.format(this, true) else NumberUtil.format(this)
             1 -> this.addSeparators()
             else -> "0"
         }
