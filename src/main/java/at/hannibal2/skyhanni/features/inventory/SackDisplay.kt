@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.fishing.TrophyFishManager
-import at.hannibal2.skyhanni.features.fishing.TrophyRarity
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -213,26 +213,28 @@ class SackDisplay {
                 rendered++
             }
 
-            val name = SortType.values()[config.sortingType].longName
+            val name = SortType.entries[config.sortingType].longName
             newDisplay.addAsSingletonList("§7Sorted By: §c$name")
 
-            newDisplay.addSelector(" ", SortType.values(),
-                    getName = { type -> type.shortName },
-                    isCurrent = { it.ordinal == config.sortingType },
-                    onChange = {
-                        config.sortingType = it.ordinal
-                        update()
-                    })
+            newDisplay.addSelector<SortType>(
+                " ",
+                getName = { type -> type.shortName },
+                isCurrent = { it.ordinal == config.sortingType },
+                onChange = {
+                    config.sortingType = it.ordinal
+                    update()
+                })
 
             if (config.showPrice) {
                 newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
-                newDisplay.addSelector(" ", PriceFrom.values(),
-                        getName = { type -> type.displayName },
-                        isCurrent = { it.ordinal == config.priceFrom },
-                        onChange = {
-                            config.priceFrom = it.ordinal
-                            update()
-                        })
+                newDisplay.addSelector<PriceFrom>(
+                    " ",
+                    getName = { type -> type.displayName },
+                    isCurrent = { it.ordinal == config.priceFrom },
+                    onChange = {
+                        config.priceFrom = it.ordinal
+                        update()
+                    })
             }
         }
 

@@ -40,19 +40,48 @@ interface Renderable {
             else -> null
         }
 
-        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable = link(string(text), onClick, bypassChecks = bypassChecks) { true }
-        fun optionalLink(text: String, onClick: () -> Unit, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable =
+        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable =
+            link(string(text), onClick, bypassChecks = bypassChecks) { true }
+
+        fun optionalLink(
+            text: String,
+            onClick: () -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable =
             link(string(text), onClick, bypassChecks, condition)
 
-        fun link(renderable: Renderable, onClick: () -> Unit, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
-            return clickable(hoverable(underlined(renderable), renderable, bypassChecks, condition = condition), onClick, 0, bypassChecks, condition)
+        fun link(
+            renderable: Renderable,
+            onClick: () -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable {
+            return clickable(
+                hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
+                onClick,
+                0,
+                bypassChecks,
+                condition
+            )
         }
 
-        fun clickAndHover(text: String, tips: List<String>, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable {
+        fun clickAndHover(
+            text: String,
+            tips: List<String>,
+            bypassChecks: Boolean = false,
+            onClick: () -> Unit
+        ): Renderable {
             return clickable(hoverTips(text, tips, bypassChecks = bypassChecks), onClick, bypassChecks = bypassChecks)
         }
 
-        fun clickable(render: Renderable, onClick: () -> Unit, button: Int = 0, bypassChecks: Boolean = false, condition: () -> Boolean = { true }) =
+        fun clickable(
+            render: Renderable,
+            onClick: () -> Unit,
+            button: Int = 0,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ) =
             object : Renderable {
                 override val width: Int
                     get() = render.width
@@ -72,7 +101,12 @@ interface Renderable {
                 }
             }
 
-        fun hoverTips(text: String, tips: List<String>, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
+        fun hoverTips(
+            text: String,
+            tips: List<String>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ): Renderable {
             val render = string(text)
             return object : Renderable {
                 override val width: Int
@@ -171,7 +205,12 @@ interface Renderable {
             }
         }
 
-        fun hoverable(hovered: Renderable, unhovered: Renderable, bypassChecks: Boolean = false, condition: () -> Boolean = { true }) =
+        fun hoverable(
+            hovered: Renderable,
+            unhovered: Renderable,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true }
+        ) =
             object : Renderable {
                 override val width: Int
                     get() = max(hovered.width, unhovered.width)

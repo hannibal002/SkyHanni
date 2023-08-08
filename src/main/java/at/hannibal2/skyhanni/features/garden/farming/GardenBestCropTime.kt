@@ -26,7 +26,7 @@ class GardenBestCropTime {
         }
 
         fun updateTimeTillNextCrop() {
-            for (crop in CropType.values()) {
+            for (crop in CropType.entries) {
                 val speed = crop.getSpeed() ?: continue
                 if (crop.isMaxed()) continue
 
@@ -50,7 +50,7 @@ class GardenBestCropTime {
 
     fun drawBestDisplay(currentCrop: CropType?): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
-        if (timeTillNextCrop.size < CropType.values().size) {
+        if (timeTillNextCrop.size < CropType.entries.size) {
             updateTimeTillNextCrop()
         }
 
@@ -93,7 +93,7 @@ class GardenBestCropTime {
         for (crop in sorted.keys) {
             if (crop.isMaxed()) continue
             val millis = timeTillNextCrop[crop]!!
-            val biggestUnit = TimeUnit.values()[config.cropMilestoneHighestTimeFormat.get()]
+            val biggestUnit = TimeUnit.entries[config.cropMilestoneHighestTimeFormat.get()]
             val duration = TimeUtils.formatDuration(millis, biggestUnit, maxUnits = 2)
             val isCurrent = crop == currentCrop
             number++

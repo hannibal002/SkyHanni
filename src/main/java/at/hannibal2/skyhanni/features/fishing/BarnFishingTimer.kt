@@ -47,10 +47,8 @@ class BarnFishingTimer {
     private fun checkMobs() {
         val newCount = if (inHollows) countHollowsMobs() else countMobs()
 
-        if (currentCount == 0) {
-            if (newCount > 0) {
-                startTime = System.currentTimeMillis()
-            }
+        if (currentCount == 0 && newCount > 0) {
+            startTime = System.currentTimeMillis()
         }
 
         currentCount = newCount
@@ -67,11 +65,9 @@ class BarnFishingTimer {
         .count { it.endsWith("§c❤") }
 
     private fun isRightLocation(): Boolean {
-        if (config.barnTimerCrystalHollows) {
-            if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
-                inHollows = true
-                return true
-            }
+        if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
+            inHollows = true
+            return true
         }
         inHollows = false
 

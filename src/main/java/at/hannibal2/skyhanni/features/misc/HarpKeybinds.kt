@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -26,6 +27,7 @@ class HarpKeybinds {
 
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.harpKeybinds) return
         if (!openInventoryName().startsWith("Harp")) return
         val chest = event.gui as? GuiChest ?: return

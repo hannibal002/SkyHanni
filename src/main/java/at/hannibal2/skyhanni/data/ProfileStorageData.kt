@@ -13,7 +13,7 @@ object ProfileStorageData {
     var playerSpecific: Storage.PlayerSpecific? = null
     var profileSpecific: Storage.ProfileSpecific? = null
     var loaded = false
-    var noTabListTime = -1L
+    private var noTabListTime = -1L
 
     private var nextProfile: String? = null
 

@@ -43,11 +43,11 @@ object StringUtils {
      */
     fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): Map<String?, T>? {
         if ("" == prefix) return map
-        val lastKey = createLexicographicallyNextStringOfTheSameLength(prefix)
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subMap(prefix, true, lastKey, false)
     }
 
-    fun createLexicographicallyNextStringOfTheSameLength(input: String): String {
+    fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
         val lastChar = input[lastCharPosition]
@@ -107,7 +107,6 @@ object StringUtils {
             "$format$text"
         }
     }
-
 
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")

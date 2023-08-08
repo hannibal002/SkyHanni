@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.jsonobjects;
 
-import at.hannibal2.skyhanni.features.fishing.TrophyFishInfo;
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishInfo;
 import com.google.gson.annotations.Expose;
 
 import java.util.Map;

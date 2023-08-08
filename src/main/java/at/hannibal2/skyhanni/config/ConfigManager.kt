@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.fishing.TrophyRarity
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -142,7 +142,7 @@ class ConfigManager {
 
     private fun fixConfig(line: String): String {
         var result = line
-        for (type in CropType.values()) {
+        for (type in CropType.entries) {
             val normal = "\"${type.cropName}\""
             val enumName = "\"${type.name}\""
             while (result.contains(normal)) {

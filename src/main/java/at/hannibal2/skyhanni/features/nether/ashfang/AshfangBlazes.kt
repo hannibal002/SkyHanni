@@ -37,14 +37,17 @@ class AshfangBlazes {
                 if (list.size == 1) {
                     val armorStand = list[0]
                     blazeArmorStand[entity] = armorStand
-                    if (armorStand.name.contains("Ashfang Follower")) {
-                        blazeColor[entity] = LorenzColor.DARK_GRAY
-                    } else if (armorStand.name.contains("Ashfang Underling")) {
-                        blazeColor[entity] = LorenzColor.RED
-                    } else if (armorStand.name.contains("Ashfang Acolyte")) {
-                        blazeColor[entity] = LorenzColor.BLUE
-                    } else {
-                        blazeArmorStand.remove(entity)
+                    val color = when {
+                        armorStand.name.contains("Ashfang Follower") -> LorenzColor.DARK_GRAY
+                        armorStand.name.contains("Ashfang Underling") -> LorenzColor.RED
+                        armorStand.name.contains("Ashfang Acolyte") -> LorenzColor.BLUE
+                        else -> {
+                            blazeArmorStand.remove(entity)
+                            null
+                        }
+                    }
+                    color?.let {
+                        blazeColor[entity] = it
                     }
                 }
             }

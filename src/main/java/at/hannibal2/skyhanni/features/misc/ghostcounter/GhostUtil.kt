@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.ghostcounter
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,7 +13,7 @@ import java.io.FileReader
 object GhostUtil {
 
     fun reset() {
-        for (opt in GhostData.Option.values()) {
+        for (opt in GhostData.Option.entries) {
             opt.set(0.0)
             opt.set(0.0, true)
         }
@@ -74,15 +75,28 @@ object GhostUtil {
             LorenzUtils.chat("§e[SkyHanni] §cGhostCounterV3 ChatTriggers module not found!")
     }
 
-    fun String.formatText(value: Int, session: Int = -1): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())
+    fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))
+
+    fun String.formatText(value: Int, session: Int = -1) = Utils.chromaStringByColourCode(
+        replace("%value%", value.addSeparators())
             .replace("%session%", session.addSeparators())
-            .replace("&", "§"))
-    }
+            .replace("&", "§")
+    )
 
     fun String.formatText(t: String): String {
         return Utils.chromaStringByColourCode(this.replace("%value%", t)
             .replace("&", "§"))
+    }
+
+    fun String.preFormat(t: String, level: Int, nextLevel: Int): String {
+        return if (nextLevel == 26) {
+            val lol = Utils.chromaStringByColourCode(this.replace("%value%", t)
+                .replace("%display%", "25"))
+            lol
+        } else {
+            Utils.chromaStringByColourCode(this.replace("%value%", t)
+                .replace("%display%", "$level->${if (SkyHanniMod.feature.ghostCounter.showMax) "25" else nextLevel}"))
+        }
     }
 
     fun String.formatText(value: Double, session: Double): String {
@@ -92,11 +106,10 @@ object GhostUtil {
     }
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
-        val maxLevel = if (GhostCounter.bestiaryUpdate) "25" else "46"
         val bestiaryNextLevel = GhostCounter.hidden?.bestiaryNextLevel
         val currentLevel =
-            bestiaryNextLevel?.let { if (it.toInt() < 0) maxLevel else "${it.toInt() - 1}" } ?: "§cNo Bestiary Level Data!"
-        val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) maxLevel else "${it.toInt()}" }
+            bestiaryNextLevel?.let { if (it.toInt() < 0) "25" else "${it.toInt() - 1}" } ?: "§cNo Bestiary Level Data!"
+        val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) "25" else "${it.toInt()}" }
             ?: "§cNo Bestiary Level data!"
 
         return Utils.chromaStringByColourCode(
@@ -110,7 +123,6 @@ object GhostUtil {
     }
 
     private fun percent(number: Double): String {
-        val max = if (GhostCounter.bestiaryUpdate) 3_000_000 else 100_000
-        return "${((number / max) * 100).roundToPrecision(4)}"
+        return "${((number / 250_000) * 100).roundToPrecision(4)}"
     }
 }

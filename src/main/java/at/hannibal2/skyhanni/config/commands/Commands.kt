@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ApiDataLoader
+import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
@@ -48,6 +49,7 @@ object Commands {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
         } else {
+            val arr = mutableListOf<String>()
             ConfigGuiManager.openConfigGui()
         }
     }
@@ -186,6 +188,7 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shtest", "Unused test command.") { SkyHanniTestCommand.testCommand(it) }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
+        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
             "shstoplisteners",
             "Unregistering all loaded forge event listeners"

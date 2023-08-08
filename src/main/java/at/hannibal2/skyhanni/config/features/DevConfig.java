@@ -2,12 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
 
 public class DevConfig {
@@ -39,7 +34,7 @@ public class DevConfig {
     @ConfigOption(
             name = "Mod Menu Log",
             desc = "Enables debug messages when the currently opened gui changes, with the path to the gui class. " +
-            "Useful for adding more mods to quick mod menu switch."
+                    "Useful for adding more mods to quick mod menu switch."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -62,6 +57,12 @@ public class DevConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showItemUuid = false;
+
+    @Expose
+    @ConfigOption(name = "Copy NBT data", desc = "Copies compressed NBT data on key press in a GUI")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 0)
+    public int copyNBTDataCompressed = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Copy Rng Meter", desc = "Copies internal names and maxed xp needed from rng meter inventories in json format into the clipboard.")

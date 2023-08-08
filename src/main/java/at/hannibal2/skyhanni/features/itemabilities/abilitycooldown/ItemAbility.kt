@@ -93,7 +93,7 @@ enum class ItemAbility(
 
     companion object {
         fun getByInternalName(internalName: String): ItemAbility? {
-            return values().firstOrNull { it.newVariant && internalName in it.internalNames }
+            return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
     }
 
