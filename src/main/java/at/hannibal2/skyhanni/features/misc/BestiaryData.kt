@@ -478,7 +478,7 @@ object BestiaryData {
         })
     }
 
-    fun String.romanOrInt() = romanToDecimalIfNeeded().let {
+    private fun String.romanOrInt() = romanToDecimalIfNeeded().let {
         if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
