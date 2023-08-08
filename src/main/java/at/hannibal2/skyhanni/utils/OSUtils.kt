@@ -50,7 +50,6 @@ object OSUtils {
             e.printStackTrace()
             return false
         }
-        if (this.isKeyDown || this.isPressed) return true
-        return false
+        return this.isKeyDown || this.isPressed
     }
 }

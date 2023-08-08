@@ -13,7 +13,7 @@ object CombatUtils {
     var lastUpdate: Long = -1
     private var skillInfo: XPInformation.SkillInfo? = null
     private var skillInfoLast: XPInformation.SkillInfo? = null
-    private const val skillType = "Combat"
+    private const val SKILL_TYPE = "Combat"
     var xpGainHourLast = -1f
     var xpGainHour = -1f
     var isKilling = false
@@ -33,7 +33,7 @@ object CombatUtils {
         lastUpdate = System.currentTimeMillis()
         xpGainHourLast = xpGainHour
         skillInfoLast = skillInfo
-        skillInfo = XPInformation.getInstance().getSkillInfo(skillType) ?: return
+        skillInfo = XPInformation.getInstance().getSkillInfo(SKILL_TYPE) ?: return
         val totalXp: Float = skillInfo!!.totalXp
         if (lastTotalXp > 0) {
             val delta: Float = totalXp - lastTotalXp

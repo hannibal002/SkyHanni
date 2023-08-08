@@ -14,7 +14,6 @@ import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
@@ -404,11 +403,9 @@ object LorenzUtils {
         return new
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
-        if (values.isEmpty()) {
-            return 0.0
-        }
+        if (values.isEmpty()) return 0.0
+
         return when (values.first()) {
             is Double -> values.sumOf { it.toDouble() }
             is Float -> values.sumOf { it.toDouble() }

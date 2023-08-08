@@ -28,7 +28,7 @@ import kotlin.time.DurationUnit
 
 object RenderUtils {
 
-    val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
+    private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -438,7 +438,8 @@ object RenderUtils {
         GlStateManager.translate(getAbsX().toFloat(), (getAbsY() + offsetY).toFloat(), 0F)
         var offsetX = 0
         for (any in line) {
-            val renderable = Renderable.fromAny(any, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: ${any}")
+            val renderable = Renderable.fromAny(any, itemScale = itemScale)
+                ?: throw RuntimeException("Unknown render object: $any")
 
             renderable.render(getAbsX() + offsetX, getAbsY() + offsetY)
             offsetX += renderable.width
@@ -571,7 +572,7 @@ object RenderUtils {
     ) {
         val strLen = fr.getStringWidth(str)
         var factor = len / strLen.toFloat()
-        factor = Math.min(1f, factor)
+        factor = 1f.coerceAtMost(factor)
         TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, colour, factor)
     }
 
@@ -719,7 +720,6 @@ object RenderUtils {
         val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
         return LorenzVec(x, y, z)
     }
-
 
 
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
@@ -905,8 +905,7 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun RenderWorldLastEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean, targetColor: Color? = null,
-        seeThroughBlocks: Boolean = true
+        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean
     ) {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
