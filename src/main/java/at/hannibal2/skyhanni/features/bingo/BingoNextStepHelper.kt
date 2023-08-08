@@ -76,11 +76,9 @@ class BingoNextStepHelper {
                 }
             }
 
-            if (!step.done && !parentDone) {
-                if (requirementsToDo == 0) {
-                    if (!currentSteps.contains(step)) {
-                        currentSteps = currentSteps.editCopy { add(step) }
-                    }
+            if (!step.done && !parentDone && requirementsToDo == 0) {
+                if (!currentSteps.contains(step)) {
+                    currentSteps = currentSteps.editCopy { add(step) }
                 }
             }
         }
@@ -195,10 +193,8 @@ class BingoNextStepHelper {
         if (done) return
         done = true
         updateResult()
-        if (!silent) {
-            if (config.stepHelper) {
-                LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
-            }
+        if (!silent && config.stepHelper) {
+            LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
         }
     }
 

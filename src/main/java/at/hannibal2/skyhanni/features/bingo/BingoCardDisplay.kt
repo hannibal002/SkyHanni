@@ -142,14 +142,12 @@ class BingoCardDisplay {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
-        if (config.quickToggle) {
-            if (ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
-                val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
-                if (lastSneak != sneaking) {
-                    lastSneak = sneaking
-                    if (sneaking) {
-                        toggleMode()
-                    }
+        if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
+            val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+            if (lastSneak != sneaking) {
+                lastSneak = sneaking
+                if (sneaking) {
+                    toggleMode()
                 }
             }
         }

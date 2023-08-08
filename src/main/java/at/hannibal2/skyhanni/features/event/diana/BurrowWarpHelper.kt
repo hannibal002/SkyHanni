@@ -65,10 +65,6 @@ class BurrowWarpHelper {
 
             val playerDistance = playerLocation.distance(target)
             val warpDistance = warpPoint.distance(target)
-//            println(" ")
-//            println("shouldUseWarps")
-//            println("playerDistance: ${playerDistance.round(1)}")
-//            println("warpDistance: ${warpDistance.round(1)}")
             val difference = playerDistance - warpDistance
             currentWarp = if (difference > 10) {
                 warpPoint

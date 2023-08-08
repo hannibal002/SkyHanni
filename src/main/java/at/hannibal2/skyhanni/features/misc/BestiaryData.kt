@@ -340,13 +340,15 @@ object BestiaryData {
             for (cat in catList) {
                 newDisplay.add(buildList {
                     add(" §7- ${cat.name}§7: ")
-                    if (cat.familiesCompleted == cat.totalFamilies) {
-                        add("§c§lCompleted!")
-                    } else if (cat.familiesFound == cat.totalFamilies) {
-                        add("§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed")
-                    } else if (cat.familiesFound < cat.totalFamilies) {
-                        add("§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed")
+                    val element = when {
+                        cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
+                        cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                        cat.familiesFound < cat.totalFamilies ->
+                            "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+
+                        else -> continue
                     }
+                    add(element)
                 })
             }
         }

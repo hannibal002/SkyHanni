@@ -103,12 +103,10 @@ class BazaarApi {
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val returnItem = event.inventorySize - 5
         for ((slot, item) in event.inventoryItems) {
-            if (slot == returnItem) {
-                if (item.name?.removeColor().let { it == "Go Back" }) {
-                    val lore = item.getLore()
-                    if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
-                        return true
-                    }
+            if (slot == returnItem && item.name?.removeColor().let { it == "Go Back" }) {
+                val lore = item.getLore()
+                if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
+                    return true
                 }
             }
         }
