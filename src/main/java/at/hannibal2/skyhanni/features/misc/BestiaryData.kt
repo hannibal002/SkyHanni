@@ -479,7 +479,7 @@ object BestiaryData {
     }
 
     fun String.romanOrInt() = romanToDecimalIfNeeded().let {
-        if (config.replaceRoman) it.toString() else it.toRoman()
+        if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
     fun Any.getNextLevel(): String {
