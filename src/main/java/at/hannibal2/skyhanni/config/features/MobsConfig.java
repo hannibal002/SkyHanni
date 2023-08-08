@@ -53,7 +53,7 @@ public class MobsConfig {
     public boolean corruptedMobHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Arachne Boss", desc = "Highlight the arachne boss in red and mini bosses and orange.")
+    @ConfigOption(name = "Arachne Boss", desc = "Highlight the arachne boss in red and mini bosses in orange.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean arachneBossHighlighter = true;
