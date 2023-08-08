@@ -96,25 +96,25 @@ class ChestValue {
                 else -> chestItems.values.sortedByDescending { it.total }.toMutableList()
             }
             val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
-
             newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Showing $amountShowing of ${sortedList.size} items)")
             for ((index, amount, stack, total, tips) in sortedList) {
                 totalPrice += total
                 if (rendered >= config.itemToShow) continue
                 if (total < config.hideBelow) continue
+                val name = stack.displayName.reduceStringLength(config.nameLength)
+                val str = "$name §7x$amount: §b${(total).formatPrice()}"
                 newDisplay.add(buildList {
                     val renderable = Renderable.hoverTips(
-                        "${stack.displayName} §7x$amount: §b${(total).formatPrice()}",
+                        str,
                         tips,
                         stack = stack,
                         indexes = index)
                     add(" §7- ")
-                    add(stack)
+                    if (config.showStacks) add(stack)
                     add(renderable)
                 })
                 rendered++
             }
-
             val sortingType = SortType.entries[config.sortingType].longName
             newDisplay.addAsSingletonList("§7Sorted By: §c$sortingType")
             newDisplay.addSelector(" ", SortType.entries.toTypedArray(),
@@ -202,6 +202,30 @@ class ChestValue {
         this == "Large Chest") ||
         (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
         this == "Personal Vault")
+
+
+    fun String.reduceStringLength(targetLength: Int): String {
+        val mc = Minecraft.getMinecraft()
+        val spaceWidth = mc.fontRendererObj.getCharWidth(' ')
+
+        var currentString = this
+        var currentLength = mc.fontRendererObj.getStringWidth(currentString)
+
+        while (currentLength > targetLength) {
+            currentString = currentString.dropLast(1)
+            currentLength = mc.fontRendererObj.getStringWidth(currentString)
+        }
+
+        val difference = targetLength - currentLength
+
+        if (difference > 0) {
+            val numSpacesToAdd = difference / spaceWidth
+            val spaces = " ".repeat(numSpacesToAdd)
+            return currentString + spaces
+        }
+
+        return currentString
+    }
 
     data class Item(
         val index: MutableList<Int>,

@@ -212,6 +212,16 @@ public class InventoryConfig {
         public boolean enabled = false;
 
         @Expose
+        @ConfigOption(name = "Show Stacks", desc = "Show the item icon before name.")
+        @ConfigEditorBoolean
+        public boolean showStacks = true;
+
+        @Expose
+        @ConfigOption(name = "Name Length", desc = "Reduce item name length to gain extra space on screen.\n§cCalculated in pixels!")
+        @ConfigEditorSlider(minStep = 1, minValue = 10, maxValue = 200)
+        public int nameLength = 100;
+
+        @Expose
         @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
         @ConfigEditorBoolean
         public boolean enableHighlight = true;
