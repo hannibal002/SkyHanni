@@ -34,7 +34,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         RenderUtils.drawFloatingRectDark(0, 0, w, h)
         GlStateManager.translate(5.0, 5.0 - scroll, 0.0)
         var mouseX = mouseX - l
-        val isMouseButtonDown = if (mouseX in 0..w && mouseY in t..(t + h)) Mouse.isButtonDown(0) else false
+        val isMouseButtonDown = mouseX in 0..w && mouseY in t..(t + h) && Mouse.isButtonDown(0)
         var mouseY = mouseY - (t - scroll).toInt()
         val sr = ScaledResolution(mc)
         GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)

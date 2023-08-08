@@ -38,11 +38,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
-    fun ItemStack.getDungeonStarCount() = getAttributeInt("dungeon_item_level")?.let {
-        getAttributeInt("upgrade_level")?.let { upgradeLevel ->
-            return it.coerceAtLeast(upgradeLevel)
-        } ?: it
-    }
+    fun ItemStack.getDungeonStarCount() =
+        getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
@@ -154,7 +151,7 @@ object SkyBlockItemModifierUtils {
     // TODO untested
     fun ItemStack.hasBookOfStats() = getAttributeBoolean("stats_book")
 
-    fun ItemStack.hasArtOfPiece() = getAttributeBoolean("artOfPeaceApplied")
+    fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
@@ -242,7 +239,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
-            fun getByName(name: String) = GemstoneQuality.values().firstOrNull { it.name == name }
+            fun getByName(name: String) = entries.firstOrNull { it.name == name }
         }
     }
 
@@ -258,7 +255,7 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
-            fun getByName(name: String) = values().firstOrNull { it.name == name }
+            fun getByName(name: String) = entries.firstOrNull { it.name == name }
         }
     }
 }

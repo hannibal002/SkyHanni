@@ -71,7 +71,7 @@ object FortuneUpgrades {
     private fun getTalismanUpgrade() {
         val currentTalismanTier = CropAccessoryData.cropAccessory?.ordinal ?: return
         if (currentTalismanTier < 3) {
-            val nextTalisman = CropAccessory.values()[currentTalismanTier + 1]
+            val nextTalisman = CropAccessory.entries[currentTalismanTier + 1]
             genericUpgrades.add(FortuneUpgrade("§7Upgrade your talisman to ${nextTalisman.internalName.replace("_", " ").lowercase()}",
                 null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0))
         }
@@ -197,7 +197,7 @@ object FortuneUpgrades {
     private fun recombobulateItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
         if (item.isRecombobulated()) return
         val reforge = item.getReforgeName()?.let {
-            FarmingReforges.values().find { enumValue -> enumValue.name == it.uppercase()
+            FarmingReforges.entries.find { enumValue -> enumValue.name == it.uppercase()
             }
         } ?: return
 

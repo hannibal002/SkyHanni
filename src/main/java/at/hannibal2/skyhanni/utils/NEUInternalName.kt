@@ -20,9 +20,9 @@ class NEUInternalName private constructor(private val internalName: String) {
         return super.equals(other)
     }
 
-    override fun toString(): String {
-        return "internalName:$internalName"
-    }
+    override fun toString(): String = "internalName:$internalName"
+
+    override fun hashCode(): Int = internalName.hashCode()
 
 //    fun equals(other: String) = internalName == other
 }

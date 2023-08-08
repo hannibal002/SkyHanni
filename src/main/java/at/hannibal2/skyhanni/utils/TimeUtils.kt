@@ -29,7 +29,7 @@ object TimeUtils {
         // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
         var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
-        for (unit in TimeUnit.values()) {
+        for (unit in TimeUnit.entries) {
             if (unit.ordinal >= biggestUnit.ordinal) {
                 val factor = unit.factor
                 map[unit] = (milliseconds / factor).toInt()

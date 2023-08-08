@@ -81,7 +81,7 @@ object GardenVisitorDropStatistics {
                 saveAndUpdate()
             }
 
-            for (reward in VisitorReward.values()) {
+            for (reward in VisitorReward.entries) {
                 reward.pattern.matchMatcher(message) {
                     val old = rewardsCount[reward] ?: 0
                     rewardsCount = rewardsCount.editCopy { this[reward] = old + 1 }
@@ -130,7 +130,7 @@ object GardenVisitorDropStatistics {
         addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
 
         //9 – 14
-        for (reward in VisitorReward.values()) {
+        for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) {// Icons
                 val stack = NEUItems.getItemStack(reward.internalName, true)

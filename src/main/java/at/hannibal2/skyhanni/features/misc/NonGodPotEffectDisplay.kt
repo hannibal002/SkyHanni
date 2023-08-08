@@ -145,7 +145,7 @@ class NonGodPotEffectDisplay {
 
         for (stack in event.inventoryItems.values) {
                 val name = stack.name ?: continue
-                for (effect in NonGodPotEffect.values()) {
+                for (effect in NonGodPotEffect.entries) {
                     if (name != effect.displayName) continue
                     for (line in stack.getLore()) {
                         if (line.contains("Remaining") &&
@@ -182,7 +182,7 @@ class NonGodPotEffectDisplay {
 
             var effectsCount = 0
             for (line in lines) {
-                for (effect in NonGodPotEffect.values()) {
+                for (effect in NonGodPotEffect.entries) {
                     if (line.startsWith(effect.displayName)) {
                         try {
                             val duration = TimeUtils.getMillis(line.split("§f")[1])
@@ -221,7 +221,7 @@ class NonGodPotEffectDisplay {
         for (element in effects) {
             val effectJson = element.asJsonObject
             val name = effectJson["effect"].asString
-            val effect = NonGodPotEffect.values().find { it.apiName == name } ?: continue
+            val effect = NonGodPotEffect.entries.find { it.apiName == name } ?: continue
 
             val time = effectJson["ticks_remaining"].asLong / 20
             val newValue = System.currentTimeMillis() + time * 1000

@@ -158,15 +158,17 @@ class ShowMotesNpcSellPrice {
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         newDisplay.addAsSingletonList("§7Total price: §b$total")
-        val name = FormatType.values()[config.inventoryValue.formatType].type
+        val name = FormatType.entries[config.inventoryValue.formatType].type
         newDisplay.addAsSingletonList("§7Price format: §c$name")
-        newDisplay.addSelector(" ", FormatType.values(),
+        newDisplay.addSelector<FormatType>(
+            " ",
             getName = { type -> type.type },
             isCurrent = { it.ordinal == config.inventoryValue.formatType },
             onChange = {
                 config.inventoryValue.formatType = it.ordinal
                 update()
-            })
+            }
+        )
         return newDisplay
     }
 

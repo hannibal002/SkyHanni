@@ -185,7 +185,7 @@ class ItemAbilityCooldown {
                 val name: String = message.between(" (§6", "§b) ")
                 if (name == lastAbility) return
                 lastAbility = name
-                for (ability in ItemAbility.values()) {
+                for (ability in ItemAbility.entries) {
                     if (ability.abilityName == name) {
                         click(ability)
                         return
@@ -321,7 +321,7 @@ class ItemAbilityCooldown {
         val internalName = stack.getInternalName()
 
         val list = mutableListOf<ItemAbility>()
-        for (ability in ItemAbility.values()) {
+        for (ability in ItemAbility.entries) {
             if (ability.newVariant) {
                 if (ability.internalNames.contains(internalName)) {
                     list.add(ability)

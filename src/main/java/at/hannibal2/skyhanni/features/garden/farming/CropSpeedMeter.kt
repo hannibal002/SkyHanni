@@ -75,7 +75,7 @@ class CropSpeedMeter {
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         if (!isEnabled()) return
         val counters = mutableMapOf<CropType, Long>()
-        for (cropType in CropType.values()) {
+        for (cropType in CropType.entries) {
             counters[cropType] = cropType.getCounter()
         }
         if (startCrops.isEmpty()) {

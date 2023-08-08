@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
-    private val actionBarPattern = "(?:.*)§3\\+(?:.*) (?<skill>.*) \\((?<overflow>.*)\\/(?<needed>.*)\\)(?:.*)".toPattern()
-    private val inventoryPattern = "(?:.*) §e(?<number>.*)§6\\/(?:.*)".toPattern()
+    private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
+    private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {

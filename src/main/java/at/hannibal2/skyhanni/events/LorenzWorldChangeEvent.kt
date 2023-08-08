@@ -1,3 +1,3 @@
 package at.hannibal2.skyhanni.events
 
-class LorenzWorldChangeEvent() : LorenzEvent()
+class LorenzWorldChangeEvent : LorenzEvent()

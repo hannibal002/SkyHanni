@@ -105,6 +105,8 @@ object EntityUtils {
         //Derpy
         if (maxHealth == health * 2) return true
 
+        // TODO runic support
+
         if (!boss) {
             //Corrupted
             if (maxHealth == health * 3) return true
@@ -160,5 +162,5 @@ object EntityUtils {
 
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence() ?: emptySequence<Entity>()
+    }?.asSequence() ?: emptySequence()
 }

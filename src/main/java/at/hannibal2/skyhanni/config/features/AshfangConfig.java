@@ -6,7 +6,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class Ashfang {
+public class AshfangConfig {
 
     @Expose
     @ConfigOption(name = "Freeze", desc = "Show the cooldown for how long Ashfang blocks your abilities.")

@@ -308,16 +308,15 @@ object LorenzUtils {
         }
     }
 
-    fun <T> MutableList<List<Any>>.addSelector(
+    inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
-        values: Array<T>,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        onChange: (T) -> Unit,
+        crossinline onChange: (T) -> Unit,
     ) {
         add(buildList {
             add(prefix)
-            for (entry in values) {
+            for (entry in enumValues<T>()) {
                 val display = getName(entry)
                 if (isCurrent(entry)) {
                     add("§a[$display]")
@@ -404,11 +403,9 @@ object LorenzUtils {
         return new
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
-        if (values.isEmpty()) {
-            return 0.0
-        }
+        if (values.isEmpty()) return 0.0
+
         return when (values.first()) {
             is Double -> values.sumOf { it.toDouble() }
             is Float -> values.sumOf { it.toDouble() }

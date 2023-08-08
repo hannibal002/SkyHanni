@@ -22,7 +22,7 @@ object APIUtil {
     private val parser = JsonParser()
     private var showApiErrors = false
 
-    val builder: HttpClientBuilder =
+    private val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.version}")
             .setDefaultHeaders(
                 mutableListOf(
@@ -60,7 +60,10 @@ object APIUtil {
                             e.printStackTrace()
 
                         } else {
-                            CopyErrorCommand.logError(Error("Hypixel API error for url: '$urlString'", e), "Failed to load data from Hypixel API")
+                            CopyErrorCommand.logError(
+                                Error("Hypixel API error for url: '$urlString'", e),
+                                "Failed to load data from Hypixel API"
+                            )
                         }
                     }
                 }
@@ -69,7 +72,10 @@ object APIUtil {
             if (silentError) {
                 throw throwable
             } else {
-                CopyErrorCommand.logError(Error("Hypixel API error for url: '$urlString'", throwable), "Failed to load data from Hypixel API")
+                CopyErrorCommand.logError(
+                    Error("Hypixel API error for url: '$urlString'", throwable),
+                    "Failed to load data from Hypixel API"
+                )
             }
         } finally {
             client.close()

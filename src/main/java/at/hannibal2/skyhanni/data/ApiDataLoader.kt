@@ -25,7 +25,7 @@ class ApiDataLoader {
     fun onRepositoryReload(event: RepositoryReloadEvent) {
         usePlayerApiKey = false
         event.getConstant("DisabledFeatures")?.let {
-            if (it.asJsonObject["user_api_keys"]?.asBoolean ?: false) {
+            if (it.asJsonObject["user_api_keys"]?.asBoolean == true) {
                 usePlayerApiKey = true
             }
         }
@@ -103,7 +103,7 @@ class ApiDataLoader {
     private fun findApiCandidatesFromOtherMods(): Map<String, String> {
         LorenzUtils.consoleLog("Trying to find the api key from the config of other mods..")
         val candidates = mutableMapOf<String, String>()
-        for (mod in OtherMod.values()) {
+        for (mod in OtherMod.entries) {
             val modName = mod.modName
             val file = File(mod.configPath)
             if (file.exists()) {

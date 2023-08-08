@@ -5,7 +5,17 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -15,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class Garden {
+public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "SkyMart", desc = "")
@@ -801,7 +811,7 @@ public class Garden {
     @Expose
     @ConfigOption(name = "Show money per Hour",
             desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
-                    "Supports Bountiful and Mushroom Cow Perk.")
+                    "Supports Bountiful, Mushroom Cow Perk and Dicer drops. Thier toggles are below.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourDisplay = true;
@@ -878,6 +888,30 @@ public class Garden {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourMergeSeeds = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Bountiful",
+            desc = "Includes the coins from bountiful in the calculation.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourBountiful = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Mooshroom Cow",
+            desc = "Includes the coins you get from selling the mushrooms from your mooshroom cow pet.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourMooshroom = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Include Dicer Drops",
+            desc = "Includes the average coins/hr from your melon or pumpkin dicer.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 13)
+    public boolean moneyPerHourDicer = true;
 
     @Expose
     @ConfigOption(

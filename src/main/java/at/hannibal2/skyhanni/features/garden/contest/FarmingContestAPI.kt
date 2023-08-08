@@ -104,7 +104,7 @@ object FarmingContestAPI {
             cropPattern.matchMatcher(it) { CropType.getByName(group("crop")) }
         } ?: error("Crop not found in lore!")
 
-        val brackets = ContestBracket.values().associateWith { bracket ->
+        val brackets = ContestBracket.entries.associateWith { bracket ->
             lore.firstNotNullOfOrNull {
                 bracket.pattern.matchMatcher(it) {
                     group("amount").replace(",", "").toInt()
