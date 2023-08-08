@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -58,30 +58,30 @@ object BestiaryData {
     fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inInventory) {
-            val inventoryName = InventoryUtils.openInventoryName()
-            if (isBestiaryGui(InventoryUtils.getItemsInOpenChest()[4].stack, inventoryName)) {
-                for (slot in InventoryUtils.getItemsInOpenChest()) {
-                    val stack = slot.stack
-                    val lore = stack.getLore()
-                    if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100§6% §7(§c§lMAX!§7)" }) {
-                        slot highlight LorenzColor.GREEN
-                    }
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                val stack = slot.stack
+                val lore = stack.getLore()
+                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100§6% §7(§c§lMAX!§7)" }) {
+                    slot highlight LorenzColor.GREEN
                 }
             }
+
         }
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
+        val stack = event.inventoryItems[4] ?: return
         if ((inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") || isBestiaryGui(
-                event.inventoryItems[4],
+                stack,
                 inventoryName
             )
         ) {
             isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
             stackList.putAll(event.inventoryItems)
+            inInventory = true
             update()
         }
     }
@@ -478,7 +478,7 @@ object BestiaryData {
         })
     }
 
-    fun String.romanOrInt() = romanToDecimalIfNeeded().let {
+    private fun String.romanOrInt() = romanToDecimalIfNeeded().let {
         if (config.replaceRoman || it == 0) it.toString() else it.toRoman()
     }
 
