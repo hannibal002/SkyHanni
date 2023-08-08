@@ -36,7 +36,7 @@ enum class CropType(
         fun getByNameOrNull(itemName: String): CropType? {
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
             if (itemName == "Seeds") return WHEAT
-            return values().firstOrNull { it.cropName == itemName }
+            return entries.firstOrNull { it.cropName == itemName }
         }
 
         fun getByName(name: String) = getByNameOrNull(name) ?: throw RuntimeException("No valid crop type '$name'")

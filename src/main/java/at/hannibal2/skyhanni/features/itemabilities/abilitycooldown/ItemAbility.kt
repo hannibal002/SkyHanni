@@ -32,7 +32,8 @@ enum class ItemAbility(
     STAFF_OF_THE_VOLCANO(30),
     STARLIGHT_WAND(2),
     VOODOO_DOLL(5),
-    WEIRD_TUBA(20, "WEIRDER_TUBA"),
+    WEIRD_TUBA(20),
+    WEIRDER_TUBA(30),
     FIRE_FREEZE_STAFF(10),
     SWORD_OF_BAD_HEALTH(5),
     WITHER_CLOAK(10),
@@ -92,7 +93,7 @@ enum class ItemAbility(
 
     companion object {
         fun getByInternalName(internalName: String): ItemAbility? {
-            return values().firstOrNull { it.newVariant && internalName in it.internalNames }
+            return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
     }
 

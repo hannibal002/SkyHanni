@@ -46,7 +46,7 @@ class HighlightMiningCommissionMobs {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(40)) return
+        if (!event.repeatSeconds(2)) return
 
         val entities = EntityUtils.getEntities<EntityLivingBase>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
@@ -61,7 +61,7 @@ class HighlightMiningCommissionMobs {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
-        MobType.values().filter { type ->
+        MobType.entries.filter { type ->
             event.tabList.find { line -> line.contains(type.commissionName) }?.let { !it.endsWith("§aDONE") } ?: false
         }.let {
             if (it != active) {

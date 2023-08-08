@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -132,7 +131,7 @@ class GriffinBurrowParticleFinder {
 
             fun getParticleType(packet: S2APacketParticles): ParticleType? {
                 if (!packet.isLongDistance) return null
-                for (type in values()) {
+                for (type in entries) {
                     if (type.check(packet)) {
                         return type
                     }
@@ -143,7 +142,7 @@ class GriffinBurrowParticleFinder {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         burrows.clear()
         recentlyDugParticleBurrows.clear()
     }

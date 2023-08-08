@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.Storage
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -77,7 +77,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             }
         }
 
-        for (entry in dailyQuestHelper.reputationHelper.repoData.entrySet()) {
+        val repoData = dailyQuestHelper.reputationHelper.repoData ?: return UnknownQuest(name)
+        for (entry in repoData.entrySet()) {
             val categoryName = entry.key
             val category = entry.value.asJsonObject
             for ((entryName, extraData) in category.entrySet()) {
@@ -109,7 +110,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         return dailyQuestHelper.quests.firstOrNull { it.internalName == name }
     }
 
-    fun checkInventory(event: InventoryOpenEvent) {
+    fun checkInventory(event: InventoryFullyOpenedEvent) {
         val inMageRegion = LorenzUtils.skyBlockArea == "Community Center"
         val inBarbarianRegion = LorenzUtils.skyBlockArea == "Dragontail"
         if (!inMageRegion && !inBarbarianRegion) return
@@ -139,7 +140,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
-        for (text in storage.quests) {
+        for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
             val state = QuestState.valueOf(split[1])

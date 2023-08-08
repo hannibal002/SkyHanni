@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -54,7 +54,7 @@ class CaptureFarmingGear {
                 //todo better fall back items
                 //todo Daedalus axe
             } else {
-                for (item in FarmingItems.values()) {
+                for (item in FarmingItems.entries) {
                     if (item.name == currentCrop.name) {
                         farmingItems[item] = itemStack
                     }
@@ -64,7 +64,7 @@ class CaptureFarmingGear {
                 if (armor == null) continue
                 val split = armor.getInternalName().split("_")
                 if (split.first() in farmingSets) {
-                    for (item in FarmingItems.values()) {
+                    for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
                             farmingItems[item] = armor
                         }
@@ -85,7 +85,7 @@ class CaptureFarmingGear {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val hidden = GardenAPI.config?.fortune ?: return
         val farmingItems = farmingItems ?: return
@@ -94,7 +94,7 @@ class CaptureFarmingGear {
             for ((_, slot) in event.inventoryItems) {
                 val split = slot.getInternalName().split("_")
                 if (split.first() == "LOTUS") {
-                    for (item in FarmingItems.values()) {
+                    for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
                             farmingItems[item] = slot
                             outdatedItems[item] = false
@@ -208,7 +208,7 @@ class CaptureFarmingGear {
         }
         lotusUpgradePattern.matchMatcher(msg) {
             val piece = group("piece").uppercase()
-            for (item in FarmingItems.values()) {
+            for (item in FarmingItems.entries) {
                 if (item.name == piece) {
                     outdatedItems[item] = true
                 }
@@ -216,7 +216,7 @@ class CaptureFarmingGear {
         }
         petLevelUpPattern.matchMatcher(msg) {
             val pet = group("pet").uppercase()
-            for (item in FarmingItems.values()) {
+            for (item in FarmingItems.entries) {
                 if (item.name.contains(pet)) {
                     outdatedItems[item] = true
                 }

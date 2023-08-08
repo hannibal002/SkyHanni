@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -47,17 +47,20 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         try {
-            val hideNotClickableItems = event.getConstant("HideNotClickableItems")!!
+            event.getConstant("TradeNpcs")?.let {
+                tradeNpcFilter.load(it)
+            }
+
+            val hideNotClickableItems = event.getConstant("HideNotClickableItems") ?: return
             hideNpcSellFilter.load(hideNotClickableItems["hide_npc_sell"].asJsonObject)
             hideInStorageFilter.load(hideNotClickableItems["hide_in_storage"].asJsonObject)
-            tradeNpcFilter.load(event.getConstant("TradeNpcs")!!)
             updateSalvageList(hideNotClickableItems)
             hidePlayerTradeFilter.load(hideNotClickableItems["hide_player_trade"].asJsonObject)
             notAuctionableFilter.load(hideNotClickableItems["not_auctionable"].asJsonObject)
 
         } catch (e: Exception) {
             e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
+            LorenzUtils.error("Error in RepositoryReloadEvent for HideNotClickableItems")
         }
     }
 
@@ -408,11 +411,6 @@ class HideNotClickableItems {
         }
 
         val name = stack.cleanName()
-
-        if (ItemUtils.isSack(name)) {
-            hideReason = "Sacks cannot be put into the storage!"
-            return true
-        }
 
         val result = hideInStorageFilter.match(name)
 

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.bingo.card.CommunityGoal
 import at.hannibal2.skyhanni.features.bingo.card.PersonalGoal
@@ -21,12 +21,7 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardDisplay {
-    private val config get() = SkyHanniMod.feature.bingo.bingoCard
 
-    private val MAX_PERSONAL_GOALS = 20
-    private val MAX_COMMUNITY_GOALS = 5
-
-    private var tick = 0
     private var display = emptyList<String>()
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
@@ -35,6 +30,11 @@ class BingoCardDisplay {
     }
 
     companion object {
+        private const val MAX_PERSONAL_GOALS = 20
+        private const val MAX_COMMUNITY_GOALS = 5
+
+        private val config get() = SkyHanniMod.feature.bingo.bingoCard
+        private var displayMode = 0
         val personalGoals = mutableListOf<PersonalGoal>()
         private val communityGoals = mutableListOf<CommunityGoal>()
 
@@ -46,10 +46,29 @@ class BingoCardDisplay {
             personalGoals.clear()
             communityGoals.clear()
         }
+
+        fun toggleCommand() {
+            if (!LorenzUtils.isBingoProfile) {
+                LorenzUtils.chat("§cThis command only works on a bingo profile!")
+                return
+            }
+            if (!config.enabled) {
+                LorenzUtils.chat("§cBingo Card is disabled in the config!")
+                return
+            }
+            toggleMode()
+        }
+
+        private fun toggleMode() {
+            displayMode++
+            if (displayMode == 3) {
+                displayMode = 0
+            }
+        }
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return
@@ -117,22 +136,18 @@ class BingoCardDisplay {
     }
 
     private var lastSneak = false
-    private var displayMode = 0
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
 
-        if (ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
+        if (config.quickToggle && ItemUtils.isSkyBlockMenuItem(InventoryUtils.getItemInHand())) {
             val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
             if (lastSneak != sneaking) {
                 lastSneak = sneaking
                 if (sneaking) {
-                    displayMode++
-                    if (displayMode == 3) {
-                        displayMode = 0
-                    }
+                    toggleMode()
                 }
             }
         }

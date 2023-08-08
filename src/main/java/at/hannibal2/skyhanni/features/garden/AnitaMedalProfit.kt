@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -32,7 +32,7 @@ class AnitaMedalProfit {
         ;
     }
 
-    private fun getMedal(name: String) = MedalType.values().firstOrNull { it.displayName == name }
+    private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -40,7 +40,7 @@ class AnitaMedalProfit {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.anitaMedalProfitEnabled) return
         if (event.inventoryName != "Anita") return
         if (GardenVisitorFeatures.inVisitorInventory) return

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.rift.area
 
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.withAlpha
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,7 +25,7 @@ class RiftLarva {
         checkHand()
         if (!hasHookInHand) return
 
-        if (event.isMod(20)) {
+        if (event.repeatSeconds(1)) {
             findLarvas()
         }
     }
@@ -35,8 +35,7 @@ class RiftLarva {
     }
 
     private fun findLarvas() {
-        val list = EntityUtils.getEntitiesOrNull<EntityArmorStand>() ?: return
-        for (stand in list) {
+        for (stand in getEntities<EntityArmorStand>()) {
             if (stand.hasSkullTexture(larvaSkullTexture)) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,

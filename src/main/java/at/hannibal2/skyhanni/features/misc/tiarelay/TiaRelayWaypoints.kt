@@ -22,7 +22,7 @@ class TiaRelayWaypoints {
         if (!SkyHanniMod.feature.misc.tiaRelayNextWaypoint) return
 
         val message = event.message
-        for (relay in Relay.values()) {
+        for (relay in Relay.entries) {
             if (relay.chatMessage == message) {
                 waypoint = relay.waypoint
                 waypointName = relay.relayName
@@ -42,7 +42,7 @@ class TiaRelayWaypoints {
         if (!LorenzUtils.inSkyBlock) return
 
         if (SkyHanniMod.feature.misc.tiaRelayAllWaypoints) {
-            for (relay in Relay.values()) {
+            for (relay in Relay.entries) {
                 if (relay.island == LorenzUtils.skyBlockIsland) {
                     event.drawWaypointFilled(relay.waypoint, LorenzColor.LIGHT_PURPLE.toColor())
                     event.drawDynamicText(relay.waypoint, "§d" + relay.relayName, 1.5)

@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -15,9 +13,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 
 class FarmingWeightDisplay {
@@ -36,7 +32,7 @@ class FarmingWeightDisplay {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         // We want to try to connect to the api again after a world switch.
         apiError = false
         // We ask both api endpoints after every world switch
@@ -48,6 +44,8 @@ class FarmingWeightDisplay {
         lastLeaderboardUpdate = 0
 
         nextPlayers.clear()
+        rankGoal = -1
+
         localCounter.clear()
     }
 
@@ -56,15 +54,15 @@ class FarmingWeightDisplay {
         display = emptyList()
         profileId = ""
         weight = -2.0
+
         nextPlayers.clear()
+        rankGoal = -1
     }
 
-    var tick = 0
-
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (tick++ % 5 != 0) return
+        if (!event.isMod(5)) return
         update()
     }
 
@@ -83,6 +81,7 @@ class FarmingWeightDisplay {
         private var dirtyCropWeight = false
         private var isLoadingWeight = false
         private var isLoadingLeaderboard = false
+        private var rankGoal = -1
 
         private var nextPlayers = mutableListOf<UpcomingPlayer>()
         private val nextPlayer get() = nextPlayers.firstOrNull()
@@ -123,6 +122,8 @@ class FarmingWeightDisplay {
             }
 
             val weight = getWeight()
+
+            if (rankGoal == -1) rankGoal = getRankGoal()
             val leaderboard = getLeaderboard()
 
             val list = mutableListOf<String>()
@@ -139,14 +140,7 @@ class FarmingWeightDisplay {
 
             // Fetching new leaderboard position every 10.5 minutes
             if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
-                if (!isLoadingLeaderboard) {
-                    isLoadingLeaderboard = true
-                    SkyHanniMod.coroutineScope.launch {
-                        leaderboardPosition = loadLeaderboardPosition()
-                        lastLeaderboardUpdate = System.currentTimeMillis()
-                        isLoadingLeaderboard = false
-                    }
-                }
+                loadLeaderboardIfAble()
             }
 
             return if (leaderboardPosition != -1) {
@@ -172,11 +166,33 @@ class FarmingWeightDisplay {
             return "§e" + LorenzUtils.formatDouble(totalWeight, 2)
         }
 
+        private fun getRankGoal(): Int {
+            val value = config.eliteFarmingWeightETAGoalRank
+            var goal = 10000
+
+            // Check that the provided string is valid
+            val parsed = value.toIntOrNull() ?: 0
+            if (parsed < 1 || parsed > goal) {
+                LorenzUtils.error("[SkyHanni] Invalid Farming Weight Overtake Goal!")
+                LorenzUtils.chat("§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!")
+                config.eliteFarmingWeightETAGoalRank = goal.toString()
+            } else {
+                goal = parsed
+            }
+
+            // Fetch the positions again if the goal was changed
+            if (rankGoal != goal) {
+                loadLeaderboardIfAble()
+            }
+
+            return goal
+        }
+
         private fun getETA(): String {
             if (weight < 0) return ""
 
             var nextPlayer = nextPlayer ?: return ""
-            var nextName = if (leaderboardPosition == -1) "#10000" else nextPlayer.name
+            var nextName = if (leaderboardPosition == -1 || leaderboardPosition > rankGoal) "#$rankGoal" else nextPlayer.name
 
             val totalWeight = (localWeight + weight)
             var weightUntilOvertake = nextPlayer.weight - totalWeight
@@ -244,10 +260,25 @@ class FarmingWeightDisplay {
             } else 0.0
         }
 
+        private fun loadLeaderboardIfAble() {
+            if (isLoadingLeaderboard) return
+            isLoadingLeaderboard = true
+
+            SkyHanniMod.coroutineScope.launch {
+                leaderboardPosition = loadLeaderboardPosition()
+                lastLeaderboardUpdate = System.currentTimeMillis()
+                isLoadingLeaderboard = false
+            }
+        }
+
         private suspend fun loadLeaderboardPosition() = try {
             val uuid = LorenzUtils.getPlayerUuid()
+
             val includeUpcoming = if (isEtaEnabled()) "?includeUpcoming=true" else ""
-            val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming"
+            val goalRank = getRankGoal() + 1 // API returns upcoming players as if you were at this rank already
+            val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
+
+            val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             if (isEtaEnabled()) {
@@ -306,7 +337,7 @@ class FarmingWeightDisplay {
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
             val weightPerCrop = mutableMapOf<CropType, Double>()
             var totalWeight = 0.0
-            for (crop in CropType.values()) {
+            for (crop in CropType.entries) {
                 val weight = crop.getLocalCounter() / crop.getFactor()
                 weightPerCrop[crop] = weight
                 totalWeight += weight

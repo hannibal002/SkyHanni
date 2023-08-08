@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -34,7 +33,6 @@ import javax.swing.UIManager
 object GardenNextJacobContest {
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
-    private var tick = 0
     private var contests = mutableMapOf<Long, FarmingContest>()
     private var inCalendar = false
     private val patternDay = "§aDay (?<day>.*)".toPattern()
@@ -77,9 +75,9 @@ object GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (tick++ % (40) != 0) return
+        if (!event.repeatSeconds(2)) return
 
         if (inCalendar) return
         update()
@@ -94,7 +92,7 @@ object GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.nextJacobContestDisplay) return
 
         val backItem = event.inventoryItems[48] ?: return
@@ -140,9 +138,9 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-            val name = item.name ?: continue
-            val matcherDay = patternDay.matcher(name)
-            if (!matcherDay.matches()) continue
+                val name = item.name ?: continue
+                val matcherDay = patternDay.matcher(name)
+                if (!matcherDay.matches()) continue
 
             val day = matcherDay.group("day").toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()

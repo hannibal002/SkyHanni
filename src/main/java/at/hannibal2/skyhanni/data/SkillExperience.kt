@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzActionBarEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
-    private val actionBarPattern = "(?:.*)§3\\+(?:.*) (?<skill>.*) \\((?<overflow>.*)\\/(?<needed>.*)\\)(?:.*)".toPattern()
-    private val inventoryPattern = "(?:.*) §e(?<number>.*)§6\\/(?:.*)".toPattern()
+    private val actionBarPattern = ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*".toPattern()
+    private val inventoryPattern = ".* §e(?<number>.*)§6/.*".toPattern()
 
     @SubscribeEvent
     fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
@@ -49,7 +49,7 @@ class SkillExperience {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
@@ -74,7 +74,6 @@ class SkillExperience {
                         val overflow = rawNumber.formatNumber()
                         val experience = baseExp + overflow
                         skillExp[skillName] = experience
-                        println("skill exp: $skillName -> $experience")
                     }
                     next = false
                 }

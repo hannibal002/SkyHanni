@@ -3,20 +3,19 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BlazeSlayerFirePitsWarning {
     private val config get() = SkyHanniMod.feature.slayer
 
     companion object {
         private var lastFirePitsWarning = 0L
-        private var nextTickIn = 0
 
         fun fireFirePits() {
             TitleUtils.sendTitle("§cFire Pits!", 2_000)
@@ -24,19 +23,13 @@ class BlazeSlayerFirePitsWarning {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
         val difference = System.currentTimeMillis() - lastFirePitsWarning
 
-        if (difference > 0) {
-            if (difference <= 2_000) {
-                if (nextTickIn++ % 10 == 0) {
-                    if (config.firePitsWarning) {
-                        SoundUtils.createSound("random.orb", 0.8f).playSound()
-                    }
-                }
-            }
+        if (difference in 1..2_000 && event.isMod(10) && config.firePitsWarning) {
+            SoundUtils.createSound("random.orb", 0.8f).playSound()
         }
     }
 

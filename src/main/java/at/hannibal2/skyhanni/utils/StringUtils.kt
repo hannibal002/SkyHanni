@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiUtilRenderComponents
+import net.minecraft.util.ChatComponentText
 import org.intellij.lang.annotations.Language
 import java.util.*
 import java.util.regex.Matcher
@@ -41,11 +43,11 @@ object StringUtils {
      */
     fun <T> subMapWithKeysThatAreSuffixes(prefix: String, map: NavigableMap<String?, T>): Map<String?, T>? {
         if ("" == prefix) return map
-        val lastKey = createLexicographicallyNextStringOfTheSameLength(prefix)
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subMap(prefix, true, lastKey, false)
     }
 
-    fun createLexicographicallyNextStringOfTheSameLength(input: String): String {
+    fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
         val lastChar = input[lastCharPosition]
@@ -106,5 +108,20 @@ object StringUtils {
         }
     }
 
+
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
+
+    fun String.splitLines(width: Int): String {
+        val fr = Minecraft.getMinecraft().fontRendererObj
+        return GuiUtilRenderComponents.splitText(
+            ChatComponentText(this), width, fr, false, false
+        ).joinToString("\n") {
+            val text = it.formattedText
+            val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
+            formatCode.matchAt(text, 0)?.let { matcher ->
+                val codes = matcher.value.replace("\\s".toRegex(), "")
+                codes + text.removeRange(matcher.range)
+            } ?: text
+        }
+    }
 }

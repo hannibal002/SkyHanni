@@ -11,16 +11,15 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class ItemAbilityCooldown {
     private var lastAbility = ""
-    var tick = 0
     var items = mapOf<ItemStack, List<ItemText>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
 
@@ -92,7 +91,13 @@ class ItemAbilityCooldown {
         }
         if (event.soundName == "mob.wolf.howl") {
             if (event.volume == 0.5f) {
-                ItemAbility.WEIRD_TUBA.sound()
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if ("WEIRD_TUBA" in recentItems) {
+                    ItemAbility.WEIRD_TUBA.sound()
+                }
+                if ("WEIRDER_TUBA" in recentItems) {
+                    ItemAbility.WEIRDER_TUBA.sound()
+                }
             }
         }
         if (event.soundName == "mob.zombie.unfect") {
@@ -131,7 +136,7 @@ class ItemAbilityCooldown {
             }
         }
         if (event.soundName == "random.drink") {
-            if (event.pitch == 1.8888888f && event.volume == 1.0f) {
+            if (event.pitch.round(1).toDouble() == 1.8 && event.volume == 1.0f) {
                 ItemAbility.HOLY_ICE.sound()
             }
         }
@@ -180,7 +185,7 @@ class ItemAbilityCooldown {
                 val name: String = message.between(" (§6", "§b) ")
                 if (name == lastAbility) return
                 lastAbility = name
-                for (ability in ItemAbility.values()) {
+                for (ability in ItemAbility.entries) {
                     if (ability.abilityName == name) {
                         click(ability)
                         return
@@ -203,11 +208,10 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        tick++
-        if (tick % 2 == 0) {
+        if (event.isMod(2)) {
             checkHotBar()
         }
     }
@@ -317,7 +321,7 @@ class ItemAbilityCooldown {
         val internalName = stack.getInternalName()
 
         val list = mutableListOf<ItemAbility>()
-        for (ability in ItemAbility.values()) {
+        for (ability in ItemAbility.entries) {
             if (ability.newVariant) {
                 if (ability.internalNames.contains(internalName)) {
                     list.add(ability)

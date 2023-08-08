@@ -1,24 +1,17 @@
 package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BazaarApi {
     private var loadedNpcPriceData = false
@@ -31,13 +24,18 @@ class BazaarApi {
         fun getBazaarDataByName(name: String): BazaarData? =
             NEUItems.getInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
 
-        fun getBazaarDataByInternalName(internalName: String): BazaarData? {
-            return if (isBazaarItem(internalName)) {
-                holder.getData(internalName)
-            } else null
-        }
+        fun getBazaarDataByInternalName(internalName: String) =
+            getBazaarDataByInternalName_new(NEUInternalName.from(internalName))
+
+        fun getBazaarDataByInternalName_new(internalName: NEUInternalName) = if (isBazaarItem(internalName)) {
+            holder.getData(internalName)
+        } else null
 
         fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
+
+        fun isBazaarItem(internalName: NEUInternalName): Boolean {
+            return NEUItems.manager.auctionManager.getBazaarInfo(internalName.asString()) != null
+        }
 
         fun isBazaarItem(internalName: String): Boolean {
             return NEUItems.manager.auctionManager.getBazaarInfo(internalName) != null
@@ -55,13 +53,12 @@ class BazaarApi {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
 
         if (!loadedNpcPriceData) {
             loadedNpcPriceData = true
@@ -96,20 +93,20 @@ class BazaarApi {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if ("\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toRegex().matches(event.message.removeColor())) {
+        if ("\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toRegex()
+                .matches(event.message.removeColor())
+        ) {
             currentSearchedItem = ""
         }
     }
 
-    private fun checkIfInBazaar(event: InventoryOpenEvent): Boolean {
+    private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val returnItem = event.inventorySize - 5
         for ((slot, item) in event.inventoryItems) {
-            if (slot == returnItem) {
-                if (item.name?.removeColor().let { it == "Go Back" }) {
-                    val lore = item.getLore()
-                    if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
-                        return true
-                    }
+            if (slot == returnItem && item.name?.removeColor().let { it == "Go Back" }) {
+                val lore = item.getLore()
+                if (lore.getOrNull(0)?.removeColor().let { it == "To Bazaar" }) {
+                    return true
                 }
             }
         }

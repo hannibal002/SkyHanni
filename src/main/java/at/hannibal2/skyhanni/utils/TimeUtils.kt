@@ -29,7 +29,7 @@ object TimeUtils {
         // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
         var milliseconds = millis + 999
         val map = mutableMapOf<TimeUnit, Int>()
-        for (unit in TimeUnit.values()) {
+        for (unit in TimeUnit.entries) {
             if (unit.ordinal >= biggestUnit.ordinal) {
                 val factor = unit.factor
                 map[unit] = (milliseconds / factor).toInt()
@@ -69,7 +69,9 @@ object TimeUtils {
     }
 
     // TODO: use kotlin Duration
-    fun getMillis(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
+    fun getMillis(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " "))
+
+    private fun getMillis_(string: String) = pattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
         val days = group("d")?.toLong() ?: 0L
         val hours = group("h")?.toLong() ?: 0L
@@ -83,7 +85,7 @@ object TimeUtils {
         millis += days * 24 * 60 * 60 * 1000
         millis += (years * 365.25 * 24 * 60 * 60 * 1000).toLong()
 
-         millis
+        millis
     } ?: tryAlternativeFormat(string)
 
     private fun tryAlternativeFormat(string: String): Long {

@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.fishing.TrophyRarity
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -124,8 +125,11 @@ class SackDisplay {
                         item.stored = stored
                         item.total = total
                         if (isTrophySack) {
-                            val trophyName = name.removeColor().uppercase().replace(" ", "_").replace("-", "_")
-                            item.price = calculatePrice("MAGMA_FISH", Trophy.valueOf(trophyName).convert(sackRarity, stored))
+                            val trophyName = internalName.lowercase()
+                                .substringBeforeLast("_").replace("_", "")
+                            val filletValue = TrophyFishManager.getInfoByName(trophyName)?.getFilletValue(sackRarity!!) ?: 0
+                            val storedNumber = stored.formatNumber().toInt()
+                            item.price = calculatePrice("MAGMA_FISH", (filletValue * storedNumber).toString())
                         } else {
                             item.price = if (calculatePrice(internalName, stored) < 0) 0 else calculatePrice(internalName, stored)
                         }
@@ -209,26 +213,28 @@ class SackDisplay {
                 rendered++
             }
 
-            val name = SortType.values()[config.sortingType].longName
+            val name = SortType.entries[config.sortingType].longName
             newDisplay.addAsSingletonList("§7Sorted By: §c$name")
 
-            newDisplay.addSelector(" ", SortType.values(),
-                    getName = { type -> type.shortName },
-                    isCurrent = { it.ordinal == config.sortingType },
-                    onChange = {
-                        config.sortingType = it.ordinal
-                        update()
-                    })
+            newDisplay.addSelector<SortType>(
+                " ",
+                getName = { type -> type.shortName },
+                isCurrent = { it.ordinal == config.sortingType },
+                onChange = {
+                    config.sortingType = it.ordinal
+                    update()
+                })
 
             if (config.showPrice) {
                 newDisplay.addAsSingletonList("§cTotal price: §6${format(totalPrice)}")
-                newDisplay.addSelector(" ", PriceFrom.values(),
-                        getName = { type -> type.displayName },
-                        isCurrent = { it.ordinal == config.priceFrom },
-                        onChange = {
-                            config.priceFrom = it.ordinal
-                            update()
-                        })
+                newDisplay.addSelector<PriceFrom>(
+                    " ",
+                    getName = { type -> type.displayName },
+                    isCurrent = { it.ordinal == config.priceFrom },
+                    onChange = {
+                        config.priceFrom = it.ordinal
+                        update()
+                    })
             }
         }
 
@@ -283,7 +289,7 @@ class SackDisplay {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
         if (!isRuneDisplayEnabled() && inventoryName == "Runes Sack") return
@@ -326,35 +332,6 @@ class SackDisplay {
             var total: String = "0",
             var price: Int = 0,
     )
-
-    enum class Trophy(private val bronzeValue: Int, private val silverValue: Int) {
-        BLOBFISH(4, 5),
-        FLYFISH(32, 48),
-        GOLDEN_FISH(400, 700),
-        GUSHER(32, 48),
-        KARATE_FISH(40, 60),
-        LAVAHORSE(12, 16),
-        MANA_RAY(40, 60),
-        MOLDFIN(32, 48),
-        SKELETON_FISH(32, 48),
-        SLUGFISH(40, 60),
-        SOUL_FISH(32, 48),
-        STEAMING_HOT_FLOUNDER(20, 28),
-        SULPHUR_SKITTER(40, 60),
-        VANILLE(80, 120),
-        VOLCANIC_STONEFISH(20, 28),
-        OBFUSCATED_1(16, 24),
-        OBFUSCATED_2(40, 60),
-        OBFUSCATED_3(400, 700);
-
-        fun convert(rarity: TrophyRarity?, stored: String): String {
-            return when (rarity) {
-                TrophyRarity.BRONZE -> (this.bronzeValue * stored.formatNumber().toInt()).toString()
-                TrophyRarity.SILVER -> (this.silverValue * stored.formatNumber().toInt()).toString()
-                else -> "0"
-            }
-        }
-    }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
     private fun isRuneDisplayEnabled() = config.showRunes

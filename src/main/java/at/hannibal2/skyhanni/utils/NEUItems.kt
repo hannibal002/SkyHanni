@@ -29,12 +29,12 @@ import java.util.regex.Pattern
 
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val itemNameCache = mutableMapOf<String, String>() // item name -> internal name
+    private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
     private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
-    var allItemsCache = mapOf<String, String>() // item name -> internal name
-    var allInternalNames = mutableListOf<String>()
+    var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
+    var allInternalNames = mutableListOf<NEUInternalName>()
 
     private val fallbackItem by lazy {
         Utils.createItemStack(
@@ -45,10 +45,14 @@ object NEUItems {
     }
 
     fun getInternalName(itemName: String): String {
-        return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
+        return getInternalNameOrNull_new(itemName)?.asString() ?: throw Error("getInternalName is null for '$itemName'")
     }
 
-    fun getInternalNameOrNullIgnoreCase(itemName: String): String? {
+    fun getInternalName_new(itemName: String): NEUInternalName {
+        return getInternalNameOrNull_new(itemName) ?: throw Error("getInternalName is null for '$itemName'")
+    }
+
+    fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
         val lowercase = itemName.removeColor().lowercase()
         if (itemNameCache.containsKey(lowercase)) {
             return itemNameCache[lowercase]!!
@@ -65,26 +69,30 @@ object NEUItems {
         return null
     }
 
-    fun readAllNeuItems(): Map<String, String> {
+    fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
-        val map = mutableMapOf<String, String>()
-        for (internalName in manager.itemInformation.keys) {
-            val name = manager.createItem(internalName).displayName.removeColor().lowercase()
+        val map = mutableMapOf<String, NEUInternalName>()
+        for (internalNameRaw in manager.itemInformation.keys) {
+            val name = manager.createItem(internalNameRaw).displayName.removeColor().lowercase()
+            val internalName = NEUInternalName.from(internalNameRaw)
             map[name] = internalName
             allInternalNames.add(internalName)
         }
         return map
     }
 
-    fun getInternalNameOrNull(itemName: String): String? {
+    fun getInternalNameOrNull(itemName: String) = getInternalNameOrNull_new(itemName)?.asString()
+
+    fun getInternalNameOrNull_new(itemName: String): NEUInternalName? {
         val lowercase = itemName.lowercase()
         if (itemNameCache.containsKey(lowercase)) {
             return itemNameCache[lowercase]!!
         }
 
         if (itemName == "§cmissing repo item") {
-            itemNameCache[lowercase] = "MISSING_ITEM"
-            return "MISSING_ITEM"
+            val name = NEUInternalName.from("MISSING_ITEM")
+            itemNameCache[lowercase] = name
+            return name
         }
 
         resolveEnchantmentByName(itemName)?.let {
@@ -92,26 +100,28 @@ object NEUItems {
             itemNameCache[itemName] = enchantmentName
             return enchantmentName
         }
-        var internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+        val internalNameRaw = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
-        if (internalName == "HAY_BALE") {
-            internalName = "HAY_BLOCK"
+        val internalName = if (internalNameRaw == "HAY_BALE") {
+            NEUInternalName.from("HAY_BLOCK")
+        } else {
+            NEUInternalName.from(internalNameRaw)
         }
 
         itemNameCache[lowercase] = internalName
         return internalName
     }
 
-    private fun fixEnchantmentName(originalName: String): String {
+    private fun fixEnchantmentName(originalName: String): NEUInternalName {
         // Workaround for duplex
         "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern().matchMatcher(originalName) {
             val tier = group("tier")
-            return "ULTIMATE_REITERATE;$tier"
+            return NEUInternalName.from("ULTIMATE_REITERATE;$tier")
         }
 
-        return originalName
+        return NEUInternalName.from(originalName)
     }
 
     private fun turboCheck(text: String): String {
@@ -136,23 +146,27 @@ object NEUItems {
         return price
     }
 
-    fun getPrice(internalName: String): Double {
-        if (internalName == "WISP_POTION") {
+    fun getPrice(internalName: NEUInternalName): Double {
+        if (internalName.asString() == "WISP_POTION") {
             return 20_000.0
         }
         return getPrice(internalName, false)
     }
 
-    fun transHypixelNameToInternalName(hypixelId: String): String =
-        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
+    fun getPrice(internalName: String) = getPrice(NEUInternalName.from(internalName))
 
-    fun getPrice(internalName: String, useSellingPrice: Boolean): Double {
-        val result = manager.auctionManager.getBazaarOrBin(internalName, useSellingPrice)
+    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName {
+        val name = manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
+        return NEUInternalName.from(name)
+    }
+
+    fun getPrice(internalName: NEUInternalName, useSellingPrice: Boolean): Double {
+        val result = manager.auctionManager.getBazaarOrBin(internalName.asString(), useSellingPrice)
         if (result == -1.0) {
-            if (internalName == "JACK_O_LANTERN") {
+            if (internalName.asString() == "JACK_O_LANTERN") {
                 return getPrice("PUMPKIN", useSellingPrice) + 1
             }
-            if (internalName == "GOLDEN_CARROT") {
+            if (internalName.asString() == "GOLDEN_CARROT") {
                 // 6.8 for some players
                 return 7.0 // NPC price
             }
@@ -160,22 +174,32 @@ object NEUItems {
         return result
     }
 
-    fun getItemStackOrNull(internalName: String) = ItemResolutionQuery(manager)
-        .withKnownInternalName(internalName)
+    fun getPrice(internalName: String, useSellingPrice: Boolean): Double {
+        return getPrice(NEUInternalName.from(internalName), useSellingPrice)
+    }
+
+    fun getItemStackOrNull(internalName: NEUInternalName) = ItemResolutionQuery(manager)
+        .withKnownInternalName(internalName.asString())
         .resolveToItemStack()?.copy()
 
-    fun getItemStack(internalName: String, definite: Boolean = false): ItemStack = getItemStackOrNull(internalName) ?: run {
-        if (definite) {
-            Utils.showOutdatedRepoNotification()
+    fun getItemStackOrNull(internalName: String) = getItemStackOrNull(NEUInternalName.from(internalName))
+
+    fun getItemStack(internalName: String, definite: Boolean = false): ItemStack =
+        getItemStack(NEUInternalName.from(internalName), definite)
+
+    fun getItemStack(internalName: NEUInternalName, definite: Boolean = false): ItemStack =
+        getItemStackOrNull(internalName) ?: run {
+            if (definite) {
+                Utils.showOutdatedRepoNotification()
+            }
+            CopyErrorCommand.logError(
+                IllegalStateException("Something went wrong!"),
+                "Encountered an error getting the item for §7$internalName§c. " +
+                        "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
+                        "Discord if this is the case"
+            )
+            fallbackItem
         }
-        CopyErrorCommand.logError(
-            IllegalStateException("Something went wrong!"),
-            "Encountered an error getting the item for §7$internalName§c. " +
-                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                    "Discord if this is the case"
-        )
-        fallbackItem
-    }
 
     fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
 

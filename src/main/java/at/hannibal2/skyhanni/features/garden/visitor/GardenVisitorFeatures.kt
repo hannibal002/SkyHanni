@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import io.github.moulberry.moulconfig.internal.KeybindHelper
 import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraft.client.Minecraft
@@ -38,7 +39,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.round
 
 private val config get() = SkyHanniMod.feature.garden
@@ -47,7 +47,6 @@ class GardenVisitorFeatures {
     private val visitors = mutableMapOf<String, Visitor>()
     private var display = emptyList<List<Any>>()
     private var lastClickedNpc = 0
-    private var tick = 0
     private val newVisitorArrivedMessage = ".* §r§ehas arrived on your §r§bGarden§r§e!".toPattern()
     private val copperPattern = " §8\\+§c(?<amount>.*) Copper".toPattern()
     private val gardenExperiencePattern = " §8\\+§2(?<amount>.*) §7Garden Experience".toPattern()
@@ -68,7 +67,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[13] ?: return
         val lore = npcItem.getLore()
@@ -142,7 +141,7 @@ class GardenVisitorFeatures {
 
     private fun readReward(offerItem: ItemStack): VisitorReward? {
         for (line in offerItem.getLore()) {
-            for (reward in VisitorReward.values()) {
+            for (reward in VisitorReward.entries) {
                 if (line.contains(reward.displayName)) {
                     return reward
                 }
@@ -271,6 +270,10 @@ class GardenVisitorFeatures {
 
             visitor.hasReward()?.let {
                 if (config.visitorRewardWarning.preventRefusing) {
+                    if (KeybindHelper.isKeyDown(config.visitorRewardWarning.bypassKey)) {
+                        LorenzUtils.chat("§e[SkyHanni] §cBypassed blocking refusal of visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                        return
+                    }
                     event.isCanceled = true
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     Minecraft.getMinecraft().thePlayer.closeScreen()
@@ -419,11 +422,11 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
-        if (tick++ % 10 != 0) return
-//        if (tick++ % 300 != 0) return
+            if (!event.isMod(10)) return
+//            if (!event.isMod(300)) return
 
         if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {
             checkVisitorsReady()

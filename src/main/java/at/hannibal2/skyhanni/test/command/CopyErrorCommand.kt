@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
 import net.minecraft.client.Minecraft
 import java.util.*
@@ -51,9 +52,10 @@ object CopyErrorCommand {
         val stackTrace = throwable.getExactStackTrace(false).joinToString("\n").removeSpam()
         val randomId = UUID.randomUUID().toString()
 
-        errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.version}: $message\n \n$stackTrace\n```"
+        val rawMessage = message.removeColor()
+        errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n \n$stackTrace\n```"
         fullErrorMessages[randomId] =
-            "```\nSkyHanni ${SkyHanniMod.version}: $message\n(full stack trace)\n \n$fullStackTrace\n```"
+            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n```"
 
         LorenzUtils.clickableChat(
             "§c[SkyHanni ${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",

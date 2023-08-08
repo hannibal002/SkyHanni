@@ -51,6 +51,6 @@ object SoundUtils {
     }
 
     fun playClickSound() {
-       clickSound.playSound()
+        clickSound.playSound()
     }
 }

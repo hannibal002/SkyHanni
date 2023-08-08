@@ -251,8 +251,6 @@ public class SlayerConfig {
         public int lineWidth = 1;
 
 
-
-
         @Expose
         @ConfigOption(name = "Blood Ichor", desc = "")
         @Accordion
@@ -262,7 +260,7 @@ public class SlayerConfig {
             @Expose
             @ConfigOption(name = "Highlight blood Ichor", desc = "Highlight the blood Ichor.")
             @ConfigEditorBoolean
-            public boolean highlight = true;
+            public boolean highlight = false;
 
             @Expose
             @ConfigOption(name = "Beacon Beam", desc = "Render a beacon beam where the Blood Ichor is.")
@@ -295,7 +293,7 @@ public class SlayerConfig {
             @Expose
             @ConfigOption(name = "Highlight Killer Spring", desc = "Highlight the Killer Spring tower.")
             @ConfigEditorBoolean
-            public boolean highlight = true;
+            public boolean highlight = false;
 
             @Expose
             @ConfigOption(name = "Color", desc = "Highlight color.")

@@ -2,18 +2,18 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.put
 import at.hannibal2.skyhanni.utils.jsonobjects.MayorJson
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class MayorElection {
-    private var tick = 0
     private var lastUpdate = 0L
 
     companion object {
@@ -30,13 +30,10 @@ class MayorElection {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.onHypixel) return
 
-        tick++
-
-        if (tick % 60 == 0) {
+        if (event.repeatSeconds(3)) {
             check()
         }
     }
@@ -78,8 +75,4 @@ class MayorElection {
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
     private fun List<MayorJson.Candidate>.bestCandidate() = maxBy { it.votes }
-
-    private infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
-        this[pairs.first] = pairs.second
-    }
 }

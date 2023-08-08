@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ApiDataLoader
+import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
@@ -20,7 +21,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
-import at.hannibal2.skyhanni.features.misc.CollectionCounter
+import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
@@ -49,6 +50,7 @@ object Commands {
                 ConfigGuiManager.openConfigGui(it.joinToString(" "))
             }
         } else {
+            val arr = mutableListOf<String>()
             ConfigGuiManager.openConfigGui()
         }
     }
@@ -108,7 +110,7 @@ object Commands {
             "shmarkplayer",
             "Add a highlight effect to a player for better visibility"
         ) { MarkedPlayerManager.command(it) }
-        registerCommand("shtrackcollection", "Tracks your collection gain over time") { CollectionCounter.command(it) }
+        registerCommand("shtrackcollection", "Tracks your collection gain over time") { CollectionTracker.command(it) }
         registerCommand(
             "shcroptime",
             "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
@@ -134,6 +136,7 @@ object Commands {
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
+        registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
     }
 
     private fun usersBugFix() {
@@ -186,6 +189,7 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shtest", "Unused test command.") { SkyHanniTestCommand.testCommand(it) }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
+        registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI() }
         registerCommand(
             "shstoplisteners",
             "Unregistering all loaded forge event listeners"

@@ -34,7 +34,7 @@ public class DevConfig {
     @ConfigOption(
             name = "Mod Menu Log",
             desc = "Enables debug messages when the currently opened gui changes, with the path to the gui class. " +
-            "Useful for adding more mods to quick mod menu switch."
+                    "Useful for adding more mods to quick mod menu switch."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -59,16 +59,33 @@ public class DevConfig {
     public boolean showItemUuid = false;
 
     @Expose
+    @ConfigOption(name = "Copy NBT data", desc = "Copies compressed NBT data on key press in a GUI")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 0)
+    public int copyNBTDataCompressed = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(name = "Copy Rng Meter", desc = "Copies internal names and maxed xp needed from rng meter inventories in json format into the clipboard.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean copyRngMeter = false;
 
     @Expose
+    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the besiary data from the inventory as json in clipboard.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean copyBestiaryData = false;
+
+    @Expose
     @ConfigOption(name = "Highlight Missing Repo Items", desc = "Highlights each item in the current inventory that is not in your current NEU repo.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean highlightMissingRepo = false;
+
+    @Expose
+    @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int showSlotNumberKey = Keyboard.KEY_NONE;
 
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion

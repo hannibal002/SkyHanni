@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -30,11 +30,19 @@ class PatcherSendCoordinates {
 
         val message = event.message.removeColor()
         pattern.matchMatcher(message) {
-            val playerName = group("playerName").split(" ").last()
+            var description = group("playerName").split(" ").last()
             val x = group("x").toInt()
             val y = group("y").toInt()
-            val z = group("z").toInt()
-            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), playerName, System.currentTimeMillis() / 1000))
+
+            val end = group("z")
+            val z = if (end.contains(" ")) {
+                val split = end.split(" ")
+                val extra = split.drop(1).joinToString(" ")
+                description += " " + extra
+
+                split.first().toInt()
+            } else end.toInt()
+            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
             logger.log("got patcher coords and username")
         }
     }
@@ -52,7 +60,7 @@ class PatcherSendCoordinates {
     }
 
     @SubscribeEvent
-    fun onEnterWaypoint(event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()
@@ -64,7 +72,7 @@ class PatcherSendCoordinates {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         patcherBeacon.clear()
         logger.log("Reset everything (world change)")
     }

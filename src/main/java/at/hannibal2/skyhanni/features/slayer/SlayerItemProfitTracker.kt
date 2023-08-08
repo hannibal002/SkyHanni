@@ -162,13 +162,15 @@ object SlayerItemProfitTracker {
 
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
         if (inventoryOpen) {
-            addSelector("§7Display Mode: ", DisplayMode.values(),
+            addSelector<DisplayMode>(
+                "§7Display Mode: ",
                 getName = { type -> type.displayName },
                 isCurrent = { it == currentDisplayMode },
                 onChange = {
                     currentDisplayMode = it
                     update()
-                })
+                }
+            )
         }
 
         var profit = 0.0
@@ -265,13 +267,15 @@ object SlayerItemProfitTracker {
         addAsSingletonList(Renderable.hoverTips(text, listOf("§7Profit per boss: $profitPrefix$profitPerBossFormat")))
 
         if (inventoryOpen) {
-            addSelector("", PriceSource.values(),
+            addSelector<PriceSource>(
+                "",
                 getName = { type -> type.displayName },
                 isCurrent = { it.ordinal == config.priceFrom },
                 onChange = {
                     config.priceFrom = it.ordinal
                     update()
-                })
+                }
+            )
         }
         if (inventoryOpen && currentDisplayMode == DisplayMode.CURRENT) {
             addAsSingletonList(

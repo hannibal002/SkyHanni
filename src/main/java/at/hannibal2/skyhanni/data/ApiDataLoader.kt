@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import kotlinx.coroutines.Dispatchers
@@ -10,19 +12,30 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.util.*
 
 class ApiDataLoader {
-
     private var currentProfileName = ""
     private var currentProfileId = ""
 
+    private var usePlayerApiKey = false
+
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onRepositoryReload(event: RepositoryReloadEvent) {
+        usePlayerApiKey = false
+        event.getConstant("DisabledFeatures")?.let {
+            if (it.asJsonObject["user_api_keys"]?.asBoolean == true) {
+                usePlayerApiKey = true
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
         thePlayer.worldObj ?: return
+        if (!usePlayerApiKey) return
 
         if (nextApiCallTime != -1L && System.currentTimeMillis() > nextApiCallTime) {
             nextApiCallTime = System.currentTimeMillis() + 60_000 * 5
@@ -37,6 +50,7 @@ class ApiDataLoader {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         currentProfileName = event.name
+        if (!usePlayerApiKey) return
         updateApiData()
     }
 
@@ -89,7 +103,7 @@ class ApiDataLoader {
     private fun findApiCandidatesFromOtherMods(): Map<String, String> {
         LorenzUtils.consoleLog("Trying to find the api key from the config of other mods..")
         val candidates = mutableMapOf<String, String>()
-        for (mod in OtherMod.values()) {
+        for (mod in OtherMod.entries) {
             val modName = mod.modName
             val file = File(mod.configPath)
             if (file.exists()) {

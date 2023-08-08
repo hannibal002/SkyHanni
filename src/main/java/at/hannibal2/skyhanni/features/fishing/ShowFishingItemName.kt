@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -10,12 +11,10 @@ import com.google.common.cache.CacheBuilder
 import net.minecraft.entity.item.EntityItem
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.concurrent.TimeUnit
 
 class ShowFishingItemName {
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
-    private var tick = 0
     private var hasRodInHand = false
     private var cache =
         CacheBuilder.newBuilder().expireAfterWrite(750, TimeUnit.MILLISECONDS)
@@ -28,12 +27,10 @@ class ShowFishingItemName {
     )
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        tick++
-        if (tick % 10 == 0) {
+        if (event.isMod(10)) {
             hasRodInHand = isFishingRod()
         }
     }

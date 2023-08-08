@@ -1,12 +1,55 @@
 # SkyHanni - Change Log
 
-## Version 0.19 (unreleased)
+## Version 0.20 (Unreleased)
 
-#### Rift Features
+### New Features
++ Replacing command `/warp is` with `/is`.
++ Added command `/shbingotoggle` to toggle the bingo card. 
++ Added option to disable quick bingo card toggle with sneaking.
++ **King Talisman Helper**
+  + Show kings you have not talked to yet, and when the next missing king will appear.
++ **Harp Keybinds** - NetheriteMiner
+  + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
++ **Ender Node Tracker** - pretz
+  + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
++ **Fishing timer** now works in **Crystal Hollows** as well. (Worm fishing)
++ Option to shorten the **bestiary level-up message**.
++ **Bestiary overlay** - HiZe
+  + Options for change number format, display time, number type and hide maxed.
+  + Highlight maxed bestiaries.
++ Show the names of the **4 areas** while in the center of **crystal Hollows**.
+
+### Changes
++ Added option to disable quick bingo card toggle with sneaking.
++ Made damage indicator more performant. - nea
++ Ghost bestiary update. - HiZe
++ Api error messages are now formatted more helpful.
++ Added option to only show the reputation helper while pressing a hotkey.
++ Garden **Money per Hour** now uses the **dicer drops** from melon and pumpkins as well. - CalMWolfs
++ Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0
+
+### Fixes
++ Removed `Simple Carrot Candy` from composter overlay.
++ Fixed croesus highlight unopened chest not working anymore. (ty hypixel)
++ Should not crash anymore if a file in repo is missing.
++ Fixed Killer Spring tower still highlighting even with the feature turned off. - HiZe
++ Fixed weird tuba ability cooldown not working in rift.
++ Fixed holy ice cooldown sometimes not working.
++ Fixed a rare startup crash.
++ Fixed Ghost stats after bestiary update. - HiZe
++ Watchdog hider now correctly hides empty lines as well, even when empty line hider is disabled. - appable0
++ Fixed `saw mob` title for trevor trapper solver still showing even when feature is disabled.
++ Fixed chicken from raider of the sea get detected as trevor trapper mob.
++ Fixed master star detection in estimate item value broken for some times.
++ Fixed description in golden trophy fish info tooltip. - appable0
++ Fixed End Node Tracker not updating when changing the text format.
+
+## Version 0.19
+
+### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
-+ **Rift 
-+ Highlight Guide**
++ **Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + Added **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy crux will steal your time.
@@ -53,7 +96,6 @@
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
 + Added Jinxed voodoo doll ability cooldown support - HiZe
 + Added Polarvoid Books to estimated item value - jani
-+ Added Chumcap support for Chum Bucket Hider - jani
 + Added **Motes NPC** price in the item lore
   + With Burgers multiplier - HiZe
 + Added Motes Grubber to Not Clickable Items feature
@@ -77,8 +119,20 @@
   + Draw line starting from the boss head to the Killer Spring/Blood Ichor (if the boss is highlighted)
   + Draw line starting from your crosshair to the boss head
   + Configurable to work only on your boss, on bosses hit, or on coop boss
++ Show locations of inactive Blood Effigy
+  + Show effigies that are about to respawn
+  + Show effigies without known time
++ Added **Wilted Berberis Helper**
+  + Option to only show the helper while standing on Farmland blocks
+  + Option to hide the wilted berberis particles
++ Added **Vampire Slayer** features in Damage Indicator
+  + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
+  + Show a timer until the boss leaves the invicible Mania Circles state.
+  + Show the percentage of HP next to the HP.
++ Added **Horsezooka Hider**
+  + Hide horses while holding the Horsezooka in the hand.
 
-### Other Features
+### Other New Features
 + Added **Frozen Treasure Tracker** (Contributed by CalMWolfs)
   + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
   + Show Ice per hour
@@ -99,11 +153,25 @@
 + Hide particles around enderman slayer bosses and mini bosses
 + Added support for Shadow Fury abilty cooldown - HiZe
 + Added /sendcoords sending, detecting and rendering - dragon99z
-+ Boss Spawn Warning - HiZe + hannibal2
++ Added **Boss Spawn Warning** - HiZe + hannibal2
   + Send a title when your slayer boss is about to spawn
   + Configurable percentage at which the title and sound should be sent
++ Added **Refusal Bypass Key** - HiZe
+  + Hold a custom key to bypass the Prevent Refusing feature for visitors
++ Added **Farming Weight ETA Goal** - Kaeso
+  + Override the Overtake ETA to show when you will reach the specified rank.
+  + If not there yet
+  + Default: #10k
++ Added **Dungeon Potion level as item stack size - HiZe
++ Added **Griffin Pet Warning**
+  + Warn when holding an Ancestral Spade while no Griffin pet is selected.
++ More **Trophy Fish** features - appable0
+  + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish.
+  + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value.
++ Added Chumcap support for Chum Bucket Hider - jani
 
 ### Changes
++ SkyHanni no longer requires Patcher to start! (Big thanks nea)
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
 + Added option to show exact prices in estimated item value
@@ -120,6 +188,11 @@
   + Instantly showing the next player in the lb when passing someone on the leaderboard
 + Show in chat the total amount of sharks fished after the fishing contest
 + Custom text over Visitor name moves more smoothly now
++ Discord Rich Presence now supports Motes in the rift and the garden plot number - NetheriteMiner
++ Crop money display: Using npc price for mushroom cow pet calculation when on ironman, stranded or bingo
++ Sacks no longer get blocked from moving in storage (not clickable items feature)
++ Using 19.9 bps if bps is too low for jacob contest ff needed display
++ Better default positions for some guis
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -150,6 +223,10 @@
 + Fixed togglesneak mod breaking escape menu open detection for quick mod menu switch
 + Fixed error with detecting hit phase during eman slayer in damage indicator
 + No longer double counting mob kill coins in slayer item profit tracker
++ Fixed jacob contest time chat message chat shows one second too long
++ Fixed farming contest calendar reading going above 100% - Contrabass26
++ Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
++ Fixed rare bug with Damage Indicator
 
 ## Version 0.18 (2023-06-19)
 

@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.damageindicator.BossType
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -15,10 +12,8 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class AshfangBlazes {
 
@@ -26,13 +21,12 @@ class AshfangBlazes {
     private val blazeArmorStand = mutableMapOf<EntityBlaze, EntityArmorStand>()
 
     var nearAshfang = false
-    var tick = 0
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        if (tick++ % 20 == 0) {
+        if (event.repeatSeconds(1)) {
             checkNearAshfang()
         }
 
@@ -43,14 +37,17 @@ class AshfangBlazes {
                 if (list.size == 1) {
                     val armorStand = list[0]
                     blazeArmorStand[entity] = armorStand
-                    if (armorStand.name.contains("Ashfang Follower")) {
-                        blazeColor[entity] = LorenzColor.DARK_GRAY
-                    } else if (armorStand.name.contains("Ashfang Underling")) {
-                        blazeColor[entity] = LorenzColor.RED
-                    } else if (armorStand.name.contains("Ashfang Acolyte")) {
-                        blazeColor[entity] = LorenzColor.BLUE
-                    } else {
-                        blazeArmorStand.remove(entity)
+                    val color = when {
+                        armorStand.name.contains("Ashfang Follower") -> LorenzColor.DARK_GRAY
+                        armorStand.name.contains("Ashfang Underling") -> LorenzColor.RED
+                        armorStand.name.contains("Ashfang Acolyte") -> LorenzColor.BLUE
+                        else -> {
+                            blazeArmorStand.remove(entity)
+                            null
+                        }
+                    }
+                    color?.let {
+                        blazeColor[entity] = it
                     }
                 }
             }
@@ -106,7 +103,7 @@ class AshfangBlazes {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         blazeColor.clear()
         blazeArmorStand.clear()
     }

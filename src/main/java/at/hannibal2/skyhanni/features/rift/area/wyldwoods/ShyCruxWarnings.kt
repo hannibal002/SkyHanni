@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -20,8 +20,7 @@ class ShyCruxWarnings {
     }
 
     private fun checkForShy() {
-        val list = EntityUtils.getAllEntitiesOrNull() ?: return
-        if (list.any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
+        if (EntityUtils.getAllEntities().any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
             TitleUtils.sendTitle("§eLook away!", 150)
         }
     }

@@ -67,7 +67,7 @@ open class FFGuideGUI : GuiScreen() {
         pages[FortuneGuidePage.UPGRADES] = UpgradePage()
 
         if (currentCrop != null) {
-            for (item in FarmingItems.values()) {
+            for (item in FarmingItems.entries) {
                 if (item.name == currentCrop?.name) {
                     FFStats.getCropStats(currentCrop!!, item.getItem())
                 }
@@ -216,7 +216,7 @@ open class FFGuideGUI : GuiScreen() {
                 }
             }
         }
-        for (crop in CropType.values()) {
+        for (crop in CropType.entries) {
             x += 30
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
                 SoundUtils.playClickSound()
@@ -225,7 +225,7 @@ open class FFGuideGUI : GuiScreen() {
                     if (selectedPage == FortuneGuidePage.OVERVIEW) {
                         selectedPage = FortuneGuidePage.CROP
                     }
-                    for (item in FarmingItems.values()) {
+                    for (item in FarmingItems.entries) {
                         if (item.name == crop.name) {
                             FFStats.getCropStats(crop, item.getItem())
                             FortuneUpgrades.getCropSpecific(item.getItem())
@@ -234,14 +234,14 @@ open class FFGuideGUI : GuiScreen() {
                 } else {
                     if (selectedPage == FortuneGuidePage.CROP) {
                         selectedPage = FortuneGuidePage.UPGRADES
-                        for (item in FarmingItems.values()) {
+                        for (item in FarmingItems.entries) {
                             if (item.name == crop.name) {
                                 FortuneUpgrades.getCropSpecific(item.getItem())
                             }
                         }
                     } else {
                         selectedPage = FortuneGuidePage.CROP
-                        for (item in FarmingItems.values()) {
+                        for (item in FarmingItems.entries) {
                             if (item.name == crop.name) {
                                 FFStats.getCropStats(crop, item.getItem())
                             }
@@ -347,7 +347,7 @@ open class FFGuideGUI : GuiScreen() {
             tooltipToDisplay.add("§eOverview")
         }
 
-        for (crop in CropType.values()) {
+        for (crop in CropType.entries) {
             x += 30
             drawRect(x, y, x + 25, y + 28, if (currentCrop == crop) 0x50555555 else 0x50000000)
             GuiRenderUtils.renderItemStack(crop.icon, x + 5, y + 5)

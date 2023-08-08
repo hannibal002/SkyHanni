@@ -8,7 +8,7 @@ enum class CropAccessory(val internalName: String, private val affectedCrops: Se
         setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT, CropType.COCOA_BEANS, CropType.MELON, CropType.PUMPKIN),
         20.0, Pair("SQUASH", 128)
     ),
-    FERMENTO("FERMENTO_ARTIFACT", CropType.values().toSet(), 30.0, Pair("CONDENSED_FERMENTO", 8)),
+    FERMENTO("FERMENTO_ARTIFACT", CropType.entries.toSet(), 30.0, Pair("CONDENSED_FERMENTO", 8)),
     ;
 
     fun getFortune(cropType: CropType): Double {
@@ -16,6 +16,6 @@ enum class CropAccessory(val internalName: String, private val affectedCrops: Se
     }
 
     companion object {
-        fun getByName(internalName: String) = values().firstOrNull { it.internalName == internalName }
+        fun getByName(internalName: String) = entries.firstOrNull { it.internalName == internalName }
     }
 }

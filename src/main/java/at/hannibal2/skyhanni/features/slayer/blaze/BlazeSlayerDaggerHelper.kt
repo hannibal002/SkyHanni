@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -19,7 +16,6 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 class BlazeSlayerDaggerHelper {
 
@@ -47,7 +43,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
         val player = Minecraft.getMinecraft().thePlayer
@@ -67,7 +63,7 @@ class BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.values()[SkyHanniMod.feature.slayer.blazeFirstDagger]
+        val first = Dagger.entries[SkyHanniMod.feature.slayer.blazeFirstDagger]
         val second = first.other()
 
         textTopLeft = format(holding, true, first)
@@ -126,7 +122,7 @@ class BlazeSlayerDaggerHelper {
         if (lastDaggerCheck + 1_000 > System.currentTimeMillis()) return
         lastDaggerCheck = System.currentTimeMillis()
 
-        for (dagger in Dagger.values()) {
+        for (dagger in Dagger.entries) {
             if (dagger.updated) continue
 
             val first = dagger.shields[0]
@@ -164,7 +160,7 @@ class BlazeSlayerDaggerHelper {
 
     private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
         val itemName = stack?.name ?: ""
-        for (dagger in Dagger.values()) {
+        for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger
             }
@@ -178,9 +174,9 @@ class BlazeSlayerDaggerHelper {
         if (!isEnabled()) return
 
 
-        for (shield in HellionShield.values()) {
+        for (shield in HellionShield.entries) {
             if (shield.formattedName + "§r" == event.title) {
-                Dagger.values().filter { shield in it.shields }.forEach {
+                Dagger.entries.filter { shield in it.shields }.forEach {
                     it.shields.forEach { shield -> shield.active = false }
                     it.updated = true
                 }
@@ -314,7 +310,7 @@ class BlazeSlayerDaggerHelper {
 }
 
 private fun HellionShield.other(): HellionShield {
-    for (dagger in BlazeSlayerDaggerHelper.Dagger.values()) {
+    for (dagger in BlazeSlayerDaggerHelper.Dagger.entries) {
         if (this in dagger.shields) {
             for (shield in dagger.shields) {
                 if (shield != this) {
