@@ -138,9 +138,9 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-                val name = item.name ?: continue
-                val matcherDay = patternDay.matcher(name)
-                if (!matcherDay.matches()) continue
+            val name = item.name ?: continue
+            val matcherDay = patternDay.matcher(name)
+            if (!matcherDay.matches()) continue
 
             val day = matcherDay.group("day").toInt()
             val startTime = SkyBlockTime(year, month, day).toMillis()
