@@ -337,7 +337,7 @@ class FarmingWeightDisplay {
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
             val weightPerCrop = mutableMapOf<CropType, Double>()
             var totalWeight = 0.0
-            for (crop in CropType.values()) {
+            for (crop in CropType.entries) {
                 val weight = crop.getLocalCounter() / crop.getFactor()
                 weightPerCrop[crop] = weight
                 totalWeight += weight

@@ -14,6 +14,10 @@
   + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
 + **Fishing timer** now works in **Crystal Hollows** as well. (Worm fishing)
 + Option to shorten the **bestiary level-up message**.
++ **Bestiary overlay** - HiZe
+  + Options for change number format, display time, number type and hide maxed.
+  + Highlight maxed bestiaries.
++ Show the names of the **4 areas** while in the center of **crystal Hollows**.
 
 ### Changes
 + Added option to disable quick bingo card toggle with sneaking.
@@ -21,6 +25,8 @@
 + Ghost bestiary update. - HiZe
 + Api error messages are now formatted more helpful.
 + Added option to only show the reputation helper while pressing a hotkey.
++ Garden **Money per Hour** now uses the **dicer drops** from melon and pumpkins as well. - CalMWolfs
++ Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0
 
 ### Fixes
 + Removed `Simple Carrot Candy` from composter overlay.
@@ -28,10 +34,15 @@
 + Should not crash anymore if a file in repo is missing.
 + Fixed Killer Spring tower still highlighting even with the feature turned off. - HiZe
 + Fixed weird tuba ability cooldown not working in rift.
-  = Fixed holy ice cooldown sometimes not working.
-  = Fixed a rare startup crash.
-  = Fixed Ghost stats after bestiary update. - HiZe
-  = Watchdog hider now correctly hides empty lines as well, even when empty line hider is disabled. - appable0
++ Fixed holy ice cooldown sometimes not working.
++ Fixed a rare startup crash.
++ Fixed Ghost stats after bestiary update. - HiZe
++ Watchdog hider now correctly hides empty lines as well, even when empty line hider is disabled. - appable0
++ Fixed `saw mob` title for trevor trapper solver still showing even when feature is disabled.
++ Fixed chicken from raider of the sea get detected as trevor trapper mob.
++ Fixed master star detection in estimate item value broken for some times.
++ Fixed description in golden trophy fish info tooltip. - appable0
++ Fixed End Node Tracker not updating when changing the text format.
 
 ## Version 0.19
 

@@ -142,7 +142,7 @@ class ConfigManager {
 
     private fun fixConfig(line: String): String {
         var result = line
-        for (type in CropType.values()) {
+        for (type in CropType.entries) {
             val normal = "\"${type.cropName}\""
             val enumName = "\"${type.name}\""
             while (result.contains(normal)) {

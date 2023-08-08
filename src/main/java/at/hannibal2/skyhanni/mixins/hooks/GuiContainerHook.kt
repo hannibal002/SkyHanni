@@ -20,19 +20,20 @@ class GuiContainerHook(guiAny: Any) {
         if (CloseWindowEvent(gui, gui.inventorySlots).postAndCatch()) ci.cancel()
     }
 
-    fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
+    fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
         GuiContainerEvent.BackgroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
-    fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
+    fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
         GuiContainerEvent.ForegroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
-        if (GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, gui.inventorySlots, slot).postAndCatch()) ci.cancel()
+        val event = GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, gui.inventorySlots, slot)
+        if (event.postAndCatch()) ci.cancel()
     }
 
-    fun onDrawSlotPost(slot: Slot, ci: CallbackInfo) {
+    fun onDrawSlotPost(slot: Slot) {
         GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPost(gui, gui.inventorySlots, slot).postAndCatch()
     }
 

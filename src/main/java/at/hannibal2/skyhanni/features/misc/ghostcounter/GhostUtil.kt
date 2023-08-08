@@ -75,11 +75,13 @@ object GhostUtil {
             LorenzUtils.chat("§e[SkyHanni] §cGhostCounterV3 ChatTriggers module not found!")
     }
 
-    fun String.formatText(value: Int, session: Int = -1): String {
-        return Utils.chromaStringByColourCode(this.replace("%value%", value.addSeparators())
+    fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))
+
+    fun String.formatText(value: Int, session: Int = -1) = Utils.chromaStringByColourCode(
+        replace("%value%", value.addSeparators())
             .replace("%session%", session.addSeparators())
-            .replace("&", "§"))
-    }
+            .replace("&", "§")
+    )
 
     fun String.formatText(t: String): String {
         return Utils.chromaStringByColourCode(this.replace("%value%", t)

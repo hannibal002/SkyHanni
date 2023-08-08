@@ -133,13 +133,13 @@ class TrevorFeatures {
                 active = true
             }
 
-            CurrentMobArea.values().firstOrNull { it.location == formattedLine }?.let {
+            CurrentMobArea.entries.firstOrNull { it.location == formattedLine }?.let {
                 TrevorSolver.mobLocation = it
                 found = true
             }
             locationPattern.matchMatcher(formattedLine) {
                 val zone = group("zone")
-                TrevorSolver.mobLocation = CurrentMobArea.values().firstOrNull { it.location == zone }
+                TrevorSolver.mobLocation = CurrentMobArea.entries.firstOrNull { it.location == zone }
                     ?: CurrentMobArea.NONE
                 found = true
             }

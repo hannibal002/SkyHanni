@@ -2,29 +2,29 @@ package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
-import at.hannibal2.skyhanni.config.features.Ashfang;
-import at.hannibal2.skyhanni.config.features.Bazaar;
-import at.hannibal2.skyhanni.config.features.Bingo;
+import at.hannibal2.skyhanni.config.features.AshfangConfig;
+import at.hannibal2.skyhanni.config.features.BazaarConfig;
+import at.hannibal2.skyhanni.config.features.BingoConfig;
 import at.hannibal2.skyhanni.config.features.ChatConfig;
-import at.hannibal2.skyhanni.config.features.CommandsFeatures;
+import at.hannibal2.skyhanni.config.features.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.DamageIndicatorConfig;
 import at.hannibal2.skyhanni.config.features.DevConfig;
 import at.hannibal2.skyhanni.config.features.DianaConfig;
-import at.hannibal2.skyhanni.config.features.Dungeon;
-import at.hannibal2.skyhanni.config.features.Fishing;
-import at.hannibal2.skyhanni.config.features.GUI;
-import at.hannibal2.skyhanni.config.features.Garden;
+import at.hannibal2.skyhanni.config.features.DungeonConfig;
+import at.hannibal2.skyhanni.config.features.FishingConfig;
+import at.hannibal2.skyhanni.config.features.GUIConfig;
+import at.hannibal2.skyhanni.config.features.GardenConfig;
 import at.hannibal2.skyhanni.config.features.GhostCounterConfig;
 import at.hannibal2.skyhanni.config.features.InventoryConfig;
-import at.hannibal2.skyhanni.config.features.ItemAbilities;
-import at.hannibal2.skyhanni.config.features.MarkedPlayers;
-import at.hannibal2.skyhanni.config.features.Minions;
+import at.hannibal2.skyhanni.config.features.ItemAbilityConfig;
+import at.hannibal2.skyhanni.config.features.MarkedPlayerConfig;
+import at.hannibal2.skyhanni.config.features.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.MiscConfig;
-import at.hannibal2.skyhanni.config.features.Mobs;
+import at.hannibal2.skyhanni.config.features.MobsConfig;
 import at.hannibal2.skyhanni.config.features.OldHidden;
 import at.hannibal2.skyhanni.config.features.RiftConfig;
 import at.hannibal2.skyhanni.config.features.SlayerConfig;
-import at.hannibal2.skyhanni.config.features.Summonings;
+import at.hannibal2.skyhanni.config.features.SummoningsConfig;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.Config;
 import io.github.moulberry.moulconfig.Social;
@@ -68,7 +68,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
-    public GUI gui = new GUI();
+    public GUIConfig gui = new GUIConfig();
 
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")
@@ -76,7 +76,7 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Dungeon", desc = "Features that change the dungeon experience in catacombs.")
-    public Dungeon dungeon = new Dungeon();
+    public DungeonConfig dungeon = new DungeonConfig();
 
     @Expose
     @Category(name = "Inventory", desc = "Changing the behavior around items and the inventory.")
@@ -84,27 +84,27 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
-    public ItemAbilities itemAbilities = new ItemAbilities();
+    public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
     @Category(name = "Summonings", desc = "Mobs you revive.")
-    public Summonings summonings = new Summonings();
+    public SummoningsConfig summonings = new SummoningsConfig();
 
     @Expose
     @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle.")
-    public Ashfang ashfang = new Ashfang();
+    public AshfangConfig ashfang = new AshfangConfig();
 
     @Expose
     @Category(name = "Minion", desc = "The minions at your private island.")
-    public Minions minions = new Minions();
+    public MinionsConfig minions = new MinionsConfig();
 
     @Expose
     @Category(name = "Bazaar", desc = "Bazaar settings.")
-    public Bazaar bazaar = new Bazaar();
+    public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
     @Category(name = "Fishing", desc = "Fishing stuff.")
-    public Fishing fishing = new Fishing();
+    public FishingConfig fishing = new FishingConfig();
 
     @Expose
     @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
@@ -120,23 +120,23 @@ public class Features extends Config {
 
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
-    public CommandsFeatures commands = new CommandsFeatures();
+    public CommandsConfig commands = new CommandsConfig();
 
     @Expose
     @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer.")
-    public MarkedPlayers markedPlayers = new MarkedPlayers();
+    public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
 
     @Expose
     @Category(name = "Bingo", desc = "Features for the Bingo mode.")
-    public Bingo bingo = new Bingo();
+    public BingoConfig bingo = new BingoConfig();
 
     @Expose
     @Category(name = "Mobs", desc = "Visual help for Mobs")
-    public Mobs mobs = new Mobs();
+    public MobsConfig mobs = new MobsConfig();
 
     @Expose
     @Category(name = "Garden", desc = "Features on the Garden island.")
-    public Garden garden = new Garden();
+    public GardenConfig garden = new GardenConfig();
 
     @Expose
     @Category(name = "The Rift", desc = "Features for The Rift dimension.")

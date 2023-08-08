@@ -26,7 +26,7 @@ class HighlightSlayerMiniBoss {
         if (DamageIndicatorManager.isBoss(entity)) return
 
         val maxHealth = event.maxHealth
-        for (bossType in SlayerMiniBossType.values()) {
+        for (bossType in SlayerMiniBossType.entries) {
             if (!bossType.clazz.isInstance(entity)) continue
 
             if (bossType.health.any { entity.hasMaxHealth(it, false, maxHealth) }) {

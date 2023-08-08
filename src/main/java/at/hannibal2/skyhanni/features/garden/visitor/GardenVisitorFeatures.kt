@@ -141,7 +141,7 @@ class GardenVisitorFeatures {
 
     private fun readReward(offerItem: ItemStack): VisitorReward? {
         for (line in offerItem.getLore()) {
-            for (reward in VisitorReward.values()) {
+            for (reward in VisitorReward.entries) {
                 if (line.contains(reward.displayName)) {
                     return reward
                 }

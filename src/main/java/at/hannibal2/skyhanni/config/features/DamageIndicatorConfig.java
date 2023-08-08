@@ -88,7 +88,6 @@ public class DamageIndicatorConfig {
     public boolean timeToKillSlayer = true;
 
 
-
     @Expose
     @ConfigOption(name = "Vampire Slayer", desc = "")
     @Accordion

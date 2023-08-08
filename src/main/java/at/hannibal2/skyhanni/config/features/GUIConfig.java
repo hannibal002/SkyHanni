@@ -7,7 +7,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
-public class GUI {
+public class GUIConfig {
 
     @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays")
     @ConfigEditorButton(buttonText = "Edit")

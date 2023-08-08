@@ -172,7 +172,6 @@ public class GhostCounterConfig {
                     "§e%nextLevel% §7is replaced with your current bestiary level +1.\n" +
                     "§e%value% §7is replaced with one of the text below.")
             @ConfigEditorText
-           // public String base = "  &6Bestiary %currentLevel%->%nextLevel%: &b%value%";
             public String base = "  &6Bestiary %display%: &b%value%";
 
             @Expose

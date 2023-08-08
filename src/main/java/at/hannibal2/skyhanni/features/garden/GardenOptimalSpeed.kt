@@ -38,7 +38,7 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
-        rancherOverlayList = CropType.values().map { crop ->
+        rancherOverlayList = CropType.entries.map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
                 LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")
             })

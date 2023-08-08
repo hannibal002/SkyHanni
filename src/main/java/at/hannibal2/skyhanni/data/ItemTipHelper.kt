@@ -16,21 +16,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemTipHelper {
 
-//    private val lastColorCacheTime = HashMap<String, Long>()
-//    private val cache = HashMap<String, String>()
-
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
 
-//        val uuid = stacremovek.getLore().joinToString { ", " }
-        val stackTip: String
-//        if (lastColorCacheTime.getOrDefault(uuid, 0L) + 1000 > System.currentTimeMillis()) {
-//            stackTip = cache[uuid]!!
-//        } else {
-            val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
-            itemTipEvent.postAndCatch()
+        val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
+        itemTipEvent.postAndCatch()
 
         if (itemTipEvent.renderObjects.isEmpty()) return
 
@@ -57,7 +49,7 @@ class ItemTipHelper {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return
         val chest = gui.inventorySlots as ContainerChest
-        var inventoryName = chest.getInventoryName()
+        val inventoryName = chest.getInventoryName()
 
         val guiLeft = (gui as AccessorGuiContainer).guiLeft
         val guiTop = (gui as AccessorGuiContainer).guiTop

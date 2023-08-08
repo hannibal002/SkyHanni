@@ -32,7 +32,7 @@ class FarmingArmorDrops {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        for (dropType in ArmorDropType.values()) {
+        for (dropType in ArmorDropType.entries) {
             if (dropType.chatMessage == event.message) {
                 addDrop(dropType)
                 if (config.farmingArmorDropsHideChat) {

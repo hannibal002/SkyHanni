@@ -146,7 +146,7 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    private fun getStatusByConfigId(id: Int) = DiscordStatus.values().getOrElse(id) { DiscordStatus.NONE }
+    private fun getStatusByConfigId(id: Int) = DiscordStatus.entries.getOrElse(id) { DiscordStatus.NONE }
 
     private fun isEnabled() = config.enabled.get()
 

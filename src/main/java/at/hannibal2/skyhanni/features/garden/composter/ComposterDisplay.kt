@@ -117,7 +117,7 @@ class ComposterDisplay {
             }
             if (next) {
                 if (line == "") break
-                for (type in DataType.values()) {
+                for (type in DataType.entries) {
                     type.pattern.matchMatcher(line) {
                         newData[type] = group(1)
                     }
@@ -125,7 +125,7 @@ class ComposterDisplay {
             }
         }
 
-        for (type in DataType.values()) {
+        for (type in DataType.entries) {
             if (!newData.containsKey(type)) {
                 tabListData = emptyMap()
                 return

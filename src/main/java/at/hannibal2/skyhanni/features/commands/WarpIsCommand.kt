@@ -14,11 +14,9 @@ class WarpIsCommand {
         if (!SkyHanniMod.feature.commands.replaceWarpIs) return
 
         val packet = event.packet
-        if (packet is C01PacketChatMessage) {
-            if (packet.message.lowercase() == "/warp is") {
-                event.isCanceled = true
-                LorenzUtils.sendMessageToServer("/is")
-            }
+        if (packet is C01PacketChatMessage && packet.message.lowercase() == "/warp is") {
+            event.isCanceled = true
+            LorenzUtils.sendMessageToServer("/is")
         }
     }
 }

@@ -52,7 +52,7 @@ object TrevorSolver {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
-            currentMob = TrevorMobs.values().firstOrNull { it.mobName.contains(name) }
+            currentMob = TrevorMobs.entries.firstOrNull { it.mobName.contains(name) }
             if (currentMob == TrevorMobs.CHICKEN) {
                 if (entity is EntityChicken) {
                     if (entity.hasMaxHealth(20_000)) {

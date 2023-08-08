@@ -5,7 +5,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
-public class MarkedPlayers {
+public class MarkedPlayerConfig {
 
     @Expose
     @ConfigOption(name = "Highlight in World", desc = "Highlight marked players in the world.")

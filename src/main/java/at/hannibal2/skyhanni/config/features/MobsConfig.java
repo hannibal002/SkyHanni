@@ -6,7 +6,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class Mobs {
+public class MobsConfig {
 
     @Expose
     @ConfigOption(name = "Highlighters", desc = "")
@@ -53,7 +53,7 @@ public class Mobs {
     public boolean corruptedMobHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Arachne Boss", desc = "Highlight the arachne boss in red and mini bosses and orange.")
+    @ConfigOption(name = "Arachne Boss", desc = "Highlight the arachne boss in red and mini bosses in orange.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean arachneBossHighlighter = true;

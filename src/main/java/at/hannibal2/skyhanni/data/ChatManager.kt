@@ -38,7 +38,7 @@ object ChatManager {
             }
         }
 
-    fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
+    private fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
 
     enum class ActionKind(format: Any) {
         BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
@@ -97,7 +97,7 @@ object ChatManager {
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
-            messageHistory.put(key, MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null))
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null)
             return
         }
 
@@ -109,9 +109,9 @@ object ChatManager {
             loggerModified.log(" ")
             loggerModified.log("[original] " + original.formattedText)
             loggerModified.log("[modified] " + modified.formattedText)
-            messageHistory.put(key, MessageFilteringResult(original, ActionKind.MODIFIED, null, modified))
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified)
         } else {
-            messageHistory.put(key, MessageFilteringResult(original, ActionKind.ALLOWED, null, null))
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null)
         }
     }
 
@@ -154,7 +154,7 @@ object ChatManager {
         SkyHanniMod.screenToOpen = ChatFilterGui(getRecentMessageHistory())
     }
 
-    val chatLinesField by lazy {
+    private val chatLinesField by lazy {
         MethodHandles.publicLookup().unreflectGetter(
             ReflectionHelper.findField(GuiNewChat::class.java, "chatLines", "field_146252_h", "h")
                 .makeAccessible()
@@ -164,6 +164,7 @@ object ChatManager {
     fun retractMessage(message: IChatComponent?, reason: String) {
         if (message == null) return
         val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
+
         @Suppress("UNCHECKED_CAST")
         val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine>
         if (!chatLines.removeIf { it.chatComponent === message }) return

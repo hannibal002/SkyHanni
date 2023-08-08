@@ -16,7 +16,7 @@ permissions: write-all
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    name: "Build and test"
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -25,18 +25,20 @@ jobs:
           java-version: 17
           distribution: temurin
           cache: gradle
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v2
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -x test --stacktrace
       - uses: actions/upload-artifact@v3
+        name: Upload development build
         with:
+          name: "Development Build"
           path: build/libs/*.jar
-      - name: Stop gradle daemons
-        run: ./gradlew --stop
+      - name: Test with Gradle
+        run: ./gradlew test
+      - uses: actions/upload-artifact@v3
+        name: "Upload test report"
+        if: ${{ !cancelled() }}
+        with:
+          name: "Test Results"
+          path: build/reports/tests/test/

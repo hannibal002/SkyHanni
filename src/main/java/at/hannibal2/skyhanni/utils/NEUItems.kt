@@ -100,7 +100,7 @@ object NEUItems {
             itemNameCache[itemName] = enchantmentName
             return enchantmentName
         }
-        var internalNameRaw = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+        val internalNameRaw = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
