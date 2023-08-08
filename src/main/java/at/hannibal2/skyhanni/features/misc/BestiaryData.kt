@@ -65,7 +65,6 @@ object BestiaryData {
                     slot highlight LorenzColor.GREEN
                 }
             }
-
         }
     }
 
@@ -460,7 +459,7 @@ object BestiaryData {
         tips: List<String> = emptyList(),
     ) {
         val onClick = {
-            if ((System.currentTimeMillis() - lastclicked) > 100) { //funny thing happen if i don't do that
+            if ((System.currentTimeMillis() - lastclicked) > 100) { // funny thing happen if I don't do that
                 onChange()
                 SoundUtils.playClickSound()
                 lastclicked = System.currentTimeMillis()
