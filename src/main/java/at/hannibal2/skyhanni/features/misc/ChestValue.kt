@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -101,11 +102,13 @@ class ChestValue {
                 totalPrice += total
                 if (rendered >= config.itemToShow) continue
                 if (total < config.hideBelow) continue
-                val name = stack.displayName.reduceStringLength(config.nameLength)
-                val str = "$name §7x$amount: §b${(total).formatPrice()}"
+                val textAmount = " §7x$amount:"
+                val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
+                val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+                val price = "§b${(total).formatPrice()}"
                 newDisplay.add(buildList {
                     val renderable = Renderable.hoverTips(
-                        str,
+                        "$name $price",
                         tips,
                         stack = stack,
                         indexes = index)
@@ -159,21 +162,12 @@ class ChestValue {
                     total /= 2
                 list.add("§aTotal: §6§l${total.formatPrice()}")
                 if (total == 0.0) continue
-                if (chestItems.contains(stack.getInternalName())) {
-                    val (oldIndex, oldAmount, oldStack, oldTotal, oldTips) = chestItems[stack.getInternalName()]
-                        ?: return
-                    oldIndex.add(i)
-                    chestItems[stack.getInternalName()] = Item(
-                        oldIndex,
-                        oldAmount + stack.stackSize,
-                        oldStack,
-                        oldTotal + (total * stack.stackSize),
-                        oldTips
-                    )
-                } else {
-                    chestItems[stack.getInternalName()] =
-                        Item(mutableListOf(i), stack.stackSize, stack, (total * stack.stackSize), list)
+                val item = chestItems.getOrPut(internalName) {
+                    Item(mutableListOf(), 0, stack, 0.0, list)
                 }
+                item.index.add(i)
+                item.amount += stack.stackSize
+                item.total += total * stack.stackSize
             }
         }
     }
@@ -204,9 +198,9 @@ class ChestValue {
         this == "Personal Vault")
 
 
-    fun String.reduceStringLength(targetLength: Int): String {
+    private fun String.reduceStringLength(targetLength: Int, char: Char): String {
         val mc = Minecraft.getMinecraft()
-        val spaceWidth = mc.fontRendererObj.getCharWidth(' ')
+        val spaceWidth = mc.fontRendererObj.getCharWidth(char)
 
         var currentString = this
         var currentLength = mc.fontRendererObj.getStringWidth(currentString)
@@ -227,11 +221,12 @@ class ChestValue {
         return currentString
     }
 
+
     data class Item(
         val index: MutableList<Int>,
-        val amount: Int,
+        var amount: Int,
         val stack: ItemStack,
-        val total: Double,
+        var total: Double,
         val tips: MutableList<String>
     )
 
