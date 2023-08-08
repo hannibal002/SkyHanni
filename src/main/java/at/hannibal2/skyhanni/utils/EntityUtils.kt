@@ -105,6 +105,8 @@ object EntityUtils {
         //Derpy
         if (maxHealth == health * 2) return true
 
+        // TODO runic support
+
         if (!boss) {
             //Corrupted
             if (maxHealth == health * 3) return true
@@ -126,10 +128,10 @@ object EntityUtils {
             ?.value
     }
 
-    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): List<T> =
+    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =
         getEntitiesNearby<T>(LocationUtils.playerLocation(), radius)
 
-    inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): List<T> =
+    inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceTo(location) < radius }
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
@@ -156,11 +158,9 @@ object EntityUtils {
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
-    inline fun <reified R : Entity> getEntities(): List<R> = getAllEntities().filterIsInstance<R>()
+    inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
-    inline fun <reified R : Entity> getEntitiesOrNull(): List<R>? = getAllEntitiesOrNull()?.filterIsInstance<R>()
-
-    fun getAllEntities(): List<Entity> = getAllEntitiesOrNull() ?: error("minecraft.world.loadedEntityList is null.")
-
-    fun getAllEntitiesOrNull(): List<Entity>? = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.toMutableList()
+    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
+        if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
+    }?.asSequence() ?: emptySequence()
 }

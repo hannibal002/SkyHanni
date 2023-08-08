@@ -117,6 +117,10 @@ object ItemUtils {
 
     fun ItemStack.getInternalNameOrNull() = getInternalName().takeIf { it != "" }
 
+    fun ItemStack.getInternalNameOrNull_new() = getInternalName_new().takeIf { it.asString() != "" }
+
+    fun ItemStack.getInternalName_new() = NEUInternalName.from(getInternalName())
+
     fun ItemStack.getInternalName(): String {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return "WISP_POTION"
@@ -135,6 +139,14 @@ object ItemUtils {
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+    }
+
+    fun ItemStack.getSkullOwner(): String? {
+        if (item != Items.skull) return null
+        if (tagCompound == null) return null
+        val nbt = tagCompound
+        if (!nbt.hasKey("SkullOwner")) return null
+        return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
     fun ItemStack.getItemRarity(): Int {

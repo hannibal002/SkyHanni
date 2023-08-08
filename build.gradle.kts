@@ -6,11 +6,12 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.8.20-RC"
+    kotlin("jvm") version "1.9.0"
+    id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.19.Beta.15"
+version = "0.20.Beta.4"
 
 // Toolchains:
 java {
@@ -68,21 +69,41 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.4-SNAPSHOT")
 
     implementation(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") {
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
         exclude(group = "org.jetbrains.kotlin")
     }
 
     // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
-    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    @Suppress("VulnerableLibrariesLocal")
+    modImplementation("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
+    @Suppress("VulnerableLibrariesLocal")
+    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
 
     shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.5")
     devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.5:test")
 
     shadowImpl("moe.nea:libautoupdate:1.0.3")
+    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+
+//    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 }
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    workingDir(file("run"))
+    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+}
+
 kotlin {
     sourceSets.all {
         languageSettings {
@@ -163,6 +184,7 @@ tasks.shadowJar {
             println("Config: ${it.files}")
         }
     }
+    exclude("META-INF/versions/**")
 
     relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")

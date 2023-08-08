@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LateInventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getLatestTrueFarmingFortune
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
@@ -25,7 +25,7 @@ class JacobContestTimeNeeded {
     private var currentBracket = ContestBracket.GOLD
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onLateInventoryOpen(event: LateInventoryOpenEvent) {
+    fun onLateInventoryOpen(event: InventoryUpdatedEvent) {
         if (FarmingContestAPI.inInventory) {
             update()
         }
@@ -34,7 +34,7 @@ class JacobContestTimeNeeded {
     private fun update() {
         val sorted = mutableMapOf<CropType, Double>()
         val map = mutableMapOf<CropType, Renderable>()
-        for (crop in CropType.values()) {
+        for (crop in CropType.entries) {
             val speed = crop.getSpeed()
             if (speed == null) {
                 sorted[crop] = Double.MAX_VALUE
@@ -98,13 +98,15 @@ class JacobContestTimeNeeded {
         this.display = buildList {
             addAsSingletonList("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
 
-            addSelector("§7Bracket: ", ContestBracket.values(),
+            addSelector<ContestBracket>(
+                "§7Bracket: ",
                 getName = { type -> type.name.lowercase() },
                 isCurrent = { it == currentBracket },
                 onChange = {
                     currentBracket = it
                     update()
-                })
+                }
+            )
             addAsSingletonList("")
             for (crop in sorted.sorted().keys) {
                 val text = map[crop]!!

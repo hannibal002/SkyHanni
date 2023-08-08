@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
@@ -21,7 +22,7 @@ object APIUtil {
     private val parser = JsonParser()
     private var showApiErrors = false
 
-    val builder: HttpClientBuilder =
+    private val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.version}")
             .setDefaultHeaders(
                 mutableListOf(
@@ -59,10 +60,10 @@ object APIUtil {
                             e.printStackTrace()
 
                         } else {
-                            println("JsonSyntaxException at getJSONResponse '$urlString'")
-                            LorenzUtils.error("[SkyHanni] JsonSyntaxException at getJSONResponse!")
-                            println("result: '$retSrc'")
-                            e.printStackTrace()
+                            CopyErrorCommand.logError(
+                                Error("Hypixel API error for url: '$urlString'", e),
+                                "Failed to load data from Hypixel API"
+                            )
                         }
                     }
                 }
@@ -71,8 +72,10 @@ object APIUtil {
             if (silentError) {
                 throw throwable
             } else {
-                throwable.printStackTrace()
-                LorenzUtils.error("SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst fetching a resource. See logs for more details.")
+                CopyErrorCommand.logError(
+                    Error("Hypixel API error for url: '$urlString'", throwable),
+                    "Failed to load data from Hypixel API"
+                )
             }
         } finally {
             client.close()

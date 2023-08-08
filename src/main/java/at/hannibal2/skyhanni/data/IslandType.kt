@@ -27,7 +27,7 @@ enum class IslandType(val displayName: String, val apiName: String = "null") {
 
     companion object {
         fun getBySidebarName(name: String): IslandType {
-            return values().firstOrNull { it.displayName == name } ?: UNKNOWN
+            return entries.firstOrNull { it.displayName == name } ?: UNKNOWN
         }
     }
 }

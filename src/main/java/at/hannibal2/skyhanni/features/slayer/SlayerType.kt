@@ -51,7 +51,7 @@ enum class SlayerType(val displayName: String, val clazz: Class<*>) {
         }
 
         fun getByDisplayName(text: String): SlayerType? {
-            return values().firstOrNull { text.startsWith(it.displayName) }
+            return entries.firstOrNull { text.startsWith(it.displayName) }
         }
     }
 }

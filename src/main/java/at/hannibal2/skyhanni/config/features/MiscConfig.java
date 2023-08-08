@@ -2,7 +2,15 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.Accordion;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -24,7 +32,7 @@ public class MiscConfig {
     public boolean petDisplay = false;
 
     @Expose
-    public Position petDisplayPos = new Position(-111, 221, false, true);
+    public Position petDisplayPos = new Position(-330, -15, false, true);
 
     @Expose
     @ConfigOption(name = "Time", desc = "")
@@ -102,6 +110,19 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
     public boolean crimsonIsleReputationHelper = true;
+
+    @Expose
+    @ConfigOption(name = "Use Hotkey", desc = "Only show the reputation helper while pressing the hotkey.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 6)
+    public boolean reputationHelperUseHotkey = false;
+
+    @Expose
+    @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the reputation helper.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 6)
+    public int reputationHelperHotkey = Keyboard.KEY_NONE;
+
 
     @Expose
     public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
@@ -559,6 +580,61 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Ender Node Tracker", desc = "")
+    @Accordion
+    public EnderNodeTracker enderNodeTracker = new EnderNodeTracker();
+
+    public static class EnderNodeTracker {
+        @Expose
+        @ConfigOption(
+                name = "Enabled",
+                desc = "Tracks all of your drops from mining Ender Nodes in the End.\n" +
+                        "Also tracks drops from Endermen."
+        )
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(
+                name = "Text Format",
+                desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§5§lEnder Node Tracker",
+                        "§d1,303 Ender Nodes Mined",
+                        "§615.3M Coins Made",
+                        " ",
+                        "§b123 §cEndermite Nest",
+                        "§b832 §aEnchanted End Stone",
+                        "§b230 §aEnchanted Obsidian",
+                        "§b1630 §aEnchanted Ender Pearl",
+                        "§b85 §aGrand Experience Bottle",
+                        "§b4 §9Titanic Experience Bottle",
+                        "§b15 §9End Stone Shulker",
+                        "§b53 §9End Stone Geode",
+                        "§b10 §d◆ Magical Rune I",
+                        "§b24 §5Ender Gauntlet",
+                        "§b357 §5Mite Gel",
+                        "§b2 §cShrimp The Fish",
+                        " ",
+                        "§b200 §5Ender Armor",
+                        "§b24 §5Ender Helmet",
+                        "§b24 §5Ender Chestplate",
+                        "§b24 §5Ender Leggings",
+                        "§b24 §5Ender Boots",
+                        "§b24 §5Ender Necklace",
+                        "§f10§7-§a8§7-§93§7-§52§7-§61 §fEnderman Pet",
+                        " "
+                }
+        )
+        public Property<List<Integer>> textFormat = Property.of(new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 15, 16, 17, 23)));
+
+        @Expose
+        public Position position = new Position(10, 80, false, true);
+    }
+
+    @Expose
     @ConfigOption(name = "Custom Text box", desc = "")
     @Accordion
     public TextBox textBox = new TextBox();
@@ -582,9 +658,55 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Bestiary Data", desc = "")
+    @Accordion
+    public BestiaryDataConfig bestiaryData = new BestiaryDataConfig();
+
+    public static class BestiaryDataConfig {
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Show bestiary data overlay in the bestiary menu.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Number format", desc = "Short: 1.1k\nLong: 1.100")
+        @ConfigEditorDropdown(values = {"Short", "Long"})
+        public int numberFormat = 0;
+
+
+        @Expose
+        @ConfigOption(name = "Display type", desc = "Choose what the display should show")
+        @ConfigEditorDropdown(values = {
+                "Global to max",
+                "Global to next tier",
+                "Lowest total kills",
+                "Highest total kills",
+                "Lowest kills needed to max",
+                "Highest kills needed to max",
+                "Lowest kills needed to next tier",
+                "Highest kills needed to next tier"
+        })
+        public int displayType = 0;
+
+        @Expose
+        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs")
+        @ConfigEditorBoolean
+        public boolean hideMaxed = false;
+
+        @Expose
+        @ConfigOption(name = "Replace romans", desc = "Replace romans numeral (IX) with regular number (9)")
+        @ConfigEditorBoolean
+        public boolean replaceRoman = false;
+
+        @Expose
+        public Position position = new Position(100, 100, false, true);
+    }
+
+    @Expose
     @ConfigOption(name = "Mining", desc = "")
     @Accordion
     public MiningConfig mining = new MiningConfig();
+
     public static class MiningConfig {
 
         @Expose
@@ -592,6 +714,18 @@ public class MiscConfig {
         @ConfigEditorBoolean
         public boolean highlightCommissionMobs = false;
 
+        @Expose
+        @ConfigOption(name = "King Talisman Helper", desc = "Show kings you have not talked to yet, and when the next missing king will appear.")
+        @ConfigEditorBoolean
+        public boolean kingTalismanHelper = false;
+
+        @Expose
+        public Position kingTalismanHelperPos = new Position(-400, 220, false, true);
+
+        @Expose
+        @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of crystal hollows.")
+        @ConfigEditorBoolean
+        public boolean crystalHollowsNamesInCore = false;
     }
 
     @Expose
@@ -664,6 +798,11 @@ public class MiscConfig {
     @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coordinates sent by Patcher.")
     @ConfigEditorBoolean
     public boolean patcherSendCoordWaypoint = false;
+
+    @Expose
+    @ConfigOption(name = "Harp Keybinds", desc = "In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.")
+    @ConfigEditorBoolean
+    public boolean harpKeybinds = false;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

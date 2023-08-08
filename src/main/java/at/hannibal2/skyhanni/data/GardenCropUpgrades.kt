@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.CropUpgradeUpdateEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
@@ -26,7 +26,7 @@ class GardenCropUpgrades {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Upgrades") return
         event.inventoryItems.forEach { (_, item) ->
             val crop = item.name?.removeColor()?.let { CropType.getByNameOrNull(it) } ?: return@forEach

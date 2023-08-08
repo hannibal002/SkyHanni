@@ -1,12 +1,55 @@
 # SkyHanni - Change Log
 
-## Version 0.19 (unreleased)
+## Version 0.20 (Unreleased)
 
-#### Rift Features
+### New Features
++ Replacing command `/warp is` with `/is`.
++ Added command `/shbingotoggle` to toggle the bingo card. 
++ Added option to disable quick bingo card toggle with sneaking.
++ **King Talisman Helper**
+  + Show kings you have not talked to yet, and when the next missing king will appear.
++ **Harp Keybinds** - NetheriteMiner
+  + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
++ **Ender Node Tracker** - pretz
+  + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
++ **Fishing timer** now works in **Crystal Hollows** as well. (Worm fishing)
++ Option to shorten the **bestiary level-up message**.
++ **Bestiary overlay** - HiZe
+  + Options for change number format, display time, number type and hide maxed.
+  + Highlight maxed bestiaries.
++ Show the names of the **4 areas** while in the center of **crystal Hollows**.
+
+### Changes
++ Added option to disable quick bingo card toggle with sneaking.
++ Made damage indicator more performant. - nea
++ Ghost bestiary update. - HiZe
++ Api error messages are now formatted more helpful.
++ Added option to only show the reputation helper while pressing a hotkey.
++ Garden **Money per Hour** now uses the **dicer drops** from melon and pumpkins as well. - CalMWolfs
++ Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0
+
+### Fixes
++ Removed `Simple Carrot Candy` from composter overlay.
++ Fixed croesus highlight unopened chest not working anymore. (ty hypixel)
++ Should not crash anymore if a file in repo is missing.
++ Fixed Killer Spring tower still highlighting even with the feature turned off. - HiZe
++ Fixed weird tuba ability cooldown not working in rift.
++ Fixed holy ice cooldown sometimes not working.
++ Fixed a rare startup crash.
++ Fixed Ghost stats after bestiary update. - HiZe
++ Watchdog hider now correctly hides empty lines as well, even when empty line hider is disabled. - appable0
++ Fixed `saw mob` title for trevor trapper solver still showing even when feature is disabled.
++ Fixed chicken from raider of the sea get detected as trevor trapper mob.
++ Fixed master star detection in estimate item value broken for some times.
++ Fixed description in golden trophy fish info tooltip. - appable0
++ Fixed End Node Tracker not updating when changing the text format.
+
+## Version 0.19
+
+### Rift Features
 + Added **Rift Timer**
   + Show the remaining rift time, max time, percentage, and extra time changes.
-+ **Rift 
-+ Highlight Guide**
++ **Highlight Guide**
   + Highlight things to do in the Rift Guide.
 + Added **Shy Warning** (Contributed by CalMWolfs)
   + Shows a warning when a shy crux will steal your time.
@@ -53,7 +96,6 @@
   + Outlines the top edge of the platforms (for Upside Down Parkour only) - CalMWolfs
 + Added Jinxed voodoo doll ability cooldown support - HiZe
 + Added Polarvoid Books to estimated item value - jani
-+ Added Chumcap support for Chum Bucket Hider - jani
 + Added **Motes NPC** price in the item lore
   + With Burgers multiplier - HiZe
 + Added Motes Grubber to Not Clickable Items feature
@@ -126,8 +168,10 @@
 + More **Trophy Fish** features - appable0
   + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy fish.
   + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack value.
++ Added Chumcap support for Chum Bucket Hider - jani
 
 ### Changes
++ SkyHanni no longer requires Patcher to start! (Big thanks nea)
 + Option to show the yaw and pitch display outside garden or while not holding a farming tool (Contributed by CalMWolfs)
 + Added wizard warp as diana waypoint
 + Added option to show exact prices in estimated item value
@@ -146,6 +190,9 @@
 + Custom text over Visitor name moves more smoothly now
 + Discord Rich Presence now supports Motes in the rift and the garden plot number - NetheriteMiner
 + Crop money display: Using npc price for mushroom cow pet calculation when on ironman, stranded or bingo
++ Sacks no longer get blocked from moving in storage (not clickable items feature)
++ Using 19.9 bps if bps is too low for jacob contest ff needed display
++ Better default positions for some guis
 
 ### Fixes
 + Fixed Pocket Sack-In-A-Sack Replace in lore
@@ -179,6 +226,7 @@
 + Fixed jacob contest time chat message chat shows one second too long
 + Fixed farming contest calendar reading going above 100% - Contrabass26
 + Changed multiple descriptions in the misc category, fixed grammar and punctuation problems - Absterge
++ Fixed rare bug with Damage Indicator
 
 ## Version 0.18 (2023-06-19)
 

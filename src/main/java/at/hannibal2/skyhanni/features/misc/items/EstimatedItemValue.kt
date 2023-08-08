@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTunerCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPiece
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfWar
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasBookOfStats
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
@@ -320,7 +320,7 @@ object EstimatedItemValue {
 
     // TODO untested
     private fun addArtOfPiece(stack: ItemStack, list: MutableList<String>): Double {
-        if (!stack.hasArtOfPiece()) return 0.0
+        if (!stack.hasArtOfPeace()) return 0.0
 
         val ripTechno = "THE_ART_OF_PEACE"
         val price = NEUItems.getPrice(ripTechno)

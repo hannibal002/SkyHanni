@@ -30,7 +30,7 @@ class PlayerChatFilter {
         var countFilters = 0
 
         try {
-            val data = event.getConstant("PlayerChatFilter")!!
+            val data = event.getConstant("PlayerChatFilter") ?: return
 
             for (category in data["filters"].asJsonArray) {
                 val jsonObject = category.asJsonObject

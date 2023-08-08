@@ -13,18 +13,21 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
 import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.bingo.*
-import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
-import at.hannibal2.skyhanni.features.chat.ChatFilter
-import at.hannibal2.skyhanni.features.chat.PlayerDeathMessages
+import at.hannibal2.skyhanni.features.chat.*
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
+import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
 import at.hannibal2.skyhanni.features.event.diana.*
 import at.hannibal2.skyhanni.features.fishing.*
+import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
 import at.hannibal2.skyhanni.features.garden.*
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
 import at.hannibal2.skyhanni.features.garden.composter.ComposterInventoryNumbers
@@ -42,6 +45,8 @@ import at.hannibal2.skyhanni.features.inventory.*
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
+import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
@@ -63,9 +68,7 @@ import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.rift.RiftTimer
-import at.hannibal2.skyhanni.features.rift.ShowMotesNpcSellPrice
-import at.hannibal2.skyhanni.features.rift.VampireSlayerFeatures
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.RiftLarva
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap
@@ -83,6 +86,8 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonHacking
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftOdonata
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.ShyCruxWarnings
 import at.hannibal2.skyhanni.features.rift.everywhere.*
+import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
+import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
 import at.hannibal2.skyhanni.features.slayer.*
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
@@ -119,7 +124,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.19.Beta.15",
+    version = "0.20.Beta.4",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -128,7 +133,7 @@ class SkyHanniMod {
 
         // utils
         loadModule(this)
-        loadModule(ChatManager())
+        loadModule(ChatManager)
         loadModule(HypixelData())
         loadModule(DungeonData())
         loadModule(ScoreboardData())
@@ -137,6 +142,7 @@ class SkyHanniMod {
         loadModule(ItemRenderBackground())
         loadModule(EntityData())
         loadModule(EntityMovementData())
+        loadModule(TestExportTools)
         loadModule(ItemClickData())
         loadModule(MinecraftData())
         loadModule(TitleUtils())
@@ -212,6 +218,7 @@ class SkyHanniMod {
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
+        loadModule(WarpIsCommand())
         loadModule(PartyTransferCommand())
         loadModule(SummoningMobManager())
         loadModule(AreaMiniBossFeatures())
@@ -241,7 +248,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowHelper)
         loadModule(GriffinBurrowParticleFinder())
         loadModule(BurrowWarpHelper())
-        loadModule(CollectionCounter())
+        loadModule(CollectionTracker())
         loadModule(HighlightBonzoMasks())
         loadModule(DungeonLevelColor())
         loadModule(BazaarCancelledBuyOrderClipboard())
@@ -281,6 +288,7 @@ class SkyHanniMod {
         loadModule(WrongFungiCutterWarning())
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
+        loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames())
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
@@ -363,8 +371,13 @@ class SkyHanniMod {
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
+        loadModule(BestiaryData)
+        loadModule(KingTalismanHelper())
+        loadModule(HarpKeybinds())
+        loadModule(EnderNodeTracker())
+        loadModule(CompactBestiaryChatMessage())
+        loadModule(WatchdogHider())
         loadModule(AuctionHouseCompareValue())
-
 
         init()
 
@@ -375,6 +388,7 @@ class SkyHanniMod {
         loadModule(PacketTest())
         loadModule(TestBingo)
         loadModule(TestCopyRngMeterValues)
+        loadModule(TestCopyBestiaryValues)
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
     }

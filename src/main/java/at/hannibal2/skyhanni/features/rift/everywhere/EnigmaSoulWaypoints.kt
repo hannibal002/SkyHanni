@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -52,7 +53,7 @@ object EnigmaSoulWaypoints {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!event.inventoryName.contains("Enigma Souls")) return
         inInventory = true

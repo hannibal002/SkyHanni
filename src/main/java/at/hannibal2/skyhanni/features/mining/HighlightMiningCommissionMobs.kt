@@ -61,7 +61,7 @@ class HighlightMiningCommissionMobs {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
-        MobType.values().filter { type ->
+        MobType.entries.filter { type ->
             event.tabList.find { line -> line.contains(type.commissionName) }?.let { !it.endsWith("§aDONE") } ?: false
         }.let {
             if (it != active) {

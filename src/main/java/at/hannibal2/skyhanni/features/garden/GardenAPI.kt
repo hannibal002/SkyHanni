@@ -118,6 +118,8 @@ object GardenAPI {
 
         if (internalName.startsWith("ROOKIE_HOE")) return true
 
+        if (internalName.startsWith("BINGHOE")) return true
+
         return false
     }
 
@@ -125,7 +127,7 @@ object GardenAPI {
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
-        return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
+        return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L

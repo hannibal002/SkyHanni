@@ -18,14 +18,16 @@ import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
+    val config get() = SkyHanniMod.feature.misc
 
     val questHelper = DailyQuestHelper(this)
     val miniBossHelper = DailyMiniBossHelper(this)
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
-    var repoData: JsonObject = JsonObject()
+    var repoData: JsonObject? = null
     var factionType = FactionType.NONE
 
     private var display = emptyList<List<Any>>()
@@ -39,7 +41,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        repoData = event.getConstant("CrimsonIsleReputation")!!
+        repoData = event.getConstant("CrimsonIsleReputation") ?: return
 
         tryLoadConfig()
         update()
@@ -62,7 +64,10 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!config.crimsonIsleReputationHelper) return
+        if (!dirty && display.isEmpty()) {
+            dirty = true
+        }
         if (dirty) {
             dirty = false
             updateRender()
@@ -101,12 +106,21 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
+        if (!config.crimsonIsleReputationHelper) return
 
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
-        SkyHanniMod.feature.misc.crimsonIsleReputationHelperPos.renderStringsAndItems(display, posLabel = "Crimson Isle Reputation Helper")
+        if (config.reputationHelperUseHotkey) {
+            if (!Keyboard.isKeyDown(config.reputationHelperHotkey)) {
+                return
+            }
+        }
+
+        config.crimsonIsleReputationHelperPos.renderStringsAndItems(
+            display,
+            posLabel = "Crimson Isle Reputation Helper"
+        )
     }
 
     fun update() {
