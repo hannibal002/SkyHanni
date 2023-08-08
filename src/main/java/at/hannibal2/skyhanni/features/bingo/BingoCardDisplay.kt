@@ -22,9 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BingoCardDisplay {
 
-    private val MAX_PERSONAL_GOALS = 20
-    private val MAX_COMMUNITY_GOALS = 5
-
     private var display = emptyList<String>()
     private val goalCompletePattern = "§6§lBINGO GOAL COMPLETE! §r§e(?<name>.*)".toPattern()
 
@@ -33,6 +30,9 @@ class BingoCardDisplay {
     }
 
     companion object {
+        private const val MAX_PERSONAL_GOALS = 20
+        private const val MAX_COMMUNITY_GOALS = 5
+
         private val config get() = SkyHanniMod.feature.bingo.bingoCard
         private var displayMode = 0
         val personalGoals = mutableListOf<PersonalGoal>()

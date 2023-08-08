@@ -28,8 +28,8 @@ class BazaarApi {
             getBazaarDataByInternalName_new(NEUInternalName.from(internalName))
 
         fun getBazaarDataByInternalName_new(internalName: NEUInternalName) = if (isBazaarItem(internalName)) {
-                holder.getData(internalName)
-            } else null
+            holder.getData(internalName)
+        } else null
 
         fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
 

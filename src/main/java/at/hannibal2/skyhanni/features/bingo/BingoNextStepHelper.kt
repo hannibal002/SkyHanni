@@ -121,7 +121,7 @@ class BingoNextStepHelper {
         }
     }
 
-    var nextMessageIsCrystal = false
+    private var nextMessageIsCrystal = false
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -278,7 +278,7 @@ class BingoNextStepHelper {
         return null
     }
 
-    fun <T : NextStep> T.makeFinalStep(): T {
+    private fun <T : NextStep> T.makeFinalStep(): T {
         finalSteps.add(this)
         return this
     }
@@ -299,12 +299,12 @@ class BingoNextStepHelper {
         }
     }
 
-    infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
+    private infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
         itemIslandRequired[itemName]?.let { this requires it }
         return this
     }
 
-    infix fun <T : NextStep> T.requires(other: NextStep): T {
+    private infix fun <T : NextStep> T.requires(other: NextStep): T {
         requirements.add(other)
         return this
     }
