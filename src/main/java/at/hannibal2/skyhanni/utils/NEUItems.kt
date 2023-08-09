@@ -146,27 +146,22 @@ object NEUItems {
         return price
     }
 
-    fun getPrice(internalName: NEUInternalName): Double {
-        if (internalName.asString() == "WISP_POTION") {
-            return 20_000.0
-        }
-        return getPrice(internalName, false)
-    }
-
-    fun getPrice(internalName: String) = getPrice(NEUInternalName.from(internalName))
-
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName {
         val name = manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
         return NEUInternalName.from(name)
     }
 
-    fun getPrice(internalName: NEUInternalName, useSellingPrice: Boolean): Double {
-        val result = manager.auctionManager.getBazaarOrBin(internalName.asString(), useSellingPrice)
+    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false): Double {
+        val string = asString()
+        if (string == "WISP_POTION") {
+            return 20_000.0
+        }
+        val result = manager.auctionManager.getBazaarOrBin(string, useSellingPrice)
         if (result == -1.0) {
-            if (internalName.asString() == "JACK_O_LANTERN") {
+            if (string == "JACK_O_LANTERN") {
                 return getPrice("PUMPKIN", useSellingPrice) + 1
             }
-            if (internalName.asString() == "GOLDEN_CARROT") {
+            if (string == "GOLDEN_CARROT") {
                 // 6.8 for some players
                 return 7.0 // NPC price
             }
@@ -174,9 +169,8 @@ object NEUItems {
         return result
     }
 
-    fun getPrice(internalName: String, useSellingPrice: Boolean): Double {
-        return getPrice(NEUInternalName.from(internalName), useSellingPrice)
-    }
+    fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
+        NEUInternalName.from(internalName).getPrice(useSellingPrice)
 
     fun getItemStackOrNull(internalName: NEUInternalName) = ItemResolutionQuery(manager)
         .withKnownInternalName(internalName.asString())
@@ -189,8 +183,7 @@ object NEUItems {
 
     fun getItemStack(internalName: NEUInternalName, definite: Boolean = false): ItemStack =
         getItemStackOrNull(internalName) ?: run {
-
-            if (getPrice(internalName) == -1.0) return@run fallbackItem
+            if (internalName.getPrice() == -1.0) return@run fallbackItem
 
             if (definite) {
                 Utils.showOutdatedRepoNotification()

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlinx.coroutines.launch
 import kotlin.concurrent.fixedRateTimer
@@ -62,8 +63,8 @@ class BazaarDataHolder {
             return null
         }
         val displayName = stack.name!!.removeColor()
-        val sellPrice = NEUItems.getPrice(internalName, true)
-        val buyPrice = NEUItems.getPrice(internalName, false)
+        val sellPrice = internalName.getPrice(true)
+        val buyPrice = internalName.getPrice(false)
         val npcPrice = npcPrices[internalName].let {
             if (it == null) {
                 if (!ignoreNoNpcPrice(internalName.asString())) {
