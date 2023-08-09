@@ -5,6 +5,9 @@ class NEUInternalName private constructor(private val internalName: String) {
     companion object {
         private val map = mutableMapOf<String, NEUInternalName>()
 
+        val NONE = "NONE".asInternalName()
+        val MISSING_ITEM = "MISSING_ITEM".asInternalName()
+
         fun String.asInternalName(): NEUInternalName {
             val internalName = uppercase()
             return map.getOrPut(internalName) { NEUInternalName(internalName) }

@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.isBazaarItem
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
@@ -13,15 +15,13 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CropMoneyDisplay {
-    var multipliers = mapOf<String, Int>()
+    var multipliers = mapOf<NEUInternalName, Int>()
     private var showCalculation = false
 
 
@@ -44,7 +44,7 @@ object CropMoneyDisplay {
     private val config get() = SkyHanniMod.feature.garden
     private var loaded = false
     private var ready = false
-    private val cropNames = mutableMapOf<String, CropType>() // internalName -> cropName
+    private val cropNames = mutableMapOf<NEUInternalName, CropType>()
     private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
 
     @SubscribeEvent
@@ -130,9 +130,7 @@ object CropMoneyDisplay {
                 extraMushroomCowPerkCoins = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.getItemInHand()?.getInternalName_old()
-                    ?.contains("DICER") == true && config.moneyPerHourDicer
-            ) {
+            if (InventoryUtils.itemInHandId.contains("DICER") && config.moneyPerHourDicer) {
                 var dicerDrops = 0.0
                 var bazaarData: BazaarData? = null
                 if (it == CropType.MELON) {
@@ -187,7 +185,7 @@ object CropMoneyDisplay {
                 if (isSeeds(internalName)) {
                     list.add(NEUItems.getItemStack("BOX_OF_SEEDS", true))
                 } else {
-                    list.add(NEUItems.getItemStack(internalName))
+                    list.add(internalName.getItemStack())
                 }
 
                 if (cropNames[internalName] == CropType.WHEAT && config.moneyPerHourMergeSeeds) {
@@ -198,7 +196,7 @@ object CropMoneyDisplay {
             }
 
             if (!config.moneyPerHourCompact) {
-                val itemName = NEUItems.getItemStack(internalName).name?.removeColor() ?: continue
+                val itemName = internalName.getItemNameOrNull()?.removeColor() ?: continue
                 val currentColor = if (isCurrent) "§e" else "§7"
                 val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
                 list.add("$currentColor$contestFormat$itemName§7: ")
@@ -259,8 +257,8 @@ object CropMoneyDisplay {
         LorenzUtils.formatInteger(moneyPerHour.toLong())
     }
 
-    private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<String, Array<Double>> {
-        val moneyPerHours = mutableMapOf<String, Array<Double>>()
+    private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<NEUInternalName, Array<Double>> {
+        val moneyPerHours = mutableMapOf<NEUInternalName, Array<Double>>()
 
         var seedsPrice: BazaarData? = null
         var seedsPerHour = 0.0
@@ -312,7 +310,7 @@ object CropMoneyDisplay {
                 debugList.addAsSingletonList(" cropsPerHour: ${cropsPerHour.addSeparators()}")
             }
 
-            val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName) ?: continue
+            val bazaarData = internalName.getBazaarData() ?: continue
 
             var npcPrice = bazaarData.npcPrice * cropsPerHour
             var sellOffer = bazaarData.buyPrice * cropsPerHour
@@ -351,7 +349,8 @@ object CropMoneyDisplay {
         return moneyPerHours
     }
 
-    private fun isSeeds(internalName: String) = (internalName == "ENCHANTED_SEEDS" || internalName == "SEEDS")
+    private fun isSeeds(internalName: NEUInternalName) =
+        internalName.equals("ENCHANTED_SEEDS") || internalName.equals("SEEDS")
 
     private fun formatNumbers(sellOffer: Double, instantSell: Double, npcPrice: Double): Array<Double> {
         return if (config.moneyPerHourUseCustomFormat) {
@@ -381,16 +380,17 @@ object CropMoneyDisplay {
         loaded = true
 
         SkyHanniMod.coroutineScope.launch {
-            val map = mutableMapOf<String, Int>()
-            for ((internalName, _) in NEUItems.manager.itemInformation) {
-                if (!BazaarApi.isBazaarItem(internalName)) continue
-                if (internalName == "ENCHANTED_PAPER") continue
-                if (internalName == "ENCHANTED_BREAD") continue
-                if (internalName == "SIMPLE_CARROT_CANDY") continue
-                if (internalName == "BOX_OF_SEEDS") continue
+            val map = mutableMapOf<NEUInternalName, Int>()
+            for ((rawInternalName, _) in NEUItems.manager.itemInformation) {
+                if (rawInternalName == "ENCHANTED_PAPER") continue
+                if (rawInternalName == "ENCHANTED_BREAD") continue
+                if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
+                if (rawInternalName == "BOX_OF_SEEDS") continue
+                val internalName = rawInternalName.asInternalName()
+                if (!internalName.isBazaarItem()) continue
 
                 val (newId, amount) = NEUItems.getMultiplier(internalName)
-                val itemName = NEUItems.getItemStack(newId).name?.removeColor() ?: continue
+                val itemName = newId.getItemNameOrNull()?.removeColor() ?: continue
                 val crop = getByNameOrNull(itemName)
                 crop?.let {
                     map[internalName] = amount

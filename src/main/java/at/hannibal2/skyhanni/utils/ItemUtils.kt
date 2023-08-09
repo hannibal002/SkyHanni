@@ -120,7 +120,7 @@ object ItemUtils {
     // TODO remove
     fun ItemStack.getInternalName_old() = getInternalName().asString()
 
-    fun ItemStack.getInternalName() = getInternalNameOrNull() ?: "".asInternalName()
+    fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
 
     fun ItemStack.getInternalNameOrNull() = getRawInternalName()?.asInternalName()
 

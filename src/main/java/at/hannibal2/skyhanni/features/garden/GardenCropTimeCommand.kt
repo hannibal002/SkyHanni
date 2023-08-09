@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -39,10 +39,10 @@ object GardenCropTimeCommand {
         val map = mutableMapOf<String, Long>()
         for (entry in CropMoneyDisplay.multipliers) {
             val internalName = entry.key
-            val itemName = NEUItems.getItemStack(internalName).name!!
+            val itemName = internalName.getItemName()
             if (itemName.removeColor().lowercase().contains(searchName)) {
                 val (baseId, baseAmount) = NEUItems.getMultiplier(internalName)
-                val baseName = NEUItems.getItemStack(baseId).name!!
+                val baseName = baseId.getItemName()
                 val crop = CropType.getByName(baseName.removeColor())
 
                 val fullAmount = baseAmount.toLong() * amount.toLong()

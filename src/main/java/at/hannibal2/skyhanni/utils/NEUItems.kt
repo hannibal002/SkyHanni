@@ -93,9 +93,8 @@ object NEUItems {
         }
 
         if (itemName == "§cmissing repo item") {
-            val name = "MISSING_ITEM".asInternalName()
-            itemNameCache[lowercase] = name
-            return name
+            itemNameCache[lowercase] = NEUInternalName.MISSING_ITEM
+            return NEUInternalName.MISSING_ITEM
         }
 
         resolveEnchantmentByName(itemName)?.let {
