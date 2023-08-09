@@ -100,8 +100,8 @@ interface Renderable {
                 }
             }
 
-
         fun hoverTips(text: String, tips: List<String>, indexes: List<Int> = listOf(), stack: ItemStack? = null, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
+
             val render = string(text)
             return object : Renderable {
                 override val width: Int
