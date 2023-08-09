@@ -25,17 +25,15 @@ class BazaarApi {
             NEUItems.getInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
 
         fun getBazaarDataByInternalName(internalName: String) =
-            getBazaarDataByInternalName_new(NEUInternalName.from(internalName))
+            NEUInternalName.from(internalName).getBazaarData()
 
-        fun getBazaarDataByInternalName_new(internalName: NEUInternalName) = if (isBazaarItem(internalName)) {
-            holder.getData(internalName)
+        fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
+            holder.getData(this)
         } else null
 
         fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
 
-        fun isBazaarItem(internalName: NEUInternalName): Boolean {
-            return NEUItems.manager.auctionManager.getBazaarInfo(internalName.asString()) != null
-        }
+        fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 
         fun isBazaarItem(internalName: String): Boolean {
             return NEUItems.manager.auctionManager.getBazaarInfo(internalName) != null

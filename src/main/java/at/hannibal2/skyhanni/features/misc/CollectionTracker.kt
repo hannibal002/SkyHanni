@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -62,7 +64,7 @@ class CollectionTracker {
                 return
             }
 
-            val stack = NEUItems.getItemStackOrNull(foundInternalName)
+            val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
                 LorenzUtils.chat("§c[SkyHanni] Item '$rawName' does not exist!")
                 return
@@ -129,7 +131,7 @@ class CollectionTracker {
 
             display = Collections.singletonList(buildList {
                 internalName?.let {
-                    add(NEUItems.getItemStack(it))
+                    add(it.getItemStack())
                 }
                 add("$itemName collection: §e$format $gainText")
             })
@@ -141,7 +143,7 @@ class CollectionTracker {
         fun handleTabComplete(command: String): List<String>? {
             if (command != "shtrackcollection") return null
 
-            return CollectionAPI.collectionValue.keys.mapNotNull { NEUItems.getItemStackOrNull(it) }
+            return CollectionAPI.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
                 .map { it.displayName.removeColor().replace(" ", "_") }
         }
     }

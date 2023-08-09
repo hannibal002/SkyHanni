@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -29,7 +30,7 @@ class CollectionAPI {
             val internalName = NEUItems.transHypixelNameToInternalName(hypixelId)
 
             // MUSHROOM_COLLECTION,
-            NEUItems.getItemStackOrNull(internalName)?.displayName ?: continue
+            internalName.getItemStackOrNull()?.displayName ?: continue
 
             collectionValue[internalName] = counter
         }

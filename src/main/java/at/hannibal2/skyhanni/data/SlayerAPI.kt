@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.slayer.SlayerType
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.common.cache.CacheBuilder
@@ -18,7 +20,8 @@ import java.util.concurrent.TimeUnit
 object SlayerAPI {
 
     private var nameCache =
-        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build<Pair<String, Int>, Pair<String, Double>>()
+        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+            .build<Pair<NEUInternalName, Int>, Pair<String, Double>>()
 
     var questStartTime = 0L
     var isInSlayerArea = false
@@ -53,7 +56,7 @@ object SlayerAPI {
     }
 
     fun getItemNameAndPrice(stack: ItemStack): Pair<String, Double> {
-        val internalName = stack.getInternalName()
+        val internalName = stack.getInternalName_new()
         val amount = stack.stackSize
         val key = internalName to amount
         nameCache.getIfPresent(key)?.let {
@@ -63,8 +66,8 @@ object SlayerAPI {
         val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
         val displayName = getNameWithEnchantmentFor(internalName)
 
-        val price = NEUItems.getPrice(internalName)
-        val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
+        val price = internalName.getPrice()
+        val npcPrice = internalName.getBazaarData()?.npcPrice ?: 0.0
         val maxPrice = npcPrice.coerceAtLeast(price)
         val totalPrice = maxPrice * amount
 
@@ -76,11 +79,11 @@ object SlayerAPI {
         return result
     }
 
-    fun getNameWithEnchantmentFor(internalName: String): String? {
-        if (internalName == "WISP_POTION") {
+    fun getNameWithEnchantmentFor(internalName: NEUInternalName): String? {
+        if (internalName.asString() == "WISP_POTION") {
             return "§fWisp's Ice-Flavored Water"
         }
-        return NEUItems.getItemStack(internalName).nameWithEnchantment
+        return internalName.getItemStack().nameWithEnchantment
     }
 
     @SubscribeEvent

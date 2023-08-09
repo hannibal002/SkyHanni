@@ -172,25 +172,25 @@ object NEUItems {
     fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
         NEUInternalName.from(internalName).getPrice(useSellingPrice)
 
-    fun getItemStackOrNull(internalName: NEUInternalName) = ItemResolutionQuery(manager)
-        .withKnownInternalName(internalName.asString())
+    fun NEUInternalName.getItemStackOrNull() = ItemResolutionQuery(manager)
+        .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
-    fun getItemStackOrNull(internalName: String) = getItemStackOrNull(NEUInternalName.from(internalName))
+    fun getItemStackOrNull(internalName: String) = NEUInternalName.from(internalName).getItemStackOrNull()
 
     fun getItemStack(internalName: String, definite: Boolean = false): ItemStack =
-        getItemStack(NEUInternalName.from(internalName), definite)
+        NEUInternalName.from(internalName).getItemStack(definite)
 
-    fun getItemStack(internalName: NEUInternalName, definite: Boolean = false): ItemStack =
-        getItemStackOrNull(internalName) ?: run {
-            if (internalName.getPrice() == -1.0) return@run fallbackItem
+    fun NEUInternalName.getItemStack(definite: Boolean = false): ItemStack =
+        getItemStackOrNull() ?: run {
+            if (getPrice() == -1.0) return@run fallbackItem
 
             if (definite) {
                 Utils.showOutdatedRepoNotification()
             }
             CopyErrorCommand.logError(
                 IllegalStateException("Something went wrong!"),
-                "Encountered an error getting the item for §7$internalName§c. " +
+                "Encountered an error getting the item for §7$this§c. " +
                         "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
                         "Discord if this is the case"
             )
