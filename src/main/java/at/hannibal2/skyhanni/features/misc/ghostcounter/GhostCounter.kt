@@ -292,8 +292,7 @@ object GhostCounter {
                     )
                 }
             }
-            // some area don't show as 'The Mist' in the scoreboard
-            inMist = Minecraft.getMinecraft().thePlayer.posY <= 110
+            inMist = LorenzUtils.skyBlockArea == "The Mist"
             update()
         }
         if (event.repeatSeconds(2)) {
