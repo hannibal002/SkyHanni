@@ -298,7 +298,6 @@ class SackDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
-        if (!isRuneDisplayEnabled() && inventoryName == "Runes Sack") return
         val match = sackPattern.matcher(inventoryName).matches()
         if (!match) return
         val stacks = event.inventoryItems
@@ -340,7 +339,6 @@ class SackDisplay {
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isRuneDisplayEnabled() = config.showRunes
 
     private fun NEUInternalName.sackPrice(stored: String) = when (config.priceFrom) {
         0 -> (getPrice(true) * stored.formatNumber()).toInt().let { if (it < 0) 0 else it }

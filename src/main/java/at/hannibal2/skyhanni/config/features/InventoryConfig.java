@@ -2,14 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -189,11 +182,6 @@ public class InventoryConfig {
         @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
         @ConfigEditorDropdown(values = {"Bazaar", "NPC"})
         public int priceFrom = 0;
-
-        @Expose
-        @ConfigOption(name = "Show in Runes Sack", desc = "Show contained items inside a runes sack.")
-        @ConfigEditorBoolean
-        public boolean showRunes = false;
 
         @Expose
         public Position position = new Position(144, 139, false, true);
