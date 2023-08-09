@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
@@ -92,10 +93,10 @@ class ItemAbilityCooldown {
         if (event.soundName == "mob.wolf.howl") {
             if (event.volume == 0.5f) {
                 val recentItems = InventoryUtils.recentItemsInHand.values
-                if ("WEIRD_TUBA" in recentItems) {
+                if ("WEIRD_TUBA".asInternalName() in recentItems) {
                     ItemAbility.WEIRD_TUBA.sound()
                 }
-                if ("WEIRDER_TUBA" in recentItems) {
+                if ("WEIRDER_TUBA".asInternalName() in recentItems) {
                     ItemAbility.WEIRDER_TUBA.sound()
                 }
             }

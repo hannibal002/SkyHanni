@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
@@ -22,10 +21,7 @@ class BazaarApi {
         var inBazaarInventory = false
         private var currentSearchedItem = ""
 
-        fun getBazaarDataByName(name: String): BazaarData? =
-            NEUItems.getRawInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
-
-        fun getBazaarDataByInternalName(internalName: String) = internalName.asInternalName().getBazaarData()
+        fun getBazaarDataByName(name: String): BazaarData? = NEUItems.getInternalNameOrNull(name)?.getBazaarData()
 
         fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
             holder.getData(this)

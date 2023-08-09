@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -39,25 +40,25 @@ class BazaarBestSellMethod {
             if (buyInstantly == null || buyInstantly.displayName != "§aBuy Instantly") return ""
             val bazaarItem = inv.getStackInSlot(13) ?: return ""
 
-            val internalName = NEUItems.getRawInternalNameOrNull(bazaarItem.displayName) ?: return ""
+            val internalName = NEUItems.getInternalNameOrNull(bazaarItem.displayName) ?: return ""
 
             var having = 0
             for (slot in chest.inventorySlots) {
                 if (slot == null) continue
                 if (slot.slotNumber == slot.slotIndex) continue
                 val stack = slot.stack ?: continue
-                if (internalName == stack.getInternalName_old()) {
+                if (internalName == stack.getInternalName()) {
                     having += stack.stackSize
                 }
             }
 
             if (having <= 0) return ""
 
-            val data = BazaarApi.getBazaarDataByInternalName(internalName) ?: return ""
+            val data = internalName.getBazaarData() ?: return ""
             val totalDiff = (data.buyPrice - data.sellPrice) * having
             val result = NumberUtil.format(totalDiff.toInt())
 
-            val name = NEUItems.getItemStack(internalName).nameWithEnchantment
+            val name = internalName.getNameWithEnchantment()
             return "$name§7 sell difference: §6$result coins"
         } catch (e: Error) {
             e.printStackTrace()

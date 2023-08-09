@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreProfileSwitchEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.isBazaarItem
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -113,15 +113,15 @@ object CropMoneyDisplay {
             toolHasBountiful?.put(it, reforgeName == "bountiful")
 
             if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM && config.moneyPerHourMooshroom) {
+                val redMushroom = "ENCHANTED_RED_MUSHROOM".asInternalName()
+                val brownMushroom = "ENCHANTED_BROWN_MUSHROOM".asInternalName()
                 val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
-                    val redPrice =
-                        (BazaarApi.getBazaarDataByInternalName("ENCHANTED_RED_MUSHROOM")?.npcPrice ?: 160.0) / 160
-                    val brownPrice =
-                        (BazaarApi.getBazaarDataByInternalName("ENCHANTED_BROWN_MUSHROOM")?.npcPrice ?: 160.0) / 160
+                    val redPrice = (redMushroom.getBazaarData()?.npcPrice ?: 160.0) / 160
+                    val brownPrice = (brownMushroom.getBazaarData()?.npcPrice ?: 160.0) / 160
                     redPrice to brownPrice
                 } else {
-                    val redPrice = NEUItems.getPrice("ENCHANTED_RED_MUSHROOM") / 160
-                    val brownPrice = NEUItems.getPrice("ENCHANTED_BROWN_MUSHROOM") / 160
+                    val redPrice = redMushroom.getPrice() / 160
+                    val brownPrice = brownMushroom.getPrice() / 160
                     redPrice to brownPrice
                 }
 
@@ -135,11 +135,11 @@ object CropMoneyDisplay {
                 var bazaarData: BazaarData? = null
                 if (it == CropType.MELON) {
                     dicerDrops = GardenCropSpeed.latestMelonDicer
-                    bazaarData = BazaarApi.getBazaarDataByInternalName("ENCHANTED_MELON")
+                    bazaarData = "ENCHANTED_MELON".asInternalName().getBazaarData()
                 }
                 if (it == CropType.PUMPKIN) {
                     dicerDrops = GardenCropSpeed.latestPumpkinDicer
-                    bazaarData = BazaarApi.getBazaarDataByInternalName("ENCHANTED_PUMPKIN")
+                    bazaarData = "ENCHANTED_PUMPKIN".asInternalName().getBazaarData()
                 }
                 if (bazaarData != null) {
                     val price =

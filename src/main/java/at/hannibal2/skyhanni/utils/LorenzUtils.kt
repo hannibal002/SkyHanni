@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -196,7 +197,7 @@ object LorenzUtils {
     }
 
     // (key -> value) -> (sorting value -> key item icon)
-    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, String>>) {
+    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
         val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
@@ -208,7 +209,7 @@ object LorenzUtils {
                 displayName += " "
             }
 
-            NEUItems.getItemStackOrNull(data[pair]!!.second)?.let {
+            data[pair]!!.second.getItemStackOrNull()?.let {
                 list.add(listOf(it, "$displayName   $second"))
             }
         }

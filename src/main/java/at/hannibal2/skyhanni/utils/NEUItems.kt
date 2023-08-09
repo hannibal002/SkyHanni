@@ -83,9 +83,6 @@ object NEUItems {
         return map
     }
 
-    // TODO remove
-    fun getRawInternalNameOrNull(itemName: String) = getInternalNameOrNull(itemName)?.asString()
-
     fun getInternalNameOrNull(itemName: String): NEUInternalName? {
         val lowercase = itemName.lowercase()
         if (itemNameCache.containsKey(lowercase)) {

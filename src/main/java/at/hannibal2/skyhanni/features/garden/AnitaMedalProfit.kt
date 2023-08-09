@@ -5,14 +5,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -47,7 +45,7 @@ class AnitaMedalProfit {
 
         inInventory = true
 
-        val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
+        val table = mutableMapOf<Pair<String, String>, Pair<Double, NEUInternalName>>()
         for ((_, item) in event.inventoryItems) {
             try {
                 readItem(item, table)
@@ -63,7 +61,7 @@ class AnitaMedalProfit {
         display = newList
     }
 
-    private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, String>>) {
+    private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
         val itemName = item.nameWithEnchantment ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
@@ -76,12 +74,12 @@ class AnitaMedalProfit {
         val (name, amount) = ItemUtils.readItemAmount(itemName)
         if (name == null) return
 
-        var internalName = NEUItems.getRawInternalNameOrNull(name)
+        var internalName = NEUItems.getInternalNameOrNull(name)
         if (internalName == null) {
-            internalName = item.getInternalName_old()
+            internalName = item.getInternalName()
         }
 
-        val itemPrice = NEUItems.getPrice(internalName) * amount
+        val itemPrice = internalName.getPrice() * amount
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost

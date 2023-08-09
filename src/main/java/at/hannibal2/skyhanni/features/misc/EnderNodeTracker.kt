@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -114,24 +114,22 @@ class EnderNodeTracker {
 
     private fun calculateProfit(): Map<EnderNode, Double> {
         val newProfit = mutableMapOf<EnderNode, Double>()
-        lootCount.forEach {
-            val price = if (isEnderArmor(it.key.displayName)) {
+        lootCount.forEach { (key, _) ->
+            val price = if (isEnderArmor(key.displayName)) {
                 10_000.0
             } else {
-                val bzData = BazaarApi.getBazaarDataByInternalName(it.key.internalName)
+                val internalName = key.internalName
+                val bzData = internalName.getBazaarData()
                 if (LorenzUtils.noTradeMode) {
-                    bzData?.npcPrice ?: georgePrice(it.key) ?: 0.0
+                    bzData?.npcPrice ?: georgePrice(key) ?: 0.0
                 } else {
-
                     bzData?.npcPrice
                         ?.coerceAtLeast(bzData.sellPrice)
-                        ?.coerceAtLeast(georgePrice(it.key) ?: 0.0)
-                        ?: NEUItems.getPrice(it.key.internalName)
-
+                        ?.coerceAtLeast(georgePrice(key) ?: 0.0)
+                        ?: internalName.getPrice()
                 }
-
             }
-            newProfit[it.key] = price * (lootCount[it.key] ?: 0)
+            newProfit[key] = price * (lootCount[key] ?: 0)
         }
         return newProfit
     }

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.Option.*
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData.bestiaryData
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil.formatBestiary
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils.clickableChat
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -223,10 +224,10 @@ object GhostCounter {
         addAsSingletonList(etaFormatting.base.formatText(eta).formatText(killETA))
 
         val rate = 0.12 * (1 + (avgMagicFind.toDouble() / 100))
-        val sorrowValue = (BazaarApi.getBazaarDataByInternalName("SORROW")?.buyPrice ?: 0).toLong()
+        val sorrowValue = ("SORROW".asInternalName().getBazaarData()?.buyPrice ?: 0).toLong()
         val final: String = (killInterp * sorrowValue * (rate / 100)).toLong().addSeparators()
-        val plasmaValue = (BazaarApi.getBazaarDataByInternalName("PLASMA")?.buyPrice ?: 0).toLong()
-        val voltaValue = (BazaarApi.getBazaarDataByInternalName("VOLTA")?.buyPrice ?: 0).toLong()
+        val plasmaValue = ("PLASMA".asInternalName().getBazaarData()?.buyPrice ?: 0).toLong()
+        val voltaValue = ("VOLTA".asInternalName().getBazaarData()?.buyPrice ?: 0).toLong()
         var moneyMade: Long = 0
         val priceMap = listOf(
             Triple("Sorrow", SORROWCOUNT.getInt(), sorrowValue),

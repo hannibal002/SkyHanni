@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -44,7 +45,7 @@ class GardenComposterInventoryFeatures {
                     LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                     continue
                 }
-                val internalName = NEUItems.getRawInternalNameOrNull(itemName)
+                val internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName == null) {
                     LorenzUtils.chat(
                         "§c[SkyHanni] Error reading internal name for item '$itemName§c' " +
@@ -52,7 +53,7 @@ class GardenComposterInventoryFeatures {
                     )
                     continue
                 }
-                val lowestBin = NEUItems.getPrice(internalName)
+                val lowestBin = internalName.getPrice()
                 val price = lowestBin * amount
                 fullPrice += price
                 val format = NumberUtil.format(price)

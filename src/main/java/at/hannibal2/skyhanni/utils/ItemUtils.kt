@@ -226,4 +226,11 @@ object ItemUtils {
     fun NEUInternalName.getItemNameOrNull() = getItemStack().name
 
     fun NEUInternalName.getItemName() = getItemNameOrNull() ?: error("No item name found for $this")
+
+    fun NEUInternalName.getNameWithEnchantment(): String {
+        if (equals("WISP_POTION")) {
+            return "§fWisp's Ice-Flavored Water"
+        }
+        return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
+    }
 }
