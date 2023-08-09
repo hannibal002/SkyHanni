@@ -151,16 +151,15 @@ object NEUItems {
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false): Double {
-        val string = asString()
-        if (string == "WISP_POTION") {
+        if (equals("WISP_POTION")) {
             return 20_000.0
         }
-        val result = manager.auctionManager.getBazaarOrBin(string, useSellingPrice)
+        val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
         if (result == -1.0) {
-            if (string == "JACK_O_LANTERN") {
+            if (equals("JACK_O_LANTERN")) {
                 return getPrice("PUMPKIN", useSellingPrice) + 1
             }
-            if (string == "GOLDEN_CARROT") {
+            if (equals("GOLDEN_CARROT")) {
                 // 6.8 for some players
                 return 7.0 // NPC price
             }
@@ -177,6 +176,7 @@ object NEUItems {
 
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
+    // TODO remove
     fun getItemStack(internalName: String, definite: Boolean = false): ItemStack =
         internalName.asInternalName().getItemStack(definite)
 

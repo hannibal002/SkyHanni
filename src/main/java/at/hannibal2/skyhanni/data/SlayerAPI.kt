@@ -79,11 +79,11 @@ object SlayerAPI {
         return result
     }
 
-    fun getNameWithEnchantmentFor(internalName: NEUInternalName): String? {
+    fun getNameWithEnchantmentFor(internalName: NEUInternalName): String {
         if (internalName.asString() == "WISP_POTION") {
             return "§fWisp's Ice-Flavored Water"
         }
-        return internalName.getItemStack().nameWithEnchantment
+        return internalName.getItemStack().nameWithEnchantment ?: error("Could not find name for $internalName")
     }
 
     @SubscribeEvent

@@ -176,15 +176,10 @@ object ItemUtils {
         }
 
     val ItemStack.nameWithEnchantment: String?
-        get() {
-            val name = name
-            name?.let {
-                if (name.endsWith("Enchanted Book")) {
-                    return getLore()[0]
-                }
-            }
-
-            return name
+        get() = name?.let {
+            if (it.endsWith("Enchanted Book")) {
+                getLore()[0]
+            } else it
         }
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName_old() == "SKYBLOCK_MENU"

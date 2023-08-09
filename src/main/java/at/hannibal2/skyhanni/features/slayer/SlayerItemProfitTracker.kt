@@ -180,7 +180,7 @@ object SlayerItemProfitTracker {
 
             val price = (getPrice(internalName) * amount).toLong()
 
-            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName.asString()
+            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName)
             var name = cleanName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
