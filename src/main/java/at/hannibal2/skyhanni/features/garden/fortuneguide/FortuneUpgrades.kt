@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
@@ -72,8 +73,12 @@ object FortuneUpgrades {
         val currentTalismanTier = CropAccessoryData.cropAccessory?.ordinal ?: return
         if (currentTalismanTier < 3) {
             val nextTalisman = CropAccessory.entries[currentTalismanTier + 1]
-            genericUpgrades.add(FortuneUpgrade("§7Upgrade your talisman to ${nextTalisman.internalName.replace("_", " ").lowercase()}",
-                null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0))
+            genericUpgrades.add(
+                FortuneUpgrade(
+                    "§7Upgrade your talisman to ${nextTalisman.internalName?.getItemName()}",
+                    null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0
+                )
+            )
         }
     }
 

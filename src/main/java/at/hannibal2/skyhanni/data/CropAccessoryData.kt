@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.JsonElement
@@ -95,10 +95,9 @@ class CropAccessoryData {
     }
 
 
-    private fun bestCropAccessory(items: Iterable<ItemStack>): CropAccessory {
-        return items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName_old()) }
+    private fun bestCropAccessory(items: Iterable<ItemStack>) =
+        items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
             .maxOrNull() ?: CropAccessory.NONE
-    }
 
     companion object {
         var accessoryBagPageCount = 0

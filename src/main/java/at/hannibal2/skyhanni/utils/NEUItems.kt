@@ -137,7 +137,7 @@ object NEUItems {
         .resolveInternalName()
 
     fun getInternalNameOrNull(nbt: NBTTagCompound) =
-        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
+        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
         val price = getPrice(useSellingPrice)
