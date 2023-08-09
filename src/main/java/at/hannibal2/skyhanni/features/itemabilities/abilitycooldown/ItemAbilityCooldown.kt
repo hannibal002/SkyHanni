@@ -21,8 +21,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemAbilityCooldown {
     private var lastAbility = ""
-    var items = mapOf<ItemStack, List<ItemText>>()
+    private var items = mapOf<ItemStack, List<ItemText>>()
     private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
+    private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
+    private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
 
     @SubscribeEvent
     fun onSoundEvent(event: PlaySoundEvent) {
@@ -93,10 +95,10 @@ class ItemAbilityCooldown {
         if (event.soundName == "mob.wolf.howl") {
             if (event.volume == 0.5f) {
                 val recentItems = InventoryUtils.recentItemsInHand.values
-                if ("WEIRD_TUBA".asInternalName() in recentItems) {
+                if (WEIRD_TUBA in recentItems) {
                     ItemAbility.WEIRD_TUBA.sound()
                 }
-                if ("WEIRDER_TUBA".asInternalName() in recentItems) {
+                if (WEIRDER_TUBA in recentItems) {
                     ItemAbility.WEIRDER_TUBA.sound()
                 }
             }
@@ -137,7 +139,7 @@ class ItemAbilityCooldown {
             }
         }
         if (event.soundName == "random.drink") {
-            if (event.pitch.round(1).toDouble() == 1.8 && event.volume == 1.0f) {
+            if (event.pitch.round(1) == 1.8 && event.volume == 1.0f) {
                 ItemAbility.HOLY_ICE.sound()
             }
         }

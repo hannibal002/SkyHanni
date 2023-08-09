@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
@@ -89,7 +90,7 @@ class AnitaMedalProfit {
     }
 
     private fun getFullCost(requiredItems: MutableList<String>): Double {
-        val jacobTicketPrice = NEUItems.getPrice("JACOBS_TICKET")
+        val jacobTicketPrice = "JACOBS_TICKET".asInternalName().getPrice()
         var otherItemsPrice = 0.0
         for (rawItemName in requiredItems) {
             val (name, amount) = ItemUtils.readItemAmount(rawItemName)

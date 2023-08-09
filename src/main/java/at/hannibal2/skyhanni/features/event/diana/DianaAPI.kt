@@ -9,5 +9,5 @@ object DianaAPI {
 
     fun isRitualActive() = MayorElection.isPerkActive("Diana", "Mythological Ritual")
 
-    fun hasGriffinPet() = ProfileStorageData.profileSpecific?.let { it.currentPet.contains("Griffin") } ?: false
+    fun hasGriffinPet() = ProfileStorageData.profileSpecific?.currentPet?.contains("Griffin") ?: false
 }

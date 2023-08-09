@@ -102,7 +102,7 @@ class KingTalismanHelper {
                     farDisplay_ = "§cNext missing king: §7$king §eNow $missingTimeFormat"
                 }
 
-                val timeString = if (missing) " §cMissing " + missingTimeFormat else ""
+                val timeString = if (missing) " §cMissing $missingTimeFormat" else ""
 
                 add("§7$currentString$king$missingString$timeString")
             }

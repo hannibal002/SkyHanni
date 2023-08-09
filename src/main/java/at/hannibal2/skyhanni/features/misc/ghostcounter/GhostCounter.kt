@@ -83,6 +83,9 @@ object GhostCounter {
     private var currentSkill = ""
     private var currentSkillLevel = -1
     private const val CONFIG_VALUE_VERSION = 1
+    private val SORROW = "SORROW".asInternalName()
+    private val PLASMA = "PLASMA".asInternalName()
+    private val VOLTA = "VOLTA".asInternalName()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
@@ -224,10 +227,10 @@ object GhostCounter {
         addAsSingletonList(etaFormatting.base.formatText(eta).formatText(killETA))
 
         val rate = 0.12 * (1 + (avgMagicFind.toDouble() / 100))
-        val sorrowValue = ("SORROW".asInternalName().getBazaarData()?.buyPrice ?: 0).toLong()
+        val sorrowValue = SORROW.getBazaarData()?.buyPrice?.toLong() ?: 0L
         val final: String = (killInterp * sorrowValue * (rate / 100)).toLong().addSeparators()
-        val plasmaValue = ("PLASMA".asInternalName().getBazaarData()?.buyPrice ?: 0).toLong()
-        val voltaValue = ("VOLTA".asInternalName().getBazaarData()?.buyPrice ?: 0).toLong()
+        val plasmaValue = PLASMA.getBazaarData()?.buyPrice?.toLong() ?: 0L
+        val voltaValue = VOLTA.getBazaarData()?.buyPrice?.toLong() ?: 0L
         var moneyMade: Long = 0
         val priceMap = listOf(
             Triple("Sorrow", SORROWCOUNT.getInt(), sorrowValue),

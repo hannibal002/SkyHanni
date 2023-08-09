@@ -35,12 +35,20 @@ object FortuneUpgrades {
         genericUpgrades.clear()
 
         if (hidden.plotsUnlocked != -1 && hidden.plotsUnlocked != 24) {
-            genericUpgrades.add(FortuneUpgrade("§7Unlock your ${(hidden.plotsUnlocked + 1).addSuffix()} §7plot",
-                null, "COMPOST", compostNeeded[hidden.plotsUnlocked], 3.0))
+            genericUpgrades.add(
+                FortuneUpgrade(
+                    "§7Unlock your ${(hidden.plotsUnlocked + 1).addSuffix()} §7plot",
+                    null, "COMPOST", compostNeeded[hidden.plotsUnlocked], 3.0
+                )
+            )
         }
         if (hidden.anitaUpgrade != -1 && hidden.anitaUpgrade != 15) {
-            genericUpgrades.add(FortuneUpgrade("§7Upgrade Anita bonus to level ${hidden.anitaUpgrade + 1}",
-                null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 2.0))
+            genericUpgrades.add(
+                FortuneUpgrade(
+                    "§7Upgrade Anita bonus to level ${hidden.anitaUpgrade + 1}",
+                    null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 2.0
+                )
+            )
         }
 
         getEquipmentUpgrades()
@@ -91,8 +99,12 @@ object FortuneUpgrades {
             val enchantments = item.getEnchantments() ?: emptyMap()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
             if (greenThumbLvl != 5 && visitors != 0.0) {
-                genericUpgrades.add(FortuneUpgrade("§7Enchant your ${item.displayName} §7with Green Thumb ${greenThumbLvl + 1}",
-                    1500, "GREEN_THUMB;1", getNeededBooks(greenThumbLvl), visitors * 0.05))
+                genericUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${item.displayName} §7with Green Thumb ${greenThumbLvl + 1}",
+                        1500, "GREEN_THUMB;1", getNeededBooks(greenThumbLvl), visitors * 0.05
+                    )
+                )
             }
             recombobulateItem(item, genericUpgrades)
             when (item.getReforgeName()) {
@@ -100,6 +112,7 @@ object FortuneUpgrades {
                 "blooming" -> {
                     reforgeItem(item, FarmingReforges.ROOTED, genericUpgrades)
                 }
+
                 else -> {
                     reforgeItem(item, FarmingReforges.BLOOMING, genericUpgrades)
                 }
@@ -119,6 +132,7 @@ object FortuneUpgrades {
                 "bustling" -> {
                     reforgeItem(item, FarmingReforges.MOSSY, genericUpgrades)
                 }
+
                 else -> {
                     reforgeItem(item, FarmingReforges.BUSTLING, genericUpgrades, 100)
                 }
@@ -134,6 +148,7 @@ object FortuneUpgrades {
                 "YELLOW_BANDANA" -> {
                     //todo once auction stuff is done
                 }
+
                 else -> {
                     //give pet yellow bandana
                 }
@@ -154,39 +169,70 @@ object FortuneUpgrades {
         if (crop in axeCrops) {
             val sunderLvl = enchantments["sunder"] ?: 0
             if (sunderLvl != 5) {
-                cropSpecificUpgrades.add(FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Sunder ${sunderLvl + 1}",
-                    10, "SUNDER;1", getNeededBooks(sunderLvl), 12.5))
+                cropSpecificUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${tool.displayName} §7with Sunder ${sunderLvl + 1}",
+                        10, "SUNDER;1", getNeededBooks(sunderLvl), 12.5
+                    )
+                )
             }
         } else {
             val harvestingLvl = enchantments["harvesting"] ?: 0
             if (harvestingLvl == 5) {
-                cropSpecificUpgrades.add(FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Harvesting ${harvestingLvl + 1}",
-                    10, "HARVESTING;6", 1, 12.5))
+                cropSpecificUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${tool.displayName} §7with Harvesting ${harvestingLvl + 1}",
+                        10, "HARVESTING;6", 1, 12.5
+                    )
+                )
             }
         }
         if (farmingForDummiesCount != 5) {
-            cropSpecificUpgrades.add(FortuneUpgrade("§7Add a Farming for Dummies to your ${tool.displayName}",
-                null, "FARMING_FOR_DUMMIES", 1, 1.0))
+            cropSpecificUpgrades.add(
+                FortuneUpgrade(
+                    "§7Add a Farming for Dummies to your ${tool.displayName}",
+                    null,
+                    "FARMING_FOR_DUMMIES",
+                    1,
+                    1.0
+                )
+            )
         }
         val cropMilestone = GardenCropMilestones.getTierForCrops(crop.getCounter())
         if (dedicationLvl != 4 && cropMilestone > 0) {
             val dedicationMultiplier = listOf(0.5, 0.75, 1.0, 2.0)[dedicationLvl]
-            val dedicationIncrease = dedicationMultiplier * cropMilestone - FarmingFortuneDisplay.getDedicationFortune(tool, crop)
+            val dedicationIncrease =
+                dedicationMultiplier * cropMilestone - FarmingFortuneDisplay.getDedicationFortune(tool, crop)
             if (dedicationLvl == 3) {
-                cropSpecificUpgrades.add(FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Dedication ${dedicationLvl + 1}",
-                    null, "DEDICATION;4", 1, dedicationIncrease))
+                cropSpecificUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${tool.displayName} §7with Dedication ${dedicationLvl + 1}",
+                        null, "DEDICATION;4", 1, dedicationIncrease
+                    )
+                )
             } else {
-                cropSpecificUpgrades.add(FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Dedication ${dedicationLvl + 1}",
-                    250, "DEDICATION;1", getNeededBooks(dedicationLvl), dedicationIncrease))
+                cropSpecificUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${tool.displayName} §7with Dedication ${dedicationLvl + 1}",
+                        250, "DEDICATION;1", getNeededBooks(dedicationLvl), dedicationIncrease
+                    )
+                )
             }
         }
         if (cultivatingLvl == 0) {
-            cropSpecificUpgrades.add(FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating",
-                null, "CULTIVATING;1", 1, 6.0))
+            cropSpecificUpgrades.add(
+                FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating", null, "CULTIVATING;1", 1, 6.0)
+            )
         }
         if (turboCropLvl != 5) {
-            cropSpecificUpgrades.add(FortuneUpgrade("§7Enchant your ${tool.displayName} §7with ${crop.getTurboCrop().replace("_", " ")} ${turboCropLvl + 1}",
-                null, "${crop.getTurboCrop().uppercase()};1", getNeededBooks(turboCropLvl), 5.0))
+            cropSpecificUpgrades.add(
+                FortuneUpgrade(
+                    "§7Enchant your ${tool.displayName} §7with ${
+                        crop.getTurboCrop().replace("_", " ")
+                    } ${turboCropLvl + 1}",
+                    null, "${crop.getTurboCrop().uppercase()};1", getNeededBooks(turboCropLvl), 5.0
+                )
+            )
         }
         recombobulateItem(tool, cropSpecificUpgrades)
         when (tool.getReforgeName()) {
@@ -202,21 +248,32 @@ object FortuneUpgrades {
     private fun recombobulateItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
         if (item.isRecombobulated()) return
         val reforge = item.getReforgeName()?.let {
-            FarmingReforges.entries.find { enumValue -> enumValue.name == it.uppercase()
+            FarmingReforges.entries.find { enumValue ->
+                enumValue.name == it.uppercase()
             }
         } ?: return
 
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         val increase = reforge[item.getItemRarity() + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
-        list.add(FortuneUpgrade("§7Recombobulate your ${item.displayName}",
-            null, "RECOMBOBULATOR_3000", 1, increase))
+        list.add(
+            FortuneUpgrade("§7Recombobulate your ${item.displayName}", null, "RECOMBOBULATOR_3000", 1, increase)
+        )
     }
 
-    private fun reforgeItem(item: ItemStack, reforge: FarmingReforges, list: MutableList<FortuneUpgrade>,copperPrice: Int? = null) {
+    private fun reforgeItem(
+        item: ItemStack,
+        reforge: FarmingReforges,
+        list: MutableList<FortuneUpgrade>,
+        copperPrice: Int? = null
+    ) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
-        list.add(FortuneUpgrade("§7Reforge your ${item.displayName} §7to ${reforge.reforgeName}",
-            copperPrice, reforge.reforgeItem, 1, increase))
+        list.add(
+            FortuneUpgrade(
+                "§7Reforge your ${item.displayName} §7to ${reforge.reforgeName}",
+                copperPrice, reforge.reforgeItem, 1, increase
+            )
+        )
     }
 
     private fun getNeededBooks(currentLvl: Int): Int {
@@ -232,8 +289,10 @@ object FortuneUpgrades {
     private val cropUpgrades = listOf(5, 10, 20, 50, 100, 500, 1000, 5000, 10000)
 
     // If they unlock in a weird order for example getting a corner before a cheaper one won't work properly
-    private val compostNeeded = listOf(1, 2, 4, 8, 16, 24, 32, 48, 64, 96, 128, 160, 160,
-        320, 320, 480, 480, 640, 800, 1120, 1280, 1600, 1920, 2400)
+    private val compostNeeded = listOf(
+        1, 2, 4, 8, 16, 24, 32, 48, 64, 96, 128, 160, 160,
+        320, 320, 480, 480, 640, 800, 1120, 1280, 1600, 1920, 2400
+    )
 
     // no support for people with 5% discount
     private val anitaTicketsNeeded = listOf(0, 50, 50, 100, 100, 150, 150, 200, 200, 250, 300, 350, 400, 450, 1000)

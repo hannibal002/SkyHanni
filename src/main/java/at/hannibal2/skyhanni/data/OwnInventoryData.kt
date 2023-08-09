@@ -78,7 +78,7 @@ class OwnInventoryData {
         val internalName = item.getInternalNameOrNull()
 
         if (internalName == null) {
-            LorenzUtils.debug("OwnInventoryData add is empty for: '$internalName'")
+            LorenzUtils.debug("OwnInventoryData add is empty for: '${item.name}'")
             return
         }
         if (internalName.startsWith("MAP-")) return

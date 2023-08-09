@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EnderNodeTracker {
-    private val config get() = SkyHanniMod.feature.misc.enderNodeTracker;
+    private val config get() = SkyHanniMod.feature.misc.enderNodeTracker
 
     private var totalNodesMined = 0
     private var totalEndermiteNests = 0
@@ -154,6 +154,7 @@ class EnderNodeTracker {
         "§5Ender Boots",
         "§5Ender Necklace",
         "§5Ender Gauntlet" -> true
+
         else -> false
     }
 
@@ -179,8 +180,10 @@ class EnderNodeTracker {
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         addAsSingletonList(" ")
-        addAsSingletonList("§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                "§7(§6${format(totalEnderArmor * 10_000)}§7)")
+        addAsSingletonList(
+            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
+                    "§7(§6${format(totalEnderArmor * 10_000)}§7)"
+        )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (lootCount[item] ?: 0).addSeparators()
             val profit = format(lootProfit[item] ?: 0.0)

@@ -100,7 +100,10 @@ class GardenVisitorFeatures {
             println("visitors: $visitors")
             println("name: $name")
             println("npcItem.name: ${npcItem.name}")
-            CopyErrorCommand.logError(RuntimeException("visitor is null! '$name'"), "Error finding the visitor `$name§c`. Try to reopen the inventory")
+            CopyErrorCommand.logError(
+                RuntimeException("visitor is null! '$name'"),
+                "Error finding the visitor `$name§c`. Try to reopen the inventory"
+            )
             return
         }
 
@@ -428,7 +431,7 @@ class GardenVisitorFeatures {
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.visitorNeedsDisplay && config.visitorHighlightStatus == 3) return
-            if (!event.isMod(10)) return
+        if (!event.isMod(10)) return
 //            if (!event.isMod(300)) return
 
         if (GardenAPI.onBarnPlot && config.visitorHighlightStatus != 3) {

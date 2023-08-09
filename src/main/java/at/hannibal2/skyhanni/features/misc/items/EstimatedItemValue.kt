@@ -81,7 +81,7 @@ object EstimatedItemValue {
 
         val item = event.stack
         val oldData = cache[item]
-        if (oldData != null && false) {
+        if (oldData != null) {
             display = oldData
             lastToolTipTime = System.currentTimeMillis()
             return
