@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -91,19 +90,14 @@ class CollectionAPI {
 
         fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
 
-        fun getCollectionCounter(itemName: String) = getCollectionCounter(NEUItems.getInternalName_new(itemName))
-
         fun getCollectionCounter(internalName: NEUInternalName) = collectionValue[internalName]
 
         // TODO add support for replenish (higher collection than actual items in inv)
-        fun addFromInventory(internalNameRaw: String, amount: Int) {
-            val stack = NEUItems.getItemStackOrNull(internalNameRaw)
-            if (stack == null) {
-                LorenzUtils.debug("CollectionAPI.addFromInventory: internalName is null for '$internalNameRaw'")
+        fun addFromInventory(internalName: NEUInternalName, amount: Int) {
+            if (internalName.getItemStackOrNull() == null) {
+                LorenzUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
                 return
             }
-            val internalName = stack.getInternalName_new()
-
             collectionValue.addOrPut(internalName, amount.toLong())
         }
     }
