@@ -800,9 +800,14 @@ public class MiscConfig {
     public boolean patcherSendCoordWaypoint = false;
 
     @Expose
-    @ConfigOption(name = "Harp Keybinds", desc = "In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.")
+    @ConfigOption(name = "Harp Keybinds", desc = "In Melody's Harp, press buttons with your number row on the keyboard instead of clicking.")
     @ConfigEditorBoolean
     public boolean harpKeybinds = false;
+
+    @Expose
+    @ConfigOption(name = "Harp Numbers", desc = "In Melody's Harp, show buttons as stack size (intended to be used with Harp Keybinds).")
+    @ConfigEditorBoolean
+    public boolean harpNumbers = false;
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
