@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -138,13 +139,16 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound) =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
 
-    fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false): Double? {
-        val price = getPrice(internalName, useSellingPrice)
+    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
+        val price = getPrice(useSellingPrice)
         if (price == -1.0) {
             return null
         }
         return price
     }
+
+    fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false) =
+        internalName.asInternalName().getPriceOrNull(useSellingPrice)
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName {
         val name = manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
@@ -318,15 +322,14 @@ object NEUItems {
     }
 
     // Taken and edited from NEU
-    private fun resolveEnchantmentByName(enchantmentName: String): String? {
-        return enchantmentNamePattern.matchMatcher(enchantmentName) {
+    private fun resolveEnchantmentByName(enchantmentName: String) =
+        enchantmentNamePattern.matchMatcher(enchantmentName) {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
             ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
                     + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
                     + ";" + group("level").romanToDecimal())
         }
-    }
 
     //Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {

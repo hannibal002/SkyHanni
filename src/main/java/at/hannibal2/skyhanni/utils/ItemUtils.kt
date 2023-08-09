@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -224,4 +225,6 @@ object ItemUtils {
         itemAmountCache[input] = pair
         return pair
     }
+
+    fun NEUInternalName.getItemName() = getItemStack().name ?: error("No item name found for $this")
 }
