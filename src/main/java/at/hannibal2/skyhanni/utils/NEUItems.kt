@@ -189,6 +189,9 @@ object NEUItems {
 
     fun getItemStack(internalName: NEUInternalName, definite: Boolean = false): ItemStack =
         getItemStackOrNull(internalName) ?: run {
+
+            if (getPrice(internalName) == -1.0) return@run fallbackItem
+
             if (definite) {
                 Utils.showOutdatedRepoNotification()
             }
