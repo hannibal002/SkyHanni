@@ -56,6 +56,7 @@ object LorenzUtils {
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
+    var lastButtonClicked = 0L
 
     fun debug(message: String) {
         if (SkyHanniMod.feature.dev.debugEnabled) {
@@ -308,16 +309,15 @@ object LorenzUtils {
         }
     }
 
-    fun <T> MutableList<List<Any>>.addSelector(
+    inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
-        values: Array<T>,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        onChange: (T) -> Unit,
+        crossinline onChange: (T) -> Unit,
     ) {
         add(buildList {
             add(prefix)
-            for (entry in values) {
+            for (entry in enumValues<T>()) {
                 val display = getName(entry)
                 if (isCurrent(entry)) {
                     add("§a[$display]")
@@ -330,6 +330,31 @@ object LorenzUtils {
                 }
                 add(" ")
             }
+        })
+    }
+
+    inline fun MutableList<List<Any>>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(buildList {
+            add(prefix)
+            add("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            add("§a]")
         })
     }
 
@@ -383,8 +408,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
@@ -404,11 +429,9 @@ object LorenzUtils {
         return new
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
-        if (values.isEmpty()) {
-            return 0.0
-        }
+        if (values.isEmpty()) return 0.0
+
         return when (values.first()) {
             is Double -> values.sumOf { it.toDouble() }
             is Float -> values.sumOf { it.toDouble() }
@@ -450,4 +473,7 @@ object LorenzUtils {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
     }
+
+    fun Int.toBoolean() = this != 0
+    fun Boolean.toInt() = if (!this) 0 else 1
 }

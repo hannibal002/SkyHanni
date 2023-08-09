@@ -26,7 +26,7 @@ object BlockUtils {
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
 
-    fun IBlockState.isBabyCrop(): Boolean  {
+    fun IBlockState.isBabyCrop(): Boolean {
         for (property in block.blockState.properties) {
             val name = property.name
             if (name != "age") continue

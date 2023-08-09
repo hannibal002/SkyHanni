@@ -123,9 +123,9 @@ class KingTalismanHelper {
         val oneSbDay = 1000 * 60 * 20
         val oneCircleTime = oneSbDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
-        for ((index, king) in kingCircles.reversed().withIndex()) {
+        for ((index, king) in kingCircles.withIndex()) {
 
-            val startTime = SkyBlockTime(day = index + 1)
+            val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
             var timeNext = startTime.toMillis()
             while (timeNext < System.currentTimeMillis()) {
                 timeNext += oneCircleTime

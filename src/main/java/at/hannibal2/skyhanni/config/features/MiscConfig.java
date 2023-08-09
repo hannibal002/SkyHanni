@@ -628,7 +628,7 @@ public class MiscConfig {
                         " "
                 }
         )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 15, 16, 17, 23));
+        public Property<List<Integer>> textFormat = Property.of(new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 15, 16, 17, 23)));
 
         @Expose
         public Position position = new Position(10, 80, false, true);
@@ -658,9 +658,54 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Bestiary Data", desc = "")
+    @Accordion
+    public BestiaryDataConfig bestiaryData = new BestiaryDataConfig();
+
+    public static class BestiaryDataConfig {
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Show bestiary data overlay in the bestiary menu.")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Number format", desc = "Short: 1.1k\nLong: 1.100")
+        @ConfigEditorDropdown(values = {"Short", "Long"})
+        public int numberFormat = 0;
+
+        @Expose
+        @ConfigOption(name = "Display type", desc = "Choose what the display should show")
+        @ConfigEditorDropdown(values = {
+                "Global to max",
+                "Global to next tier",
+                "Lowest total kills",
+                "Highest total kills",
+                "Lowest kills needed to max",
+                "Highest kills needed to max",
+                "Lowest kills needed to next tier",
+                "Highest kills needed to next tier"
+        })
+        public int displayType = 0;
+
+        @Expose
+        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs")
+        @ConfigEditorBoolean
+        public boolean hideMaxed = false;
+
+        @Expose
+        @ConfigOption(name = "Replace romans", desc = "Replace romans numeral (IX) with regular number (9)")
+        @ConfigEditorBoolean
+        public boolean replaceRoman = false;
+
+        @Expose
+        public Position position = new Position(100, 100, false, true);
+    }
+
+    @Expose
     @ConfigOption(name = "Mining", desc = "")
     @Accordion
     public MiningConfig mining = new MiningConfig();
+
     public static class MiningConfig {
 
         @Expose
@@ -675,6 +720,11 @@ public class MiscConfig {
 
         @Expose
         public Position kingTalismanHelperPos = new Position(-400, 220, false, true);
+
+        @Expose
+        @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of crystal hollows.")
+        @ConfigEditorBoolean
+        public boolean crystalHollowsNamesInCore = false;
     }
 
     @Expose

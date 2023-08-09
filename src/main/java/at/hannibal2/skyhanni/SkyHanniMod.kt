@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
@@ -100,7 +101,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.*
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
 import kotlinx.coroutines.CoroutineName
@@ -124,7 +124,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.3",
+    version = "0.20.Beta.5",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -288,6 +288,7 @@ class SkyHanniMod {
         loadModule(WrongFungiCutterWarning())
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
+        loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames())
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
@@ -371,6 +372,7 @@ class SkyHanniMod {
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
+        loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
         loadModule(HarpKeybinds())
         loadModule(EnderNodeTracker())

@@ -143,7 +143,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
                             return Filter.Result.DENY
                         }
                         if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
-                            firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)") {
+                            firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)"
+                        ) {
                             filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
                             return Filter.Result.DENY
                         }

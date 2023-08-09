@@ -22,7 +22,7 @@ class RepoManager(private val configLocation: File) {
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
         if (SkyHanniMod.feature.dev.repoAutoUpdate) {
-            fetchRepository().thenRun(this::reloadRepository)
+            fetchRepository(false).thenRun(this::reloadRepository)
         } else {
             reloadRepository()
         }
@@ -40,7 +40,7 @@ class RepoManager(private val configLocation: File) {
         reloadRepository("Repo loaded from local files successful :)")
     }
 
-    private fun fetchRepository(command: Boolean = false): CompletableFuture<Boolean> {
+    private fun fetchRepository(command: Boolean): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync {
             try {
                 val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))

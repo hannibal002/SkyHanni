@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.config.features;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
+import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
+import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.moulberry.moulconfig.annotations.ConfigOption;
 
-public class ItemAbilities {
+public class ItemAbilityConfig {
 
     @Expose
     @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")

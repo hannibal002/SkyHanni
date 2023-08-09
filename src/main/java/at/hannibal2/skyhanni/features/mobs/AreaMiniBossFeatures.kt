@@ -27,7 +27,7 @@ class AreaMiniBossFeatures {
 
         val entity = event.entity
         val maxHealth = event.maxHealth
-        for (bossType in AreaMiniBossType.values()) {
+        for (bossType in AreaMiniBossType.entries) {
             if (!bossType.clazz.isInstance(entity)) continue
             if (!entity.hasMaxHealth(bossType.health, false, maxHealth)) continue
 

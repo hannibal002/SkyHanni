@@ -7,7 +7,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
-public class Bingo {
+public class BingoConfig {
 
     @Expose
     @ConfigOption(name = "Bingo Card", desc = "")

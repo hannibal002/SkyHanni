@@ -76,11 +76,9 @@ class BingoNextStepHelper {
                 }
             }
 
-            if (!step.done && !parentDone) {
-                if (requirementsToDo == 0) {
-                    if (!currentSteps.contains(step)) {
-                        currentSteps = currentSteps.editCopy { add(step) }
-                    }
+            if (!step.done && !parentDone && requirementsToDo == 0) {
+                if (!currentSteps.contains(step)) {
+                    currentSteps = currentSteps.editCopy { add(step) }
                 }
             }
         }
@@ -121,7 +119,7 @@ class BingoNextStepHelper {
         }
     }
 
-    var nextMessageIsCrystal = false
+    private var nextMessageIsCrystal = false
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -195,10 +193,8 @@ class BingoNextStepHelper {
         if (done) return
         done = true
         updateResult()
-        if (!silent) {
-            if (config.stepHelper) {
-                LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
-            }
+        if (!silent && config.stepHelper) {
+            LorenzUtils.chat("§e[SkyHanni] A bingo goal step is done! ($displayName)")
         }
     }
 
@@ -278,7 +274,7 @@ class BingoNextStepHelper {
         return null
     }
 
-    fun <T : NextStep> T.makeFinalStep(): T {
+    private fun <T : NextStep> T.makeFinalStep(): T {
         finalSteps.add(this)
         return this
     }
@@ -299,12 +295,12 @@ class BingoNextStepHelper {
         }
     }
 
-    infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
+    private infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
         itemIslandRequired[itemName]?.let { this requires it }
         return this
     }
 
-    infix fun <T : NextStep> T.requires(other: NextStep): T {
+    private infix fun <T : NextStep> T.requires(other: NextStep): T {
         requirements.add(other)
         return this
     }

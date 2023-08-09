@@ -255,7 +255,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         else if (milestoneResult != "Not farming!") milestoneResult
         else if (stackingResult != "") stackingResult
         else {
-            val statusNoAuto = DiscordStatus.values().toMutableList()
+            val statusNoAuto = entries.toMutableList()
             statusNoAuto.remove(AUTO)
             statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
         }

@@ -28,14 +28,8 @@ class BlazeSlayerFirePitsWarning {
 
         val difference = System.currentTimeMillis() - lastFirePitsWarning
 
-        if (difference > 0) {
-            if (difference <= 2_000) {
-                if (event.isMod(10)) {
-                    if (config.firePitsWarning) {
-                        SoundUtils.createSound("random.orb", 0.8f).playSound()
-                    }
-                }
-            }
+        if (difference in 1..2_000 && event.isMod(10) && config.firePitsWarning) {
+            SoundUtils.createSound("random.orb", 0.8f).playSound()
         }
     }
 

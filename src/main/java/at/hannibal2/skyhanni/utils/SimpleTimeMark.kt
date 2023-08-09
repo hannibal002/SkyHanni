@@ -5,7 +5,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @JvmInline
-value class SimpleTimeMark(val millis: Long) {
+value class SimpleTimeMark(private val millis: Long) {
     operator fun minus(other: SimpleTimeMark) =
         (millis - other.millis).milliseconds
 

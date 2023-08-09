@@ -12,7 +12,7 @@ import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
 import io.github.moulberry.moulconfig.annotations.ConfigOption;
 import io.github.moulberry.moulconfig.observer.Property;
 
-public class Fishing {
+public class FishingConfig {
 
     @ConfigOption(name = "Trophy Fishing", desc = "")
     @ConfigEditorAccordion(id = 0)
@@ -188,4 +188,9 @@ public class Fishing {
     @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of sea creature you have fished.")
     @ConfigEditorBoolean
     public boolean shortenFishingMessage = false;
+
+    @Expose
+    @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the sea creature chat message instead of in a previous line.")
+    @ConfigEditorBoolean
+    public boolean compactDoubleHook = true;
 }

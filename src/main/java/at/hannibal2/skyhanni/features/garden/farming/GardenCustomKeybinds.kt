@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.Garden
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
 import net.minecraft.client.Minecraft
@@ -14,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.*
 
 object GardenCustomKeybinds {
-    private val shConfig: Garden get() = SkyHanniMod.feature.garden
+    private val shConfig get() = SkyHanniMod.feature.garden
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()

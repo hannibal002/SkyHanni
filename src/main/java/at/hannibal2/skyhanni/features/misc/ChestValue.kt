@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
+import at.hannibal2.skyhanni.utils.LorenzUtils.toBoolean
+import at.hannibal2.skyhanni.utils.LorenzUtils.toInt
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -86,57 +86,79 @@ class ChestValue {
 
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
-        var totalPrice = 0.0
-        var rendered = 0
+
         init()
 
-        if (chestItems.isNotEmpty()) {
-            val sortedList = when (config.sortingType) {
-                0 -> chestItems.values.sortedByDescending { it.total }.toMutableList()
-                1 -> chestItems.values.sortedBy { it.total }.toMutableList()
-                else -> chestItems.values.sortedByDescending { it.total }.toMutableList()
-            }
-            val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
-            newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Showing $amountShowing of ${sortedList.size} items)")
-            for ((index, amount, stack, total, tips) in sortedList) {
-                totalPrice += total
-                if (rendered >= config.itemToShow) continue
-                if (total < config.hideBelow) continue
-                val textAmount = " §7x$amount:"
-                val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-                val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
-                val price = "§b${(total).formatPrice()}"
-                newDisplay.add(buildList {
-                    val renderable = Renderable.hoverTips(
-                        "$name $price",
-                        tips,
-                        stack = stack,
-                        indexes = index)
-                    add(" §7- ")
-                    if (config.showStacks) add(stack)
-                    add(renderable)
-                })
-                rendered++
-            }
-            val sortingType = SortType.entries[config.sortingType].longName
-            newDisplay.addAsSingletonList("§7Sorted By: §c$sortingType")
-            newDisplay.addSelector(" ", SortType.entries.toTypedArray(),
-                getName = { type -> type.shortName },
-                isCurrent = { it.ordinal == config.sortingType },
-                onChange = {
-                    config.sortingType = it.ordinal
-                    update()
-                })
-            newDisplay.addAsSingletonList("§6Total value : §b${totalPrice.formatPrice()}")
-            newDisplay.addSelector(" ", FormatType.entries.toTypedArray(),
-                getName = { type -> type.type },
-                isCurrent = { it.ordinal == config.formatType },
-                onChange = {
-                    config.formatType = it.ordinal
-                    update()
-                })
-        }
+        if (chestItems.isEmpty()) return newDisplay
+
+        addList(newDisplay)
+        addButton(newDisplay)
+
         return newDisplay
+    }
+
+    private fun addList(newDisplay: MutableList<List<Any>>) {
+        val sortedList = sortedList()
+        var totalPrice = 0.0
+        var rendered = 0
+        val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
+        newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Showing $amountShowing of ${sortedList.size} items)")
+        for ((index, amount, stack, total, tips) in sortedList) {
+            totalPrice += total
+            if (rendered >= config.itemToShow) continue
+            if (total < config.hideBelow) continue
+            val textAmount = " §7x$amount:"
+            val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
+            val name = "${stack.displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val price = "§b${(total).formatPrice()}"
+            val text = if (config.alignedDisplay)
+                "$name $price"
+            else
+                "${stack.displayName} §7x$amount: §b${total.formatPrice()}"
+            newDisplay.add(buildList {
+                val renderable = Renderable.hoverTips(
+                    text,
+                    tips,
+                    stack = stack,
+                    indexes = index)
+                add(" §7- ")
+                if (config.showStacks) add(stack)
+                add(renderable)
+            })
+            rendered++
+        }
+        newDisplay.addAsSingletonList("§6Total value : §b${totalPrice.formatPrice()}")
+    }
+
+    private fun sortedList(): MutableList<Item> {
+        return when (config.sortingType) {
+            0 -> chestItems.values.sortedByDescending { it.total }
+            1 -> chestItems.values.sortedBy { it.total }
+            else -> chestItems.values.sortedByDescending { it.total }
+        }.toMutableList()
+    }
+
+    private fun addButton(newDisplay: MutableList<List<Any>>) {
+        newDisplay.addButton("§7Sorted By: ",
+            getName = SortType.entries[config.sortingType].longName,
+            onChange = {
+                config.sortingType = (config.sortingType + 1) % 2
+                update()
+            })
+
+        newDisplay.addButton("§7Value format: ",
+            getName = FormatType.entries[config.formatType].type,
+            onChange = {
+                config.formatType = (config.formatType + 1) % 2
+                update()
+            })
+
+        newDisplay.addButton("§7Display Type: ",
+            getName = DisplayType.entries[config.alignedDisplay.toInt()].type,
+            onChange = {
+                config.alignedDisplay = ((config.alignedDisplay.toInt() + 1) % 2).toBoolean()
+                update()
+            })
     }
 
     private fun init() {
@@ -190,6 +212,11 @@ class ChestValue {
         SHORT("Formatted"),
         LONG("Unformatted")
         ;
+    }
+
+    enum class DisplayType(val type: String) {
+        NORMAL("Normal"),
+        COMPACT("Aligned")
     }
 
     private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||

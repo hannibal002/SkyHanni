@@ -32,7 +32,7 @@ class AnitaMedalProfit {
         ;
     }
 
-    private fun getMedal(name: String) = MedalType.values().firstOrNull { it.displayName == name }
+    private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {

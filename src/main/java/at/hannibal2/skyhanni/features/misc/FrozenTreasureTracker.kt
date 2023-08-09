@@ -89,7 +89,7 @@ class FrozenTreasureTracker {
             if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
-        for (treasure in FrozenTreasure.values()) {
+        for (treasure in FrozenTreasure.entries) {
             if ("FROZEN TREASURE! You found ${treasure.displayName.removeColor()}!".toRegex().matches(message)) {
                 treasuresMined += 1
                 val old = treasureCount[treasure] ?: 0
@@ -122,7 +122,7 @@ class FrozenTreasureTracker {
         addAsSingletonList("§8${formatNumber(compactProcs)} Compact Procs")
         addAsSingletonList("")
 
-        for (treasure in FrozenTreasure.values()) {
+        for (treasure in FrozenTreasure.entries) {
             val count = (treasureCount[treasure] ?: 0) * if (config.showAsDrops) treasure.defaultAmount else 1
             addAsSingletonList("§b${formatNumber(count)} ${treasure.displayName}")
         }
@@ -147,7 +147,7 @@ class FrozenTreasureTracker {
     private fun calculateIce() {
         estimatedIce = 0
         estimatedIce += compactProcs * 160
-        for (treasure in FrozenTreasure.values()) {
+        for (treasure in FrozenTreasure.entries) {
             val amount = treasureCount[treasure] ?: 0
             estimatedIce += amount * treasure.defaultAmount * treasure.iceMultiplier
         }
