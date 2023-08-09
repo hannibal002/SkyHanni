@@ -227,5 +227,7 @@ object ItemUtils {
         return pair
     }
 
-    fun NEUInternalName.getItemName() = getItemStack().name ?: error("No item name found for $this")
+    fun NEUInternalName.getItemNameOrNull() = getItemStack().name
+
+    fun NEUInternalName.getItemName() = getItemNameOrNull() ?: error("No item name found for $this")
 }

@@ -229,6 +229,11 @@ object NEUItems {
         GlStateManager.popMatrix()
     }
 
+    fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
+        val pair = getMultiplier(internalName.asString(), tryCount)
+        return Pair(pair.first.asInternalName(), pair.second)
+    }
+
     fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
         if (multiplierCache.contains(internalName)) {
             return multiplierCache[internalName]!!

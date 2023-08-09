@@ -12,10 +12,14 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -232,9 +236,9 @@ class GardenVisitorFeatures {
                         list.add("§7(§fAny§7)")
                     } else {
                         for (item in items) {
-                            val internalName = NEUItems.getInternalNameOrNull(item)
+                            val internalName = NEUItems.getInternalNameOrNull_new(item)
                             if (internalName != null) {
-                                list.add(NEUItems.getItemStack(internalName))
+                                list.add(internalName.getItemStack())
                             } else {
                                 list.add(" '$item' ")
                             }
@@ -369,10 +373,10 @@ class GardenVisitorFeatures {
             val formattedLine = line.substring(4)
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
             if (itemName != null) {
-                var internalName = NEUItems.getInternalNameOrNull(itemName)
+                var internalName = NEUItems.getInternalNameOrNull_new(itemName)
                 if (internalName != null) {
-                    internalName = internalName.replace("◆_", "")
-                    price = NEUItems.getPrice(internalName) * amount
+                    internalName = internalName.asString().replace("◆_", "").asInternalName()
+                    price = internalName.getPrice() * amount
 
                     if (config.visitorShowPrice) {
                         val format = NumberUtil.format(price)
@@ -381,7 +385,7 @@ class GardenVisitorFeatures {
                     if (totalPrice == 0.0) {
                         totalPrice = price
                         val multiplier = NEUItems.getMultiplier(internalName)
-                        val rawName = NEUItems.getItemStackOrNull(multiplier.first)?.name?.removeColor() ?: continue
+                        val rawName = multiplier.first.getItemNameOrNull()?.removeColor() ?: continue
                         getByNameOrNull(rawName)?.let {
                             val cropAmount = multiplier.second.toLong() * amount
                             val formattedAmount = LorenzUtils.formatInteger(cropAmount)
