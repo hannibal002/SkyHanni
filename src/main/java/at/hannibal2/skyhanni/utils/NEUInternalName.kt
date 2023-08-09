@@ -24,5 +24,14 @@ class NEUInternalName private constructor(private val internalName: String) {
 
     override fun hashCode(): Int = internalName.hashCode()
 
-//    fun equals(other: String) = internalName == other
+    fun equals(other: String) = internalName == other
+
+    fun contains(other: String) = internalName.contains(other)
+
+    fun startsWith(other: String) = internalName.startsWith(other)
+
+    fun endsWith(other: String) = internalName.endsWith(other)
+
+    fun replace(oldValue: String, newValue: String) =
+        internalName.replace(oldValue.uppercase(), newValue.uppercase()).asInternalName()
 }

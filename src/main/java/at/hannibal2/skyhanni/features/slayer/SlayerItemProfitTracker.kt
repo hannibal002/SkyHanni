@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull_new
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
@@ -135,7 +135,7 @@ object SlayerItemProfitTracker {
         val itemStack = item.entityItem
         val name = itemStack.name ?: return
         if (SlayerAPI.ignoreSlayerDrop(name)) return
-        val internalName = itemStack.getInternalNameOrNull_new() ?: return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack)
         addItemPickup(internalName, itemStack.stackSize)

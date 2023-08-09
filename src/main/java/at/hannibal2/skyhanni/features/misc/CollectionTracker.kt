@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -138,7 +138,7 @@ class CollectionTracker {
         }
 
         private fun countCurrentlyInInventory() =
-            InventoryUtils.countItemsInLowerInventory { it.getInternalName_new() == internalName }
+            InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
 
         fun handleTabComplete(command: String): List<String>? {
             if (command != "shtrackcollection") return null

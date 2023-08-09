@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.client.Minecraft
@@ -71,7 +71,7 @@ class MinecraftData {
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
-        val newItem = hand?.getInternalName() ?: ""
+        val newItem = hand?.getInternalName_old() ?: ""
         if (newItem != InventoryUtils.itemInHandId) {
             ItemInHandChangeEvent(newItem, hand).postAndCatch()
 

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -34,7 +34,7 @@ class KloonHacking {
     }
 
     private fun checkHelmet() {
-        wearingHelmet = InventoryUtils.getArmor()[3]?.getInternalName() == "RETRO_ENCABULATING_VISOR"
+        wearingHelmet = InventoryUtils.getArmor()[3]?.getInternalName_old() == "RETRO_ENCABULATING_VISOR"
     }
 
     @SubscribeEvent

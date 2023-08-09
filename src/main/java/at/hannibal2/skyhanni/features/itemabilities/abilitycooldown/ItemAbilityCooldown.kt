@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -43,7 +43,7 @@ class ItemAbilityCooldown {
                 ItemAbility.GYROKINETIC_WAND_LEFT.sound()
             }
             if (event.pitch == 1f && event.volume == 1f) {
-                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName_old() ?: return
                 if (!internalName.equalsOneOf("SHADOW_FURY", "STARRED_SHADOW_FURY")) return
 
                 ItemAbility.SHADOW_FURY.sound()
@@ -154,7 +154,7 @@ class ItemAbilityCooldown {
 
     private fun handleItemClick(itemInHand: ItemStack?) {
         if (!LorenzUtils.inSkyBlock) return
-        itemInHand?.getInternalName()?.run {
+        itemInHand?.getInternalName_old()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
         }
     }
@@ -318,7 +318,7 @@ class ItemAbilityCooldown {
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
-        val internalName = stack.getInternalName()
+        val internalName = stack.getInternalName_old()
 
         val list = mutableListOf<ItemAbility>()
         for (ability in ItemAbility.entries) {

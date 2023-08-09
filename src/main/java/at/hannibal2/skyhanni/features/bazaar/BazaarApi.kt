@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -23,7 +23,7 @@ class BazaarApi {
         private var currentSearchedItem = ""
 
         fun getBazaarDataByName(name: String): BazaarData? =
-            NEUItems.getInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
+            NEUItems.getRawInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
 
         fun getBazaarDataByInternalName(internalName: String) = internalName.asInternalName().getBazaarData()
 
@@ -31,7 +31,7 @@ class BazaarApi {
             holder.getData(this)
         } else null
 
-        fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
+        fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName_old())
 
         fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.nbt.NBTTagCompound
@@ -94,7 +94,7 @@ class SkyHanniTestCommand {
                 list.add("$coloredName§7 (")
                 for (itemName in item.value) {
                     try {
-                        val internalName = NEUItems.getInternalName(itemName)
+                        val internalName = NEUItems.getRawInternalName(itemName)
                         list.add(NEUItems.getItemStack(internalName))
                     } catch (e: Error) {
                         LorenzUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
@@ -222,7 +222,7 @@ class SkyHanniTestCommand {
         if (!SkyHanniMod.feature.dev.showInternalName) return
         val itemStack = event.itemStack
         if (itemStack != null) {
-            val internalName = itemStack.getInternalName()
+            val internalName = itemStack.getInternalName_old()
             if (internalName == "" && !SkyHanniMod.feature.dev.showEmptyNames) return
             event.toolTip.add("Internal Name: '$internalName'")
         }

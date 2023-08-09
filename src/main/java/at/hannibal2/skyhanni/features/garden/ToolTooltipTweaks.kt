@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -139,7 +139,7 @@ class ToolTooltipTweaks {
         }
 
         // Fixing a hypixel bug. TODO remove once hypixel fixes it.
-        if (itemStack.getInternalName().contains("LOTUS")) {
+        if (itemStack.getInternalName_old().contains("LOTUS")) {
             event.toolTip.replaceAll { it.replace("Kills:", "Visitors:") }
         }
     }

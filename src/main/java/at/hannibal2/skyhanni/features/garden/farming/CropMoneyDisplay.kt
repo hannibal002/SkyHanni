@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -130,7 +130,7 @@ object CropMoneyDisplay {
                 extraMushroomCowPerkCoins = perSecond * 60 * 60
             }
 
-            if (InventoryUtils.getItemInHand()?.getInternalName()
+            if (InventoryUtils.getItemInHand()?.getInternalName_old()
                     ?.contains("DICER") == true && config.moneyPerHourDicer
             ) {
                 var dicerDrops = 0.0

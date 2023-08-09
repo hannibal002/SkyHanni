@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -76,9 +76,9 @@ class AnitaMedalProfit {
         val (name, amount) = ItemUtils.readItemAmount(itemName)
         if (name == null) return
 
-        var internalName = NEUItems.getInternalNameOrNull(name)
+        var internalName = NEUItems.getRawInternalNameOrNull(name)
         if (internalName == null) {
-            internalName = item.getInternalName()
+            internalName = item.getInternalName_old()
         }
 
         val itemPrice = NEUItems.getPrice(internalName) * amount
@@ -105,7 +105,7 @@ class AnitaMedalProfit {
                 val bronze = medal.factorBronze * amount
                 bronze * jacobTicketPrice
             } else {
-                val internalName = NEUItems.getInternalName(name)
+                val internalName = NEUItems.getRawInternalName(name)
                 NEUItems.getPrice(internalName) * amount
             }
         }

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -102,7 +102,7 @@ class FarmingArmorDrops {
 
     private fun checkArmor() {
         val armorPieces = InventoryUtils.getArmor()
-            .mapNotNull { it?.getInternalName() }
+            .mapNotNull { it?.getInternalName_old() }
             .count { armorPattern.matcher(it).matches() }
         hasArmor = armorPieces > 1
     }

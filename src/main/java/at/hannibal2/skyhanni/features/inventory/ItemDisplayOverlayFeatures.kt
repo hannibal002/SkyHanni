@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
@@ -163,7 +163,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
-            if (item.getInternalName() == "LARVA_HOOK") {
+            if (item.getInternalName_old() == "LARVA_HOOK") {
                 for (line in item.getLore()) {
                     "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
                         val amount = group("amount").toInt()
@@ -178,7 +178,7 @@ class ItemDisplayOverlayFeatures {
         }
 
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13)) {
-            if (item.getInternalName() == "POTION") {
+            if (item.getInternalName_old() == "POTION") {
                 item.name?.let {
                     "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
                         return when (val level = group("level").romanToDecimal()) {

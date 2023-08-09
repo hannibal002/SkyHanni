@@ -117,13 +117,14 @@ object ItemUtils {
         return false
     }
 
-    fun ItemStack.getInternalNameOrNull() = getInternalName().takeIf { it != "" }
+    // TODO remove
+    fun ItemStack.getInternalName_old() = getInternalName().asString()
 
-    fun ItemStack.getInternalNameOrNull_new() = getInternalName_new().takeIf { it.asString() != "" }
+    fun ItemStack.getInternalName() = getInternalNameOrNull() ?: "".asInternalName()
 
-    fun ItemStack.getInternalName_new() = getInternalName().asInternalName()
+    fun ItemStack.getInternalNameOrNull() = getRawInternalName()?.asInternalName()
 
-    fun ItemStack.getInternalName(): String {
+    private fun ItemStack.getRawInternalName(): String? {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return "WISP_POTION"
         }
@@ -186,7 +187,7 @@ object ItemUtils {
             return name
         }
 
-    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
+    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName_old() == "SKYBLOCK_MENU"
 
     private val patternInFront = "(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)".toPattern()
     private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()

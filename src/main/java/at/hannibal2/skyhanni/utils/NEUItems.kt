@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -45,12 +45,13 @@ object NEUItems {
         )
     }
 
-    fun getInternalName(itemName: String): String {
-        return getInternalNameOrNull_new(itemName)?.asString() ?: throw Error("getInternalName is null for '$itemName'")
+    // TODO remove
+    fun getRawInternalName(itemName: String): String {
+        return getInternalNameOrNull(itemName)?.asString() ?: throw Error("internal name is null for '$itemName'")
     }
 
-    fun getInternalName_new(itemName: String): NEUInternalName {
-        return getInternalNameOrNull_new(itemName) ?: throw Error("getInternalName is null for '$itemName'")
+    fun getInternalName(itemName: String): NEUInternalName {
+        return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
     }
 
     fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
@@ -82,9 +83,10 @@ object NEUItems {
         return map
     }
 
-    fun getInternalNameOrNull(itemName: String) = getInternalNameOrNull_new(itemName)?.asString()
+    // TODO remove
+    fun getRawInternalNameOrNull(itemName: String) = getInternalNameOrNull(itemName)?.asString()
 
-    fun getInternalNameOrNull_new(itemName: String): NEUInternalName? {
+    fun getInternalNameOrNull(itemName: String): NEUInternalName? {
         val lowercase = itemName.lowercase()
         if (itemNameCache.containsKey(lowercase)) {
             return itemNameCache[lowercase]!!
@@ -132,7 +134,7 @@ object NEUItems {
     fun getInternalName(itemStack: ItemStack) = ItemResolutionQuery(manager)
         .withCurrentGuiContext()
         .withItemStack(itemStack)
-        .resolveInternalName() ?: ""
+        .resolveInternalName()
 
     fun getInternalNameOrNull(nbt: NBTTagCompound) =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()
@@ -144,9 +146,6 @@ object NEUItems {
         }
         return price
     }
-
-    fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false) =
-        internalName.asInternalName().getPriceOrNull(useSellingPrice)
 
     fun transHypixelNameToInternalName(hypixelId: String) =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
@@ -197,7 +196,7 @@ object NEUItems {
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName())
+    fun isVanillaItem(item: ItemStack) = manager.auctionManager.isVanillaItem(item.getInternalName_old())
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()

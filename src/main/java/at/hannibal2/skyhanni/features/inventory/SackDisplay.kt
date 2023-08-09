@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -119,7 +119,7 @@ class SackDisplay {
                     numPattern.matchMatcher(line) {
                         val stored = group("stored")
                         val total = group("total")
-                        val internalName = stack.getInternalName()
+                        val internalName = stack.getInternalName_old()
                         item.internalName = internalName
                         item.colorCode = group("color")
                         item.stored = stored

@@ -11,13 +11,12 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -115,7 +114,7 @@ class GardenVisitorFeatures {
                 LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                 continue
             }
-            val internalName = NEUItems.getInternalName(itemName)
+            val internalName = NEUItems.getRawInternalName(itemName)
             visitor.items[internalName] = amount
         }
 
@@ -236,7 +235,7 @@ class GardenVisitorFeatures {
                         list.add("§7(§fAny§7)")
                     } else {
                         for (item in items) {
-                            val internalName = NEUItems.getInternalNameOrNull_new(item)
+                            val internalName = NEUItems.getInternalNameOrNull(item)
                             if (internalName != null) {
                                 list.add(internalName.getItemStack())
                             } else {
@@ -373,9 +372,9 @@ class GardenVisitorFeatures {
             val formattedLine = line.substring(4)
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
             if (itemName != null) {
-                var internalName = NEUItems.getInternalNameOrNull_new(itemName)
+                var internalName = NEUItems.getInternalNameOrNull(itemName)
                 if (internalName != null) {
-                    internalName = internalName.asString().replace("◆_", "").asInternalName()
+                    internalName = internalName.replace("◆_", "")
                     price = internalName.getPrice() * amount
 
                     if (config.visitorShowPrice) {
@@ -649,7 +648,7 @@ class GardenVisitorFeatures {
     private fun hasItemsInInventory(visitor: Visitor): Boolean {
         var ready = true
         for ((internalName, need) in visitor.items) {
-            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName_old() == internalName }
             if (having < need) {
                 ready = false
             }

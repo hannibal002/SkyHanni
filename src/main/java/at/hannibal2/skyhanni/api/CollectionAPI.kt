@@ -51,7 +51,7 @@ class CollectionAPI {
                 singleCounterPattern.matchMatcher(line) {
                     val counter = group("amount").replace(",", "").toLong()
                     val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                    val internalName = NEUItems.getInternalNameOrNull_new(name) ?: continue
+                    val internalName = NEUItems.getInternalNameOrNull(name) ?: continue
                     collectionValue[internalName] = counter
                 }
             }
@@ -75,7 +75,7 @@ class CollectionAPI {
                 for (line in lore) {
                     counterPattern.matchMatcher(line) {
                         val counter = group("amount").replace(",", "").toLong()
-                        val internalName = NEUItems.getInternalNameOrNull_new(name) ?: continue
+                        val internalName = NEUItems.getInternalNameOrNull(name) ?: continue
                         collectionValue[internalName] = counter
                     }
                 }

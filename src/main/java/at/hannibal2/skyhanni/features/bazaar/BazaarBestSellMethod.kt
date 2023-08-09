@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -39,14 +39,14 @@ class BazaarBestSellMethod {
             if (buyInstantly == null || buyInstantly.displayName != "§aBuy Instantly") return ""
             val bazaarItem = inv.getStackInSlot(13) ?: return ""
 
-            val internalName = NEUItems.getInternalNameOrNull(bazaarItem.displayName) ?: return ""
+            val internalName = NEUItems.getRawInternalNameOrNull(bazaarItem.displayName) ?: return ""
 
             var having = 0
             for (slot in chest.inventorySlots) {
                 if (slot == null) continue
                 if (slot.slotNumber == slot.slotIndex) continue
                 val stack = slot.stack ?: continue
-                if (internalName == stack.getInternalName()) {
+                if (internalName == stack.getInternalName_old()) {
                     having += stack.stackSize
                 }
             }

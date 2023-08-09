@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.slayer.SlayerType
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.nextAfter
@@ -56,7 +56,7 @@ object SlayerAPI {
     }
 
     fun getItemNameAndPrice(stack: ItemStack): Pair<String, Double> {
-        val internalName = stack.getInternalName_new()
+        val internalName = stack.getInternalName()
         val amount = stack.stackSize
         val key = internalName to amount
         nameCache.getIfPresent(key)?.let {

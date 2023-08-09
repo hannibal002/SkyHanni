@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull_new
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -101,20 +101,19 @@ object EstimatedItemValue {
     }
 
     private fun draw(stack: ItemStack): List<List<Any>> {
-        val internalName = stack.getInternalNameOrNull_new() ?: return listOf()
+        val internalName = stack.getInternalNameOrNull() ?: return listOf()
 
-        val rawInternalName = internalName.asString()
         // FIX neu item list
-        if (rawInternalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
+        if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
         // We don't need this feature to work on books at all
         if (stack.item == Items.enchanted_book) return listOf()
         // Block catacombs items in mort inventory
-        if (rawInternalName.startsWith("CATACOMBS_PASS_") || rawInternalName.startsWith("MASTER_CATACOMBS_PASS_")) return listOf()
+        if (internalName.startsWith("CATACOMBS_PASS_") || internalName.startsWith("MASTER_CATACOMBS_PASS_")) return listOf()
         // Blocks the dungeon map
-        if (rawInternalName.startsWith("MAP-")) return listOf()
+        if (internalName.startsWith("MAP-")) return listOf()
         // Hides the rune item
-        if (rawInternalName.contains("_RUNE;")) return listOf()
-        if (rawInternalName.contains("UNIQUE_RUNE")) return listOf()
+        if (internalName.contains("_RUNE;")) return listOf()
+        if (internalName.contains("UNIQUE_RUNE")) return listOf()
 
 
         if (internalName.getItemStackOrNull() == null) {
@@ -186,7 +185,7 @@ object EstimatedItemValue {
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
-        var internalName = stack.getInternalName().removePrefix("VANQUISHED_")
+        var internalName = stack.getInternalName_old().removePrefix("VANQUISHED_")
         val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
         var genericName = internalName
         if (kuudraSets.any { internalName.contains(it) }
@@ -374,7 +373,7 @@ object EstimatedItemValue {
     private fun addSilex(stack: ItemStack, list: MutableList<String>): Double {
         val tier = stack.getSilexCount() ?: return 0.0
 
-        val internalName = stack.getInternalName()
+        val internalName = stack.getInternalName_old()
         val maxTier = if (internalName == "STONK_PICKAXE") 4 else 5
 
         val wtfHardcodedSilex = "SIL_EX".asInternalName()
@@ -504,14 +503,14 @@ object EstimatedItemValue {
     }
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getInternalName_new()
+        val internalName = stack.getInternalName()
         var price = internalName.getPrice()
         if (price == -1.0) {
             price = 0.0
         }
 
         val name = internalName.getItemName()
-        if (internalName.asString().startsWith("ENCHANTED_BOOK_BUNDLE_")) {
+        if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0
         }
@@ -537,7 +536,7 @@ object EstimatedItemValue {
             "ZOMBIE_COMMANDER_WHIP",
         )
 
-        val internalName = stack.getInternalName()
+        val internalName = stack.getInternalName_old()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue

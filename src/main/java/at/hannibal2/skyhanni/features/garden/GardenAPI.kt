@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -103,7 +103,7 @@ object GardenAPI {
     private fun getToolInHand(toolItem: ItemStack?, crop: CropType?): String? {
         if (crop != null) return crop.cropName
 
-        val internalName = toolItem?.getInternalName() ?: return null
+        val internalName = toolItem?.getInternalName_old() ?: return null
         return if (isOtherTool(internalName)) internalName else null
     }
 
@@ -126,7 +126,7 @@ object GardenAPI {
     fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
 
     fun ItemStack.getCropType(): CropType? {
-        val internalName = getInternalName()
+        val internalName = getInternalName_old()
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 

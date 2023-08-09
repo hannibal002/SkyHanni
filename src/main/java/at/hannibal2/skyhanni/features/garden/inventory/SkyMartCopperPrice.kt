@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,7 +34,7 @@ class SkyMartCopperPrice {
         val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
         for (stack in event.inventoryItems.values) {
             for (line in stack.getLore()) {
-                val internalName = stack.getInternalName()
+                val internalName = stack.getInternalName_old()
                 val lowestBin = NEUItems.getPrice(internalName)
                 if (lowestBin == -1.0) continue
                 pattern.matchMatcher(line) {
