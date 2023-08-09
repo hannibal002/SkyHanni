@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
@@ -120,7 +121,7 @@ object ItemUtils {
 
     fun ItemStack.getInternalNameOrNull_new() = getInternalName_new().takeIf { it.asString() != "" }
 
-    fun ItemStack.getInternalName_new() = NEUInternalName.from(getInternalName())
+    fun ItemStack.getInternalName_new() = getInternalName().asInternalName()
 
     fun ItemStack.getInternalName(): String {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {

@@ -419,7 +419,7 @@ object EstimatedItemValue {
 
         for ((prefix, number) in stars) {
             if (masterStars >= number) {
-                price += NEUInternalName.from("${prefix}_MASTER_STAR").getPrice()
+                price += "${prefix}_MASTER_STAR".asInternalName().getPrice()
             }
         }
 

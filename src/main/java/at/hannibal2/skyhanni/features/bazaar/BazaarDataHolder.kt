@@ -69,7 +69,7 @@ class BazaarDataHolder {
         val npcPrice = npcPrices[internalName].let {
             if (it == null) {
                 if (!ignoreNoNpcPrice(internalName.asString())) {
-                    LorenzUtils.debug("NPC price not found for item '$internalName'")
+                    LorenzUtils.debug("NPC price not found for '$internalName'")
                 }
                 0.0
             } else it

@@ -73,9 +73,9 @@ object NEUItems {
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
-        for (internalNameRaw in manager.itemInformation.keys) {
-            val name = manager.createItem(internalNameRaw).displayName.removeColor().lowercase()
-            val internalName = NEUInternalName.from(internalNameRaw)
+        for (rawInternalName in manager.itemInformation.keys) {
+            val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
+            val internalName = rawInternalName.asInternalName()
             map[name] = internalName
             allInternalNames.add(internalName)
         }
@@ -91,7 +91,7 @@ object NEUItems {
         }
 
         if (itemName == "§cmissing repo item") {
-            val name = NEUInternalName.from("MISSING_ITEM")
+            val name = "MISSING_ITEM".asInternalName()
             itemNameCache[lowercase] = name
             return name
         }
@@ -101,15 +101,13 @@ object NEUItems {
             itemNameCache[itemName] = enchantmentName
             return enchantmentName
         }
-        val internalNameRaw = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
+        var rawInternalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, false) ?: return null
 
         // This fixes a NEU bug with §9Hay Bale (cosmetic item)
         // TODO remove workaround when this is fixed in neu
-        val internalName = if (internalNameRaw == "HAY_BALE") {
-            NEUInternalName.from("HAY_BLOCK")
-        } else {
-            NEUInternalName.from(internalNameRaw)
-        }
+        rawInternalName = if (rawInternalName == "HAY_BALE") "HAY_BLOCK" else rawInternalName
+
+        val internalName = rawInternalName.asInternalName()
 
         itemNameCache[lowercase] = internalName
         return internalName
@@ -119,10 +117,10 @@ object NEUItems {
         // Workaround for duplex
         "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern().matchMatcher(originalName) {
             val tier = group("tier")
-            return NEUInternalName.from("ULTIMATE_REITERATE;$tier")
+            return "ULTIMATE_REITERATE;$tier".asInternalName()
         }
 
-        return NEUInternalName.from(originalName)
+        return originalName.asInternalName()
     }
 
     private fun turboCheck(text: String): String {
@@ -150,10 +148,8 @@ object NEUItems {
     fun getPriceOrNull(internalName: String, useSellingPrice: Boolean = false) =
         internalName.asInternalName().getPriceOrNull(useSellingPrice)
 
-    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName {
-        val name = manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId)
-        return NEUInternalName.from(name)
-    }
+    fun transHypixelNameToInternalName(hypixelId: String) =
+        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false): Double {
         val string = asString()
@@ -174,16 +170,16 @@ object NEUItems {
     }
 
     fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
-        NEUInternalName.from(internalName).getPrice(useSellingPrice)
+        internalName.asInternalName().getPrice(useSellingPrice)
 
     fun NEUInternalName.getItemStackOrNull() = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
-    fun getItemStackOrNull(internalName: String) = NEUInternalName.from(internalName).getItemStackOrNull()
+    fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
 
     fun getItemStack(internalName: String, definite: Boolean = false): ItemStack =
-        NEUInternalName.from(internalName).getItemStack(definite)
+        internalName.asInternalName().getItemStack(definite)
 
     fun NEUInternalName.getItemStack(definite: Boolean = false): ItemStack =
         getItemStackOrNull() ?: run {
