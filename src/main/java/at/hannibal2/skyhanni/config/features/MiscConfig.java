@@ -673,7 +673,6 @@ public class MiscConfig {
         @ConfigEditorDropdown(values = {"Short", "Long"})
         public int numberFormat = 0;
 
-
         @Expose
         @ConfigOption(name = "Display type", desc = "Choose what the display should show")
         @ConfigEditorDropdown(values = {

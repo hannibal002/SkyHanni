@@ -366,6 +366,7 @@ class SkyHanniMod {
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
+        loadModule(ChestValue())
         loadModule(SlayerBossSpawnSoon())
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())

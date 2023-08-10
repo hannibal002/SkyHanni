@@ -8,6 +8,9 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
+import at.hannibal2.skyhanni.utils.LorenzUtils.toBoolean
+import at.hannibal2.skyhanni.utils.LorenzUtils.toInt
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -230,7 +233,7 @@ object BestiaryData {
             if (isMaxed && config.hideMaxed) continue
             val text = getMobLine(mob, isMaxed)
             val tips = getMobHover(mob)
-            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips, false) { true })
+            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips) { true })
         }
     }
 
@@ -413,9 +416,6 @@ object BestiaryData {
         else -> "0"
     }
 
-    private fun Int.toBoolean() = this != 0
-    private fun Boolean.toInt() = if (!this) 0 else 1
-
     data class Category(
         val name: String,
         val familiesFound: Long,
@@ -452,30 +452,6 @@ object BestiaryData {
         fun getNextLevel() = level.getNextLevel()
     }
 
-    private fun MutableList<List<Any>>.addButton(
-        prefix: String,
-        getName: String,
-        onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - lastclicked) > 100) { // funny thing happen if I don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                lastclicked = System.currentTimeMillis()
-            }
-        }
-        add(buildList {
-            add(prefix)
-            add("§a[")
-            if (tips.isEmpty()) {
-                add(Renderable.link("§e$getName", false, onClick))
-            } else {
-                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-            }
-            add("§a]")
-        })
-    }
 
     private fun String.romanOrInt() = romanToDecimalIfNeeded().let {
         if (config.replaceRoman || it == 0) it.toString() else it.toRoman()

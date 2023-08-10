@@ -188,6 +188,77 @@ public class InventoryConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Chest Value", desc = "")
+    @Accordion
+    public ChestValueConfig chestValueConfig = new ChestValueConfig();
+
+    public static class ChestValueConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enabled estimated value of chest")
+        @ConfigEditorBoolean
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Show Stacks", desc = "Show the item icon before name.")
+        @ConfigEditorBoolean
+        public boolean showStacks = true;
+
+        @Expose
+        @ConfigOption(name = "Display Type", desc = "Try to align everything to look nicer.")
+        @ConfigEditorBoolean
+        public boolean alignedDisplay = true;
+
+        @Expose
+        @ConfigOption(name = "Name Length", desc = "Reduce item name length to gain extra space on screen.\n§cCalculated in pixels!")
+        @ConfigEditorSlider(minStep = 1, minValue = 10, maxValue = 200)
+        public int nameLength = 100;
+
+        @Expose
+        @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
+        @ConfigEditorBoolean
+        public boolean enableHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight color", desc = "Choose the highlight color.")
+        @ConfigEditorColour
+        public String highlightColor = "0:249:0:255:88";
+
+        @Expose
+        @ConfigOption(name = "Sorting Type", desc = "Price sorting type.")
+        @ConfigEditorDropdown(values = {"Descending", "Ascending"})
+        public int sortingType = 0;
+
+        @Expose
+        @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
+        @ConfigEditorDropdown(values = {"Short", "Long"})
+        public int formatType = 0;
+
+        @Expose
+        @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed.\n" +
+                "All items in the chest are still counted for the total value.")
+        @ConfigEditorSlider(
+                minValue = 0,
+                maxValue = 54,
+                minStep = 1
+        )
+        public int itemToShow = 15;
+
+        @Expose
+        @ConfigOption(name = "Hide below", desc = "Item item value below configured amount.\n" +
+                "Items are still counted for the total value.")
+        @ConfigEditorSlider(
+                minValue = 50_000,
+                maxValue = 10_000_000,
+                minStep = 50_000
+        )
+        public int hideBelow = 100_000;
+
+
+        @Expose
+        public Position position = new Position(107, 141, false, true);
+    }
+
+    @Expose
     @ConfigOption(
             name = "Item number",
             desc = "Showing the item number as a stack size for these items."

@@ -57,6 +57,7 @@ object LorenzUtils {
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
+    var lastButtonClicked = 0L
 
     fun debug(message: String) {
         if (SkyHanniMod.feature.dev.debugEnabled) {
@@ -333,6 +334,31 @@ object LorenzUtils {
         })
     }
 
+    inline fun MutableList<List<Any>>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(buildList {
+            add(prefix)
+            add("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            add("§a]")
+        })
+    }
+
     // TODO nea?
 //    fun <T> dynamic(block: () -> KMutableProperty0<T>?): ReadWriteProperty<Any?, T?> {
 //        return object : ReadWriteProperty<Any?, T?> {
@@ -383,8 +409,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
@@ -448,4 +474,7 @@ object LorenzUtils {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
     }
+
+    fun Int.toBoolean() = this != 0
+    fun Boolean.toInt() = if (!this) 0 else 1
 }

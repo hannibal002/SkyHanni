@@ -2,14 +2,12 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.ToolTipData
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -21,7 +19,7 @@ interface Renderable {
     val height: Int
     fun isHovered(posX: Int, posY: Int) =
         Utils.getMouseX() in (posX..posX + width)
-                && Utils.getMouseY() in (posY..posY + height) // TODO: adjust for variable height?
+            && Utils.getMouseY() in (posY..posY + height) // TODO: adjust for variable height?
 
     /**
      * N.B.: the offset is absolute, not relative to the position and shouldn't be used for rendering
@@ -31,6 +29,7 @@ interface Renderable {
 
     companion object {
         val logger = LorenzLogger("debug/renderable")
+        val list = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
         fun fromAny(any: Any?, itemScale: Double = 1.0): Renderable? = when (any) {
             null -> placeholder(12)
@@ -101,12 +100,8 @@ interface Renderable {
                 }
             }
 
-        fun hoverTips(
-            text: String,
-            tips: List<String>,
-            bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true }
-        ): Renderable {
+        fun hoverTips(text: String, tips: List<String>, indexes: List<Int> = listOf(), stack: ItemStack? = null, bypassChecks: Boolean = false, condition: () -> Boolean = { true }): Renderable {
+
             val render = string(text)
             return object : Renderable {
                 override val width: Int
@@ -117,51 +112,16 @@ interface Renderable {
                     render.render(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
-                            renderToolTips(posX, posY, tips)
+                            list[Pair(posX, posY)] = indexes
+                            RenderLineTooltips.drawHoveringText(posX, posY, tips, stack)
+                        }
+                    } else {
+                        if (list.contains(Pair(posX, posY))) {
+                            list.remove(Pair(posX, posY))
                         }
                     }
                 }
             }
-        }
-
-        private fun renderToolTips(posX: Int, posY: Int, tips: List<String>, border: Int = 1) {
-            GlStateManager.pushMatrix()
-//            GlStateManager.translate(0f, 0f, 2f)
-//            GuiRenderUtils.drawTooltip(tips, posX, posY, 0)
-//            GlStateManager.translate(0f, 0f, -2f)
-
-            val x = Utils.getMouseX() - posX + 10
-            val startY = Utils.getMouseY() - posY - 10
-            var maxX = 0
-            var y = startY
-            val renderer = Minecraft.getMinecraft().fontRendererObj
-
-            GlStateManager.translate(0f, 0f, 2f)
-            for (line in tips) {
-                renderer.drawStringWithShadow(
-                    "§f$line",
-                    1f + x,
-                    1f + y,
-                    0
-                )
-                val currentX = renderer.getStringWidth(line)
-                if (currentX > maxX) {
-                    maxX = currentX
-                }
-                y += 10
-            }
-            GlStateManager.translate(0f, 0f, -1f)
-
-            GuiScreen.drawRect(
-                x - border,
-                startY - border,
-                x + maxX + 10 + border,
-                y + border,
-                LorenzColor.DARK_GRAY.toColor().rgb
-            )
-            GlStateManager.translate(0f, 0f, -1f)
-
-            GlStateManager.popMatrix()
         }
 
         private fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
@@ -253,3 +213,4 @@ interface Renderable {
         }
     }
 }
+
