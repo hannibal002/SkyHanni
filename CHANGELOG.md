@@ -19,6 +19,10 @@
     + Options for change number format, display time, number type and hide maxed.
     + Highlight maxed bestiaries.
 + Show the names of the **4 areas** while in the center of **crystal Hollows**.
++ Chest Value - HiZe
+    + Shows a list of all items and their price when inside a chest on your private island.
++ In Melody's Harp, show buttons as stack size. - NetheriteMiner
+    + Intended to be used with Harp Keybinds
 
 ### Changes
 
@@ -29,6 +33,10 @@
 + Added option to only show the reputation helper while pressing a hotkey.
 + Garden **Money per Hour** now uses the **dicer drops** from melon and pumpkins as well. - CalMWolfs
 + Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0
++ Rune display now shows always in sack display.
++ Shark fish counter now counts twice for Double hook. - appable0
++ Ghost counter check for Mist now ignores y coordiantes - HiZe
++ Telling the user about the bypass hotkey when the visitor drop warning blocks a visitor refusal. - CalMWolfs
 
 ### Fixes
 
@@ -46,6 +54,8 @@
 + Fixed master star detection in estimate item value broken for some times.
 + Fixed description in golden trophy fish info tooltip. - appable0
 + Fixed End Node Tracker not updating when changing the text format.
++ Fixed neu repo error messages with runes.
++ Fixed rare crashes with scoreboard.
 
 ## Version 0.19
 

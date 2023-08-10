@@ -95,6 +95,10 @@
 + **Bestiary overlay** - HiZe
     + Options for change number format, display time, number type and hide maxed.
     + Highlight maxed bestiaries.
++ Chest Value - HiZe
+    + Shows a list of all items and their price when inside a chest on your private island.
++ In Melody's Harp, show buttons as stack size. - NetheriteMiner
+    + Intended to be used with Harp Keybinds
 
 ## Item Abilities
 
