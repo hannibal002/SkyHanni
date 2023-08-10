@@ -35,7 +35,7 @@ object NumberUtil {
     )
 
     /**
-     * This code was unmodified and taken under CC BY-SA 3.0 license
+     * This code was modified and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
