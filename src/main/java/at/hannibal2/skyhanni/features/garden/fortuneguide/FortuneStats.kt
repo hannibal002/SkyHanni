@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 enum class FortuneStats(val label: String, val tooltip: String) {
-    BASE("§2Universal Farming Fortune", "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-            "§eSee on the grass block page"),
+    BASE(
+        "§2Universal Farming Fortune",
+        "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
+                "§eSee on the grass block page"
+    ),
     CROP_TOTAL("§6Crop Farming Fortune", "§7§2Farming fortune for this crop"),
     ACCESSORY("§2Talisman Bonus", "§7§2Fortune from your talisman\n§2You get 10☘ per talisman tier"),
     CROP_UPGRADE("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n§2You get 5☘ per level"),

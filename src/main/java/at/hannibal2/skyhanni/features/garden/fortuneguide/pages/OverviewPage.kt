@@ -18,8 +18,13 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
         //todo change based on pet and based on setting
-        GuiRenderUtils.drawFarmingBar("§6Universal Farming Fortune", "§7§2Farming fortune in that is\n" +
-                "§2applied to every crop\n§eNot the same as tab FF\n§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1250, FFGuideGUI.guiLeft + 15,
+        GuiRenderUtils.drawFarmingBar(
+            "§6Universal Farming Fortune",
+            "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
+                    "§eSee on the grass block page",
+            FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0,
+            1250,
+            FFGuideGUI.guiLeft + 15,
             FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         var line = if (FFStats.baseFF[FFTypes.ANITA]!! < 0.0) "§cAnita buff not saved\n§eVisit Anita to set it!"

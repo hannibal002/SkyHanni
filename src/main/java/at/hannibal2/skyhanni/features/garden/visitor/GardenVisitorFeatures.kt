@@ -284,7 +284,10 @@ class GardenVisitorFeatures {
                     event.isCanceled = true
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.visitorRewardWarning.bypassKey == Keyboard.KEY_NONE) {
-                        LorenzUtils.chat("§eIf you want to deny this visitor set a keybind in /sh bypass")
+                        LorenzUtils.clickableChat(
+                            "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
+                            "sh bypass"
+                        )
                     }
                     Minecraft.getMinecraft().thePlayer.closeScreen()
                     return
