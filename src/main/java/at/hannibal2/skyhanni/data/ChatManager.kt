@@ -142,14 +142,6 @@ object ChatManager {
         return false
     }
 
-    @SubscribeEvent
-    fun onChatMessage(chatEvent: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
-        val seaCreature = SeaCreatureManager.getSeaCreature(chatEvent.message) ?: return
-        SeaCreatureFishEvent(seaCreature, chatEvent).postAndCatch()
-    }
-
     fun openChatFilterGUI() {
         SkyHanniMod.screenToOpen = ChatFilterGui(getRecentMessageHistory())
     }
