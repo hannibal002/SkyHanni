@@ -48,7 +48,7 @@ class DetectBrokenHyperion {
             TitleUtils.sendTitle("§eBroken Hyperion!", 3_000)
             LorenzUtils.chat(
                 "§e[SkyHanni] Your Hyperion is broken! It no longer collects combat exp. " +
-                        "Kill a mob with meele-hits to fix this hypixel bug"
+                        "Kill a mob with melee-hits to fix this hypixel bug"
             )
         }
     }
