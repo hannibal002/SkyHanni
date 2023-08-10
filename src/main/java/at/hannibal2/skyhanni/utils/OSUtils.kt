@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import net.minecraft.client.settings.KeyBinding
 import org.lwjgl.input.Keyboard
 import java.awt.Desktop
@@ -28,7 +29,11 @@ object OSUtils {
     }
 
     fun copyToClipboard(text: String) {
-        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+        try {
+            Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+        } catch (e: Exception) {
+            CopyErrorCommand.logError(e, "Error while trying to set clipboard content.")
+        }
     }
 
     fun readFromClipboard(): String? {
