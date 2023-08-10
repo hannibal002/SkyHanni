@@ -32,6 +32,7 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.time.Duration
 
 object LorenzUtils {
 
@@ -468,6 +469,14 @@ object LorenzUtils {
 
     infix fun <K, V> MutableMap<K, V>.put(pairs: Pair<K, V>) {
         this[pairs.first] = pairs.second
+    }
+
+    fun runDelayed(duration: Duration, runnable: () -> Unit) {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runnable()
+            }
+        }, duration.inWholeMilliseconds)
     }
 
     fun Field.removeFinal(): Field {
