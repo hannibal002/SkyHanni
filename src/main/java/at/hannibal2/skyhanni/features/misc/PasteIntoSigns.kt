@@ -17,8 +17,9 @@ class PasteIntoSigns {
 
         if (LorenzUtils.isControlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_V)) {
             SkyHanniMod.coroutineScope.launch {
-                val clipboard = OSUtils.readFromClipboard() ?: return@launch
-                LorenzUtils.setTextIntoSign(clipboard.take(15))
+                OSUtils.readFromClipboard()?.let {
+                    LorenzUtils.setTextIntoSign(it.take(15))
+                }
             }
         }
     }
