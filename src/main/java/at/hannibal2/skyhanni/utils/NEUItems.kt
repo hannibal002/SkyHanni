@@ -47,11 +47,11 @@ object NEUItems {
 
     // TODO remove
     fun getRawInternalName(itemName: String): String {
-        return getInternalNameOrNull(itemName)?.asString() ?: throw Error("internal name is null for '$itemName'")
+        return getInternalNameFromItemName(itemName).asString()
     }
 
-    fun getInternalName(itemName: String): NEUInternalName {
-        return getInternalNameOrNull(itemName) ?: throw Error("getInternalName is null for '$itemName'")
+    fun getInternalNameFromItemName(itemName: String): NEUInternalName {
+        return getInternalNameOrNull(itemName) ?: throw Error("Internal name is null for '$itemName'")
     }
 
     fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
