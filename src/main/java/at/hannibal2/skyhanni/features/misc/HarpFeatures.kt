@@ -15,6 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 class HarpFeatures {
+    private val config get() = SkyHanniMod.feature.misc
     private var lastClick = SimpleTimeMark.farPast()
 
     private val keys = listOf(
@@ -32,7 +33,7 @@ class HarpFeatures {
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.misc.harpKeybinds) return
+        if (!config.harpKeybinds) return
         if (!openInventoryName().startsWith("Harp")) return
         val chest = event.gui as? GuiChest ?: return
 
@@ -56,12 +57,12 @@ class HarpFeatures {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.misc.harpNumbers) return
+        if (!config.harpNumbers) return
         if (!openInventoryName().startsWith("Harp")) return
         if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
 
-        val index =
-            buttonColors.indexOfFirst { it == event.stack.displayName[1] } // Example: §9| §7Click! will select the 9
+        // Example: §9| §7Click! will select the 9
+        val index = buttonColors.indexOfFirst { it == event.stack.displayName[1] }
         if (index == -1) return // this should never happen unless there's an update
 
         event.stackTip = (index + 1).toString()
