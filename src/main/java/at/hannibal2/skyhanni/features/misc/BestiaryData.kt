@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
-import at.hannibal2.skyhanni.utils.LorenzUtils.toBoolean
-import at.hannibal2.skyhanni.utils.LorenzUtils.toInt
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNeeded
@@ -320,17 +321,17 @@ object BestiaryData {
 
         newDisplay.addButton(
             prefix = "§7Number Type: ",
-            getName = NumberType.entries[config.replaceRoman.toInt()].type,
+            getName = NumberType.entries[if (config.replaceRoman) 1 else 0].type,
             onChange = {
-                config.replaceRoman = ((config.replaceRoman.toInt() + 1) % 2).toBoolean()
+                config.replaceRoman = !config.replaceRoman
                 update()
             }
         )
         newDisplay.addButton(
             prefix = "§7Hide Maxed: ",
-            getName = HideMaxed.entries[config.hideMaxed.toInt()].b,
+            getName = HideMaxed.entries[if (config.hideMaxed) 1 else 0].type,
             onChange = {
-                config.hideMaxed = ((config.hideMaxed.toInt() + 1) % 2).toBoolean()
+                config.hideMaxed = !config.hideMaxed
                 update()
             }
         )
@@ -405,7 +406,7 @@ object BestiaryData {
         HIGHEST_NEEDED_TIER("Highest kills needed to next tier"),
     }
 
-    enum class HideMaxed(val b: String) {
+    enum class HideMaxed(val type: String) {
         NO("Show"),
         YES("Hide")
     }
