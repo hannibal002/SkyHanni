@@ -1,18 +1,20 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.item.Item
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
-class HarpKeybinds {
+class HarpFeatures {
     private var lastClick = SimpleTimeMark.farPast()
 
     private val keys = listOf(
@@ -24,6 +26,8 @@ class HarpKeybinds {
         Keyboard.KEY_6,
         Keyboard.KEY_7
     )
+
+    private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
     @SubscribeEvent
     fun onGui(event: GuiScreenEvent) {
@@ -47,5 +51,19 @@ class HarpKeybinds {
                 break
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onRenderItemTip(event: RenderItemTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyHanniMod.feature.misc.harpNumbers) return
+        if (!openInventoryName().startsWith("Harp")) return
+        if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
+
+        val index =
+            buttonColors.indexOfFirst { it == event.stack.displayName[1] } // Example: §9| §7Click! will select the 9
+        if (index == -1) return // this should never happen unless there's an update
+
+        event.stackTip = (index + 1).toString()
     }
 }
