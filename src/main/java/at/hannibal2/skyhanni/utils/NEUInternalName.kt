@@ -12,6 +12,8 @@ class NEUInternalName private constructor(private val internalName: String) {
             val internalName = uppercase()
             return map.getOrPut(internalName) { NEUInternalName(internalName) }
         }
+
+        fun fromItemName(itemName: String) = NEUItems.getInternalNameFromItemName(itemName)
     }
 
     fun asString() = internalName

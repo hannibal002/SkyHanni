@@ -12,7 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FarmingArmorDrops {
     private var display = emptyList<String>()
-    private val drops = mutableMapOf<ArmorDropType, Int>()
+    private val storage get() = GardenAPI.config
+
     private var hasArmor = false
     private val armorPattern = "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)".toPattern()
     private val config get() = SkyHanniMod.feature.garden
@@ -26,7 +27,6 @@ class FarmingArmorDrops {
     @SubscribeEvent
     fun onPreProfileSwitch(event: PreProfileSwitchEvent) {
         display = emptyList()
-        drops.clear()
         hasArmor = false
     }
 
@@ -43,9 +43,9 @@ class FarmingArmorDrops {
     }
 
     private fun addDrop(drop: ArmorDropType) {
+        val drops = storage?.farmArmorDrops ?: return
         val old = drops[drop] ?: 0
         drops[drop] = old + 1
-        saveConfig()
         update()
     }
 
@@ -53,31 +53,18 @@ class FarmingArmorDrops {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): List<String> {
-        val help = mutableListOf<String>()
-        help.add("§7RNG Drops for Farming Armor:")
+    private fun drawDisplay() = buildList {
+        val drops = storage?.farmArmorDrops ?: return@buildList
+
+        add("§7RNG Drops for Farming Armor:")
         for ((drop, amount) in drops.sortedDesc()) {
             val dropName = drop.dropName
-            help.add(" §7- §e${amount.addSeparators()}x $dropName")
-        }
-
-        return help
-    }
-
-    private fun saveConfig() {
-        val map = GardenAPI.config?.farmArmorDrops ?: return
-        map.clear()
-        for ((drop, amount) in drops) {
-            map[drop.toString()] = amount
+            add(" §7- §e${amount.addSeparators()}x $dropName")
         }
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val map = GardenAPI.config?.farmArmorDrops ?: return
-        for ((rawName, amount) in map) {
-            drops[ArmorDropType.valueOf(rawName)] = amount
-        }
         update()
     }
 

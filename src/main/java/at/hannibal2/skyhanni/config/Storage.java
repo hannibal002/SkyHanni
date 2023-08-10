@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.EnderNode;
@@ -128,7 +129,7 @@ public class Storage {
             public long nextSixthVisitorArrival = 0;
 
             @Expose
-            public Map<String, Integer> farmArmorDrops = new HashMap<>();
+            public Map<FarmingArmorDrops.ArmorDropType, Integer> farmArmorDrops = new HashMap<>();
 
             @Expose
             public Map<ComposterUpgrade, Integer> composterUpgrades = new HashMap<>();

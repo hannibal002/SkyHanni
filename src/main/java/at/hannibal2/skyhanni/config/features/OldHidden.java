@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import com.google.gson.annotations.Expose;
 
@@ -77,7 +78,7 @@ public class OldHidden {
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
-    public Map<String, Integer> gardenFarmingArmorDrops = new HashMap<>();
+    public Map<FarmingArmorDrops.ArmorDropType, Integer> gardenFarmingArmorDrops = new HashMap<>();
 
     @Expose
     public Map<ComposterUpgrade, Integer> gardenComposterUpgrades = new HashMap<>();
