@@ -31,8 +31,8 @@ import java.util.regex.Pattern
 object NEUItems {
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
-    private val multiplierCache = mutableMapOf<String, Pair<String, Int>>()
-    private val recipesCache = mutableMapOf<String, Set<NeuRecipe>>()
+    private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
+    private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val enchantmentNamePattern = Pattern.compile("^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$")
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     var allInternalNames = mutableListOf<NEUInternalName>()
@@ -224,12 +224,12 @@ object NEUItems {
         GlStateManager.popMatrix()
     }
 
-    fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
-        val pair = getMultiplier(internalName.asString(), tryCount)
-        return Pair(pair.first.asInternalName(), pair.second)
+    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
+        val pair = getMultiplier(internalName.asInternalName(), tryCount)
+        return Pair(pair.first.asString(), pair.second)
     }
 
-    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
+    fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {
             return multiplierCache[internalName]!!
         }
@@ -242,34 +242,34 @@ object NEUItems {
         for (recipe in getRecipes(internalName)) {
             if (recipe !is CraftingRecipe) continue
 
-            val map = mutableMapOf<String, Int>()
+            val map = mutableMapOf<NEUInternalName, Int>()
             for (ingredient in recipe.ingredients) {
                 val count = ingredient.count.toInt()
-                var internalItemId = ingredient.internalItemId
+                var internalItemId = ingredient.internalItemId.asInternalName()
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN") {
-                    if (internalItemId == "INK_SACK-2") {
-                        internalItemId = "CACTUS"
+                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName()) {
+                    if (internalItemId == "INK_SACK-2".asInternalName()) {
+                        internalItemId = "CACTUS".asInternalName()
                     }
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE") {
-                    if (internalItemId == "WHEAT") {
+                if (internalName == "ENCHANTED_COOKIE".asInternalName()) {
+                    if (internalItemId == "WHEAT".asInternalName()) {
                         continue
                     }
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT") {
-                    if (internalItemId == "GOLDEN_CARROT") {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName()) {
+                    if (internalItemId == "GOLDEN_CARROT".asInternalName()) {
                         continue
                     }
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER") {
-                    if (internalItemId == "RABBIT_HIDE") {
+                if (internalName == "LEATHER".asInternalName()) {
+                    if (internalItemId == "RABBIT_HIDE".asInternalName()) {
                         continue
                     }
                 }
@@ -299,12 +299,12 @@ object NEUItems {
         return result
     }
 
-    fun getRecipes(minionId: String): Set<NeuRecipe> {
-        if (recipesCache.contains(minionId)) {
-            return recipesCache[minionId]!!
+    fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
+        if (recipesCache.contains(internalName)) {
+            return recipesCache[internalName]!!
         }
-        val recipes = manager.getRecipesFor(minionId)
-        recipesCache[minionId] = recipes
+        val recipes = manager.getRecipesFor(internalName.asString())
+        recipesCache[internalName] = recipes
         return recipes
     }
 
