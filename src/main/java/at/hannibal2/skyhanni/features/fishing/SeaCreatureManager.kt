@@ -45,7 +45,7 @@ class SeaCreatureManager {
                     val fishingExperience = seaCreature["fishing_experience"].asInt
 
                     val rare = if (seaCreature.has("rare")) {
-                         seaCreature["rare"].asBoolean
+                        seaCreature["rare"].asBoolean
                     } else false
 
                     seaCreatureMap[chatMessage] = SeaCreature(displayName, fishingExperience, chatColor, rare)
