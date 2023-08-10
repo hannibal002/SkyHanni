@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.test.SkyHanniTestCommand
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -120,17 +121,18 @@ class KingTalismanHelper {
     }
 
     private fun getKingTimes(): MutableMap<String, Long> {
+        val currentTimeMillis = System.currentTimeMillis() + (SkyHanniTestCommand.a * 1000 * 60).toLong()
         val oneSbDay = 1000 * 60 * 20
         val oneCircleTime = oneSbDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
         for ((index, king) in kingCircles.withIndex()) {
 
-            val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
+            val startTime = SkyBlockTime(day = -kingCircles.size + index + 1)
             var timeNext = startTime.toMillis()
-            while (timeNext < System.currentTimeMillis()) {
+            while (timeNext < currentTimeMillis) {
                 timeNext += oneCircleTime
             }
-            val timeUntil = timeNext - System.currentTimeMillis()
+            val timeUntil = timeNext - currentTimeMillis
             kingTime[king] = timeUntil
         }
         return kingTime
