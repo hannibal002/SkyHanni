@@ -42,6 +42,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.math.round
 
 private val config get() = SkyHanniMod.feature.garden
@@ -282,6 +283,9 @@ class GardenVisitorFeatures {
                     }
                     event.isCanceled = true
                     LorenzUtils.chat("§e[SkyHanni] §cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
+                    if (config.visitorRewardWarning.bypassKey == Keyboard.KEY_NONE) {
+                        LorenzUtils.chat("§eIf you want to deny this visitor set a keybind in /sh bypass")
+                    }
                     Minecraft.getMinecraft().thePlayer.closeScreen()
                     return
                 }
