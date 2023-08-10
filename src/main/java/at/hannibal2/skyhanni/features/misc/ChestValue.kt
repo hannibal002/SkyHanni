@@ -5,11 +5,12 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.toBoolean
 import at.hannibal2.skyhanni.utils.LorenzUtils.toInt
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -26,7 +27,7 @@ class ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
-    private val chestItems = mutableMapOf<String, Item>()
+    private val chestItems = mutableMapOf<NEUInternalName, Item>()
     private val inInventory get() = InventoryUtils.openInventoryName().isValidStorage()
 
     @SubscribeEvent
@@ -174,9 +175,8 @@ class ChestValue {
             }
             chestItems.clear()
             for ((i, stack) in stacks) {
-                val internalName = stack.getInternalName()
-                if (internalName == "") continue
-                if (NEUItems.getItemStackOrNull(internalName) == null) continue
+                val internalName = stack.getInternalNameOrNull() ?: continue
+                if (internalName.getItemStackOrNull() == null) continue
                 val list = mutableListOf<String>()
                 val pair = EstimatedItemValue.getEstimatedItemPrice(stack, list)
                 var (total, _) = pair
