@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
-import at.hannibal2.skyhanni.utils.LorenzUtils.toBoolean
-import at.hannibal2.skyhanni.utils.LorenzUtils.toInt
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -155,9 +153,9 @@ class ChestValue {
             })
 
         newDisplay.addButton("§7Display Type: ",
-            getName = DisplayType.entries[config.alignedDisplay.toInt()].type,
+            getName = DisplayType.entries[if (config.alignedDisplay) 1 else 0].type,
             onChange = {
-                config.alignedDisplay = ((config.alignedDisplay.toInt() + 1) % 2).toBoolean()
+                config.alignedDisplay = !config.alignedDisplay
                 update()
             })
     }

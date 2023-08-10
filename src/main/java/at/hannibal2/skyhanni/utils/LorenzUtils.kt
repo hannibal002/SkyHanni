@@ -474,7 +474,4 @@ object LorenzUtils {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
     }
-
-    fun Int.toBoolean() = this != 0
-    fun Boolean.toInt() = if (!this) 0 else 1
 }
