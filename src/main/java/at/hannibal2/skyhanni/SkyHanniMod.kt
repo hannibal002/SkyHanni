@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
 import at.hannibal2.skyhanni.features.event.diana.*
+import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
+import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.*
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
@@ -378,6 +380,7 @@ class SkyHanniMod {
         loadModule(EnderNodeTracker())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
+        loadModule(AccountUpgradeReminder())
 
         init()
 

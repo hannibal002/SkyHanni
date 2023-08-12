@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -46,9 +46,7 @@ class CityProjectFeatures {
     private fun checkDailyReminder() {
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
-        if (LorenzUtils.inDungeons) return
-        if (LorenzUtils.inKuudraFight) return
-        if (FarmingContestAPI.inContest) return
+        if (ReminderUtils.isBusy()) return
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 

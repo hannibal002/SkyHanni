@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
+import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
@@ -229,6 +230,8 @@ object Commands {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
+        registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
+
     }
 
     private fun commandHelp(args: Array<String>) {
