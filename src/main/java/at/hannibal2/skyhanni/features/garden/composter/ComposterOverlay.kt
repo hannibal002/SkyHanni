@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -388,7 +389,16 @@ class ComposterOverlay {
             val item = NEUItems.getItemStack(internalName)
             val itemName = item.name!!
             val price = getPrice(internalName)
-            val itemsNeeded = ceil(missing / factor)
+            val itemsNeeded = if (config.composterRoundDown) {
+                val amount = missing / factor
+                if (amount > .75 && amount < 1.0) {
+                    1.0
+                } else {
+                    floor(amount)
+                }
+            } else {
+                ceil(missing / factor)
+            }
             val totalPrice = itemsNeeded * price
 
             val list = mutableListOf<Any>()

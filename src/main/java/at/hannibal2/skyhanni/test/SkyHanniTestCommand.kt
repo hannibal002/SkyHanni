@@ -229,7 +229,7 @@ class SkyHanniTestCommand {
         val itemStack = event.itemStack
         if (itemStack != null) {
             val internalName = itemStack.getInternalName_old()
-            if (internalName == "" && !SkyHanniMod.feature.dev.showEmptyNames) return
+            if ((internalName == "NONE" || internalName == "") && !SkyHanniMod.feature.dev.showEmptyNames) return
             event.toolTip.add("Internal Name: '$internalName'")
         }
     }
