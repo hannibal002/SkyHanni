@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -136,6 +137,7 @@ object Commands {
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
+        registerCommand("shcopytranslation", "<language code (2 letters)> <messsage to translate>\nRequires the Chat > Translator feature to be enabled.\nCopies the translation for a given message to your clipboard. Language codes are at the end of the translation when you click on a message.") { Translator.fromEnglish(it) }
     }
 
     private fun usersBugFix() {
@@ -229,6 +231,7 @@ object Commands {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
+        registerCommand("shsendtranslation", "Respond with a translation of the message that the user clicks") { Translator.toEnglish(it) }
     }
 
     private fun commandHelp(args: Array<String>) {
