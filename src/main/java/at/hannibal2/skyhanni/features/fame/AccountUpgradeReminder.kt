@@ -34,7 +34,7 @@ class AccountUpgradeReminder {
         lastReminderSend = System.currentTimeMillis()
 
         LorenzUtils.clickableChat(
-            "§e[SkyHanni] The §a$upgrade §eupgrade has completed! Go to the Community Center to claim.",
+            "§e[SkyHanni] The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
             "shstopaccountupgradereminder"
         )
     }
