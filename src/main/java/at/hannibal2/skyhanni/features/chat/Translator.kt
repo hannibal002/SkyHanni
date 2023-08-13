@@ -46,7 +46,7 @@ class Translator {
         style.setChatClickEvent(
             ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
-                "shsendtranslation ${messageContentRegex.find(message.removeColor())!!.groupValues[1]}"
+                "/shsendtranslation ${messageContentRegex.find(message.removeColor())!!.groupValues[1]}"
             )
         )
         style.setChatHoverEvent(
@@ -75,6 +75,24 @@ class Translator {
                         .build()
                 )
                 .useSystemProperties()
+
+        /*
+         * Simplified version of the JSON response:
+         * [
+         *   [
+         *     [
+         *       'translated sentence one with a space after the punctuation. '
+         *       'original sentence one without a space after the punctuation.'
+         *     ],
+         *     [
+         *       'translated sentence two without punctuation bc it's last'
+         *       'original sentence two without punctuation'
+         *     ]
+         *   ],
+         *   null,
+         *   'target language as a two letter code following ISO 639-1',
+         * ]
+         */
 
         private fun getJSONResponse(urlString: String, silentError: Boolean = false): JsonElement {
             val client = builder.build()
@@ -150,17 +168,16 @@ class Translator {
                     "UTF-8"
                 )
 
-            var messageToSend = ""
             val layer1 = getJSONResponse(url).asJsonArray
             val layer2 = layer1[0] as JsonArray
 
-            for (layer3 in layer2) {
-                val arrayLayer3 = layer3 as JsonArray
-                val sentence = arrayLayer3[0].toString()
-                val sentenceWithoutQuotes = sentence.substring(0, sentence.length - 1)
-                messageToSend = "$messageToSend$sentenceWithoutQuotes}"
-            }
-
+            val firstSentence = (layer2[0] as JsonArray).get(0).toString()
+            var messageToSend = firstSentence.substring(0, firstSentence.length - 1)
+            for (sentenceIndex in 1..<layer2.size()) {
+                val sentence = (layer2[sentenceIndex] as JsonArray).get(0).toString()
+                val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
+                messageToSend = "$messageToSend$sentenceWithoutQuotes"
+            } // The first translated sentence only has 1 extra char at the end, but sentences after it need 1 at the front and 1 at the end removed in the substring
             messageToSend = messageToSend.substring(1, messageToSend.length - 1)
             return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
         }
