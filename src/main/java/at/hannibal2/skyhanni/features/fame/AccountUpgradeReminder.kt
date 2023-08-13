@@ -75,7 +75,7 @@ class AccountUpgradeReminder {
         if (durationDays == -1) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         playerSpecific.currentAccountUpgrade = upgrade
-        playerSpecific.nextAccountUpgradeCompletionTime = System.currentTimeMillis() + durationDays * MILLIS_IN_DAY
+        playerSpecific.nextAccountUpgradeCompletionTime = System.currentTimeMillis() + durationDays.toLong() * MILLIS_IN_DAY
     }
 
     private fun clearUpgrade() {
@@ -88,7 +88,7 @@ class AccountUpgradeReminder {
         private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
         private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
         private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()
-        private const val MILLIS_IN_DAY = 1000 * 60 * 60 * 24
+        private const val MILLIS_IN_DAY = 1000 * 60 * 60 * 24L
 
         private fun isEnabled() = SkyHanniMod.feature.misc.accountUpgradeReminder
 
