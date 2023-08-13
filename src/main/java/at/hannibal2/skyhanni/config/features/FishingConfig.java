@@ -2,15 +2,9 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 public class FishingConfig {
 
@@ -120,6 +114,21 @@ public class FishingConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
     public boolean barnTimerCrystalHollows = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Worm Cap Alert",
+            desc = "Alerts you if you hit the Worm Sea Creature limit of 60."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean wormLimitAlert = true;
+
+    @Expose
+    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manualy")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    @ConfigAccordionId(id = 2)
+    public int manualResetTimer = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Fishing Timer Alert", desc = "Change the amount of time in seconds until the timer dings.")
