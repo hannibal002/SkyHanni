@@ -117,7 +117,7 @@ public class FishingConfig {
 
     @Expose
     @ConfigOption(
-            name = "Worm Fishing Sea Creature Cap Alert",
+            name = "Worm Cap Alert",
             desc = "Alerts you if you hit the Worm Sea Creature limit of 60."
     )
     @ConfigEditorBoolean
@@ -125,7 +125,7 @@ public class FishingConfig {
     public boolean wormLimitAlert = true;
 
     @Expose
-    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer and Sea Creature amount manualy")
+    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manualy")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     @ConfigAccordionId(id = 2)
     public int manualResetTimer = Keyboard.KEY_NONE;
