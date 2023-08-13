@@ -33,8 +33,7 @@ class BarnFishingTimer {
 
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
-        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (key == config.manualResetTimer) startTime = System.currentTimeMillis()
+        if (Keyboard.isKeyDown(config.manualResetTimer)) startTime = System.currentTimeMillis()
     }
 
     private fun tryPlaySound() {
@@ -48,7 +47,8 @@ class BarnFishingTimer {
     }
 
     private fun checkMobs() {
-        val newCount = if (inHollows) countHollowsMobs() else countMobs()
+        // We ignore sea creatures more than 10 blocks away in crystal hollows
+        val newCount = if (inHollows) countMobs(10) else countMobs(40)
 
         if (currentCount == 0 && newCount > 0) {
             startTime = System.currentTimeMillis()
@@ -64,12 +64,8 @@ class BarnFishingTimer {
         }
     }
 
-    private fun countHollowsMobs() = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(10.0)
+    private fun countMobs(radius: Int) = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(radius.toDouble())
         .count { entity -> SeaCreatureManager.allFishingMobNames.any { entity.name.contains(it) } }
-
-    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
-        .map { it.name }
-        .count { it.endsWith("§c❤") }
 
     private fun isRightLocation(): Boolean {
         if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
@@ -78,7 +74,7 @@ class BarnFishingTimer {
         }
         inHollows = false
 
-        if (IslandType.THE_FARMING_ISLANDS.isInIsland()) {
+        if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50
         }
 
