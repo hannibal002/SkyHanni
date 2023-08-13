@@ -118,7 +118,7 @@ public class FishingConfig {
     @Expose
     @ConfigOption(
             name = "Worm Cap Alert",
-            desc = "Alerts you if you hit the Worm Sea Creature limit of 60."
+            desc = "Alerts you with sound if you hit the Worm Sea Creature limit of 60."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
