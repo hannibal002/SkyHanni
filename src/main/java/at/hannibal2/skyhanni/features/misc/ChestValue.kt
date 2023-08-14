@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.neuHasFocus
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -32,6 +33,7 @@ class ChestValue {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "") return
+        println("focus: ${NEUItems.neuHasFocus()}")
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,
@@ -220,7 +222,8 @@ class ChestValue {
     private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
         this == "Large Chest") ||
         (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
-        this == "Personal Vault")
+        this == "Personal Vault") ||
+        this.contains("Backpack") && this.contains("Slot #") && !neuHasFocus()
 
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
