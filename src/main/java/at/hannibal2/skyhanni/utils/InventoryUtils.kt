@@ -7,8 +7,8 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
 object InventoryUtils {
-    var itemInHandId = ""
-    var recentItemsInHand = mutableMapOf<Long, String>()
+    var itemInHandId = NEUInternalName.NONE
+    var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
 
     fun getItemsInOpenChest() = buildList<Slot> {

@@ -42,7 +42,7 @@ object TestExportTools {
 
     @SubscribeEvent
     fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent) {
-        if (!Keyboard.getEventKeyState() || Keyboard.getEventKey() != SkyHanniMod.feature.dev.copyNBTDataCompressed) return
+        if (!Keyboard.isKeyDown(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return

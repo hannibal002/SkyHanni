@@ -138,7 +138,7 @@ class ToolTooltipTweaks {
             }
         }
 
-        // Fixing a hypixel bug. TODO remove once hypixel fixes it.
+        // Fixing a hypixel bug. TODO remove once hypixel fixes it. use disabled features repo maybe?
         if (itemStack.getInternalName().contains("LOTUS")) {
             event.toolTip.replaceAll { it.replace("Kills:", "Visitors:") }
         }

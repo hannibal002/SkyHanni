@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.rift
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.RiftConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_new
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import net.minecraft.item.ItemStack
@@ -17,7 +17,7 @@ object RiftAPI {
     var motesPrice = emptyMap<NEUInternalName, Double>()
 
     fun ItemStack.motesNpcPrice(): Double? {
-        val baseMotes = motesPrice[getInternalName_new()] ?: return null
+        val baseMotes = motesPrice[getInternalName()] ?: return null
         val burgerStacks = config.motes.burgerStacks
         val pricePer = baseMotes + (burgerStacks * 5) * baseMotes / 100
         return pricePer * stackSize

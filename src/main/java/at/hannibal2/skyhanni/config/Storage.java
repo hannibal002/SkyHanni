@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
 import at.hannibal2.skyhanni.features.garden.CropType;
+import at.hannibal2.skyhanni.features.garden.farming.FarmingArmorDrops;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.EnderNode;
@@ -11,14 +12,11 @@ import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
+import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Storage {
 
@@ -131,7 +129,7 @@ public class Storage {
             public long nextSixthVisitorArrival = 0;
 
             @Expose
-            public Map<String, Integer> farmArmorDrops = new HashMap<>();
+            public Map<FarmingArmorDrops.ArmorDropType, Integer> farmArmorDrops = new HashMap<>();
 
             @Expose
             public Map<ComposterUpgrade, Integer> composterUpgrades = new HashMap<>();
@@ -297,7 +295,7 @@ public class Storage {
         public static class SlayerProfitList {
 
             @Expose
-            public Map<String, SlayerItemProfit> items = new HashMap<>();
+            public Map<NEUInternalName, SlayerItemProfit> items = new HashMap<>();
 
             @Expose
             public long mobKillCoins = 0;
@@ -310,7 +308,7 @@ public class Storage {
 
             public static class SlayerItemProfit {
                 @Expose
-                public String internalName;
+                public NEUInternalName internalName;
                 @Expose
                 public long timesDropped;
                 @Expose

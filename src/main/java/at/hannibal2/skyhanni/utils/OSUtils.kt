@@ -3,10 +3,6 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.client.settings.KeyBinding
 import org.lwjgl.input.Keyboard
 import java.awt.Desktop
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.StringSelection
-import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
 import java.net.URI
 
@@ -28,18 +24,10 @@ object OSUtils {
     }
 
     fun copyToClipboard(text: String) {
-        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+        ClipboardUtils.copyToClipboard(text)
     }
 
-    fun readFromClipboard(): String? {
-        val systemClipboard = Toolkit.getDefaultToolkit().systemClipboard ?: return null
-        try {
-            val data = systemClipboard.getData(DataFlavor.stringFlavor) ?: return null
-            return data.toString()
-        } catch (e: UnsupportedFlavorException) {
-            return null
-        }
-    }
+    suspend fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 
     fun KeyBinding.isActive(): Boolean {
         if (!Keyboard.isCreated()) return false

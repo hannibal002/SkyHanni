@@ -21,25 +21,15 @@ class BazaarApi {
         var inBazaarInventory = false
         private var currentSearchedItem = ""
 
-        fun getBazaarDataByName(name: String): BazaarData? =
-            NEUItems.getInternalNameOrNull(name)?.let { getBazaarDataByInternalName(it) }
+        fun getBazaarDataByName(name: String): BazaarData? = NEUItems.getInternalNameOrNull(name)?.getBazaarData()
 
-        fun getBazaarDataByInternalName(internalName: String) =
-            getBazaarDataByInternalName_new(NEUInternalName.from(internalName))
-
-        fun getBazaarDataByInternalName_new(internalName: NEUInternalName) = if (isBazaarItem(internalName)) {
-            holder.getData(internalName)
+        fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
+            holder.getData(this)
         } else null
 
-        fun isBazaarItem(stack: ItemStack) = isBazaarItem(stack.getInternalName())
+        fun isBazaarItem(stack: ItemStack) = stack.getInternalName().isBazaarItem()
 
-        fun isBazaarItem(internalName: NEUInternalName): Boolean {
-            return NEUItems.manager.auctionManager.getBazaarInfo(internalName.asString()) != null
-        }
-
-        fun isBazaarItem(internalName: String): Boolean {
-            return NEUItems.manager.auctionManager.getBazaarInfo(internalName) != null
-        }
+        fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
 
         fun searchForBazaarItem(displayName: String, amount: Int = -1) {
             if (!LorenzUtils.inSkyBlock) return

@@ -45,6 +45,12 @@ class SkyHanniTestCommand {
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
 
+            val a = Thread { OSUtils.copyToClipboard("123") }
+            val b = Thread { OSUtils.copyToClipboard("456") }
+            a.start()
+            b.start()
+
+
 //            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
 //                println("$i: '$s'")
 //            }
@@ -94,7 +100,7 @@ class SkyHanniTestCommand {
                 list.add("$coloredName§7 (")
                 for (itemName in item.value) {
                     try {
-                        val internalName = NEUItems.getInternalName(itemName)
+                        val internalName = NEUItems.getRawInternalName(itemName)
                         list.add(NEUItems.getItemStack(internalName))
                     } catch (e: Error) {
                         LorenzUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
@@ -223,8 +229,8 @@ class SkyHanniTestCommand {
         val itemStack = event.itemStack
         if (itemStack != null) {
             val internalName = itemStack.getInternalName()
-            if (internalName == "" && !SkyHanniMod.feature.dev.showEmptyNames) return
-            event.toolTip.add("Internal Name: '$internalName'")
+            if ((internalName == NEUInternalName.NONE) && !SkyHanniMod.feature.dev.showEmptyNames) return
+            event.toolTip.add("Internal Name: '${internalName.asString()}'")
         }
     }
 

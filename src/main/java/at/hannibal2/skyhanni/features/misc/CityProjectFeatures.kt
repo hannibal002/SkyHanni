@@ -154,7 +154,7 @@ class CityProjectFeatures {
 
             val (name, amount) = ItemUtils.readItemAmount(line)
             if (name != null) {
-                val internalName = NEUItems.getInternalName(name)
+                val internalName = NEUItems.getRawInternalName(name)
                 val old = materials.getOrPut(internalName) { 0 }
                 materials[internalName] = old + amount
             }

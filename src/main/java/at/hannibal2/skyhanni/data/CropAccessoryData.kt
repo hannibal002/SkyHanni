@@ -95,10 +95,9 @@ class CropAccessoryData {
     }
 
 
-    private fun bestCropAccessory(items: Iterable<ItemStack>): CropAccessory {
-        return items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
+    private fun bestCropAccessory(items: Iterable<ItemStack>) =
+        items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
             .maxOrNull() ?: CropAccessory.NONE
-    }
 
     companion object {
         var accessoryBagPageCount = 0

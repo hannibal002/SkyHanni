@@ -6,15 +6,16 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.bazaar.BazaarData
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -80,7 +81,7 @@ object SlayerItemProfitTracker {
         update()
     }
 
-    private fun addItemPickup(internalName: String, stackSize: Int) {
+    private fun addItemPickup(internalName: NEUInternalName, stackSize: Int) {
         val itemLog = currentLog() ?: return
 
         itemLog.modify {
@@ -134,8 +135,7 @@ object SlayerItemProfitTracker {
         val itemStack = item.entityItem
         val name = itemStack.name ?: return
         if (SlayerAPI.ignoreSlayerDrop(name)) return
-        val internalName = itemStack.getInternalName()
-        if (internalName == "") return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack)
         addItemPickup(internalName, itemStack.stackSize)
@@ -180,7 +180,7 @@ object SlayerItemProfitTracker {
 
             val price = (getPrice(internalName) * amount).toLong()
 
-            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName) ?: internalName
+            val cleanName = SlayerAPI.getNameWithEnchantmentFor(internalName)
             var name = cleanName
             val priceFormat = NumberUtil.format(price)
             val hidden = itemProfit.hidden
@@ -298,18 +298,14 @@ object SlayerItemProfitTracker {
         list.slayerCompletedCount = 0
     }
 
-    private fun getPrice(internalName: String): Double {
-        val bazaarData = BazaarApi.getBazaarDataByInternalName(internalName)
-        return bazaarData?.let { getPrice(it) } ?: NEUItems.getPrice(internalName)
-    }
+    private fun getPrice(internalName: NEUInternalName) =
+        internalName.getBazaarData()?.let { getPrice(it) } ?: internalName.getPrice()
 
-    private fun getPrice(bazaarData: BazaarData): Double {
-        return when (config.priceFrom) {
-            0 -> bazaarData.sellPrice
-            1 -> bazaarData.buyPrice
+    private fun getPrice(bazaarData: BazaarData) = when (config.priceFrom) {
+        0 -> bazaarData.sellPrice
+        1 -> bazaarData.buyPrice
 
-            else -> bazaarData.npcPrice
-        }
+        else -> bazaarData.npcPrice
     }
 
     @SubscribeEvent

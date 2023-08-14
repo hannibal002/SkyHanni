@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlinx.coroutines.launch
 import kotlin.concurrent.fixedRateTimer
@@ -56,18 +58,18 @@ class BazaarDataHolder {
     fun getData(internalName: NEUInternalName) = bazaarData[internalName] ?: createNewData(internalName)
 
     private fun createNewData(internalName: NEUInternalName): BazaarData? {
-        val stack = NEUItems.getItemStackOrNull(internalName.asString())
+        val stack = internalName.getItemStackOrNull()
         if (stack == null) {
             LorenzUtils.debug("Bazaar data is null: '$internalName'")
             return null
         }
         val displayName = stack.name!!.removeColor()
-        val sellPrice = NEUItems.getPrice(internalName, true)
-        val buyPrice = NEUItems.getPrice(internalName, false)
+        val sellPrice = internalName.getPrice(true)
+        val buyPrice = internalName.getPrice(false)
         val npcPrice = npcPrices[internalName].let {
             if (it == null) {
-                if (!ignoreNoNpcPrice(internalName.asString())) {
-                    LorenzUtils.debug("NPC price not found for item '$internalName'")
+                if (!ignoreNoNpcPrice(internalName)) {
+                    LorenzUtils.debug("NPC price not found for '$internalName'")
                 }
                 0.0
             } else it
@@ -78,12 +80,12 @@ class BazaarDataHolder {
         return data
     }
 
-    private fun ignoreNoNpcPrice(internalName: String): Boolean {
+    private fun ignoreNoNpcPrice(internalName: NEUInternalName): Boolean {
         if (internalName.startsWith("TURBO_")) return true
-        if (internalName == "PURPLE_CANDY") return true
-        if (internalName == "JACOBS_TICKET") return true
-        if (internalName == "RAW_SOULFLOW") return true
-        if (internalName == "DERELICT_ASHE") return true
+        if (internalName.equals("PURPLE_CANDY")) return true
+        if (internalName.equals("JACOBS_TICKET")) return true
+        if (internalName.equals("RAW_SOULFLOW")) return true
+        if (internalName.equals("DERELICT_ASHE")) return true
 
         if (internalName.contains(";")) return true
 

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -13,7 +14,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -42,30 +47,31 @@ class SackDisplay {
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private val gemstoneMap = mapOf(
-            "Jade Gemstones" to "ROUGH_JADE_GEM",
-            "Amber Gemstones" to "ROUGH_AMBER_GEM",
-            "Topaz Gemstones" to "ROUGH_TOPAZ_GEM",
-            "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM",
-            "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM",
-            "Jasper Gemstones" to "ROUGH_JASPER_GEM",
-            "Ruby Gemstones" to "ROUGH_RUBY_GEM",
-            "Opal Gemstones" to "ROUGH_OPAL_GEM"
+        "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
+        "Amber Gemstones" to "ROUGH_AMBER_GEM".asInternalName(),
+        "Topaz Gemstones" to "ROUGH_TOPAZ_GEM".asInternalName(),
+        "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM".asInternalName(),
+        "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM".asInternalName(),
+        "Jasper Gemstones" to "ROUGH_JASPER_GEM".asInternalName(),
+        "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
+        "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
     )
+    private val MAGMA_FISH = "MAGMA_FISH".asInternalName()
 
     private val numPattern =
-            "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)".toPattern()
+        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)".toPattern()
     private val gemstonePattern =
-            " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
+        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?".toPattern()
 
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (inInventory) {
             config.position.renderStringsAndItems(
-                    display,
-                    extraSpace = config.extraSpace,
-                    itemScale = 1.3,
-                    posLabel = "Sacks Items"
+                display,
+                extraSpace = config.extraSpace,
+                itemScale = 1.3,
+                posLabel = "Sacks Items"
             )
         }
     }
@@ -86,30 +92,31 @@ class SackDisplay {
                     gemstonePattern.matchMatcher(line) {
                         val rarity = group("gemrarity")
                         val stored = group("stored")
-                        gem.internalName = gemstoneMap[name.removeColor()].toString()
+                        gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
                         if (gemstoneMap.containsKey(name.removeColor())) {
-                            val internalName =
-                                    "${rarity.uppercase()}_${name.uppercase().split(" ")[0].removeColor()}_GEM"
+                            val internalName = "${rarity.uppercase()}_${
+                                name.uppercase().split(" ")[0].removeColor()
+                            }_GEM".asInternalName()
 
                             when (rarity) {
                                 "Rough" -> {
                                     gem.rough = stored
-                                    gem.roughPrice = calculatePrice(internalName, stored)
+                                    gem.roughPrice = internalName.sackPrice(stored)
                                 }
 
                                 "Flawed" -> {
                                     gem.flawed = stored
-                                    gem.flawedPrice = calculatePrice(internalName, stored)
+                                    gem.flawedPrice = internalName.sackPrice(stored)
                                 }
 
                                 "Fine" -> {
                                     gem.fine = stored
-                                    gem.finePrice = calculatePrice(internalName, stored)
+                                    gem.finePrice = internalName.sackPrice(stored)
                                 }
 
                                 "Flawless" -> {
                                     gem.flawless = stored
-                                    gem.flawlessPrice = calculatePrice(internalName, stored)
+                                    gem.flawlessPrice = internalName.sackPrice(stored)
                                 }
                             }
                             gemstoneItem[name] = gem
@@ -118,21 +125,20 @@ class SackDisplay {
                 } else {
                     numPattern.matchMatcher(line) {
                         val stored = group("stored")
-                        val total = group("total")
                         val internalName = stack.getInternalName()
                         item.internalName = internalName
                         item.colorCode = group("color")
                         item.stored = stored
-                        item.total = total
-                        if (isTrophySack) {
-                            val trophyName = internalName.lowercase()
-                                .substringBeforeLast("_").replace("_", "")
-                            val filletValue = TrophyFishManager.getInfoByName(trophyName)?.getFilletValue(sackRarity!!) ?: 0
+                        item.total = group("total")
+                        item.price = if (isTrophySack) {
+                            val trophyName =
+                                internalName.asString().lowercase().substringBeforeLast("_").replace("_", "")
+                            val filletValue =
+                                TrophyFishManager.getInfoByName(trophyName)?.getFilletValue(sackRarity!!) ?: 0
                             val storedNumber = stored.formatNumber().toInt()
-                            item.price = calculatePrice("MAGMA_FISH", (filletValue * storedNumber).toString())
-                        } else {
-                            item.price = if (calculatePrice(internalName, stored) < 0) 0 else calculatePrice(internalName, stored)
-                        }
+                            MAGMA_FISH.sackPrice((filletValue * storedNumber).toString())
+                        } else internalName.sackPrice(stored).coerceAtLeast(0)
+
                         if (isRuneSack) {
                             val level = group("level")
                             rune.stack = stack
@@ -185,7 +191,7 @@ class SackDisplay {
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
                 if (stored == "0" && !config.showEmpty) continue
-                val itemStack = NEUItems.getItemStack(internalName)
+                val itemStack = internalName.getItemStack()
                 newDisplay.add(buildList {
                     add(" §7- ")
                     add(itemStack)
@@ -197,12 +203,12 @@ class SackDisplay {
                         add("${itemName.replace("§k", "")}: ")
 
                     add(
-                            when (config.numberFormat) {
-                                0 -> "$colorCode${stored}§7/§b${total}"
-                                1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
-                                2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
-                                else -> "$colorCode${stored}§7/§b${total}"
-                            }
+                        when (config.numberFormat) {
+                            0 -> "$colorCode${stored}§7/§b${total}"
+                            1 -> "$colorCode${NumberUtil.format(stored.formatNumber())}§7/§b${total}"
+                            2 -> "$colorCode${stored}§7/§b${total.formatNumber().toInt().addSeparators()}"
+                            else -> "$colorCode${stored}§7/§b${total}"
+                        }
                     )
 
                     if (colorCode == "§a")
@@ -257,7 +263,7 @@ class SackDisplay {
                 val (internalName, rough, flawed, fine, flawless, roughprice, flawedprice, fineprice, flawlessprice) = gem
                 newDisplay.add(buildList {
                     add(" §7- ")
-                    add(NEUItems.getItemStack(internalName))
+                    add(internalName.getItemStack())
                     add(Renderable.optionalLink("$name: ", {
                         BazaarApi.searchForBazaarItem(name.dropLast(1))
                     }) { !NEUItems.neuHasFocus() })
@@ -292,7 +298,6 @@ class SackDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
-        if (!isRuneDisplayEnabled() && inventoryName == "Runes Sack") return
         val match = sackPattern.matcher(inventoryName).matches()
         if (!match) return
         val stacks = event.inventoryItems
@@ -307,46 +312,39 @@ class SackDisplay {
 
 
     data class Gemstone(
-            var internalName: String = "",
-            var rough: String = "0",
-            var flawed: String = "0",
-            var fine: String = "0",
-            var flawless: String = "0",
-            var roughPrice: Int = 0,
-            var flawedPrice: Int = 0,
-            var finePrice: Int = 0,
-            var flawlessPrice: Int = 0,
+        var internalName: NEUInternalName = NEUInternalName.NONE,
+        var rough: String = "0",
+        var flawed: String = "0",
+        var fine: String = "0",
+        var flawless: String = "0",
+        var roughPrice: Int = 0,
+        var flawedPrice: Int = 0,
+        var finePrice: Int = 0,
+        var flawlessPrice: Int = 0,
     )
 
     data class Rune(
-            var stack: ItemStack? = null,
-            var lvl1: String = "0",
-            var lvl2: String = "0",
-            var lvl3: String = "0",
+        var stack: ItemStack? = null,
+        var lvl1: String = "0",
+        var lvl2: String = "0",
+        var lvl3: String = "0",
     )
 
     data class Item(
-            var internalName: String = "",
-            var colorCode: String = "",
-            var stored: String = "0",
-            var total: String = "0",
-            var price: Int = 0,
+        var internalName: NEUInternalName = NEUInternalName.NONE,
+        var colorCode: String = "",
+        var stored: String = "0",
+        var total: String = "0",
+        var price: Int = 0,
     )
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isRuneDisplayEnabled() = config.showRunes
 
-    private fun calculatePrice(internalName: String, stored: String) = when (config.priceFrom) {
-        0 -> {
-            (NEUItems.getPrice(internalName, true) * stored.formatNumber()).toInt().let {
-                if (it < 0)
-                    0
-                else it
-            }
-        }
+    private fun NEUInternalName.sackPrice(stored: String) = when (config.priceFrom) {
+        0 -> (getPrice(true) * stored.formatNumber()).toInt().let { if (it < 0) 0 else it }
 
         1 -> try {
-            val npcPrice = BazaarApi.getBazaarDataByInternalName(internalName)?.npcPrice ?: 0.0
+            val npcPrice = getBazaarData()?.npcPrice ?: 0.0
             (npcPrice * stored.formatNumber()).toInt()
         } catch (e: Exception) {
             0

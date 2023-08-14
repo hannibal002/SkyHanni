@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,7 +24,7 @@ class RiftAgaricusCap {
     }
 
     private fun updateLocation(): LorenzVec? {
-        if (InventoryUtils.getItemInHand()?.getInternalName() != "FARMING_WAND") return null
+        if (InventoryUtils.getItemInHand()?.getInternalName_old() != "FARMING_WAND") return null
         val currentLocation = BlockUtils.getBlockLookingAt() ?: return null
 
         when (currentLocation.getBlockStateAt().toString()) {

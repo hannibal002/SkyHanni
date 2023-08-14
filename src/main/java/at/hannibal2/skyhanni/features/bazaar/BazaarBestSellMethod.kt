@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.features.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.getNameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -53,11 +54,11 @@ class BazaarBestSellMethod {
 
             if (having <= 0) return ""
 
-            val data = BazaarApi.getBazaarDataByInternalName(internalName) ?: return ""
+            val data = internalName.getBazaarData() ?: return ""
             val totalDiff = (data.buyPrice - data.sellPrice) * having
             val result = NumberUtil.format(totalDiff.toInt())
 
-            val name = NEUItems.getItemStack(internalName).nameWithEnchantment
+            val name = internalName.getNameWithEnchantment()
             return "$name§7 sell difference: §6$result coins"
         } catch (e: Error) {
             e.printStackTrace()

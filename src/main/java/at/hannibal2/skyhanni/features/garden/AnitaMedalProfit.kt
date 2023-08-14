@@ -5,14 +5,13 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -47,7 +46,7 @@ class AnitaMedalProfit {
 
         inInventory = true
 
-        val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
+        val table = mutableMapOf<Pair<String, String>, Pair<Double, NEUInternalName>>()
         for ((_, item) in event.inventoryItems) {
             try {
                 readItem(item, table)
@@ -63,7 +62,7 @@ class AnitaMedalProfit {
         display = newList
     }
 
-    private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, String>>) {
+    private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
         val itemName = item.nameWithEnchantment ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
@@ -81,7 +80,7 @@ class AnitaMedalProfit {
             internalName = item.getInternalName()
         }
 
-        val itemPrice = NEUItems.getPrice(internalName) * amount
+        val itemPrice = internalName.getPrice() * amount
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost
@@ -91,7 +90,7 @@ class AnitaMedalProfit {
     }
 
     private fun getFullCost(requiredItems: MutableList<String>): Double {
-        val jacobTicketPrice = NEUItems.getPrice("JACOBS_TICKET")
+        val jacobTicketPrice = "JACOBS_TICKET".asInternalName().getPrice()
         var otherItemsPrice = 0.0
         for (rawItemName in requiredItems) {
             val (name, amount) = ItemUtils.readItemAmount(rawItemName)
@@ -105,7 +104,7 @@ class AnitaMedalProfit {
                 val bronze = medal.factorBronze * amount
                 bronze * jacobTicketPrice
             } else {
-                val internalName = NEUItems.getInternalName(name)
+                val internalName = NEUItems.getRawInternalName(name)
                 NEUItems.getPrice(internalName) * amount
             }
         }

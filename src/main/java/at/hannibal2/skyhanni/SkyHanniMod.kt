@@ -124,7 +124,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.4",
+    version = "0.20.Beta.7",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -366,6 +366,7 @@ class SkyHanniMod {
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
+        loadModule(ChestValue())
         loadModule(SlayerBossSpawnSoon())
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())
@@ -373,7 +374,7 @@ class SkyHanniMod {
         loadModule(GriffinPetWarning())
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
-        loadModule(HarpKeybinds())
+        loadModule(HarpFeatures())
         loadModule(EnderNodeTracker())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())

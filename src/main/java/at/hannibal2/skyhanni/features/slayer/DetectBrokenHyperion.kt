@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -25,7 +26,7 @@ class DetectBrokenHyperion {
         if (SlayerAPI.latestWrongAreaWarning + 5_000 > System.currentTimeMillis()) return
 
         val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
-        if (!abilityScrolls.contains("IMPLOSION_SCROLL")) return
+        if (!abilityScrolls.contains("IMPLOSION_SCROLL".asInternalName())) return
 
         val diff = System.currentTimeMillis() - SlayerAPI.getLatestProgressChangeTime()
         logger.log("diff: $diff")
@@ -47,7 +48,7 @@ class DetectBrokenHyperion {
             TitleUtils.sendTitle("§eBroken Hyperion!", 3_000)
             LorenzUtils.chat(
                 "§e[SkyHanni] Your Hyperion is broken! It no longer collects combat exp. " +
-                        "Kill a mob with meele-hits to fix this hypixel bug"
+                        "Kill a mob with melee-hits to fix this hypixel bug"
             )
         }
     }

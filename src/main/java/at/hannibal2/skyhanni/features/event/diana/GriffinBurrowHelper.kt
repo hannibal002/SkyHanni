@@ -3,13 +3,10 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -18,6 +15,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object GriffinBurrowHelper {
     private val config get() = SkyHanniMod.feature.diana
@@ -139,19 +137,29 @@ object GriffinBurrowHelper {
         sendTip(event)
 
         val playerLocation = LocationUtils.playerLocation()
-        for ((playerName, location) in InquisitorWaypointShare.waypoints) {
-            event.drawColor(location, LorenzColor.LIGHT_PURPLE)
-            val distance = location.distance(playerLocation)
-            if (distance > 10) {
-                val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
-                event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor §e${formattedDistance}m", 1.7)
-            } else {
-                event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor", 1.7)
+        if (SkyHanniMod.feature.diana.inquisitorSharing.enabled) {
+            for (inquis in InquisitorWaypointShare.waypoints.values) {
+                val playerName = inquis.fromPlayer
+                val location = inquis.location
+                event.drawColor(location, LorenzColor.LIGHT_PURPLE)
+                val distance = location.distance(playerLocation)
+                if (distance > 10) {
+                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
+                    event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+                } else {
+                    event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor", 1.7)
+                }
+                if (distance < 5) {
+                    InquisitorWaypointShare.maybeRemove(playerName)
+                }
+                event.drawDynamicText(location.add(0, 1, 0), "§eFrom §b$playerName", 1.6, yOff = 9f)
+
+                if (config.inquisitorSharing.showDespawnTime) {
+                    val spawnTime = inquis.spawnTime
+                    val format = TimeUtils.formatDuration(75.seconds - spawnTime.passedSince())
+                    event.drawDynamicText(location.add(0, 1, 0), "§eDespawns in §b$format", 1.6, yOff = 18f)
+                }
             }
-            if (distance < 5) {
-                InquisitorWaypointShare.maybeRemove(playerName)
-            }
-            event.drawDynamicText(location.add(0, 1, 0), "§eFrom §b$playerName", 1.6, yOff = 9f)
         }
 
         if (InquisitorWaypointShare.waypoints.isNotEmpty()) {
