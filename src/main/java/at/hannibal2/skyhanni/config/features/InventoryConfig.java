@@ -318,7 +318,7 @@ public class InventoryConfig {
     public boolean highlightAuctions = true;
 
     @Expose
-    @ConfigOption(name = "Highlight disabled potion", desc = "Highlight disabled potion effect in (menu name).")
+    @ConfigOption(name = "Highlight disabled potion", desc = "Highlight disabled potion effect in the Toggle Potion Effects menu.")
     @ConfigEditorBoolean
     public boolean disabledPotionHighlight = false;
 
