@@ -309,22 +309,10 @@ object NEUItems {
     }
 
     fun neuHasFocus(): Boolean {
-        if (AuctionSearchOverlay.shouldReplace()) {
-            println("auction")
-            return true
-        }
-        if (BazaarSearchOverlay.shouldReplace()) {
-            println("baazar")
-            return true
-        }
-        if (InventoryUtils.inStorage()) {
-            println("in storage")
-            return true
-        }
-        if (NEUOverlay.searchBarHasFocus) {
-            println("search bar")
-            return true
-        }
+        if (AuctionSearchOverlay.shouldReplace()) return true
+        if (BazaarSearchOverlay.shouldReplace()) return true
+        if (InventoryUtils.inStorage()) return true
+        if (NEUOverlay.searchBarHasFocus) return true
 
         return false
     }

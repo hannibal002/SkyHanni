@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.OtherMod
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.*
@@ -9,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.neuHasFocus
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -22,6 +23,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import java.io.File
 
 class ChestValue {
 
@@ -34,7 +36,6 @@ class ChestValue {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "") return
-        println("focus: ${NEUItems.neuHasFocus()}")
         if (inInventory) {
             config.position.renderStringsAndItems(
                 display,
@@ -220,11 +221,20 @@ class ChestValue {
         COMPACT("Aligned")
     }
 
-    private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
-        this == "Large Chest") ||
+    private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((
+        this == "Chest" ||
+            this == "Large Chest") ||
         (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
         this == "Personal Vault") ||
-        this.contains("Backpack") && this.contains("Slot #") && !neuHasFocus()
+        ((contains("Backpack") && contains("Slot #") || startsWith("Ender Chest ("))
+            && !isNeuStorageEnabled())
+
+    private fun isNeuStorageEnabled(): Boolean {
+        val file = File(OtherMod.NEU.configPath)
+        if (!file.exists()) return false
+        return ConfigManager.gson.fromJson(APIUtil.readFile(File(OtherMod.NEU.configPath)),
+            com.google.gson.JsonObject::class.java)["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
+    }
 
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
@@ -249,7 +259,6 @@ class ChestValue {
 
         return currentString
     }
-
 
     data class Item(
         val index: MutableList<Int>,
