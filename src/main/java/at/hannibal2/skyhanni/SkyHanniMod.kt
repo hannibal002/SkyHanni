@@ -378,6 +378,7 @@ class SkyHanniMod {
         loadModule(EnderNodeTracker())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
+        loadModule(DisabledPotionHighlight())
 
         init()
 
