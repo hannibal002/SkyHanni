@@ -164,6 +164,8 @@
 + **Barn Timer**
     + Show the time and amount of sea creatures while fishing on the barn via hub.
     + Works in crystal hollows too (worm fishing)
+    + Keybind to manually reset the barn/worm fishing timer. - CarsCupcake
+    + Warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
 + **Shark Fish Counter** - Counts how many sharks have been caught.
 + **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + Showing fished item names
@@ -249,6 +251,9 @@
 + Warps to the nearest warp point on the hub, if closer to the next burrow.
 + **Griffin Pet Warning**
     + Warn when holding an Ancestral Spade while no Griffin pet is selected.
++ **Inquisitor Sharing**
+    + Share aypoints for inquisitors you find with your party.
+    + Show a timer until the inquisitor will despawn.
 
 ## Marked Players
 

@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 object InquisitorWaypointShare {
     private val config get() = SkyHanniMod.feature.diana.inquisitorSharing
@@ -35,7 +36,9 @@ object InquisitorWaypointShare {
 
     private val logger = LorenzLogger("diana/waypoints")
 
-    var waypoints = mapOf<String, LorenzVec>()
+    var waypoints = mapOf<String, SharedInquisitor>()
+
+    class SharedInquisitor(val fromPlayer: String, val location: LorenzVec, val spawnTime: SimpleTimeMark)
 
     private var test = false
 
@@ -50,6 +53,9 @@ object InquisitorWaypointShare {
 
         if (event.repeatSeconds(3)) {
             inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
+        }
+        if (event.repeatSeconds(1)) {
+            waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
         }
     }
 
@@ -124,6 +130,7 @@ object InquisitorWaypointShare {
         inquisitor = inquisId
 
         if (config.instantShare) {
+            // add repo kill switch
             sendInquisitor()
         } else {
             val keyName = KeybindHelper.getKeyName(config.keyBindShare)
@@ -222,7 +229,8 @@ object InquisitorWaypointShare {
                     SoundUtils.playBeepSound()
                 }
             }
-            waypoints = waypoints.editCopy { this[cleanName] = location }
+            val inquis = SharedInquisitor(cleanName, location, SimpleTimeMark.now())
+            waypoints = waypoints.editCopy { this[cleanName] = inquis }
             if (config.focusInquisitor) {
                 GriffinBurrowHelper.setTargetLocation(location.add(0, 1, 0))
                 GriffinBurrowHelper.animationLocation = LocationUtils.playerLocation()

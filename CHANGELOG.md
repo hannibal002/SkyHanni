@@ -23,6 +23,8 @@
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
++ Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
++ Added timer till shared inquisitors will despawn. - hannibal2
 
 ### Changes
 
@@ -37,6 +39,8 @@
 + Shark fish counter now counts twice for Double hook. - appable0
 + Ghost counter check for Mist now ignores y coordiantes - HiZe
 + Telling the user about the bypass hotkey when the visitor drop warning blocks a visitor refusal. - CalMWolfs
++ Added warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
++ Shared inquisitor waypoints will now get removed after 75 seconds. - hannibal2
 
 ### Fixes
 
@@ -56,6 +60,11 @@
 + Fixed End Node Tracker not updating when changing the text format.
 + Fixed neu repo error messages with runes.
 + Fixed rare crashes with scoreboard.
++ Fixed feature that replaces the sack stitched lore message. - hannibal2
++ Fixed some typos in config descriptions and correctly rounding down in composter overlay. - CalMWolfs
++ Fixed a typo in an error message. - Obsidian
++ Fixed Chest Value fails to detect chests when using a resource pack. - HiZe
++ Fixed Sea Creature Timer not working on barn. - hannibal2
 
 ## Version 0.19
 

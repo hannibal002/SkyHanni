@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.neuHasFocus
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -27,7 +28,7 @@ class ChestValue {
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<NEUInternalName, Item>()
-    private val inInventory get() = InventoryUtils.openInventoryName().isValidStorage()
+    private val inInventory get() = InventoryUtils.openInventoryName().removeColor().isValidStorage()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
