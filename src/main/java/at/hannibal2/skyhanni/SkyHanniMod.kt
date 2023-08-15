@@ -139,7 +139,6 @@ class SkyHanniMod {
         loadModule(HypixelData())
         loadModule(DungeonData())
         loadModule(ScoreboardData())
-        loadModule(ApiDataLoader())
         loadModule(SeaCreatureManager())
         loadModule(ItemRenderBackground())
         loadModule(EntityData())

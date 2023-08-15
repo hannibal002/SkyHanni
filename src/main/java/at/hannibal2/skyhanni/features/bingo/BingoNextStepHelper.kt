@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
 import at.hannibal2.skyhanni.features.bingo.nextstep.*
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -277,22 +276,6 @@ class BingoNextStepHelper {
     private fun <T : NextStep> T.makeFinalStep(): T {
         finalSteps.add(this)
         return this
-    }
-
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-
-        val visitedZones = profileData["visited_zones"]?.asJsonArray ?: return
-        for (element in visitedZones) {
-            val zoneName = element.asString
-            for (step in islands.values) {
-                val island = step.island
-                if (island.apiName == zoneName) {
-                    step.done(true)
-                }
-            }
-        }
     }
 
     private infix fun <T : NextStep> T.withItemIslandRequirement(itemName: String): T {
