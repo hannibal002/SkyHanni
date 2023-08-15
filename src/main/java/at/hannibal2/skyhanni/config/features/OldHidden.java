@@ -15,9 +15,6 @@ import java.util.Map;
 public class OldHidden {
 
     @Expose
-    public String apiKey = "";
-
-    @Expose
     public String currentPet = "";
 
     @Expose

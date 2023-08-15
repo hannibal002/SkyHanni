@@ -173,6 +173,7 @@ class TrevorFeatures {
             }
         }
 
+        LorenzUtils.clickableChat("", "")
         if (config.trapperSolver) {
             var location = TrevorSolver.mobLocation.coordinates
             if (TrevorSolver.mobLocation == CurrentMobArea.NONE) return

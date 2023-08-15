@@ -25,6 +25,7 @@
     + Intended to be used with Harp Keybinds
 + Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
 + Added timer till shared inquisitors will despawn. - hannibal2
++ Account upgrade complete reminder. - appable0
 
 ### Changes
 
@@ -41,6 +42,9 @@
 + Telling the user about the bypass hotkey when the visitor drop warning blocks a visitor refusal. - CalMWolfs
 + Added warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
 + Shared inquisitor waypoints will now get removed after 75 seconds. - hannibal2
++ Chest Value now works with Backpack and Ender Chest. - HiZe
+    + Only works if NEU storage is not active.
++ Removed distance checks when detecting sea creatures for fishing timer. - hannibal2
 
 ### Fixes
 
@@ -65,6 +69,15 @@
 + Fixed a typo in an error message. - Obsidian
 + Fixed Chest Value fails to detect chests when using a resource pack. - HiZe
 + Fixed Sea Creature Timer not working on barn. - hannibal2
++ Arachne boss highlighter no longer requires damage indicator to be enabled. - hannibal2
++ /shtrackcollection Cactus now detects cactus green. hannibal2
+
+### Removed Features
+
+- Removed **Broken Wither Impact** detection. - hannibal2
+    - (Hypixel fixed their bug, finally)
+- Removed remaining **Hypixel API** support for still existing legacy api keys. - hannibal2
+    - This should not affect much
 
 ## Version 0.19
 

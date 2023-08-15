@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.OtherMod
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.*
@@ -21,6 +23,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 class ChestValue {
 
@@ -120,7 +124,8 @@ class ChestValue {
                     text,
                     tips,
                     stack = stack,
-                    indexes = index)
+                    indexes = index
+                )
                 add(" §7- ")
                 if (config.showStacks) add(stack)
                 add(renderable)
@@ -218,10 +223,30 @@ class ChestValue {
         COMPACT("Aligned")
     }
 
-    private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
-        this == "Large Chest") ||
-        (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
-        this == "Personal Vault")
+    private fun String.isValidStorage(): Boolean {
+        if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
+
+        if ((contains("Backpack") && contains("Slot #") || startsWith("Ender Chest (")) &&
+            !isNeuStorageEnabled.getValue()
+        ) {
+            return true
+        }
+
+        val inMinion = contains("Minion") && !contains("Recipe") &&
+                LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND
+        return this == "Chest" || this == "Large Chest" || inMinion || this == "Personal Vault"
+    }
+
+    private val isNeuStorageEnabled = RecalculatingValue(1.seconds) {
+        val configPath = OtherMod.NEU.configPath
+        if (File(configPath).exists()) {
+            val json = ConfigManager.gson.fromJson(
+                APIUtil.readFile(File(configPath)),
+                com.google.gson.JsonObject::class.java
+            )
+            json["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
+        } else false
+    }
 
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
@@ -246,7 +271,6 @@ class ChestValue {
 
         return currentString
     }
-
 
     data class Item(
         val index: MutableList<Int>,
