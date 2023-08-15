@@ -39,6 +39,12 @@ public class Storage {
 
         @Expose
         public long nextCityProjectParticipationTime = 0L;
+
+        @Expose
+        public String currentAccountUpgrade = null;
+
+        @Expose
+        public long nextAccountUpgradeCompletionTime = -1L;
     }
 
     public static class ProfileSpecific {
