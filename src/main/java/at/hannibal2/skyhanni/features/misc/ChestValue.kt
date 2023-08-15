@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.OtherMod
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.*
@@ -21,6 +23,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import java.io.File
 
 class ChestValue {
 
@@ -218,10 +221,20 @@ class ChestValue {
         COMPACT("Aligned")
     }
 
-    private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((this == "Chest" ||
-        this == "Large Chest") ||
+    private fun String.isValidStorage() = Minecraft.getMinecraft().currentScreen is GuiChest && ((
+        this == "Chest" ||
+            this == "Large Chest") ||
         (contains("Minion") && !contains("Recipe") && LorenzUtils.skyBlockIsland == IslandType.PRIVATE_ISLAND) ||
-        this == "Personal Vault")
+        this == "Personal Vault") ||
+        ((contains("Backpack") && contains("Slot #") || startsWith("Ender Chest ("))
+            && !isNeuStorageEnabled())
+
+    private fun isNeuStorageEnabled(): Boolean {
+        val file = File(OtherMod.NEU.configPath)
+        if (!file.exists()) return false
+        return ConfigManager.gson.fromJson(APIUtil.readFile(File(OtherMod.NEU.configPath)),
+            com.google.gson.JsonObject::class.java)["storageGUI"].asJsonObject["enableStorageGUI3"].asBoolean
+    }
 
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
@@ -246,7 +259,6 @@ class ChestValue {
 
         return currentString
     }
-
 
     data class Item(
         val index: MutableList<Int>,
