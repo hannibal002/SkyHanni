@@ -24,9 +24,6 @@ public class Storage {
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
-    public String apiKey = "";
-
-    @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
 
     public static class PlayerSpecific {
