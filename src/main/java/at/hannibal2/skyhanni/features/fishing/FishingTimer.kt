@@ -11,7 +11,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
-class BarnFishingTimer {
+class FishingTimer {
     private val config get() = SkyHanniMod.feature.fishing
     private val barnLocation = LorenzVec(108, 89, -252)
 
@@ -47,8 +47,7 @@ class BarnFishingTimer {
     }
 
     private fun checkMobs() {
-        // We ignore sea creatures more than 10 blocks away in crystal hollows
-        val newCount = if (inHollows) countMobs(10) else countMobs(40)
+        val newCount = countMobs()
 
         if (currentCount == 0 && newCount > 0) {
             startTime = System.currentTimeMillis()
@@ -64,7 +63,7 @@ class BarnFishingTimer {
         }
     }
 
-    private fun countMobs(radius: Int) = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(radius.toDouble())
+    private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
         .count { entity -> SeaCreatureManager.allFishingMobNames.any { entity.name.contains(it) } }
 
     private fun isRightLocation(): Boolean {
