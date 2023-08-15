@@ -553,3 +553,4 @@
 + **Inventory Numbers**
     + Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
     + Only on Private island.
++ Account upgrade complete reminder. - appable0
