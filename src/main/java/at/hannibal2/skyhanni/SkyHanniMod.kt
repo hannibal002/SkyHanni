@@ -378,8 +378,8 @@ class SkyHanniMod {
         loadModule(EnderNodeTracker())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
-        loadModule(AccountUpgradeReminder()
-                loadModule(Translator())
+        loadModule(AccountUpgradeReminder())
+        loadModule(Translator())
 
         init()
 
