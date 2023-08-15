@@ -47,7 +47,7 @@ public class DevConfig {
     public boolean showInternalName = false;
 
     @Expose
-    @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even if it is blank.")
+    @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even for items with none.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean showEmptyNames = false;

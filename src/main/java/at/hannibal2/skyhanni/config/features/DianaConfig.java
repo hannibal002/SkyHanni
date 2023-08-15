@@ -58,6 +58,11 @@ public class DianaConfig {
         @ConfigOption(name = "Share Key", desc = "Press this key to share your Inquisitor Waypoint.")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Y)
         public int keyBindShare = Keyboard.KEY_Y;
+
+        @Expose
+        @ConfigOption(name = "Show Despawn Time", desc = "Show the time until the shared Inquisitor will despawn.")
+        @ConfigEditorBoolean
+        public boolean showDespawnTime = true;
     }
 
     @Expose

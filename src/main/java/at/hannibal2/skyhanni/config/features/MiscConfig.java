@@ -809,6 +809,11 @@ public class MiscConfig {
     public boolean harpNumbers = false;
 
     @Expose
+    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
+    @ConfigEditorBoolean
+    public boolean accountUpgradeReminder = true;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     public boolean configButtonOnPause = true;
