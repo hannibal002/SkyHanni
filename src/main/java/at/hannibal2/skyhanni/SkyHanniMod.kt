@@ -336,7 +336,6 @@ class SkyHanniMod {
         loadModule(PlayerTabComplete)
         loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
-        loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
         loadModule(ArachneChatMessageHider())
