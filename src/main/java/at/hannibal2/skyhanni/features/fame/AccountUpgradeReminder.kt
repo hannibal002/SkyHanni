@@ -5,12 +5,25 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 class AccountUpgradeReminder {
     private var inInventory = false
-    private var durationDays = -1
-    private var lastReminderSend = 0L
+    private var duration: Duration? = null
+    private var lastReminderSend = SimpleTimeMark.farPast()
+
+    // TODO: find a way to save SimpleTimeMark directly in the config
+    private var nextCompletionTime: SimpleTimeMark?
+        get() = ProfileStorageData.playerSpecific?.nextAccountUpgradeCompletionTime?.asTimeMark()
+        set(value) {
+            ProfileStorageData.playerSpecific?.nextAccountUpgradeCompletionTime = value?.toMillis()
+        }
+
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -28,10 +41,11 @@ class AccountUpgradeReminder {
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
         val upgrade = playerSpecific.currentAccountUpgrade ?: return
-        if (System.currentTimeMillis() <= playerSpecific.nextAccountUpgradeCompletionTime ) return
+        val nextCompletionTime = nextCompletionTime ?: return
+        if (!nextCompletionTime.isInPast()) return
 
-        if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
-        lastReminderSend = System.currentTimeMillis()
+        if (lastReminderSend.passedSince() < 30.seconds) return
+        lastReminderSend = SimpleTimeMark.now()
 
         LorenzUtils.clickableChat(
             "§e[SkyHanni] The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
@@ -56,9 +70,9 @@ class AccountUpgradeReminder {
         if (!inInventory) return
         val clickedItemLore = event.slot?.stack?.getLore() ?: return
         if (clickedItemLore.getOrNull(0) != "§8Account Upgrade") return
-        durationDays = clickedItemLore.firstNotNullOf {
+        duration = clickedItemLore.firstNotNullOf {
             durationRegex.matchEntire(it)
-        }.groups[1]!!.value.toInt()
+        }.groups[1]!!.value.toInt().days
     }
 
     @SubscribeEvent
@@ -72,23 +86,23 @@ class AccountUpgradeReminder {
     }
 
     private fun startUpgrade(upgrade: String) {
-        if (durationDays == -1) return
+        val duration = duration ?: return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         playerSpecific.currentAccountUpgrade = upgrade
-        playerSpecific.nextAccountUpgradeCompletionTime = System.currentTimeMillis() + durationDays.toLong() * MILLIS_IN_DAY
+
+        nextCompletionTime = SimpleTimeMark.now() + duration
     }
 
     private fun clearUpgrade() {
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         playerSpecific.currentAccountUpgrade = null
-        playerSpecific.nextAccountUpgradeCompletionTime = -1L
+        nextCompletionTime = SimpleTimeMark.farPast()
     }
 
     companion object {
         private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
         private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
         private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()
-        private const val MILLIS_IN_DAY = 1000 * 60 * 60 * 24L
 
         private fun isEnabled() = SkyHanniMod.feature.misc.accountUpgradeReminder
 
