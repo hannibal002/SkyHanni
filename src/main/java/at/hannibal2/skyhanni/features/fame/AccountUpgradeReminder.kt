@@ -21,7 +21,9 @@ class AccountUpgradeReminder {
     private var nextCompletionTime: SimpleTimeMark?
         get() = ProfileStorageData.playerSpecific?.nextAccountUpgradeCompletionTime?.asTimeMark()
         set(value) {
-            ProfileStorageData.playerSpecific?.nextAccountUpgradeCompletionTime = value?.toMillis()
+            value?.let {
+                ProfileStorageData.playerSpecific?.nextAccountUpgradeCompletionTime = it.toMillis()
+            }
         }
 
 
