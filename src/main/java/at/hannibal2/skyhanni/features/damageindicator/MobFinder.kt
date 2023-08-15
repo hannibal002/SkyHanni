@@ -374,11 +374,16 @@ class MobFinder {
         if (entity.hasNameTagWith(1, "[§7Lv300§8] §cArachne") ||
             entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne")
         ) {
+            val maxHealth = entity.baseMaxHealth
+            // Ignore the minis
+            if (maxHealth == 12 || maxHealth == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_SMALL)
         }
         if (entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") ||
             entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
         ) {
+            val maxHealth = entity.baseMaxHealth
+            if (maxHealth == 12 || maxHealth == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_BIG)
         }
 

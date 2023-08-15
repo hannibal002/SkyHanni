@@ -86,7 +86,7 @@ class MobHighlight {
         ) return
 
         val maxHealth = entity.baseMaxHealth
-        if (maxHealth == 12 || maxHealth == 4000 || maxHealth == 20000) {
+        if (maxHealth == 12 || maxHealth == 4000) {
             markArachneMinis(entity)
         } else {
             markArachne(entity)
