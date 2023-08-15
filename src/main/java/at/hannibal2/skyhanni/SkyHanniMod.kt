@@ -257,7 +257,7 @@ class SkyHanniMod {
         loadModule(CroesusUnopenedChestTracker())
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
-        loadModule(BarnFishingTimer())
+        loadModule(FishingTimer())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
         loadModule(SkyblockLevelGuideHelper())

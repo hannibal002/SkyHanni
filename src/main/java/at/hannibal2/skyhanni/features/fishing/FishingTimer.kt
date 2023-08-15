@@ -11,7 +11,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
-class BarnFishingTimer {
+class FishingTimer {
     private val config get() = SkyHanniMod.feature.fishing
     private val barnLocation = LorenzVec(108, 89, -252)
 
