@@ -8,6 +8,14 @@ object TimeUtils {
     private val pattern =
         "(?:(?<y>\\d+) ?y(?:\\w* ?)?)?(?:(?<d>\\d+) ?d(?:\\w* ?)?)?(?:(?<h>\\d+) ?h(?:\\w* ?)?)?(?:(?<m>\\d+) ?m(?:\\w* ?)?)?(?:(?<s>\\d+) ?s(?:\\w* ?)?)?".toPattern()
 
+    fun Duration.format(
+        biggestUnit: TimeUnit = TimeUnit.YEAR,
+        showMilliSeconds: Boolean = false,
+        longName: Boolean = false,
+        maxUnits: Int = -1
+    ): String {
+        return formatDuration(this, biggestUnit, showMilliSeconds, longName, maxUnits)
+    }
 
     fun formatDuration(
         duration: Duration,
