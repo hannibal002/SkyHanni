@@ -475,7 +475,6 @@ object GardenNextJacobContest {
 
         val url = "https://api.elitebot.dev/contests/at/now"
         val body = Gson().toJson(formatted)
-        println(body)
 
         val result = withContext(Dispatchers.IO) { APIUtil.postJSONIsSuccessful(url, body) }
 
