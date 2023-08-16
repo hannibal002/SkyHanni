@@ -2,15 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -265,6 +257,17 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 30,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 11)
+    public Property<Integer> estimatedIemValueEnchantmentsCap = Property.of(7);
+
 
     @Expose
     @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")

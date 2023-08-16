@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -72,6 +74,14 @@ object EstimatedItemValue {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
+    }
+
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.estimatedIemValueEnchantmentsCap.onToggle {
+            cache.clear()
+        }
     }
 
     @SubscribeEvent
@@ -580,13 +590,13 @@ object EstimatedItemValue {
 
             map[" $name §7(§6$format§7)"] = price
         }
+        val enchantmentsCap: Int = config.estimatedIemValueEnchantmentsCap.get().toInt()
         if (map.isNotEmpty()) {
             list.add("§7Enchantments: §6" + NumberUtil.format(totalPrice))
             var i = 0
-            val size = map.size
             for (entry in map.sortedDesc().keys) {
-                if (i == 7) {
-                    val missing = size - i
+                if (i == enchantmentsCap) {
+                    val missing = map.size - enchantmentsCap
                     list.add(" §7§o$missing more enchantments..")
                     break
                 }
