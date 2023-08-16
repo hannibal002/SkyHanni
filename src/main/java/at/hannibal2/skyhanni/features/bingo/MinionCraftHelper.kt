@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -90,7 +90,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = item.getInternalName()
+            val rawId = item.getInternalName_old()
             if (isMinionName(name)) {
                 minions[name] = rawId
             }
@@ -101,7 +101,7 @@ class MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            val rawId = item.getInternalName()
+            val rawId = item.getInternalName_old()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
                 if (!isAllowed(allMinions, rawId)) continue
@@ -269,7 +269,7 @@ class MinionCraftHelper {
             val name = b.name ?: continue
             if (!name.startsWith("§e")) continue
 
-            val internalName = NEUItems.getInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
+            val internalName = NEUItems.getRawInternalName("$name I").replace("MINION", "GENERATOR").replace(";", "_")
             if (!tierOneMinionsDone.contains(internalName)) {
                 tierOneMinionsDone.add(internalName)
             }

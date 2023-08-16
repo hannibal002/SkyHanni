@@ -8,19 +8,19 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EnderNodeTracker {
-    private val config get() = SkyHanniMod.feature.misc.enderNodeTracker;
+    private val config get() = SkyHanniMod.feature.misc.enderNodeTracker
 
     private var totalNodesMined = 0
     private var totalEndermiteNests = 0
@@ -114,24 +114,22 @@ class EnderNodeTracker {
 
     private fun calculateProfit(): Map<EnderNode, Double> {
         val newProfit = mutableMapOf<EnderNode, Double>()
-        lootCount.forEach {
-            val price = if (isEnderArmor(it.key.displayName)) {
+        lootCount.forEach { (key, _) ->
+            val price = if (isEnderArmor(key.displayName)) {
                 10_000.0
             } else {
-                val bzData = BazaarApi.getBazaarDataByInternalName(it.key.internalName)
+                val internalName = key.internalName
+                val bzData = internalName.getBazaarData()
                 if (LorenzUtils.noTradeMode) {
-                    bzData?.npcPrice ?: georgePrice(it.key) ?: 0.0
+                    bzData?.npcPrice ?: georgePrice(key) ?: 0.0
                 } else {
-
                     bzData?.npcPrice
                         ?.coerceAtLeast(bzData.sellPrice)
-                        ?.coerceAtLeast(georgePrice(it.key) ?: 0.0)
-                        ?: NEUItems.getPrice(it.key.internalName)
-
+                        ?.coerceAtLeast(georgePrice(key) ?: 0.0)
+                        ?: internalName.getPrice()
                 }
-
             }
-            newProfit[it.key] = price * (lootCount[it.key] ?: 0)
+            newProfit[key] = price * (lootCount[key] ?: 0)
         }
         return newProfit
     }
@@ -156,6 +154,7 @@ class EnderNodeTracker {
         "§5Ender Boots",
         "§5Ender Necklace",
         "§5Ender Gauntlet" -> true
+
         else -> false
     }
 
@@ -181,8 +180,10 @@ class EnderNodeTracker {
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         addAsSingletonList(" ")
-        addAsSingletonList("§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                "§7(§6${format(totalEnderArmor * 10_000)}§7)")
+        addAsSingletonList(
+            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
+                    "§7(§6${format(totalEnderArmor * 10_000)}§7)"
+        )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (lootCount[item] ?: 0).addSeparators()
             val profit = format(lootProfit[item] ?: 0.0)

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -158,7 +158,7 @@ class FarmingFortuneDisplay {
         var greenThumbFortune = 0.0
 
         fun getToolFortune(tool: ItemStack?): Double {
-            val internalName = tool?.getInternalName() ?: return 0.0
+            val internalName = tool?.getInternalName_old() ?: return 0.0
             if (internalName == "THEORETICAL_HOE") {
                 return 0.0
             }
@@ -212,7 +212,7 @@ class FarmingFortuneDisplay {
             val armorAbilityFortune = "§7.*§7Grants §6(?<bonus>.*)☘.*".toPattern()
             var pieces = 0
             for (line in item?.getLore()!!) {
-                if (item.getInternalName().contains("LOTUS")) {
+                if (item.getInternalName_old().contains("LOTUS")) {
                     lotusAbilityPattern.matchMatcher(line) {
                         return group("bonus").toDouble()
                     }
@@ -239,9 +239,9 @@ class FarmingFortuneDisplay {
                     displayedFortune = match[1]!!.value.toDouble()
                     reforgeFortune = match[2]?.value?.toDouble() ?: 0.0
 
-                    itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) 5.0
+                    itemBaseFortune = if (tool.getInternalName_old().contains("LOTUS")) 5.0
                     else displayedFortune - reforgeFortune - enchantmentFortune - (tool.getFarmingForDummiesCount() ?: 0 ) * 1.0
-                    greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
+                    greenThumbFortune = if (tool.getInternalName_old().contains("LOTUS")) {
                         displayedFortune - reforgeFortune - itemBaseFortune
                     } else 0.0
                 }

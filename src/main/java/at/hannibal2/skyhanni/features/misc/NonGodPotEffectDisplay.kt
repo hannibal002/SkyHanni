@@ -214,24 +214,6 @@ class NonGodPotEffectDisplay {
         )
     }
 
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-        val effects = profileData["active_effects"]?.asJsonArray ?: return
-        for (element in effects) {
-            val effectJson = element.asJsonObject
-            val name = effectJson["effect"].asString
-            val effect = NonGodPotEffect.entries.find { it.apiName == name } ?: continue
-
-            val time = effectJson["ticks_remaining"].asLong / 20
-            val newValue = System.currentTimeMillis() + time * 1000
-
-            effectDuration[effect] = if (effect == NonGodPotEffect.INVISIBILITY) {
-                System.currentTimeMillis() + 1000 * 60 * 60 * 24
-            } else newValue
-        }
-    }
-
     private fun isEnabled(): Boolean {
         return LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
     }

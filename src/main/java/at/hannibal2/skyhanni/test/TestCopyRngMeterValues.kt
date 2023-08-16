@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -23,10 +23,10 @@ object TestCopyRngMeterValues {
         for (item in event.inventoryItems.values) {
             for (line in item.getLore()) {
                 slayerPattern.matchMatcher(line) {
-                    map[item.getInternalName()] = group("xp").formatNumber()
+                    map[item.getInternalName_old()] = group("xp").formatNumber()
                 }
                 dungeonPattern.matchMatcher(line) {
-                    map[item.getInternalName()] = group("xp").formatNumber()
+                    map[item.getInternalName_old()] = group("xp").formatNumber()
                 }
             }
         }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
@@ -15,8 +16,11 @@ class PasteIntoSigns {
         if (!SkyHanniMod.feature.misc.pasteIntoSigns) return
 
         if (LorenzUtils.isControlKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_V)) {
-            val clipboard = OSUtils.readFromClipboard() ?: return
-            LorenzUtils.setTextIntoSign(clipboard.take(15))
+            SkyHanniMod.coroutineScope.launch {
+                OSUtils.readFromClipboard()?.let {
+                    LorenzUtils.setTextIntoSign(it.take(15))
+                }
+            }
         }
     }
 }

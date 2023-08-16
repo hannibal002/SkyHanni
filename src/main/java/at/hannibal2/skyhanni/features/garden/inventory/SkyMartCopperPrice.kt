@@ -10,7 +10,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -31,12 +32,12 @@ class SkyMartCopperPrice {
         if (event.inventoryName != "SkyMart") return
 
         inInventory = true
-        val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
+        val table = mutableMapOf<Pair<String, String>, Pair<Double, NEUInternalName>>()
         for (stack in event.inventoryItems.values) {
             for (line in stack.getLore()) {
                 val internalName = stack.getInternalName()
-                val lowestBin = NEUItems.getPrice(internalName)
-                if (lowestBin == -1.0) continue
+                val lowestBin = internalName.getPriceOrNull() ?: continue
+
                 pattern.matchMatcher(line) {
                     val amount = group("amount").replace(",", "").toInt()
                     val factor = lowestBin / amount

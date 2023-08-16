@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -63,6 +65,15 @@ class ConfigManager {
 
                 override fun read(reader: JsonReader): ItemStack {
                     return NEUItems.loadNBTData(reader.nextString())
+                }
+            }.nullSafe())
+            .registerTypeAdapter(NEUInternalName::class.java, object : TypeAdapter<NEUInternalName>() {
+                override fun write(out: JsonWriter, value: NEUInternalName) {
+                    out.value(value.asString())
+                }
+
+                override fun read(reader: JsonReader): NEUInternalName {
+                    return reader.nextString().asInternalName()
                 }
             }.nullSafe())
             .enableComplexMapKeySerialization()

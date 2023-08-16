@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -115,13 +117,14 @@ object ItemUtils {
         return false
     }
 
-    fun ItemStack.getInternalNameOrNull() = getInternalName().takeIf { it != "" }
+    // TODO remove
+    fun ItemStack.getInternalName_old() = getInternalName().asString()
 
-    fun ItemStack.getInternalNameOrNull_new() = getInternalName_new().takeIf { it.asString() != "" }
+    fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
 
-    fun ItemStack.getInternalName_new() = NEUInternalName.from(getInternalName())
+    fun ItemStack.getInternalNameOrNull() = getRawInternalName()?.asInternalName()
 
-    fun ItemStack.getInternalName(): String {
+    private fun ItemStack.getRawInternalName(): String? {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return "WISP_POTION"
         }
@@ -173,18 +176,13 @@ object ItemUtils {
         }
 
     val ItemStack.nameWithEnchantment: String?
-        get() {
-            val name = name
-            name?.let {
-                if (name.endsWith("Enchanted Book")) {
-                    return getLore()[0]
-                }
-            }
-
-            return name
+        get() = name?.let {
+            if (it.endsWith("Enchanted Book")) {
+                getLore()[0]
+            } else it
         }
 
-    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == "SKYBLOCK_MENU"
+    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName_old() == "SKYBLOCK_MENU"
 
     private val patternInFront = "(?: *§8(?<amount>[\\d,]+)x )?(?<name>.*)".toPattern()
     private val patternBehind = "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?".toPattern()
@@ -223,5 +221,16 @@ object ItemUtils {
         val pair = Pair(itemName, amount)
         itemAmountCache[input] = pair
         return pair
+    }
+
+    fun NEUInternalName.getItemNameOrNull() = getItemStack().name
+
+    fun NEUInternalName.getItemName() = getItemNameOrNull() ?: error("No item name found for $this")
+
+    fun NEUInternalName.getNameWithEnchantment(): String {
+        if (equals("WISP_POTION")) {
+            return "§fWisp's Ice-Flavored Water"
+        }
+        return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -56,6 +57,7 @@ object LorenzUtils {
 
     const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private val log = LorenzLogger("chat/mod_sent")
+    var lastButtonClicked = 0L
 
     fun debug(message: String) {
         if (SkyHanniMod.feature.dev.debugEnabled) {
@@ -196,7 +198,7 @@ object LorenzUtils {
     }
 
     // (key -> value) -> (sorting value -> key item icon)
-    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, String>>) {
+    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
         val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
         val renderer = Minecraft.getMinecraft().fontRendererObj
         val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
@@ -208,7 +210,7 @@ object LorenzUtils {
                 displayName += " "
             }
 
-            NEUItems.getItemStackOrNull(data[pair]!!.second)?.let {
+            data[pair]!!.second.getItemStackOrNull()?.let {
                 list.add(listOf(it, "$displayName   $second"))
             }
         }
@@ -332,6 +334,31 @@ object LorenzUtils {
         })
     }
 
+    inline fun MutableList<List<Any>>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(buildList {
+            add(prefix)
+            add("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            add("§a]")
+        })
+    }
+
     // TODO nea?
 //    fun <T> dynamic(block: () -> KMutableProperty0<T>?): ReadWriteProperty<Any?, T?> {
 //        return object : ReadWriteProperty<Any?, T?> {
@@ -382,8 +409,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island

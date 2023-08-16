@@ -424,14 +424,6 @@ public class SlayerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Broken Wither Impact",
-            desc = "Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp. " +
-                    "Kill a mob with melee-hits to fix this hypixel bug. §cOnly works while doing slayers!"
-    )
-    @ConfigEditorBoolean
-    public boolean brokenHyperion = true;
-
-    @Expose
     @ConfigOption(name = "Miniboss Highlight", desc = "Highlight slayer miniboss in blue color.")
     @ConfigEditorBoolean
     public boolean slayerMinibossHighlight = false;

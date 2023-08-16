@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
@@ -27,7 +28,7 @@ object SkyBlockItemModifierUtils {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
-    private fun ItemStack.getBaseSilexCount() = when (getInternalName()) {
+    private fun ItemStack.getBaseSilexCount() = when (getInternalName_old()) {
         "STONK_PICKAXE" -> 1
         "PROMISING_SPADE" -> 5
 
@@ -87,40 +88,39 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
-        val list = mutableListOf<String>()
+        val list = mutableListOf<NEUInternalName>()
         for (attributes in it.keySet) {
             if (attributes in drillPartTypes) {
                 val upgradeItem = it.getString(attributes)
-                list.add(upgradeItem.uppercase())
+                list.add(upgradeItem.uppercase().asInternalName())
             }
         }
         list
     }
 
-    fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")
+    fun ItemStack.getPowerScroll() = getAttributeString("power_ability_scroll")?.asInternalName()
 
-    fun ItemStack.getHelmetSkin() = getAttributeString("skin")
+    fun ItemStack.getHelmetSkin() = getAttributeString("skin")?.asInternalName()
 
-    fun ItemStack.getArmorDye() = getAttributeString("dye_item")
+    fun ItemStack.getArmorDye() = getAttributeString("dye_item")?.asInternalName()
 
-    fun ItemStack.getRune(): String? {
+    fun ItemStack.getRune(): NEUInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
         val runesList = runesMap.keySet.associateWith { runesMap.getInteger(it) }.toList()
         if (runesList.isEmpty()) return null
         val (name, tier) = runesList.first()
-        return "${name.uppercase()}_RUNE;$tier"
+        return "${name.uppercase()}_RUNE;$tier".asInternalName()
     }
 
     fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let {
-        val list = mutableListOf<String>()
+        val list = mutableListOf<NEUInternalName>()
         for (attributes in it.keySet) {
             if (attributes == "ability_scroll") {
                 val tagList = it.getTagList(attributes, 8)
                 for (i in 0..3) {
                     val text = tagList.get(i).toString()
                     if (text == "END") break
-                    val internalName = text.replace("\"", "")
-                    list.add(internalName)
+                    list.add(text.replace("\"", "").asInternalName())
                 }
             }
         }
@@ -227,7 +227,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
 
     class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
-        fun getInternalName() = "${quality}_${type}_GEM"
+        fun getInternalName() = "${quality}_${type}_GEM".asInternalName()
     }
 
     enum class GemstoneQuality(val displayName: String) {

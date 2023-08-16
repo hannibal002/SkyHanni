@@ -37,9 +37,9 @@ public class RiftConfig {
     @ConfigOption(name = "Crux Talisman Progress", desc = "")
     @Accordion
     @Expose
-    public CruxTalisman cruxTalisman = new CruxTalisman();
+    public CruxTalismanDisplay cruxTalisman = new CruxTalismanDisplay();
 
-    public static class CruxTalisman {
+    public static class CruxTalismanDisplay {
         @Expose
         @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
         @ConfigEditorBoolean

@@ -5,17 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -766,7 +756,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Overtake ETA", desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Will show an ETA to rank #1000 if you're not on the leaderboard yet.")
+            "Will show an ETA to rank #10,000 if you're not on the leaderboard yet.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean eliteFarmingWeightOvertakeETA = false;
@@ -778,7 +768,7 @@ public class GardenConfig {
     public boolean eliteFarmingWeightOvertakeETAAlways = true;
 
     @Expose
-    @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10000\")")
+    @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")")
     @ConfigEditorText
     @ConfigAccordionId(id = 11)
     public String eliteFarmingWeightETAGoalRank = "10000";
@@ -1084,6 +1074,15 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
     public boolean composterUpgradePrice = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Round Amount Needed",
+            desc = "Rounds the amount needed to fill your composter down so that you don't overspend."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 17)
+    public boolean composterRoundDown = true;
 
     @Expose
     @ConfigOption(

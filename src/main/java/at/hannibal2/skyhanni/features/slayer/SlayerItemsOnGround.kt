@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -40,7 +40,7 @@ class SlayerItemsOnGround {
             if (SlayerAPI.ignoreSlayerDrop(name)) continue
             // happens in spiders den sometimes
             if (itemStack.item == Items.spawn_egg) continue
-            if (itemStack.getInternalName() == "") continue
+            if (itemStack.getInternalName_old() == "") continue
 
             val (itemName, price) = SlayerAPI.getItemNameAndPrice(itemStack)
             if (config.minimumPrice > price) continue

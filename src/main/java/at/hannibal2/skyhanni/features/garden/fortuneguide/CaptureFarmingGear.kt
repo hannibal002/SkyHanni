@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -44,7 +44,7 @@ class CaptureFarmingGear {
             val resultList = mutableListOf<String>()
 
             val itemStack = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem() ?: return
-            val itemID = itemStack.getInternalName()
+            val itemID = itemStack.getInternalName_old()
             resultList.add(itemStack.displayName.toString())
             resultList.add(itemID)
 
@@ -62,7 +62,7 @@ class CaptureFarmingGear {
             }
             for (armor in InventoryUtils.getArmor()) {
                 if (armor == null) continue
-                val split = armor.getInternalName().split("_")
+                val split = armor.getInternalName_old().split("_")
                 if (split.first() in farmingSets) {
                     for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
@@ -92,7 +92,7 @@ class CaptureFarmingGear {
         val outdatedItems = outdatedItems ?: return
         if (event.inventoryName == "Your Equipment and Stats") {
             for ((_, slot) in event.inventoryItems) {
-                val split = slot.getInternalName().split("_")
+                val split = slot.getInternalName_old().split("_")
                 if (split.first() == "LOTUS") {
                     for (item in FarmingItems.entries) {
                         if (item.name == split.last()) {
@@ -117,7 +117,7 @@ class CaptureFarmingGear {
             var highestRabbitLvl = -1
 
             for ((_, item) in event.inventoryItems) {
-                val split = item.getInternalName().split(";")
+                val split = item.getInternalName_old().split(";")
                 if (split.first() == "ELEPHANT") {
                     if (split.last().toInt() > highestElephantLvl) {
                         farmingItems[FarmingItems.ELEPHANT] = item

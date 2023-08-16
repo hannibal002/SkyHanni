@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
@@ -375,52 +375,19 @@ class MobFinder {
             entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne")
         ) {
             val maxHealth = entity.baseMaxHealth
-            if (maxHealth == 12) {
-                markArachneMinis(entity)
-                return null
-            }
-            if (maxHealth == 4000) {
-                markArachneMinis(entity)
-                return null
-            }
-            markArachne(entity)
+            // Ignore the minis
+            if (maxHealth == 12 || maxHealth == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_SMALL)
         }
         if (entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") ||
             entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
         ) {
             val maxHealth = entity.baseMaxHealth
-            if (maxHealth == 12) {
-                markArachneMinis(entity)
-                return null
-            }
-            if (maxHealth == 20000) {
-                markArachneMinis(entity)
-                return null
-            }
-            markArachne(entity)
+            if (maxHealth == 12 || maxHealth == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_BIG)
         }
 
         return null
-    }
-
-    private val arachneBossHighlighter get() = SkyHanniMod.feature.mobs.arachneBossHighlighter
-
-    private fun markArachneMinis(entity: EntityLivingBase) {
-        if (arachneBossHighlighter) {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.GOLD.toColor().withAlpha(50))
-            { arachneBossHighlighter }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { arachneBossHighlighter }
-        }
-    }
-
-    private fun markArachne(entity: EntityLivingBase) {
-        if (arachneBossHighlighter) {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.RED.toColor().withAlpha(50))
-            { arachneBossHighlighter }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { arachneBossHighlighter }
-        }
     }
 
     private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Long {

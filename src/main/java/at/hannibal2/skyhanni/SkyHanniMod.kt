@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.features.commands.WikiCommand
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
 import at.hannibal2.skyhanni.features.event.diana.*
+import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
+import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.*
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
@@ -124,7 +126,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.4",
+    version = "0.20.Beta.8",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -137,7 +139,6 @@ class SkyHanniMod {
         loadModule(HypixelData())
         loadModule(DungeonData())
         loadModule(ScoreboardData())
-        loadModule(ApiDataLoader())
         loadModule(SeaCreatureManager())
         loadModule(ItemRenderBackground())
         loadModule(EntityData())
@@ -256,7 +257,7 @@ class SkyHanniMod {
         loadModule(CroesusUnopenedChestTracker())
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
-        loadModule(BarnFishingTimer())
+        loadModule(FishingTimer())
         loadModule(CrimsonIsleReputationHelper(this))
         loadModule(SharkFishCounter())
         loadModule(SkyblockLevelGuideHelper())
@@ -334,7 +335,6 @@ class SkyHanniMod {
         loadModule(PlayerTabComplete)
         loadModule(SlayerItemProfitTracker)
         loadModule(SlayerItemsOnGround())
-        loadModule(DetectBrokenHyperion())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
         loadModule(ArachneChatMessageHider())
@@ -366,6 +366,7 @@ class SkyHanniMod {
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
+        loadModule(ChestValue())
         loadModule(SlayerBossSpawnSoon())
         loadModule(RiftBloodEffigies())
         loadModule(RiftWiltedBerberisHelper())
@@ -373,10 +374,11 @@ class SkyHanniMod {
         loadModule(GriffinPetWarning())
         loadModule(BestiaryData)
         loadModule(KingTalismanHelper())
-        loadModule(HarpKeybinds())
+        loadModule(HarpFeatures())
         loadModule(EnderNodeTracker())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
+        loadModule(AccountUpgradeReminder())
 
         init()
 
