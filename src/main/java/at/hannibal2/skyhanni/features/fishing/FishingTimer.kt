@@ -64,7 +64,12 @@ class FishingTimer {
     }
 
     private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
-        .count { entity -> SeaCreatureManager.allFishingMobNames.any { entity.name.contains(it) } }
+        .map { entity ->
+            val name = entity.name
+            if (SeaCreatureManager.allFishingMobNames.any { name.contains(it) }) {
+                if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
+            } else 0
+        }.sum()
 
     private fun isRightLocation(): Boolean {
         if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
