@@ -21,6 +21,8 @@ import java.util.*;
 public class Storage {
 
     @Expose
+    public boolean hasPlayedBefore = false;
+    @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose

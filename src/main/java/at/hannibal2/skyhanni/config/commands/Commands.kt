@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.features.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -103,6 +104,7 @@ object Commands {
         registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { commandHelp(it) }
+        registerCommand("shdefaultoptions", "Select default options") { DefaultConfigFeatures.onCommand() }
     }
 
     private fun usersNormal() {
