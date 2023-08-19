@@ -307,6 +307,7 @@
     + provided by the elite skyblock farmers.
     + next leaderboard position eta.
     + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
+    + Chat message how many places you dropped in the farming weight lb when joining garden.
 + **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for
   switching to a different pet for leveling.
@@ -472,6 +473,8 @@
   particular item based on the current crop speed.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
++ **/shfarmingprofile [player name]**
+  + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 
 ## Misc
 

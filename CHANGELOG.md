@@ -26,6 +26,9 @@
 + Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
 + Added timer till shared inquisitors will despawn. - hannibal2
 + Account upgrade complete reminder. - appable0
++ Chat message how many places you dropped in the farming weight lb when joining garden.
++ Added command /shfarmingprofile [player name]
++ Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 
 ### Changes
 
@@ -45,6 +48,11 @@
 + Chest Value now works with Backpack and Ender Chest. - HiZe
     + Only works if NEU storage is not active.
 + Removed distance checks when detecting sea creatures for fishing timer. - hannibal2
++ Added Enchantments Cap to EstimatedItemValue. - hannibal2
+    + Only show the top # most expensive enchantments on an item.
++ Count sea emperor and rider of the deep twice against sea creature cap.
++ Clicking on the chat message from farming weight will run the /shfarmingprofile command.
++ Changed Bestiary Display number format - HiZe
 
 ### Fixes
 
@@ -71,6 +79,9 @@
 + Fixed Sea Creature Timer not working on barn. - hannibal2
 + Arachne boss highlighter no longer requires damage indicator to be enabled. - hannibal2
 + /shtrackcollection Cactus now detects cactus green. hannibal2
++ Fixed arachne minis falsely show in damage indicator.
++ Fixed rare cases where special laptop keys trigger behavior unintended. - hannibal2
++ Fixed rendering problems with stack background and custom text lore. - nea
 
 ### Removed Features
 
