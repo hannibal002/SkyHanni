@@ -157,7 +157,7 @@ object GardenNextJacobContest {
 
         // If contests were just fully saved
         if (contests.size == maxContestsPerYear) {
-            nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 1).toMillis()
+            nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toMillis()
 
             if (isSendEnabled()) {
                 if (!askToSendContests()) {
