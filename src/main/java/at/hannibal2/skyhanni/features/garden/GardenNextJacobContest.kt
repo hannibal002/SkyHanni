@@ -442,7 +442,7 @@ object GardenNextJacobContest {
 
                 contests = newContests
                 fetchedFromElite = true
-                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 1).toMillis()
+                nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toMillis()
                 loadedContestsYear = SkyBlockTime.now().year
 
                 saveConfig()
