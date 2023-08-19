@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -48,21 +49,34 @@ class DungeonSadanGyroSpots {
     }
 
     @SubscribeEvent
-    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        val entity = event.entity
-        val name = entity.name
-        println("EntityHealthUpdateEvent: '$name' (${event.health})")
-        if (event.health <= 0) {
-            println("death: '$name'")
-
-            if (name.lowercase().contains("terra")) {
-
+    fun onLivingDeath(event: LivingDeathEvent) {
+        val name = event.entity.name
+        if (active) {
+            if (name == "Terracotta ") {
                 if (!firstTerraDied) {
                     LorenzUtils.debug("first terra died!")
                     firstTerraDied = true
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+        val entity = event.entity
+        val name = entity.name
+//        println("EntityHealthUpdateEvent: '$name' (${event.health})")
+//        if (event.health <= 0) {
+//            println("death: '$name'")
+//
+//            if (name.lowercase().contains("terra")) {
+//
+//                if (!firstTerraDied) {
+//                    LorenzUtils.debug("first terra died!")
+//                    firstTerraDied = true
+//                }
+//            }
+//        }
     }
 
     @SubscribeEvent
