@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
@@ -48,7 +49,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.moulconfig.internal.KeybindHelper
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -65,7 +65,7 @@ object EstimatedItemValue {
     fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.estimatedIemValueEnabled) return
-        if (!KeybindHelper.isKeyDown(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
+        if (!OSUtils.isKeyHeld(config.estimatedItemValueHotkey) && !config.estimatedIemValueAlwaysEnabled) return
         if (System.currentTimeMillis() > lastToolTipTime + 200) return
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")

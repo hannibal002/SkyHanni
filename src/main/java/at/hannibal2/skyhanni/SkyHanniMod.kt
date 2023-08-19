@@ -392,6 +392,7 @@ class SkyHanniMod {
         loadModule(TestCopyBestiaryValues)
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
+        loadModule(TestShowSlotNumber())
     }
 
     @Mod.EventHandler

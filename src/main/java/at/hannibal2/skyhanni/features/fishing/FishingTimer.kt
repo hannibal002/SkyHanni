@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 
 class FishingTimer {
     private val config get() = SkyHanniMod.feature.fishing
@@ -33,7 +32,7 @@ class FishingTimer {
 
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
-        if (Keyboard.isKeyDown(config.manualResetTimer)) startTime = System.currentTimeMillis()
+        if (OSUtils.isKeyHeld(config.manualResetTimer)) startTime = System.currentTimeMillis()
     }
 
     private fun tryPlaySound() {
