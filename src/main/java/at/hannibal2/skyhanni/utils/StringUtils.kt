@@ -124,4 +124,7 @@ object StringUtils {
             } ?: text
         }
     }
+
+    fun optionalPlural(number: Int, singular: String, plural: String) =
+        "$number " + if (number == 1) singular else plural
 }
