@@ -24,6 +24,26 @@ public class MiscConfig {
     public boolean petDisplay = false;
 
     @Expose
+    @ConfigOption(name = "Pet Experience Tooltip", desc = "Show the currently active pet.")
+    @ConfigAccordionId(id = 0)
+    @Accordion
+    public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
+
+    public static class PetExperienceToolTipConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing shift key.")
+        @ConfigEditorBoolean
+        public boolean petDisplay = true;
+
+        @Expose
+        @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
+        @ConfigEditorBoolean
+        public boolean showAlways = false;
+
+    }
+
+    @Expose
     public Position petDisplayPos = new Position(-330, -15, false, true);
 
     @Expose
