@@ -267,9 +267,9 @@ object LorenzUtils {
         }
     }
 
-    fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
+    fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
 
-    fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
+    fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -409,8 +409,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island

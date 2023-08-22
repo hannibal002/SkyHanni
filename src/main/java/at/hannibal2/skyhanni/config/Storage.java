@@ -24,9 +24,6 @@ public class Storage {
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
 
     @Expose
-    public String apiKey = "";
-
-    @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
 
     public static class PlayerSpecific {
@@ -39,6 +36,12 @@ public class Storage {
 
         @Expose
         public long nextCityProjectParticipationTime = 0L;
+
+        @Expose
+        public String currentAccountUpgrade = null;
+
+        @Expose
+        public long nextAccountUpgradeCompletionTime = -1L;
     }
 
     public static class ProfileSpecific {
@@ -221,6 +224,15 @@ public class Storage {
 
             @Expose
             public long lastComposterEmptyWarningTime = 0;
+
+            @Expose
+            public FarmingWeightConfig faramingWeight = new FarmingWeightConfig();
+
+            public static class FarmingWeightConfig {
+
+                @Expose
+                public int lastFarmingWeightLeaderboard = -1;
+            }
         }
 
         @Expose

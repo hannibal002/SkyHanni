@@ -177,20 +177,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-        val sacks = profileData["sacks_counts"]?.asJsonObject ?: return
-
-        sacksCache.clear()
-
-        for ((name, v) in sacks.entrySet()) {
-            val amount = v.asLong
-            sacksCache[name] = amount
-        }
-        update()
-    }
-
-    @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return

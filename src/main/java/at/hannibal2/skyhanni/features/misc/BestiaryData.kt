@@ -35,7 +35,6 @@ object BestiaryData {
     private val catList = mutableListOf<Category>()
     private val progressPattern = "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+$)".toPattern()
     private val titlePattern = "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)$".toPattern()
-    private var lastclicked = 0L
     private var inInventory = false
     private var isCategory = false
     private var indexes = listOf(
@@ -241,16 +240,16 @@ object BestiaryData {
     private fun getMobHover(mob: BestiaryMob) = listOf(
         "§6Name: §b${mob.name}",
         "§6Level: §b${mob.level} ${if (!config.replaceRoman) "§7(${mob.level.romanToDecimalIfNeeded()})" else ""}",
-        "§6Total Kills: §b${mob.actualRealTotalKill.addSeparators()}",
-        "§6Kills needed to max: §b${mob.killNeededToMax().addSeparators()}",
-        "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().addSeparators()}",
-        "§6Current kill to next level: §b${mob.currentKillToNextLevel.addSeparators()}",
-        "§6Kill needed for next level: §b${mob.killNeededForNextLevel.addSeparators()}",
-        "§6Current kill to max: §b${mob.killToMax.addSeparators()}",
+        "§6Total Kills: §b${mob.actualRealTotalKill.formatNumber()}",
+        "§6Kills needed to max: §b${mob.killNeededToMax().formatNumber()}",
+        "§6Kills needed to next lvl: §b${mob.killNeededToNextLevel().formatNumber()}",
+        "§6Current kill to next level: §b${mob.currentKillToNextLevel.formatNumber()}",
+        "§6Kill needed for next level: §b${mob.killNeededForNextLevel.formatNumber()}",
+        "§6Current kill to max: §b${mob.killToMax.formatNumber()}",
         "§6Percent to max: §b${mob.percentToMaxFormatted()}",
         "§6Percent to tier: §b${mob.percentToTierFormatted()}",
         "",
-        "§7More infos thing"
+        "§7More info thing"
     )
 
     private fun getMobLine(
@@ -262,7 +261,7 @@ object BestiaryData {
         text += " §7- "
         text += "${mob.name} ${mob.level.romanOrInt()} "
         text += if (isMaxed) {
-            "§c§lMAXED! §7(§b${mob.actualRealTotalKill.addSeparators()}§7 kills)"
+            "§c§lMAXED! §7(§b${mob.actualRealTotalKill.formatNumber()}§7 kills)"
         } else {
             when (displayType) {
                 0, 1 -> {
@@ -321,7 +320,7 @@ object BestiaryData {
 
         newDisplay.addButton(
             prefix = "§7Number Type: ",
-            getName = NumberType.entries[if (config.replaceRoman) 1 else 0].type,
+            getName = NumberType.entries[if (config.replaceRoman) 0 else 1].type,
             onChange = {
                 config.replaceRoman = !config.replaceRoman
                 update()

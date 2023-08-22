@@ -164,6 +164,8 @@
 + **Barn Timer**
     + Show the time and amount of sea creatures while fishing on the barn via hub.
     + Works in crystal hollows too (worm fishing)
+    + Keybind to manually reset the barn/worm fishing timer. - CarsCupcake
+    + Warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
 + **Shark Fish Counter** - Counts how many sharks have been caught.
 + **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + Showing fished item names
@@ -249,6 +251,9 @@
 + Warps to the nearest warp point on the hub, if closer to the next burrow.
 + **Griffin Pet Warning**
     + Warn when holding an Ancestral Spade while no Griffin pet is selected.
++ **Inquisitor Sharing**
+    + Share aypoints for inquisitors you find with your party.
+    + Show a timer until the inquisitor will despawn.
 
 ## Marked Players
 
@@ -302,6 +307,7 @@
     + provided by the elite skyblock farmers.
     + next leaderboard position eta.
     + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
+    + Chat message how many places you dropped in the farming weight lb when joining garden.
 + **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for
   switching to a different pet for leveling.
@@ -467,6 +473,8 @@
   particular item based on the current crop speed.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
++ **/shfarmingprofile [player name]**
+  + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 
 ## Misc
 
@@ -548,3 +556,4 @@
 + **Inventory Numbers**
     + Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
     + Only on Private island.
++ Account upgrade complete reminder. - appable0

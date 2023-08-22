@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BarnFishingTimer {
+class FishingTimer {
     private val config get() = SkyHanniMod.feature.fishing
     private val barnLocation = LorenzVec(108, 89, -252)
 
@@ -32,6 +32,7 @@ class BarnFishingTimer {
 
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
+        if (OSUtils.isKeyHeld(config.manualResetTimer)) startTime = System.currentTimeMillis()
     }
 
     private fun tryPlaySound() {
@@ -45,7 +46,7 @@ class BarnFishingTimer {
     }
 
     private fun checkMobs() {
-        val newCount = if (inHollows) countHollowsMobs() else countMobs()
+        val newCount = countMobs()
 
         if (currentCount == 0 && newCount > 0) {
             startTime = System.currentTimeMillis()
@@ -55,14 +56,19 @@ class BarnFishingTimer {
         if (newCount == 0) {
             startTime = 0
         }
+
+        if (inHollows && newCount >= 60 && config.wormLimitAlert) {
+            SoundUtils.playBeepSound()
+        }
     }
 
-    private fun countHollowsMobs() = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(10.0)
-        .count { entity -> SeaCreatureManager.allFishingMobNames.any { entity.name.contains(it) } }
-
     private fun countMobs() = EntityUtils.getEntities<EntityArmorStand>()
-        .map { it.name }
-        .count { it.endsWith("§c❤") }
+        .map { entity ->
+            val name = entity.name
+            if (SeaCreatureManager.allFishingMobNames.any { name.contains(it) }) {
+                if (name == "Sea Emperor" || name == "Rider of the Deep") 2 else 1
+            } else 0
+        }.sum()
 
     private fun isRightLocation(): Boolean {
         if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
@@ -71,7 +77,7 @@ class BarnFishingTimer {
         }
         inHollows = false
 
-        if (IslandType.THE_FARMING_ISLANDS.isInIsland()) {
+        if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50
         }
 

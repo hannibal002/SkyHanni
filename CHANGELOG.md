@@ -23,6 +23,12 @@
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
++ Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
++ Added timer till shared inquisitors will despawn. - hannibal2
++ Account upgrade complete reminder. - appable0
++ Chat message how many places you dropped in the farming weight lb when joining garden.
++ Added command /shfarmingprofile [player name]
++ Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 
 ### Changes
 
@@ -37,6 +43,16 @@
 + Shark fish counter now counts twice for Double hook. - appable0
 + Ghost counter check for Mist now ignores y coordiantes - HiZe
 + Telling the user about the bypass hotkey when the visitor drop warning blocks a visitor refusal. - CalMWolfs
++ Added warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
++ Shared inquisitor waypoints will now get removed after 75 seconds. - hannibal2
++ Chest Value now works with Backpack and Ender Chest. - HiZe
+    + Only works if NEU storage is not active.
++ Removed distance checks when detecting sea creatures for fishing timer. - hannibal2
++ Added Enchantments Cap to EstimatedItemValue. - hannibal2
+    + Only show the top # most expensive enchantments on an item.
++ Count sea emperor and rider of the deep twice against sea creature cap.
++ Clicking on the chat message from farming weight will run the /shfarmingprofile command.
++ Changed Bestiary Display number format - HiZe
 
 ### Fixes
 
@@ -56,6 +72,23 @@
 + Fixed End Node Tracker not updating when changing the text format.
 + Fixed neu repo error messages with runes.
 + Fixed rare crashes with scoreboard.
++ Fixed feature that replaces the sack stitched lore message. - hannibal2
++ Fixed some typos in config descriptions and correctly rounding down in composter overlay. - CalMWolfs
++ Fixed a typo in an error message. - Obsidian
++ Fixed Chest Value fails to detect chests when using a resource pack. - HiZe
++ Fixed Sea Creature Timer not working on barn. - hannibal2
++ Arachne boss highlighter no longer requires damage indicator to be enabled. - hannibal2
++ /shtrackcollection Cactus now detects cactus green. hannibal2
++ Fixed arachne minis falsely show in damage indicator.
++ Fixed rare cases where special laptop keys trigger behavior unintended. - hannibal2
++ Fixed rendering problems with stack background and custom text lore. - nea
+
+### Removed Features
+
+- Removed **Broken Wither Impact** detection. - hannibal2
+    - (Hypixel fixed their bug, finally)
+- Removed remaining **Hypixel API** support for still existing legacy api keys. - hannibal2
+    - This should not affect much
 
 ## Version 0.19
 

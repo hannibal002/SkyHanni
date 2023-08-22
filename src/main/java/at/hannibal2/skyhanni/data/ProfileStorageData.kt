@@ -107,8 +107,6 @@ object ProfileStorageData {
         val oldHidden = SkyHanniMod.feature.hidden
         if (oldHidden.isMigrated) return
 
-        SkyHanniMod.feature.storage.apiKey = oldHidden.apiKey
-
         SkyHanniMod.feature.storage?.let {
             it.gardenJacobFarmingContestTimes = oldHidden.gardenJacobFarmingContestTimes
         }

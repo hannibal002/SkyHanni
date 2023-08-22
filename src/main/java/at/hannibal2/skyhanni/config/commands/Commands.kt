@@ -3,23 +3,24 @@ package at.hannibal2.skyhanni.config.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
-import at.hannibal2.skyhanni.data.ApiDataLoader
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
+import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
+import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
+import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.CityProjectFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
@@ -136,14 +137,14 @@ object Commands {
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter stats") { GhostUtil.reset() }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
+        registerCommand(
+            "shfarmingprofile",
+            "Look up the farming profile from yourself or another player on elitebot.dev"
+        ) { FarmingWeightDisplay.lookUpCommand(it) }
     }
 
     private fun usersBugFix() {
         registerCommand("shupdaterepo", "Download the Skyhanni repo again") { SkyHanniMod.repo.updateRepo() }
-        registerCommand(
-            "shsetapikey",
-            "Manually set the api key (§cThis command will get removed soon§7)"
-        ) { ApiDataLoader.command(it) } // TODO remove with api
         registerCommand(
             "shresetburrowwarps",
             "Manually resetting disabled diana burrow warp points"
@@ -229,6 +230,8 @@ object Commands {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
+        registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
+
     }
 
     private fun commandHelp(args: Array<String>) {

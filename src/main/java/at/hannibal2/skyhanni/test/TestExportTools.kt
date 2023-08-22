@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.io.Reader
 
@@ -41,8 +40,8 @@ object TestExportTools {
     }
 
     @SubscribeEvent
-    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent) {
-        if (!Keyboard.isKeyDown(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
+    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+        if (!OSUtils.isKeyHeld(SkyHanniMod.feature.dev.copyNBTDataCompressed)) return
         val gui = event.gui as? GuiContainer ?: return
         val focussedSlot = gui.slotUnderMouse ?: return
         val stack = focussedSlot.stack ?: return
