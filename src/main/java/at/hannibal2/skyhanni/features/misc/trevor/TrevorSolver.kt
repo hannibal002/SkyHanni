@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -51,7 +52,7 @@ object TrevorSolver {
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
-            val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth else 0
+            val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMobs.entries.firstOrNull { it.mobName.contains(name) }
             if (currentMob == TrevorMobs.CHICKEN) {
                 if (entity is EntityChicken) {

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -32,6 +33,7 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
@@ -128,7 +130,7 @@ object LorenzUtils {
     // TODO replace all calls with regex
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
-    //TODO change to Int
+    // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
@@ -476,4 +478,11 @@ object LorenzUtils {
     }
 
     fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
+
+    private val recalculateDerpy =
+        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+
+    val isDerpy get() = recalculateDerpy.getValue()
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
 }
