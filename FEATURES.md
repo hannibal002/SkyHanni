@@ -557,3 +557,5 @@
     + Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
     + Only on Private island.
 + Account upgrade complete reminder. - appable0
++ Pet Experience Tooltip
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing shift key.

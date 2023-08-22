@@ -29,6 +29,8 @@
 + Chat message how many places you dropped in the farming weight lb when joining garden.
 + Added command /shfarmingprofile [player name]
 + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
++ Pet Experience Tooltip
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing shift key.
 
 ### Changes
 
@@ -53,6 +55,8 @@
 + Count sea emperor and rider of the deep twice against sea creature cap.
 + Clicking on the chat message from farming weight will run the /shfarmingprofile command.
 + Changed Bestiary Display number format - HiZe
++ Changed ff buffs for Elephant and Anita.
++ Changed chicken head timer from 20s to 5s.
 
 ### Fixes
 
@@ -82,6 +86,7 @@
 + Fixed arachne minis falsely show in damage indicator.
 + Fixed rare cases where special laptop keys trigger behavior unintended. - hannibal2
 + Fixed rendering problems with stack background and custom text lore. - nea
++ Hopefully fixed Derpy problems with Trevor Trapper, Arachne, Arachne Keeper and Zealots.
 
 ### Removed Features
 
@@ -89,6 +94,9 @@
     - (Hypixel fixed their bug, finally)
 - Removed remaining **Hypixel API** support for still existing legacy api keys. - hannibal2
     - This should not affect much
+    -
+- Removed wishing compass in item number.
+    - Every Wishing Compass now only has one use instead of three.
 
 ## Version 0.19
 
