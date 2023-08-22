@@ -50,7 +50,7 @@ class ChickenHeadTimer {
         if (!hasChickenHead) return
 
         val sinceLastTime = System.currentTimeMillis() - lastTime
-        val cooldown = 20_000
+        val cooldown = 5_000
         val remainingTime = cooldown - sinceLastTime
 
         val displayText = if (remainingTime < 0) {
