@@ -379,6 +379,7 @@ class SkyHanniMod {
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
+        loadModule(GardenPlotBorders())
 
         init()
 

@@ -670,7 +670,6 @@ object RenderUtils {
     }
 
     fun RenderWorldLastEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
         val render = Minecraft.getMinecraft().renderViewEntity

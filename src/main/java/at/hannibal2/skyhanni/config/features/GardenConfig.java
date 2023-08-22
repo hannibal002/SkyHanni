@@ -1355,4 +1355,9 @@ public class GardenConfig {
 
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
+
+    @Expose
+    @ConfigOption(name = "Enable Plot Borders", desc = "Enable the use of F3 + G hotkey to show Garden plot borders. Similar to how later minecraft version render chunk borders.")
+    @ConfigEditorBoolean
+    public boolean plotBorders = true;
 }
