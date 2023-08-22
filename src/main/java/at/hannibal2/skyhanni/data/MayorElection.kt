@@ -21,12 +21,9 @@ class MayorElection {
         var candidates = mapOf<Int, MayorJson.Candidate>()
         var currentCandidate: MayorJson.Candidate? = null
 
-        fun isPerkActive(mayor: String, perk: String): Boolean {
-            return currentCandidate?.let { currentCandidate ->
-                currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
-            } ?: false
-        }
-
+        fun isPerkActive(mayor: String, perk: String) = currentCandidate?.let { currentCandidate ->
+            currentCandidate.name == mayor && currentCandidate.perks.any { it.name == perk }
+        } ?: false
     }
 
     @SubscribeEvent
