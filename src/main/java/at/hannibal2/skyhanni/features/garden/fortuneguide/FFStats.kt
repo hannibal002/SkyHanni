@@ -238,7 +238,7 @@ object FFStats {
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
             return if (rawInternalName.contains("ELEPHANT;4")) {
-                1.3 * petLevel
+                1.5 * petLevel
             } else if (rawInternalName.contains("MOOSHROOM_COW;4")) {
                 (10 + petLevel).toDouble() + strength / (40 - petLevel * .2)
             } else if (rawInternalName.contains("MOOSHROOM")) {
