@@ -28,8 +28,8 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         var line = if (FFStats.baseFF[FFTypes.ANITA]!! < 0.0) "§cAnita buff not saved\n§eVisit Anita to set it!"
-        else "§7§2Fortune for levelling your Anita extra crops\n§2You get 2☘ per buff level"
-        GuiRenderUtils.drawFarmingBar("§2Anita Buff", line, FFStats.baseFF[FFTypes.ANITA] ?: 0.0, 30, FFGuideGUI.guiLeft + 15,
+        else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
+        GuiRenderUtils.drawFarmingBar("§2Anita Buff", line, FFStats.baseFF[FFTypes.ANITA] ?: 0.0, 60, FFGuideGUI.guiLeft + 15,
             FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (FFStats.baseFF[FFTypes.FARMING_LVL]!! < 0.0) "§cFarming level not saved\n§eOpen /skills to set it!"

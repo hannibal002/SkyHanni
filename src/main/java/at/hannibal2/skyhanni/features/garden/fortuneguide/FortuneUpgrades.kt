@@ -46,7 +46,7 @@ object FortuneUpgrades {
             genericUpgrades.add(
                 FortuneUpgrade(
                     "§7Upgrade Anita bonus to level ${hidden.anitaUpgrade + 1}",
-                    null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 2.0
+                    null, "JACOBS_TICKET", anitaTicketsNeeded[hidden.anitaUpgrade], 4.0
                 )
             )
         }

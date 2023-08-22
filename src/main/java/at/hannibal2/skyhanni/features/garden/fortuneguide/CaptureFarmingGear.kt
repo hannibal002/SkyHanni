@@ -204,7 +204,7 @@ class CaptureFarmingGear {
             hidden.farmingLevel = group("level").romanToDecimalIfNeeded()
         }
         anitaBuffPattern.matchMatcher(msg) {
-            hidden.anitaUpgrade = group("level").toInt() / 2
+            hidden.anitaUpgrade = group("level").toInt() / 4
         }
         lotusUpgradePattern.matchMatcher(msg) {
             val piece = group("piece").uppercase()
