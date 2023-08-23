@@ -89,11 +89,13 @@ changes by acident.
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
     - Java classes that represent json data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
-- Please use the existing event system, or expand on it.
-    - We inject the calls with mixins, and avoid using forge events.
+- Please use the existing event system, or expand on it. Do not use forge events.
+    - (We inject the calls with mixins)
 - Please use existing utils methods.
-- We try to avoid calling NEU code too often. We plan to remove the dependency to NEU in the future.
-- We try to not use forge specific methods if possible. We plan to switch to gradle and minecraft 1.20 in the future.
+- We try to avoid calling NEU code too often.
+    - (We plan to remove NEU as dependency in the future)
+- We try to not use forge specific methods if possible
+    - (We plan to switch to gradle and minecraft 1.20 in the future)
 
 # Additional Useful Developement Tools
 
