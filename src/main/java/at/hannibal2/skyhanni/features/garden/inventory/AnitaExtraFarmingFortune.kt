@@ -65,7 +65,7 @@ class AnitaExtraFarmingFortune {
 
         val upgradeIndex = event.toolTip.indexOfFirst { it.contains("You have") }
         if (upgradeIndex != -1) {
-            event.toolTip.add(upgradeIndex + 1, "§7Upgrades: §e$anitaUpgrade/${levelPrice.size}")
+            event.toolTip.add(upgradeIndex + 1, "§7Current Tier: §e$anitaUpgrade/${levelPrice.size}")
         }
     }
 

@@ -1001,7 +1001,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(
             name = "Extra Farming Fortune",
-            desc = "Show Amount of upgrades and cost to max out in the item tooltip.")
+            desc = "Show current tier and cost to max out in the item tooltip.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 16)
     public boolean extraFarmingFortune = true;
