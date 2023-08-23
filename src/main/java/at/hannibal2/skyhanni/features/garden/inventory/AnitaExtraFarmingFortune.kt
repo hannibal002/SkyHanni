@@ -31,12 +31,12 @@ class AnitaExtraFarmingFortune {
 
         val anitaUpgrade = GardenAPI.config?.fortune?.anitaUpgrade ?: return
 
-        var amountFactor = 1.0
-        val currentPrice = levelPrice[anitaUpgrade + 1] ?: return
+        var contributionFactor = 1.0
+        val baseAmount = levelPrice[anitaUpgrade + 1]?.jacob_tickets  ?: return
         for (line in event.toolTip) {
             "§5§o§aJacob's Ticket §8x(?<realAmount>.*)".toPattern().matchMatcher(line) {
                 val realAmount = group("realAmount").formatNumber().toDouble()
-                amountFactor = realAmount / currentPrice.jacob_tickets
+                contributionFactor = realAmount / baseAmount
             }
         }
 
@@ -48,7 +48,7 @@ class AnitaExtraFarmingFortune {
                 jacobTickets += price.jacob_tickets
             }
         }
-        jacobTickets = (amountFactor * jacobTickets).toInt()
+        jacobTickets = (contributionFactor * jacobTickets).toInt()
 
         val index = event.toolTip.indexOfFirst("§5§o§eClick to trade!")?.let { it - 1 } ?: return
 
