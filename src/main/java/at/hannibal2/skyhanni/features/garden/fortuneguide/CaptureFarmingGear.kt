@@ -28,7 +28,7 @@ class CaptureFarmingGear {
     private val farmingLevelUpPattern = "SKILL LEVEL UP Farming .*➜(?<level>.*)".toPattern()
     private val fortuneUpgradePattern = "You claimed the Garden Farming Fortune (?<level>.*) upgrade!".toPattern()
     private val anitaBuffPattern = "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!".toPattern()
-    private val anitaMenuPattern = "You have: [+](?<level>.*)%".toPattern()
+    private val anitaMenuPattern = "§7You have: §6\\+(?<level>.*)☘ Farming Fortune".toPattern()
 
     private val lotusUpgradePattern = "Lotus (?<piece>.*) upgraded to [+].*☘!".toPattern()
     private val petLevelUpPattern = "Your (?<pet>.*) leveled up to level .*!".toPattern()
@@ -174,11 +174,11 @@ class CaptureFarmingGear {
         if (event.inventoryName.contains("Anita")) {
             var level = -1
             for ((_, item) in event.inventoryItems) {
-                if (item.displayName.contains("Extra Farming Drops")) {
+                if (item.displayName.contains("Extra Farming Fortune")) {
                     level = 0
                     for (line in item.getLore()) {
-                        anitaMenuPattern.matchMatcher(line.removeColor()) {
-                            level = group("level").toInt() / 2
+                        anitaMenuPattern.matchMatcher(line) {
+                            level = group("level").toInt() / 4
                         }
                     }
                 }
