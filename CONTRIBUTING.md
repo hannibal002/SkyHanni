@@ -70,7 +70,7 @@ For more info see https://github.com/SpongePowered/Mixin.
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
 The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
-A copy of all files in the repo is stored for every SkyHanni user under `.minecraft\config\skyhanni\repo`
+A copy of all files in the repo is stored for every SkyHanni user under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated, and if not manually disabled)
 When working with the repo, it is recommended to disable the manual repo update to prevent to override your local
 changes by acident.
