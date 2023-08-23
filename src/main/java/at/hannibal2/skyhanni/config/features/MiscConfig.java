@@ -140,10 +140,10 @@ public class MiscConfig {
     public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Reputation Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
-    @ConfigEditorBoolean
+    @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
+    @ConfigEditorDropdown(values = {"Always", "Only With Hotkey", "Never"})
     @ConfigAccordionId(id = 6)
-    public boolean crimsonIsleReputationLocation = false;
+    public int crimsonIsleReputationShowLocation = 1;
 
     @Expose
     @ConfigOption(name = "Tia Relay", desc = "")
