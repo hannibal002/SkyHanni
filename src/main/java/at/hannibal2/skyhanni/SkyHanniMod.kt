@@ -293,6 +293,7 @@ class SkyHanniMod {
         loadModule(GardenVisitorColorNames())
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
+        loadModule(AnitaExtraFarmingFortune())
         loadModule(ComposterDisplay())
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())

@@ -984,19 +984,27 @@ public class GardenConfig {
     public Position farmingArmorDropsPos = new Position(16, -232, false, true);
 
     @Expose
-    @ConfigOption(name = "Anita Medal Profit", desc = "")
+    @ConfigOption(name = "Anita Shop", desc = "")
     @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
 
     @Expose
     @ConfigOption(
-            name = "Show Prices",
+            name = "Medal Prices",
             desc = "Helps to identify profitable items to buy at the Anita item shop " +
                     "and potential profit from selling the item at the auction house."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 16)
     public boolean anitaMedalProfitEnabled = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Extra Farming Fortune",
+            desc = "Show Amount of upgrades and cost to max out in the item tooltip.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 16)
+    public boolean extraFarmingFortune = true;
 
     @Expose
     public Position anitaMedalProfitPos = new Position(206, 158, false, true);
