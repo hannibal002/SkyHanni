@@ -48,12 +48,6 @@ public class ChatConfig {
     public boolean guildExp = true;
 
     @Expose
-    @ConfigOption(name = "Friend Join Left", desc = "Hide friend join/left messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean friendJoinLeft = false;
-
-    @Expose
     @ConfigOption(name = "Winter Gifts", desc = "Hide useless winter gift messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
