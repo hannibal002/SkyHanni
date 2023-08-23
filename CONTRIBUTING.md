@@ -1,6 +1,6 @@
 # How to Contribute
 
-This is a technical guide that helps Kotin and Java developers to code with SkyHanni.
+This is a technical guide that helps Kotlin and Java developers to understand how SkyHanni works and provide first steps for new forge developers.
 
 # Setup the developement enviroment
 
