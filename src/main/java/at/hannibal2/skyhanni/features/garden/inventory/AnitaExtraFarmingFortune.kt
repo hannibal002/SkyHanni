@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.jsonobjects.AnitaUpgradeCostsJson
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -29,8 +31,14 @@ class AnitaExtraFarmingFortune {
 
         val anitaUpgrade = GardenAPI.config?.fortune?.anitaUpgrade ?: return
 
-        // TODO: Add support for 5% or 10% contribution bonus
-//        val currentPrice = levelPrice[anitaUpgrade + 1] ?: return
+        var amountFactor = 1.0
+        val currentPrice = levelPrice[anitaUpgrade + 1] ?: return
+        for (line in event.toolTip) {
+            "§5§o§aJacob's Ticket §8x(?<realAmount>.*)".toPattern().matchMatcher(line) {
+                val realAmount = group("realAmount").formatNumber().toDouble()
+                amountFactor = realAmount / currentPrice.jacob_tickets
+            }
+        }
 
         var goldMedals = 0
         var jacobTickets = 0
@@ -40,6 +48,7 @@ class AnitaExtraFarmingFortune {
                 jacobTickets += price.jacob_tickets
             }
         }
+        jacobTickets = (amountFactor * jacobTickets).toInt()
 
         val index = event.toolTip.indexOfFirst("§5§o§eClick to trade!")?.let { it - 1 } ?: return
 
