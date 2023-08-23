@@ -13,23 +13,23 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 - Download IntelliJ from [JetBrains Website](https://www.jetbrains.com/idea/download/).
     - Use Community Edition. (Scroll down a bit)
 
-## Downloading SkyHanni source code
+## Cloning the project
 
 - Create an account on GitHub
     - Go to https://github.com/hannibal002/SkyHanni
     - Click on the Fork button to create a fork
         - Leave the settings unchanged
-        - Click on "create fork"
+        - Click on `create fork`
     - Open IntelliJ
-        - Log in into your GitHub account with intellij
-        - Go to "new" -> "project from version control"
-        - Select SkyHanni from the list
-        - Open the project
+        - Link the GitHub account with IntelliJ.
+        - Install Git in IntelliJ.
+        - In IntelliJ, go to `new` -> `project from version control`.
+        - Select `SkyHanni` from the list.
+        - Open the project.
 
 ## Setting up IntelliJ
 
-SkyHannis' gradle configuration is very similar to the one used in **NotEnoughUpdates**, you can just follow their
-guide:
+SkyHannis' gradle configuration is very similar to the one used in **NotEnoughUpdates**, just follow this guide:
 https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md
 
 # Software Used in SkyHanni
@@ -84,7 +84,7 @@ changes by acident.
     - Paid only mods.
     - Mods that have reached the end of life. (Rip SBA, Dulkir, Soopy)
     - The mod has, according to hypixel rules, illegal features ("cheat mod").
-    - If you can meainingfully imrpove upon the existing feature.
+    - If you can improve the existing feature meaningful.
 - All classes should be written in Kotlin, with few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
@@ -97,15 +97,15 @@ changes by acident.
 
 # Additional Useful Developement Tools
 
-## Dev Auth
+## DevAuth
 
-[Dev Auth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows you to log in to your Minecraft account
-inside IntelliJ. That way you can
-debug and test code live on Hypixel, without the need to compile a jar, move it into a mods folder and start the
+[DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in a Minecraft account
+whilde debugging in IntelliJ. This is very useful for coding live on Hypixel, without the need to compile a jar, move it
+into a mods folder, and start the
 Minecraft launcher manually.
 
-- Gradle already downloads dev auth for you.
-- You only need to create a configuration folder:
+- The library gets downloaded by Gradle already.
+- Create a configuration folder: (Windows only. For other OS, use the guide from DJtheRedstoner)
     - Navigate to `C:\Users\<your username>`
     - Create a new folder `.devauth`
     - Navigate to `C:\Users\<your username>\.devauth`
@@ -122,17 +122,15 @@ type = "microsoft"
 ```
 
 - Start Minecraft inside IntelliJ normal.
-    - You should see a link in the console.
-    - Click on the link, verify yourself with the mojang account.
-    - You are done. The verify process will reappear every couple of days (as your session token does expire)
+    - Click on the link in the console, verify with a mojang account.
+    - The verify process will reappear every few of days (The session token expire)
 
-## Hot Swapping
+## Hot Swap
 
-What is Hot Swapping? This allows you to reload edited code while debugging to remove the need to restart
+Hot Swap allows to reload edited code while debugging to remove the need to restart
 the whole game every time.
 We use [dcevm](https://dcevm.github.io/) and the IntelliJ
 Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
 
-Follow this tutorial:
-
-https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/
+Follow [this](https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/)
+tutorial.
