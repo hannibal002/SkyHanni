@@ -1,6 +1,6 @@
 # SkyHanni - List of all Features
 
-> Use /skyhanni or /sh to open the SkyHanni config in game
+Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Chat Filter
 

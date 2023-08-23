@@ -13,6 +13,8 @@ SkyHanni is a Forge mod for Minecraft 1.8.9. It adds lots of features to Hypixel
 The mod is filled with GUIs, extra chat messages, reminders, message hiders and entity highlighters.
 Most of these features are centered around the Garden, Slayer, Bingo, Diana and Rift.
 
+Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
+
 Here is a [big list](https://github.com/hannibal002/SkyHanni/blob/beta/FEATURES.md) with all features!
 
 Visit our [Discord](https://discord.gg/skyhanni-997079228510117908) for bug reports, feature requests and other
