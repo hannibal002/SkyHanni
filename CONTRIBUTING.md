@@ -1,6 +1,6 @@
 # How to Contribute
 
-This is a technical guide that helps Kotin and Java developers when coding on with SkyHanni.
+This is a technical guide that helps Kotin and Java developers to code with SkyHanni.
 
 # Setup the developement enviroment
 
@@ -75,28 +75,25 @@ On every game start, the copy gets updated (if outdated, and if not manually dis
 When working with the repo, it is recommended to disable the manual repo update to prevent to override your local
 changes by acident.
 
-# Coding Styles
+# Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
+- Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
+  and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Do not copy features from other mods. Exceptions:
     - Paid only mods.
-    - Mods that have reached their end of life.
-    - If you can meainingfully imrpove upon the existing feature.
+    - Mods that have reached the end of life. (Rip SBA, Dulkir, Soopy)
     - The mod has, according to hypixel rules, illegal features ("cheat mod").
-- All classes have to be written in Kotlin, with few exceptions:
+    - If you can meainingfully imrpove upon the existing feature.
+- All classes should be written in Kotlin, with few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
     - Java classes that represent json data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
-
-## Coding Conventions
-
-- Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
-  and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Please use the existing event system, or expand on it.
     - We inject the calls with mixins, and avoid using forge events.
 - Please use existing utils methods.
 - We try to avoid calling NEU code too often. We plan to remove the dependency to NEU in the future.
-- We try to use forge specific methods if possible. We plan to switch to gradle and minecraft 1.20 in the future.
+- We try to not use forge specific methods if possible. We plan to switch to gradle and minecraft 1.20 in the future.
 
 # Additional Useful Developement Tools
 
