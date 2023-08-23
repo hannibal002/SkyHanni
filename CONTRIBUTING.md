@@ -21,8 +21,8 @@ written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.htm
 - Create an account on GitHub
     - Go to https://github.com/hannibal002/SkyHanni
     - Click on the Fork button to create a fork
-        - leave the settings unchanged
-        - click on "create fork"
+        - Leave the settings unchanged
+        - Click on "create fork"
 - Open IntelliJ
     - Log in into your GitHub account with intellij
     - Go to "new" -> "project from version control"
@@ -47,7 +47,7 @@ Minecraft launcher manually.
 - You only need to create a configuration folder:
     - Navigate to `C:\Users\<your username>`
     - Create a new folder `.devauth`
-    - Naviga to `C:\Users\<your username>\.devauth`
+    - Navigate to `C:\Users\<your username>\.devauth`
     - Create a new file `config.toml`
     - Paste this text in the file: (Don't change anyhting)
 
