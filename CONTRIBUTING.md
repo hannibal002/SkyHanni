@@ -5,7 +5,7 @@ use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 ## Basics
 
-SkyHanni is a 1.8.9 Forge mod, written in [Kotlin](https://kotlinlang.org/) and [Java](https://www.java.com/en/).
+SkyHanni is a Forge mod for Minecraft 1.8.9, written in [Kotlin](https://kotlinlang.org/) and [Java](https://www.java.com/en/).
 We use a [gradle config](https://gradle.org/) to build the mod,
 written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html).
 
@@ -39,9 +39,9 @@ https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md
 
 ### [Dev Auth](https://github.com/DJtheRedstoner/DevAuth)
 
-What is Dev Auth? It is a tool that allows you to log in to your minecraft account inside IntelliJ. That way you can
+What is Dev Auth? It is a tool that allows you to log in to your Minecraft account inside IntelliJ. That way you can
 debug and test code live on Hypixel, without the need to compile a jar, move it into a mods folder and start the
-minecraf launcher manually.
+Minecraft launcher manually.
 
 - Gradle already downloads dev auth for you.
 - You only need to create a configuration folder:
@@ -60,7 +60,7 @@ defaultAccount = "main"
 type = "microsoft"
 ```
 
-- Start minecraft inside IntelliJ normal.
+- Start Minecraft inside IntelliJ normal.
     - You should see a link in the console.
     - Click on the link, verify yourself with the mojang account.
     - You are done. The verify process will reappear every couple of days (as your session token does expire)
@@ -73,4 +73,4 @@ We [dcevm](https://dcevm.github.io/) to hot swap SkyHanni.
 
 Follow this tutorial:
 
-https://forums.minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/
+https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/
