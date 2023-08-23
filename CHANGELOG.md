@@ -30,7 +30,10 @@
 + Added command /shfarmingprofile [player name]
 + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 + Pet Experience Tooltip
-    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing shift key.
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
+      shift key.
++ Anita Extra Farming Fortune:
+    + Show current tier and cost to max out in the item tooltip.
 
 ### Changes
 
@@ -57,6 +60,9 @@
 + Changed Bestiary Display number format - HiZe
 + Changed ff buffs for Elephant and Anita.
 + Changed chicken head timer from 20s to 5s.
++ Added option to show reputation locations only when pressing the hotkey.
++ Delay the custom garden level up message by a few milliseconds to not cut into the garden milestone message.
++ Added runic support for Zealots/Bruiser.
 
 ### Fixes
 
@@ -87,6 +93,8 @@
 + Fixed rare cases where special laptop keys trigger behavior unintended. - hannibal2
 + Fixed rendering problems with stack background and custom text lore. - nea
 + Hopefully fixed Derpy problems with Trevor Trapper, Arachne, Arachne Keeper and Zealots.
++ Fixed Anita upgrade detection from the Anita Shop inventory.
++ Fixed error message when clicking a finished upgrade in the community shop.
 
 ### Removed Features
 
