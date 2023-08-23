@@ -1,7 +1,7 @@
 # How to Contribute
 
-This is a technical guide that helps Kotlin and Java developers understand how SkyHanni works and provides the first
-steps for new Forge developers.
+This is a technical guide that helps Kotlin and Java developers understand how SkyHanni works, and provides the first
+steps for new Forge developers to take.
 
 # Set up the development environment
 
@@ -57,7 +57,7 @@ For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
 
 ## Config
 
-SkyHanni uses the config  system from NEU.
+SkyHanni uses the config system from NEU.
 
 For more information, see https://github.com/NotEnoughUpdates/MoulConfig
 
