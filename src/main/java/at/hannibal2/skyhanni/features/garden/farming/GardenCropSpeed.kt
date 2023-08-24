@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.setCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent

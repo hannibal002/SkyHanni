@@ -153,7 +153,7 @@ class SkyHanniMod {
         loadModule(OtherInventoryData)
         loadModule(TabListData())
         loadModule(RenderGuiData())
-        loadModule(GardenCropMilestones())
+        loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
