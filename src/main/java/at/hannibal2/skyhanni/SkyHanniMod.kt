@@ -381,6 +381,7 @@ class SkyHanniMod {
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
+        loadModule(SackAPI())
 
         init()
 
