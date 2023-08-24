@@ -86,7 +86,7 @@ object FFStats {
 
     fun getCropStats(crop: CropType, tool: ItemStack) {
         cropPage.clear()
-        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1250.0)
+        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1257.0)
         cropPage[FortuneStats.CROP_UPGRADE] = Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
         cropPage[FortuneStats.ACCESSORY] = Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
         cropPage[FortuneStats.FFD] = Pair((tool.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
@@ -148,6 +148,11 @@ object FFStats {
             }
 
             else -> {}
+        }
+        if (crop == CropType.CARROT) {
+            val hidden = GardenAPI.config?.fortune ?: return
+            val carrotFortune = if (hidden.carrotFortune) 12.0 else 0.0
+            cropPage[FortuneStats.EXPORTED_CARROT] = Pair(carrotFortune, 12.0)
         }
 
         cropPage[FortuneStats.CROP_TOTAL] = Pair(

@@ -169,6 +169,10 @@ object Commands {
             "shdebugdata",
             "Prints debug data in the clipboard"
         ) { SkyHanniTestCommand.debugData(it) }
+        registerCommand(
+            "shcarrot",
+            "Toggles receiving the 12 fortune from carrots"
+        ) { CaptureFarmingGear.reverseCarrotFortune() }
     }
 
     private fun developersDebugFeatures() {

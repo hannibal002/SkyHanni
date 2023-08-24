@@ -19,9 +19,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ItemDisplayOverlayFeatures {
-
-    private val wishingCompassPattern = "§7Remaining Uses: §e(?<amount>.*)§8/§e3".toPattern()
-    private val rangerBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
+    private val rancherBootsSpeedCapPattern = "§7Current Speed Cap: §a(?<cap>.*)".toPattern()
     private val petLevelPattern = "\\[Lvl (?<level>.*)] .*".toPattern()
 
     @SubscribeEvent
@@ -142,7 +140,7 @@ class ItemDisplayOverlayFeatures {
         if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
             if (itemName.contains("Rancher's Boots")) {
                 for (line in item.getLore()) {
-                    rangerBootsSpeedCapPattern.matchMatcher(line) {
+                    rancherBootsSpeedCapPattern.matchMatcher(line) {
                         return group("cap")
                     }
                 }

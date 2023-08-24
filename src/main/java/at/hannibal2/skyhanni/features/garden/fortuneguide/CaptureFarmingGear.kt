@@ -77,6 +77,12 @@ class CaptureFarmingGear {
                 }
             }
         }
+
+        fun reverseCarrotFortune() {
+            val hidden = GardenAPI.config?.fortune ?: return
+            hidden.carrotFortune = !hidden.carrotFortune
+            LorenzUtils.chat("§2Toggled exportable carrot fortune to: ${hidden.carrotFortune}")
+        }
     }
 
     @SubscribeEvent

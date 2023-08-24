@@ -23,7 +23,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
                     "§eSee on the grass block page",
             FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0,
-            1250,
+            1257,
             FFGuideGUI.guiLeft + 15,
             FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
@@ -138,14 +138,22 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             value, FFGuideGUI.guiLeft + 135,
             FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-        val currentPet = when (FFGuideGUI.currentPet) {
-            FarmingItems.ELEPHANT -> FFStats.elephantFF
-            FarmingItems.MOOSHROOM_COW -> FFStats.mooshroomFF
-            else -> FFStats.rabbitFF
+        var currentPet = FFStats.rabbitFF
+        var petMaxFF = 60
+        when (FFGuideGUI.currentPet) {
+            FarmingItems.ELEPHANT -> {
+                currentPet = FFStats.elephantFF
+                petMaxFF = 210
+            }
+            FarmingItems.MOOSHROOM_COW -> {
+                currentPet = FFStats.mooshroomFF
+                petMaxFF = 217
+            }
+            else -> {}
         }
 
         GuiRenderUtils.drawFarmingBar("§2Total Pet Fortune", "§7§2The total fortune from your pet and its item",
-            currentPet[FFTypes.TOTAL] ?: 0, 240, FFGuideGUI.guiLeft + 105,
+            currentPet[FFTypes.TOTAL] ?: 0, petMaxFF, FFGuideGUI.guiLeft + 105,
             FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = when (FFStats.currentPetItem) {
