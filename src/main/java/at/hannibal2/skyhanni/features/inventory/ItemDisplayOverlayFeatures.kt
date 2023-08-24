@@ -110,7 +110,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(8)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9)) {
             if (InventoryUtils.openInventoryName() == "Your Skills") {
                 if (item.getLore().any { it.contains("Click to view!") }) {
                     if (CollectionAPI.isCollectionTier0(item.getLore())) return "0"
@@ -122,7 +122,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(9)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
             if (InventoryUtils.openInventoryName().endsWith(" Collections")) {
                 val lore = item.getLore()
                 if (lore.any { it.contains("Click to view!") }) {
@@ -137,7 +137,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(10)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
             if (itemName.contains("Rancher's Boots")) {
                 for (line in item.getLore()) {
                     rancherBootsSpeedCapPattern.matchMatcher(line) {
@@ -147,7 +147,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(11)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
             if (item.getInternalName_old() == "LARVA_HOOK") {
                 for (line in item.getLore()) {
                     "§7§7You may harvest §6(?<amount>.).*".toPattern().matchMatcher(line) {
@@ -162,7 +162,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(12)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(13)) {
             if (item.getInternalName_old() == "POTION") {
                 item.name?.let {
                     "Dungeon (?<level>.*) Potion".toPattern().matchMatcher(it.removeColor()) {
