@@ -97,7 +97,7 @@ class ItemDisplayOverlayFeatures {
             }
         }
 
-        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(7)) {
+        if (SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(8)) {
             if (itemName.contains("Kuudra Key")) {
                 return when (itemName) {
                     "Kuudra Key" -> "§a1"

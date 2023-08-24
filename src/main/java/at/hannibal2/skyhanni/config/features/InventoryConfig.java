@@ -272,7 +272,7 @@ public class InventoryConfig {
                     "§bPet Level",
                     "§bMinion Tier",
                     "§bCrimson Armor",
-                    "§7 (Removed)",
+                    "§7(Removed)",
                     "§bKuudra Key",
                     "§bSkill Level",
                     "§bCollection Level",
