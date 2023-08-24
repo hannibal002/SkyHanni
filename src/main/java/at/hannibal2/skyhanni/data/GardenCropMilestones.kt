@@ -12,19 +12,6 @@ class GardenCropMilestones {
     private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
     private val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
 
-    // Add when api support is there
-//    @SubscribeEvent
-//    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-//        val profileData = event.profileData
-//        for ((key, value) in profileData.entrySet()) {
-//            if (key.startsWith("experience_skill_")) {
-//                val label = key.substring(17)
-//                val exp = value.asLong
-//                gardenExp[label] = exp
-//            }
-//        }
-//    }
-
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Milestones") return
@@ -143,18 +130,4 @@ class GardenCropMilestones {
             100000000,
         )
     }
-}
-
-// TODO delete?
-private fun String.formatNumber(): Long {
-    var text = replace(",", "")
-    val multiplier = if (text.endsWith("k")) {
-        text = text.substring(0, text.length - 1)
-        1_000
-    } else if (text.endsWith("m")) {
-        text = text.substring(0, text.length - 1)
-        1_000_000
-    } else 1
-    val d = text.toDouble()
-    return (d * multiplier).toLong()
 }
