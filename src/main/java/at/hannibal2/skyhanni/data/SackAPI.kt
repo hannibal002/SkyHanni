@@ -74,6 +74,17 @@ object SackAPI {
             }
         }
     }
+
+    fun fetchSackItem(item: NEUInternalName): SackItem? {
+        val sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return SackItem(-1, true)
+
+        if (sackData.containsKey(item)) {
+            return sackData[item]
+        }
+
+        sackData[item] = SackItem(0, true)
+        return sackData[item]
+    }
 }
 
 data class SackItem(
