@@ -54,14 +54,15 @@ object SackAPI {
 
         for (change in event.sackChanges) {
             justChanged.add(change.internalName)
-            println("${change.internalName} from the ${change.sacks} changed by ${change.delta}")
 
             if (sackData.containsKey(change.internalName)) {
                 val oldData = sackData[change.internalName]
-                sackData[change.internalName] = SackItem(oldData!!.amount + change.delta, oldData.isOutdated)
+                var newAmount = oldData!!.amount
+                if (newAmount < 0) newAmount = 0
+                sackData[change.internalName] = SackItem(newAmount, oldData.isOutdated)
             } else {
-                val amount = if (change.delta > 0) change.delta else 0
-                sackData[change.internalName] = SackItem(amount, true)
+                val newAmount = if (change.delta > 0) change.delta else 0
+                sackData[change.internalName] = SackItem(newAmount, true)
             }
         }
 
