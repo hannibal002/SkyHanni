@@ -221,7 +221,7 @@ object FortuneUpgrades {
         }
         if (cultivatingLvl == 0) {
             cropSpecificUpgrades.add(
-                FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating", null, "CULTIVATING;1", 1, 6.0)
+                FortuneUpgrade("§7Enchant your ${tool.displayName} §7with Cultivating", null, "CULTIVATING;1", 1, 12.0)
             )
         }
         if (turboCropLvl != 5) {

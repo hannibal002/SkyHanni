@@ -23,7 +23,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
                     "§eSee on the grass block page",
             FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0,
-            1257,
+            1267,
             FFGuideGUI.guiLeft + 15,
             FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
@@ -185,7 +185,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         line = if (currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar("§2Total $word Fortune", line, equipmentFF[FFTypes.TOTAL] ?: 0,
-            if (currentEquipment == 0) 198 else 49.5,
+            if (currentEquipment == 0) 218 else 54.5,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
@@ -203,7 +203,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
         else "§7§2Total reforge fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar("§2$word Reforge", line, equipmentFF[FFTypes.REFORGE] ?: 0,
-            if (currentEquipment == 0) 40 else 10,
+            if (currentEquipment == 0) 60 else 15,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
