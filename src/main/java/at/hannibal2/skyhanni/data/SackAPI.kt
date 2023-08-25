@@ -32,7 +32,9 @@ class SackAPI {
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return
-        val isMissingInfo = sackChangeText.contains("other items")
+
+        val otherItemsAdded = sackAddText.contains("other items")
+        val otherItemsRemoved = sackRemoveText.contains("other items")
 
         for (match in sackChangeRegex.findAll(sackChangeText)) {
             val delta = match.groups[1]!!.value.replace(",", "").toInt()
@@ -42,6 +44,6 @@ class SackAPI {
             val internalName = NEUInternalName.fromItemName(item)
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
-        SackChangeEvent(sackChanges, isMissingInfo).postAndCatch()
+        SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved).postAndCatch()
     }
 }
