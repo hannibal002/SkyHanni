@@ -42,6 +42,7 @@ object FFStats {
     val elephantFF = mutableMapOf<FFTypes, Double>()
     val mooshroomFF = mutableMapOf<FFTypes, Double>()
     val rabbitFF = mutableMapOf<FFTypes, Double>()
+    val beeFF = mutableMapOf<FFTypes, Double>()
     var currentPetItem = ""
 
     var baseFF = mutableMapOf<FFTypes, Double>()
@@ -78,6 +79,7 @@ object FFStats {
         getPetFFData(FarmingItems.ELEPHANT.getItem(), elephantFF)
         getPetFFData(FarmingItems.MOOSHROOM_COW.getItem(), mooshroomFF)
         getPetFFData(FarmingItems.RABBIT.getItem(), rabbitFF)
+        getPetFFData(FarmingItems.BEE.getItem(), beeFF)
 
         getGenericFF(baseFF)
 
@@ -222,6 +224,10 @@ object FFStats {
                 petList = rabbitFF
             }
 
+            FarmingItems.BEE -> {
+                petList = beeFF
+            }
+
             else -> {}
         }
         currentPetItem = FFGuideGUI.currentPet.getItem().getPetItem().toString()
@@ -243,6 +249,8 @@ object FFStats {
                 (10 + petLevel).toDouble() + strength / (40 - petLevel * .2)
             } else if (rawInternalName.contains("MOOSHROOM")) {
                 (10 + petLevel).toDouble()
+            } else if (rawInternalName.contains("BEE;4")) {
+                0.3 * petLevel
             } else 0.0
         }
         return 0.0
