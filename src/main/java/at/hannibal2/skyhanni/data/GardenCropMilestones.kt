@@ -46,7 +46,7 @@ object GardenCropMilestones {
     }
 
     fun CropType.isMaxed(): Boolean {
-        val maxValue = cropMilestoneData?.get(this)?.lastOrNull() ?: 1_000_000_000 // 1 bil for now
+        val maxValue = cropMilestoneData?.get(this)?.sum() ?: 1_000_000_000 // 1 bil for now
         return getCounter() >= maxValue
     }
 
