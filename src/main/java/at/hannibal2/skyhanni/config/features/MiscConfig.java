@@ -775,10 +775,10 @@ public class MiscConfig {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§b§lPowder Tracker",
-                        "§d852 Total chests Picked",
+                        "§d852 Total chests Picked §7(950/h)",
                         "§bx2 Powder: §aActive!",
-                        "§b250,420 §aMithril Powder (350,000/h)",
-                        "§b250,420 §dGemstone Powder (350,000/h)",
+                        "§b250,420 §aMithril Powder §7(350,000/h)",
+                        "§b250,420 §dGemstone Powder §7(350,000/h)",
                         "",
                         "§50§7-§90§7-§a0§f-0 §cRuby Gemstone",
                         "§50§7-§90§7-§a0§f-0 §bSapphire Gemstone",
