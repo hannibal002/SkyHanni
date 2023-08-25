@@ -265,7 +265,7 @@ public class Storage {
         }
 
         @Expose
-        public PowderTracker powderTracker = new PowderTracker();
+        public Map<Integer, PowderTracker> powderTracker = new HashMap<>();
 
         public static class PowderTracker {
             @Expose

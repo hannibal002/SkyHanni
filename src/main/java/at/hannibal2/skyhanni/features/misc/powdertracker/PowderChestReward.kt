@@ -9,8 +9,8 @@ enum class PowderChestReward(val displayName: String, val pattern: Pattern) {
     GEMSTONE_POWDER("§dGemstone Powder", "§aYou received §r§b[+](?<amount>.*) §r§aGemstone Powder.".toPattern()),
 
     ROUGH_RUBY_GEMSTONE("§fRough Ruby Gemstone", "§aYou received §r§f(?<amount>.*) §r§f❤ §r§fRough Ruby Gemstone§r§a.".toPattern()),
-    FLAWED_RUBY_GEMSTONE("§aFlawed Sapphire Gemstone", "§aYou received §r§f(?<amount>.*) §r§a✎ §r§aFlawed RubyGemstone§r§a.".toPattern()),
-    FINE_RUBY_GEMSTONE("§9Fine Ruby Gemstone", "§aYou received §r§f(?<amount>.*) §r§9✎ §r§9Fine Ruby Gemstone§r§a.".toPattern()),
+    FLAWED_RUBY_GEMSTONE("§aFlawed Sapphire Gemstone", "§aYou received §r§f(?<amount>.*) §r§a❤ §r§aFlawed RubyGemstone§r§a.".toPattern()),
+    FINE_RUBY_GEMSTONE("§9Fine Ruby Gemstone", "§aYou received §r§f(?<amount>.*) §r§9❤ §r§9Fine Ruby Gemstone§r§a.".toPattern()),
 
     ROUGH_SAPPHIRE_GEMSTONE("§fRough Sapphire Gemstone", "§aYou received §r§f(?<amount>.*) §r§f✎ §r§fRough Sapphire Gemstone§r§a.".toPattern()),
     FLAWED_SAPPHIRE_GEMSTONE("§aFlawed Sapphire Gemstone", "§aYou received §r§f(?<amount>.*) §r§a✎ §r§aFlawed Sapphire Gemstone§r§a.".toPattern()),
@@ -18,19 +18,19 @@ enum class PowderChestReward(val displayName: String, val pattern: Pattern) {
 
     ROUGH_AMBER_GEMSTONE("§fRough Amber Gemstone", "§aYou received §r§f(?<amount>.*) §r§f⸕ §r§fRough Amber Gemstone§r§a.".toPattern()),
     FLAWED_AMBER_GEMSTONE("§aFlawed Amber Gemstone", "§aYou received §r§f(?<amount>.*) §r§a⸕ §r§aFlawed Amber Gemstone§r§a.".toPattern()),
-    FINE_AMBER_GEMSTONE("§9Fine Amber Gemstone", "§aYou received §r§f(?<amount>.*) §r§9✎ §r§9Fine Amber Gemstone§r§a.".toPattern()),
+    FINE_AMBER_GEMSTONE("§9Fine Amber Gemstone", "§aYou received §r§f(?<amount>.*) §r§9⸕ §r§9Fine Amber Gemstone§r§a.".toPattern()),
 
     ROUGH_AMETHYST_GEMSTONE("§fRough Amethyst Gemstone", "§aYou received §r§f(?<amount>.*) §r§f❈ §r§fRough Amethyst Gemstone§r§a.".toPattern()),
-    FLAWED_AMETHYST_GEMSTONE("§aFlawed Amber Gemstone", "§aYou received §r§f(?<amount>.*) §r§a⸕ §r§aFlawed Amethyst Gemstone§r§a.".toPattern()),
-    FINE_AMETHYST_GEMSTONE("9Fine Amethyst Gemstone", "§aYou received §r§f(?<amount>.*) §r§9✎ §r§9Fine Amethyst Gemstone§r§a.".toPattern()),
+    FLAWED_AMETHYST_GEMSTONE("§aFlawed Amber Gemstone", "§aYou received §r§f(?<amount>.*) §r§a❈ §r§aFlawed Amethyst Gemstone§r§a.".toPattern()),
+    FINE_AMETHYST_GEMSTONE("§9Fine Amethyst Gemstone", "§aYou received §r§f(?<amount>.*) §r§9❈ §r§9Fine Amethyst Gemstone§r§a.".toPattern()),
 
     ROUGH_JADE_GEMSTONE("§fRough Jade Gemstone", "§aYou received §r§f(?<amount>.*) §r§f⸕ §r§fRough Jade Gemstone§r§a.".toPattern()),
     FLAWED_JADE_GEMSTONE("§aFlawed Jade Gemstone", "§aYou received §r§f(?<amount>.*) §r§a⸕ §r§aFlawed Jade Gemstone§r§a.".toPattern()),
-    FINE_JADE_GEMSTONE("9Fine Jade Gemstone", "§aYou received §r§f(?<amount>.*) §r§9✎ §r§9Fine Jade Gemstone§r§a.".toPattern()),
+    FINE_JADE_GEMSTONE("§9Fine Jade Gemstone", "§aYou received §r§f(?<amount>.*) §r§9⸕ §r§9Fine Jade Gemstone§r§a.".toPattern()),
 
     ROUGH_TOPAZ_GEMSTONE("§fRough Topaz Gemstone", "§aYou received §r§f(?<amount>.*) §r§f⸕ §r§fRough Topaz Gemstone§r§a.".toPattern()),
     FLAWED_TOPAZ_GEMSTONE("§aFlawed Topaz Gemstone", "§aYou received §r§f(?<amount>.*) §r§a⸕ §r§aFlawed Topaz Gemstone§r§a.".toPattern()),
-    FINE_TOPAZ_GEMSTONE("9Fine Topaz Gemstone", "§aYou received §r§f(?<amount>.*) §r§9✎ §r§9Fine Topaz Gemstone§r§a.".toPattern()),
+    FINE_TOPAZ_GEMSTONE("§9Fine Topaz Gemstone", "§aYou received §r§f(?<amount>.*) §r§9⸕ §r§9Fine Topaz Gemstone§r§a.".toPattern()),
 
     FTX_3070("§9FTX 3070", "§aYou received §r§f(?<amount>.*) §r§9FTX 3070§r§a.".toPattern()),
     ELECTRON_TRANSIMTTER("§9Electron Transmitter", "§aYou received §r§f(?<amount>.*) §r§9Electron Transmitter§r§a.".toPattern()),
