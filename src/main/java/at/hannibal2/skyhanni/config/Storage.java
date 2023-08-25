@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config;
 
+import at.hannibal2.skyhanni.data.SackItem;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
 import at.hannibal2.skyhanni.features.garden.CropAccessory;
@@ -394,6 +395,15 @@ public class Storage {
 
             @Expose
             public List<String> kingsTalkedTo = new ArrayList<>();
+        }
+
+        @Expose
+        public SackData sacks = new SackData();
+
+        public static class  SackData {
+
+            @Expose
+            public Map<NEUInternalName, SackItem> sackContents = new HashMap<>();
         }
     }
 }
