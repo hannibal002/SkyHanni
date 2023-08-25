@@ -751,16 +751,21 @@ public class MiscConfig {
     }
 
     @Expose
-    @ConfigOption(name = "", desc = "")
+    @ConfigOption(name = "Powder Tracker", desc = "")
     @Accordion
     public PowderTrackerConfig powderTrackerConfig = new PowderTrackerConfig();
 
     public static class PowderTrackerConfig {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enable the Powder grinding overlay.")
+        @ConfigOption(name = "Enabled", desc = "Enable the Powder Tracker overlay.")
         @ConfigEditorBoolean
-        public boolean enabled = true;
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Only when Grinding", desc = "Only show the overlay when powder grinding.")
+        @ConfigEditorBoolean
+        public boolean onlyWhenPowderGrinding = false;
 
         @Expose
         @ConfigOption(
@@ -771,16 +776,16 @@ public class MiscConfig {
                 exampleText = {
                         "§b§lPowder Tracker",
                         "§d852 Total chests Picked",
-                        "§dx2 Powder: §aActive!",
-                        "§b250,420 §aMithril Powder",
-                        "§b250,420 §dGemstone Powder",
+                        "§bx2 Powder: §aActive!",
+                        "§b250,420 §aMithril Powder (350,000/h)",
+                        "§b250,420 §dGemstone Powder (350,000/h)",
                         "",
-                        "§90§7-§a0§f-0 §cRuby Gemstone",
-                        "§90§7-§a0§f-0 §bSapphire Gemstone",
-                        "§90§7-§a0§f-0 §6Amber Gemstone",
-                        "§90§7-§a0§f-0 §5Amethyst Gemstone",
-                        "§90§7-§a0§f-0 §aJade Gemstone",
-                        "§90§7-§a0§f-0 §eTopaz Gemstone",
+                        "§50§7-§90§7-§a0§f-0 §cRuby Gemstone",
+                        "§50§7-§90§7-§a0§f-0 §bSapphire Gemstone",
+                        "§50§7-§90§7-§a0§f-0 §6Amber Gemstone",
+                        "§50§7-§90§7-§a0§f-0 §5Amethyst Gemstone",
+                        "§50§7-§90§7-§a0§f-0 §aJade Gemstone",
+                        "§50§7-§90§7-§a0§f-0 §eTopaz Gemstone",
 
                         "§b14 §9FTX 3070",
                         "§b14 §9Electron Transmitter",

@@ -4,10 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -15,7 +12,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
@@ -29,6 +25,8 @@ import net.minecraft.tileentity.TileEntityChest
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.concurrent.fixedRateTimer
+import kotlin.math.roundToInt
 
 class PowderTracker {
 
@@ -37,11 +35,32 @@ class PowderTracker {
     private val picked = "§6You have successfully picked the lock on this chest!".toPattern()
     private val powderEvent = ".*§r§b§l2X POWDER STARTED!.*".toPattern()
     private val powderEnded = ".*§r§b§l2X POWDER ENDED!.*".toPattern()
-
+    private var lastChestPicked = 0L
+    private var isGrinding = false
+    private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
+    private val mithrilInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
+    private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
     private var currentDisplayMode = DisplayMode.TOTAL
     private var inventoryOpen = false
     private var currentSessionData = mutableMapOf<Int, Storage.ProfileSpecific.PowderTracker>()
+    private val gemstones = listOf(
+        "Ruby" to "§c",
+        "Sapphire" to "§b",
+        "Amber" to "§6",
+        "Amethyst" to "§5",
+        "Jade" to "§a",
+        "Topaz" to "§e"
+    )
+
+    init {
+        fixedRateTimer(name = "skyhanni-powder-tracker", period = 1000) {
+            if (!isEnabled()) return@fixedRateTimer
+            calculateResourceHour(gemstoneInfo)
+            calculateResourceHour(mithrilInfo)
+            calculateResourceHour(chestInfo)
+        }
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -53,6 +72,8 @@ class PowderTracker {
             saveAndUpdate()
         }
 
+        if (config.onlyWhenPowderGrinding && !isGrinding) return
+
         config.position.renderStringsAndItems(
             display,
             posLabel = "Powder Chest Tracker")
@@ -63,12 +84,16 @@ class PowderTracker {
         if (!isEnabled()) return
         val msg = event.message
         val both = currentLog() ?: return
-        println("msg: ${event.message}")
 
-        picked.matchMatcher(msg) { both.modify { it.totalChestPicked += 1 } }
+        picked.matchMatcher(msg) {
+            both.modify {
+                it.totalChestPicked += 1
+            }
+            isGrinding = true
+            lastChestPicked = System.currentTimeMillis()
+        }
         powderEvent.matchMatcher(msg) { doublePowder = true }
         powderEnded.matchMatcher(msg) { doublePowder = false }
-
 
         for (reward in PowderChestReward.entries) {
             reward.pattern.matchMatcher(msg) {
@@ -82,21 +107,46 @@ class PowderTracker {
     }
 
     @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        if (!config.onlyWhenPowderGrinding) return
+        if (System.currentTimeMillis() - lastChestPicked > 60_000) {
+            isGrinding = false
+        }
+    }
+
+    @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.textFormat.afterChange { saveAndUpdate() }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        if (!isEnabled()) return
+        gemstoneInfo.perHour = 0.0
+        gemstoneInfo.stoppedChecks = 0
+        gemstoneInfo.perMin.clear()
+        mithrilInfo.perHour = 0.0
+        mithrilInfo.stoppedChecks = 0
+        mithrilInfo.perMin.clear()
+        chestInfo.perHour = 0.0
+        chestInfo.stoppedChecks = 0
+        chestInfo.perMin.clear()
         saveAndUpdate()
     }
 
     private fun saveAndUpdate() {
+        calculateGemstone()
+        calculateMithril()
+        calculateChest()
         display = formatDisplay(drawDisplay())
     }
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
-        val list = mutableListOf<List<Any>>()
+    private fun formatDisplay(map: List<List<Any>>) = buildList {
+        if (map.isEmpty()) return@buildList
         for (index in config.textFormat.get()) {
-            list.add(map[index])
+            add(map[index])
         }
-        return list
     }
 
     private fun drawDisplay() = buildList<List<Any>> {
@@ -113,55 +163,42 @@ class PowderTracker {
             )
         }
         val both = currentLog() ?: return@buildList
-        val chest = both.get(currentDisplayMode)
-        val rewards = chest.rewards
+        val display = both.get(currentDisplayMode)
+        val rewards = display.rewards
 
-        addAsSingletonList("§d${chest.totalChestPicked.addSeparators()} Total Chests Picked")
+        addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7(${chestInfo.perHour.roundToInt().addSeparators()}/h)")
         addAsSingletonList("§bDouble Powder: ${if (doublePowder) "§aActive!" else "§cInactive!"}")
 
-        for (reward in PowderChestReward.entries.subList(0, 2)) {
-            val count = rewards.getOrDefault(reward, 0).addSeparators()
-            addAsSingletonList("§b$count ${reward.displayName}")
-        }
+        val mithril = PowderChestReward.entries[0]
+        val mithrilCount = rewards.getOrDefault(mithril, 0).addSeparators()
+        addAsSingletonList("§b$mithrilCount ${mithril.displayName} §7(${mithrilInfo.perHour.roundToInt().addSeparators()}/h)")
+
+        val gemstone = PowderChestReward.entries[1]
+        val gemstoneCount = rewards.getOrDefault(gemstone, 0).addSeparators()
+        addAsSingletonList("§b$gemstoneCount ${gemstone.displayName} §7(${gemstoneInfo.perHour.roundToInt().addSeparators()}/h)")
+
         addAsSingletonList("")
 
-        var ruby = rewards.getOrDefault(PowderChestReward.ROUGH_RUBY_GEMSTONE, 0)
-        ruby += rewards.getOrDefault(PowderChestReward.FLAWED_RUBY_GEMSTONE, 0) * 80
-        ruby += rewards.getOrDefault(PowderChestReward.FINE_RUBY_GEMSTONE, 0) * 6400
-        val (rubyFine, rubyFlawed, rubyRough) = convert(ruby)
-        addAsSingletonList("§9$rubyFine§f-§a$rubyFlawed§f-$rubyRough §cRuby Gemstone")
+        for ((gem, color) in gemstones) {
+            var totalGemstone = 0L
 
-        var sapphire = rewards.getOrDefault(PowderChestReward.ROUGH_SAPPHIRE_GEMSTONE, 0)
-        sapphire += rewards.getOrDefault(PowderChestReward.FLAWED_SAPPHIRE_GEMSTONE, 0) * 80
-        sapphire += rewards.getOrDefault(PowderChestReward.FINE_SAPPHIRE_GEMSTONE, 0) * 6400
-        val (sapphireFine, sapphireFlawed, sapphireRough) = convert(sapphire)
-        addAsSingletonList("§9$sapphireFine§f-§a$sapphireFlawed§f-$sapphireRough §bSapphire Gemstone")
+            for (quality in arrayOf("ROUGH", "FLAWED", "FINE", "FLAWLESS")) {
+                val gemstoneType = PowderChestReward.valueOf("${quality}_${gem.uppercase()}_GEMSTONE")
+                val count = rewards.getOrDefault(gemstoneType, 0)
+                val multiplier = when (quality) {
+                    "FLAWED" -> 80
+                    "FINE" -> 6400
+                    "FLAWLESS" -> 512000
+                    else -> 1
+                }
+                totalGemstone += count * multiplier
+            }
 
-        var amber = rewards.getOrDefault(PowderChestReward.ROUGH_AMBER_GEMSTONE, 0)
-        amber += rewards.getOrDefault(PowderChestReward.FLAWED_AMBER_GEMSTONE, 0) * 80
-        amber += rewards.getOrDefault(PowderChestReward.FINE_AMBER_GEMSTONE, 0) * 6400
-        val (amberFine, amberFlawed, amberRough) = convert(amber)
-        addAsSingletonList("§9$amberFine§7-§a$amberFlawed§f-$amberRough §6Amber Gemstone")
+            val (flawless, fine, flawed, rough) = convert(totalGemstone)
+            addAsSingletonList("§5${flawless}§7-§9${fine}§7-§a${flawed}§f-${rough} $color$gem Gemstone")
+        }
 
-        var amethyst = rewards.getOrDefault(PowderChestReward.ROUGH_AMETHYST_GEMSTONE, 0)
-        amethyst += rewards.getOrDefault(PowderChestReward.FLAWED_AMETHYST_GEMSTONE, 0) * 80
-        amethyst += rewards.getOrDefault(PowderChestReward.FINE_AMETHYST_GEMSTONE, 0) * 6400
-        val (amethystFine, amethystFlawed, amethystRough) = convert(amethyst)
-        addAsSingletonList("§9$amethystFine§7-§a$amethystFlawed§f-$amethystRough §5Amethyst Gemstone")
-
-        var jade = rewards.getOrDefault(PowderChestReward.ROUGH_JADE_GEMSTONE, 0)
-        jade += rewards.getOrDefault(PowderChestReward.FLAWED_JADE_GEMSTONE, 0) * 80
-        jade += rewards.getOrDefault(PowderChestReward.FINE_JADE_GEMSTONE, 0) * 6400
-        val (jadeFine, jadeFlawed, jadeRough) = convert(jade)
-        addAsSingletonList("§9$jadeFine§7-§a$jadeFlawed§f-$jadeRough §aJade Gemstone")
-
-        var topaz = rewards.getOrDefault(PowderChestReward.ROUGH_TOPAZ_GEMSTONE, 0)
-        topaz += rewards.getOrDefault(PowderChestReward.FLAWED_TOPAZ_GEMSTONE, 0) * 80
-        topaz += rewards.getOrDefault(PowderChestReward.FINE_TOPAZ_GEMSTONE, 0) * 6400
-        val (topazFine, topazFlawed, topazRough) = convert(topaz)
-        addAsSingletonList("§9$topazFine§7-§a$topazFlawed§f-$topazRough §eTopaz Gemstone")
-
-        for (reward in PowderChestReward.entries.subList(20, 26)) {
+        for (reward in PowderChestReward.entries.subList(26, 32)) { // robots part
             val count = rewards.getOrDefault(reward, 0).addSeparators()
             addAsSingletonList("§b$count ${reward.displayName}")
         }
@@ -173,23 +210,84 @@ class PowderTracker {
         val blueEgg = rewards.getOrDefault(PowderChestReward.BLUE_GOBLIN_EGG, 0)
         addAsSingletonList("§9$goblinEgg§7-§a$greenEgg§7-§c$redEgg§f-§e$yellowEgg§f-§3$blueEgg §fGoblin Egg")
 
-        for (reward in PowderChestReward.entries.subList(31, 40)) {
+        for (reward in PowderChestReward.entries.subList(37, 46)) {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
             addAsSingletonList("§b$count ${reward.displayName}")
         }
     }
 
-    private fun convert(roughCount: Long): Triple<Long, Long, Long> {
-        val flawedRatio = 80
-        val fineRatio = 6400
+    private fun calculateResourceHour(resourceInfo: ResourceInfo) {
+        val difference = resourceInfo.estimated - resourceInfo.lastEstimated
+        resourceInfo.lastEstimated = resourceInfo.estimated
 
-        val fineCount = roughCount / fineRatio
-        val flawedCount = roughCount % fineRatio / flawedRatio
-        val remainingRoughCount = roughCount % fineRatio % flawedRatio
+        if (difference == resourceInfo.estimated) {
+            return
+        }
 
-        return Triple(fineCount, flawedCount, remainingRoughCount)
+        resourceInfo.perHour = resourceInfo.perMin.average() * 3600
+        resourceInfo.perMin.add(difference)
+
+        if (difference == 0L) {
+            resourceInfo.stoppedChecks += 1
+
+            if (resourceInfo.stoppedChecks == 60) {
+                resourceInfo.stoppedChecks = 0
+                resourceInfo.perMin.clear()
+                resourceInfo.perHour = 0.0
+            }
+            return
+        }
+        resourceInfo.stoppedChecks = 0
     }
 
+    private fun calculateGemstone() {
+        val both = currentLog() ?: return
+        val display = both.get(currentDisplayMode)
+        val rewards = display.rewards
+        gemstoneInfo.estimated = 0
+        gemstoneInfo.estimated += rewards.getOrDefault(PowderChestReward.GEMSTONE_POWDER, 0)
+    }
+
+    private fun calculateMithril() {
+        val both = currentLog() ?: return
+        val display = both.get(currentDisplayMode)
+        val rewards = display.rewards
+        mithrilInfo.estimated = 0
+        mithrilInfo.estimated += rewards.getOrDefault(PowderChestReward.MITHRIL_POWDER, 0)
+    }
+
+    private fun calculateChest() {
+        val both = currentLog() ?: return
+        val display = both.get(currentDisplayMode)
+        chestInfo.estimated = 0
+        chestInfo.estimated += display.totalChestPicked
+    }
+
+    private fun convert(roughCount: Long): Gem {
+        val flawlessRatio = 512000
+        val fineRatio = 6400
+        val flawedRatio = 80
+
+        val flawlessCount = roughCount / flawlessRatio
+        val remainingAfterFlawless = roughCount % flawlessRatio
+
+        val fineCount = remainingAfterFlawless / fineRatio
+        val remainingAfterFine = remainingAfterFlawless % fineRatio
+
+        val flawedCount = remainingAfterFine / flawedRatio
+        val remainingRoughCount = remainingAfterFine % flawedRatio
+
+        return Gem(flawlessCount, fineCount, flawedCount, remainingRoughCount)
+    }
+
+    data class Gem(val flawless: Long, val fine: Long, val flawed: Long, val rough: Long)
+    private data class ResourceInfo(
+        var estimated: Long,
+        var lastEstimated: Long,
+        var stoppedChecks: Int,
+        var perHour: Double,
+        val perMin: MutableList<Long>
+    )
 
     enum class DisplayMode(val displayName: String) {
         TOTAL("Total"),
@@ -223,26 +321,5 @@ class PowderTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS
-
-
-    /*
-    delete all of this before making pr
-     */
-
-    @SubscribeEvent
-    fun onRender(event: RenderWorldLastEvent) {
-        if (!isEnabled()) return
-        getTilesNearby<TileEntityChest>(LocationUtils.playerLocation(), 20.0).forEach {
-            event.drawWaypointFilled(it.pos.toLorenzVec(), Color.GREEN, seeThroughBlocks = true)
-        }
-    }
-
-    private inline fun <reified T : TileEntity> getTilesNearby(location: LorenzVec, radius: Double): Sequence<T> =
-        getTiles<T>().filter { it.pos.toLorenzVec().distanceToPlayer() <= radius }
-
-    private inline fun <reified R : TileEntity> getTiles(): Sequence<R> = getAllTiles().filterIsInstance<R>()
-    private fun getAllTiles(): Sequence<TileEntity> = Minecraft.getMinecraft()?.theWorld?.loadedTileEntityList?.let {
-        if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence() ?: emptySequence()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.CRYSTAL_HOLLOWS && config.enabled
 }
