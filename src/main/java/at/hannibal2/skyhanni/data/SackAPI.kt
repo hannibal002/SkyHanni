@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
-class SackAPI {
+object SackAPI {
 
     data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
 
@@ -44,4 +44,37 @@ class SackAPI {
         }
         SackChangeEvent(sackChanges, isMissingInfo).postAndCatch()
     }
+
+    @SubscribeEvent
+    fun sackChange(event: SackChangeEvent) {
+        val sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return
+
+        val justChanged = mutableListOf<NEUInternalName>()
+
+        for (change in event.sackChanges) {
+            justChanged.add(change.internalName)
+            println("${change.internalName} from the ${change.sacks} changed by ${change.delta}")
+
+            if (sackData.containsKey(change.internalName)) {
+                val oldData = sackData[change.internalName]
+                sackData[change.internalName] = SackItem(oldData!!.amount + change.delta, oldData.isOutdated)
+            } else {
+                val amount = if (change.delta > 0) change.delta else 0
+                sackData[change.internalName] = SackItem(amount, true)
+            }
+        }
+
+        if (event.isMissingInfo) {
+            for (item in sackData) {
+                if (item.key in justChanged) continue
+                val oldData = sackData[item.key]
+                sackData[item.key] = SackItem(oldData!!.amount, true)
+            }
+        }
+    }
 }
+
+data class SackItem(
+    val amount: Int,
+    val isOutdated: Boolean
+)

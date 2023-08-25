@@ -179,7 +179,7 @@ class SkyHanniMod {
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
-        loadModule(SackAPI())
+        loadModule(SackAPI)
 
         // features
         loadModule(BazaarOrderHelper())
