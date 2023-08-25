@@ -179,6 +179,7 @@ class SkyHanniMod {
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
+        loadModule(SackAPI())
 
         // features
         loadModule(BazaarOrderHelper())
@@ -381,7 +382,6 @@ class SkyHanniMod {
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
-        loadModule(SackAPI())
 
         init()
 
