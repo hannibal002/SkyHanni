@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -49,10 +50,15 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
+import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.File
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -60,6 +66,17 @@ object EstimatedItemValue {
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
+    private var gemstoneUnlockCosts = HashMap<String, List<String>>()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
+
+        if (data != null)
+            gemstoneUnlockCosts = Gson().fromJson(data, object : TypeToken<HashMap<String, List<String>>>() {}.getType())
+        else
+            LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
@@ -188,6 +205,7 @@ object EstimatedItemValue {
         // dynamic
         totalPrice += addAbilityScrolls(stack, list)
         totalPrice += addDrillUpgrades(stack, list)
+        totalPrice += addGemstoneSlotUnlockCost(stack, list)
         totalPrice += addGemstones(stack, list)
         totalPrice += addEnchantments(stack, list)
         return Pair(totalPrice, basePrice)
@@ -638,6 +656,27 @@ object EstimatedItemValue {
         if (priceMap.isNotEmpty()) {
             list.add("§7Gemstones: §6" + NumberUtil.format(totalPrice))
             list += priceMap.sortedDesc().keys
+        }
+        return totalPrice
+    }
+
+    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalName_old()
+
+        var totalPrice = 0.0
+
+        if (gemstoneUnlockCosts.isNotEmpty() && gemstoneUnlockCosts.contains(internalName)) {
+            for (ingredients in gemstoneUnlockCosts.get(internalName)!!) {
+                val ingredient = Ingredient(manager, ingredients)
+
+                totalPrice += if (ingredient.isCoins) {
+                    ingredient.count
+                } else {
+                    getPrice(ingredient.internalItemId) * ingredient.count
+                }
+            }
+
+            list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
         }
         return totalPrice
     }
