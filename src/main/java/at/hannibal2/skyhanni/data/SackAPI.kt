@@ -19,15 +19,20 @@ class SackAPI {
 
         val sackChanges = ArrayList<SackChange>()
 
-        var sackChangeText = try {
-            event.chatComponent.siblings.firstNotNullOf {
-                it.chatStyle?.chatHoverEvent?.value?.formattedText
+        val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
+            sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
+                it.startsWith("Added")
             }
-        } catch (e: NoSuchElementException) {
-            return
-        }
+        } ?: ""
+        val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
+            sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
+                it.startsWith("Removed")
+            }
+        } ?: ""
 
-        sackChangeText = sackChangeText.trim().removeColor()
+        val sackChangeText = sackAddText + sackRemoveText
+        if (sackChangeText.isEmpty()) return
+        val isMissingInfo = sackChangeText.contains("other items")
 
         for (match in sackChangeRegex.findAll(sackChangeText)) {
             val delta = match.groups[1]!!.value.replace(",", "").toInt()
@@ -35,10 +40,8 @@ class SackAPI {
             val sacks = match.groups[3]!!.value.split(", ")
 
             val internalName = NEUInternalName.fromItemName(item)
-
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
-
-        SackChangeEvent(sackChanges).postAndCatch()
+        SackChangeEvent(sackChanges, isMissingInfo).postAndCatch()
     }
 }

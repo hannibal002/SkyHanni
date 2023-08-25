@@ -2,4 +2,4 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.data.SackAPI
 
-class SackChangeEvent(val sackChanges: List<SackAPI.SackChange>) : LorenzEvent()
+class SackChangeEvent(val sackChanges: List<SackAPI.SackChange>, val isMissingInfo: Boolean) : LorenzEvent()
