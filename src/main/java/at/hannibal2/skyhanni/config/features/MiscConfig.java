@@ -751,6 +751,66 @@ public class MiscConfig {
     }
 
     @Expose
+    @ConfigOption(name = "", desc = "")
+    @Accordion
+    public PowderTrackerConfig powderTrackerConfig = new PowderTrackerConfig();
+
+    public static class PowderTrackerConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enable the Powder grinding overlay.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(
+                name = "Text Format",
+                desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§b§lPowder Tracker",
+                        "§d852 Total chests Picked",
+                        "§dx2 Powder: §aActive!",
+                        "§b250,420 §aMithril Powder",
+                        "§b250,420 §dGemstone Powder",
+                        "",
+                        "§90§7-§a0§f-0 §cRuby Gemstone",
+                        "§90§7-§a0§f-0 §bSapphire Gemstone",
+                        "§90§7-§a0§f-0 §6Amber Gemstone",
+                        "§90§7-§a0§f-0 §5Amethyst Gemstone",
+                        "§90§7-§a0§f-0 §aJade Gemstone",
+                        "§90§7-§a0§f-0 §eTopaz Gemstone",
+
+                        "§b14 §9FTX 3070",
+                        "§b14 §9Electron Transmitter",
+                        "§b14 §9Robotron Reflector",
+                        "§b14 §9Superlite Motor",
+                        "§b14 §9Control Switch",
+                        "§b14 §9Synthetic Heart",
+
+                        "§90§7-§a0§7-§c0§f-§e0§f-§30 §fGoblin Egg",
+
+                        "§b12 §aWishing Compass",
+
+                        "§b320 §aSludge Juice",
+                        "§b2 §9Ascension Rope",
+                        "§b6 §5Treasurite",
+                        "§b4 §6Jungle Heart",
+                        "§b1 §5Pickonimbus 2000",
+                        "§b14 §aYoggie",
+                        "§b9 §fPrehistoric Egg",
+                        "§b25 §aOil Barrel"
+                }
+        )
+        public Property<List<Integer>> textFormat = Property.of(new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)));
+
+        @Expose
+        public Position position = new Position(100, 100, false, true);
+
+    }
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     public boolean hideExpBottles = false;
