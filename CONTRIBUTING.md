@@ -61,6 +61,12 @@ SkyHanni uses the config system from NEU.
 
 For more information, see https://github.com/NotEnoughUpdates/MoulConfig
 
+## Elite Farmers API
+
+SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for some farming features.
+
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience. All data sent is anonymonized and opt-in. 
+
 ## Mixin
 
 A system to inject code into the original Minecraft code.
