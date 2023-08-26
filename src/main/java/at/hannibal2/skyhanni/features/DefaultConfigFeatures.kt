@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean
 import io.github.moulberry.moulconfig.annotations.ConfigOption
 import io.github.moulberry.moulconfig.internal.GlScissorStack
@@ -14,6 +15,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.command.CommandBase
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -21,32 +23,61 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Mouse
 import java.lang.reflect.Field
+import java.util.*
 
 object DefaultConfigFeatures {
+    var pr = false
+
     @SubscribeEvent
     fun onTick(event: TickEvent) {
+        if (pr) return
         val p = Minecraft.getMinecraft().thePlayer ?: return
-//        MinecraftForge.EVENT_BUS.unregister(this)
-        if (SkyHanniMod.feature.storage.hasPlayedBefore) return
-        SkyHanniMod.feature.storage.hasPlayedBefore = true
-        p.addChatMessage(
-            ChatComponentText(
-                "§e[SkyHanni] Looks like this is the first time you are using SkyHanni." +
-                        " Click here to configure default options, or run /shdefaultoptions."
-            ).setChatStyle(
-                ChatStyle().setChatClickEvent(
-                    ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/shdefaultoptions"
+        pr = true
+        val k = SkyHanniMod.feature.storage.knownFeatureToggles
+        val updated = SkyHanniMod.version !in k
+        val processor = FeatureToggleProcessor()
+        ConfigProcessorDriver.processConfig(SkyHanniMod.feature.javaClass, SkyHanniMod.feature, processor)
+        k[SkyHanniMod.version] = processor.allOptions.map { it.path }
+        SkyHanniMod.configManager.saveConfig("Updated known feature flags")
+        if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
+            SkyHanniMod.feature.storage.hasPlayedBefore = true
+            p.addChatMessage(
+                ChatComponentText(
+                    "§e[SkyHanni] Looks like this is the first time you are using SkyHanni." +
+                            " Click here to configure default options, or run /shdefaultoptions."
+                ).setChatStyle(
+                    ChatStyle().setChatClickEvent(
+                        ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/shdefaultoptions"
+                        )
                     )
                 )
             )
-        )
+
+        } else if (updated) {
+            val mostFeatureFulOldVersion = k.maxByOrNull { if (it.key != SkyHanniMod.version) it.value.size else -1 }
+            val command = "/shdefaultoptions ${mostFeatureFulOldVersion?.key} ${SkyHanniMod.version}"
+            p.addChatMessage(
+                ChatComponentText(
+                    "§e[SkyHanni] Looks like you updated SkyHanni." +
+                            " Click here to configure the newly introduced options, or run $command."
+                ).setChatStyle(
+                    ChatStyle().setChatClickEvent(
+                        ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            command
+                        )
+                    )
+                )
+            )
+        }
     }
 
     class FeatureToggleProcessor : ConfigStructureReader {
 
         var latestCategory: Category? = null
+        val s = Stack<String>()
 
         val allOptions = mutableListOf<FeatureToggleableOption>()
         val orderedOptions by lazy {
@@ -56,7 +87,8 @@ object DefaultConfigFeatures {
         data class FeatureToggleableOption(
             val name: String, val description: String, val previouslyEnabled: Boolean,
             val isTrueEnabled: Boolean, val category: Category,
-            val setter: (Boolean) -> Unit
+            val setter: (Boolean) -> Unit,
+            val path: String,
         )
 
         data class Category(val name: String, val description: String)
@@ -74,6 +106,14 @@ object DefaultConfigFeatures {
         override fun endAccordion() {
         }
 
+        override fun pushPath(fieldPath: String) {
+            s.push(fieldPath)
+        }
+
+        override fun popPath() {
+            s.pop()
+        }
+
         override fun emitOption(baseObject: Any, field: Field, option: ConfigOption) {
             val featureToggle = field.getAnnotation(FeatureToggle::class.java) ?: return
             field.getAnnotation(ConfigEditorBoolean::class.java)
@@ -85,7 +125,8 @@ object DefaultConfigFeatures {
                     field.getBoolean(baseObject),
                     featureToggle.trueIsEnabled,
                     latestCategory!!,
-                    { field.setBoolean(baseObject, it) }
+                    { field.setBoolean(baseObject, it) },
+                    s.joinToString(".") + "." + field.name
                 )
             )
         }
@@ -94,14 +135,44 @@ object DefaultConfigFeatures {
         }
     }
 
-    fun onCommand() {
+    fun onCommand(old: String, new: String) {
         val processor = FeatureToggleProcessor()
         ConfigProcessorDriver.processConfig(SkyHanniMod.feature.javaClass, SkyHanniMod.feature, processor)
-        SkyHanniMod.screenToOpen = DefaultConfigOptionGui(processor.orderedOptions)
+        var opt = processor.orderedOptions
+        val k = SkyHanniMod.feature.storage.knownFeatureToggles
+        val n = k[new]
+        if (new != "null" && n == null) {
+            LorenzUtils.chat("§e[SkyHanni] Unknown version $new")
+            return
+        }
+        val o = k[old]
+        if (old != "null" && o == null) {
+            LorenzUtils.chat("§e[SkyHanni] Unknown version $old")
+            return
+        }
+        opt = opt.mapValues { it.value.filter { (n == null || it.path in n) && (o == null || it.path !in o) } }
+            .filter { it.value.isNotEmpty() }
+        SkyHanniMod.screenToOpen = DefaultConfigOptionGui(opt, old, new)
     }
 
-    class DefaultConfigOptionGui(val orderedOptions: Map<FeatureToggleProcessor.Category, List<FeatureToggleProcessor.FeatureToggleableOption>>) :
+    class DefaultConfigOptionGui(
+        val orderedOptions: Map<FeatureToggleProcessor.Category, List<FeatureToggleProcessor.FeatureToggleableOption>>,
+        old: String,
+        new: String
+    ) :
         GuiScreen() {
+        val title = if (old == "null") {
+            if (new == "null")
+                "§5SkyHanni Options In Version $new"
+            else
+                "§5SkyHanni Default Options"
+        } else {
+            if (new == "null") {
+                "§5SkyHanni Options since $old"
+            } else {
+                "§5SkyHanni Options $old → $new"
+            }
+        }
         val w = 400
         val h = 300
         val bars = 40
@@ -137,12 +208,13 @@ object DefaultConfigFeatures {
             GlStateManager.pushMatrix()
             GlStateManager.translate(width / 2F, (height - h) / 2F, 0F)
             GlStateManager.scale(2f, 2f, 1f)
-            TextRenderUtils.drawStringCentered(
-                "§5SkyHanni Default Options",
+            TextRenderUtils.drawStringCenteredScaledMaxWidth(
+                title,
                 mc.fontRendererObj,
                 0F,
                 mc.fontRendererObj.FONT_HEIGHT.toFloat(),
                 false,
+                w / 2 - padding,
                 -1
             )
             GlStateManager.popMatrix()
@@ -203,10 +275,22 @@ object DefaultConfigFeatures {
                 drawRect(0, 0, 1, 30, 0xFF808080.toInt())
                 drawRect(w - padding * 2 - 1, 0, w - padding * 2, 30, 0xFF808080.toInt())
                 mc.fontRendererObj.drawString("§e${cat.name} ${suggestionState.label}", 4, 4, -1)
-                mc.fontRendererObj.drawSplitString("§7${cat.description}", 4, 14, w - padding * 2-8, -1)
+                mc.fontRendererObj.drawSplitString("§7${cat.description}", 4, 14, w - padding * 2 - 8, -1)
                 if (isMouseInScrollArea && my in 0..cardHeight) {
                     hoveringTextToDraw =
-                        listOf("§e${cat.name}", "§7${cat.description}", "§7Current plan: ${suggestionState.label}", "§aClick to toggle!")
+                        listOf(
+                            "§e${cat.name}",
+                            "§7${cat.description}",
+                            "§7Current plan: ${suggestionState.label}",
+                            "§aClick to toggle!",
+                            "§7Hold shift to show all options"
+                        )
+                    if (isShiftKeyDown()) {
+                        hoveringTextToDraw = listOf(
+                            "§e${cat.name}",
+                            "§7${cat.description}",
+                        ) + orderedOptions[cat]!!.map { "§7 - §a" + it.name }
+                    }
                     if (shouldClick) {
                         resetSuggestionState[cat] = suggestionState.next
                     }
@@ -252,6 +336,15 @@ object DefaultConfigFeatures {
                 o.setter(setTO)
             }
         }
+    }
+
+    fun onComplete(strings: Array<String>): List<String> {
+        if (strings.size <= 2)
+            return CommandBase.getListOfStringsMatchingLastWord(
+                strings,
+                SkyHanniMod.feature.storage.knownFeatureToggles.keys + listOf("null")
+            )
+        return listOf()
     }
 
 
