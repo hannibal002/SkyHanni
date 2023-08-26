@@ -229,20 +229,30 @@ object SackAPI {
     fun sackChange(event: SackChangeEvent) {
         sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return
 
-        // this could break if one of the added/removed is shown and the other is in the other category
-        val justChanged = mutableListOf<NEUInternalName>()
+        // if it gets added and subtracted but only 1 shows it will be outdated
+        val justChanged = mutableMapOf<NEUInternalName, Int>()
 
         for (change in event.sackChanges) {
-            justChanged.add(change.internalName)
-
-            if (sackData.containsKey(change.internalName)) {
-                val oldData = sackData[change.internalName]
-                var newAmount = oldData!!.amount + change.delta
-                if (newAmount < 0) newAmount = 0
-                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, oldData.outdatedStatus) }
+            if (change.internalName in justChanged) {
+                justChanged[change.internalName] = (justChanged[change.internalName] ?: 0) + change.delta
             } else {
-                val newAmount = if (change.delta > 0) change.delta else 0
-                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, 2) }
+                justChanged[change.internalName] = change.delta
+            }
+        }
+
+        for (item in justChanged) {
+            if (sackData.containsKey(item.key)) {
+                val oldData = sackData[item.key]
+                var newAmount = oldData!!.amount + item.value
+                var changed = newAmount - oldData.amount
+                if (newAmount < 0) {
+                    newAmount = 0
+                    changed = 0
+                }
+                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.outdatedStatus) }
+            } else {
+                val newAmount = if (item.value > 0) item.value else 0
+                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, newAmount, 2) }
             }
         }
 
@@ -250,24 +260,24 @@ object SackAPI {
             for (item in sackData) {
                 if (item.key in justChanged) continue
                 val oldData = sackData[item.key]
-                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, 1) }
+                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, 0, 1) }
             }
         }
         saveSackData()
     }
 
     private fun setSackItem(item: NEUInternalName, amount: Int) {
-        sackData = sackData.editCopy { this[item] = SackItem(amount, 0) }
+        sackData = sackData.editCopy { this[item] = SackItem(amount, 0, 0) }
     }
 
     fun fetchSackItem(item: NEUInternalName): SackItem? {
-        sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return SackItem(-1, -1)
+        sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return SackItem(0, 0, -1)
 
         if (sackData.containsKey(item)) {
             return sackData[item]
         }
 
-        sackData = sackData.editCopy { this[item] = SackItem(0, 2) }
+        sackData = sackData.editCopy { this[item] = SackItem(0, 0, 2) }
         return sackData[item]
     }
 
@@ -305,8 +315,11 @@ object SackAPI {
 }
 
 // status -1 = fetching data failed, 0 = < 1% of being wrong, 1 = 10% of being wrong, 2 = is 100% wrong
+// lastChange is set to 0 when value is refreshed in the sacks gui and when being set initially
+// if it didn't change in an update the lastChange value will stay the same and not be set to 0
 data class SackItem(
     @Expose val amount: Int,
+    @Expose val lastChange: Int,
     @Expose val outdatedStatus: Int
 )
 
