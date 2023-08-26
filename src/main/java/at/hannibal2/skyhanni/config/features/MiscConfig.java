@@ -728,6 +728,11 @@ public class MiscConfig {
         @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of crystal hollows.")
         @ConfigEditorBoolean
         public boolean crystalHollowsNamesInCore = false;
+
+        @Expose
+        @ConfigOption(name = "Share CH Locations", desc = "Share and receive Crystal Hollows locations")
+        @ConfigEditorBoolean
+        public boolean crystalHollowsShareLocations = false;
     }
 
     @Expose

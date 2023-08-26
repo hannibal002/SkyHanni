@@ -30,6 +30,7 @@ class HypixelData {
         var joinedWorld = 0L
 
         var skyBlockArea = "?"
+        var skyBlockServerId = "?"
     }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
@@ -91,6 +92,7 @@ class HypixelData {
         if (inSkyBlock) {
             checkIsland()
             checkSidebar()
+            checkServerId()
         }
 
         if (inSkyBlock == skyBlock) return
@@ -144,6 +146,14 @@ class HypixelData {
         }
 
         noTrade = ironman || stranded || bingo
+    }
+
+    private fun checkServerId(){
+        for (line in TabListData.getTabList()) {
+            if (line.startsWith(" Server: ")) {
+                skyBlockServerId = line.split(": ")[1].removeColor()
+            }
+        }
     }
 
     private fun checkIsland() {

@@ -49,6 +49,7 @@ import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityC
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsSharedLocations
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.*
@@ -69,6 +70,7 @@ import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.nether.ashfang.*
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraChestWaypoints
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.RiftLarva
@@ -213,6 +215,7 @@ class SkyHanniMod {
         loadModule(AshfangBlazes())
         loadModule(AshfangHideParticles())
         loadModule(AshfangHideDamageIndicator())
+        loadModule(KuudraChestWaypoints())
         loadModule(ItemStars())
         loadModule(MinionFeatures())
         loadModule(RealTime())
@@ -289,6 +292,7 @@ class SkyHanniMod {
         loadModule(WrongFungiCutterWarning())
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
+        loadModule(CrystalHollowsSharedLocations())
         loadModule(CrystalHollowsNamesInCore())
         loadModule(GardenVisitorColorNames())
         loadModule(TeleportPadCompactName())

@@ -72,6 +72,10 @@ public class Features extends Config {
     public AshfangConfig ashfang = new AshfangConfig();
 
     @Expose
+    @Category(name = "Kuudra", desc = "Kuudra fight in Crimson Isle.")
+    public KuudraConfig kuudra = new KuudraConfig();
+
+    @Expose
     @Category(name = "Minion", desc = "The minions at your private island.")
     public MinionsConfig minions = new MinionsConfig();
 

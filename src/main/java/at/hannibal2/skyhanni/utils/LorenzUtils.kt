@@ -46,6 +46,7 @@ object LorenzUtils {
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
+    val skyBlockServerId get() = HypixelData.skyBlockServerId
 
     val inKuudraFight get() = skyBlockIsland == IslandType.KUUDRA_ARENA
 
