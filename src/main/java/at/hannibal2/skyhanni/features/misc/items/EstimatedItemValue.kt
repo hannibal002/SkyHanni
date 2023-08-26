@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
@@ -66,14 +67,15 @@ object EstimatedItemValue {
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
-    private var gemstoneUnlockCosts = HashMap<String, List<String>>()
+    private var gemstoneUnlockCosts = HashMap<String, HashMap<String, List<String>>>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
 
         if (data != null)
-            gemstoneUnlockCosts = Gson().fromJson(data, object : TypeToken<HashMap<String, List<String>>>() {}.getType())
+            // item_internal_names -> gemstone_slots -> ingredients_array
+            gemstoneUnlockCosts = Gson().fromJson(data, object : TypeToken<HashMap<String, HashMap<String, List<String>>>>() {}.getType())
         else
             LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
     }
@@ -663,20 +665,29 @@ object EstimatedItemValue {
     private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName_old()
 
+        // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
+        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots").toString()
+
         var totalPrice = 0.0
 
         if (gemstoneUnlockCosts.isNotEmpty() && gemstoneUnlockCosts.contains(internalName)) {
-            for (ingredients in gemstoneUnlockCosts.get(internalName)!!) {
-                val ingredient = Ingredient(manager, ingredients)
+            for (slot in gemstoneUnlockCosts.get(internalName)!!) {
+                if (unlockedSlots.contains(slot.key)) { //|| (unlockedSlots.equals("null") && slotLoaded)) {
+                    for (ingredients in slot.value) {
+                        val ingredient = Ingredient(manager, ingredients)
 
-                totalPrice += if (ingredient.isCoins) {
-                    ingredient.count
-                } else {
-                    getPrice(ingredient.internalItemId) * ingredient.count
+                        totalPrice += if (ingredient.isCoins) {
+                            ingredient.count
+                        } else {
+                            getPrice(ingredient.internalItemId) * ingredient.count
+                        }
+                    }
                 }
             }
 
-            list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
+            // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
+            if (!unlockedSlots.equals("null"))
+                list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
         }
         return totalPrice
     }
