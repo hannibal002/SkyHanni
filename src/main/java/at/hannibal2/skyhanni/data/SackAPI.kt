@@ -97,7 +97,8 @@ object SackAPI {
     }
 
     fun getSacksData(savingSacks: Boolean) {
-        if (savingSacks) sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return
+        if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return
+        if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return
         for ((_, stack) in stackList) {
             val name = stack.name ?: continue
             val lore = stack.getLore()
@@ -227,7 +228,7 @@ object SackAPI {
 
     @SubscribeEvent
     fun sackChange(event: SackChangeEvent) {
-        sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return
+        sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return
 
         // this could break if one of the added/removed is shown and the other is in the other category
         val justChanged = mutableListOf<NEUInternalName>()
@@ -261,19 +262,19 @@ object SackAPI {
     }
 
     fun fetchSackItem(item: NEUInternalName): SackItem? {
-        sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return SackItem(-1, -1)
+        sackData = ProfileStorageData.sackProfiles?.sacks?.sackContents ?: return SackItem(-1, -1)
 
         if (sackData.containsKey(item)) {
             return sackData[item]
         }
 
         sackData = sackData.editCopy { this[item] = SackItem(0, 2) }
-        saveSackData()
         return sackData[item]
     }
 
     private fun saveSackData() {
-        ProfileStorageData.profileSpecific?.sacks?.sackContents = sackData
+        ProfileStorageData.sackProfiles?.sacks?.sackContents = sackData
+        SkyHanniMod.configManager.saveSackData("shutdown-hook")
     }
 
     data class SackGemstone(

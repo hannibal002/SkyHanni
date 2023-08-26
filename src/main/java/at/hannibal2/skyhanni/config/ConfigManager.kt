@@ -81,11 +81,14 @@ class ConfigManager {
     }
 
     lateinit var features: Features
+    lateinit var sackData: SackData
+
         private set
     private val logger = LorenzLogger("config_manager")
 
     var configDirectory = File("config/skyhanni")
     private var configFile: File? = null
+    private var sackFile: File? = null
     lateinit var processor: MoulConfigProcessor<Features>
 
     fun firstLoad() {
@@ -95,6 +98,7 @@ class ConfigManager {
         configDirectory.mkdir()
 
         configFile = File(configDirectory, "config.json")
+        sackFile = File(configDirectory, "sacks.json")
 
         fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
             saveConfig("auto-save-60s")
@@ -134,10 +138,38 @@ class ConfigManager {
             }
         }
 
+        if (sackFile!!.exists()) {
+            try {
+                val inputStreamReader = InputStreamReader(FileInputStream(sackFile!!), StandardCharsets.UTF_8)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                val builder = StringBuilder()
+                for (line in bufferedReader.lines()) {
+                    builder.append(line)
+                    builder.append("\n")
+                }
+
+
+                logger.log("load-sacks-now")
+                sackData = gson.fromJson(
+                    builder.toString(),
+                    SackData::class.java
+                )
+                logger.log("Loaded sacks from file")
+            } catch (error: Exception) {
+                error.printStackTrace()
+            }
+        }
+
         if (!::features.isInitialized) {
             logger.log("Creating blank config and saving to file")
             features = Features()
             saveConfig("blank config")
+        }
+
+        if (!::sackData.isInitialized) {
+            logger.log("Creating blank sack data and saving")
+            sackData = SackData()
+            saveSackData("blank config")
         }
 
         val features = SkyHanniMod.feature
@@ -176,6 +208,22 @@ class ConfigManager {
             }
         } catch (e: IOException) {
             logger.log("Could not save config file to $file")
+            e.printStackTrace()
+        }
+    }
+
+    fun saveSackData(reason: String) {
+        logger.log("saveSackData: $reason")
+        val file = sackFile ?: throw Error("Can not save sacks, sackFile is null!")
+        try {
+            logger.log("Saving sack file")
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            BufferedWriter(OutputStreamWriter(FileOutputStream(file), StandardCharsets.UTF_8)).use { writer ->
+                writer.write(gson.toJson(SkyHanniMod.sackData))
+            }
+        } catch (e: IOException) {
+            logger.log("Could not save sacks file to $file")
             e.printStackTrace()
         }
     }
