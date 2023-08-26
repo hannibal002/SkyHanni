@@ -166,16 +166,16 @@ class PowderTracker {
         val display = both.get(currentDisplayMode)
         val rewards = display.rewards
 
-        addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7(${chestInfo.perHour.roundToInt().addSeparators()}/h)")
+        addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7(${chestInfo.perHour.toInt().addSeparators()}/h)")
         addAsSingletonList("§bDouble Powder: ${if (doublePowder) "§aActive!" else "§cInactive!"}")
 
         val mithril = PowderChestReward.entries[0]
         val mithrilCount = rewards.getOrDefault(mithril, 0).addSeparators()
-        addAsSingletonList("§b$mithrilCount ${mithril.displayName} §7(${mithrilInfo.perHour.roundToInt().addSeparators()}/h)")
+        addAsSingletonList("§b$mithrilCount ${mithril.displayName} §7(${mithrilInfo.perHour.toInt().addSeparators()}/h)")
 
         val gemstone = PowderChestReward.entries[1]
         val gemstoneCount = rewards.getOrDefault(gemstone, 0).addSeparators()
-        addAsSingletonList("§b$gemstoneCount ${gemstone.displayName} §7(${gemstoneInfo.perHour.roundToInt().addSeparators()}/h)")
+        addAsSingletonList("§b$gemstoneCount ${gemstone.displayName} §7(${gemstoneInfo.perHour.toInt().addSeparators()}/h)")
 
         addAsSingletonList("")
 
