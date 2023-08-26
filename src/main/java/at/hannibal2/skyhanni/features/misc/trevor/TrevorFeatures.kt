@@ -28,7 +28,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.concurrent.fixedRateTimer
 
 
-class TrevorFeatures {
+object TrevorFeatures {
     private val trapperPattern =
         "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).".toPattern()
     private val talbotPatternAbove =
@@ -43,6 +43,10 @@ class TrevorFeatures {
     private var trapperID: Int = 56
     private var backupTrapperID: Int = 17
     private var timeLastWarped: Long = 0
+    private var questActive = false
+    private var lastChatPrompt = ""
+    private var lastChatPromptTime = -1L
+    private var teleportBlock = -1L
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
@@ -53,7 +57,7 @@ class TrevorFeatures {
                     if (config.trapperSolver) {
                         if (onFarmingIsland()) {
                             updateTrapper()
-                            TrevorSolver.findMob()
+                            if (questActive) TrevorSolver.findMob()
                         }
                     }
                 } catch (error: Throwable) {
@@ -103,6 +107,24 @@ class TrevorFeatures {
             val height = matcher.group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
         }
+
+        if (event.message.removeColor() == "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.") {
+            teleportBlock = System.currentTimeMillis()
+        }
+
+        if (event.message.contains("§r§7Click an option: §r§a§l[YES]§r§7 - §r§c§l[NO]")) {
+
+            val siblings = event.chatComponent.siblings
+
+            for (sibling in siblings) {
+                if (sibling.chatStyle.chatClickEvent != null) {
+                    if (sibling.chatStyle.chatClickEvent.value.contains("YES")) {
+                        lastChatPromptTime = System.currentTimeMillis()
+                        lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
+                    }
+                }
+            }
+        }
     }
 
     private fun updateTrapper() {
@@ -151,6 +173,7 @@ class TrevorFeatures {
         if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
             TrevorSolver.mobLocation = previousLocation
         }
+        questActive = active
     }
 
     @SubscribeEvent
@@ -192,20 +215,32 @@ class TrevorFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!config.warpToTrapper) return
         if (!onFarmingIsland()) return
         if (!Keyboard.getEventKeyState()) return
-        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (config.keyBindWarpTrapper != key) return
 
         Minecraft.getMinecraft().currentScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
         }
         if (NEUItems.neuHasFocus()) return
-
-        if (System.currentTimeMillis() - timeLastWarped < 3000) return
-        LorenzUtils.sendCommandToServer("warp trapper")
-        timeLastWarped = System.currentTimeMillis()
+        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
+        if (config.keyBindWarpTrapper == key) {
+            if (lastChatPromptTime != -1L && config.acceptQuest) {
+                if (System.currentTimeMillis() - 100 > lastChatPromptTime && System.currentTimeMillis() < lastChatPromptTime + 5000) {
+                    lastChatPromptTime = -1L
+                    LorenzUtils.sendCommandToServer(lastChatPrompt)
+                    lastChatPrompt = ""
+                    timeLastWarped = System.currentTimeMillis()
+                    return
+                }
+            }
+            if (System.currentTimeMillis() - timeLastWarped > 3000 && config.warpToTrapper) {
+                if (System.currentTimeMillis() < teleportBlock + 5000) {
+                    return
+                }
+                LorenzUtils.sendCommandToServer("warp trapper")
+                timeLastWarped = System.currentTimeMillis()
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

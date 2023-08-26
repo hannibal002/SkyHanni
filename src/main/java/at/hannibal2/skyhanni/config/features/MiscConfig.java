@@ -402,9 +402,16 @@ public class MiscConfig {
         public boolean warpToTrapper = false;
 
         @Expose
-        @ConfigOption(name = "Warp Hotkey", desc = "Press this key to warp to Trevor's Den.")
+        @ConfigOption(name = "Accept Trapper Quest", desc = "Click this key after the chat prompt to accept Trevor's quest.")
+        @ConfigEditorBoolean
+        public boolean acceptQuest = false;
+
+        @Expose
+        @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den and to accept the quest." +
+                "§eRequires the above settings to be toggled")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int keyBindWarpTrapper = Keyboard.KEY_NONE;
+
 
         @Expose
         @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")

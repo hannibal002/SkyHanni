@@ -319,7 +319,7 @@ class SkyHanniMod {
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(InquisitorWaypointShare)
-        loadModule(TrevorFeatures())
+        loadModule(TrevorFeatures)
         loadModule(TrevorSolver)
         loadModule(BingoCardTips())
         loadModule(GardenVisitorDropStatistics)

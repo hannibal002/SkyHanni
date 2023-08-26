@@ -16,7 +16,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.passive.EntityChicken
 
 object TrevorSolver {
-    private val animalHealths = intArrayOf(100, 200, 400, 500, 1000, 2000, 5000, 10000, 20000) //future proofing for Derpy :)
+    private val animalHealths = intArrayOf(100, 200, 400, 500, 1000, 2000, 5000, 10000, 20000)
 
     private var currentMob: TrevorMobs? = null
     private var maxHeight: Double = 0.0
