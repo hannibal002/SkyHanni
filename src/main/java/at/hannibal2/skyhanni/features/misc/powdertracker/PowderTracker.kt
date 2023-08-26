@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.client.event.sound.SoundEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -78,8 +77,8 @@ class PowderTracker {
         val msg = event.message
         val both = currentLog() ?: return
 
-        if(config.greatExplorerMaxed){
-            uncovered.matchMatcher(msg){
+        if (config.greatExplorerMaxed) {
+            uncovered.matchMatcher(msg) {
                 both.modify {
                     it.totalChestPicked += 1
                 }
