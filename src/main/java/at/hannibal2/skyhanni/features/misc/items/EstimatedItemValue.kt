@@ -672,7 +672,7 @@ object EstimatedItemValue {
 
         if (gemstoneUnlockCosts.isNotEmpty() && gemstoneUnlockCosts.contains(internalName)) {
             for (slot in gemstoneUnlockCosts.get(internalName)!!) {
-                if (unlockedSlots.contains(slot.key)) { //|| (unlockedSlots.equals("null") && slotLoaded)) {
+                if (unlockedSlots.contains(slot.key)) {
                     for (ingredients in slot.value) {
                         val ingredient = Ingredient(manager, ingredients)
 
