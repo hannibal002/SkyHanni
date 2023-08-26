@@ -768,6 +768,11 @@ public class MiscConfig {
         public boolean onlyWhenPowderGrinding = false;
 
         @Expose
+        @ConfigOption(name = "Great Explorer", desc = "Enable this if your Great Explorer perk is maxed.")
+        @ConfigEditorBoolean
+        public boolean greatExplorerMaxed = false;
+
+        @Expose
         @ConfigOption(
                 name = "Text Format",
                 desc = "Drag text to change the appearance of the overlay."

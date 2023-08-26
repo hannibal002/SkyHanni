@@ -40,7 +40,7 @@ enum class PowderChestReward(val displayName: String, val pattern: Pattern) {
 
     FTX_3070("§9FTX 3070", "§aYou received §r§f(?<amount>.*) §r§9FTX 3070§r§a.".toPattern()),
     ELECTRON_TRANSIMTTER("§9Electron Transmitter", "§aYou received §r§f(?<amount>.*) §r§9Electron Transmitter§r§a.".toPattern()),
-    ROBOTRON_REFLECTOR("§9Robotron Reflector", "§§aYou received §r§f(?<amount>.*) §r§9Robotron Reflector§r§a.".toPattern()),
+    ROBOTRON_REFLECTOR("§9Robotron Reflector", "§aYou received §r§f(?<amount>.*) §r§9Robotron Reflector§r§a.".toPattern()),
     SUPERLITE_MOTOR("§9Superlite Motor", "§aYou received §r§f(?<amount>.*) §r§9Superlite Motor§r§a.".toPattern()),
     CONTROL_SWITCH("§9Control Switch", "§aYou received §r§f(?<amount>.*) §r§9Control Switch§r§a.".toPattern()),
     SYNTHETIC_HEART("§9Synthetic Heart", "§aYou received §r§f(?<amount>.*) §r§9Synthetic Heart§r§a.".toPattern()),

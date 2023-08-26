@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraftforge.client.event.sound.SoundEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -23,6 +24,7 @@ class PowderTracker {
     private val config get() = SkyHanniMod.feature.misc.powderTrackerConfig
     private var display = emptyList<List<Any>>()
     private val picked = "§6You have successfully picked the lock on this chest!".toPattern()
+    private val uncovered = "§aYou uncovered a treasure chest!".toPattern()
     private val powderEvent = ".*§r§b§l2X POWDER STARTED!.*".toPattern()
     private val powderEnded = ".*§r§b§l2X POWDER ENDED!.*".toPattern()
     private var lastChestPicked = 0L
@@ -76,6 +78,16 @@ class PowderTracker {
         val msg = event.message
         val both = currentLog() ?: return
 
+        if(config.greatExplorerMaxed){
+            uncovered.matchMatcher(msg){
+                both.modify {
+                    it.totalChestPicked += 1
+                }
+                isGrinding = true
+                lastChestPicked = System.currentTimeMillis()
+            }
+        }
+
         picked.matchMatcher(msg) {
             both.modify {
                 it.totalChestPicked += 1
@@ -83,6 +95,8 @@ class PowderTracker {
             isGrinding = true
             lastChestPicked = System.currentTimeMillis()
         }
+
+
         powderEvent.matchMatcher(msg) { doublePowder = true }
         powderEnded.matchMatcher(msg) { doublePowder = false }
 
