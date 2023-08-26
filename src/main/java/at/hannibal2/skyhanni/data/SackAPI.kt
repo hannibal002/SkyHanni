@@ -119,21 +119,25 @@ object SackAPI {
                                 "Rough" -> {
                                     gem.rough = stored
                                     gem.roughPrice = internalName.sackPrice(stored)
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
                                 }
 
                                 "Flawed" -> {
                                     gem.flawed = stored
                                     gem.flawedPrice = internalName.sackPrice(stored)
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
                                 }
 
                                 "Fine" -> {
                                     gem.fine = stored
                                     gem.finePrice = internalName.sackPrice(stored)
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
                                 }
 
                                 "Flawless" -> {
                                     gem.flawless = stored
                                     gem.flawlessPrice = internalName.sackPrice(stored)
+                                    if (savingSacks) setSackItem(internalName, stored.formatNumber().toInt())
                                 }
                             }
                             gemstoneItem[name] = gem
