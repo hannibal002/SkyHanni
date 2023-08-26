@@ -229,6 +229,7 @@ object SackAPI {
     fun sackChange(event: SackChangeEvent) {
         sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return
 
+        // this could break if one of the added/removed is shown and the other is in the other category
         val justChanged = mutableListOf<NEUInternalName>()
 
         for (change in event.sackChanges) {
@@ -238,10 +239,10 @@ object SackAPI {
                 val oldData = sackData[change.internalName]
                 var newAmount = oldData!!.amount + change.delta
                 if (newAmount < 0) newAmount = 0
-                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, oldData.isOutdated) }
+                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, oldData.outdatedStatus) }
             } else {
                 val newAmount = if (change.delta > 0) change.delta else 0
-                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, true) }
+                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, 2) }
             }
         }
 
@@ -249,31 +250,30 @@ object SackAPI {
             for (item in sackData) {
                 if (item.key in justChanged) continue
                 val oldData = sackData[item.key]
-                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, true) }
+                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, 1) }
             }
         }
         saveSackData()
     }
 
     private fun setSackItem(item: NEUInternalName, amount: Int) {
-        sackData = sackData.editCopy { this[item] = SackItem(amount, false) }
+        sackData = sackData.editCopy { this[item] = SackItem(amount, 0) }
     }
 
     fun fetchSackItem(item: NEUInternalName): SackItem? {
-        sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return SackItem(-1, true)
+        sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return SackItem(-1, -1)
 
         if (sackData.containsKey(item)) {
             return sackData[item]
         }
 
-        sackData = sackData.editCopy { this[item] = SackItem(0, true) }
+        sackData = sackData.editCopy { this[item] = SackItem(0, 2) }
         saveSackData()
         return sackData[item]
     }
 
     private fun saveSackData() {
         ProfileStorageData.profileSpecific?.sacks?.sackContents = sackData
-        println("saved sack data")
     }
 
     data class SackGemstone(
@@ -304,9 +304,10 @@ object SackAPI {
     )
 }
 
+// status -1 = fetching data failed, 0 = < 1% of being wrong, 1 = 10% of being wrong, 2 = is 100% wrong
 data class SackItem(
     @Expose val amount: Int,
-    @Expose val isOutdated: Boolean
+    @Expose val outdatedStatus: Int
 )
 
 private val gemstoneMap = mapOf(
