@@ -155,11 +155,11 @@ object SackDisplay {
         STORED_DESC("Stored D", "Stored Descending"),
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending"), ;
+        PRICE_ASC("Price A", "Price Ascending")
     }
 
     enum class PriceFrom(val displayName: String) {
         BAZAAR("Bazaar Price"),
-        NPC("Npc Price"), ;
+        NPC("Npc Price")
     }
 }

@@ -12,18 +12,21 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
 object SackAPI {
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
+    private var lastOpenedInventory = ""
 
     var inSackInventory = false
     private val sackPattern = "^(.* Sack|Enchanted .* Sack)$".toPattern()
@@ -57,6 +60,8 @@ object SackAPI {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
+        val isNewInventory = inventoryName != lastOpenedInventory
+        lastOpenedInventory = inventoryName
         val match = sackPattern.matcher(inventoryName).matches()
         if (!match) return
         val stacks = event.inventoryItems
@@ -66,8 +71,7 @@ object SackAPI {
         sackRarity = inventoryName.getTrophyRarity()
         inSackInventory = true
         stackList.putAll(stacks)
-        // this gets called even when taking item in/out of sack which will break later detection
-        SackDisplay.update(true)
+        SackDisplay.update(isNewInventory)
     }
 
     private fun String.getTrophyRarity(): TrophyRarity? {
@@ -93,6 +97,7 @@ object SackAPI {
     }
 
     fun getSacksData(savingSacks: Boolean) {
+        if (savingSacks) sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return
         for ((_, stack) in stackList) {
             val name = stack.name ?: continue
             val lore = stack.getLore()
@@ -142,6 +147,7 @@ object SackAPI {
                         item.colorCode = group("color")
                         item.stored = stored
                         item.total = group("total")
+                        if (savingSacks) setSackItem(item.internalName, item.stored.formatNumber().toInt())
                         item.price = if (isTrophySack) {
                             val trophyName =
                                 internalName.asString().lowercase().substringBeforeLast("_").replace("_", "")
@@ -173,10 +179,13 @@ object SackAPI {
                 }
             }
         }
+        if (savingSacks) saveSackData()
     }
 
+    private var sackData = mapOf<NEUInternalName, SackItem>()
 
     data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
+
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
     @SubscribeEvent
@@ -213,7 +222,7 @@ object SackAPI {
 
     @SubscribeEvent
     fun sackChange(event: SackChangeEvent) {
-        val sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return
+        sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return
 
         val justChanged = mutableListOf<NEUInternalName>()
 
@@ -222,12 +231,12 @@ object SackAPI {
 
             if (sackData.containsKey(change.internalName)) {
                 val oldData = sackData[change.internalName]
-                var newAmount = oldData!!.amount
+                var newAmount = oldData!!.amount + change.delta
                 if (newAmount < 0) newAmount = 0
-                sackData[change.internalName] = SackItem(newAmount, oldData.isOutdated)
+                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, oldData.isOutdated) }
             } else {
                 val newAmount = if (change.delta > 0) change.delta else 0
-                sackData[change.internalName] = SackItem(newAmount, true)
+                sackData = sackData.editCopy { this[change.internalName] = SackItem(newAmount, true) }
             }
         }
 
@@ -235,20 +244,31 @@ object SackAPI {
             for (item in sackData) {
                 if (item.key in justChanged) continue
                 val oldData = sackData[item.key]
-                sackData[item.key] = SackItem(oldData!!.amount, true)
+                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, true) }
             }
         }
+        saveSackData()
+    }
+
+    private fun setSackItem(item: NEUInternalName, amount: Int) {
+        sackData = sackData.editCopy { this[item] = SackItem(amount, false) }
     }
 
     fun fetchSackItem(item: NEUInternalName): SackItem? {
-        val sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return SackItem(-1, true)
+        sackData = ProfileStorageData.profileSpecific?.sacks?.sackContents ?: return SackItem(-1, true)
 
         if (sackData.containsKey(item)) {
             return sackData[item]
         }
 
-        sackData[item] = SackItem(0, true)
+        sackData = sackData.editCopy { this[item] = SackItem(0, true) }
+        saveSackData()
         return sackData[item]
+    }
+
+    private fun saveSackData() {
+        ProfileStorageData.profileSpecific?.sacks?.sackContents = sackData
+        println("saved sack data")
     }
 
     data class SackGemstone(
@@ -280,8 +300,8 @@ object SackAPI {
 }
 
 data class SackItem(
-    val amount: Int,
-    val isOutdated: Boolean
+    @Expose val amount: Int,
+    @Expose val isOutdated: Boolean
 )
 
 private val gemstoneMap = mapOf(
@@ -293,31 +313,4 @@ private val gemstoneMap = mapOf(
     "Jasper Gemstones" to "ROUGH_JASPER_GEM".asInternalName(),
     "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
     "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
-)
-
-data class SackGemstone(
-    var internalName: NEUInternalName = NEUInternalName.NONE,
-    var rough: String = "0",
-    var flawed: String = "0",
-    var fine: String = "0",
-    var flawless: String = "0",
-    var roughPrice: Int = 0,
-    var flawedPrice: Int = 0,
-    var finePrice: Int = 0,
-    var flawlessPrice: Int = 0,
-)
-
-data class SackRune(
-    var stack: ItemStack? = null,
-    var lvl1: String = "0",
-    var lvl2: String = "0",
-    var lvl3: String = "0",
-)
-
-data class SackOtherItem(
-    var internalName: NEUInternalName = NEUInternalName.NONE,
-    var colorCode: String = "",
-    var stored: String = "0",
-    var total: String = "0",
-    var price: Int = 0,
 )
