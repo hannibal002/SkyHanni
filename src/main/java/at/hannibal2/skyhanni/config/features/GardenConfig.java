@@ -339,7 +339,7 @@ public class GardenConfig {
     @ConfigOption(
             name = "Progress Display",
             desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
-                    "§cRequires a tool with either a counter or cultivating enchantment."
+                    "§eRequires a tool with either a counter or cultivating enchantment for full accuracy."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
