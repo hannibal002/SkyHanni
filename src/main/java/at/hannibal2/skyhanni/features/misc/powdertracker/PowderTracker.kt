@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -26,12 +27,14 @@ class PowderTracker {
     private val uncovered = "§aYou uncovered a treasure chest!".toPattern()
     private val powderEvent = ".*§r§b§l2X POWDER STARTED!.*".toPattern()
     private val powderEnded = ".*§r§b§l2X POWDER ENDED!.*".toPattern()
+    private val powderBossBar = "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r".toPattern()
     private var lastChestPicked = 0L
     private var isGrinding = false
     private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val mithrilInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
+    private var powderTimer = ""
     private var currentDisplayMode = DisplayMode.TOTAL
     private var inventoryOpen = false
     private var currentSessionData = mutableMapOf<Int, Storage.ProfileSpecific.PowderTracker>()
@@ -95,7 +98,6 @@ class PowderTracker {
             lastChestPicked = System.currentTimeMillis()
         }
 
-
         powderEvent.matchMatcher(msg) { doublePowder = true }
         powderEnded.matchMatcher(msg) { doublePowder = false }
 
@@ -103,7 +105,10 @@ class PowderTracker {
             reward.pattern.matchMatcher(msg) {
                 both.modify {
                     val count = it.rewards[reward] ?: 0
-                    it.rewards[reward] = count + group("amount").formatNumber()
+                    var amount = group("amount").formatNumber()
+                    if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder)
+                        amount *= 2
+                    it.rewards[reward] = count + amount
                 }
             }
         }
@@ -113,7 +118,12 @@ class PowderTracker {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!config.onlyWhenPowderGrinding) return
+        if (event.repeatSeconds(1)) {
+            powderBossBar.matchMatcher(BossStatus.bossName) {
+                doublePowder = true
+                powderTimer = group("timer")
+            }
+        }
         if (System.currentTimeMillis() - lastChestPicked > 60_000) {
             isGrinding = false
         }
@@ -136,6 +146,7 @@ class PowderTracker {
         chestInfo.perHour = 0.0
         chestInfo.stoppedChecks = 0
         chestInfo.perMin.clear()
+        doublePowder = false
         saveAndUpdate()
     }
 
