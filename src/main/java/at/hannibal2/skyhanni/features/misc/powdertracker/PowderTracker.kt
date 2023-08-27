@@ -216,10 +216,13 @@ class PowderTracker {
             addAsSingletonList("§5${flawless}§7-§9${fine}§7-§a${flawed}§f-${rough} $color$gem Gemstone")
         }
 
+        var totalParts = 0L
         for (reward in PowderChestReward.entries.subList(26, 32)) { // robots part
             val count = rewards.getOrDefault(reward, 0).addSeparators()
+            totalParts += count.toLong()
             addAsSingletonList("§b$count ${reward.displayName}")
         }
+        addAsSingletonList("§b$totalParts §9Total Robot Parts")
 
         val goblinEgg = rewards.getOrDefault(PowderChestReward.GOBLIN_EGG, 0)
         val greenEgg = rewards.getOrDefault(PowderChestReward.GREEN_GOBLIN_EGG, 0)

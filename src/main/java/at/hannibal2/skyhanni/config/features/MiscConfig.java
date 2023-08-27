@@ -798,6 +798,7 @@ public class MiscConfig {
                         "§b14 §9Superlite Motor",
                         "§b14 §9Control Switch",
                         "§b14 §9Synthetic Heart",
+                        "§b14 §9Total Robot Parts",
 
                         "§90§7-§a0§7-§c0§f-§e0§f-§30 §fGoblin Egg",
 
