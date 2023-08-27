@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.config.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.commands.SimpleCommand.ProcessCommandRunnable
-import at.hannibal2.skyhanni.config.commands.SimpleCommand.TabCompleteRunnable
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.features.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -27,6 +25,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -109,7 +108,7 @@ object Commands {
             DefaultConfigFeatures.onCommand(
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
             )
-        },DefaultConfigFeatures::onComplete)
+        }, DefaultConfigFeatures::onComplete)
     }
 
     private fun usersNormal() {
@@ -297,7 +296,9 @@ object Commands {
     private fun registerCommand(
         name: String,
         description: String,
-        function: (Array<String>) -> Unit) = registerCommand0(name, description, function)
+        function: (Array<String>) -> Unit
+    ) = registerCommand0(name, description, function)
+
     private fun registerCommand0(
         name: String,
         description: String,
