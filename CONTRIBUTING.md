@@ -86,7 +86,7 @@ accidentally.
     - Paid only mods.
     - Mods that have reached the end of life. (Rip SBA, Dulkir and Soopy)
     - The mod has, according to Hypixel rules, illegal features ("cheat mod").
-    - If you can improve the existing feature, that is meaningful.
+    - If you can improve the existing feature in a meaningful way.
 - All classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
