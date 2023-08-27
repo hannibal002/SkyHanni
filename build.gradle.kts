@@ -82,7 +82,7 @@ dependencies {
         isTransitive = false
     }
     @Suppress("VulnerableLibrariesLocal")
-    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+    devenvMod("com.github.notenoughupdates:notenoughupdates:v2.1.1-alpha19:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
