@@ -80,8 +80,10 @@ accidentally.
 ## DiscordIPC
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
-Specifically, we use [TirelessTraveler's Fork](https://github.com/ILikePlayingGames/DiscordIPC) of a fork of a fork of the [original](https://github.com/jagrosh/DiscordIPC). 
-For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+Specifically, we use [TirelessTraveler's Fork](https://github.com/ILikePlayingGames/DiscordIPC) of a fork of a fork of
+the [original](https://github.com/jagrosh/DiscordIPC).
+For info on usage, look
+at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
 # Coding Styles and Conventions
 
