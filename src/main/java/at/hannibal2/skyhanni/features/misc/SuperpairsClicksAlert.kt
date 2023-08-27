@@ -45,7 +45,7 @@ class SuperpairsClicksAlert {
             (event.inventoryName.contains("Chronomatron")
                     && ((event.inventoryItems[4]?.displayName?.removeColor()
                 ?.let { currentRoundRegex.find(it) }
-                ?.groups?.get(1)?.value?.toInt() ?: return) > roundsNeeded))
+                ?.groups?.get(1)?.value?.toInt() ?: -1) > roundsNeeded))
 
             || (event.inventoryName.contains("Ultrasequencer")
                     && event.inventoryItems.entries
