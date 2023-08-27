@@ -120,7 +120,6 @@ class PowderTracker {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
             powderBossBar.matchMatcher(BossStatus.bossName) {
-                println("name: ${BossStatus.bossName}")
                 doublePowder = true
                 powderTimer = group("time")
                 saveAndUpdate()
