@@ -92,6 +92,5 @@ object GardenCropMilestones {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden") ?: return
         cropMilestoneData = data.crop_milestones
-        println("loaded stuff: $cropMilestoneData")
     }
 }
