@@ -159,10 +159,6 @@ object FFStats {
         cropPage[FortuneStats.CROP_TOTAL] = Pair(
             cropPage.toList().sumOf { it.second.first },
             cropPage.toList().sumOf { it.second.second })
-
-        if (tool.getInternalName_old().contains("DICER")) {
-            cropPage[FortuneStats.DICER] = Pair(33.0, 33.0)
-        }
     }
 
     private fun getEquipmentFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
