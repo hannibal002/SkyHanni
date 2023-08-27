@@ -6,13 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -174,7 +168,7 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
                 versionInfo.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
                 versionInfo.setHorizontalAlignment(SwingConstants.CENTER);
                 versionInfo.setPreferredSize(new Dimension(w, h));
-                versionInfo.setText("SkyHanni by hannibal2, Installer by Biscuit\nMinecraft 1.8.9");
+                versionInfo.setText("SkyHanni by hannibal2, Installer by Biscuit");
 
                 y += h;
             } catch (Throwable ivjExc) {
