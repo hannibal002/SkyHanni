@@ -193,6 +193,8 @@ public class GardenConfig {
                         "§9Dedication IV",
                         "§9Music Rune",
                         "§cSpace Helmet",
+                        "§9Cultivating I",
+                        "§9Replenish I",
                 }
         )
         public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
