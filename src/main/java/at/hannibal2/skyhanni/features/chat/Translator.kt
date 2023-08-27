@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -34,6 +35,8 @@ class Translator {
         if (e.type != 0.toByte()) return // If this is not a player-sent message, return
 
         val chatComponent = e.message
+        // If you want to help me debug, experience the bug while this line is uncommented (spams logs)
+//        consoleLog(chatComponent.toString())
         val message = chatComponent.unformattedText
         if (!messageContentRegex.matches(message.removeColor())) return
 
@@ -192,11 +195,10 @@ class Translator {
             val translation = getTranslationToEnglish(message)
 
             if (translation == "Unable to translate!") LorenzUtils.chat("§c[SkyHanni] Unable to translate message :(")
-            else LorenzUtils.chat("§6[SkyHanni] §eFound translation: $translation")
+            else LorenzUtils.chat("§e[SkyHanni] Found translation: $translation")
         }
 
         fun fromEnglish(args: Array<String>) {
-            // TODO: Still needs work when translating multiple sentences, but the current state is sufficient
             if (!SkyHanniMod.feature.chat.translator) return
             if (args.size < 2 || args[0].length != 2) { // args[0] is the language code
                 LorenzUtils.chat("§cUsage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
