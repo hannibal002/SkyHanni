@@ -236,7 +236,7 @@ object GuiRenderUtils {
         GlStateManager.scale(textScale, textScale, 1f)
         drawString(label, xPos * inverseScale, yPos * inverseScale)
         drawString(
-            "§2$current / ${DecimalFormat("0.#").format(maxValue)}☘",
+            "§2$current / ${DecimalFormat("0.##").format(maxValue)}☘",
             xPos * inverseScale,
             (yPos + 8) * inverseScale
         )

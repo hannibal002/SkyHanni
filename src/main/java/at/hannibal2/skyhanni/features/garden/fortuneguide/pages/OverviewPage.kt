@@ -114,7 +114,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             when (currentArmor) {
                 0 -> 50
                 4 -> 0
-                else -> 16.67
+                else -> 16.667
             }
         } else {
             when (currentArmor) {
