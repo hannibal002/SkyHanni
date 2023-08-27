@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.GemstoneSlotType
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
@@ -60,6 +61,8 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -669,10 +672,13 @@ object EstimatedItemValue {
         val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots").toString()
 
         var totalPrice = 0.0
+        val priceMap = mutableMapOf<String, Double>()
 
         if (gemstoneUnlockCosts.isNotEmpty() && gemstoneUnlockCosts.contains(internalName)) {
             for (slot in gemstoneUnlockCosts.get(internalName)!!) {
                 if (unlockedSlots.contains(slot.key)) {
+                    val previousTotal = totalPrice
+
                     for (ingredients in slot.value) {
                         val ingredient = Ingredient(manager, ingredients)
 
@@ -682,12 +688,27 @@ object EstimatedItemValue {
                             getPrice(ingredient.internalItemId) * ingredient.count
                         }
                     }
+
+                    val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
+                    val colorCode = GemstoneSlotType.getColorCode(splitSlot[0])
+                    val formattedPrice = NumberUtil.format(totalPrice - previousTotal)
+
+                    // eg. SAPPHIRE_1 -> Sapphire Slot 2
+                    val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
+                            // If the slot index is 0, we don't need to specify
+                            if (!splitSlot[1].equals("0")) {
+                                " " + (splitSlot[1].toInt() + 1)
+                            } else { "" }
+
+                    priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
                 }
             }
 
             // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
-            if (!unlockedSlots.equals("null"))
+            if (!unlockedSlots.equals("null")) {
                 list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
+                list += priceMap.sortedDesc().keys
+            }
         }
         return totalPrice
     }
