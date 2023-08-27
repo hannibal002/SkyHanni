@@ -120,8 +120,10 @@ class PowderTracker {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
             powderBossBar.matchMatcher(BossStatus.bossName) {
+                println("name: ${BossStatus.bossName}")
                 doublePowder = true
-                powderTimer = group("timer")
+                powderTimer = group("time")
+                saveAndUpdate()
             }
         }
         if (System.currentTimeMillis() - lastChestPicked > 60_000) {
@@ -183,7 +185,7 @@ class PowderTracker {
 
         val chestPerHour = if (chestInfo.perHour < 0) 0 else chestInfo.perHour.toInt().addSeparators()
         addAsSingletonList("§d${display.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
-        addAsSingletonList("§bDouble Powder: ${if (doublePowder) "§aActive!" else "§cInactive!"}")
+        addAsSingletonList("§bDouble Powder: ${if (doublePowder) "§aActive! §7($powderTimer)" else "§cInactive!"}")
 
         val mithril = PowderChestReward.entries[0]
         val mithrilCount = rewards.getOrDefault(mithril, 0).addSeparators()
