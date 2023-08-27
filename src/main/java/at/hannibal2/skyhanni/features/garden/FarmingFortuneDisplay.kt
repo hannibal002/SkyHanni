@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
@@ -194,10 +194,11 @@ class FarmingFortuneDisplay {
         }
 
         fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
+            if (cropType == null) return 0.0
             val dedicationLevel = tool?.getEnchantments()?.get("dedication") ?: 0
             val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
-            val cropMilestone = GardenCropMilestones.getTierForCrops(
-                cropType?.getCounter() ?: 0
+            val cropMilestone = GardenCropMilestones.getTierForCropCount(
+                cropType.getCounter(), cropType
             )
             return dedicationMultiplier * cropMilestone
         }

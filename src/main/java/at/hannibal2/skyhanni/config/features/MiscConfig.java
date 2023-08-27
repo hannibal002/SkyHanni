@@ -2,15 +2,7 @@ package at.hannibal2.skyhanni.config.features;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorAccordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.moulberry.moulconfig.annotations.*;
 import io.github.moulberry.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
@@ -30,6 +22,26 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean petDisplay = false;
+
+    @Expose
+    @ConfigOption(name = "Pet Experience Tooltip", desc = "Show the currently active pet.")
+    @ConfigAccordionId(id = 0)
+    @Accordion
+    public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
+
+    public static class PetExperienceToolTipConfig {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing shift key.")
+        @ConfigEditorBoolean
+        public boolean petDisplay = true;
+
+        @Expose
+        @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
+        @ConfigEditorBoolean
+        public boolean showAlways = false;
+
+    }
 
     @Expose
     public Position petDisplayPos = new Position(-330, -15, false, true);
@@ -128,10 +140,10 @@ public class MiscConfig {
     public Position crimsonIsleReputationHelperPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Reputation Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
-    @ConfigEditorBoolean
+    @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
+    @ConfigEditorDropdown(values = {"Always", "Only With Hotkey", "Never"})
     @ConfigAccordionId(id = 6)
-    public boolean crimsonIsleReputationLocation = false;
+    public int crimsonIsleReputationShowLocation = 1;
 
     @Expose
     @ConfigOption(name = "Tia Relay", desc = "")
@@ -265,6 +277,17 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
     public boolean estimatedIemValueAlwaysEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
+    @ConfigEditorSlider(
+            minValue = 1,
+            maxValue = 30,
+            minStep = 1
+    )
+    @ConfigAccordionId(id = 11)
+    public Property<Integer> estimatedIemValueEnchantmentsCap = Property.of(7);
+
 
     @Expose
     @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")

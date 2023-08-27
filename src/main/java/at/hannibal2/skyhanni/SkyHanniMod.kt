@@ -126,7 +126,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.7",
+    version = "0.20.Beta.11",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -153,7 +153,7 @@ class SkyHanniMod {
         loadModule(OtherInventoryData)
         loadModule(TabListData())
         loadModule(RenderGuiData())
-        loadModule(GardenCropMilestones())
+        loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
@@ -293,6 +293,7 @@ class SkyHanniMod {
         loadModule(GardenVisitorColorNames())
         loadModule(TeleportPadCompactName())
         loadModule(AnitaMedalProfit())
+        loadModule(AnitaExtraFarmingFortune())
         loadModule(ComposterDisplay())
         loadModule(GardenComposterInventoryFeatures())
         loadModule(MinionCollectLogic())
@@ -379,6 +380,7 @@ class SkyHanniMod {
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
+        loadModule(PetExpTooltip())
         loadModule(Translator())
 
         init()
@@ -393,6 +395,7 @@ class SkyHanniMod {
         loadModule(TestCopyBestiaryValues)
         loadModule(HighlightMissingRepoItems())
         loadModule(ParkourWaypointSaver())
+        loadModule(TestShowSlotNumber())
     }
 
     @Mod.EventHandler

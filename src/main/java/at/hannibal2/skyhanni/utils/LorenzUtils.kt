@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -32,6 +33,8 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
@@ -128,7 +131,7 @@ object LorenzUtils {
     // TODO replace all calls with regex
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
-    //TODO change to Int
+    // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
@@ -267,9 +270,9 @@ object LorenzUtils {
         }
     }
 
-    fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
+    fun isShiftKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LSHIFT) || OSUtils.isKeyHeld(Keyboard.KEY_RSHIFT)
 
-    fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
+    fun isControlKeyDown() = OSUtils.isKeyHeld(Keyboard.KEY_LCONTROL) || OSUtils.isKeyHeld(Keyboard.KEY_RCONTROL)
 
     // MoulConfig is in Java, I don't want to downgrade this logic
     fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
@@ -409,8 +412,8 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
     fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
@@ -473,5 +476,22 @@ object LorenzUtils {
     fun Field.removeFinal(): Field {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
+    }
+
+    fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
+
+    private val recalculateDerpy =
+        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+
+    val isDerpy get() = recalculateDerpy.getValue()
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun runDelayed(duration: Duration, runnable: () -> Unit) {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runnable()
+            }
+        }, duration.inWholeMilliseconds)
     }
 }

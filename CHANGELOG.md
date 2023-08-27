@@ -25,6 +25,15 @@
     + Intended to be used with Harp Keybinds
 + Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
 + Added timer till shared inquisitors will despawn. - hannibal2
++ Account upgrade complete reminder. - appable0
++ Chat message how many places you dropped in the farming weight lb when joining garden.
++ Added command /shfarmingprofile [player name]
++ Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
++ Pet Experience Tooltip
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
+      shift key.
++ Anita Extra Farming Fortune:
+    + Show current tier and cost to max out in the item tooltip.
 
 ### Changes
 
@@ -41,6 +50,19 @@
 + Telling the user about the bypass hotkey when the visitor drop warning blocks a visitor refusal. - CalMWolfs
 + Added warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
 + Shared inquisitor waypoints will now get removed after 75 seconds. - hannibal2
++ Chest Value now works with Backpack and Ender Chest. - HiZe
+    + Only works if NEU storage is not active.
++ Removed distance checks when detecting sea creatures for fishing timer. - hannibal2
++ Added Enchantments Cap to EstimatedItemValue. - hannibal2
+    + Only show the top # most expensive enchantments on an item.
++ Count sea emperor and rider of the deep twice against sea creature cap.
++ Clicking on the chat message from farming weight will run the /shfarmingprofile command.
++ Changed Bestiary Display number format - HiZe
++ Changed ff buffs for Elephant and Anita.
++ Changed chicken head timer from 20s to 5s.
++ Added option to show reputation locations only when pressing the hotkey.
++ Delay the custom garden level up message by a few milliseconds to not cut into the garden milestone message.
++ Added runic support for Zealots/Bruiser.
 
 ### Fixes
 
@@ -65,6 +87,24 @@
 + Fixed a typo in an error message. - Obsidian
 + Fixed Chest Value fails to detect chests when using a resource pack. - HiZe
 + Fixed Sea Creature Timer not working on barn. - hannibal2
++ Arachne boss highlighter no longer requires damage indicator to be enabled. - hannibal2
++ /shtrackcollection Cactus now detects cactus green. hannibal2
++ Fixed arachne minis falsely show in damage indicator.
++ Fixed rare cases where special laptop keys trigger behavior unintended. - hannibal2
++ Fixed rendering problems with stack background and custom text lore. - nea
++ Hopefully fixed Derpy problems with Trevor Trapper, Arachne, Arachne Keeper and Zealots.
++ Fixed Anita upgrade detection from the Anita Shop inventory.
++ Fixed error message when clicking a finished upgrade in the community shop.
+
+### Removed Features
+
+- Removed **Broken Wither Impact** detection. - hannibal2
+    - (Hypixel fixed their bug, finally)
+- Removed remaining **Hypixel API** support for still existing legacy api keys. - hannibal2
+    - This should not affect much
+    -
+- Removed wishing compass in item number.
+    - Every Wishing Compass now only has one use instead of three.
 
 ## Version 0.19
 

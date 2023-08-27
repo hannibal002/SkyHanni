@@ -1,6 +1,6 @@
 # SkyHanni - List of all Features
 
-> Use /skyhanni or /sh to open the SkyHanni config in game
+Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Chat Filter
 
@@ -307,6 +307,7 @@
     + provided by the elite skyblock farmers.
     + next leaderboard position eta.
     + Instantly showing the next player in the lb when passing someone on the leaderboard. - Kaeso
+    + Chat message how many places you dropped in the farming weight lb when joining garden.
 + **Dicer Counter** - Count RNG drops for Melon Dicer and Pumpkin Dicer.
 + **Warn When Close** - Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. Useful for
   switching to a different pet for leveling.
@@ -325,8 +326,12 @@
   require any crop)
 + **Money per Hour Advanced stats** - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (
   Suggestion: Enable Compact Price as well for this)
-+ **Anita Medal Profit** - Helps to identify profitable items to buy at the Anita item shop and potential profit from
-  selling the item at the auction house.
++ **Anita Inventory**
+    + **Medal Profit**
+        + Helps to identify profitable items to buy at the Anita item shop and potential profit from
+        + selling the item at the auction house.
+    + **Extra Farming Fortune**
+        + Show current tier and cost to max out in the item tooltip.
 + **Composter Compact Display** - Displays the compost data from the tab list in a compact form as gui element.
 + **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
 + **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
@@ -472,6 +477,8 @@
   particular item based on the current crop speed.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
++ **/shfarmingprofile [player name]**
+    + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 
 ## Misc
 
@@ -553,3 +560,7 @@
 + **Inventory Numbers**
     + Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
     + Only on Private island.
++ Account upgrade complete reminder. - appable0
++ Pet Experience Tooltip
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
+      shift key.

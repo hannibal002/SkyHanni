@@ -56,7 +56,9 @@ class MobHighlight {
         }
 
         if (config.zealotBruiserHighlighter) {
-            if ((maxHealth == 65_000 || maxHealth == 13_000) && entity is EntityEnderman) {
+            val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 3 // runic
+            val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 3 // runic
+            if ((isZealot || isBruiser) && entity is EntityEnderman) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_AQUA.toColor().withAlpha(127))
                 { config.zealotBruiserHighlighter }
                 RenderLivingEntityHelper.setNoHurtTime(entity) { config.zealotBruiserHighlighter }
@@ -86,7 +88,7 @@ class MobHighlight {
         ) return
 
         val maxHealth = entity.baseMaxHealth
-        if (maxHealth == 12 || maxHealth == 4000 || maxHealth == 20000) {
+        if (maxHealth == 12 || maxHealth == 4000) {
             markArachneMinis(entity)
         } else {
             markArachne(entity)

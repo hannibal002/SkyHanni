@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -99,7 +100,7 @@ class CollectionTracker {
         private fun setNewCollection(internalName: NEUInternalName, name: String) {
             val foundAmount = CollectionAPI.getCollectionCounter(internalName)
             if (foundAmount == null) {
-                LorenzUtils.chat("§c[SkyHanni] Item $name is not in the collection data! (Maybe the API is disabled or try to open the collection inventory)")
+                LorenzUtils.chat("§c[SkyHanni] $name collection not found. Try to open the collection inventory!")
                 return
             }
             this.internalName = internalName
@@ -137,8 +138,16 @@ class CollectionTracker {
             })
         }
 
-        private fun countCurrentlyInInventory() =
-            InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
+        private fun countCurrentlyInInventory(): Int {
+            val cactus = "CACTUS".asInternalName()
+            val cactusGreen = "INK_SACK-2".asInternalName()
+            return InventoryUtils.countItemsInLowerInventory {
+                if (internalName == cactus && it.getInternalName() == cactusGreen) {
+                    return@countItemsInLowerInventory true
+                }
+                it.getInternalName() == internalName
+            }
+        }
 
         fun handleTabComplete(command: String): List<String>? {
             if (command != "shtrackcollection") return null

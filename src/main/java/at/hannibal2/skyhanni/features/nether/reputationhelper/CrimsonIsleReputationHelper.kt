@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMini
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
 import com.google.gson.JsonObject
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val config get() = SkyHanniMod.feature.misc
@@ -112,7 +112,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
 
         if (config.reputationHelperUseHotkey) {
-            if (!Keyboard.isKeyDown(config.reputationHelperHotkey)) {
+            if (!OSUtils.isKeyHeld(config.reputationHelperHotkey)) {
                 return
             }
         }
@@ -150,5 +150,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         val y = locationData[1].asDouble
         val z = locationData[2].asDouble - 1
         return LorenzVec(x, y, z)
+    }
+
+    fun showLocations() = when (config.crimsonIsleReputationShowLocation) {
+        0 -> true
+        1 -> OSUtils.isKeyHeld(config.reputationHelperHotkey)
+        else -> false
     }
 }

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -374,11 +375,16 @@ class MobFinder {
         if (entity.hasNameTagWith(1, "[§7Lv300§8] §cArachne") ||
             entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne")
         ) {
+            val maxHealth = entity.baseMaxHealth
+            // Ignore the minis
+            if (maxHealth == 12 || maxHealth.derpy() == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_SMALL)
         }
         if (entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") ||
             entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
         ) {
+            val maxHealth = entity.baseMaxHealth
+            if (maxHealth == 12 || maxHealth.derpy() == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_BIG)
         }
 

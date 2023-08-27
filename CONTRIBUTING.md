@@ -1,19 +1,139 @@
 # How to Contribute
 
-This tutorial explains how to set up a development environment to work on SkyHanni. We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
+This is a technical guide that helps Kotlin and Java developers understand how SkyHanni works, and provides the first
+steps for new Forge developers to take.
 
-## Basics
-SkyHanni is a 1.8.9 Forge mod, written in [Kotlin](https://kotlinlang.org/) and [Java](https://www.java.com/en/).
-We use a [gradle config](https://gradle.org/) to build the mod, 
-written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html).
+# Set up the development environment
 
-This development environment uses [DevAuth](https://github.com/DJtheRedstoner/DevAuth) to allow connecting to Hypixel while debugging in IntelliJ.
+When making changes to the code, it is recommended to use an IDE for live debugging and testing.
+This tutorial explains how to set up the development environment for SkyHanni.
+We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
-## Setup
+## Download IntelliJ
 
-### Download IntelliJ
-- Download IntelliJ from [JetBrains Website](https://www.jetbrains.com/idea/download/).
-- Use Community Edition.
-- ![image](https://github.com/hannibal002/SkyHanni/assets/24389977/68b9044c-42d0-44ba-85f7-9848a35a27b2)
+- Download IntelliJ from the [JetBrains Website](https://www.jetbrains.com/idea/download/).
+    - Use the Community Edition. (Scroll down a bit.)
 
-In Progress - more later
+## Cloning the project
+
+- Create an account on GitHub
+    - Go to https://github.com/hannibal002/SkyHanni
+    - Click on the fork button to create a fork.
+        - Leave the settings unchanged
+        - Click on `create fork`
+    - Open IntelliJ
+        - Link the GitHub account with IntelliJ.
+        - Install Git in IntelliJ.
+        - In IntelliJ, go to `new` → `project from version control`.
+        - Select `SkyHanni` from the list.
+        - Open the project.
+
+## Setting up IntelliJ
+
+SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**; just follow this guide:
+https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md
+
+# Software Used in SkyHanni
+
+## Core
+
+SkyHanni is a Forge mod for Minecraft 1.8.9, written in [Kotlin](https://kotlinlang.org/)
+and [Java](https://www.java.com/en/).
+
+We use a [Gradle configuration](https://gradle.org/) to build the mod,
+written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html):
+[build.gradle.kts](https://github.com/hannibal002/SkyHanni/blob/beta/build.gradle.kts)
+
+This start script will automatically download all required libraries.
+
+## NotEnoughUpdates
+
+SkyHanni requires NEU.
+We use NEU to get auction house and bazaar price data for items and to read
+the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
+and recipes.
+
+For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
+
+## Config
+
+SkyHanni uses the config system from NEU.
+
+For more information, see https://github.com/NotEnoughUpdates/MoulConfig
+
+## Mixin
+
+A system to inject code into the original Minecraft code.
+This library is not part of SkyHanni itself; it comes preinstalled with Forge.
+
+For more information, see https://github.com/SpongePowered/Mixin.
+
+## Repo
+
+SkyHanni uses a repo system to easily change static variables without the need for a mod update.
+The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
+A copy of all files in the repo is stored for every SkyHanni user under `.minecraft\config\skyhanni\repo`.
+On every game start, the copy gets updated (if outdated and if not manually disabled).
+When working with the repo, it is recommended to disable the manual repo update to prevent overriding your local changes
+accidentally.
+
+# Coding Styles and Conventions
+
+- Follow the [Hypixel Rules](https://hypixel.net/rules).
+- Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
+  and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
+- Do not copy features from other mods. Exceptions:
+    - Paid only mods.
+    - Mods that have reached the end of life. (Rip SBA, Dulkir and Soopy)
+    - The mod has, according to Hypixel rules, illegal features ("cheat mod").
+    - If you can improve the existing feature, that is meaningful.
+- All classes should be written in Kotlin, with a few exceptions:
+    - Config files in `at.hannibal2.skyhanni.config.features`
+    - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+    - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
+- Please use the existing event system, or expand on it. Do not use Forge events.
+    - (We inject the calls with Mixin)
+- Please use existing utils methods.
+- We try to avoid calling the NEU code too often.
+    - (We plan to remove NEU as a dependency in the future.)
+- We try not to use Forge-specific methods if possible.
+    - (We plan to switch to Fabric and Minecraft 1.20 in the future.)
+
+# Additional Useful Developement Tools
+
+## DevAuth
+
+[DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
+debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar, put it into the
+`mods` folder, and start the Minecraft launcher manually.
+
+- The library is already downloaded by Gradle.
+- Create the config folder (Windows only). For other OSes, use the guide from DJtheRedstoner.
+    - Navigate to `C:\Users\<your username>`
+    - Create a new folder `.devauth`
+    - Navigate to `C:\Users\<your username>\.devauth`
+    - Create a new file `config.toml`
+    - Paste this text into the file: (Don't change anything.)
+
+```
+defaultEnabled = true
+
+defaultAccount = "main"
+
+[accounts.main]
+type = "microsoft"
+```
+
+- Start Minecraft inside IntelliJ normally.
+    - Click on the link in the console and verify with a Mojang account.
+    - The verification process will reappear every few days (after the session token expires).
+
+## Hot Swap
+
+Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
+
+We use [dcevm](https://dcevm.github.io/) and the IntelliJ
+Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
+
+Follow [this](https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/)
+tutorial.

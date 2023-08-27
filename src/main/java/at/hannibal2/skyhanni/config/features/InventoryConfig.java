@@ -210,7 +210,7 @@ public class InventoryConfig {
 
         @Expose
         @ConfigOption(name = "Name Length", desc = "Reduce item name length to gain extra space on screen.\n§cCalculated in pixels!")
-        @ConfigEditorSlider(minStep = 1, minValue = 10, maxValue = 200)
+        @ConfigEditorSlider(minStep = 1, minValue = 100, maxValue = 150)
         public int nameLength = 100;
 
         @Expose
@@ -272,7 +272,7 @@ public class InventoryConfig {
                     "§bPet Level",
                     "§bMinion Tier",
                     "§bCrimson Armor",
-                    "§bWishing Compass",
+                    "§b§mWishing Compass§r §7(Disabled)",
                     "§bKuudra Key",
                     "§bSkill Level",
                     "§bCollection Level",

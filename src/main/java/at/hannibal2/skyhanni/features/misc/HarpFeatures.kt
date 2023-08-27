@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -38,7 +39,7 @@ class HarpFeatures {
         val chest = event.gui as? GuiChest ?: return
 
         for (key in keys) {
-            if (Keyboard.isKeyDown(key)) {
+            if (OSUtils.isKeyHeld(key)) {
                 if (lastClick.passedSince() > 200.milliseconds) {
                     Minecraft.getMinecraft().playerController.windowClick(
                         chest.inventorySlots.windowId,

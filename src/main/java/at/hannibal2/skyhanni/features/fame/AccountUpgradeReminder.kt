@@ -72,9 +72,10 @@ class AccountUpgradeReminder {
         if (!inInventory) return
         val clickedItemLore = event.slot?.stack?.getLore() ?: return
         if (clickedItemLore.getOrNull(0) != "§8Account Upgrade") return
-        duration = clickedItemLore.firstNotNullOf {
+        val result = clickedItemLore.firstNotNullOfOrNull {
             durationRegex.matchEntire(it)
-        }.groups[1]!!.value.toInt().days
+        } ?: return
+        duration = result.groups[1]!!.value.toInt().days
     }
 
     @SubscribeEvent

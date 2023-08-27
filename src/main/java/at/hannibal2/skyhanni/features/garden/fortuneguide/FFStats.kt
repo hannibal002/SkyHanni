@@ -198,7 +198,7 @@ object FFStats {
         out[FFTypes.FARMING_LVL] = savedStats.farmingLevel.toDouble() * 4
         out[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
         out[FFTypes.PLOTS] = savedStats.plotsUnlocked.toDouble() * 3
-        out[FFTypes.ANITA] = savedStats.anitaUpgrade.toDouble() * 2
+        out[FFTypes.ANITA] = savedStats.anitaUpgrade.toDouble() * 4
         if (cakeExpireTime - System.currentTimeMillis() > 0 || cakeExpireTime == -1L) {
             out[FFTypes.CAKE] = 5.0
         } else {
@@ -238,7 +238,7 @@ object FFStats {
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
             return if (rawInternalName.contains("ELEPHANT;4")) {
-                1.8 * petLevel
+                1.5 * petLevel
             } else if (rawInternalName.contains("MOOSHROOM_COW;4")) {
                 (10 + petLevel).toDouble() + strength / (40 - petLevel * .2)
             } else if (rawInternalName.contains("MOOSHROOM")) {

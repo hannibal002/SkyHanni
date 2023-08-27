@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import io.github.moulberry.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
@@ -133,7 +132,7 @@ object InquisitorWaypointShare {
             // add repo kill switch
             sendInquisitor()
         } else {
-            val keyName = KeybindHelper.getKeyName(config.keyBindShare)
+            val keyName = OSUtils.getKeyName(config.keyBindShare)
             val message =
                 "§e[SkyHanni] §l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
             LorenzUtils.clickableChat(message, "shshareinquis")

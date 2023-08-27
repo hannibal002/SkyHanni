@@ -339,7 +339,7 @@ public class GardenConfig {
     @ConfigOption(
             name = "Progress Display",
             desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
-                    "§cRequires a tool with either a counter or cultivating enchantment."
+                    "§eRequires a tool with either a counter or cultivating enchantment for full accuracy."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
@@ -984,19 +984,27 @@ public class GardenConfig {
     public Position farmingArmorDropsPos = new Position(16, -232, false, true);
 
     @Expose
-    @ConfigOption(name = "Anita Medal Profit", desc = "")
+    @ConfigOption(name = "Anita Shop", desc = "")
     @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
 
     @Expose
     @ConfigOption(
-            name = "Show Prices",
+            name = "Medal Prices",
             desc = "Helps to identify profitable items to buy at the Anita item shop " +
                     "and potential profit from selling the item at the auction house."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 16)
     public boolean anitaMedalProfitEnabled = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Extra Farming Fortune",
+            desc = "Show current tier and cost to max out in the item tooltip.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 16)
+    public boolean extraFarmingFortune = true;
 
     @Expose
     public Position anitaMedalProfitPos = new Position(206, 158, false, true);

@@ -42,6 +42,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getDungeonStarCount() =
         getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
 
+    fun ItemStack.getPetExp() = getPetInfo()?.get("exp")?.asDouble
+
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
         if (data.petCandies == -1) {

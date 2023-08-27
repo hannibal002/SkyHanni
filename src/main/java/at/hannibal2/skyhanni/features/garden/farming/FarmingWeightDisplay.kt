@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
-import at.hannibal2.skyhanni.utils.APIUtil
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -147,9 +147,7 @@ class FarmingWeightDisplay {
                 val format = LorenzUtils.formatInteger(leaderboardPosition)
                 " §7[§b#$format§7]"
             } else {
-                if (isLoadingLeaderboard) {
-                    " §7[§b#?§7]"
-                } else ""
+                if (isLoadingLeaderboard) " §7[§b#?§7]" else ""
             }
         }
 
@@ -192,15 +190,15 @@ class FarmingWeightDisplay {
             if (weight < 0) return ""
 
             var nextPlayer = nextPlayer ?: return ""
-            var nextName = if (leaderboardPosition == -1 || leaderboardPosition > rankGoal) "#$rankGoal" else nextPlayer.name
+            var nextName =
+                if (leaderboardPosition == -1 || leaderboardPosition > rankGoal) "#$rankGoal" else nextPlayer.name
 
             val totalWeight = (localWeight + weight)
             var weightUntilOvertake = nextPlayer.weight - totalWeight
 
             if (weightUntilOvertake < 0) {
                 if (weightPerSecond > 0) {
-                    LorenzUtils.debug("weightPerSecond: '$weightPerSecond'")
-                    LorenzUtils.chat("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
+                    farmingChatMessage("§e[SkyHanni] You passed §b$nextName §ein the Farming Weight Leaderboard!")
                 }
 
                 // Lower leaderboard position
@@ -209,6 +207,8 @@ class FarmingWeightDisplay {
                 } else {
                     leaderboardPosition--
                 }
+                ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =
+                    leaderboardPosition
 
                 // Remove passed player to present the next one
                 nextPlayers.removeFirst()
@@ -232,6 +232,17 @@ class FarmingWeightDisplay {
 
             val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
             return "§e$weightFormat$timeFormat §7behind §b$nextName"
+        }
+
+        private fun farmingChatMessage(message: String) {
+            LorenzUtils.hoverableChat(
+                message,
+                listOf(
+                    "§eClick to open your Farming Weight",
+                    "§eprofile on §celitebot.dev",
+                ),
+                "shfarmingprofile ${LorenzUtils.getPlayerName()}"
+            )
         }
 
         private fun isEnabled() = GardenAPI.inGarden() && config.eliteFarmingWeightDisplay
@@ -265,10 +276,39 @@ class FarmingWeightDisplay {
             isLoadingLeaderboard = true
 
             SkyHanniMod.coroutineScope.launch {
+                val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
+                if (wasNotLoaded) {
+                    checkOffScreenLeaderboardChanges()
+                }
+                ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =
+                    leaderboardPosition
                 lastLeaderboardUpdate = System.currentTimeMillis()
                 isLoadingLeaderboard = false
             }
+        }
+
+        private fun checkOffScreenLeaderboardChanges() {
+            val profileSpecific = ProfileStorageData.profileSpecific ?: return
+            val oldPosition = profileSpecific.garden.faramingWeight.lastFarmingWeightLeaderboard
+            if (oldPosition == -1) return
+
+            val diff = leaderboardPosition - oldPosition
+            if (diff == 0) return
+
+            if (diff > 0) {
+                chatOffScreenChange("§cdropped ${StringUtils.optionalPlural(diff, "place", "places")}", oldPosition)
+            } else {
+                chatOffScreenChange("§arisen ${StringUtils.optionalPlural(-diff, "place", "places")}", oldPosition)
+            }
+        }
+
+        private fun chatOffScreenChange(direction: String, oldPosition: Int) {
+            farmingChatMessage(
+                "§e[SkyHanni] §7Since your last visit to the §aGarden§7, " +
+                        "you have $direction §7on the §dFarming Leaderboard§7. " +
+                        "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+            )
         }
 
         private suspend fun loadLeaderboardPosition() = try {
@@ -331,7 +371,7 @@ class FarmingWeightDisplay {
         private fun error() {
             apiError = true
             LorenzUtils.error("[SkyHanni] Loading the farming weight data from elitebot.dev failed!")
-            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats itself, please report it on Discord!")
+            LorenzUtils.chat("§eYou can re-enter the garden to try to fix the problem. If this message repeats, please report it on Discord!")
         }
 
         private fun calculateCollectionWeight(): MutableMap<CropType, Double> {
@@ -362,6 +402,12 @@ class FarmingWeightDisplay {
         private fun CropType.getLocalCounter() = localCounter[this] ?: 0L
 
         private fun CropType.getFactor() = factorPerCrop[this]!!
+
+        fun lookUpCommand(it: Array<String>) {
+            val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
+            OSUtils.openBrowser("https://elitebot.dev/@$name/")
+            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile from §b$name")
+        }
 
         private val factorPerCrop by lazy {
             mapOf(
