@@ -119,9 +119,11 @@ class PowderTracker {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
+            doublePowder = powderBossBar.matcher(BossStatus.bossName).find()
             powderBossBar.matchMatcher(BossStatus.bossName) {
-                doublePowder = true
                 powderTimer = group("time")
+                doublePowder = powderTimer != "00:00"
+
                 saveAndUpdate()
             }
         }
