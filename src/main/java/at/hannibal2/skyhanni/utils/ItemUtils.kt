@@ -189,7 +189,7 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
-    fun readItemAmount(input: String): Pair<String?, Int> {
+    fun readItemAmount(input: String): Pair<String, Int>? {
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
         }
@@ -213,7 +213,7 @@ object ItemUtils {
             println("")
             println("input: '$input'")
             println("string: '$string'")
-            return Pair(null, 0)
+            return null
         }
 
         val itemName = color + matcher.group("name").trim()

@@ -113,11 +113,12 @@ class GardenVisitorFeatures {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
-            val (itemName, amount) = ItemUtils.readItemAmount(line)
-            if (itemName == null) {
+            val pair = ItemUtils.readItemAmount(line)
+            if (pair == null) {
                 LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                 continue
             }
+            val (itemName, amount) = pair
             val internalName = NEUInternalName.fromItemName(itemName)
             visitor.items[internalName] = amount
         }
@@ -387,8 +388,7 @@ class GardenVisitorFeatures {
                 readingItemsNeeded = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
-            if (itemName == null) continue
+            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
             val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
             val price = internalName.getPrice() * amount
 
@@ -429,8 +429,7 @@ class GardenVisitorFeatures {
                 readingItemsNeeded = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine)
-            if (itemName == null) continue
+            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
             val internalName = NEUItems.getInternalNameOrNull(itemName)?.replace("◆_", "") ?: continue
             val price = internalName.getPrice() * amount
 

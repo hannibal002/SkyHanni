@@ -149,12 +149,10 @@ class CityProjectFeatures {
             if (line == "") break
             if (line.contains("Bits")) break
 
-            val (name, amount) = ItemUtils.readItemAmount(line)
-            if (name != null) {
-                val internalName = NEUItems.getRawInternalName(name)
-                val old = materials.getOrPut(internalName) { 0 }
-                materials[internalName] = old + amount
-            }
+            val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
+            val internalName = NEUItems.getRawInternalName(name)
+            val old = materials.getOrPut(internalName) { 0 }
+            materials[internalName] = old + amount
         }
     }
 
