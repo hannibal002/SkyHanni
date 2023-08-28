@@ -229,7 +229,7 @@ public class Storage {
             public long lastComposterEmptyWarningTime = 0;
 
             @Expose
-            public FarmingWeightConfig faramingWeight = new FarmingWeightConfig();
+            public FarmingWeightConfig farmingWeight = new FarmingWeightConfig();
 
             public static class FarmingWeightConfig {
 
