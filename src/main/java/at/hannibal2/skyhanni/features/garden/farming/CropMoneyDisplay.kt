@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
@@ -133,16 +134,11 @@ object CropMoneyDisplay {
             }
 
             if (InventoryUtils.itemInHandId.contains("DICER") && config.moneyPerHourDicer) {
-                var dicerDrops = 0.0
-                val internalName: NEUInternalName
-                if (it == CropType.MELON) {
-                    dicerDrops = GardenCropSpeed.latestMelonDicer
-                    internalName = "ENCHANTED_MELON".asInternalName()
-                } else if (it == CropType.PUMPKIN) {
-                    dicerDrops = GardenCropSpeed.latestPumpkinDicer
-                    internalName = "ENCHANTED_PUMPKIN".asInternalName()
-                } else {
-                    error("Impossible")
+                val (dicerDrops, internalName) = when (it) {
+                    CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".asInternalName()
+                    CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".asInternalName()
+
+                    else -> CopyErrorCommand.skyHanniError("Unknown dicer: $it")
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
