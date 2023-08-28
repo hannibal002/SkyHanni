@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.features.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
@@ -138,10 +139,15 @@ object NEUItems {
     fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
         val price = getPrice(useSellingPrice)
         if (price == -1.0) {
+            getNpcPrice()
             return null
         }
         return price
     }
+
+    fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
+
+    fun NEUInternalName.getNpcPriceOrNull() = BazaarDataHolder.getNpcPrice(this)
 
     fun transHypixelNameToInternalName(hypixelId: String) =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
