@@ -163,7 +163,7 @@ class SkyHanniMod {
         loadModule(MayorElection())
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
-        loadModule(GardenCropMilestoneAverage())
+        loadModule(GardenCropMilestoneInventory())
         loadModule(GardenCropSpeed)
         loadModule(ProfileStorageData)
         loadModule(TitleData())

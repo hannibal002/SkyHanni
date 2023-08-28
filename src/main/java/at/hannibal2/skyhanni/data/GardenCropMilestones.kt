@@ -8,26 +8,33 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestones {
     private val cropPattern = "§7Harvest §f(?<name>.*) §7on .*".toPattern()
     private val totalPattern = "§7Total: §a(?<name>.*)".toPattern()
 
+    fun getCropTypeByLore(itemStack: ItemStack): CropType? {
+        for (line in itemStack.getLore()) {
+            cropPattern.matchMatcher(line) {
+                val name = group("name")
+                return CropType.getByNameOrNull(name)
+            }
+        }
+        return null
+    }
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Milestones") return
 
         for ((_, stack) in event.inventoryItems) {
-            var crop: CropType? = null
+            val crop = getCropTypeByLore(stack) ?: continue
             for (line in stack.getLore()) {
-                cropPattern.matchMatcher(line) {
-                    val name = group("name")
-                    crop = CropType.getByNameOrNull(name)
-                }
                 totalPattern.matchMatcher(line) {
                     val amount = group("name").replace(",", "").toLong()
-                    crop?.setCounter(amount)
+                    crop.setCounter(amount)
                 }
             }
         }
@@ -64,6 +71,8 @@ object GardenCropMilestones {
 
         return tier
     }
+
+    fun getMaxTier() = cropMilestoneData?.values?.firstOrNull()?.size ?: 0
 
     fun getCropsForTier(requestedTier: Int, crop: CropType): Long {
         var totalCrops = 0L

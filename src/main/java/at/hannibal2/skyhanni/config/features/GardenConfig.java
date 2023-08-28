@@ -1222,6 +1222,15 @@ public class GardenConfig {
     public int cropTooltipFortune = 1;
 
     @Expose
+    @ConfigOption(
+            name = "Total Crop Milestone",
+            desc = "Shows the progress bar till maxed crop milestone in the crop milestone inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 20)
+    public boolean cropMilestoneTotalProgress = true;
+
+    @Expose
     @ConfigOption(name = "Yaw and Pitch", desc = "")
     @Accordion
     public YawPitchDisplay yawPitchDisplay = new YawPitchDisplay();
