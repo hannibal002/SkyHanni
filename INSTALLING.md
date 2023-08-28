@@ -77,16 +77,11 @@ On Mac, go to `~/Library/Application Support/minecraft`.
 
 
 <details>
-<summary>7. Open mods folder</summary>
+
+<summary>7. Move mods into mods folder</summary>
 
 If there is a "mods" folder, great! Open it.
 Otherwise, create one and name it exactly "mods".
-
-</details>
-
-
-<details>
-<summary>8. Move mods into mods folder</summary>
 
 Move both your downloaded NEU file and SkyHanni file into the folder.
 (If you have already an older version of NEU or SkyHanni in that folder, delete it.)
@@ -97,7 +92,7 @@ Move both your downloaded NEU file and SkyHanni file into the folder.
 
 
 <details>
-<summary>9. Setup RAM</summary>
+<summary>8. Setup RAM</summary>
 
 If you're running mods, you also need to set up your allocated ram.
 If you don't know how much ram your computer has,
@@ -115,7 +110,7 @@ You should never need more than 4G, unless you have more mods, than you know wha
 
 
 <details>
-<summary>10. Launch the Forge profile in the launcher</summary>
+<summary>9. Launch the Forge profile in the launcher</summary>
 
 Installing Minecraft Forge should have set the profile for you, but if it didn't, go to installations,
 select new installation, under version you need to find Forge for 1.8.9 (most likely at the top or bottom)
@@ -124,7 +119,7 @@ select new installation, under version you need to find Forge for 1.8.9 (most li
 
 
 <details>
-<summary>11. Recommended additional mods (optional)</summary>
+<summary>10. Recommended additional mods (optional)</summary>
 
 [OptiFine](https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar)
 and [Patcher](https://sk1er.club/mods/patcher).
