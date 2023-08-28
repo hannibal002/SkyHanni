@@ -36,7 +36,7 @@ class SlayerQuestWarning {
         if (message == "  §r§c§lSLAYER QUEST FAILED!") {
             needNewQuest("The old slayer quest has failed!")
         }
-        if (message == "§eYour unsuccessful quest has been cleared out!") {
+        if (message == "  §r§5§lSLAYER QUEST STARTED!") {
             needSlayerQuest = false
         }
 
