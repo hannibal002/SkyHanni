@@ -23,7 +23,7 @@ public class DamageIndicatorConfig {
     @ConfigOption(
             name = "Boss Name",
             desc = "Change how the boss name should be displayed.")
-    @ConfigEditorDropdown(values = {"Disabled", "Full Name", "Short Name"})
+    @ConfigEditorDropdown(values = {"Hidden", "Full Name", "Short Name"})
     public int bossName = 1;
 
     @Expose
