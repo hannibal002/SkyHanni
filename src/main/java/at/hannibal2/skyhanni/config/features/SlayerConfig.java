@@ -12,31 +12,31 @@ public class SlayerConfig {
     public boolean enderman = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Yang Glyph", desc = "Highlight the enderman slayer Yang Glyph (beacon) in red color. Supports beacon in hand and beacon flying.")
+    @ConfigOption(name = "Highlight Yang Glyph", desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added an timer when he explodes. Supports beacon in hand and beacon flying.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean slayerEndermanBeacon = false;
 
     @Expose
-    @ConfigOption(name = "Beacon Warning", desc = "Displays a warning mid-screen then the enderman Slayer throws a Yang Glyph (beacon).")
+    @ConfigOption(name = "Beacon Warning", desc = "Displays a warning mid-screen then the Enderman Slayer throws a Yang Glyph (beacon).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean slayerEndermanBeaconWaring = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Nukekebi Skulls", desc = "Highlights the enderman Slayer Nukekebi Skulls.")
+    @ConfigOption(name = "Highlight Nukekebi Skulls", desc = "Highlights the Enderman Slayer Nukekebi Skulls.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanHighlightNukekebi = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer in damage indcator.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indcator.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanPhaseDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide particles around enderman slayer bosses and mini bosses.")
+    @ConfigOption(name = "Hide Particles", desc = "Hide particles around Enderman Slayer bosses and mini bosses.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanHideParticles = false;

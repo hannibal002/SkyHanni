@@ -126,7 +126,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.11",
+    version = "0.20.Beta.12",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -153,7 +153,7 @@ class SkyHanniMod {
         loadModule(OtherInventoryData)
         loadModule(TabListData())
         loadModule(RenderGuiData())
-        loadModule(GardenCropMilestones())
+        loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
@@ -285,7 +285,7 @@ class SkyHanniMod {
         loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
-        loadModule(GardenNextJacobContest())
+        loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())

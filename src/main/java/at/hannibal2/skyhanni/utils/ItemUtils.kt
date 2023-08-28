@@ -233,4 +233,11 @@ object ItemUtils {
         }
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
+
+    fun getPetRarityOld(petStack: ItemStack?): Int {
+        val petInternalName = petStack?.getInternalName_old()
+        if (petInternalName == "NONE" || petInternalName == null) return -1
+        val split = petInternalName.split(";")
+        return split.last().toInt()
+    }
 }

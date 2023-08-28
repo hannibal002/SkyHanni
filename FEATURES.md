@@ -199,7 +199,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Hide poor slayer drop chat messages.
 + Highlight slayer miniboss in blue color.
-+ Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
++ Enderman Slayer **Yang Glyph**:
+    + Highlight the beacon in red color.
+        + Supports beacon in hand and beacon flying.
+    + Shots timer till it explodes.
 + Warning when enderman slayer beacon spawns - dragon99z
 + Highlight enderman slayer Nukekebi (Skulls) - dragon99z
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
@@ -389,6 +392,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Override the Overtake ETA to show when you will reach the specified rank
     + If not there yet
     + Default: #10k
++ Sync Jacob Contests - Kaeso + CalMWolfs
+    + No need to open the calendar every SkyBlock year again.
+    + Grab Jacob Contest data from the elitebot.dev website.
+    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 
 ## The Rift
 
@@ -564,3 +571,5 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Pet Experience Tooltip
     + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
       shift key.
++ Added **SkyHanni Installer** - NetheriteMiner
+    + Double-clicking the mod jar file will open a window that asks you where to move the mod into.

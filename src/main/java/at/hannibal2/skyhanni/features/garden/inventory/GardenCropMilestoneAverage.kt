@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
@@ -20,7 +20,7 @@ class GardenCropMilestoneAverage {
         val tiers = mutableListOf<Double>()
         for (cropType in CropType.entries) {
             val counter = cropType.getCounter()
-            val tier = GardenCropMilestones.getTierForCrops(counter)
+            val tier = GardenCropMilestones.getTierForCropCount(counter, cropType)
             tiers.add(tier.toDouble())
         }
         average = (tiers.sum() / CropType.entries.size).round(2)

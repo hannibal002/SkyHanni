@@ -193,6 +193,8 @@ public class GardenConfig {
                         "§9Dedication IV",
                         "§9Music Rune",
                         "§cSpace Helmet",
+                        "§9Cultivating I",
+                        "§9Replenish I",
                 }
         )
         public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
@@ -339,7 +341,7 @@ public class GardenConfig {
     @ConfigOption(
             name = "Progress Display",
             desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
-                    "§cRequires a tool with either a counter or cultivating enchantment."
+                    "§eRequires a tool with either a counter or cultivating enchantment for full accuracy."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
@@ -936,6 +938,18 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestOtherGuis = false;
+
+    @Expose
+    @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch contests from elitebot.dev for the current year if they're uploaded already.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestsFetchAutomatically = true;
+
+    @Expose
+    @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming contests to elitebot.dev for everyone else to then fetch automatically.")
+    @ConfigEditorDropdown(values = { "Ask When Needed", "Share Automatically", "Disabled" })
+    @ConfigAccordionId(id = 14)
+    public int nextJacobContestsShareAutomatically = 0;
 
     @Expose
     @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's contest starts.")
