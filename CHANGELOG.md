@@ -40,6 +40,10 @@
     + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 + Added **SkyHanni Installer** - NetheriteMiner
     + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
++ Added Chat Translator - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
++ Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
++ Show a line to the enderman slayer beacon. - hannibal2
 
 ### Changes
 
@@ -73,6 +77,13 @@
 + Added Bee pet support to /ff - derholzmann12321
 + Added exportable carrot to /ff. - CalMWolfs
     + If SkyHanni doesn't know you have it, run /shcarrot
++ The damage indicator now includes a toggle option for the Ender Slayer Laser Phase timer. - hannibal2
++ Added ender slayer beacon explode timer. - hannibal2
++ Show the name over Nukekubi Skulls for in ender slayer (deadly eyes). - hannibal2
++ Changed the enderman slayer laser timer to be more exact. - hannibal2
++ Added support for the new fixed inquisitor spawn message from Hypixel for the detection. - hannibal2
++ Added option to hide the off-screen drop chat message. - hannibal2
++ Now hides the farming weight display by default when below 200 weight (can be disabled). - hannibal2
 
 ### Fixes
 
@@ -112,6 +123,17 @@
 + Various **/ff fixes** - CalMWolfs
 + Numbers, rounding and pets being reset.
 + Fixed inventory item number offset being wrong. - CalMWolfs
++ Fixed slayer quest detection after death. - hannibal2
++ Fixed rounding errors with yaw and pitch display. - hannibal2
++ Fixed ender slayer beacon don't disappear sometimes. - hannibal2
++ Fixed multiple bugs with garden visitor: - hannibal2
+    + Visitors with multiple different crops now calculate the copper price and the visitor drop stats correctly.
+    + Reward items no longer impact the visitor drop coins spent data negatively.
+    + Copper per coin price now respects the reward item profit as well.
+    + Now showing the NPC price for items without ah/bazaar data (looking at pet candy).
++ Now correctly ignoring the minis from tier 2 Arachne in the Damage Indicator. - hannibal2
++ Fixed highlight in the main bestiary menu. - HiZe
++ Fixed maxed farming fortune possible in /ff - CalMWolfs
 
 ### Removed Features
 

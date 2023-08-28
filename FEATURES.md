@@ -15,20 +15,22 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Chat
 
-- Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
++ Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
   player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
-- Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
-- Dungeon Filter (Removing annoying chat messages from the dungeon)
-- Dungeon Boss Message hider (includes The Watcher as well)
-- Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon
++ Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
++ Dungeon Filter (Removing annoying chat messages from the dungeon)
++ Dungeon Boss Message hider (includes The Watcher as well)
++ Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon
   or during a Kuudra fight.
-- Scan messages sent by players in all-chat for blacklisted words and greys out the message.
-- Chat peeking (holding key to display chat without opening the chat gui)
-- Compact Potion Effect Messages
-- **Arachne Chat Hider**
-    - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
++ Scan messages sent by players in all-chat for blacklisted words and greys out the message.
++ Chat peeking (holding key to display chat without opening the chat gui)
++ Compact Potion Effect Messages
++ **Arachne Chat Hider**
+    + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
 
 + Option to shorten the **bestiary level-up** message.
++ Added Chat **Translator** - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
 
 ## Dungeon
 
@@ -202,8 +204,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Enderman Slayer **Yang Glyph**:
     + Highlight the beacon in red color.
         + Supports beacon in hand and beacon flying.
-    + Shots timer till it explodes.
-+ Warning when enderman slayer beacon spawns - dragon99z
+    + Show timer till it explodes.
+    + Show a line to the beacon. - hannibal2
+    + Warning when enderman slayer beacon spawns - dragon99z
 + Highlight enderman slayer Nukekubi (Skulls) - dragon99z
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
@@ -290,6 +293,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   to checked what items it needs.
 + **Show Price** - Show the bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of crop milestone in the inventory.
++ Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 + **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
