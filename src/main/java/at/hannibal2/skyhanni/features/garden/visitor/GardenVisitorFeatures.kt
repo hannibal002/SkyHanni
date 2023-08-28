@@ -399,6 +399,9 @@ class GardenVisitorFeatures {
                 totalPrice -= price
             }
         }
+        if (totalPrice < 0) {
+            totalPrice = 0.0
+        }
 
         readingItemsNeeded = true
         val iterator = list.listIterator()
