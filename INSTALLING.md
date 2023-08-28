@@ -126,9 +126,11 @@ select new installation, under version you need to find Forge for 1.8.9 (most li
 <details>
 <summary>11. Recommended additional mods (optional)</summary>
 
+[OptiFine](https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar)
+and [Patcher](https://sk1er.club/mods/patcher).
 Those two mods help you get more FPS in game and lets you change many more performance
-settings: [OptiFine](https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar)
-and [Patcher](https://sk1er.club/mods/patcher)
+settings.
+
 *Ask on discord if you need help with those.*
 
 </details>
