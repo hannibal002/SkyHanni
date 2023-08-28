@@ -19,7 +19,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
 
         GuiRenderUtils.drawFarmingBar("§6Universal Farming Fortune",
             "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-                    "§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1267,
+                    "§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1277,
             FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         var line = if (FFStats.baseFF[FFTypes.ANITA]!! < 0.0) "§cAnita buff not saved\n§eVisit Anita to set it!"
