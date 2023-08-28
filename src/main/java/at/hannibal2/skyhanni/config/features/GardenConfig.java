@@ -764,6 +764,12 @@ public class GardenConfig {
     public boolean eliteFarmingWeightOvertakeETA = false;
 
     @Expose
+    @ConfigOption(name = "Offscreen Drop Message", desc = "Show a chat message when joining garden how many spots you have dropped since last garden join.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightoffScreenDropMessage = true;
+
+    @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)

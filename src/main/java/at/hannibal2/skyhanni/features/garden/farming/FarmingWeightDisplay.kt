@@ -278,7 +278,7 @@ class FarmingWeightDisplay {
             SkyHanniMod.coroutineScope.launch {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
-                if (wasNotLoaded) {
+                if (wasNotLoaded && config.eliteFarmingWeightoffScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
                 ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =
