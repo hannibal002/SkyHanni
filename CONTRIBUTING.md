@@ -77,6 +77,14 @@ On every game start, the copy gets updated (if outdated and if not manually disa
 When working with the repo, it is recommended to disable the manual repo update to prevent overriding your local changes
 accidentally.
 
+## DiscordIPC
+
+DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
+Specifically, we use [TirelessTraveler's Fork](https://github.com/ILikePlayingGames/DiscordIPC) of a fork of a fork of
+the [original](https://github.com/jagrosh/DiscordIPC).
+For info on usage, look
+at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+
 # Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
@@ -86,7 +94,7 @@ accidentally.
     - Paid only mods.
     - Mods that have reached the end of life. (Rip SBA, Dulkir and Soopy)
     - The mod has, according to Hypixel rules, illegal features ("cheat mod").
-    - If you can improve the existing feature, that is meaningful.
+    - If you can improve the existing feature in a meaningful way.
 - All classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`

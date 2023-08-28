@@ -17,15 +17,10 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
-        //todo change based on pet and based on setting
-        GuiRenderUtils.drawFarmingBar(
-            "§6Universal Farming Fortune",
+        GuiRenderUtils.drawFarmingBar("§6Universal Farming Fortune",
             "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-                    "§eSee on the grass block page",
-            FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0,
-            1267,
-            FFGuideGUI.guiLeft + 15,
-            FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+                    "§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1267,
+            FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         var line = if (FFStats.baseFF[FFTypes.ANITA]!! < 0.0) "§cAnita buff not saved\n§eVisit Anita to set it!"
         else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
@@ -148,6 +143,10 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             FarmingItems.MOOSHROOM_COW -> {
                 currentPet = FFStats.mooshroomFF
                 petMaxFF = 217
+            }
+            FarmingItems.BEE -> {
+                currentPet = FFStats.beeFF
+                petMaxFF = 90
             }
             else -> {}
         }

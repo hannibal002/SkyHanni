@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent

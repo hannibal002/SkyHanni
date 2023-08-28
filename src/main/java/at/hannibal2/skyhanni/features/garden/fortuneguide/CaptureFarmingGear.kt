@@ -118,9 +118,11 @@ class CaptureFarmingGear {
             farmingItems[FarmingItems.ELEPHANT] = FFGuideGUI.getFallbackItem(FarmingItems.ELEPHANT)
             farmingItems[FarmingItems.MOOSHROOM_COW] = FFGuideGUI.getFallbackItem(FarmingItems.MOOSHROOM_COW)
             farmingItems[FarmingItems.RABBIT] = FFGuideGUI.getFallbackItem(FarmingItems.RABBIT)
+            farmingItems[FarmingItems.BEE] = FFGuideGUI.getFallbackItem(FarmingItems.BEE)
             var highestElephantLvl = -1
             var highestMooshroomLvl = -1
             var highestRabbitLvl = -1
+            var highestBeeLvl = -1
 
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName_old().split(";")
@@ -143,6 +145,13 @@ class CaptureFarmingGear {
                         farmingItems[FarmingItems.RABBIT] = item
                         outdatedItems[FarmingItems.RABBIT] = false
                         highestRabbitLvl = split.last().toInt()
+                    }
+                }
+                if (split.first() == "BEE") {
+                    if (split.last().toInt() > highestBeeLvl) {
+                        farmingItems[FarmingItems.BEE] = item
+                        outdatedItems[FarmingItems.BEE] = false
+                        highestBeeLvl = split.last().toInt()
                     }
                 }
             }
