@@ -85,9 +85,12 @@ object InquisitorWaypointShare {
             foundInquisitor(lastInquisitor)
         }
 
-        if (message.endsWith("§r§eYou dug out §r§2a Minos Champion§r§e!")) {
-            time = System.currentTimeMillis()
-            logger.log("found Champion/Inquisitor")
+        // TODO: Change the check to only one line once we have a confirmed inquis message line
+        if (message.contains("§r§eYou dug out ")) {
+            if (message.contains("Inquis")) {
+                time = System.currentTimeMillis()
+                logger.log("found Champion/Inquisitor")
+            }
         }
     }
 
