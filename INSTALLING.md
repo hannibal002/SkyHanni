@@ -58,7 +58,7 @@ and [Beta](https://github.com/hannibal002/SkyHanni/releases).
 
 In general, it is recommended to use the **Full Release**.
 It updates every 3–4 weeks and should run very stable.
-If you find bugs or miss features in the full version, they might be fixed/implemented already in the beta.
+If you find bugs or miss features in the full version, they might be fixed/implemented already in a beta version.
 
 The **Beta Version**, on the other hand, gets updated multiple times a week,
 has new features earlier but also may contain more bugs.
