@@ -229,7 +229,7 @@
     + Show all commands in SkyHanni
 + Added Attribute price support to Estimated Item Value - nea
 + Added warning when enderman slayer beacon spawns - dragon99z
-+ Added Highlight enderman slayer Nukekebi (Skulls) - dragon99z
++ Added Highlight enderman slayer Nukekubi (Skulls) - dragon99z
 + Added option to hide the vanilla particles around enderman
 + Hide particles around enderman slayer bosses and mini bosses
 + Added support for Shadow Fury abilty cooldown - HiZe

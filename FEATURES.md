@@ -204,7 +204,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
         + Supports beacon in hand and beacon flying.
     + Shots timer till it explodes.
 + Warning when enderman slayer beacon spawns - dragon99z
-+ Highlight enderman slayer Nukekebi (Skulls) - dragon99z
++ Highlight enderman slayer Nukekubi (Skulls) - dragon99z
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
 + Cooldown when the Fire Pillar from the Blaze Slayer will kill you.

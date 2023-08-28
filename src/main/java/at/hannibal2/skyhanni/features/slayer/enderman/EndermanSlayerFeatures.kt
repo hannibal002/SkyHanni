@@ -31,10 +31,10 @@ class EndermanSlayerFeatures {
     private val beaconConfig get() = config.endermanBeaconConfig
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private val flyingBeacons = mutableListOf<EntityArmorStand>()
-    private val nukekebiSkulls = mutableListOf<EntityArmorStand>()
+    private val nukekubiSkulls = mutableListOf<EntityArmorStand>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = LorenzLogger("slayer/enderman")
-    private val nukekebiSkulTexture =
+    private val nukekubiSkulTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0="
 
     @SubscribeEvent
@@ -64,10 +64,10 @@ class EndermanSlayerFeatures {
             }
 
             if (config.endermanHighlightNukekebi) {
-                if (entity.inventory.any { it?.getSkullTexture() == nukekebiSkulTexture }) {
-                    if (entity !in nukekebiSkulls) {
-                        nukekebiSkulls.add(entity)
-                        logger.log("Added nukekebi skulls at ${entity.getLorenzVec()}")
+                if (entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture }) {
+                    if (entity !in nukekubiSkulls) {
+                        nukekubiSkulls.add(entity)
+                        logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
                     }
                 }
             }
@@ -86,7 +86,7 @@ class EndermanSlayerFeatures {
             event.color = LorenzColor.DARK_RED.toColor().withAlpha(1)
         }
 
-        if (config.endermanHighlightNukekebi && event.entity in nukekebiSkulls) {
+        if (config.endermanHighlightNukekebi && event.entity in nukekubiSkulls) {
             event.color = LorenzColor.GOLD.toColor().withAlpha(1)
         }
     }
@@ -130,11 +130,11 @@ class EndermanSlayerFeatures {
             }
         }
 
-        for (skull in nukekebiSkulls) {
+        for (skull in nukekubiSkulls) {
             if (!skull.isDead) {
                 event.drawDynamicText(
                     skull.getLorenzVec().add(-0.5, 1.5, -0.5),
-                    "§6Nukekebi Skull",
+                    "§6Nukekubi Skull",
                     1.6,
                     ignoreBlocks = false
                 )
@@ -147,7 +147,7 @@ class EndermanSlayerFeatures {
         if (!IslandType.THE_END.isInIsland()) return
         if (!event.repeatSeconds(1)) return
 
-        nukekebiSkulls.also { it.removeAll { it.isDead } }
+        nukekubiSkulls.also { it.removeAll { it.isDead } }
         flyingBeacons.also { it.removeAll { it.isDead } }
 
         // Removing the beacon if It's still there after 7 sesconds.
@@ -185,7 +185,7 @@ class EndermanSlayerFeatures {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         endermenWithBeacons.clear()
         flyingBeacons.clear()
-        nukekebiSkulls.clear()
+        nukekubiSkulls.clear()
         sittingBeacon = emptyMap()
         logger.log("Reset everything (world change)")
     }

@@ -48,7 +48,7 @@ public class SlayerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Highlight Nukekebi Skulls", desc = "Highlights the Enderman Slayer Nukekebi Skulls (Eyes).")
+    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlights the Enderman Slayer Nukekubi Skulls (Eyes).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanHighlightNukekebi = false;
