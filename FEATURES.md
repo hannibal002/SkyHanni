@@ -199,7 +199,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Hide poor slayer drop chat messages.
 + Highlight slayer miniboss in blue color.
-+ Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
++ Enderman Slayer **Yang Glyph**:
+    + Highlight the beacon in red color.
+        + Supports beacon in hand and beacon flying.
+    + Shots timer till it explodes.
 + Warning when enderman slayer beacon spawns - dragon99z
 + Highlight enderman slayer Nukekebi (Skulls) - dragon99z
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,

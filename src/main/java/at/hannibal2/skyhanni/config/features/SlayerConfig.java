@@ -12,7 +12,7 @@ public class SlayerConfig {
     public boolean enderman = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Yang Glyph", desc = "Highlight the enderman slayer Yang Glyph (beacon) in red color. Supports beacon in hand and beacon flying.")
+    @ConfigOption(name = "Highlight Yang Glyph", desc = "Highlight the enderman slayer Yang Glyph (beacon) in red color and added an timer when he explodes. Supports beacon in hand and beacon flying.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean slayerEndermanBeacon = false;
