@@ -141,6 +141,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         val currentPet = when (FFGuideGUI.currentPet) {
             FarmingItems.ELEPHANT -> FFStats.elephantFF
             FarmingItems.MOOSHROOM_COW -> FFStats.mooshroomFF
+            FarmingItems.BEE -> FFStats.beeFF
             else -> FFStats.rabbitFF
         }
 
