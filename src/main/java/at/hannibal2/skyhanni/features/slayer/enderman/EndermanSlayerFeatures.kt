@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
@@ -60,9 +61,10 @@ class EndermanSlayerFeatures {
 
             if (config.endermanHighlightNukekebi) {
                 if (entity.inventory.any { it?.getSkullTexture() == nukekebiSkulTexture }) {
-                    nukekebiSkulls.add(entity)
-                    logger.log("Added nukekebi skulls at ${entity.getLorenzVec()}")
-                    nukekebiSkulls.also { it.removeAll { it.isDead } }
+                    if (entity !in nukekebiSkulls) {
+                        nukekebiSkulls.add(entity)
+                        logger.log("Added nukekebi skulls at ${entity.getLorenzVec()}")
+                    }
                 }
             }
         }
@@ -102,13 +104,32 @@ class EndermanSlayerFeatures {
             event.drawWaypointFilled(location, LorenzColor.RED.toColor(), true, true)
             event.drawDynamicText(location.add(0, 1, 0), "§4Beacon §b$durationFormat", 1.8)
         }
+        for (beacon in flyingBeacons) {
+            if (!beacon.isDead) {
+                val location = event.exactLocation(beacon)
+                event.drawDynamicText(location.add(0, 1, 0), "§4Beacon", 1.8)
+            }
+        }
+
+        for (skull in nukekebiSkulls) {
+            if (!skull.isDead) {
+                event.drawDynamicText(
+                    skull.getLorenzVec().add(-0.5, 1.5, -0.5),
+                    "§6Nukekebi Skull",
+                    1.6,
+                    ignoreBlocks = false
+                )
+            }
+        }
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!IslandType.THE_END.isInIsland()) return
-        if (!config.slayerEndermanBeacon) return
         if (!event.repeatSeconds(1)) return
+
+        nukekebiSkulls.also { it.removeAll { it.isDead } }
+        flyingBeacons.also { it.removeAll { it.isDead } }
 
         // Removing the beacon if It's still there after 7 sesconds.
         // This is just a workaround for the cases where the ServerBlockChangeEvent don't detect the beacon despawn info.
