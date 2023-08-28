@@ -441,7 +441,7 @@ class GardenVisitorFeatures {
             val multiplier = NEUItems.getMultiplier(internalName)
 
             val rawName = multiplier.first.getItemNameOrNull()?.removeColor() ?: continue
-            val cropType = getByNameOrNull(rawName) ?: return
+            val cropType = getByNameOrNull(rawName) ?: continue
 
             val cropAmount = multiplier.second.toLong() * amount
             val formattedAmount = LorenzUtils.formatInteger(cropAmount)
