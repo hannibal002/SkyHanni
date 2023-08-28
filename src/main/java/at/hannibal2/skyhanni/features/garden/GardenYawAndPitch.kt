@@ -38,8 +38,8 @@ class GardenYawAndPitch {
         if (!config.showAlways && System.currentTimeMillis() > lastChange + (config.timeout * 1000)) return
 
         val displayList = listOf(
-            "§aYaw: §f${yaw.toDouble().round(config.yawPrecision)}",
-            "§aPitch: §f${pitch.toDouble().round(config.pitchPrecision)}",
+            "§aYaw: §f${yaw.round(config.yawPrecision)}",
+            "§aPitch: §f${pitch.round(config.pitchPrecision)}",
         )
         if (GardenAPI.inGarden()) {
             config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")
