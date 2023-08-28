@@ -136,14 +136,7 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound) =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
-        val price = getPrice(useSellingPrice)
-        if (price == -1.0) {
-            getNpcPrice()
-            return null
-        }
-        return price
-    }
+    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
@@ -152,21 +145,21 @@ object NEUItems {
     fun transHypixelNameToInternalName(hypixelId: String) =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
-    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false): Double {
+    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
         if (equals("WISP_POTION")) {
             return 20_000.0
         }
         val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
-        if (result == -1.0) {
-            if (equals("JACK_O_LANTERN")) {
-                return getPrice("PUMPKIN", useSellingPrice) + 1
-            }
-            if (equals("GOLDEN_CARROT")) {
-                // 6.8 for some players
-                return 7.0 // NPC price
-            }
+        if (result != -1.0) return result
+
+        if (equals("JACK_O_LANTERN")) {
+            return getPrice("PUMPKIN", useSellingPrice) + 1
         }
-        return result
+        if (equals("GOLDEN_CARROT")) {
+            // 6.8 for some players
+            return 7.0 // NPC price
+        }
+        return getNpcPriceOrNull()
     }
 
     fun getPrice(internalName: String, useSellingPrice: Boolean = false) =
@@ -184,7 +177,7 @@ object NEUItems {
 
     fun NEUInternalName.getItemStack(definite: Boolean = false): ItemStack =
         getItemStackOrNull() ?: run {
-            if (getPrice() == -1.0) return@run fallbackItem
+            if (getPriceOrNull() == null) return@run fallbackItem
 
             if (definite) {
                 Utils.showOutdatedRepoNotification()
