@@ -1,11 +1,11 @@
-# How to install SkyHanni
+# Download and Install SkyHanni
 
-- SkyHanni is a Forge mod for Minecraft 1.8.9 only.
-  Trying to run this on Badlion, Lunar, Feather, or newer versions of Minecraft is not supported.
-  Follow this guide to install SkyHanni in regular Minecraft forge.
+SkyHanni is a Forge mod for **Minecraft 1.8.9 only**.
+Trying to run this on Badlion, Lunar, Feather, or newer versions of Minecraft is **not supported**.
 
-- If you already have mods, you can skip to step 4. Otherwise, start from step 1.
-- If you already have the latest neu alpha, you can skip to step 5.
+Follow this guide to install SkyHanni in regular Minecraft Forge.
+If you already have Forge mods, you can skip to step 4. Otherwise, start from step 1.
+If you already have the latest alpha version from NEU, you can skip to step 5.
 
 <details>
 <summary>1. Run vanilla 1.8.9</summary>
@@ -29,11 +29,11 @@ Double-click the file to install it.
 <summary>3. Install Forge</summary>
 
 Forge is the system that loads your mods into the game.
-You need Java to run forge.
+You need Java to run Forge.
 Download [Forge for 1.8.9](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html).
 Click installer, when you double-click the file, install as client.
-If forge does not open with Java, download [Jarfix](https://johann.loefflmann.net/en/software/jarfix/index.html),
-double click it, then try running forge again.
+If Forge does not open with Java, download [Jarfix](https://johann.loefflmann.net/en/software/jarfix/index.html),
+double click it, then try running Forge again.
 
 </details>
 
@@ -41,7 +41,7 @@ double click it, then try running forge again.
 <details>
 <summary>4. Download NEU</summary>
 
-Neu is NotEnoughUpdates, another forge mod that contains files that SkyHanni depends on to function.
+Neu is NotEnoughUpdates, another Forge mod that contains files that SkyHanni depends on to function.
 You can install it from [Moulberry's Bush Discord Server](https://discord.gg/moulberry) in the
 channel [#🧪neu-alphas](https://discord.com/channels/516977525906341928/1028896920346841118) or
 from [SkyHanni Discord](https://discord.com/invite/skyhanni-997079228510117908) in the
@@ -89,6 +89,7 @@ Otherwise, create one and name it exactly "mods".
 <summary>8. Move mods into mods folder</summary>
 
 Move both your downloaded NEU file and SkyHanni file into the folder.
+(If you have already an older version of NEU or SkyHanni in that folder, delete it.)
 
 *Note: if you have a problem, people may ask to see your mod folder - that is this folder.*
 
@@ -114,10 +115,10 @@ You should never need more than 4G, unless you have more mods, than you know wha
 
 
 <details>
-<summary>10. Launch the forge profile in the launcher</summary>
+<summary>10. Launch the Forge profile in the launcher</summary>
 
-Installing Minecraft forge should have set the profile for you, but if it didn't, go to installations,
-select new installation, under version you need to find forge for 1.8.9 (most likely at the top or bottom)
+Installing Minecraft Forge should have set the profile for you, but if it didn't, go to installations,
+select new installation, under version you need to find Forge for 1.8.9 (most likely at the top or bottom)
 
 </details>
 
@@ -125,7 +126,8 @@ select new installation, under version you need to find forge for 1.8.9 (most li
 <details>
 <summary>11. Recommended additional mods (optional)</summary>
 
-Those two mods help you get more FPS in game and lets you change many more performance settings: [OptiFine](https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar)
+Those two mods help you get more FPS in game and lets you change many more performance
+settings: [OptiFine](https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar)
 and [Patcher](https://sk1er.club/mods/patcher)
 *Ask on discord if you need help with those.*
 
