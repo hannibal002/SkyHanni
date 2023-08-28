@@ -386,6 +386,46 @@ public class MiscConfig {
     public static class TrevorTheTrapper {
 
         @Expose
+        @ConfigOption(
+                name = "Enable Data Tracker",
+                desc = "Tracks all of your data from doing Trevor Quests.\n" +
+                        "Shows based on the setting below"
+        )
+        @ConfigEditorBoolean
+        public boolean dataTracker = true;
+
+        @Expose
+        @ConfigOption(name = "When to display", desc = "Choose when the display should show while on the farming islands.")
+        @ConfigEditorDropdown(values = {
+                "While on farming island",
+                "During and in between quests",
+                "During quests and while in Trapper Den"
+        })
+        public int displayType = 1;
+
+        @Expose
+        @ConfigOption(
+                name = "Text Format",
+                desc = "Drag text to change the appearance of the overlay."
+        )
+        @ConfigEditorDraggableList(
+                exampleText = {
+                        "§1§lTrevor Data Tracker",
+                        "§d7,267 Current Pelts",
+                        "§d11,281 Total Pelts Gained",
+                        "§c1,428 Animals Killed",
+                        "§c153 Self Killing Animals",
+                        "",
+                        "§b788 Trackable Animals",
+
+                }
+        )
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
+
+        @Expose
+        public Position position = new Position(10, 80, false, true);
+
+        @Expose
         @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
                 "§cWill not help you to find rabbits or sheep in the Oasis!")
         @ConfigEditorBoolean
@@ -408,7 +448,7 @@ public class MiscConfig {
 
         @Expose
         @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den and to accept the quest." +
-                "§eRequires the above settings to be toggled")
+                "§eRequires the relevant above settings to be toggled")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         public int keyBindWarpTrapper = Keyboard.KEY_NONE;
 
@@ -704,7 +744,7 @@ public class MiscConfig {
         public int numberFormat = 0;
 
         @Expose
-        @ConfigOption(name = "Display type", desc = "Choose what the display should show")
+        @ConfigOption(name = "Display type", desc = "Choose what the display should show.")
         @ConfigEditorDropdown(values = {
                 "Global to max",
                 "Global to next tier",
@@ -718,7 +758,7 @@ public class MiscConfig {
         public int displayType = 0;
 
         @Expose
-        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs")
+        @ConfigOption(name = "Hide maxed", desc = "Hide maxed mobs.")
         @ConfigEditorBoolean
         public boolean hideMaxed = false;
 

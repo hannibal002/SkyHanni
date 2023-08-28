@@ -43,10 +43,12 @@ object TrevorFeatures {
     private var trapperID: Int = 56
     private var backupTrapperID: Int = 17
     private var timeLastWarped: Long = 0
-    private var questActive = false
     private var lastChatPrompt = ""
     private var lastChatPromptTime = -1L
     private var teleportBlock = -1L
+
+    var questActive = false
+    var inBetweenQuests = false
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
@@ -94,6 +96,7 @@ object TrevorFeatures {
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
+            TrevorTracker.startQuest(matcher)
         }
 
         matcher = talbotPatternAbove.matcher(event.message.removeColor())
@@ -224,8 +227,8 @@ object TrevorFeatures {
         if (NEUItems.neuHasFocus()) return
         val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
         if (config.keyBindWarpTrapper == key) {
-            if (lastChatPromptTime != -1L && config.acceptQuest) {
-                if (System.currentTimeMillis() - 100 > lastChatPromptTime && System.currentTimeMillis() < lastChatPromptTime + 5000) {
+            if (lastChatPromptTime != -1L && config.acceptQuest && !questActive) {
+                if (System.currentTimeMillis() - 200 > lastChatPromptTime && System.currentTimeMillis() < lastChatPromptTime + 5000) {
                     lastChatPromptTime = -1L
                     LorenzUtils.sendCommandToServer(lastChatPrompt)
                     lastChatPrompt = ""
@@ -234,9 +237,7 @@ object TrevorFeatures {
                 }
             }
             if (System.currentTimeMillis() - timeLastWarped > 3000 && config.warpToTrapper) {
-                if (System.currentTimeMillis() < teleportBlock + 5000) {
-                    return
-                }
+                if (System.currentTimeMillis() < teleportBlock + 5000) return
                 LorenzUtils.sendCommandToServer("warp trapper")
                 timeLastWarped = System.currentTimeMillis()
             }
@@ -260,6 +261,8 @@ object TrevorFeatures {
         TrevorSolver.resetLocation()
         currentStatus = TrapperStatus.READY
         currentLabel = "§2Ready"
+        questActive = false
+        inBetweenQuests = false
     }
 
     enum class TrapperStatus(val color: Int) {
@@ -268,8 +271,8 @@ object TrevorFeatures {
         ACTIVE(LorenzColor.DARK_RED.toColor().withAlpha(75)),
     }
 
-    private fun onFarmingIsland() =
+    fun onFarmingIsland() =
         LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.THE_FARMING_ISLANDS
 
-    private fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
+    fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
 }
