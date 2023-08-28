@@ -11,7 +11,8 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -117,7 +118,7 @@ class GardenVisitorFeatures {
                 LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                 continue
             }
-            val internalName = NEUItems.getRawInternalName(itemName)
+            val internalName = NEUInternalName.fromItemName(itemName)
             visitor.items[internalName] = amount
         }
 
@@ -164,7 +165,7 @@ class GardenVisitorFeatures {
         val newDisplay = mutableListOf<List<Any>>()
         if (!config.visitorNeedsDisplay) return newDisplay
 
-        val requiredItems = mutableMapOf<String, Int>()
+        val requiredItems = mutableMapOf<NEUInternalName, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in visitors) {
             if (visitor.status == VisitorStatus.ACCEPTED || visitor.status == VisitorStatus.REFUSED) continue
@@ -182,8 +183,8 @@ class GardenVisitorFeatures {
             var totalPrice = 0.0
             newDisplay.addAsSingletonList("§7Visitor items needed:")
             for ((internalName, amount) in requiredItems) {
-                val name = NEUItems.getItemStack(internalName).name!!
-                val itemStack = NEUItems.getItemStack(internalName)
+                val name = internalName.getItemName()
+                val itemStack = internalName.getItemStack()
 
                 val list = mutableListOf<Any>()
                 list.add(" §7- ")
@@ -198,7 +199,7 @@ class GardenVisitorFeatures {
                 }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
 
                 if (config.visitorNeedsShowPrice) {
-                    val price = NEUItems.getPrice(internalName) * amount
+                    val price = internalName.getPrice() * amount
                     totalPrice += price
                     val format = NumberUtil.format(price)
                     list.add(" §7(§6$format§7)")
@@ -371,7 +372,6 @@ class GardenVisitorFeatures {
                 iterator.add(line)
             }
         }
-
     }
 
     private fun drawToolTip(iterator: MutableListIterator<String>) {
@@ -657,7 +657,7 @@ class GardenVisitorFeatures {
     private fun hasItemsInInventory(visitor: Visitor): Boolean {
         var ready = true
         for ((internalName, need) in visitor.items) {
-            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName_old() == internalName }
+            val having = InventoryUtils.countItemsInLowerInventory { it.getInternalName() == internalName }
             if (having < need) {
                 ready = false
             }
@@ -735,7 +735,7 @@ class GardenVisitorFeatures {
         var status: VisitorStatus,
         var inSacks: Boolean = false,
         var reward: VisitorReward? = null,
-        val items: MutableMap<String, Int> = mutableMapOf(),
+        val items: MutableMap<NEUInternalName, Int> = mutableMapOf(),
     ) {
         fun getEntity(): Entity? = Minecraft.getMinecraft().theWorld.getEntityByID(entityId)
 
