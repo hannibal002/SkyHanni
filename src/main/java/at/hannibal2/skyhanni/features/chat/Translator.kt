@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -195,7 +194,7 @@ class Translator {
             val translation = getTranslationToEnglish(message)
 
             if (translation == "Unable to translate!") LorenzUtils.chat("§c[SkyHanni] Unable to translate message :(")
-            else LorenzUtils.chat("§e[SkyHanni] Found translation: $translation")
+            else LorenzUtils.chat("§e[SkyHanni] Found translation: §f$translation")
         }
 
         fun fromEnglish(args: Array<String>) {
