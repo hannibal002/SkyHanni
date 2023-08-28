@@ -221,11 +221,11 @@ class PowderTracker {
 
         var totalParts = 0L
         for (reward in PowderChestReward.entries.subList(26, 32)) { // robots part
-            val count = rewards.getOrDefault(reward, 0).addSeparators()
-            totalParts += count.toLong()
-            addAsSingletonList("§b$count ${reward.displayName}")
+            val count = rewards.getOrDefault(reward, 0)
+            totalParts += count
+            addAsSingletonList("§b${count.addSeparators()} ${reward.displayName}")
         }
-        addAsSingletonList("§b$totalParts §9Total Robot Parts")
+        addAsSingletonList("§b${totalParts.addSeparators()} §9Total Robot Parts")
 
         val goblinEgg = rewards.getOrDefault(PowderChestReward.GOBLIN_EGG, 0)
         val greenEgg = rewards.getOrDefault(PowderChestReward.GREEN_GOBLIN_EGG, 0)
