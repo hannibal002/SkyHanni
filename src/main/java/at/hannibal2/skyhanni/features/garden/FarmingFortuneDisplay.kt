@@ -255,10 +255,10 @@ class FarmingFortuneDisplay {
 
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
             var carrotFortune = 0.0
-            val hidden = GardenAPI.config?.fortune
-            if (currentCrop != null && hidden != null) {
-                if (currentCrop == CropType.CARROT) {
-                    if (hidden.carrotFortune) carrotFortune = 12.0
+
+            if (currentCrop == CropType.CARROT) {
+                GardenAPI.config?.fortune?.let {
+                    if (it.carrotFortune) carrotFortune = 12.0
                 }
             }
             return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + carrotFortune

@@ -255,8 +255,7 @@ object FFStats {
                 0.2 * petLevel
             } else if (rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4")) {
                 0.3 * petLevel
-            }
-            else 0.0
+            } else 0.0
         }
         return 0.0
     }
