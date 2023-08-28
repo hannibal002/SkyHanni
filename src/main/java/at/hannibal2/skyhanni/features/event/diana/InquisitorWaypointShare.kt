@@ -94,7 +94,6 @@ object InquisitorWaypointShare {
         }
     }
 
-
     @SubscribeEvent
     fun onJoinWorld(event: EntityJoinWorldEvent) {
         if (!isEnabled()) return
