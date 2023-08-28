@@ -89,7 +89,7 @@ object InquisitorWaypointShare {
         if (message.contains("§r§eYou dug out ")) {
             if (message.contains("Inquis")) {
                 time = System.currentTimeMillis()
-                logger.log("found Champion/Inquisitor")
+                logger.log("found Inquisitor")
             }
         }
     }
