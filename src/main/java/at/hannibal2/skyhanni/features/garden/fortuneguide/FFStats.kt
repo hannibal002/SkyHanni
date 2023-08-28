@@ -251,9 +251,12 @@ object FFStats {
                 (10 + petLevel).toDouble() + floor(floor(strength / (40 - petLevel * .2)) * .7)
             } else if (rawInternalName.contains("MOOSHROOM")) {
                 (10 + petLevel).toDouble()
-            } else if (rawInternalName.contains("BEE;4")) {
+            } else if (rawInternalName.contains("BEE;2")) {
+                0.2 * petLevel
+            } else if (rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;3")) {
                 0.3 * petLevel
-            } else 0.0
+            }
+            else 0.0
         }
         return 0.0
     }
