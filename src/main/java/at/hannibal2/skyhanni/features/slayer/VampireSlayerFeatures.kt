@@ -278,9 +278,15 @@ object VampireSlayerFeatures {
                     val vec = event.exactLocation(it)
                     val distance = start.distance(vec)
                     if (distance <= 15) {
-                        val p = Minecraft.getMinecraft().thePlayer
-                        val add = if (p.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
-                        event.draw3DLine(event.exactLocation(p).add(add), vec.add(0.0, 1.54, 0.0), config.lineColor.toChromaColor(), config.lineWidth, true)
+                        val player = Minecraft.getMinecraft().thePlayer
+                        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+                        event.draw3DLine(
+                            event.exactLocation(player).add(add),
+                            vec.add(0.0, 1.54, 0.0),
+                            config.lineColor.toChromaColor(),
+                            config.lineWidth,
+                            true
+                        )
                     }
                 }
             }
@@ -300,10 +306,20 @@ object VampireSlayerFeatures {
                             color
                         ) { isEnabled() }
 
-                        val linesColorStart = (if (isIchor) configBloodIcor.linesColor else configKillerSpring.linesColor).toChromaColor()
+                        val linesColorStart =
+                            (if (isIchor) configBloodIcor.linesColor else configKillerSpring.linesColor).toChromaColor()
                         val text = if (isIchor) "§4Ichor" else "§4Spring"
-                        event.drawColor(stand.position.toLorenzVec().add(0.0, 2.0, 0.0), LorenzColor.DARK_RED, alpha = 1f)
-                        event.drawDynamicText(stand.position.toLorenzVec().add(0.5, 2.5, 0.5), text, 1.5, ignoreBlocks = false)
+                        event.drawColor(
+                            stand.position.toLorenzVec().add(0.0, 2.0, 0.0),
+                            LorenzColor.DARK_RED,
+                            alpha = 1f
+                        )
+                        event.drawDynamicText(
+                            stand.position.toLorenzVec().add(0.5, 2.5, 0.5),
+                            text,
+                            1.5,
+                            ignoreBlocks = false
+                        )
                         for ((player, stand2) in standList) {
                             if ((configBloodIcor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
                                 event.draw3DLine(
@@ -312,7 +328,8 @@ object VampireSlayerFeatures {
                                     // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
                                     linesColorStart,
                                     3,
-                                    true)
+                                    true
+                                )
                         }
                     }
                     if (configBloodIcor.renderBeam && isIchor) {
