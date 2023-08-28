@@ -782,6 +782,12 @@ public class GardenConfig {
     public String eliteFarmingWeightETAGoalRank = "10000";
 
     @Expose
+    @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightIgnoreLow = false;
+
+    @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
     @ConfigEditorAccordion(id = 12)
     public boolean dicerCounter = false;
