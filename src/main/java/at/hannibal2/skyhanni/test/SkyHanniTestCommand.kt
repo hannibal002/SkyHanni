@@ -178,6 +178,10 @@ class SkyHanniTestCommand {
             OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
         }
 
+        fun debugVersion() {
+            LorenzUtils.chat("§eYou are using SkyHanni ${SkyHanniMod.version}")
+        }
+
         fun debugData(args: Array<String>) {
             if (args.size == 2) {
                 if (args[0] == "profileName") {

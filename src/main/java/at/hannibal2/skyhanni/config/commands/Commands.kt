@@ -179,6 +179,10 @@ object Commands {
             "Prints debug data in the clipboard"
         ) { SkyHanniTestCommand.debugData(it) }
         registerCommand(
+            "shversion",
+            "Prints the SkyHanni version in the chat"
+        ) { SkyHanniTestCommand.debugVersion() }
+        registerCommand(
             "shcarrot",
             "Toggles receiving the 12 fortune from carrots"
         ) { CaptureFarmingGear.reverseCarrotFortune() }
