@@ -85,6 +85,11 @@ the [original](https://github.com/jagrosh/DiscordIPC).
 For info on usage, look
 at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
+
+## Auto Updater
+
+We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libautoupdate) from nea.
+
 # Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
