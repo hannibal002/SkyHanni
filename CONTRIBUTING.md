@@ -106,6 +106,7 @@ at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/
     - (We plan to remove NEU as a dependency in the future.)
 - We try not to use Forge-specific methods if possible.
     - (We plan to switch to Fabric and Minecraft 1.20 in the future.)
+- Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
 
 # Additional Useful Developement Tools
 
