@@ -253,7 +253,7 @@ object FFStats {
                 (10 + petLevel).toDouble()
             } else if (rawInternalName.contains("BEE;2")) {
                 0.2 * petLevel
-            } else if (rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;3")) {
+            } else if (rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4")) {
                 0.3 * petLevel
             }
             else 0.0
