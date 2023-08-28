@@ -205,7 +205,7 @@ class FarmingFortuneDisplay {
 
         fun getSunderFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5 }
         fun getHarvestingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5 }
-        fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0).toDouble()}
+        fun getCultivatingFortune(tool: ItemStack?): Double { return (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0}
 
         fun getAbilityFortune(item: ItemStack?):  Double  {
             val lotusAbilityPattern = "§7Piece Bonus: §6+(?<bonus>.*)☘".toPattern()
@@ -254,7 +254,14 @@ class FarmingFortuneDisplay {
             val accessoryFortune = accessoryFortune ?: 0.0
 
             val baseFortune = if (alwaysBaseFortune) 100.0 else baseFortune
-            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune
+            var carrotFortune = 0.0
+
+            if (currentCrop == CropType.CARROT) {
+                GardenAPI.config?.fortune?.let {
+                    if (it.carrotFortune) carrotFortune = 12.0
+                }
+            }
+            return baseFortune + upgradeFortune + tabFortune + toolFortune + accessoryFortune + carrotFortune
         }
 
         fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)

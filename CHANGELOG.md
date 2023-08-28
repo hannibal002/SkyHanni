@@ -34,6 +34,12 @@
       shift key.
 + Anita Extra Farming Fortune:
     + Show current tier and cost to max out in the item tooltip.
++ Sync Jacob Contests - Kaeso + CalMWolfs
+    + No need to open the calendar every SkyBlock year again.
+    + Grab Jacob Contest data from the elitebot.dev website.
+    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
++ Added **SkyHanni Installer** - NetheriteMiner
+    + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
 
 ### Changes
 
@@ -63,6 +69,10 @@
 + Added option to show reputation locations only when pressing the hotkey.
 + Delay the custom garden level up message by a few milliseconds to not cut into the garden milestone message.
 + Added runic support for Zealots/Bruiser.
++ Added cultivating and replenish to the visitor rewards. - ReyMaratov
++ Added Bee pet support to /ff - derholzmann12321
++ Added exportable carrot to /ff. - CalMWolfs
+    + If SkyHanni doesn't know you have it, run /shcarrot
 
 ### Fixes
 
@@ -95,6 +105,13 @@
 + Hopefully fixed Derpy problems with Trevor Trapper, Arachne, Arachne Keeper and Zealots.
 + Fixed Anita upgrade detection from the Anita Shop inventory.
 + Fixed error message when clicking a finished upgrade in the community shop.
++ Fixed everything **crop milestone** related. - CalMWolfs
++ Fixed estimated item value detects master stars on non-dungeon items. - hannibal2
++ Fixed wrong progress bar for pet exp display. - hannibal2
++ Fixed compatibility problem with NEU for pet exp number format. - hannibal2
++ Various **/ff fixes** - CalMWolfs
++ Numbers, rounding and pets being reset.
++ Fixed inventory item number offset being wrong. - CalMWolfs
 
 ### Removed Features
 

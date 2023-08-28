@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
@@ -177,6 +178,10 @@ object Commands {
             "shdebugdata",
             "Prints debug data in the clipboard"
         ) { SkyHanniTestCommand.debugData(it) }
+        registerCommand(
+            "shcarrot",
+            "Toggles receiving the 12 fortune from carrots"
+        ) { CaptureFarmingGear.reverseCarrotFortune() }
     }
 
     private fun developersDebugFeatures() {
@@ -238,6 +243,7 @@ object Commands {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
+        registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
         registerCommand(
             "shsendtranslation",

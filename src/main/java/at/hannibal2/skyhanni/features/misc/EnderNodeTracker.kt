@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
@@ -119,12 +120,13 @@ class EnderNodeTracker {
                 10_000.0
             } else {
                 val internalName = key.internalName
-                val bzData = internalName.getBazaarData()
-                if (LorenzUtils.noTradeMode) {
-                    bzData?.npcPrice ?: georgePrice(key) ?: 0.0
+                val npcPrice = internalName.getNpcPriceOrNull()
+                val bazaarData = internalName.getBazaarData()
+                if (LorenzUtils.noTradeMode || bazaarData == null) {
+                    npcPrice ?: georgePrice(key) ?: 0.0
                 } else {
-                    bzData?.npcPrice
-                        ?.coerceAtLeast(bzData.sellPrice)
+                    npcPrice
+                        ?.coerceAtLeast(bazaarData.sellPrice)
                         ?.coerceAtLeast(georgePrice(key) ?: 0.0)
                         ?: internalName.getPrice()
                 }

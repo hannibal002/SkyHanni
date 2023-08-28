@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -150,12 +149,10 @@ class CityProjectFeatures {
             if (line == "") break
             if (line.contains("Bits")) break
 
-            val (name, amount) = ItemUtils.readItemAmount(line)
-            if (name != null) {
-                val internalName = NEUItems.getRawInternalName(name)
-                val old = materials.getOrPut(internalName) { 0 }
-                materials[internalName] = old + amount
-            }
+            val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
+            val internalName = NEUItems.getRawInternalName(name)
+            val old = materials.getOrPut(internalName) { 0 }
+            materials[internalName] = old + amount
         }
     }
 

@@ -10,6 +10,9 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import net.minecraft.nbt.NBTTagCompound
@@ -224,14 +227,22 @@ class SkyHanniTestCommand {
     }
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: ItemTooltipEvent) {
+    fun onShowInternalName(event: ItemTooltipEvent) {
         if (!SkyHanniMod.feature.dev.showInternalName) return
-        val itemStack = event.itemStack
-        if (itemStack != null) {
-            val internalName = itemStack.getInternalName()
-            if ((internalName == NEUInternalName.NONE) && !SkyHanniMod.feature.dev.showEmptyNames) return
-            event.toolTip.add("Internal Name: '${internalName.asString()}'")
-        }
+        val itemStack = event.itemStack ?: return
+        val internalName = itemStack.getInternalName()
+        if ((internalName == NEUInternalName.NONE) && !SkyHanniMod.feature.dev.showEmptyNames) return
+        event.toolTip.add("Internal Name: '${internalName.asString()}'")
+    }
+
+    @SubscribeEvent
+    fun onSHowNpcPrice(event: ItemTooltipEvent) {
+        if (!SkyHanniMod.feature.dev.showNpcPrice) return
+        val itemStack = event.itemStack ?: return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
+
+        val npcPrice = internalName.getNpcPriceOrNull() ?: return
+        event.toolTip.add("§7Npc price: §6${npcPrice.addSeparators()}")
     }
 
     @SubscribeEvent
