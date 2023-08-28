@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummie
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import net.minecraft.item.ItemStack
+import kotlin.math.floor
 
 object FFStats {
     private val toolHasBountiful get() = GardenAPI.config?.toolWithBountiful
@@ -88,13 +89,13 @@ object FFStats {
 
     fun getCropStats(crop: CropType, tool: ItemStack) {
         cropPage.clear()
-        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1250.0)
+        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1287.0)
         cropPage[FortuneStats.CROP_UPGRADE] = Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
         cropPage[FortuneStats.ACCESSORY] = Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
         cropPage[FortuneStats.FFD] = Pair((tool.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
         cropPage[FortuneStats.TURBO] = Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
         cropPage[FortuneStats.DEDICATION] = Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0)
-        cropPage[FortuneStats.CULTIVATING] = Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 10.0)
+        cropPage[FortuneStats.CULTIVATING] = Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 20.0)
 
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
@@ -151,14 +152,15 @@ object FFStats {
 
             else -> {}
         }
+        if (crop == CropType.CARROT) {
+            val hidden = GardenAPI.config?.fortune ?: return
+            val carrotFortune = if (hidden.carrotFortune) 12.0 else 0.0
+            cropPage[FortuneStats.EXPORTED_CARROT] = Pair(carrotFortune, 12.0)
+        }
 
         cropPage[FortuneStats.CROP_TOTAL] = Pair(
             cropPage.toList().sumOf { it.second.first },
             cropPage.toList().sumOf { it.second.second })
-
-        if (tool.getInternalName_old().contains("DICER")) {
-            cropPage[FortuneStats.DICER] = Pair(33.0, 33.0)
-        }
     }
 
     private fun getEquipmentFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
@@ -246,12 +248,15 @@ object FFStats {
             return if (rawInternalName.contains("ELEPHANT;4")) {
                 1.5 * petLevel
             } else if (rawInternalName.contains("MOOSHROOM_COW;4")) {
-                (10 + petLevel).toDouble() + strength / (40 - petLevel * .2)
+                (10 + petLevel).toDouble() + floor(floor(strength / (40 - petLevel * .2)) * .7)
             } else if (rawInternalName.contains("MOOSHROOM")) {
                 (10 + petLevel).toDouble()
-            } else if (rawInternalName.contains("BEE;4")) {
+            } else if (rawInternalName.contains("BEE;2")) {
+                0.2 * petLevel
+            } else if (rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4")) {
                 0.3 * petLevel
-            } else 0.0
+            }
+            else 0.0
         }
         return 0.0
     }

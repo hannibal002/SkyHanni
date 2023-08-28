@@ -35,15 +35,6 @@ object GardenCropMilestoneDisplay {
     private var needsInventory = false
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-        // TODO remove this once hypixel counts 64x pumpkin drops to cultivating
-        if (event.message == "§a§lUNCOMMON DROP! §r§eDicer dropped §r§f64x §r§fPumpkin§r§e!") {
-            CropType.PUMPKIN.setCounter(CropType.PUMPKIN.getCounter() + 64)
-        }
-    }
-
-    @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         LorenzUtils.onToggle(
             config.cropMilestoneBestShowMaxedNeeded,

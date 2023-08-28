@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -77,6 +78,12 @@ class CaptureFarmingGear {
                 }
             }
         }
+
+        fun reverseCarrotFortune() {
+            val hidden = GardenAPI.config?.fortune ?: return
+            hidden.carrotFortune = !hidden.carrotFortune
+            LorenzUtils.chat("§2Toggled exportable carrot fortune to: ${hidden.carrotFortune}")
+        }
     }
 
     @SubscribeEvent
@@ -109,14 +116,24 @@ class CaptureFarmingGear {
         }
         if (event.inventoryName.contains("Pets")) {
             // If they've 2 of same pet, one will be overwritten
-            farmingItems[FarmingItems.ELEPHANT] = FFGuideGUI.getFallbackItem(FarmingItems.ELEPHANT)
-            farmingItems[FarmingItems.MOOSHROOM_COW] = FFGuideGUI.getFallbackItem(FarmingItems.MOOSHROOM_COW)
-            farmingItems[FarmingItems.RABBIT] = FFGuideGUI.getFallbackItem(FarmingItems.RABBIT)
-            farmingItems[FarmingItems.BEE] = FFGuideGUI.getFallbackItem(FarmingItems.BEE)
-            var highestElephantLvl = -1
-            var highestMooshroomLvl = -1
-            var highestRabbitLvl = -1
-            var highestBeeLvl = -1
+            if (farmingItems[FarmingItems.ELEPHANT] == null) {
+                farmingItems[FarmingItems.ELEPHANT] = FFGuideGUI.getFallbackItem(FarmingItems.ELEPHANT)
+            }
+            if (farmingItems[FarmingItems.MOOSHROOM_COW] == null) {
+                farmingItems[FarmingItems.MOOSHROOM_COW] = FFGuideGUI.getFallbackItem(FarmingItems.MOOSHROOM_COW)
+            }
+            if (farmingItems[FarmingItems.RABBIT] == null) {
+                farmingItems[FarmingItems.RABBIT] = FFGuideGUI.getFallbackItem(FarmingItems.RABBIT)
+            }
+            if (farmingItems[FarmingItems.BEE] == null) {
+                farmingItems[FarmingItems.BEE] = FFGuideGUI.getFallbackItem(FarmingItems.BEE)
+            }
+
+            // setting to current saved level -1 to stop later pages saving low rarity pets
+            var highestElephantLvl = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.ELEPHANT])
+            var highestMooshroomLvl = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.MOOSHROOM_COW])
+            var highestRabbitLvl = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.RABBIT])
+            var highestBeeLvl = ItemUtils.getPetRarityOld(farmingItems[FarmingItems.BEE])
 
             for ((_, item) in event.inventoryItems) {
                 val split = item.getInternalName_old().split(";")
