@@ -16,22 +16,22 @@ Run Minecraft 1.8.9, unmodded, for 10 seconds, then close it.
 
 
 <details>
-<summary>2. Install Java.</summary>
+<summary>2. Install Java</summary>
 
-In order to play with mods, you need Java.
+To play with mods, you need Java.
 Install [Java 8](https://www.java.com/download/ie_manual.jsp).
-Double click the file to install it.
+Double-click the file to install it.
 
 </details>
 
 
 <details>
-<summary>3. Install Forge.</summary>
+<summary>3. Install Forge</summary>
 
 Forge is the system that loads your mods into the game.
 You need Java to run forge.
 Download [Forge for 1.8.9](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html).
-Click installer, when you double click the file, install as client.
+Click installer, when you double-click the file, install as client.
 If forge does not open with Java, download [Jarfix](https://johann.loefflmann.net/en/software/jarfix/index.html),
 double click it, then try running forge again.
 
@@ -39,7 +39,7 @@ double click it, then try running forge again.
 
 
 <details>
-<summary>4. Download NEU.</summary>
+<summary>4. Download NEU</summary>
 
 Neu is NotEnoughUpdates, another forge mod that contains files that SkyHanni depends on to function.
 You can install it from [Moulberry's Bush Discord Server](https://discord.gg/moulberry) in the
@@ -51,11 +51,17 @@ channel [#neu-updates](https://discord.com/channels/997079228510117908/112320109
 
 
 <details>
-<summary>5. Download SkyHanni.</summary>
+<summary>5. Download SkyHanni</summary>
 
-It is recommended to install the full version at first, since that has less bugs.
-However, if you are a tech-savvy user and you want to test a potentially unstable version, install the beta.
-If you experience any problems in the full release, try the beta.
+SkyHanni has 2 update circles: [Full Release](https://github.com/hannibal002/SkyHanni/releases/latest)
+and [Beta](https://github.com/hannibal002/SkyHanni/releases).
+
+In general, it is recommended to use the **Full Release**.
+It updates every 3–4 weeks and should run very stable.
+If you find bugs or miss features in the full version, they might be fixed/implemented already in the beta.
+
+The **Beta Version**, on the other hand, gets updated multiple times a week,
+has new features earlier but also may contain more bugs.
 
 </details>
 
@@ -63,9 +69,9 @@ If you experience any problems in the full release, try the beta.
 <details>
 <summary>6. Find .minecraft</summary>
 
-Once you have downloaded both NEU and SkyHanni, you need to navigate to your .minecraft folder.
-On Windows, open file explorer, in the file location bar at the top type in %appdata% and open .minecraft.
-On Mac, go to ~/Library/Application Support/minecraft.
+Once you have downloaded both NEU and SkyHanni, you need to navigate to your `.minecraft` folder.
+On Windows, open file explorer, in the file location bar at the top type in `%appdata%` and open `.minecraft`.
+On Mac, go to `~/Library/Application Support/minecraft`.
 
 </details>
 
@@ -82,30 +88,33 @@ Otherwise, create one and name it exactly "mods".
 <details>
 <summary>8. Move mods into mods folder</summary>
 
-Move your neu and skyhanni .jar files into the folder.
-Note: if you have a problem, people may ask to see your mod folder - that is this folder.
+Move both your downloaded NEU file and SkyHanni file into the folder.
+
+*Note: if you have a problem, people may ask to see your mod folder - that is this folder.*
 
 </details>
 
 
 <details>
-<summary>9. Setup ram</summary>
+<summary>9. Setup RAM</summary>
 
-If you're running mods, you also need to setup your allocated ram.
+If you're running mods, you also need to set up your allocated ram.
 If you don't know how much ram your computer has,
 follow [this guide](https://www.howtogeek.com/435644/how-to-see-how-much-ram-is-in-your-pc-and-its-speed/).
 To allocate ram, go to installation, press the 3 dots next to the installation you are using,
-click edit, press more options. In jvm arguments, look for something that says -Xmx2g or some other number
-followed by g. That number is the amount you have allocated for Minecraft to use. If you have 2g of ram on your
-computer, you might struggle to play Minecraft. Try to allocate 1g. If you have 4g, allocate 2g. If you
-have 8 or more g, allocate 4g. You should never need more than 4g unless you have more mods than you know what to do
-with.
+click edit, press more options.
+In JVM arguments, look for something that says -Xmx2G or some other number followed by G.
+That number is the amount you have allocated for Minecraft to use.
+If you have 2G of ram on your computer, you might struggle to play Minecraft.
+Try to allocate 1G. If you have 4G, allocate 2G. If you
+have 8 or more G, allocate 4G.
+You should never need more than 4G, unless you have more mods, than you know what to do.
 
 </details>
 
 
 <details>
-<summary>10. Launch the forge profile in the launcher.</summary>
+<summary>10. Launch the forge profile in the launcher</summary>
 
 Installing Minecraft forge should have set the profile for you, but if it didn't, go to installations,
 select new installation, under version you need to find forge for 1.8.9 (most likely at the top or bottom)
@@ -116,8 +125,9 @@ select new installation, under version you need to find forge for 1.8.9 (most li
 <details>
 <summary>11. Recommended additional mods (optional)</summary>
 
-[Optifine](https://optifine.net) and [Patcher](https://sk1er.club/mods/patcher)
-(ask in the discord if you need help with those)
+Those two mods help you get more FPS in game and lets you change many more performance settings: [OptiFine](https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar)
+and [Patcher](https://sk1er.club/mods/patcher)
+*Ask on discord if you need help with those.*
 
 </details>
 
