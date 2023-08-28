@@ -73,11 +73,6 @@ public class DamageIndicatorConfig {
     public boolean showDamageOverTime = false;
 
     @Expose
-    @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser phase.")
-    @ConfigEditorBoolean
-    public boolean showHealthDuringLaser = false;
-
-    @Expose
     @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of damage indicator bosses.")
     @ConfigEditorBoolean
     public boolean hideVanillaNametag = false;
@@ -89,9 +84,27 @@ public class DamageIndicatorConfig {
 
 
     @Expose
+    @ConfigOption(name = "Ender Slayer", desc = "")
+    @Accordion
+    public EnderSlayerConfig enderSlayer = new EnderSlayerConfig();
+
+    public static class EnderSlayerConfig {
+
+        @Expose
+        @ConfigOption(name = "Laser phase timer", desc = "Show a timer when the laser phase will end.")
+        @ConfigEditorBoolean
+        public boolean laserPhaseTimer = false;
+
+        @Expose
+        @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser phase.")
+        @ConfigEditorBoolean
+        public boolean showHealthDuringLaser = false;
+    }
+
+    @Expose
     @ConfigOption(name = "Vampire Slayer", desc = "")
     @Accordion
-    public VampireSlayerConfig vampireSlayer = new VampireSlayerConfig();
+    public DamageIndicatorConfig.VampireSlayerConfig vampireSlayer = new DamageIndicatorConfig.VampireSlayerConfig();
 
     public static class VampireSlayerConfig {
         @Expose
