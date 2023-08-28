@@ -389,6 +389,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Override the Overtake ETA to show when you will reach the specified rank
     + If not there yet
     + Default: #10k
++ Sync Jacob Contests - Kaeso + CalMWolfs
+    + No need to open the calendar every SkyBlock year again.
+    + Grab Jacob Contest data from the elitebot.dev website.
+    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 
 ## The Rift
 
@@ -564,3 +568,5 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Pet Experience Tooltip
     + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
       shift key.
++ Added **SkyHanni Installer** - NetheriteMiner
+    + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
