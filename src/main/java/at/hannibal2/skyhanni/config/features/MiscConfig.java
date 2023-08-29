@@ -46,19 +46,29 @@ public class MiscConfig {
     @Expose
     public Position petDisplayPos = new Position(-330, -15, false, true);
 
+    @ConfigOption(name = "Time Features", desc = "")
+    @Accordion
     @Expose
-    @ConfigOption(name = "Time", desc = "")
-    @ConfigEditorAccordion(id = 1)
-    public boolean time = false;
+    public TimeConfig time = new TimeConfig();
 
-    @Expose
-    @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 1)
-    public boolean realTime = false;
+    public static class TimeConfig {
 
-    @Expose
-    public Position realTimePos = new Position(10, 10, false, true);
+        @Expose
+        @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
+        @ConfigEditorBoolean
+        public boolean realTime = false;
+
+        @Expose
+        public Position realTimePos = new Position(10, 10, false, true);
+
+        @Expose
+        @ConfigOption(name = "Winter Time", desc = "While on the Winter Island, show a timer until Jerry's Workshop closes.")
+        @ConfigEditorBoolean
+        public boolean winterTime = true;
+
+        @Expose
+        public Position winterTimePos = new Position(10, 10, false, true);
+    }
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
