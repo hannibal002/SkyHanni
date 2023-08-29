@@ -67,7 +67,6 @@ class FarmingWeightDisplay {
         if (!event.isMod(5)) return
         update()
 
-        attemptingCropWeightFetch = true
         SkyHanniMod.coroutineScope.launch {
             getCropWeights()
             hasFetchedCropWeights = true
@@ -436,7 +435,7 @@ class FarmingWeightDisplay {
             }
         }
 
-        // probably good to keep this but shouldn't be needed
+        // still needed when first joining garden and if they cant make https requests
         private val backupFactors by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
