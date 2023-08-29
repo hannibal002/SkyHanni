@@ -151,4 +151,10 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         val z = locationData[2].asDouble - 1
         return LorenzVec(x, y, z)
     }
+
+    fun showLocations() = when (config.crimsonIsleReputationShowLocation) {
+        0 -> true
+        1 -> OSUtils.isKeyHeld(config.reputationHelperHotkey)
+        else -> false
+    }
 }

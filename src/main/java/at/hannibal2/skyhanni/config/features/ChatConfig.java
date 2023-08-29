@@ -48,12 +48,6 @@ public class ChatConfig {
     public boolean guildExp = true;
 
     @Expose
-    @ConfigOption(name = "Friend Join Left", desc = "Hide friend join/left messages.")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean friendJoinLeft = false;
-
-    @Expose
     @ConfigOption(name = "Winter Gifts", desc = "Hide useless winter gift messages.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
@@ -139,4 +133,9 @@ public class ChatConfig {
     @ConfigOption(name = "Arachne Hider", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")
     @ConfigEditorBoolean
     public boolean hideArachneMessages = false;
+
+    @Expose
+    @ConfigOption(name = "Translator", desc = "Click on a message to translate it into English. Use /shcopytranslation to get the translation from English. Translation is not guaranteed to be 100% accurate.")
+    @ConfigEditorBoolean
+    public boolean translator = false;
 }

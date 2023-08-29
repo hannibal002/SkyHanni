@@ -56,7 +56,9 @@ class MobHighlight {
         }
 
         if (config.zealotBruiserHighlighter) {
-            if ((maxHealth == 65_000 || maxHealth == 13_000) && entity is EntityEnderman) {
+            val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 3 // runic
+            val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 3 // runic
+            if ((isZealot || isBruiser) && entity is EntityEnderman) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_AQUA.toColor().withAlpha(127))
                 { config.zealotBruiserHighlighter }
                 RenderLivingEntityHelper.setNoHurtTime(entity) { config.zealotBruiserHighlighter }

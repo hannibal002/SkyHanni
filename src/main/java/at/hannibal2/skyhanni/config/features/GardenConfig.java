@@ -193,6 +193,8 @@ public class GardenConfig {
                         "§9Dedication IV",
                         "§9Music Rune",
                         "§cSpace Helmet",
+                        "§9Cultivating I",
+                        "§9Replenish I",
                 }
         )
         public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
@@ -339,7 +341,7 @@ public class GardenConfig {
     @ConfigOption(
             name = "Progress Display",
             desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
-                    "§cRequires a tool with either a counter or cultivating enchantment."
+                    "§eRequires a tool with either a counter or cultivating enchantment for full accuracy."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
@@ -762,6 +764,12 @@ public class GardenConfig {
     public boolean eliteFarmingWeightOvertakeETA = false;
 
     @Expose
+    @ConfigOption(name = "Offscreen Drop Message", desc = "Show a chat message when joining garden how many spots you have dropped since last garden join.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightoffScreenDropMessage = true;
+
+    @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
@@ -772,6 +780,12 @@ public class GardenConfig {
     @ConfigEditorText
     @ConfigAccordionId(id = 11)
     public String eliteFarmingWeightETAGoalRank = "10000";
+
+    @Expose
+    @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightIgnoreLow = false;
 
     @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
@@ -938,6 +952,18 @@ public class GardenConfig {
     public boolean nextJacobContestOtherGuis = false;
 
     @Expose
+    @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch contests from elitebot.dev for the current year if they're uploaded already.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestsFetchAutomatically = true;
+
+    @Expose
+    @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming contests to elitebot.dev for everyone else to then fetch automatically.")
+    @ConfigEditorDropdown(values = { "Ask When Needed", "Share Automatically", "Disabled" })
+    @ConfigAccordionId(id = 14)
+    public int nextJacobContestsShareAutomatically = 0;
+
+    @Expose
     @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's contest starts.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
@@ -984,19 +1010,27 @@ public class GardenConfig {
     public Position farmingArmorDropsPos = new Position(16, -232, false, true);
 
     @Expose
-    @ConfigOption(name = "Anita Medal Profit", desc = "")
+    @ConfigOption(name = "Anita Shop", desc = "")
     @ConfigEditorAccordion(id = 16)
     public boolean anitaMedalProfit = false;
 
     @Expose
     @ConfigOption(
-            name = "Show Prices",
+            name = "Medal Prices",
             desc = "Helps to identify profitable items to buy at the Anita item shop " +
                     "and potential profit from selling the item at the auction house."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 16)
     public boolean anitaMedalProfitEnabled = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Extra Farming Fortune",
+            desc = "Show current tier and cost to max out in the item tooltip.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 16)
+    public boolean extraFarmingFortune = true;
 
     @Expose
     public Position anitaMedalProfitPos = new Position(206, 158, false, true);
@@ -1198,6 +1232,15 @@ public class GardenConfig {
     @ConfigEditorDropdown(values = {"Default", "Show", "Replace"})
     @ConfigAccordionId(id = 20)
     public int cropTooltipFortune = 1;
+
+    @Expose
+    @ConfigOption(
+            name = "Total Crop Milestone",
+            desc = "Shows the progress bar till maxed crop milestone in the crop milestone inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 20)
+    public boolean cropMilestoneTotalProgress = true;
 
     @Expose
     @ConfigOption(name = "Yaw and Pitch", desc = "")

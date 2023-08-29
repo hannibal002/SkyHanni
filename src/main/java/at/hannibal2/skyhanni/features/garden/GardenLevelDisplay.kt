@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 class GardenLevelDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -48,10 +49,12 @@ class GardenLevelDisplay {
         val newLevel = GardenAPI.getLevelForExp(gardenExp.toLong())
         if (newLevel == oldLevel + 1) {
             if (newLevel > 15) {
-                LorenzUtils.chat(
-                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
-                            " §8+§aRespect from Elite Farmers and SkyHanni members :)\n "
-                )
+                LorenzUtils.runDelayed(50.milliseconds) {
+                    LorenzUtils.chat(
+                        " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
+                                " §8+§aRespect from Elite Farmers and SkyHanni members :)\n "
+                    )
+                }
             }
         }
         update()

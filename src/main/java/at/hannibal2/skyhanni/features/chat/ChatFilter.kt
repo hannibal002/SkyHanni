@@ -25,7 +25,6 @@ class ChatFilter {
         warping(message) && config.warping -> "warping"
         welcome(message) && config.welcome -> "welcome"
         isGuildExp(message) && config.guildExp -> "guild_exp"
-        friendJoin(message) && config.friendJoinLeft -> "friend_join"
         killCombo(message) && config.killCombo -> "kill_combo"
         profileJoin(message) && config.profileJoin -> "profile_join"
 
@@ -63,16 +62,6 @@ class ChatFilter {
         if (message == "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.") return true
 
         return false
-    }
-
-    private fun friendJoin(message: String): Boolean {
-        return when {
-            message.matchRegex("§aFriend > §r(.*) §r§e(joined|left).") -> {
-                true
-            }
-
-            else -> false
-        }
     }
 
     private fun uselessNotification(message: String): Boolean {

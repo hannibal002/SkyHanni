@@ -16,10 +16,15 @@ object CopyErrorCommand {
     private var cache =
         CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build<Pair<String, Int>, Unit>()
 
+    fun skyHanniError(message: String): Nothing {
+        val exception = IllegalStateException(message)
+        logError(exception, message)
+        throw exception
+    }
+
     fun command(array: Array<String>) {
         if (array.size != 1) {
             LorenzUtils.chat("§cUse /shcopyerror <error id>")
-
             return
         }
 
