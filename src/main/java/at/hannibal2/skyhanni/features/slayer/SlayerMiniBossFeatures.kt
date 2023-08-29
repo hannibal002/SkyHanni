@@ -54,7 +54,7 @@ class SlayerMiniBossFeatures {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!config.slayerMinibossLine) return
         for (mob in miniBosses) {
-            if (mob.isDead) continue
+            if (mob.health <= 0) continue
             if (mob.distanceToPlayer() > 10) continue
 
             event.draw3DLine(
