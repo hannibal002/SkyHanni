@@ -66,6 +66,12 @@ class FarmingWeightDisplay {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         update()
+
+        attemptingCropWeightFetch = true
+        SkyHanniMod.coroutineScope.launch {
+            getCropWeights()
+            hasFetchedCropWeights = true
+        }
     }
 
     companion object {
@@ -403,7 +409,9 @@ class FarmingWeightDisplay {
 
         private fun CropType.getLocalCounter() = localCounter[this] ?: 0L
 
-        private fun CropType.getFactor() = factorPerCrop[this]!!
+        private fun CropType.getFactor(): Double {
+            return factorPerCrop[this] ?: backupFactors[this]!!
+        }
 
         fun lookUpCommand(it: Array<String>) {
             val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
@@ -411,7 +419,25 @@ class FarmingWeightDisplay {
             LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile from §b$name")
         }
 
-        private val factorPerCrop by lazy {
+        private val factorPerCrop = mutableMapOf<CropType, Double>()
+        private var attemptingCropWeightFetch = false
+        private var hasFetchedCropWeights = false
+
+        private suspend fun getCropWeights() {
+            if (attemptingCropWeightFetch || hasFetchedCropWeights) return
+            attemptingCropWeightFetch = true
+
+            val url = "https://api.elitebot.dev/weights"
+            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+
+            for (crop in result.entrySet()) {
+                val cropType = CropType.entries.firstOrNull { it.cropName == crop.key } ?: continue
+                factorPerCrop[cropType] = crop.value.asDouble
+            }
+        }
+
+        // probably good to keep this but shoudlnt be needed
+        private val backupFactors by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
                 CropType.CARROT to 302_061.86,
@@ -424,8 +450,8 @@ class FarmingWeightDisplay {
                 CropType.COCOA_BEANS to 267_174.04,
                 CropType.CACTUS to 177_254.45,
             )
-        }
     }
 
     class UpcomingPlayer(val name: String, val weight: Double)
+}
 }
