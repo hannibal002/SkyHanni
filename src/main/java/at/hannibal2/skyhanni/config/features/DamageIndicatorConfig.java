@@ -56,11 +56,12 @@ public class DamageIndicatorConfig {
                     "Dummy",
                     "§bArachne",
                     "§bThe Rift Bosses",
-                    "§bRiftstalker Bloodfiend"
+                    "§bRiftstalker Bloodfiend",
+                    "§6Raindrake"
             }
     )
     //TODO only show currently working and tested features
-    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21, 22, 23));
+    public List<Integer> bossesToShow = new ArrayList<>(Arrays.asList(0, 1, 2, 5, 6, 7, 8, 9, 18, 19, 21, 22, 23, 24));
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")
