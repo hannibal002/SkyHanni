@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class WildStrawberryDyeNotification {
     var lastCloseTime = 0L
@@ -36,7 +37,7 @@ class WildStrawberryDyeNotification {
             val internalName = event.itemStack.getInternalName_old()
             if (internalName == "DYE_WILD_STRAWBERRY") {
                 val name = event.itemStack.name!!
-                TitleUtils.sendTitle(name, 5_000)
+                TitleUtils.sendTitle(name, 5.seconds)
                 LorenzUtils.chat("§e[SkyHanni] You found a $name§e!")
                 SoundUtils.playBeepSound()
                 ItemBlink.setBlink(NEUItems.getItemStackOrNull("DYE_WILD_STRAWBERRY"), 5_000)

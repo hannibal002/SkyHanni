@@ -58,7 +58,7 @@ class EndermanSlayerFeatures {
                 if (stack.name == "Beacon" && canSee(LocationUtils.playerEyeLocation(), entity.getLorenzVec())) {
                     flyingBeacons.add(entity)
                     if (beaconConfig.showWarning)
-                        TitleUtils.sendTitle("§4Beacon", 2_000)
+                        TitleUtils.sendTitle("§4Beacon", 2.seconds)
                     logger.log("Added flying beacons at ${entity.getLorenzVec()}")
                 }
             }

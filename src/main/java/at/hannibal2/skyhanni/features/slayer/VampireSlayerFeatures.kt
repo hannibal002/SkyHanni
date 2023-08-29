@@ -128,8 +128,12 @@ object VampireSlayerFeatures {
                                     if (shouldSendSound)
                                         playTwinclawsSound()
                                     if (shouldSendTitle)
-                                        TitleUtils.sendTitle("§6§lTWINCLAWS", (1750 - config.twinclawsDelay), 2.6)
-                                    nextClawSend = System.currentTimeMillis() + 5000
+                                        TitleUtils.sendTitle(
+                                            "§6§lTWINCLAWS",
+                                            (1750 - config.twinclawsDelay).milliseconds,
+                                            2.6
+                                        )
+                                    nextClawSend = System.currentTimeMillis() + 5_000
                                 }
                             }
                         }
@@ -179,7 +183,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle)
-                TitleUtils.sendTitle("§c§lSTEAK!", 300, 2.6)
+                TitleUtils.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
 
             if (shouldRender) {
                 RenderLivingEntityHelper.setEntityColor(this, color) { isEnabled() }
