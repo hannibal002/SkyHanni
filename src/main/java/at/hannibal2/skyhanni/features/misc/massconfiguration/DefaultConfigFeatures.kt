@@ -9,7 +9,7 @@ import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DefaultConfigFeatures {
-    var didNotifyOnce = false
+    private var didNotifyOnce = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

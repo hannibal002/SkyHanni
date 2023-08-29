@@ -234,9 +234,10 @@ object LorenzUtils {
 
     fun clickableChat(message: String, command: String) {
         val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/${command.removePrefix("/")}")
+        val fullCommand = "/" + command.removePrefix("/")
+        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /${command.removePrefix("/")}"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
         Minecraft.getMinecraft().thePlayer.addChatMessage(text)
     }
 
