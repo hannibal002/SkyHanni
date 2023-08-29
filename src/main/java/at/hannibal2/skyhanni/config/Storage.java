@@ -400,6 +400,9 @@ public class Storage {
             public int peltsGained;
 
             @Expose
+            public int killedAnimals;
+
+            @Expose
             public int selfKillingAnimals;
 
             @Expose

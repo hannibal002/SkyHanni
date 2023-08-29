@@ -25,13 +25,13 @@ class FrozenTreasureTracker {
     private var display = emptyList<List<Any>>()
     private var estimatedIce = 0L
     private var lastEstimatedIce = 0L
-    private val icePerMin = mutableListOf<Long>()
+    private val icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
     private var compactPattern = "COMPACT! You found an Enchanted Ice!".toPattern()
 
     init {
-        fixedRateTimer(name = "skyhanni-dungeon-milestone-display", period = 1000) {
+        fixedRateTimer(name = "skyhanni-frozen-treasure-tracker", period = 1000) {
             if (!onJerryWorkshop()) return@fixedRateTimer
             calculateIcePerHour()
         }
@@ -41,7 +41,7 @@ class FrozenTreasureTracker {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         icePerHour = 0
         stoppedChecks = 0
-        icePerMin.clear()
+        icePerSecond.clear()
         saveAndUpdate()
     }
 
@@ -49,23 +49,25 @@ class FrozenTreasureTracker {
         val difference = estimatedIce - lastEstimatedIce
         lastEstimatedIce = estimatedIce
 
-        if (difference == estimatedIce) {
-            return
-        }
+        if (difference == estimatedIce) return
 
-        icePerHour = icePerMin.average().toInt() * 3600
-        icePerMin.add(difference)
 
         if (difference == 0L) {
+            if (icePerSecond.isEmpty()) return
             stoppedChecks += 1
-            if (stoppedChecks == 60) {
+        } else {
+            if (stoppedChecks > 60) {
                 stoppedChecks = 0
-                icePerMin.clear()
+                icePerSecond.clear()
                 icePerHour = 0
             }
-            return
+            while (stoppedChecks > 0) {
+                stoppedChecks -= 1
+                icePerSecond.add(0)
+            }
+            icePerSecond.add(difference)
         }
-        stoppedChecks = 0
+        icePerHour = (icePerSecond.average() * 3600).toInt()
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {

@@ -59,6 +59,7 @@ object TrevorFeatures {
                     if (config.trapperSolver) {
                         if (onFarmingIsland()) {
                             updateTrapper()
+                            TrevorTracker.calculatePeltsPerHour()
                             if (questActive) TrevorSolver.findMob()
                         }
                     }
@@ -75,7 +76,7 @@ object TrevorFeatures {
         if (event.message == "§aReturn to the Trapper soon to get a new animal to hunt!") {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
-                TitleUtils.sendTitle("§2Mob Died ", 5_000)
+                TitleUtils.sendTitle("§2Mob Died", 5_000)
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
@@ -97,6 +98,8 @@ object TrevorFeatures {
             currentLabel = "§cActive Quest"
             trapperReady = false
             TrevorTracker.startQuest(matcher)
+            updateTrapper()
+            lastChatPromptTime = -1L
         }
 
         matcher = talbotPatternAbove.matcher(event.message.removeColor())
@@ -172,6 +175,8 @@ object TrevorFeatures {
         if (!found) TrevorSolver.mobLocation = CurrentMobArea.NONE
         if (!active) {
             trapperReady = true
+        } else {
+            inBetweenQuests = true
         }
         if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
             TrevorSolver.mobLocation = previousLocation
@@ -206,9 +211,10 @@ object TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == CurrentMobArea.FOUND) {
+                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else TrevorSolver.currentMob!!.mobName
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.add(0, -2, 0), LorenzColor.GREEN.toColor(), true, true)
-                event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)
+                event.drawDynamicText(location.add(0, 1, 0), displayName, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
                 event.drawDynamicText(location.add(0, 1, 0), TrevorSolver.mobLocation.location, 1.5)

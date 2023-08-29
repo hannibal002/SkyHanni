@@ -395,13 +395,13 @@ public class MiscConfig {
         public boolean dataTracker = true;
 
         @Expose
-        @ConfigOption(name = "When to display", desc = "Choose when the display should show while on the farming islands.")
-        @ConfigEditorDropdown(values = {
-                "While on farming island",
-                "During and in between quests",
-                "During quests and while in Trapper Den"
-        })
-        public int displayType = 1;
+        @ConfigOption(
+                name = "Show Between Quests",
+                desc = "Shows the tracker during and between quests otherwise it will only show during them." +
+                        "Will show in the Trapper's Den regardless. Global toggle above"
+        )
+        @ConfigEditorBoolean
+        public boolean displayType = true;
 
         @Expose
         @ConfigOption(
@@ -411,16 +411,20 @@ public class MiscConfig {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§1§lTrevor Data Tracker",
-                        "§d7,267 Current Pelts",
-                        "§d11,281 Total Pelts Gained",
-                        "§c1,428 Animals Killed",
-                        "§c153 Self Killing Animals",
+                        "§b1,428 §9Quests Started",
+                        "§b11,281 §5Total Pelts Gained",
+                        "§b2,448 §5Pelts Per Hour",
                         "",
-                        "§b788 Trackable Animals",
-
+                        "§b850 §cKilled Animals",
+                        "§b153 §cSelf Killing Animals",
+                        "§b788 §fTrackable Animals",
+                        "§b239 §aUntrackable Animals",
+                        "§b115 §9Undetected Animals",
+                        "§b73 §5Endangered Animals",
+                        "§b12 §6Elusive Animals"
                 }
         )
-        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
+        public List<Integer> textFormat = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11));
 
         @Expose
         public Position position = new Position(10, 80, false, true);

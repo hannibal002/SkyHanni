@@ -6,9 +6,10 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
@@ -19,8 +20,43 @@ object TrevorTracker {
     private val selfKillMobPattern = "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.".toPattern()
     private val killMobPattern = "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.".toPattern()
 
+    private val peltsPerSecond = mutableListOf<Int>()
+    private var peltsPerHour = 0
+    private var stoppedChecks = 0
+    private var lastPelts = 0
+
+    fun calculatePeltsPerHour() {
+        val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
+        val difference = storage.peltsGained - lastPelts
+        lastPelts = storage.peltsGained
+        println("last: $lastPelts stopped: $stoppedChecks difference: $difference length: ${peltsPerSecond.size}")
+
+        if (difference == storage.peltsGained) return
+
+        if (difference == 0) {
+            if (peltsPerSecond.isEmpty()) return
+            stoppedChecks += 1
+        } else {
+            if (stoppedChecks > 150) {
+                peltsPerSecond.clear()
+                peltsPerHour = 0
+                stoppedChecks = 0
+            }
+            while (stoppedChecks > 0) {
+                stoppedChecks -= 1
+                peltsPerSecond.add(0)
+            }
+            peltsPerSecond.add(difference)
+        }
+
+        peltsPerHour = (peltsPerSecond.average() * 3600).toInt()
+    }
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        peltsPerSecond.clear()
+        peltsPerHour = 0
+        stoppedChecks = 0
         saveAndUpdate()
     }
 
@@ -37,17 +73,18 @@ object TrevorTracker {
         if (!TrevorFeatures.onFarmingIsland()) return
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
 
-        var matcher = selfKillMobPattern.matcher(event.message.removeColor())
+        var matcher = selfKillMobPattern.matcher(event.message)
         if (matcher.matches()) {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
-            storage.selfKillingAnimals += 1
+            storage.selfKillingAnimals +=  1
             saveAndUpdate()
         }
-        matcher = killMobPattern.matcher(event.message.removeColor())
+        matcher = killMobPattern.matcher(event.message)
         if (matcher.matches()) {
             val pelts = matcher.group("pelts").toInt()
             storage.peltsGained += pelts
+            storage.killedAnimals += 1
             saveAndUpdate()
         }
     }
@@ -68,7 +105,18 @@ object TrevorTracker {
     }
 
     private fun drawTrapperDisplay(storage: Storage.ProfileSpecific.TrapperData) = buildList<List<Any>> {
-
+        addAsSingletonList("§1§lTrevor Data Tracker")
+        addAsSingletonList("§b${storage.questsDone.addSeparators()} §9Quests Started")
+        addAsSingletonList("§b${storage.peltsGained.addSeparators()} §5Total Pelts Gained")
+        addAsSingletonList("§b${peltsPerHour.addSeparators()} §5Pelts Per Hour")
+        addAsSingletonList("")
+        addAsSingletonList("§b${storage.killedAnimals.addSeparators()} §cKilled Animals")
+        addAsSingletonList("§b${storage.selfKillingAnimals.addSeparators()} §cSelf Killing Animals")
+        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.TRACKABLE] ?: 0).addSeparators()} §fTrackable Animals")
+        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.UNTRACKABLE] ?: 0).addSeparators()} §aUntrackable Animals")
+        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.UNDETECTED] ?: 0).addSeparators()} §9Undetected Animals")
+        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.ENDANGERED] ?: 0).addSeparators()} §5Endangered Animals")
+        addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.ELUSIVE] ?: 0).addSeparators()} §6Elusive Animals")
     }
 
     @SubscribeEvent
@@ -82,10 +130,8 @@ object TrevorTracker {
         if (!TrevorFeatures.onFarmingIsland()) return false
         if (TrevorFeatures.inTrapperDen()) return true
         return when (config.displayType) {
-            0 -> true
-            1 -> TrevorFeatures.inBetweenQuests
-            2 -> TrevorFeatures.questActive
-            else -> false
+            true -> (TrevorFeatures.inBetweenQuests || TrevorFeatures.questActive)
+            else -> TrevorFeatures.questActive
         }
     }
 
@@ -93,7 +139,7 @@ object TrevorTracker {
         TRACKABLE("TRACKABLE"),
         UNTRACKABLE("UNTRACKABLE"),
         UNDETECTED("UNDETECTED"),
-        ENDANGERED("ELUSIVE"),
+        ENDANGERED("ENDANGERED"),
         ELUSIVE("ELUSIVE")
     }
 }
