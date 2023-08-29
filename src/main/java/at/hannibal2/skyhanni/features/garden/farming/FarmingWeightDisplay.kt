@@ -436,7 +436,7 @@ class FarmingWeightDisplay {
             }
         }
 
-        // probably good to keep this but shoudlnt be needed
+        // probably good to keep this but shouldn't be needed
         private val backupFactors by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
@@ -450,8 +450,8 @@ class FarmingWeightDisplay {
                 CropType.COCOA_BEANS to 267_174.04,
                 CropType.CACTUS to 177_254.45,
             )
-    }
+        }
 
-    class UpcomingPlayer(val name: String, val weight: Double)
-}
+        class UpcomingPlayer(val name: String, val weight: Double)
+    }
 }
