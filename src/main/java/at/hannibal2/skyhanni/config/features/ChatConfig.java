@@ -164,5 +164,6 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Translator", desc = "Click on a message to translate it into English. Use /shcopytranslation to get the translation from English. Translation is not guaranteed to be 100% accurate.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean translator = false;
 }

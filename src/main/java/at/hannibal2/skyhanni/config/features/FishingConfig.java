@@ -68,12 +68,14 @@ public class FishingConfig {
     @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of trophy fish in tooltip.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
+    @FeatureToggle
     public boolean trophyFilletTooltip = true;
 
     @Expose
     @ConfigOption(name = "Odger Waypoint", desc = "Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
+    @FeatureToggle
     public boolean odgerLocation = true;
 
     @ConfigOption(name = "Thunder Spark", desc = "")
@@ -84,6 +86,7 @@ public class FishingConfig {
     @ConfigOption(name = "Thunder Spark Highlight", desc = "Highlight Thunder Sparks after killing a Thunder")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean thunderSparkHighlight = false;
 
     @Expose
@@ -103,6 +106,7 @@ public class FishingConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean barnTimer = true;
 
     @Expose
@@ -115,6 +119,7 @@ public class FishingConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean barnTimerCrystalHollows = true;
 
     @Expose
@@ -152,6 +157,7 @@ public class FishingConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Hide the Chum/Chumcap Bucket name tags for other players.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public Property<Boolean> enabled = Property.of(true);
 
         @Expose
@@ -175,6 +181,7 @@ public class FishingConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show the fished item name above the item when fishing.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
@@ -190,6 +197,7 @@ public class FishingConfig {
             desc = "Counts how many sharks have been caught."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean sharkFishCounter = false;
 
     @Expose
@@ -198,10 +206,12 @@ public class FishingConfig {
     @Expose
     @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of sea creature you have fished.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean shortenFishingMessage = false;
 
     @Expose
     @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the sea creature chat message instead of in a previous line.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean compactDoubleHook = true;
 }
