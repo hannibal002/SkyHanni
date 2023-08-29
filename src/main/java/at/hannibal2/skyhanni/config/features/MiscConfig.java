@@ -49,10 +49,11 @@ public class MiscConfig {
     @Expose
     public Position petDisplayPos = new Position(-330, -15, false, true);
 
+    // rename this to just "time will cause a config reset
     @ConfigOption(name = "Time Features", desc = "")
     @Accordion
     @Expose
-    public TimeConfig time = new TimeConfig();
+    public TimeConfig timeConfigs = new TimeConfig();
 
     public static class TimeConfig {
 
