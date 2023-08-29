@@ -18,6 +18,8 @@ class BazaarDataHolder {
     companion object {
         private val bazaarData = mutableMapOf<NEUInternalName, BazaarData>()
         private var npcPrices = mapOf<NEUInternalName, Double>()
+
+        fun getNpcPrice(internalName: NEUInternalName) = npcPrices[internalName]
     }
 
     private fun loadNpcPrices(): MutableMap<NEUInternalName, Double> {
@@ -66,29 +68,9 @@ class BazaarDataHolder {
         val displayName = stack.name!!.removeColor()
         val sellPrice = internalName.getPrice(true)
         val buyPrice = internalName.getPrice(false)
-        val npcPrice = npcPrices[internalName].let {
-            if (it == null) {
-                if (!ignoreNoNpcPrice(internalName)) {
-                    LorenzUtils.debug("NPC price not found for '$internalName'")
-                }
-                0.0
-            } else it
-        }
 
-        val data = BazaarData(displayName, sellPrice, buyPrice, npcPrice)
+        val data = BazaarData(displayName, sellPrice, buyPrice)
         bazaarData[internalName] = data
         return data
-    }
-
-    private fun ignoreNoNpcPrice(internalName: NEUInternalName): Boolean {
-        if (internalName.startsWith("TURBO_")) return true
-        if (internalName.equals("PURPLE_CANDY")) return true
-        if (internalName.equals("JACOBS_TICKET")) return true
-        if (internalName.equals("RAW_SOULFLOW")) return true
-        if (internalName.equals("DERELICT_ASHE")) return true
-
-        if (internalName.contains(";")) return true
-
-        return false
     }
 }

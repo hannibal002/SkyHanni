@@ -21,7 +21,9 @@ class FarmingWeightDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
         if (isEnabled()) {
-            config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
+            if (config.eliteFarmingWeightIgnoreLow || weight >= 200) {
+                config.eliteFarmingWeightPos.renderStrings(display, posLabel = "Farming Weight Display")
+            }
         }
     }
 
@@ -278,7 +280,7 @@ class FarmingWeightDisplay {
             SkyHanniMod.coroutineScope.launch {
                 val wasNotLoaded = leaderboardPosition == -1
                 leaderboardPosition = loadLeaderboardPosition()
-                if (wasNotLoaded) {
+                if (wasNotLoaded && config.eliteFarmingWeightoffScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
                 ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =

@@ -127,7 +127,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.11",
+    version = "0.20.Beta.13",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -154,7 +154,7 @@ class SkyHanniMod {
         loadModule(OtherInventoryData)
         loadModule(TabListData())
         loadModule(RenderGuiData())
-        loadModule(GardenCropMilestones())
+        loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
@@ -164,7 +164,7 @@ class SkyHanniMod {
         loadModule(MayorElection())
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
-        loadModule(GardenCropMilestoneAverage())
+        loadModule(GardenCropMilestoneInventory())
         loadModule(GardenCropSpeed)
         loadModule(ProfileStorageData)
         loadModule(TitleData())
@@ -286,7 +286,7 @@ class SkyHanniMod {
         loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
-        loadModule(GardenNextJacobContest())
+        loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
@@ -383,6 +383,7 @@ class SkyHanniMod {
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
+        loadModule(Translator())
 
         init()
 

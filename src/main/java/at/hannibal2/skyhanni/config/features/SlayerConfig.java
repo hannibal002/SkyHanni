@@ -12,31 +12,55 @@ public class SlayerConfig {
     public boolean enderman = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Yang Glyph", desc = "Highlight the enderman slayer Yang Glyph (beacon) in red color. Supports beacon in hand and beacon flying.")
-    @ConfigEditorBoolean
+    @ConfigOption(name = "Yang Glyph (beacon)", desc = "")
     @ConfigAccordionId(id = 0)
-    public boolean slayerEndermanBeacon = false;
+    @Accordion
+    public EndermanBeaconConfig endermanBeaconConfig = new EndermanBeaconConfig();
+
+    public static class EndermanBeaconConfig {
+
+        @Expose
+        @ConfigOption(name = "Enable",
+                desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added an timer when he explodes. " +
+                        "Supports beacon in hand and beacon flying.")
+        @ConfigEditorBoolean
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Show Warning", desc = "Displays a warning mid-screen then the Enderman Slayer throws a Yang Glyph (beacon).")
+        @ConfigEditorBoolean
+        public boolean showWarning = false;
+
+        @Expose
+        @ConfigOption(name = "Show Line", desc = "Draw a line starting at your crosshair to the beacon.")
+        @ConfigEditorBoolean
+        public boolean showLine = false;
+
+        @Expose
+        @ConfigOption(name = "Line color", desc = "Color of the line.")
+        @ConfigEditorColour
+        public String lneColor = "0:255:255:0:88";
+
+        @Expose
+        @ConfigOption(name = "Line Width", desc = "Width of the line.")
+        @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+        public int lineWidth = 1;
+    }
 
     @Expose
-    @ConfigOption(name = "Beacon Warning", desc = "Displays a warning mid-screen then the enderman Slayer throws a Yang Glyph (beacon).")
-    @ConfigEditorBoolean
-    @ConfigAccordionId(id = 0)
-    public boolean slayerEndermanBeaconWaring = false;
-
-    @Expose
-    @ConfigOption(name = "Highlight Nukekebi Skulls", desc = "Highlights the enderman Slayer Nukekebi Skulls.")
+    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlights the Enderman Slayer Nukekubi Skulls (Eyes).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanHighlightNukekebi = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the enderman slayer in damage indcator.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indcator.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanPhaseDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide particles around enderman slayer bosses and mini bosses.")
+    @ConfigOption(name = "Hide Particles", desc = "Hide particles around Enderman Slayer bosses and mini bosses.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
     public boolean endermanHideParticles = false;
@@ -236,17 +260,17 @@ public class SlayerConfig {
         public int twinclawsDelay = 0;
 
         @Expose
-        @ConfigOption(name = "Draw line", desc = "Draw a line starting at your crosshair to the boss head")
+        @ConfigOption(name = "Draw line", desc = "Draw a line starting at your crosshair to the boss head.")
         @ConfigEditorBoolean
         public boolean drawLine = false;
 
         @Expose
-        @ConfigOption(name = "Line color", desc = "Color of the line")
+        @ConfigOption(name = "Line color", desc = "Color of the line.")
         @ConfigEditorColour
         public String lineColor = "0:255:255:0:88";
 
         @Expose
-        @ConfigOption(name = "Line Width", desc = "Width of the line")
+        @ConfigOption(name = "Line Width", desc = "Width of the line.")
         @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
         public int lineWidth = 1;
 
