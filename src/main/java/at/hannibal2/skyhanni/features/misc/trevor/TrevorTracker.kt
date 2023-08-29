@@ -105,7 +105,7 @@ object TrevorTracker {
     }
 
     private fun drawTrapperDisplay(storage: Storage.ProfileSpecific.TrapperData) = buildList<List<Any>> {
-        addAsSingletonList("§1§lTrevor Data Tracker")
+        addAsSingletonList("§b§lTrevor Data Tracker")
         addAsSingletonList("§b${storage.questsDone.addSeparators()} §9Quests Started")
         addAsSingletonList("§b${storage.peltsGained.addSeparators()} §5Total Pelts Gained")
         addAsSingletonList("§b${peltsPerHour.addSeparators()} §5Pelts Per Hour")

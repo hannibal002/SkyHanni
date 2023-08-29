@@ -410,7 +410,7 @@ public class MiscConfig {
         )
         @ConfigEditorDraggableList(
                 exampleText = {
-                        "§1§lTrevor Data Tracker",
+                        "§b§lTrevor Data Tracker",
                         "§b1,428 §9Quests Started",
                         "§b11,281 §5Total Pelts Gained",
                         "§b2,448 §5Pelts Per Hour",

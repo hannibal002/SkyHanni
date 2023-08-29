@@ -14,7 +14,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
 object TrevorSolver {
-    private val animalHealths = intArrayOf(100, 200, 500, 1000, 2000, 5000, 10000)
+    private val animalHealths = intArrayOf(100, 200, 500, 1000, 2000, 5000, 10000, 30000)
 
     var currentMob: TrevorMobs? = null
     private var maxHeight: Double = 0.0
