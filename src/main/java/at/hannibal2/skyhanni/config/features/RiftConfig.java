@@ -56,6 +56,7 @@ public class RiftConfig {
         @Expose
         @ConfigOption(name = "Show Bonuses", desc = "Show bonuses you get from the talisman.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public Property<Boolean> showBonuses = Property.of(true);
 
         @Expose

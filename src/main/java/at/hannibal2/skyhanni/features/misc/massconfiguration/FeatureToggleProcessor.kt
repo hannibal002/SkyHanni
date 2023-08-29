@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.misc.massconfiguration
 import at.hannibal2.skyhanni.config.FeatureToggle
 import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean
 import io.github.moulberry.moulconfig.annotations.ConfigOption
+import io.github.moulberry.moulconfig.observer.Property
 import io.github.moulberry.moulconfig.processor.ConfigStructureReader
 import java.lang.reflect.Field
+import java.lang.reflect.ParameterizedType
 import java.util.*
 
 class FeatureToggleProcessor : ConfigStructureReader {
@@ -42,14 +44,33 @@ class FeatureToggleProcessor : ConfigStructureReader {
         val featureToggle = field.getAnnotation(FeatureToggle::class.java) ?: return
         field.getAnnotation(ConfigEditorBoolean::class.java)
             ?: error("Feature toggle found without ConfigEditorBoolean: $field")
+        val setter: (Boolean) -> Unit
+        val value: Boolean
+        when (field.type) {
+            java.lang.Boolean.TYPE -> {
+                setter = { field.setBoolean(baseObject, it) }
+                value = field.getBoolean(baseObject)
+            }
+
+            Property::class.java -> {
+                val genericType = field.genericType
+                require(genericType is ParameterizedType)
+                require((genericType.actualTypeArguments[0] as Class<*>) == (java.lang.Boolean::class.java))
+                val prop = field.get(baseObject) as Property<Boolean>
+                setter = { prop.set(it) }
+                value = prop.get()
+            }
+
+            else -> error("Invalid FeatureToggle type: $field")
+        }
         allOptions.add(
             FeatureToggleableOption(
                 option.name,
                 option.desc,
-                field.getBoolean(baseObject),
+                value,
                 featureToggle.trueIsEnabled,
                 latestCategory!!,
-                { field.setBoolean(baseObject, it) },
+                setter,
                 pathStack.joinToString(".") + "." + field.name
             )
         )
