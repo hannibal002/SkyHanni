@@ -209,7 +209,7 @@ class FarmingWeightDisplay {
                 } else {
                     leaderboardPosition--
                 }
-                ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =
+                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
 
                 // Remove passed player to present the next one
@@ -283,7 +283,7 @@ class FarmingWeightDisplay {
                 if (wasNotLoaded && config.eliteFarmingWeightoffScreenDropMessage) {
                     checkOffScreenLeaderboardChanges()
                 }
-                ProfileStorageData.profileSpecific?.garden?.faramingWeight?.lastFarmingWeightLeaderboard =
+                ProfileStorageData.profileSpecific?.garden?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
                 lastLeaderboardUpdate = System.currentTimeMillis()
                 isLoadingLeaderboard = false
@@ -292,7 +292,7 @@ class FarmingWeightDisplay {
 
         private fun checkOffScreenLeaderboardChanges() {
             val profileSpecific = ProfileStorageData.profileSpecific ?: return
-            val oldPosition = profileSpecific.garden.faramingWeight.lastFarmingWeightLeaderboard
+            val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
             if (oldPosition == -1) return
 
             val diff = leaderboardPosition - oldPosition
