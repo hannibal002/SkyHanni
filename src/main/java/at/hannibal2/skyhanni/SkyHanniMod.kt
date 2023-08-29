@@ -228,7 +228,7 @@ class SkyHanniMod {
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
         loadModule(MarkedPlayerManager())
-        loadModule(HighlightSlayerMiniBoss())
+        loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())

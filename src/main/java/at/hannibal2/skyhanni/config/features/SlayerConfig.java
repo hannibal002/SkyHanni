@@ -496,6 +496,12 @@ public class SlayerConfig {
     public boolean slayerMinibossHighlight = false;
 
     @Expose
+    @ConfigOption(name = "Line to Miniboss", desc = "Adds a line to every slayer miniboss around you.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean slayerMinibossLine = false;
+
+    @Expose
     @ConfigOption(name = "Hide Mob Names", desc = "Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.")
     @ConfigEditorBoolean
     @FeatureToggle
