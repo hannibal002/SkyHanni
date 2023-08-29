@@ -88,7 +88,7 @@ enum class BossType(
     LEECH_SUPREME("§cLeech Supreme", 22),
     BACTE("§aBacte", 22),
 
-    WINTER_REINDRAKE("Raindrake", 24),//TODO fix totally
+    WINTER_REINDRAKE("Reindrake", 24),//TODO fix totally
 
     //TODO arachne
 

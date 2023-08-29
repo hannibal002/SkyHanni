@@ -57,7 +57,7 @@ public class DamageIndicatorConfig {
                     "§bArachne",
                     "§bThe Rift Bosses",
                     "§bRiftstalker Bloodfiend",
-                    "§6Raindrake"
+                    "§6Reindrake"
             }
     )
     //TODO only show currently working and tested features
