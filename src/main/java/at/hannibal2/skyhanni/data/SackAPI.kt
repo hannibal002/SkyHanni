@@ -17,8 +17,6 @@ class SackAPI {
     fun onChat(event: LorenzChatEvent) {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
-        val sackChanges = ArrayList<SackChange>()
-
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
@@ -36,6 +34,7 @@ class SackAPI {
         val otherItemsAdded = sackAddText.contains("other items")
         val otherItemsRemoved = sackRemoveText.contains("other items")
 
+        val sackChanges = ArrayList<SackChange>()
         for (match in sackChangeRegex.findAll(sackChangeText)) {
             val delta = match.groups[1]!!.value.replace(",", "").toInt()
             val item = match.groups[2]!!.value
