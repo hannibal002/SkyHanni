@@ -59,6 +59,15 @@ object RenderUtils {
         beacon: Boolean = false,
         alpha: Float = -1f,
     ) {
+        drawColor(location, color.toColor(), beacon, alpha)
+    }
+
+    fun RenderWorldLastEvent.drawColor(
+        location: LorenzVec,
+        color: Color,
+        beacon: Boolean = false,
+        alpha: Float = -1f,
+    ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
         val y = location.y - viewerY
@@ -73,11 +82,11 @@ object RenderUtils {
         GlStateManager.disableCull()
         drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
-            color.toColor(),
+            color,
             realAlpha
         )
         GlStateManager.disableTexture2D()
-        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.toColor().rgb, 1.0f, partialTicks)
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()

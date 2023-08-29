@@ -86,7 +86,7 @@ class EndermanSlayerFeatures {
         if (!IslandType.THE_END.isInIsland()) return
 
         if (beaconConfig.highlightBeacon && event.entity in flyingBeacons) {
-            event.color = LorenzColor.DARK_RED.toColor().withAlpha(1)
+            event.color = beaconConfig.beaconColor.toChromaColor().withAlpha(1)
         }
 
         if (config.endermanHighlightNukekebi && event.entity in nukekubiSkulls) {
@@ -99,11 +99,11 @@ class EndermanSlayerFeatures {
         if (!IslandType.THE_END.isInIsland()) return
 
 
-        if (showBeacon()) {
+        if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
             endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }
-                .forEach { event.drawColor(it, LorenzColor.DARK_RED, alpha = 1f) }
+                .forEach { event.drawColor(it, beaconConfig.beaconColor.toChromaColor(), alpha = 0.5f) }
         }
 
         for ((location, time) in sittingBeacon) {
@@ -121,8 +121,8 @@ class EndermanSlayerFeatures {
             if (beaconConfig.highlightBeacon) {
                 val duration = 5.seconds - time.passedSince()
                 val durationFormat = duration.format(showMilliSeconds = true)
-                event.drawColor(location, LorenzColor.DARK_RED, alpha = 1f)
-                event.drawWaypointFilled(location, LorenzColor.RED.toColor(), true, true)
+                event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
+                event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
                 event.drawDynamicText(location.add(0, 1, 0), "§4Beacon §b$durationFormat", 1.8)
             }
         }
@@ -163,8 +163,8 @@ class EndermanSlayerFeatures {
         if (!IslandType.THE_END.isInIsland()) return
         if (!event.repeatSeconds(1)) return
 
-        nukekubiSkulls.also { it.removeAll { it.isDead } }
-        flyingBeacons.also { it.removeAll { it.isDead } }
+        nukekubiSkulls.also { skulls -> skulls.removeAll { it.isDead } }
+        flyingBeacons.also { beacons -> beacons.removeAll { it.isDead } }
 
         // Removing the beacon if It's still there after 7 sesconds.
         // This is just a workaround for the cases where the ServerBlockChangeEvent don't detect the beacon despawn info.
