@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
@@ -278,10 +279,8 @@ object VampireSlayerFeatures {
                     val vec = event.exactLocation(it)
                     val distance = start.distance(vec)
                     if (distance <= 15) {
-                        val player = Minecraft.getMinecraft().thePlayer
-                        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
                         event.draw3DLine(
-                            event.exactLocation(player).add(add),
+                            event.exactPlayerEyeLocation(),
                             vec.add(0.0, 1.54, 0.0),
                             config.lineColor.toChromaColor(),
                             config.lineWidth,

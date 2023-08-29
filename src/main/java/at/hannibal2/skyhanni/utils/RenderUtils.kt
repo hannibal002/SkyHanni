@@ -707,8 +707,12 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    fun RenderWorldLastEvent.exactLocation(entity: Entity): LorenzVec {
-        return exactLocation(entity, partialTicks)
+    fun RenderWorldLastEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
+
+    fun RenderWorldLastEvent.exactPlayerEyeLocation(): LorenzVec {
+        val player = Minecraft.getMinecraft().thePlayer
+        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        return exactLocation(player).add(add)
     }
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {

@@ -21,12 +21,12 @@ public class SlayerConfig {
     public static class EndermanBeaconConfig {
 
         @Expose
-        @ConfigOption(name = "Enable",
+        @ConfigOption(name = "Highlight Beacon",
                 desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added an timer when he explodes. " +
                         "Supports beacon in hand and beacon flying.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean enabled = true;
+        public boolean highlightBeacon = true;
 
         @Expose
         @ConfigOption(name = "Show Warning", desc = "Displays a warning mid-screen then the Enderman Slayer throws a Yang Glyph (beacon).")
@@ -48,7 +48,7 @@ public class SlayerConfig {
         @Expose
         @ConfigOption(name = "Line Width", desc = "Width of the line.")
         @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
-        public int lineWidth = 1;
+        public int lineWidth = 3;
     }
 
     @Expose
