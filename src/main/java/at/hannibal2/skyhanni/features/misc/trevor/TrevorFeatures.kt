@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.concurrent.fixedRateTimer
+import kotlin.time.Duration.Companion.seconds
 
 
 object TrevorFeatures {
@@ -76,7 +77,7 @@ object TrevorFeatures {
         if (event.message == "§aReturn to the Trapper soon to get a new animal to hunt!") {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
-                TitleUtils.sendTitle("§2Mob Died", 5_000)
+                TitleUtils.sendTitle("§2Mob Died ", 5.seconds)
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
@@ -142,7 +143,7 @@ object TrevorFeatures {
 
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
-                TitleUtils.sendTitle("§2Trapper Ready", 3_000)
+                TitleUtils.sendTitle("§2Trapper Ready", 3.seconds)
                 SoundUtils.playBeepSound()
             }
             currentStatus = TrapperStatus.READY

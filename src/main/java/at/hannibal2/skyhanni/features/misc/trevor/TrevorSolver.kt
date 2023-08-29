@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
     private val animalHealths = intArrayOf(100, 200, 500, 1000, 2000, 5000, 10000, 30000)
@@ -69,7 +70,7 @@ object TrevorSolver {
                         }
                         if (canSee) {
                             if (mobLocation != CurrentMobArea.FOUND) {
-                                TitleUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3_000)
+                                TitleUtils.sendTitle("§2Saw Mob!", 3.seconds)
                             }
                             mobLocation = CurrentMobArea.FOUND
                             mobCoordinates = entity.position.toLorenzVec()

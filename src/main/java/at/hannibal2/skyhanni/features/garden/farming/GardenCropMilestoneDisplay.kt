@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<List<Any>>()
@@ -215,7 +216,7 @@ object GardenCropMilestoneDisplay {
             SoundUtils.playBeepSound()
         }
         if (!needsInventory) {
-            TitleUtils.sendTitle(title, 1_500)
+            TitleUtils.sendTitle(title, 1.5.seconds)
         }
     }
 

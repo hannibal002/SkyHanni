@@ -56,6 +56,7 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
@@ -169,6 +170,7 @@ class SkyHanniMod {
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
+        loadModule(DefaultConfigFeatures)
 
         // APIs
         loadModule(BazaarApi())
@@ -180,6 +182,7 @@ class SkyHanniMod {
         loadModule(SlayerAPI)
         loadModule(PurseAPI())
         loadModule(RiftAPI)
+        loadModule(SackAPI())
 
         // features
         loadModule(BazaarOrderHelper())
@@ -216,7 +219,7 @@ class SkyHanniMod {
         loadModule(AshfangHideDamageIndicator())
         loadModule(ItemStars())
         loadModule(MinionFeatures())
-        loadModule(RealTime())
+        loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
@@ -226,7 +229,7 @@ class SkyHanniMod {
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
         loadModule(MarkedPlayerManager())
-        loadModule(HighlightSlayerMiniBoss())
+        loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())
@@ -384,6 +387,7 @@ class SkyHanniMod {
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
+        loadModule(GardenPlotBorders())
 
         init()
 

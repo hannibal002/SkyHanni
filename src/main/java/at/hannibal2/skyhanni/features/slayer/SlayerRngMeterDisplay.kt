@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.seconds
 
 class SlayerRngMeterDisplay {
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
@@ -74,7 +75,7 @@ class SlayerRngMeterDisplay {
             if (!hasItemSelected) {
                 if (config.warnEmpty) {
                     LorenzUtils.warning("§c[Skyhanni] No Slayer RNG Meter Item selected!")
-                    TitleUtils.sendTitle("§cNo RNG Meter Item!", 3_000)
+                    TitleUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
                 }
             }
             var blockChat = config.hideChat && hasItemSelected
