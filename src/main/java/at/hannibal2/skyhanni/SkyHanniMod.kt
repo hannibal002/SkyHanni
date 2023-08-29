@@ -382,6 +382,7 @@ class SkyHanniMod {
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
+        loadModule(GardenPlotBorders())
 
         init()
 
