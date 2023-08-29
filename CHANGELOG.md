@@ -44,6 +44,16 @@
     + After enabling, click on any chat message sent by another player to translate it to English.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + Show a line to the enderman slayer beacon. - hannibal2
++ Added **Default Option Settings:** - nea
+    + Enables or disables all features at once, or per category.
+    + Sends a chat message on first SkyHanni startup (starting with this feature, so this version everyone will see this
+      message).
+    + Shows new features after an update (starting with the next beta, not this one).
+    + Allows to change those settings anytime again with /shdefaultoptions.
++ While on the Winter Island, show a timer until Jerry's Workshop closes. - hannibal2
++ Added Reindrake support to the Damage Indicator. - hannibal2
++ Added visual garden plot borders. - VixidDev
+    + Press F3 + G to enable/disable the view.
 
 ### Changes
 
@@ -84,6 +94,8 @@
 + Added support for the new fixed inquisitor spawn message from Hypixel for the detection. - hannibal2
 + Added option to hide the off-screen drop chat message. - hannibal2
 + Now hides the farming weight display by default when below 200 weight (can be disabled). - hannibal2
++ Added option to change the Enderman Slayer beacon color. - hannibal2
++ Added option to show a line to every slayer mini boss around you. - hannibal2
 
 ### Fixes
 
@@ -134,6 +146,12 @@
 + Now correctly ignoring the minis from tier 2 Arachne in the Damage Indicator. - hannibal2
 + Fixed highlight in the main bestiary menu. - HiZe
 + Fixed maxed farming fortune possible in /ff - CalMWolfs
++ Fixed negative coins per copper price in visitor inventory. - hannibal2
++ Fixed rare error message while farming. - hannibal2
++ Fixed a rare error message while showing the lore of a farming tool. - hannibal2
++ Fixed estimated item value doesn't detect master stars in Auction House. - hannibal2
++ Fixed enderman slayer beacon warning only visible for a very short amount of time. - hannibal2
++ Fixed enderman slayer line to beacon only shows when beacon highlight is enabled. - hannibal2
 
 ### Removed Features
 
