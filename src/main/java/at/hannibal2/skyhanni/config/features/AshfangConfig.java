@@ -11,7 +11,7 @@ public class AshfangConfig {
     @Expose
     @ConfigOption(name = "Freeze", desc = "Show the cooldown for how long Ashfang blocks your abilities.")
     @ConfigEditorBoolean
-    public boolean freezeCooldown = false;
+    public boolean brrrrItsSoColdCooldownCooldown = false;
 
     @Expose
     public Position freezeCooldownPos = new Position(10, 10, false, true);
