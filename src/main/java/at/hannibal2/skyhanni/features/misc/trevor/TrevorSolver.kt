@@ -70,7 +70,7 @@ object TrevorSolver {
                         }
                         if (canSee) {
                             if (mobLocation != CurrentMobArea.FOUND) {
-                                TitleUtils.sendTitle("§2Saw Mob!", 3.seconds)
+                                TitleUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
                             }
                             mobLocation = CurrentMobArea.FOUND
                             mobCoordinates = entity.position.toLorenzVec()
