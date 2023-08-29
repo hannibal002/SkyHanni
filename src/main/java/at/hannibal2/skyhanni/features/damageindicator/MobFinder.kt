@@ -384,7 +384,7 @@ class MobFinder {
             entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
         ) {
             val maxHealth = entity.baseMaxHealth
-            if (maxHealth == 12 || maxHealth.derpy() == 4000) return null
+            if (maxHealth == 12 || maxHealth.derpy() == 20_000) return null
             return EntityResult(bossType = BossType.ARACHNE_BIG)
         }
 

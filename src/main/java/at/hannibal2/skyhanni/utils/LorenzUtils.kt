@@ -119,13 +119,19 @@ object LorenzUtils {
     fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result
     }
 
-    fun Float.round(decimals: Int): Double {
+    fun Float.round(decimals: Int): Float {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result.toFloat()
     }
 
     // TODO replace all calls with regex
