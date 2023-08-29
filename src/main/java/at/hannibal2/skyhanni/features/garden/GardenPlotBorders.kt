@@ -3,13 +3,13 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import java.awt.Color
 import kotlin.math.floor
 
 class GardenPlotBorders {
@@ -24,7 +24,6 @@ class GardenPlotBorders {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
 
         val keyPressed = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter() else Keyboard.getEventKey()
@@ -36,6 +35,7 @@ class GardenPlotBorders {
 
     @SubscribeEvent
     fun render(event: RenderWorldLastEvent) {
+        if (!isEnabled()) return
         if (!showBorders) return
 
         val entity = Minecraft.getMinecraft().renderViewEntity
@@ -56,7 +56,7 @@ class GardenPlotBorders {
             for (j in 0..96 step 96) {
                 val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
                 val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
-                event.draw3DLine(start, end, LorenzColor.DARK_BLUE.toColor(), 2, true)
+                event.tryDraw3DLine(start, end, LorenzColor.DARK_BLUE.toColor(), 2, true)
             }
         }
 
@@ -65,9 +65,9 @@ class GardenPlotBorders {
             val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
             val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
             // Front lines
-            event.draw3DLine(start, end, LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start, end, LINE_COLOR, 1, true)
             // Back lines
-            event.draw3DLine(start.addZ(96), end.addZ(96), LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start.addZ(96), end.addZ(96), LINE_COLOR, 1, true)
         }
 
         // Render vertical on Z-Axis
@@ -75,23 +75,45 @@ class GardenPlotBorders {
             val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
             val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
             // Left lines
-            event.draw3DLine(start, end, LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start, end, LINE_COLOR, 1, true)
             // Right lines
-            event.draw3DLine(start.addX(96), end.addX(96), LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start.addX(96), end.addX(96), LINE_COLOR, 1, true)
         }
 
         // Render horizontal
         for (y in minHeight..maxHeight step 4) {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
             // (minX, minZ) -> (minX, minZ + 96)
-            event.draw3DLine(start, start.addZ(96), LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start, start.addZ(96), LINE_COLOR, 1, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
-            event.draw3DLine(start.addZ(96), start.addXZ(96, 96), LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start.addZ(96), start.addXZ(96, 96), LINE_COLOR, 1, true)
             // (minX + 96, minZ + 96) -> (minX + 96, minZ)
-            event.draw3DLine(start.addXZ(96, 96), start.addX(96), LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start.addXZ(96, 96), start.addX(96), LINE_COLOR, 1, true)
             // (minX + 96, minZ) -> (minX, minZ)
-            event.draw3DLine(start.addX(96), start, LINE_COLOR, 1, true)
+            event.tryDraw3DLine(start.addX(96), start, LINE_COLOR, 1, true)
         }
+    }
+
+    private fun RenderWorldLastEvent.tryDraw3DLine(
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean
+    ) {
+        if (isOutOfBorders(p1)) return
+        if (isOutOfBorders(p2)) return
+        draw3DLine(p1, p2, color, lineWidth, depth)
+    }
+
+
+    private fun isOutOfBorders(location: LorenzVec) = when {
+        location.x > 240 -> true
+        location.x < -240 -> true
+        location.z > 240 -> true
+        location.z < -240 -> true
+
+        else -> false
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config
