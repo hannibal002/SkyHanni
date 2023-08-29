@@ -17,16 +17,6 @@ class FeatureToggleProcessor : ConfigStructureReader {
         allOptions.groupBy { it.category }
     }
 
-    data class FeatureToggleableOption(
-        val name: String, val description: String, val previouslyEnabled: Boolean,
-        val isTrueEnabled: Boolean, val category: Category,
-        val setter: (Boolean) -> Unit,
-        val path: String,
-        var toggleOverride: DefaultConfigOptionGui.ResetSuggestionState? = null
-    )
-
-    data class Category(val name: String, val description: String)
-
     override fun beginCategory(baseObject: Any?, field: Field?, name: String, description: String) {
         latestCategory = Category(name, description)
     }

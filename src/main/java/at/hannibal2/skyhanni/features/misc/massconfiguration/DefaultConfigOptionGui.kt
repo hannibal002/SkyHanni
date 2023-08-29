@@ -8,9 +8,11 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Mouse
+import kotlin.math.max
+import kotlin.math.min
 
 class DefaultConfigOptionGui(
-    val orderedOptions: Map<FeatureToggleProcessor.Category, List<FeatureToggleProcessor.FeatureToggleableOption>>,
+    private val orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     old: String,
     new: String
 ) :
@@ -21,45 +23,37 @@ class DefaultConfigOptionGui(
         else
             "§5SkyHanni Options In Version $new"
     } else {
-        if (new == "null") {
+        if (new == "null")
             "§5SkyHanni Options since $old"
-        } else {
+        else
             "§5SkyHanni Options $old → $new"
-        }
-    }
-    val xSize = 400
-    val ySize = 300
-    val barSize = 40
-    val padding = 10
-    var wasMouseDown = false
-    val cardHeight = 30
-
-    var currentScrollOffset = 0
-
-    enum class ResetSuggestionState(val label: String) {
-        TURN_ALL_OFF("§c§lTurn all off"),
-        TURN_ALL_ON("§a§lTurn all on"),
-        LEAVE_DEFAULTS("§b§lLeave unchanged"), ;
-
-        val next get() = entries[(ordinal + 1) % entries.size]
     }
 
-    val resetSuggestionState =
+    private val xSize = 400
+    private val ySize = 300
+    private val barSize = 40
+    private val padding = 10
+    private var wasMouseDown = false
+    private val cardHeight = 30
+
+    private var currentScrollOffset = 0
+
+    private val resetSuggestionState =
         orderedOptions.keys.associateWith { ResetSuggestionState.LEAVE_DEFAULTS }.toMutableMap()
 
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         super.drawScreen(mouseX, mouseY, partialTicks)
         drawDefaultBackground()
         RenderUtils.drawFloatingRectDark((width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
-        val sr = ScaledResolution(mc)
+        val scaledResolution = ScaledResolution(mc)
         var hoveringTextToDraw: List<String>? = null
-        var mx = mouseX - ((width - xSize) / 2) - padding
+        val x = mouseX - ((width - xSize) / 2) - padding
         val isMouseDown = Mouse.isButtonDown(0)
         val shouldClick = isMouseDown && !wasMouseDown
         wasMouseDown = isMouseDown
         val isMouseInScrollArea =
-            mx in 0..xSize && mouseY in ((height - ySize) / 2) + barSize..((height + ySize) / 2 - barSize)
-        var my = mouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
+            x in 0..xSize && mouseY in ((height - ySize) / 2) + barSize..((height + ySize) / 2 - barSize)
+        var y = mouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(width / 2F, (height - ySize) / 2F, 0F)
@@ -82,45 +76,51 @@ class DefaultConfigOptionGui(
             0F
         )
         var i = 0
-        fun bt(title: String, tooltip: List<String>, func: () -> Unit) {
-            val lw = mc.fontRendererObj.getStringWidth(title)
-            var s = false
-            if (mouseX - ((width - xSize) / 2 + padding) in i..(i + lw)
+        fun button(title: String, tooltip: List<String>, func: () -> Unit) {
+            val width = mc.fontRendererObj.getStringWidth(title)
+            var overMouse = false
+            if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width)
                 && mouseY - (height + ySize) / 2 in -barSize..0
             ) {
-                s = true
+                overMouse = true
                 hoveringTextToDraw = tooltip
                 if (shouldClick) {
                     func()
                 }
             }
-            RenderUtils.drawFloatingRectDark(i - 1, -3, lw + 4, 14)
-            mc.fontRendererObj.drawString(title, 2 + i.toFloat(), 0F, if (s) 0xFF00FF00.toInt() else -1, s)
-            i += lw + 12
+            RenderUtils.drawFloatingRectDark(i - 1, -3, width + 4, 14)
+            mc.fontRendererObj.drawString(
+                title,
+                2 + i.toFloat(),
+                0F,
+                if (overMouse) 0xFF00FF00.toInt() else -1,
+                overMouse
+            )
+            i += width + 12
         }
-        bt("Apply choices", listOf()) {
+        button("Apply choices", listOf()) {
             DefaultConfigFeatures.applyCategorySelections(resetSuggestionState, orderedOptions)
             mc.displayGuiScreen(null)
         }
-        bt("Turn all on", listOf()) {
-            resetSuggestionState.entries.forEach {
-                it.setValue(ResetSuggestionState.TURN_ALL_ON);
-                orderedOptions[it.key]!!.forEach { it.toggleOverride = null }
+        button("Turn all on", listOf()) {
+            resetSuggestionState.entries.forEach { entry ->
+                entry.setValue(ResetSuggestionState.TURN_ALL_ON)
+                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
         }
-        bt("Turn all off", listOf()) {
-            resetSuggestionState.entries.forEach {
-                it.setValue(ResetSuggestionState.TURN_ALL_OFF)
-                orderedOptions[it.key]!!.forEach { it.toggleOverride = null }
+        button("Turn all off", listOf()) {
+            resetSuggestionState.entries.forEach { entry ->
+                entry.setValue(ResetSuggestionState.TURN_ALL_OFF)
+                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
         }
-        bt("Leave all untouched", listOf()) {
-            resetSuggestionState.entries.forEach {
-                it.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
-                orderedOptions[it.key]!!.forEach { it.toggleOverride = null }
+        button("Leave all untouched", listOf()) {
+            resetSuggestionState.entries.forEach { entry ->
+                entry.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
+                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
         }
-        bt("Cancel", listOf()) {
+        button("Cancel", listOf()) {
             mc.displayGuiScreen(null)
         }
         GlStateManager.popMatrix()
@@ -131,7 +131,7 @@ class DefaultConfigOptionGui(
             (height - ySize) / 2 + barSize,
             (width + xSize) / 2,
             (height + ySize) / 2 - barSize,
-            sr
+            scaledResolution
         )
         GlStateManager.translate(
             (width - xSize) / 2F + padding,
@@ -141,48 +141,52 @@ class DefaultConfigOptionGui(
 
         for ((cat) in orderedOptions.entries) {
             val suggestionState = resetSuggestionState[cat]!!
+
             drawRect(0, 0, xSize - padding * 2, 1, 0xFF808080.toInt())
             drawRect(0, 30, xSize - padding * 2, cardHeight + 1, 0xFF808080.toInt())
             drawRect(0, 0, 1, cardHeight, 0xFF808080.toInt())
             drawRect(xSize - padding * 2 - 1, 0, xSize - padding * 2, cardHeight, 0xFF808080.toInt())
+
             mc.fontRendererObj.drawString("§e${cat.name} ${suggestionState.label}", 4, 4, -1)
             mc.fontRendererObj.drawSplitString("§7${cat.description}", 4, 14, xSize - padding * 2 - 8, -1)
-            if (isMouseInScrollArea && my in 0..cardHeight) {
-                hoveringTextToDraw =
-                    listOf(
-                        "§e${cat.name}",
-                        "§7${cat.description}",
-                        "§7Current plan: ${suggestionState.label}",
-                        "§aClick to toggle!",
-                        "§7Hold shift to show all options"
-                    )
+
+            if (isMouseInScrollArea && y in 0..cardHeight) {
+                hoveringTextToDraw = listOf(
+                    "§e${cat.name}",
+                    "§7${cat.description}",
+                    "§7Current plan: ${suggestionState.label}",
+                    "§aClick to toggle!",
+                    "§7Hold shift to show all options"
+                )
+
                 if (isShiftKeyDown()) {
                     hoveringTextToDraw = listOf(
                         "§e${cat.name}",
-                        "§7${cat.description}",
+                        "§7${cat.description}"
                     ) + orderedOptions[cat]!!.map { "§7 - §a" + it.name }
                 }
+
                 if (shouldClick) {
                     resetSuggestionState[cat] = suggestionState.next
                     orderedOptions[cat]!!.forEach { it.toggleOverride = null }
                 }
             }
-            my -= cardHeight
+
+            y -= cardHeight
             GlStateManager.translate(0F, cardHeight.toFloat(), 0F)
         }
 
-
         GlStateManager.popMatrix()
-        GlScissorStack.pop(sr)
+        GlScissorStack.pop(scaledResolution)
         if (hoveringTextToDraw != null) {
             Utils.drawHoveringText(hoveringTextToDraw, mouseX, mouseY, width, height, 100, mc.fontRendererObj)
         }
 
     }
 
-    fun scroll(s: Int) {
+    private fun scroll(s: Int) {
         currentScrollOffset =
-            Math.max(0, Math.min(s, (orderedOptions.size + 1) * cardHeight - ySize + barSize + padding * 2))
+            max(0, min(s, (orderedOptions.size + 1) * cardHeight - ySize + barSize + padding * 2))
     }
 
     override fun handleMouseInput() {

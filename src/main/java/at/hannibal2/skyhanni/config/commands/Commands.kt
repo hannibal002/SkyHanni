@@ -329,8 +329,8 @@ object Commands {
         ClientCommandHandler.instance.registerCommand(
             SimpleCommand(
                 name,
-                createCommand(function),
-                { a, b, c -> autoComplete(b) })
+                createCommand(function)
+            ) { _, b, _ -> autoComplete(b) }
         )
         commands.add(CommandInfo(name, description, currentCategory))
     }
