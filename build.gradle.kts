@@ -34,6 +34,7 @@ repositories {
         }
     }
     maven("https://repo.nea.moe/releases")
+    maven("https://maven.notenoughupdates.org/releases")
 }
 
 val shadowImpl by configurations.creating {
@@ -87,10 +88,10 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.5")
-    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.5:test")
+    shadowModImpl(libs.moulconfig)
+    devenvMod(variantOf(libs.moulconfig) { classifier("test") })
 
-    shadowImpl("moe.nea:libautoupdate:1.0.3")
+    shadowImpl(libs.libautoupdate)
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
 //    testImplementation(kotlin("test"))

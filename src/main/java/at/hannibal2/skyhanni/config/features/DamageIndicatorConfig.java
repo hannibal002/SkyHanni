@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 
@@ -12,6 +13,7 @@ public class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the boss' remaining health.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean enabled = false;
 
     @Expose

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
@@ -19,6 +20,7 @@ public class FishingConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
+    @FeatureToggle
     public boolean trophyCounter = false;
 
     @Expose

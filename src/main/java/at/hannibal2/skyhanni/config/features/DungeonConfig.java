@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.ConfigAccordionId;
@@ -12,11 +13,13 @@ public class DungeonConfig {
     @Expose
     @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and wither essence when clicked in dungeons.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean highlightClickedBlocks = false;
 
     @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in dungeons.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean showMilestonesDisplay = false;
 
     @Expose
@@ -25,6 +28,7 @@ public class DungeonConfig {
     @Expose
     @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current dungeon.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean deathCounterDisplay = false;
 
     @Expose
@@ -39,6 +43,7 @@ public class DungeonConfig {
             "particles are no longer displayed and the music stops playing, but the loot chests are still displayed.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean cleanEndToggle = false;
 
     @Expose
@@ -51,11 +56,13 @@ public class DungeonConfig {
     @Expose
     @ConfigOption(name = "Boss Damage Splash", desc = "Hides damage splashes while inside the boss room (fixes a Skytils feature).")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean damageSplashBoss = false;
 
     @Expose
     @ConfigOption(name = "Highlight Deathmites", desc = "Highlight deathmites in dungeon in red color.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean highlightDeathmites = true;
 
     @ConfigOption(name = "Object Hider", desc = "Hide various things in dungeons.")
@@ -66,48 +73,56 @@ public class DungeonConfig {
     @ConfigOption(name = "Hide Superboom TNT", desc = "Hide Superboom TNT laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hideSuperboomTNT = false;
 
     @Expose
     @ConfigOption(name = "Hide Blessings", desc = "Hide Blessings laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hideBlessing = false;
 
     @Expose
     @ConfigOption(name = "Hide Revive Stones", desc = "Hide Revive Stones laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hideReviveStone = false;
 
     @Expose
     @ConfigOption(name = "Hide Premium Flesh", desc = "Hide Premium Flesh laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hidePremiumFlesh = false;
 
     @Expose
     @ConfigOption(name = "Hide Journal Entry", desc = "Hide Journal Entry pages laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hideJournalEntry = false;
 
     @Expose
     @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hideSkeletonSkull = true;
 
     @Expose
     @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the healer kills mobs.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hideHealerOrbs = false;
 
     @Expose
     @ConfigOption(name = "Hide Healer Fairy", desc = "Hide the golden fairy that follows the healer in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean hideHealerFairy = false;
 
     @ConfigOption(name = "Message Filter", desc = "")
@@ -118,6 +133,7 @@ public class DungeonConfig {
     @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
+    @FeatureToggle
     public boolean messageFilterKeysAndDoors = false;
 
     @ConfigOption(name = "Dungeon Copilot", desc = "")
@@ -128,6 +144,7 @@ public class DungeonConfig {
     @ConfigOption(name = "Copilot Enabled", desc = "Suggests what to do next in dungeons.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
+    @FeatureToggle
     public boolean copilotEnabled = false;
 
     @Expose
@@ -141,17 +158,20 @@ public class DungeonConfig {
     @ConfigOption(name = "Colored Class Level", desc = "Color class levels in party finder.")
     @ConfigAccordionId(id = 6)
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean partyFinderColoredClassLevel = true;
 
     @Expose
     @ConfigOption(name = "Moving Skeleton Skulls", desc = "Highlight Skeleton Skulls when combining into an " +
             "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean highlightSkeletonSkull = true;
 
     @Expose
     @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
             "shows unopened chests.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;
 }

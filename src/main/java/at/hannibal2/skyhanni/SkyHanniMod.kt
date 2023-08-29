@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.Commands.init
 import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
 import at.hannibal2.skyhanni.features.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
@@ -168,6 +169,7 @@ class SkyHanniMod {
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
+        loadModule(DefaultConfigFeatures)
 
         // APIs
         loadModule(BazaarApi())
