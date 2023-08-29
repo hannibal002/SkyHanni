@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 import kotlin.math.roundToLong
+import kotlin.time.Duration.Companion.seconds
 
 class GardenVisitorTimer {
     private val config get() = SkyHanniMod.feature.garden
@@ -111,7 +112,7 @@ class GardenVisitorTimer {
             if (isSixthVisitorEnabled() && millis < 0) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
-                    TitleUtils.sendTitle("§a6th Visitor Ready", 5_000)
+                    TitleUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) SoundUtils.playBeepSound()
                 }

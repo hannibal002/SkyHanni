@@ -196,9 +196,7 @@ object SackAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
-
-        val sackChanges = ArrayList<SackChange>()
-
+      
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
@@ -212,8 +210,11 @@ object SackAPI {
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return
-        val isMissingInfo = sackChangeText.contains("other items")
 
+        val otherItemsAdded = sackAddText.contains("other items")
+        val otherItemsRemoved = sackRemoveText.contains("other items")
+
+        val sackChanges = ArrayList<SackChange>()
         for (match in sackChangeRegex.findAll(sackChangeText)) {
             val delta = match.groups[1]!!.value.replace(",", "").toInt()
             val item = match.groups[2]!!.value
@@ -222,7 +223,7 @@ object SackAPI {
             val internalName = NEUInternalName.fromItemName(item)
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
-        SackChangeEvent(sackChanges, isMissingInfo).postAndCatch()
+        SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved).postAndCatch()
     }
 
     @SubscribeEvent
@@ -256,7 +257,7 @@ object SackAPI {
             }
         }
 
-        if (event.isMissingInfo) {
+        if (event.otherItemsAdded || event.otherItemsRemoved) {
             for (item in sackData) {
                 if (item.key in justChanged) continue
                 val oldData = sackData[item.key]

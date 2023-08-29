@@ -15,20 +15,22 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Chat
 
-- Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
++ Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
   player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
-- Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
-- Dungeon Filter (Removing annoying chat messages from the dungeon)
-- Dungeon Boss Message hider (includes The Watcher as well)
-- Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon
++ Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
++ Dungeon Filter (Removing annoying chat messages from the dungeon)
++ Dungeon Boss Message hider (includes The Watcher as well)
++ Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon
   or during a Kuudra fight.
-- Scan messages sent by players in all-chat for blacklisted words and greys out the message.
-- Chat peeking (holding key to display chat without opening the chat gui)
-- Compact Potion Effect Messages
-- **Arachne Chat Hider**
-    - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
++ Scan messages sent by players in all-chat for blacklisted words and greys out the message.
++ Chat peeking (holding key to display chat without opening the chat gui)
++ Compact Potion Effect Messages
++ **Arachne Chat Hider**
+    + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
 
 + Option to shorten the **bestiary level-up** message.
++ Added Chat **Translator** - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
 
 ## Dungeon
 
@@ -199,9 +201,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Hide poor slayer drop chat messages.
 + Highlight slayer miniboss in blue color.
-+ Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
-+ Warning when enderman slayer beacon spawns - dragon99z
-+ Highlight enderman slayer Nukekebi (Skulls) - dragon99z
++ Enderman Slayer **Yang Glyph**:
+    + Highlight the beacon in red color.
+        + Supports beacon in hand and beacon flying.
+    + Show timer till it explodes.
+    + Show a line to the beacon. - hannibal2
+    + Warning when enderman slayer beacon spawns - dragon99z
++ Highlight enderman slayer Nukekubi (Skulls) - dragon99z
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
 + Cooldown when the Fire Pillar from the Blaze Slayer will kill you.
@@ -287,6 +293,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   to checked what items it needs.
 + **Show Price** - Show the bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of crop milestone in the inventory.
++ Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 + **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
@@ -389,6 +396,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Override the Overtake ETA to show when you will reach the specified rank
     + If not there yet
     + Default: #10k
++ Sync Jacob Contests - Kaeso + CalMWolfs
+    + No need to open the calendar every SkyBlock year again.
+    + Grab Jacob Contest data from the elitebot.dev website.
+    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
 
 ## The Rift
 
@@ -564,3 +575,5 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Pet Experience Tooltip
     + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
       shift key.
++ Added **SkyHanni Installer** - NetheriteMiner
+    + Double-clicking the mod jar file will open a window that asks you where to move the mod into.

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MinecraftDispatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.jsonobjects.GardenJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -191,6 +192,14 @@ object GardenAPI {
                 return totalExp
             }
         }
+
+        while (tier < requestedLevel) {
+            totalExp += gardenOverflowExp
+            tier++
+            if (tier == requestedLevel) {
+                return totalExp
+            }
+        }
         return 0
     }
 
@@ -204,51 +213,21 @@ object GardenAPI {
             }
             tier++
         }
+        totalExp += gardenOverflowExp
+
+        while (totalExp < gardenExp) {
+            tier++
+            totalExp += gardenOverflowExp
+        }
         return tier
     }
 
-    private val gardenExperience = listOf(
-        0,
-        70,
-        100,
-        140,
-        240,
-        600,
-        1500,
-        2000,
-        2500,
-        3000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000, // level 15
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden") ?: return
+        gardenExperience = data.garden_exp
+    }
 
-        // overflow levels till 40 for now, in 10k steps
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-    )
+    private var gardenExperience = listOf<Int>()
+    private const val gardenOverflowExp = 10000 // can be changed I guess
 }

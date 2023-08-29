@@ -637,16 +637,18 @@ class DamageIndicatorManager {
         }
 
         //Laser phase
-        if (entity.ridingEntity != null) {
-            val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
-            //TODO more tests, more exact values, better logic? idk make this working perfectly pls
-            //val remainingTicks = 8 * 20 - ticksAlive
-            val remainingTicks = (8.9 * 20).toLong() - ticksAlive
+        if (config.enderSlayer.laserPhaseTimer) {
+            if (entity.ridingEntity != null) {
+                val ticksAlive = entity.ridingEntity.ticksExisted.toLong()
+                //TODO more tests, more exact values, better logic? idk make this working perfectly pls
+                //val remainingTicks = 8 * 20 - ticksAlive
+                val remainingTicks = (7.4 * 20).toLong() - ticksAlive
 
-            if (config.showHealthDuringLaser) {
-                entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
-            } else {
-                return formatDelay(remainingTicks * 50)
+                if (config.enderSlayer.showHealthDuringLaser) {
+                    entityData.nameSuffix = " §f" + formatDelay(remainingTicks * 50)
+                } else {
+                    return formatDelay(remainingTicks * 50)
+                }
             }
         }
 

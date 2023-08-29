@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.inventory.GardenPlotIcon;
@@ -26,6 +27,7 @@ public class GardenConfig {
     @ConfigOption(name = "Copper Price", desc = "Show copper to coin prices inside the SkyMart inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
+    @FeatureToggle
     public boolean skyMartCopperPrice = true;
 
     @Expose
@@ -53,6 +55,7 @@ public class GardenConfig {
             "and a number for how many visitors are already waiting.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean visitorTimerEnabled = true;
 
     @Expose
@@ -82,6 +85,7 @@ public class GardenConfig {
     @ConfigOption(name = "Items Needed", desc = "Show all items needed for the visitors.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean visitorNeedsDisplay = true;
 
     @Expose
@@ -110,6 +114,7 @@ public class GardenConfig {
     @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean visitorItemPreview = true;
 
     @Expose
@@ -122,6 +127,7 @@ public class GardenConfig {
     @ConfigOption(name = "Visitor Price", desc = "Show the bazaar price of the items required for the visitors, like in NEU.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
+    @FeatureToggle
     public boolean visitorShowPrice = false;
 
     @Expose
@@ -134,18 +140,21 @@ public class GardenConfig {
     @ConfigOption(name = "Copper Price", desc = "Show the price per copper inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
+    @FeatureToggle
     public boolean visitorCopperPrice = true;
 
     @Expose
     @ConfigOption(name = "Copper Time", desc = "Show the time required per copper inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
+    @FeatureToggle
     public boolean visitorCopperTime = false;
 
     @Expose
     @ConfigOption(name = "Garden Exp Price", desc = "Show the price per garden experience inside the visitor gui.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 4)
+    @FeatureToggle
     public boolean visitorExperiencePrice = false;
 
     @Expose
@@ -159,16 +168,19 @@ public class GardenConfig {
         @Expose
         @ConfigOption(name = "Notify in Chat", desc = "Send a Chat message once you talk to a visitor with reward.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean notifyInChat = true;
 
         @Expose
         @ConfigOption(name = "Show over Name", desc = "Show the reward name above the visitor name.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean showOverName = true;
 
         @Expose
         @ConfigOption(name = "Prevent Refusing", desc = "Prevent the refusal of a visitor with reward.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean preventRefusing = true;
 
         @Expose
@@ -193,6 +205,8 @@ public class GardenConfig {
                         "§9Dedication IV",
                         "§9Music Rune",
                         "§cSpace Helmet",
+                        "§9Cultivating I",
+                        "§9Replenish I",
                 }
         )
         public List<Integer> drops = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
@@ -204,12 +218,14 @@ public class GardenConfig {
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean visitorNotificationChat = true;
 
     @Expose
     @ConfigOption(name = "Notification Title", desc = "Show a title when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean visitorNotificationTitle = true;
 
     @Expose
@@ -222,18 +238,21 @@ public class GardenConfig {
     @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean visitorColoredName = true;
 
     @Expose
     @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean visitorHypixelArrivedMessage = true;
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in garden. (Except Beth and Spaceman)")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean visitorHideChat = true;
 
     @Expose
@@ -249,6 +268,7 @@ public class GardenConfig {
                 desc = "Tallies up statistic about visitors and the rewards you have received from them."
         )
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
@@ -310,24 +330,28 @@ public class GardenConfig {
     @ConfigOption(name = "Crop Milestone", desc = "Show the number of crop milestones in the inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
+    @FeatureToggle
     public boolean numberCropMilestone = true;
 
     @Expose
     @ConfigOption(name = "Average Milestone", desc = "Show the average crop milestone in the crop milestone inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
+    @FeatureToggle
     public boolean numberAverageCropMilestone = true;
 
     @Expose
     @ConfigOption(name = "Crop Upgrades", desc = "Show the number of upgrades in the crop upgrades inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
+    @FeatureToggle
     public boolean numberCropUpgrades = true;
 
     @Expose
     @ConfigOption(name = "Composter Upgrades", desc = "Show the number of upgrades in the composter upgrades inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
+    @FeatureToggle
     public boolean numberComposterUpgrades = true;
 
     @Expose
@@ -339,10 +363,11 @@ public class GardenConfig {
     @ConfigOption(
             name = "Progress Display",
             desc = "Shows the progress and ETA until the next crop milestone is reached and the current crops/minute value. " +
-                    "§cRequires a tool with either a counter or cultivating enchantment."
+                    "§eRequires a tool with either a counter or cultivating enchantment for full accuracy."
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 6)
+    @FeatureToggle
     public boolean cropMilestoneProgress = true;
 
     @Expose
@@ -426,6 +451,7 @@ public class GardenConfig {
             desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 7)
+    @FeatureToggle
     public boolean cropMilestoneBestDisplay = true;
 
     // TODO moulconfig runnable support
@@ -494,6 +520,7 @@ public class GardenConfig {
             desc = "Show the progress and ETA for mushroom crops when farming other crops because of the mushroom cow perk.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 15)
+    @FeatureToggle
     public boolean cropMilestoneMushroomPetPerkEnabled = true;
 
     @Expose
@@ -527,6 +554,7 @@ public class GardenConfig {
     @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the hand. §cOnly updates after scrolling in the hotbar.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
+    @FeatureToggle
     public boolean keyBindEnabled = false;
 
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
@@ -614,9 +642,11 @@ public class GardenConfig {
     public boolean optimalSpeed = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand.\n(Thanks MelonKingDE for the default values).")
+    @ConfigOption(name = "Enabled", desc = "Show the optimal speed for your current tool in the hand.\n" +
+            "(Thanks MelonKingDE for the default values).")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
+    @FeatureToggle
     public boolean optimalSpeedEnabled = true;
 
     @Expose
@@ -629,6 +659,7 @@ public class GardenConfig {
     @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the rancher boots overlay by clicking on the presets.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 9)
+    @FeatureToggle
     public boolean optimalSpeedSignEnabled = true;
 
     @Expose
@@ -726,6 +757,7 @@ public class GardenConfig {
     @ConfigOption(name = "Display", desc = "Show the current garden level and progress to the next level.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 10)
+    @FeatureToggle
     public boolean gardenLevelDisplay = true;
 
     @Expose
@@ -742,6 +774,7 @@ public class GardenConfig {
             "See §ehttps://elitebot.dev/info §7for more info.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
+    @FeatureToggle
     public boolean eliteFarmingWeightDisplay = true;
 
     @Expose
@@ -762,6 +795,12 @@ public class GardenConfig {
     public boolean eliteFarmingWeightOvertakeETA = false;
 
     @Expose
+    @ConfigOption(name = "Offscreen Drop Message", desc = "Show a chat message when joining garden how many spots you have dropped since last garden join.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightoffScreenDropMessage = true;
+
+    @Expose
     @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 11)
@@ -774,6 +813,12 @@ public class GardenConfig {
     public String eliteFarmingWeightETAGoalRank = "10000";
 
     @Expose
+    @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 11)
+    public boolean eliteFarmingWeightIgnoreLow = false;
+
+    @Expose
     @ConfigOption(name = "Dicer Counter", desc = "")
     @ConfigEditorAccordion(id = 12)
     public boolean dicerCounter = false;
@@ -782,12 +827,14 @@ public class GardenConfig {
     @ConfigOption(name = "Rng Drop Counter", desc = "Count RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
+    @FeatureToggle
     public boolean dicerCounterDisplay = true;
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 12)
+    @FeatureToggle
     public boolean dicerCounterHideChat = false;
 
     @Expose
@@ -804,6 +851,7 @@ public class GardenConfig {
                     "Supports Bountiful, Mushroom Cow Perk and Dicer drops. Thier toggles are below.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
+    @FeatureToggle
     public boolean moneyPerHourDisplay = true;
 
     // TODO moulconfig runnable support
@@ -923,6 +971,7 @@ public class GardenConfig {
     @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
+    @FeatureToggle
     public boolean nextJacobContestDisplay = true;
 
     @Expose
@@ -936,6 +985,18 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 14)
     public boolean nextJacobContestOtherGuis = false;
+
+    @Expose
+    @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch contests from elitebot.dev for the current year if they're uploaded already.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 14)
+    public boolean nextJacobContestsFetchAutomatically = true;
+
+    @Expose
+    @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming contests to elitebot.dev for everyone else to then fetch automatically.")
+    @ConfigEditorDropdown(values = { "Ask When Needed", "Share Automatically", "Disabled" })
+    @ConfigAccordionId(id = 14)
+    public int nextJacobContestsShareAutomatically = 0;
 
     @Expose
     @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's contest starts.")
@@ -972,12 +1033,14 @@ public class GardenConfig {
     @ConfigOption(name = "Show Counter", desc = "Count all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 18)
+    @FeatureToggle
     public boolean farmingArmorDropsEnabled = true;
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 18)
+    @FeatureToggle
     public boolean farmingArmorDropsHideChat = false;
 
     @Expose
@@ -996,6 +1059,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 16)
+    @FeatureToggle
     public boolean anitaMedalProfitEnabled = true;
 
     @Expose
@@ -1004,6 +1068,7 @@ public class GardenConfig {
             desc = "Show current tier and cost to max out in the item tooltip.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 16)
+    @FeatureToggle
     public boolean extraFarmingFortune = true;
 
     @Expose
@@ -1021,6 +1086,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
+    @FeatureToggle
     public boolean composterOverlay = true;
 
     @Expose
@@ -1042,6 +1108,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
+    @FeatureToggle
     public boolean composterDisplayEnabled = true;
 
     @Expose
@@ -1051,6 +1118,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
+    @FeatureToggle
     public boolean composterDisplayOutsideGarden = false;
 
     @Expose
@@ -1069,6 +1137,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
+    @FeatureToggle
     public boolean composterUpgradePrice = true;
 
     @Expose
@@ -1087,6 +1156,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
+    @FeatureToggle
     public boolean composterHighLightUpgrade = true;
 
     @Expose
@@ -1096,6 +1166,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
+    @FeatureToggle
     public boolean composterInventoryNumbers = true;
 
     @Expose
@@ -1108,6 +1179,7 @@ public class GardenConfig {
     @ConfigOption(name = "Enable", desc = "Show a notification when organic matter or fuel runs low in your composter.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 21)
+    @FeatureToggle
     public boolean composterNotifyLowEnabled = true;
 
     @Expose
@@ -1154,6 +1226,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 22)
+    @FeatureToggle
     public boolean farmingFortuneDisplay = true;
 
     @Expose
@@ -1185,6 +1258,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 20)
+    @FeatureToggle
     public boolean compactToolTooltips = false;
 
     @Expose
@@ -1208,6 +1282,16 @@ public class GardenConfig {
     public int cropTooltipFortune = 1;
 
     @Expose
+    @ConfigOption(
+            name = "Total Crop Milestone",
+            desc = "Shows the progress bar till maxed crop milestone in the crop milestone inventory."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 20)
+    @FeatureToggle
+    public boolean cropMilestoneTotalProgress = true;
+
+    @Expose
     @ConfigOption(name = "Yaw and Pitch", desc = "")
     @Accordion
     public YawPitchDisplay yawPitchDisplay = new YawPitchDisplay();
@@ -1217,6 +1301,7 @@ public class GardenConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = false;
 
         @Expose
@@ -1277,6 +1362,7 @@ public class GardenConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Show the start waypoint for your farm with the currently holding tool.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = false;
 
     }
@@ -1290,6 +1376,7 @@ public class GardenConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Enable icon replacement in the Configure Plots menu.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @ConfigOption(name = "Hard Reset", desc = "Reset every slot to it's original item.")
@@ -1303,27 +1390,32 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean plotPrice = true;
 
     @Expose
     @ConfigOption(name = "Desk in Menu", desc = "Show a Desk button in the SkyBlock Menu. Opens the /desk command on click.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean deskInSkyBlockMenu = true;
 
 
     @Expose
     @ConfigOption(name = "Fungi Cutter Warning", desc = "Warn when breaking mushroom with the wrong Fungi Cutter mode.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean fungiCutterWarn = true;
 
     @Expose
     @ConfigOption(name = "Burrowing Spores", desc = "Show a notification when a Burrowing Spores spawns during farming mushrooms.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean burrowingSporesNotification = true;
 
     @Expose
     @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops during farming.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean wildStrawberryDyeNotification = true;
 
     @Expose
@@ -1332,6 +1424,7 @@ public class GardenConfig {
             desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean farmingFortuneForContest = true;
 
     @Expose
@@ -1343,6 +1436,7 @@ public class GardenConfig {
             desc = "Show the time and missing FF for every crop inside Jacob's Farming Contest inventory."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean jacobContextTimes = true;
 
     @Expose
@@ -1354,6 +1448,7 @@ public class GardenConfig {
             desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean jacobContestSummary = true;
 
     @Expose
@@ -1363,4 +1458,10 @@ public class GardenConfig {
 
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
+
+    @Expose
+    @ConfigOption(name = "Enable Plot Borders", desc = "Enable the use of F3 + G hotkey to show Garden plot borders. Similar to how later minecraft version render chunk borders.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean plotBorders = true;
 }

@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.tabcomplete.PlayerTabComplete
 import at.hannibal2.skyhanni.features.misc.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
@@ -127,7 +128,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.20.Beta.11",
+    version = "0.20.Beta.13",
 )
 class SkyHanniMod {
     @Mod.EventHandler
@@ -154,7 +155,7 @@ class SkyHanniMod {
         loadModule(OtherInventoryData)
         loadModule(TabListData())
         loadModule(RenderGuiData())
-        loadModule(GardenCropMilestones())
+        loadModule(GardenCropMilestones)
         loadModule(GardenCropUpgrades())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
@@ -164,11 +165,12 @@ class SkyHanniMod {
         loadModule(MayorElection())
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
-        loadModule(GardenCropMilestoneAverage())
+        loadModule(GardenCropMilestoneInventory())
         loadModule(GardenCropSpeed)
         loadModule(ProfileStorageData)
         loadModule(TitleData())
         loadModule(BlockData())
+        loadModule(DefaultConfigFeatures)
 
         // APIs
         loadModule(BazaarApi())
@@ -217,7 +219,7 @@ class SkyHanniMod {
         loadModule(AshfangHideDamageIndicator())
         loadModule(ItemStars())
         loadModule(MinionFeatures())
-        loadModule(RealTime())
+        loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
         loadModule(WikiCommand())
         loadModule(SendCoordinatedCommand())
@@ -227,7 +229,7 @@ class SkyHanniMod {
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
         loadModule(MarkedPlayerManager())
-        loadModule(HighlightSlayerMiniBoss())
+        loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())
@@ -287,7 +289,7 @@ class SkyHanniMod {
         loadModule(DicerRngDropCounter())
         loadModule(CropMoneyDisplay)
         loadModule(JacobFarmingContestsInventory())
-        loadModule(GardenNextJacobContest())
+        loadModule(GardenNextJacobContest)
         loadModule(WrongFungiCutterWarning())
         loadModule(FarmingArmorDrops())
         loadModule(JoinCrystalHollows())
@@ -383,6 +385,8 @@ class SkyHanniMod {
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
+        loadModule(Translator())
+        loadModule(GardenPlotBorders())
 
         init()
 
