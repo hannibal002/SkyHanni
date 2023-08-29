@@ -47,6 +47,12 @@ public class DevConfig {
     public boolean showInternalName = false;
 
     @Expose
+    @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 0)
+    public boolean showNpcPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show empty internal names", desc = "Shows internal name even for items with none.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)

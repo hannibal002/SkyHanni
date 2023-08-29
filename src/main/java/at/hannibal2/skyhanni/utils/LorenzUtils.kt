@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MayorElection
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -32,6 +33,8 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
@@ -116,19 +119,25 @@ object LorenzUtils {
     fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result
     }
 
-    fun Float.round(decimals: Int): Double {
+    fun Float.round(decimals: Int): Float {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result.toFloat()
     }
 
     // TODO replace all calls with regex
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
-    //TODO change to Int
+    // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
@@ -473,5 +482,22 @@ object LorenzUtils {
     fun Field.removeFinal(): Field {
         javaClass.getDeclaredField("modifiers").makeAccessible().set(this, modifiers and (Modifier.FINAL.inv()))
         return this
+    }
+
+    fun <T> List<T>.indexOfFirst(vararg args: T) = args.map { indexOf(it) }.firstOrNull { it != -1 }
+
+    private val recalculateDerpy =
+        RecalculatingValue(1.seconds) { MayorElection.isPerkActive("Derpy", "DOUBLE MOBS HP!!!") }
+
+    val isDerpy get() = recalculateDerpy.getValue()
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun runDelayed(duration: Duration, runnable: () -> Unit) {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runnable()
+            }
+        }, duration.inWholeMilliseconds)
     }
 }

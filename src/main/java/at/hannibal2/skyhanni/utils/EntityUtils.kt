@@ -102,8 +102,9 @@ object EntityUtils {
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         if (maxHealth == health) return true
 
-        //Derpy
-        if (maxHealth == health * 2) return true
+        if (LorenzUtils.isDerpy) {
+            if (maxHealth == health * 2) return true
+        }
 
         // TODO runic support
 
@@ -112,7 +113,9 @@ object EntityUtils {
             if (maxHealth == health * 3) return true
 
             //Derpy + Corrupted
-            if (maxHealth == health * 2 * 3) return true
+            if (LorenzUtils.isDerpy) {
+                if (maxHealth == health * 2 * 3) return true
+            }
         }
 
         return false

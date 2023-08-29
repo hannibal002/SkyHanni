@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -299,13 +300,13 @@ object SlayerItemProfitTracker {
     }
 
     private fun getPrice(internalName: NEUInternalName) =
-        internalName.getBazaarData()?.let { getPrice(it) } ?: internalName.getPrice()
+        internalName.getBazaarData()?.let { getPrice(internalName, it) } ?: internalName.getPrice()
 
-    private fun getPrice(bazaarData: BazaarData) = when (config.priceFrom) {
+    private fun getPrice(internalName: NEUInternalName, bazaarData: BazaarData) = when (config.priceFrom) {
         0 -> bazaarData.sellPrice
         1 -> bazaarData.buyPrice
 
-        else -> bazaarData.npcPrice
+        else -> internalName.getNpcPrice()
     }
 
     @SubscribeEvent
