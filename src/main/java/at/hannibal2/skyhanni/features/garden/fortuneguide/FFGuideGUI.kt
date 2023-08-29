@@ -341,7 +341,7 @@ open class FFGuideGUI : GuiScreen() {
     private fun renderTabs() {
         var x = guiLeft + 15
         var y = guiTop - 28
-        drawRect(x, y, x + 25, y + 28, if (currentCrop == null) 0x50555555 else 0x50000000)
+        drawRect(x, y, x + 25, y + 28, if (currentCrop == null) 0x50000000 else 0x50303030)
         GuiRenderUtils.renderItemStack(ItemStack(Blocks.grass), x + 5, y + 5)
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
             tooltipToDisplay.add("§eOverview")
@@ -349,7 +349,7 @@ open class FFGuideGUI : GuiScreen() {
 
         for (crop in CropType.entries) {
             x += 30
-            drawRect(x, y, x + 25, y + 28, if (currentCrop == crop) 0x50555555 else 0x50000000)
+            drawRect(x, y, x + 25, y + 28, if (currentCrop == crop) 0x50000000 else 0x50303030)
             GuiRenderUtils.renderItemStack(crop.icon, x + 5, y + 5)
             if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 25, 28)) {
                 tooltipToDisplay.add("§e${crop.cropName}")
@@ -359,13 +359,13 @@ open class FFGuideGUI : GuiScreen() {
         x = guiLeft - 28
         y = guiTop + 15
 
-        drawRect(x, y, x + 28, y + 25, if (selectedPage != FortuneGuidePage.UPGRADES) 0x50555555 else 0x50000000)
+        drawRect(x, y, x + 28, y + 25, if (selectedPage != FortuneGuidePage.UPGRADES) 0x50000000 else 0x50303030)
         GuiRenderUtils.renderItemStack(ItemStack(Items.gold_ingot), x + 5, y + 5)
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25)) {
             tooltipToDisplay.add("§eBreakdown")
         }
         y += 30
-        drawRect(x, y, x + 28, y + 25, if (selectedPage == FortuneGuidePage.UPGRADES) 0x50555555 else 0x50000000)
+        drawRect(x, y, x + 28, y + 25, if (selectedPage == FortuneGuidePage.UPGRADES) 0x50000000 else 0x50303030)
         GuiRenderUtils.renderItemStack(ItemStack(Items.map), x + 5, y + 5)
         if (GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, 28, 25)) {
             tooltipToDisplay.add("§eUpgrades")
