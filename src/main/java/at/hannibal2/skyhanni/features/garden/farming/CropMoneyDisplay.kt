@@ -111,6 +111,7 @@ object CropMoneyDisplay {
 
         var extraMushroomCowPerkCoins = 0.0
         var extraDicerCoins = 0.0
+        val extraArmorCoins = FarmingArmorDrops.getDropsPerHour(GardenAPI.getCurrentlyFarmedCrop())
         GardenAPI.getCurrentlyFarmedCrop()?.let {
             val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
             toolHasBountiful?.put(it, reforgeName == "bountiful")
@@ -204,11 +205,12 @@ object CropMoneyDisplay {
             val moneyArray = moneyPerHourData[internalName]!!
 
             for (price in moneyArray) {
-                val finalPrice = price + extraMushroomCowPerkCoins + extraDicerCoins
+                val finalPrice = price + extraMushroomCowPerkCoins + extraDicerCoins + extraArmorCoins
                 val format = format(finalPrice)
                 if (debug) {
                     newDisplay.addAsSingletonList(" price: ${price.addSeparators()}")
                     newDisplay.addAsSingletonList(" extraMushroomCowPerkCoins: ${extraMushroomCowPerkCoins.addSeparators()}")
+                    newDisplay.addAsSingletonList(" extraArmorCoins: ${extraArmorCoins.addSeparators()}")
                     newDisplay.addAsSingletonList(" existing extraDicerCoins: ${extraDicerCoins.addSeparators()}")
                     newDisplay.addAsSingletonList(" finalPrice: ${finalPrice.addSeparators()}")
                 }
