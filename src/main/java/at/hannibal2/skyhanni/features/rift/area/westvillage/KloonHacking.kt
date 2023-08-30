@@ -34,7 +34,7 @@ class KloonHacking {
     }
 
     private fun checkHelmet() {
-        wearingHelmet = InventoryUtils.getArmor(1000)[3]?.getInternalName_old() == "RETRO_ENCABULATING_VISOR"
+        wearingHelmet = InventoryUtils.getArmor()[3]?.getInternalName_old() == "RETRO_ENCABULATING_VISOR"
     }
 
     @SubscribeEvent
