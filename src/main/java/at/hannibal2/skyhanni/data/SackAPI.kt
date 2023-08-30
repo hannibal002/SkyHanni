@@ -196,7 +196,7 @@ object SackAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
-
+      
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
@@ -257,7 +257,7 @@ object SackAPI {
             }
         }
 
-        if (event.isMissingInfo) {
+        if (event.otherItemsAdded || event.otherItemsRemoved) {
             for (item in sackData) {
                 if (item.key in justChanged) continue
                 val oldData = sackData[item.key]
