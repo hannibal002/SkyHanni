@@ -395,5 +395,14 @@ public class Storage {
             @Expose
             public List<String> kingsTalkedTo = new ArrayList<>();
         }
+
+        @Expose
+        public DungeonStorage dungeons = new DungeonStorage();
+
+        public static class DungeonStorage {
+
+            @Expose
+            public Map<String, Integer> bosses = new HashMap<>();
+        }
     }
 }
