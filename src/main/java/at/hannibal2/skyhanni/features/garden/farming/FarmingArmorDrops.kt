@@ -88,7 +88,7 @@ class FarmingArmorDrops {
     }
 
     private fun checkArmor() {
-        val armorPieces = InventoryUtils.getArmor()
+        val armorPieces = InventoryUtils.getArmor(1500)
             .mapNotNull { it?.getInternalName_old() }
             .count { armorPattern.matcher(it).matches() }
         hasArmor = armorPieces > 1
