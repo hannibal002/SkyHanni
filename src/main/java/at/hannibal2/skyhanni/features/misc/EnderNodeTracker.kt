@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -115,23 +115,21 @@ class EnderNodeTracker {
 
     private fun calculateProfit(): Map<EnderNode, Double> {
         val newProfit = mutableMapOf<EnderNode, Double>()
-        lootCount.forEach { (key, _) ->
-            val price = if (isEnderArmor(key.displayName)) {
+        lootCount.forEach { (item, amount) ->
+            val price = if (isEnderArmor(item.displayName)) {
                 10_000.0
             } else {
-                val internalName = key.internalName
-                val npcPrice = internalName.getNpcPriceOrNull()
-                val bazaarData = internalName.getBazaarData()
-                if (LorenzUtils.noTradeMode || bazaarData == null) {
-                    npcPrice ?: georgePrice(key) ?: 0.0
+                val internalName = item.internalName
+                if (LorenzUtils.noTradeMode) {
+                    internalName.getNpcPriceOrNull() ?: georgePrice(item) ?: 0.0
                 } else {
-                    npcPrice
-                        ?.coerceAtLeast(bazaarData.sellPrice)
-                        ?.coerceAtLeast(georgePrice(key) ?: 0.0)
-                        ?: internalName.getPrice()
+                    internalName.getPriceOrNull()
+                        ?.coerceAtLeast(internalName.getNpcPriceOrNull() ?: 0.0)
+                        ?.coerceAtLeast(georgePrice(item) ?: 0.0)
+                        ?: 0.0
                 }
             }
-            newProfit[key] = price * (lootCount[key] ?: 0)
+            newProfit[item] = price * amount
         }
         return newProfit
     }
