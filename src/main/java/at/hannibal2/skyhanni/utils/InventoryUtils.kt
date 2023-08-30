@@ -5,11 +5,14 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.milliseconds
 
 object InventoryUtils {
     var itemInHandId = NEUInternalName.NONE
     var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
+    private var lastArmorCheck = SimpleTimeMark.farPast()
+    private var wornArmorNames = emptyArray<ItemStack?>()
 
     fun getItemsInOpenChest() = buildList<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
@@ -40,7 +43,14 @@ object InventoryUtils {
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
 
-    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+    fun getArmor(dataAgeLimit: Int): Array<ItemStack?> {
+        if (lastArmorCheck.passedSince() > dataAgeLimit.milliseconds) {
+            wornArmorNames = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+            lastArmorCheck = SimpleTimeMark.now()
+        }
+
+        return wornArmorNames
+    }
 
     fun inStorage() =
         openInventoryName().let {

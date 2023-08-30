@@ -20,9 +20,8 @@ class ChickenHeadTimer {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(5)) return
 
-        val itemStack = InventoryUtils.getArmor()[3]
+        val itemStack = InventoryUtils.getArmor(5000)[3]
         val name = itemStack?.name ?: ""
         hasChickenHead = name.contains("Chicken Head")
     }
