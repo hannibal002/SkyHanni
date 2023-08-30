@@ -27,7 +27,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.CRIMSON_ISLE) return
         if (!SkyHanniMod.feature.misc.crimsonIsleReputationHelper) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+        if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 
         kuudraLocation?.let {

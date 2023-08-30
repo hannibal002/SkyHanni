@@ -1,6 +1,6 @@
 # SkyHanni - List of all Features
 
-> Use /skyhanni or /sh to open the SkyHanni config in game
+Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Chat Filter
 
@@ -15,20 +15,22 @@
 
 ## Chat
 
-- Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
++ Options to change the player chat format (show prefix for channel 'all', hide player rank color, hide colon after
   player name, hide/change SkyBlock level format, hide/change elite position format, edit channel prefix design)
-- Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
-- Dungeon Filter (Removing annoying chat messages from the dungeon)
-- Dungeon Boss Message hider (includes The Watcher as well)
-- Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon
++ Using a clean chat format for player messages (removing the rank prefix, every player writes in the same color)
++ Dungeon Filter (Removing annoying chat messages from the dungeon)
++ Dungeon Boss Message hider (includes The Watcher as well)
++ Option to hide the death messages of other players, except for players who are close to the player, inside the dungeon
   or during a Kuudra fight.
-- Scan messages sent by players in all-chat for blacklisted words and greys out the message.
-- Chat peeking (holding key to display chat without opening the chat gui)
-- Compact Potion Effect Messages
-- **Arachne Chat Hider**
-    - Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
++ Scan messages sent by players in all-chat for blacklisted words and greys out the message.
++ Chat peeking (holding key to display chat without opening the chat gui)
++ Compact Potion Effect Messages
++ **Arachne Chat Hider**
+    + Hide chat messages about the Arachne Fight while outside of Arachne's Sanctuary
 
 + Option to shorten the **bestiary level-up** message.
++ Chat **Translator** - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
 
 ## Dungeon
 
@@ -198,10 +200,16 @@
 ## Slayer
 
 + Hide poor slayer drop chat messages.
-+ Highlight slayer miniboss in blue color.
-+ Highlight the enderman slayer Yang Glyph (Beacon) in red color (supports beacon in hand and beacon flying)
-+ Warning when enderman slayer beacon spawns - dragon99z
-+ Highlight enderman slayer Nukekebi (Skulls) - dragon99z
++ Slayer **Mini Boss:**
+    + Highlight the mob.
+    + Show a line from player crosshair to the mob.
++ Enderman Slayer **Yang Glyph**:
+    + Highlight the beacon in red color.
+        + Supports beacon in hand and beacon flying.
+    + Show timer till it explodes.
+    + Show a line to the beacon. - hannibal2
+    + Warning when enderman slayer beacon spawns - dragon99z
++ Highlight enderman slayer Nukekubi (Skulls) - dragon99z
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
 + Cooldown when the Fire Pillar from the Blaze Slayer will kill you.
@@ -277,7 +285,7 @@
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
-+ Added option to hide the vanilla particles around enderman
++ Option to hide the vanilla particles around enderman
 
 ## Garden Features
 
@@ -287,6 +295,7 @@
   to checked what items it needs.
 + **Show Price** - Show the bazaar price of the items required for the visitors.
 + **Crop Milestone** Number - Show the number of crop milestone in the inventory.
++ Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + **Crop Upgrades** Number - Show the number of upgrades in the crop upgrades inventory.
 + **Visitor Timer** - Timer when the next visitor will appear, and a number how many visitors are already waiting.
 + **Visitor Notification** - Show as title and in chat when a new visitor is visiting your island.
@@ -326,8 +335,12 @@
   require any crop)
 + **Money per Hour Advanced stats** - Show not only Sell Offer price but also Instant Sell price and NPC Sell price (
   Suggestion: Enable Compact Price as well for this)
-+ **Anita Medal Profit** - Helps to identify profitable items to buy at the Anita item shop and potential profit from
-  selling the item at the auction house.
++ **Anita Inventory**
+    + **Medal Profit**
+        + Helps to identify profitable items to buy at the Anita item shop and potential profit from
+        + selling the item at the auction house.
+    + **Extra Farming Fortune**
+        + Show current tier and cost to max out in the item tooltip.
 + **Composter Compact Display** - Displays the compost data from the tab list in a compact form as gui element.
 + **Composter Upgrade Price** - Show the price for the composter upgrade in the lore
 + **Highlight Upgrade** - Highlight Upgrades that can be bought right now.
@@ -385,6 +398,12 @@
     + Override the Overtake ETA to show when you will reach the specified rank
     + If not there yet
     + Default: #10k
++ Sync Jacob Contests - Kaeso + CalMWolfs
+    + No need to open the calendar every SkyBlock year again.
+    + Grab Jacob Contest data from the elitebot.dev website.
+    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
++ Added visual garden plot borders. - VixidDev
+    + Press F3 + G to enable/disable the view.
 
 ## The Rift
 
@@ -423,7 +442,7 @@
     + Helps to solve the dance room in the mirror verse by showing multiple tasks at once.
     + Change how many tasks you should see
     + Hide other players inside the dance room
-    + Added timer before next instruction
+    + Timer before next instruction
     + Option to hide default title (instructions, "Keep it up!" and "It's happening!")
     + Fully customize the description for now, next and later (with color)
 + **Upside Down** Parkour & **Lava Maze** - hannibal2
@@ -437,7 +456,7 @@
 + Living Metal Suit Progress - HiZe
     + Display progress Living Metal Suit (Default disabled)
     + Option to show a compacted version of the overlay when the set is maxed
-+ Added Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
++ Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
 + Show a line between **Defense blocks** and the mob and highlight the blocks - hannibal2
     + Hide particles around Defense Blocks
 + Show a moving animation between **Living Metal** and the next block - hannibal2
@@ -474,7 +493,7 @@
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
 + **/shfarmingprofile [player name]**
-  + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
+    + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
 
 ## Misc
 
@@ -540,11 +559,13 @@
     + Show Ice per hour
     + Customizable GUI
     + Option to hide the chat messages
++ While on the Winter Island, show a timer until Jerry's Workshop closes. - hannibal2
 + **Custom Text Box** - CalMWolfs
     + Write fancy text into a gui element to show on your screen at all time
     + Supports color codes
     + Supports line breaks `\n` - hannibal2
-+ Added /sendcoords sending, detecting and rendering - dragon99z
++ **/sendcoords** - dragon99z
+    + Sending, detecting and rendering.
 + Add Dungeon Potion level as item stack size - HiZe
 + **Ender Node Tracker** - pretz
     + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
@@ -557,3 +578,14 @@
     + Show the number of the teleport pads inside the 'Change Destination' inventory as stack size.
     + Only on Private island.
 + Account upgrade complete reminder. - appable0
++ Pet Experience Tooltip
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
+      shift key.
++ **SkyHanni Installer** - NetheriteMiner
+    + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
++ **Default Option Settings:** - nea
+    + Enables or disables all features at once, or per category.
+    + Sends a chat message on first SkyHanni startup (starting with this feature, so this version everyone will see this
+      message).
+    + Shows new features after an update (starting with the next beta, not this one).
+    + Allows to change those settings anytime again with /shdefaultoptions.

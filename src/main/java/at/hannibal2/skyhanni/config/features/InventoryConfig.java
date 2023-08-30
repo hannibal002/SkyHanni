@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
@@ -18,6 +19,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Enabled", desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 0)
+    @FeatureToggle
     public boolean hideNotClickableItems = false;
 
     @Expose
@@ -53,18 +55,21 @@ public class InventoryConfig {
     @ConfigOption(name = "Floor Names", desc = "Show the floor names in the catacombs rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean rngMeterFloorName = false;
 
     @Expose
     @ConfigOption(name = "No Drop", desc = "Highlight floors without a drop selected in the catacombs rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean rngMeterNoDrop = false;
 
     @Expose
     @ConfigOption(name = "Selected Drop", desc = "Highlight the selected drop in the catacombs or slayer rng meter inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 1)
+    @FeatureToggle
     public boolean rngMeterSelectedDrop = false;
 
     @ConfigOption(name = "Stats Tuning", desc = "")
@@ -75,24 +80,28 @@ public class InventoryConfig {
     @ConfigOption(name = "Selected Stats", desc = "Show the tuning stats in the Thaumaturgy inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean statsTuningSelectedStats = true;
 
     @Expose
     @ConfigOption(name = "Tuning Points", desc = "Show the amount of selected tuning points in the stats tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean statsTuningPoints = true;
 
     @Expose
     @ConfigOption(name = "Selected Template", desc = "Highlight the selected template in the stats tuning inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean statsTuningSelectedTemplate = true;
 
     @Expose
     @ConfigOption(name = "Template Stats", desc = "Show the type of stats for the tuning point templates.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
+    @FeatureToggle
     public boolean statsTuningTemplateStats = true;
 
     @Expose
@@ -104,18 +113,21 @@ public class InventoryConfig {
     @ConfigOption(name = "Unclaimed Rewards", desc = "Highlight contests with unclaimed rewards in the jacob inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean jacobFarmingContestHighlightRewards = true;
 
     @Expose
     @ConfigOption(name = "Duplicate Hider", desc = "Hides duplicate farming contests in the inventory.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean jacobFarmingContestHideDuplicates = true;
 
     @Expose
     @ConfigOption(name = "Contest Time", desc = "Adds the real time format to the contest description.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 3)
+    @FeatureToggle
     public boolean jacobFarmingContestRealTime = true;
 
     @Expose
@@ -128,6 +140,7 @@ public class InventoryConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show contained items inside a sack inventory.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
@@ -196,6 +209,7 @@ public class InventoryConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Enabled estimated value of chest")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = false;
 
         @Expose
@@ -216,6 +230,7 @@ public class InventoryConfig {
         @Expose
         @ConfigOption(name = "Highlight slot", desc = "Highlight slot where the item is when you hover over it in the display.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enableHighlight = true;
 
         @Expose
@@ -272,7 +287,7 @@ public class InventoryConfig {
                     "§bPet Level",
                     "§bMinion Tier",
                     "§bCrimson Armor",
-                    "§bWishing Compass",
+                    "§7(Removed)",
                     "§bKuudra Key",
                     "§bSkill Level",
                     "§bCollection Level",
@@ -286,35 +301,41 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean displaySackName = false;
 
     @Expose
     @ConfigOption(name = "Anvil Combine Helper", desc = "Suggests the same item in the inventory when trying to combine two items in the anvil.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean anvilCombineHelper = false;
 
     @Expose
     @ConfigOption(name = "Item Stars",
             desc = "Show a compact star count in the item name for all items.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean itemStars = false;
 
     @Expose
     @ConfigOption(name = "Highlight Depleted Bonzo's Masks",
             desc = "Highlights used Bonzo's Masks with a background.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean highlightDepletedBonzosMasks = false;
 
     @Expose
     @ConfigOption(name = "Missing Tasks",
             desc = "Highlight missing tasks in the SkyBlock level guide inventory.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
     @ConfigOption(name = "Highlight Auctions",
             desc = "Highlight own items that are sold in green and that are expired in red.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean highlightAuctions = true;
 
 

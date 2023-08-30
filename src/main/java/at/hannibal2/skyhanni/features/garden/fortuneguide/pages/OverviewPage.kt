@@ -17,19 +17,14 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
-        //todo change based on pet and based on setting
-        GuiRenderUtils.drawFarmingBar(
-            "§6Universal Farming Fortune",
+        GuiRenderUtils.drawFarmingBar("§6Universal Farming Fortune",
             "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-                    "§eSee on the grass block page",
-            FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0,
-            1250,
-            FFGuideGUI.guiLeft + 15,
-            FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
+                    "§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1277,
+            FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         var line = if (FFStats.baseFF[FFTypes.ANITA]!! < 0.0) "§cAnita buff not saved\n§eVisit Anita to set it!"
-        else "§7§2Fortune for levelling your Anita extra crops\n§2You get 2☘ per buff level"
-        GuiRenderUtils.drawFarmingBar("§2Anita Buff", line, FFStats.baseFF[FFTypes.ANITA] ?: 0.0, 30, FFGuideGUI.guiLeft + 15,
+        else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
+        GuiRenderUtils.drawFarmingBar("§2Anita Buff", line, FFStats.baseFF[FFTypes.ANITA] ?: 0.0, 60, FFGuideGUI.guiLeft + 15,
             FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (FFStats.baseFF[FFTypes.FARMING_LVL]!! < 0.0) "§cFarming level not saved\n§eOpen /skills to set it!"
@@ -114,7 +109,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             when (currentArmor) {
                 0 -> 50
                 4 -> 0
-                else -> 16.67
+                else -> 16.667
             }
         } else {
             when (currentArmor) {
@@ -138,14 +133,26 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
             value, FFGuideGUI.guiLeft + 135,
             FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
-        val currentPet = when (FFGuideGUI.currentPet) {
-            FarmingItems.ELEPHANT -> FFStats.elephantFF
-            FarmingItems.MOOSHROOM_COW -> FFStats.mooshroomFF
-            else -> FFStats.rabbitFF
+        var currentPet = FFStats.rabbitFF
+        var petMaxFF = 60
+        when (FFGuideGUI.currentPet) {
+            FarmingItems.ELEPHANT -> {
+                currentPet = FFStats.elephantFF
+                petMaxFF = 210
+            }
+            FarmingItems.MOOSHROOM_COW -> {
+                currentPet = FFStats.mooshroomFF
+                petMaxFF = 217
+            }
+            FarmingItems.BEE -> {
+                currentPet = FFStats.beeFF
+                petMaxFF = 90
+            }
+            else -> {}
         }
 
         GuiRenderUtils.drawFarmingBar("§2Total Pet Fortune", "§7§2The total fortune from your pet and its item",
-            currentPet[FFTypes.TOTAL] ?: 0, 240, FFGuideGUI.guiLeft + 105,
+            currentPet[FFTypes.TOTAL] ?: 0, petMaxFF, FFGuideGUI.guiLeft + 105,
             FFGuideGUI.guiTop + 155, 70, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = when (FFStats.currentPetItem) {
@@ -177,7 +184,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         line = if (currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar("§2Total $word Fortune", line, equipmentFF[FFTypes.TOTAL] ?: 0,
-            if (currentEquipment == 0) 198 else 49.5,
+            if (currentEquipment == 0) 218 else 54.5,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
@@ -195,7 +202,7 @@ class OverviewPage: FFGuideGUI.FFGuidePage() {
         line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
         else "§7§2Total reforge fortune from your\n${equipmentItem.getItem().displayName}"
         GuiRenderUtils.drawFarmingBar("§2$word Reforge", line, equipmentFF[FFTypes.REFORGE] ?: 0,
-            if (currentEquipment == 0) 40 else 10,
+            if (currentEquipment == 0) 60 else 15,
             FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay)
 
         line = if (currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"

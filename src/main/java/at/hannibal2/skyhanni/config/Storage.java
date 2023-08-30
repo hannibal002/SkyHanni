@@ -21,7 +21,16 @@ import java.util.*;
 public class Storage {
 
     @Expose
+    public boolean hasPlayedBefore = false;
+
+    @Expose
+    public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
+
+    @Expose
     public Map<Long, List<CropType>> gardenJacobFarmingContestTimes = new HashMap<>();
+
+    @Expose
+    public Boolean contestSendingAsked = false;
 
     @Expose
     public Map<UUID, PlayerSpecific> players = new HashMap<>();
@@ -226,7 +235,7 @@ public class Storage {
             public long lastComposterEmptyWarningTime = 0;
 
             @Expose
-            public FarmingWeightConfig faramingWeight = new FarmingWeightConfig();
+            public FarmingWeightConfig farmingWeight = new FarmingWeightConfig();
 
             public static class FarmingWeightConfig {
 

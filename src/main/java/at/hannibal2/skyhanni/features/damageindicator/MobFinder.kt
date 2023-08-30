@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonData
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -10,6 +11,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchRegex
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -257,7 +260,11 @@ class MobFinder {
             }
             if (entity is EntityDragon) {
                 //TODO testing and use sidebar data
-                return EntityResult(bossType = BossType.END_ENDER_DRAGON)
+                if (IslandType.THE_END.isInIsland()) {
+                    return EntityResult(bossType = BossType.END_ENDER_DRAGON)
+                } else if (IslandType.WINTER.isInIsland()) {
+                    return EntityResult(bossType = BossType.WINTER_REINDRAKE)
+                }
             }
             if (entity is EntityIronGolem) {
                 if (entity.hasNameTagWith(3, "§e﴾ §8[§7Lv100§8] §lEndstone Protector§r ")) {
@@ -376,14 +383,14 @@ class MobFinder {
         ) {
             val maxHealth = entity.baseMaxHealth
             // Ignore the minis
-            if (maxHealth == 12 || maxHealth == 4000) return null
+            if (maxHealth == 12 || maxHealth.derpy() == 4000) return null
             return EntityResult(bossType = BossType.ARACHNE_SMALL)
         }
         if (entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") ||
             entity.hasNameTagWith(1, "[§7Lv500§8] §lArachne")
         ) {
             val maxHealth = entity.baseMaxHealth
-            if (maxHealth == 12 || maxHealth == 4000) return null
+            if (maxHealth == 12 || maxHealth.derpy() == 20_000) return null
             return EntityResult(bossType = BossType.ARACHNE_BIG)
         }
 

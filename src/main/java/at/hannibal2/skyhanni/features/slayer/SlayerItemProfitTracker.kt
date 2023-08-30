@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.LorenzUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -28,6 +29,7 @@ import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 object SlayerItemProfitTracker {
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
@@ -147,7 +149,7 @@ object SlayerItemProfitTracker {
         }
         if (config.titleWarning) {
             if (price > config.minimumPriceWarning) {
-                TitleUtils.sendTitle("§a+ $itemName", 5_000)
+                TitleUtils.sendTitle("§a+ $itemName", 5.seconds)
             }
         }
     }
@@ -299,13 +301,13 @@ object SlayerItemProfitTracker {
     }
 
     private fun getPrice(internalName: NEUInternalName) =
-        internalName.getBazaarData()?.let { getPrice(it) } ?: internalName.getPrice()
+        internalName.getBazaarData()?.let { getPrice(internalName, it) } ?: internalName.getPrice()
 
-    private fun getPrice(bazaarData: BazaarData) = when (config.priceFrom) {
+    private fun getPrice(internalName: NEUInternalName, bazaarData: BazaarData) = when (config.priceFrom) {
         0 -> bazaarData.sellPrice
         1 -> bazaarData.buyPrice
 
-        else -> bazaarData.npcPrice
+        else -> internalName.getNpcPrice()
     }
 
     @SubscribeEvent

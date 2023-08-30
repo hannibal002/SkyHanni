@@ -179,7 +179,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
-        if (!SkyHanniMod.feature.misc.crimsonIsleReputationLocation) return
+        if (!reputationHelper.showLocations()) return
 
         for (quest in quests) {
             if (quest is MiniBossQuest) continue

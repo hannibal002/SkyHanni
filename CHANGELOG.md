@@ -29,6 +29,31 @@
 + Chat message how many places you dropped in the farming weight lb when joining garden.
 + Added command /shfarmingprofile [player name]
 + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
++ Pet Experience Tooltip
+    + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
+      shift key.
++ Anita Extra Farming Fortune:
+    + Show current tier and cost to max out in the item tooltip.
++ Sync Jacob Contests - Kaeso + CalMWolfs
+    + No need to open the calendar every SkyBlock year again.
+    + Grab Jacob Contest data from the elitebot.dev website.
+    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
++ Added **SkyHanni Installer** - NetheriteMiner
+    + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
++ Added Chat Translator - NetheriteMiner
+    + After enabling, click on any chat message sent by another player to translate it to English.
++ Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
++ Show a line to the enderman slayer beacon. - hannibal2
++ Added **Default Option Settings:** - nea
+    + Enables or disables all features at once, or per category.
+    + Sends a chat message on first SkyHanni startup (starting with this feature, so this version everyone will see this
+      message).
+    + Shows new features after an update (starting with the next beta, not this one).
+    + Allows to change those settings anytime again with /shdefaultoptions.
++ While on the Winter Island, show a timer until Jerry's Workshop closes. - hannibal2
++ Added Reindrake support to the Damage Indicator. - hannibal2
++ Added visual garden plot borders. - VixidDev
+    + Press F3 + G to enable/disable the view.
 
 ### Changes
 
@@ -53,6 +78,24 @@
 + Count sea emperor and rider of the deep twice against sea creature cap.
 + Clicking on the chat message from farming weight will run the /shfarmingprofile command.
 + Changed Bestiary Display number format - HiZe
++ Changed ff buffs for Elephant and Anita.
++ Changed chicken head timer from 20s to 5s.
++ Added option to show reputation locations only when pressing the hotkey.
++ Delay the custom garden level up message by a few milliseconds to not cut into the garden milestone message.
++ Added runic support for Zealots/Bruiser.
++ Added cultivating and replenish to the visitor rewards. - ReyMaratov
++ Added Bee pet support to /ff - derholzmann12321
++ Added exportable carrot to /ff. - CalMWolfs
+    + If SkyHanni doesn't know you have it, run /shcarrot
++ The damage indicator now includes a toggle option for the Ender Slayer Laser Phase timer. - hannibal2
++ Added ender slayer beacon explode timer. - hannibal2
++ Show the name over Nukekubi Skulls for in ender slayer (deadly eyes). - hannibal2
++ Changed the enderman slayer laser timer to be more exact. - hannibal2
++ Added support for the new fixed inquisitor spawn message from Hypixel for the detection. - hannibal2
++ Added option to hide the off-screen drop chat message. - hannibal2
++ Now hides the farming weight display by default when below 200 weight (can be disabled). - hannibal2
++ Added option to change the Enderman Slayer beacon color. - hannibal2
++ Added option to show a line to every slayer mini boss around you. - hannibal2
 
 ### Fixes
 
@@ -82,6 +125,33 @@
 + Fixed arachne minis falsely show in damage indicator.
 + Fixed rare cases where special laptop keys trigger behavior unintended. - hannibal2
 + Fixed rendering problems with stack background and custom text lore. - nea
++ Hopefully fixed Derpy problems with Trevor Trapper, Arachne, Arachne Keeper and Zealots.
++ Fixed Anita upgrade detection from the Anita Shop inventory.
++ Fixed error message when clicking a finished upgrade in the community shop.
++ Fixed everything **crop milestone** related. - CalMWolfs
++ Fixed estimated item value detects master stars on non-dungeon items. - hannibal2
++ Fixed wrong progress bar for pet exp display. - hannibal2
++ Fixed compatibility problem with NEU for pet exp number format. - hannibal2
++ Various **/ff fixes** - CalMWolfs
++ Numbers, rounding and pets being reset.
++ Fixed inventory item number offset being wrong. - CalMWolfs
++ Fixed slayer quest detection after death. - hannibal2
++ Fixed rounding errors with yaw and pitch display. - hannibal2
++ Fixed ender slayer beacon don't disappear sometimes. - hannibal2
++ Fixed multiple bugs with garden visitor: - hannibal2
+    + Visitors with multiple different crops now calculate the copper price and the visitor drop stats correctly.
+    + Reward items no longer impact the visitor drop coins spent data negatively.
+    + Copper per coin price now respects the reward item profit as well.
+    + Now showing the NPC price for items without ah/bazaar data (looking at pet candy).
++ Now correctly ignoring the minis from tier 2 Arachne in the Damage Indicator. - hannibal2
++ Fixed highlight in the main bestiary menu. - HiZe
++ Fixed maxed farming fortune possible in /ff - CalMWolfs
++ Fixed negative coins per copper price in visitor inventory. - hannibal2
++ Fixed rare error message while farming. - hannibal2
++ Fixed a rare error message while showing the lore of a farming tool. - hannibal2
++ Fixed estimated item value doesn't detect master stars in Auction House. - hannibal2
++ Fixed enderman slayer beacon warning only visible for a very short amount of time. - hannibal2
++ Fixed enderman slayer line to beacon only shows when beacon highlight is enabled. - hannibal2
 
 ### Removed Features
 
@@ -89,6 +159,9 @@
     - (Hypixel fixed their bug, finally)
 - Removed remaining **Hypixel API** support for still existing legacy api keys. - hannibal2
     - This should not affect much
+    -
+- Removed wishing compass in item number.
+    - Every Wishing Compass now only has one use instead of three.
 
 ## Version 0.19
 
@@ -196,7 +269,7 @@
     + Show all commands in SkyHanni
 + Added Attribute price support to Estimated Item Value - nea
 + Added warning when enderman slayer beacon spawns - dragon99z
-+ Added Highlight enderman slayer Nukekebi (Skulls) - dragon99z
++ Added Highlight enderman slayer Nukekubi (Skulls) - dragon99z
 + Added option to hide the vanilla particles around enderman
 + Hide particles around enderman slayer bosses and mini bosses
 + Added support for Shadow Fury abilty cooldown - HiZe

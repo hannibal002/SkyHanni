@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
@@ -26,7 +27,7 @@ class EntityData {
             val oldMaxHealth = maxHealthMap.getOrDefault(entity, -1)
             if (oldMaxHealth != maxHealth) {
                 maxHealthMap[entity] = maxHealth
-                EntityMaxHealthUpdateEvent(entity, maxHealth).postAndCatch()
+                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).postAndCatch()
             }
         }
     }
@@ -70,7 +71,7 @@ class EntityData {
             }
 
             if (entity is EntityLivingBase) {
-                EntityHealthUpdateEvent(entity, health).postAndCatch()
+                EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
             }
         }
     }

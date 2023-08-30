@@ -139,7 +139,7 @@ class ItemAbilityCooldown {
             }
         }
         if (event.soundName == "random.drink") {
-            if (event.pitch.round(1) == 1.8 && event.volume == 1.0f) {
+            if (event.pitch.round(1) == 1.8f && event.volume == 1.0f) {
                 ItemAbility.HOLY_ICE.sound()
             }
         }

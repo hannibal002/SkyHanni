@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.*;
 import org.lwjgl.input.Keyboard;
@@ -9,11 +10,13 @@ public class DianaConfig {
     @Expose
     @ConfigOption(name = "Soopy Guess", desc = "Uses §eSoopy's Guess Logic §7to find the next burrow. Does not require SoopyV2 or ChatTriggers to be installed.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean burrowsSoopyGuess = false;
 
     @Expose
     @ConfigOption(name = "Nearby Detection", desc = "Show burrows near you.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean burrowsNearbyDetection = false;
 
     @Expose
@@ -42,6 +45,7 @@ public class DianaConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Shares your Inquisitor and receiving other Inquisitors via Party Chat.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
@@ -68,5 +72,6 @@ public class DianaConfig {
     @Expose
     @ConfigOption(name = "Griffin Pet Warning", desc = "Warn when holding an Ancestral Spade while no Griffin pet is selected.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean petWarning = true;
 }
