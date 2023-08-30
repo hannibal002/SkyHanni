@@ -60,6 +60,7 @@ object TrevorFeatures {
                     if (config.trapperSolver) {
                         if (onFarmingIsland()) {
                             updateTrapper()
+                            TrevorTracker.saveAndUpdate()
                             TrevorTracker.calculatePeltsPerHour()
                             if (questActive) TrevorSolver.findMob()
                         }

@@ -99,7 +99,7 @@ object TrevorTracker {
         saveAndUpdate()
     }
 
-    private fun saveAndUpdate() {
+    fun saveAndUpdate() {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
         display = formatDisplay(drawTrapperDisplay(storage))
     }
