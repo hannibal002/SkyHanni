@@ -815,7 +815,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Show money per Hour",
             desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
-                    "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer drops. Their toggles are below.")
+                    "Supports Bountiful, Mushroom Cow Perk, Special Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 13)
     public boolean moneyPerHourDisplay = true;
