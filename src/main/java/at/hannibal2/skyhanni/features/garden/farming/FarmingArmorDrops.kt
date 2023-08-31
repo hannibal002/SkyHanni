@@ -132,7 +132,7 @@ class FarmingArmorDrops {
                 val dropRates = specialDropObject["chance"].asJsonArray
                 var dropRate = 0.0
                 if (pieceCount > 0 && dropRates.size() >= pieceCount) {
-                    dropRate = dropRates[pieceCount -1 ].asDouble
+                    dropRate = dropRates[pieceCount - 1].asDouble
                 }
                 currentArmorDropChance = (dropRate * 60 * 60.0) / 100
             }
