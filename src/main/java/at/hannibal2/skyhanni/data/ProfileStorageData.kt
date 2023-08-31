@@ -91,8 +91,8 @@ object ProfileStorageData {
         noTabListTime = -1
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
         tryMigrateProfileSpecific()
-        ConfigLoadEvent().postAndCatch()
         loaded = true
+        ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent
