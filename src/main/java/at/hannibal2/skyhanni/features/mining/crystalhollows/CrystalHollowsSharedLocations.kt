@@ -1,36 +1,58 @@
 package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.MiscConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
 class CrystalHollowsSharedLocations {
 
-    val config get() = SkyHanniMod.feature.misc.mining
+    val config: MiscConfig.MiningConfig get() = SkyHanniMod.feature.misc.mining
     private val logger = LorenzLogger("crystal/locationSharing")
 
     var locations = mutableListOf<CrystalHollowLocations>()
-    var locationsNames = listOf(
+    private var locationsNames = listOf(
         "Mines of Divan",
         "Lost Precursor City",
         "Khazad-dûm",
         "Jungle Temple",
         "Goblin Queen's Den",
-        "Fairy Grotto",
-        "Dragon's Lair",
-        "King's Scent"
+        "Dragon's Lair"
+    )
+
+    private var locationsEntitySkins = mutableListOf(
+        CrystalHollowNPCSkins(
+            "ewogICJ0aW1lc3RhbXAiIDogMTYyNTY3OTY3MTE1MCwKICAicHJvZmlsZUlkIiA6ICJmNDY0NTcxNDNkMTU0ZmEwOTkxNjBlNGJmNzI3ZGNiOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJSZWxhcGFnbzA1IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM0MDZlM2Q4OWM1MGFjNzIwZTRiNDVlYWVlNTBkMzBlNDE2YTdkNmU5YWY2MmVkNDg2M2QzY2FmYjFlODBkYjkiCiAgICB9CiAgfQp9",
+            false
+        ), //mines of divan keeper skin
+        CrystalHollowNPCSkins(
+            "ewogICJ0aW1lc3RhbXAiIDogMTYyNDU0NjE4NTExNCwKICAicHJvZmlsZUlkIiA6ICIwZjczMDA3NjEyNGU0NGM3YWYxMTE1NDY5YzQ5OTY3OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJPcmVfTWluZXIxMjMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzU2MTIxMGUyMzY5NzdmMmY0ZTJiNDVhNDY0YjZiNGQ0OTI2NGJhMTRlNGVhZTgyZjI1YWMzMDlkYTYyMjhkNCIKICAgIH0KICB9Cn0=",
+            false
+        ), //king Yolkar skin
+        CrystalHollowNPCSkins(
+            "ewogICJ0aW1lc3RhbXAiIDogMTYxOTE4MzY4ODY1MSwKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJJb3lhbCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kNjU4NzA2MTliMGMyZGI4MjI0NzlkMmNiMzgyMTI2YmQ3OTljNTgyMzc4YjViMWRmOTNlNzViN2QwMTU1MWI3IgogICAgfQogIH0KfQ==",
+            false
+        ), //temple guardian skin
+        CrystalHollowNPCSkins(
+            "ewogICJ0aW1lc3RhbXAiIDogMTYyNTY3OTYyNDMzMCwKICAicHJvZmlsZUlkIiA6ICI3NTE0NDQ4MTkxZTY0NTQ2OGM5NzM5YTZlMzk1N2JlYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJUaGFua3NNb2phbmciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWRhZWNkMTJhMTdiZTQ0YmUwYTNlZDI4NWYyM2MzYTMwODdiNWVkOWM4NGQzMzAxOWU2ZTVhNjhmYjc3ODVlMiIKICAgIH0KICB9Cn0=",
+            false
+        ), //prof robot skin
     )
 
     var userAdded = false
@@ -122,7 +144,7 @@ class CrystalHollowsSharedLocations {
         }
     }
 
-    private suspend fun addCoordinates(location: String) {
+    private suspend fun addCoordinates(location: String, coordinate: LorenzVec) {
         if (!isEnabled()) return
         if (!userAdded) return
         if (!locationsNames.contains(location)) return
@@ -133,9 +155,8 @@ class CrystalHollowsSharedLocations {
         val encodedLocation = withContext(Dispatchers.IO) {
             URLEncoder.encode(location, "UTF-8")
         }
-        val coordinate = LocationUtils.playerLocation()
 
-        val url = "$baseAddress/api/save?serverId=$serverId&userId=$uuid&location=$encodedLocation&coordinates=${
+        val url = "$baseAddress/api/addLocation?serverId=$serverId&userId=$uuid&location=$encodedLocation&coordinates=${
             coordinationToURL(
                 coordinate.x, coordinate.y, coordinate.z
             )
@@ -152,29 +173,113 @@ class CrystalHollowsSharedLocations {
         }
     }
 
-    private fun update(location: String) {
+    private suspend fun removeLocation(location: String) {
+        if (!isEnabled()) return
+        if (!userAdded) return
+        if (!locationsNames.contains(location)) return
+        if (locations.any { it.name != location }) return
+
+        val serverId = LorenzUtils.skyBlockServerId
+        val uuid = LorenzUtils.getPlayerUuid()
+        val encodedLocation = withContext(Dispatchers.IO) {
+            URLEncoder.encode(location, "UTF-8")
+        }
+
+        val url =
+            "$baseAddress/api/removeLocation?serverId=$serverId&userId=$uuid&location=$encodedLocation&Key=$apiKey"
+        try {
+            val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val success = result["success"].asBoolean
+            if (success) {
+                logger.log("Successful removed $location from the server")
+            }
+        } catch (e: Exception) {
+            println("url: '$url'")
+            e.printStackTrace()
+        }
+    }
+
+    private fun remove(location: String) {
+        SkyHanniMod.coroutineScope.launch {
+            removeLocation(location)
+        }
+    }
+
+    private fun update(location: String, coordinate: LorenzVec) {
         SkyHanniMod.coroutineScope.launch {
             addUser()
             getLocations()
-            addCoordinates(location)
+            addCoordinates(location, coordinate)
         }
     }
 
     @SubscribeEvent
     fun onTimer(event: LorenzTickEvent) {
         if (!event.isMod(40)) return
-        if (!isEnabled()) return
-
+        if (!isEnabled()) {
+            if (userAdded) {
+                SkyHanniMod.coroutineScope.launch {
+                    removeUser()
+                }
+                locationsEntitySkins.forEach { it.found = false }
+                return
+            }
+        }
         val location = LorenzUtils.skyBlockArea
-        update(location)
+        update(location, LocationUtils.playerLocation())
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!isEnabled()) return
+        val entity = event.entity
+        if (entity is EntityOtherPlayerMP) {
+            when (entity.getSkinTexture().toString()) {
+                locationsEntitySkins[0].skin -> {
+                    if (!locationsEntitySkins[0].found) {
+                        if (locations.removeIf { it.name == "Mines of Divan" })
+                            remove("Mines of Divan")
+
+                        update("Mines of Divan", entity.getLorenzVec().add(33, 18, 3))
+                        locationsEntitySkins[0].found = true
+                    }
+                }
+
+                locationsEntitySkins[1].skin -> {
+                    if (!locationsEntitySkins[1].found) {
+                        update("King's Scent", entity.getLorenzVec())
+                        locationsEntitySkins[1].found = true
+                    }
+                }
+
+                locationsEntitySkins[2].skin -> {
+                    if (!locationsEntitySkins[2].found) {
+                        if (locations.removeIf { it.name == "Jungle Temple" })
+                            remove("Jungle Temple")
+
+                        update("Jungle Temple", entity.getLorenzVec())
+                        locationsEntitySkins[2].found = true
+                    }
+                }
+
+                locationsEntitySkins[3].skin -> {
+                    if (!locationsEntitySkins[3].found) {
+                        if (locations.removeIf { it.name == "Lost Precursor City" })
+                            remove("Lost Precursor City")
+
+                        update("Lost Precursor City", entity.getLorenzVec())
+                        locationsEntitySkins[3].found = true
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onWorldRender(event: RenderWorldLastEvent) {
-        val locationsCopy = locations.toList()
-        if (locationsCopy.isNotEmpty()) {
-            for ((location, name) in locationsCopy) {
-                event.drawColor(location, LorenzColor.DARK_BLUE, alpha = 1f)
+        if (locations.toMutableList().isNotEmpty()) {
+            for ((location, name) in locations.toMutableList()) {
+                event.drawColor(location, LorenzColor.DARK_BLUE, alpha = 0.5f)
                 event.drawWaypointFilled(location, LorenzColor.BLUE.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawString(location.add(0.5, 0.5, 0.5), "§b$name", true)
             }
@@ -189,10 +294,12 @@ class CrystalHollowsSharedLocations {
                 removeUser()
             }
         }
+        locationsEntitySkins.forEach { it.found = false }
         logger.log("Reset everything (world change)")
     }
 
     data class CrystalHollowLocations(val location: LorenzVec, val name: String)
+    data class CrystalHollowNPCSkins(val skin: String, var found: Boolean)
 
     fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.crystalHollowsShareLocations
 
