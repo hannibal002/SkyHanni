@@ -71,6 +71,7 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.mobs.MobHighlight
+import at.hannibal2.skyhanni.features.nether.*
 import at.hannibal2.skyhanni.features.nether.ashfang.*
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -391,6 +392,7 @@ class SkyHanniMod {
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
         loadModule(PowderTracker())
+        loadModule(QuestItemHelper())
 
         init()
 
