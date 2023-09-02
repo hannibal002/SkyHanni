@@ -1,15 +1,18 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
@@ -52,7 +55,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
@@ -69,7 +71,7 @@ object EstimatedItemValue {
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
-    private var gemstoneUnlockCosts = HashMap<String, HashMap<String, List<String>>>()
+    private var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -78,7 +80,10 @@ object EstimatedItemValue {
         if (data != null)
         // item_internal_names -> gemstone_slots -> ingredients_array
             gemstoneUnlockCosts =
-                Gson().fromJson(data, object : TypeToken<HashMap<String, HashMap<String, List<String>>>>() {}.getType())
+                ConfigManager.gson.fromJson(
+                    data,
+                    object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
+                )
         else
             LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
     }
@@ -666,17 +671,28 @@ object EstimatedItemValue {
     }
 
     private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getInternalName_old()
+        val internalName = stack.getInternalName()
 
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots").toString()
+        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
+
+        // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
+//        if (unlockedSlots == "null") return 0.0
 
         val priceMap = mutableMapOf<String, Double>()
+        if (gemstoneUnlockCosts.isEmpty()) return 0.0
 
-        if (gemstoneUnlockCosts.isEmpty() || !gemstoneUnlockCosts.contains(internalName)) return 0.0
+        if (internalName !in gemstoneUnlockCosts) {
+            CopyErrorCommand.logErrorState(
+                "Could not find gemstone slot price for ${stack.name}",
+                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName"
+            )
+            return 0.0
+        }
 
         var totalPrice = 0.0
-        for (slot in gemstoneUnlockCosts.get(internalName)!!) {
+        val slots = gemstoneUnlockCosts[internalName] ?: return 0.0
+        for (slot in slots) {
             if (!unlockedSlots.contains(slot.key)) continue
 
             val previousTotal = totalPrice
@@ -701,9 +717,6 @@ object EstimatedItemValue {
 
             priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
         }
-
-        // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
-        if (unlockedSlots == "null") return 0.0
 
         list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
         list += priceMap.sortedDesc().keys
