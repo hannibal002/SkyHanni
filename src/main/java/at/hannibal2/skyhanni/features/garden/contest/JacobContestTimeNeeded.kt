@@ -71,11 +71,21 @@ class JacobContestTimeNeeded {
                     line =
                         "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!"
                     val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
-                    val blocksPerSecond = crop.getLatestBlocksPerSecond() ?: 20.0
+                    var blocksPerSecond = crop.getLatestBlocksPerSecond()
+                    if (blocksPerSecond == null) {
+                        bracketText += "§0§l !" //hoping this never shows
+                        blocksPerSecond = 19.9
+                    } else {
+                        if (blocksPerSecond < 15.0) {
+                            bracketText += "§4§l !"
+                            blocksPerSecond = 19.9
+                        }
+                    }
                     val cropsPerSecond = amount.toDouble() / blocksPerSecond / 60
                     val ffNeeded = cropsPerSecond * 100 / 20 / crop.baseDrops
                     val missing = (ffNeeded - cropFF).toInt()
                     bracketText += " §7(${missing.addSeparators()} more FF needed!)"
+
                 }
                 brackets.add(bracketText)
                 if (bracket == currentBracket) {
@@ -83,6 +93,7 @@ class JacobContestTimeNeeded {
                     showLine = line
                 }
             }
+
             map[crop] = Renderable.hoverTips(showLine, buildList {
                 add("§7Time Needed for §9${crop.cropName} Medals§7:")
                 addAll(brackets)
@@ -112,6 +123,7 @@ class JacobContestTimeNeeded {
                 val text = map[crop]!!
                 add(listOf(crop.icon, text))
             }
+            addAsSingletonList("§eA§4§l ! §eindicates too low Blocks/Second. \nCalculations will use 19.9 instead.")
         }
     }
 
