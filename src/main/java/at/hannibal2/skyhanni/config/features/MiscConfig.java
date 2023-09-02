@@ -815,8 +815,9 @@ public class MiscConfig {
     public static class PowderTrackerConfig {
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enable the Powder Tracker overlay.")
+        @ConfigOption(name = "Enabled", desc = "Enable the Powder Tracker overlay for mining.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = false;
 
         @Expose
@@ -1025,6 +1026,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean superpairsClicksAlert = false;
 
     @Expose
