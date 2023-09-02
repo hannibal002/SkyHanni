@@ -124,6 +124,7 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
 - Try to avoid using kotlin's `!!` (catch if not null) feature.
     - Replace it with `?:` (ff null return this).
     - This will most likely not be possible to avoid when working with obects from java.
+- Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 
 # Additional Useful Developement Tools
 
