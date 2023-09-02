@@ -29,6 +29,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Timer
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -469,7 +470,7 @@ object LorenzUtils {
 
     // Taken and modified from Skytils
     @JvmStatic
-    fun Any.equalsOneOf(vararg other: Any): Boolean {
+    fun <T> T.equalsOneOf(vararg other: T): Boolean {
         for (obj in other) {
             if (this == obj) return true
         }

@@ -411,8 +411,8 @@ object EstimatedItemValue {
     private fun addSilex(stack: ItemStack, list: MutableList<String>): Double {
         val tier = stack.getSilexCount() ?: return 0.0
 
-        val internalName = stack.getInternalName_old()
-        val maxTier = if (internalName == "STONK_PICKAXE") 4 else 5
+        val internalName = stack.getInternalName()
+        val maxTier = if (internalName == "STONK_PICKAXE".asInternalName()) 4 else 5
 
         val wtfHardcodedSilex = "SIL_EX".asInternalName()
         val price = wtfHardcodedSilex.getPrice() * tier
