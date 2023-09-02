@@ -9,16 +9,20 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CosmeticFollowingLine {
     private val config get() = SkyHanniMod.feature.misc.cosmeticConfig.followingLineConfig
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
+    private var latestLocations = mapOf<LorenzVec, LocationSpot>()
 
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 
@@ -32,13 +36,23 @@ class CosmeticFollowingLine {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
+        updateClose(event)
 
         val firstPerson = Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
+        val color = config.lineColor.toChromaColor()
 
+        renderClose(event, firstPerson, color)
+        renderFar(event, firstPerson, color)
+    }
+
+    private fun renderFar(
+        event: RenderWorldLastEvent,
+        firstPerson: Boolean,
+        color: Color
+    ) {
         val last7 = locations.keys.toList().takeLast(7)
         val last2 = locations.keys.toList().takeLast(2)
 
-        val maxWidth = config.lineWidth
         for ((a, b) in locations.keys.zipWithNext()) {
             val locationSpot = locations[b]!!
             if (firstPerson) {
@@ -50,19 +64,40 @@ class CosmeticFollowingLine {
                 }
             }
             if (b in last2) {
-                // Do not render the line directly next to the player, prevent laggy design
-                continue
+                if (locationSpot.time.passedSince() < 400.milliseconds) {
+                    // Do not render the line directly next to the player, prevent laggy design
+                    continue
+                }
             }
-
-            val millis = locationSpot.time.passedSince().inWholeMilliseconds
-            val percentage = millis.toDouble() / (config.secondsAlive * 1000.0)
-            val rawLineWidth = 1 + maxWidth - percentage * maxWidth
-            var lineWidth = rawLineWidth.toInt()
-            if (lineWidth < 1) {
-                lineWidth = 1
-            }
-            event.draw3DLine(a, b, config.lineColor.toChromaColor(), lineWidth, !config.behindBlocks)
+            event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
+    }
+
+    private fun updateClose(event: RenderWorldLastEvent) {
+        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(0.0, 0.3, 0.0)
+
+        latestLocations = latestLocations.editCopy {
+            val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
+            this[playerLocation] = locationSpot
+            values.removeIf { it.time.passedSince() > 600.milliseconds }
+        }
+    }
+
+    private fun renderClose(event: RenderWorldLastEvent, firstPerson: Boolean, color: Color) {
+        if (firstPerson && latestLocations.any { !it.value.onGround }) return
+
+        for ((a, b) in latestLocations.keys.zipWithNext()) {
+            val locationSpot = latestLocations[b]!!
+            event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
+        }
+    }
+
+    private fun LocationSpot.getWidth(): Int {
+        val millis = time.passedSince().inWholeMilliseconds
+        val percentage = millis.toDouble() / (config.secondsAlive * 1000.0)
+        val maxWidth = config.lineWidth
+        val lineWidth = 1 + maxWidth - percentage * maxWidth
+        return lineWidth.toInt().coerceAtLeast(1)
     }
 
     @SubscribeEvent
@@ -79,40 +114,15 @@ class CosmeticFollowingLine {
             }
         }
 
-
         if (event.isMod(2)) {
             val playerLocation = LocationUtils.playerLocation().add(0.0, 0.3, 0.0)
 
             locations.keys.lastOrNull()?.let {
-//                if (it.distance(playerLocation) < 0.05) return
                 if (it.distance(playerLocation) < 0.1) return
             }
 
             locations = locations.editCopy {
-                val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
-//                if (locations.size > 1) {
-//                    val last = locations.keys.last()
-//                    var distance = last.distance(playerLocation)
-//                    if (distance > 65) {
-//                        println("skipped distance: $distance")
-//                        clear()
-//                        return@editCopy
-//                    }
-//
-//                    // We split the distance a player moves in 0.2 block long parts
-//                    val partLength = 0.2
-//                    val direction = playerLocation.subtract(last).normalize().multiply(partLength)
-//                    var help = last
-//                    var i = 0 // Just for safety
-//                    while (distance > partLength) {
-//                        distance -= partLength
-//                        help = help.add(direction)
-//                        this[help] = locationSpot
-//
-//                        if (i++ == ((1 / partLength) * 65).toInt()) break
-//                    }
-//                }
-                this[playerLocation] = locationSpot
+                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
             }
         }
     }
