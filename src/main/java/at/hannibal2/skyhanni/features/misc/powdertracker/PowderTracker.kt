@@ -305,6 +305,7 @@ class PowderTracker {
     }
 
     data class Gem(val flawless: Long, val fine: Long, val flawed: Long, val rough: Long)
+
     private data class ResourceInfo(
         var estimated: Long,
         var lastEstimated: Long,
