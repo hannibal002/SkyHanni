@@ -35,6 +35,25 @@ public class DianaConfig {
     public int keyBindWarp = Keyboard.KEY_NONE;
 
     @Expose
+    @ConfigOption(name = "Ignored Warps", desc = "")
+    @Accordion
+    public IgnoredWarpsConfig ignoredWarps = new IgnoredWarpsConfig();
+
+    public static class IgnoredWarpsConfig {
+
+        @Expose
+        @ConfigOption(name = "Crypt", desc = "Ignore the crypt warp point (Because it takes a long time to leave).")
+        @ConfigEditorBoolean
+        public boolean crypt = false;
+
+        @Expose
+        @ConfigOption(name = "Wizard", desc = "Ignore the wizard tower warp point (Because it is easy to fall into the rift).")
+        @ConfigEditorBoolean
+        public boolean wizard = false;
+
+    }
+
+    @Expose
     @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
     @Accordion
     @ConfigAccordionId(id = 9)
