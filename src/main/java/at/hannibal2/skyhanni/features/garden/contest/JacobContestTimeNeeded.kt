@@ -63,24 +63,27 @@ class JacobContestTimeNeeded {
                 val timeInMinutes = amount.toDouble() / speed / 60
                 val formatDuration = TimeUtils.formatDuration((timeInMinutes * 60 * 1000).toLong())
                 val color = if (timeInMinutes < 20) "§b" else "§c"
-                val line: String
+                var line: String
+                var marking: String = ""
                 var bracketText = "${bracket.displayName} $color$formatDuration"
-                if (timeInMinutes < 20) {
-                    line = "§9${crop.cropName} §b$formatDuration"
+                var blocksPerSecond = crop.getLatestBlocksPerSecond()
+                if (blocksPerSecond == null) {
+                    marking += "§0§l !" //hoping this never shows
+                    blocksPerSecond = 19.9
                 } else {
-                    line =
-                        "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!"
-                    val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
-                    var blocksPerSecond = crop.getLatestBlocksPerSecond()
-                    if (blocksPerSecond == null) {
-                        bracketText += "§0§l !" //hoping this never shows
+                    if (blocksPerSecond < 15.0) {
+                        marking += "§4§l !"
                         blocksPerSecond = 19.9
                     } else {
-                        if (blocksPerSecond < 15.0) {
-                            bracketText += "§4§l !"
-                            blocksPerSecond = 19.9
-                        }
+                        marking += " "
                     }
+                }
+                if (timeInMinutes < 20) {
+                    line = "§9${crop.cropName} §b$formatDuration" + marking
+                } else {
+                    line =
+                        "§9${crop.cropName} §cNo ${currentBracket.displayName} §cMedal!" + marking
+                    val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0
                     val cropsPerSecond = amount.toDouble() / blocksPerSecond / 60
                     val ffNeeded = cropsPerSecond * 100 / 20 / crop.baseDrops
                     val missing = (ffNeeded - cropFF).toInt()
@@ -123,7 +126,7 @@ class JacobContestTimeNeeded {
                 val text = map[crop]!!
                 add(listOf(crop.icon, text))
             }
-            addAsSingletonList("§eA§4§l ! §eindicates too low Blocks/Second. \nCalculations will use 19.9 instead.")
+            addAsSingletonList("§eA§4§l ! §eindicates too low Blocks/Second. Calculations will use 19.9 instead.")
         }
     }
 
