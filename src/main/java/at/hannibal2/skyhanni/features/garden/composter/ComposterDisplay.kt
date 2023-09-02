@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 class ComposterDisplay {
@@ -142,7 +143,7 @@ class ComposterDisplay {
         if (ComposterAPI.getOrganicMatter() <= config.composterNotifyLowOrganicMatter) {
             if (System.currentTimeMillis() >= hidden.informedAboutLowMatter) {
                 if (config.composterNotifyLowTitle) {
-                    TitleUtils.sendTitle("§cYour Organic Matter is low", 4_000)
+                    TitleUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
                 }
                 LorenzUtils.chat("§e[SkyHanni] §cYour Organic Matter is low!")
                 hidden.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
@@ -153,7 +154,7 @@ class ComposterDisplay {
             System.currentTimeMillis() >= hidden.informedAboutLowFuel
         ) {
             if (config.composterNotifyLowTitle) {
-                TitleUtils.sendTitle("§cYour Fuel is low", 4_000)
+                TitleUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
             LorenzUtils.chat("§e[SkyHanni] §cYour Fuel is low!")
             hidden.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
@@ -203,6 +204,6 @@ class ComposterDisplay {
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
         LorenzUtils.chat("§e[SkyHanni] $warningMessage")
-        TitleUtils.sendTitle("§eComposter Warning!", 3_000)
+        TitleUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 }

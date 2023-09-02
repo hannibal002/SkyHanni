@@ -31,13 +31,13 @@ class GardenNextPlotPrice {
             }
 
             if (next) {
-                val (itemName, amount) = ItemUtils.readItemAmount(line)
-                if (itemName != null) {
+                ItemUtils.readItemAmount(line)?.let {
+                    val (itemName, amount) = it
                     val lowestBin = NEUItems.getPrice(NEUItems.getRawInternalName(itemName))
                     val price = lowestBin * amount
                     val format = NumberUtil.format(price)
                     list[i] = list[i] + " §7(§6$format§7)"
-                } else {
+                } ?: {
                     LorenzUtils.error("§c[SkyHanni] Could not read item '$line'")
                 }
                 break
