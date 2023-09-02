@@ -409,13 +409,13 @@ class FarmingWeightDisplay {
         private fun CropType.getLocalCounter() = localCounter[this] ?: 0L
 
         private fun CropType.getFactor(): Double {
-            return factorPerCrop[this] ?: backupFactors[this]!!
+            return factorPerCrop[this] ?: backupFactors[this] ?: error("Crop $this not in backupFactors!")
         }
 
         fun lookUpCommand(it: Array<String>) {
             val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
             OSUtils.openBrowser("https://elitebot.dev/@$name/")
-            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile from §b$name")
+            LorenzUtils.chat("§e[SkyHanni] Opening Farming Profile of player §b$name")
         }
 
         private val factorPerCrop = mutableMapOf<CropType, Double>()
@@ -430,7 +430,7 @@ class FarmingWeightDisplay {
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
 
             for (crop in result.entrySet()) {
-                val cropType = CropType.entries.firstOrNull { it.cropName == crop.key } ?: continue
+                val cropType = CropType.getByName(crop.key)
                 factorPerCrop[cropType] = crop.value.asDouble
             }
         }
