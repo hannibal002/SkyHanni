@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NEUItems.manager
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -62,7 +62,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
@@ -77,8 +76,9 @@ object EstimatedItemValue {
         val data = manager.getJsonFromFile(File(manager.repoLocation, "constants/gemstonecosts.json"))
 
         if (data != null)
-            // item_internal_names -> gemstone_slots -> ingredients_array
-            gemstoneUnlockCosts = Gson().fromJson(data, object : TypeToken<HashMap<String, HashMap<String, List<String>>>>() {}.getType())
+        // item_internal_names -> gemstone_slots -> ingredients_array
+            gemstoneUnlockCosts =
+                Gson().fromJson(data, object : TypeToken<HashMap<String, HashMap<String, List<String>>>>() {}.getType())
         else
             LorenzUtils.error("Gemstone Slot Unlock Costs failed to load")
     }
@@ -671,45 +671,42 @@ object EstimatedItemValue {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
         val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots").toString()
 
-        var totalPrice = 0.0
         val priceMap = mutableMapOf<String, Double>()
 
-        if (gemstoneUnlockCosts.isNotEmpty() && gemstoneUnlockCosts.contains(internalName)) {
-            for (slot in gemstoneUnlockCosts.get(internalName)!!) {
-                if (unlockedSlots.contains(slot.key)) {
-                    val previousTotal = totalPrice
+        if (gemstoneUnlockCosts.isEmpty() || !gemstoneUnlockCosts.contains(internalName)) return 0.0
 
-                    for (ingredients in slot.value) {
-                        val ingredient = Ingredient(manager, ingredients)
+        var totalPrice = 0.0
+        for (slot in gemstoneUnlockCosts.get(internalName)!!) {
+            if (!unlockedSlots.contains(slot.key)) continue
 
-                        totalPrice += if (ingredient.isCoins) {
-                            ingredient.count
-                        } else {
-                            getPrice(ingredient.internalItemId) * ingredient.count
-                        }
-                    }
+            val previousTotal = totalPrice
+            for (ingredients in slot.value) {
+                val ingredient = Ingredient(manager, ingredients)
 
-                    val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
-                    val colorCode = GemstoneSlotType.getColorCode(splitSlot[0])
-                    val formattedPrice = NumberUtil.format(totalPrice - previousTotal)
-
-                    // eg. SAPPHIRE_1 -> Sapphire Slot 2
-                    val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
-                            // If the slot index is 0, we don't need to specify
-                            if (!splitSlot[1].equals("0")) {
-                                " " + (splitSlot[1].toInt() + 1)
-                            } else { "" }
-
-                    priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
+                totalPrice += if (ingredient.isCoins) {
+                    ingredient.count
+                } else {
+                    getPrice(ingredient.internalItemId) * ingredient.count
                 }
             }
 
-            // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
-            if (!unlockedSlots.equals("null")) {
-                list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
-                list += priceMap.sortedDesc().keys
-            }
+            val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
+            val colorCode = GemstoneSlotType.getColorCode(splitSlot[0])
+            val formattedPrice = NumberUtil.format(totalPrice - previousTotal)
+
+            // eg. SAPPHIRE_1 -> Sapphire Slot 2
+            val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
+                    // If the slot index is 0, we don't need to specify
+                    if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
+
+            priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
         }
+
+        // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
+        if (unlockedSlots == "null") return 0.0
+
+        list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
+        list += priceMap.sortedDesc().keys
         return totalPrice
     }
 }
