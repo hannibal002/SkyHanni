@@ -350,8 +350,8 @@ class ComposterOverlay {
 
 
         val priceCompost = getPrice("COMPOST")
-        val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer))*timeMultiplier
-        val profitPreview = ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview))*timeMultiplierPreview
+        val profit = ((priceCompost * multiDropFactor) - (fuelPricePer + organicMatterPricePer)) * timeMultiplier
+        val profitPreview = ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
 
         val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + NumberUtil.format(profitPreview) else ""
         val profitFormat = " §7Profit per $timeText: §6${NumberUtil.format(profit)}$profitFormatPreview"
