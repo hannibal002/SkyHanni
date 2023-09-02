@@ -1,6 +1,11 @@
 package at.hannibal2.skyhanni.features.damageindicator
 
-enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName: String = fullName, val showDeathTime: Boolean = false) {
+enum class BossType(
+    val fullName: String,
+    val bossTypeToggle: Int,
+    val shortName: String = fullName,
+    val showDeathTime: Boolean = false
+) {
     GENERIC_DUNGEON_BOSS("Generic Dungeon boss", 0),//TODO split into different bosses
 
     //Nether Mini Bosses
@@ -82,6 +87,8 @@ enum class BossType(val fullName: String, val bossTypeToggle: Int, val shortName
     // The Rift
     LEECH_SUPREME("§cLeech Supreme", 22),
     BACTE("§aBacte", 22),
+
+    WINTER_REINDRAKE("Reindrake", 24),//TODO fix totally
 
     //TODO arachne
 

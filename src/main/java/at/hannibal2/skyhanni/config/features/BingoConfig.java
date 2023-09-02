@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.moulberry.moulconfig.annotations.Accordion;
@@ -18,6 +19,7 @@ public class BingoConfig {
         @Expose
         @ConfigOption(name = "Enable", desc = "Displays the bingo card.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
         @Expose
         @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the bingo card or the step helper by sneaking with SkyBlock menu in hand.")
@@ -39,9 +41,11 @@ public class BingoConfig {
         @ConfigOption(
                 name = "Show Guide",
                 desc = "Show tips and difficulty for bingo goals inside the bingo card inventory.\n" +
-                        "§eData from Bingo Splash Community§7, made by §cMayxo"
+                        "These tips are made from inspirations and guides from the community,\n"+
+                        "aiming to help you to complete the bingo card."
         )
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean bingoSplashGuide = true;
 
         @Expose
@@ -59,11 +63,13 @@ public class BingoConfig {
         @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
                 "new area discoveries and skyblock level up messages while on bingo.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enabled = true;
 
         @Expose
         @ConfigOption(name = "Hide Border", desc = "Hide the border messages before and after the compact level up messages.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean hideBorder = true;
 
         @Expose
@@ -75,6 +81,7 @@ public class BingoConfig {
     @Expose
     @ConfigOption(name = "Minion Craft Helper", desc = "Show how many more items you need to upgrade the minion in your inventory. Especially useful for bingo.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean minionCraftHelperEnabled = true;
 
     @Expose

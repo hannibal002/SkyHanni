@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class SlayerQuestWarning {
     private val config get() = SkyHanniMod.feature.slayer
@@ -36,7 +37,7 @@ class SlayerQuestWarning {
         if (message == "  §r§c§lSLAYER QUEST FAILED!") {
             needNewQuest("The old slayer quest has failed!")
         }
-        if (message == "§eYour unsuccessful quest has been cleared out!") {
+        if (message == "  §r§5§lSLAYER QUEST STARTED!") {
             needSlayerQuest = false
         }
 
@@ -134,7 +135,7 @@ class SlayerQuestWarning {
         LorenzUtils.chat("§e[SkyHanni] $chatMessage")
 
         if (config.questWarningTitle) {
-            TitleUtils.sendTitle("§e$titleMessage", 2_000)
+            TitleUtils.sendTitle("§e$titleMessage", 2.seconds)
         }
     }
 

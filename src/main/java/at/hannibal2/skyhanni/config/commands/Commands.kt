@@ -7,12 +7,14 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
+import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
@@ -25,6 +27,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.slayer.SlayerItemProfitTracker
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -103,6 +106,11 @@ object Commands {
         registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { commandHelp(it) }
+        registerCommand0("shdefaultoptions", "Select default options", {
+            DefaultConfigFeatures.onCommand(
+                it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
+            )
+        }, DefaultConfigFeatures::onComplete)
     }
 
     private fun usersNormal() {
@@ -141,6 +149,13 @@ object Commands {
             "shfarmingprofile",
             "Look up the farming profile from yourself or another player on elitebot.dev"
         ) { FarmingWeightDisplay.lookUpCommand(it) }
+        registerCommand(
+            "shcopytranslation",
+            "<language code (2 letters)> <messsage to translate>\n" +
+                    "Requires the Chat > Translator feature to be enabled.\n" +
+                    "Copies the translation for a given message to your clipboard. " +
+                    "Language codes are at the end of the translation when you click on a message."
+        ) { Translator.fromEnglish(it) }
     }
 
     private fun usersBugFix() {
@@ -169,6 +184,14 @@ object Commands {
             "shdebugdata",
             "Prints debug data in the clipboard"
         ) { SkyHanniTestCommand.debugData(it) }
+        registerCommand(
+            "shversion",
+            "Prints the SkyHanni version in the chat"
+        ) { SkyHanniTestCommand.debugVersion() }
+        registerCommand(
+            "shcarrot",
+            "Toggles receiving the 12 fortune from carrots"
+        ) { CaptureFarmingGear.reverseCarrotFortune() }
     }
 
     private fun developersDebugFeatures() {
@@ -230,8 +253,12 @@ object Commands {
         registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
         registerCommand("shcopyerror", "") { CopyErrorCommand.command(it) }
         registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
+        registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
-
+        registerCommand(
+            "shsendtranslation",
+            "Respond with a translation of the message that the user clicks"
+        ) { Translator.toEnglish(it) }
     }
 
     private fun commandHelp(args: Array<String>) {
@@ -287,8 +314,24 @@ object Commands {
         config.outdatedItems.clear()
     }
 
-    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
-        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+    private fun registerCommand(
+        name: String,
+        description: String,
+        function: (Array<String>) -> Unit
+    ) = registerCommand0(name, description, function)
+
+    private fun registerCommand0(
+        name: String,
+        description: String,
+        function: (Array<String>) -> Unit,
+        autoComplete: ((Array<String>) -> List<String>) = { listOf() }
+    ) {
+        ClientCommandHandler.instance.registerCommand(
+            SimpleCommand(
+                name,
+                createCommand(function)
+            ) { _, b, _ -> autoComplete(b) }
+        )
         commands.add(CommandInfo(name, description, currentCategory))
     }
 

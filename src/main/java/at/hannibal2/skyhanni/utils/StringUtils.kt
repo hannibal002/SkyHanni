@@ -139,15 +139,15 @@ object StringUtils {
         var inMissingArea = false
         builder.append(prefix)
         for (i in 0..steps) {
-            builder.append(step)
             val toDouble = i.toDouble()
             val stepPercentage = toDouble / steps
-            if (stepPercentage > percentage) {
+            if (stepPercentage >= percentage) {
                 if (!inMissingArea) {
                     builder.append(missing)
                     inMissingArea = true
                 }
             }
+            builder.append(step)
         }
         builder.append(end)
         return builder.toString()

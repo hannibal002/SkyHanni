@@ -72,8 +72,7 @@ class AnitaMedalProfit {
         val fullCost = getFullCost(getRequiredItems(item))
         if (fullCost < 0) return
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName)
-        if (name == null) return
+        val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
         var internalName = NEUItems.getInternalNameOrNull(name)
         if (internalName == null) {
@@ -93,12 +92,13 @@ class AnitaMedalProfit {
         val jacobTicketPrice = "JACOBS_TICKET".asInternalName().getPrice()
         var otherItemsPrice = 0.0
         for (rawItemName in requiredItems) {
-            val (name, amount) = ItemUtils.readItemAmount(rawItemName)
-            if (name == null) {
+            val pair = ItemUtils.readItemAmount(rawItemName)
+            if (pair == null) {
                 LorenzUtils.error("§c[SkyHanni] Could not read item '$rawItemName'")
                 continue
             }
 
+            val (name, amount) = pair
             val medal = getMedal(name)
             otherItemsPrice += if (medal != null) {
                 val bronze = medal.factorBronze * amount
