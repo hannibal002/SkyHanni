@@ -388,6 +388,7 @@ class SkyHanniMod {
         loadModule(Translator())
         loadModule(GardenPlotBorders())
         loadModule(CosmeticFollowingLine())
+        loadModule(SuperpairsClicksAlert())
 
         init()
 

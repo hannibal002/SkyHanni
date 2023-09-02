@@ -952,6 +952,11 @@ public class MiscConfig {
     public boolean accountUpgradeReminder = true;
 
     @Expose
+    @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
+    @ConfigEditorBoolean
+    public boolean superpairsClicksAlert = false;
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     @FeatureToggle
