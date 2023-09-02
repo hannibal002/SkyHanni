@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.commands.PartyTransferCommand
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiCommand
+import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.*
 import at.hannibal2.skyhanni.features.event.diana.*
@@ -386,6 +387,7 @@ class SkyHanniMod {
         loadModule(PetExpTooltip())
         loadModule(Translator())
         loadModule(GardenPlotBorders())
+        loadModule(CosmeticFollowingLine())
 
         init()
 
