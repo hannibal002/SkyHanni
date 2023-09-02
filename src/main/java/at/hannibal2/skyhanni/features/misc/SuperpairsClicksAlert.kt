@@ -13,8 +13,8 @@ class SuperpairsClicksAlert {
     private val config get() = SkyHanniMod.feature.misc
 
     private var roundsNeeded = -1
-    private var roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")
-    private var currentRoundRegex = Regex("""Round: (\d+)""")
+    private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")
+    private val currentRoundRegex = Regex("""Round: (\d+)""")
     private val targetInventoryNames = arrayOf("Chronomatron", "Ultrasequencer")
 
     @SubscribeEvent
