@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -222,6 +223,7 @@ class CrystalHollowsSharedLocations {
                     removeUser()
                 }
                 locationsEntitySkins.forEach { it.found = false }
+                balFound = false
                 return
             }
         }
@@ -229,46 +231,61 @@ class CrystalHollowsSharedLocations {
         update(location, LocationUtils.playerLocation())
     }
 
+    var balFound = false
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!isEnabled()) return
-        val entity = event.entity
-        if (entity is EntityOtherPlayerMP) {
-            when (entity.getSkinTexture().toString()) {
-                locationsEntitySkins[0].skin -> {
-                    if (!locationsEntitySkins[0].found) {
-                        if (locations.removeIf { it.name == "Mines of Divan" })
-                            remove("Mines of Divan")
+        when (val entity = event.entity) {
+            is EntityOtherPlayerMP -> {
+                when (entity.getSkinTexture().toString()) {
+                    locationsEntitySkins[0].skin -> {
+                        if (!locationsEntitySkins[0].found) {
+                            if (locations.removeIf { it.name == "Mines of Divan" })
+                                remove("Mines of Divan")
 
-                        update("Mines of Divan", entity.getLorenzVec().add(33, 18, 3))
-                        locationsEntitySkins[0].found = true
+                            update("Mines of Divan", entity.getLorenzVec().add(33, 18, 3))
+                            locationsEntitySkins[0].found = true
+                        }
+                    }
+
+                    locationsEntitySkins[1].skin -> {
+                        if (!locationsEntitySkins[1].found) {
+                            update("King's Scent", entity.getLorenzVec())
+                            locationsEntitySkins[1].found = true
+                        }
+                    }
+
+                    locationsEntitySkins[2].skin -> {
+                        if (!locationsEntitySkins[2].found) {
+                            if (locations.removeIf { it.name == "Jungle Temple" })
+                                remove("Jungle Temple")
+
+                            update("Jungle Temple", entity.getLorenzVec())
+                            locationsEntitySkins[2].found = true
+                        }
+                    }
+
+                    locationsEntitySkins[3].skin -> {
+                        if (!locationsEntitySkins[3].found) {
+                            if (locations.removeIf { it.name == "Lost Precursor City" })
+                                remove("Lost Precursor City")
+
+                            update("Lost Precursor City", entity.getLorenzVec())
+                            locationsEntitySkins[3].found = true
+                        }
                     }
                 }
+            }
 
-                locationsEntitySkins[1].skin -> {
-                    if (!locationsEntitySkins[1].found) {
-                        update("King's Scent", entity.getLorenzVec())
-                        locationsEntitySkins[1].found = true
-                    }
-                }
+            is EntityMagmaCube -> {
+                if(LorenzUtils.skyBlockArea == "Khazad-dûm"){
+                    if(entity.slimeSize == 27 && !balFound){
+                        if (locations.removeIf { it.name == "Khazad-dûm" })
+                            remove("Khazad-dûm")
 
-                locationsEntitySkins[2].skin -> {
-                    if (!locationsEntitySkins[2].found) {
-                        if (locations.removeIf { it.name == "Jungle Temple" })
-                            remove("Jungle Temple")
-
-                        update("Jungle Temple", entity.getLorenzVec())
-                        locationsEntitySkins[2].found = true
-                    }
-                }
-
-                locationsEntitySkins[3].skin -> {
-                    if (!locationsEntitySkins[3].found) {
-                        if (locations.removeIf { it.name == "Lost Precursor City" })
-                            remove("Lost Precursor City")
-
-                        update("Lost Precursor City", entity.getLorenzVec())
-                        locationsEntitySkins[3].found = true
+                        update("Khazad-dûm", entity.getLorenzVec())
+                        balFound = true
                     }
                 }
             }
@@ -295,6 +312,7 @@ class CrystalHollowsSharedLocations {
             }
         }
         locationsEntitySkins.forEach { it.found = false }
+        balFound = false
         logger.log("Reset everything (world change)")
     }
 
