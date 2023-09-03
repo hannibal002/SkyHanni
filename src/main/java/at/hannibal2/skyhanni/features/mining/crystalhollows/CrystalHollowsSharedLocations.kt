@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
+import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -28,7 +29,7 @@ class CrystalHollowsSharedLocations {
     val config: MiscConfig.MiningConfig get() = SkyHanniMod.feature.misc.mining
     private val logger = LorenzLogger("crystal/locationSharing")
 
-    var locations = mutableListOf<CrystalHollowLocations>()
+    var locations = listOf<CrystalHollowLocations>()
     private var locationsNames = listOf(
         "Mines of Divan",
         "Lost Precursor City",
@@ -92,11 +93,12 @@ class CrystalHollowsSharedLocations {
                     val location =
                         LorenzVec(coordinates["x"].asDouble, coordinates["y"].asDouble, coordinates["z"].asDouble)
                     if (locations.isNotEmpty()) {
-                        if (locations.any { it.name != name }) {
-                            locations.add(CrystalHollowLocations(location, name))
+                        if (!locations.any { it.name != name }) {
+                            return
                         }
-                    } else {
-                        locations.add(CrystalHollowLocations(location, name))
+                    }
+                    locations = locations.editCopy {
+                        add(CrystalHollowLocations(location, name))
                     }
                 }
             }
@@ -255,8 +257,7 @@ class CrystalHollowsSharedLocations {
                 when (entity.getSkinTexture().toString()) {
                     locationsEntitySkins[0].skin -> {
                         if (!locationsEntitySkins[0].found) {
-                            if (locations.removeIf { it.name == "Mines of Divan" })
-                                remove("Mines of Divan")
+                            tryRemoving("Mines of Divan")
 
                             update("Mines of Divan", entity.getLorenzVec().add(33, 18, 3))
                             locationsEntitySkins[0].found = true
@@ -272,8 +273,7 @@ class CrystalHollowsSharedLocations {
 
                     locationsEntitySkins[2].skin -> {
                         if (!locationsEntitySkins[2].found) {
-                            if (locations.removeIf { it.name == "Jungle Temple" })
-                                remove("Jungle Temple")
+                            tryRemoving("Jungle Temple")
 
                             update("Jungle Temple", entity.getLorenzVec())
                             locationsEntitySkins[2].found = true
@@ -282,8 +282,7 @@ class CrystalHollowsSharedLocations {
 
                     locationsEntitySkins[3].skin -> {
                         if (!locationsEntitySkins[3].found) {
-                            if (locations.removeIf { it.name == "Lost Precursor City" })
-                                remove("Lost Precursor City")
+                            tryRemoving("Lost Precursor City")
 
                             update("Lost Precursor City", entity.getLorenzVec())
                             locationsEntitySkins[3].found = true
@@ -295,13 +294,21 @@ class CrystalHollowsSharedLocations {
             is EntityMagmaCube -> {
                 if (LorenzUtils.skyBlockArea == "Khazad-dûm") {
                     if (entity.slimeSize == 27 && !balFound) {
-                        if (locations.removeIf { it.name == "Khazad-dûm" })
-                            remove("Khazad-dûm")
+                        tryRemoving("Khazad-dûm")
 
                         update("Khazad-dûm", entity.getLorenzVec())
                         balFound = true
                     }
                 }
+            }
+        }
+    }
+
+    private fun tryRemoving(location: String) {
+        if (locations.any { it.name == location }) {
+            remove(location)
+            locations = locations.editCopy {
+                removeIf { it.name == location }
             }
         }
     }
@@ -319,7 +326,7 @@ class CrystalHollowsSharedLocations {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        locations.clear()
+        locations = emptyList()
         if (userAdded) {
             SkyHanniMod.coroutineScope.launch {
                 removeUser()
