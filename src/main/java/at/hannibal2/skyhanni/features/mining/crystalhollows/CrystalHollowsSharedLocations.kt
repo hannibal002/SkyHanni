@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,7 +68,6 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun getLocations() {
-        LorenzUtils.debug("CH sharing getLocations")
         if (!isEnabled()) return
         if (!userAdded) return
         val serverId = LorenzUtils.skyBlockServerId
@@ -150,6 +149,8 @@ class CrystalHollowsSharedLocations {
         LorenzUtils.debug("CH sharing addCoordinates")
         if (!isEnabled()) return
         if (!userAdded) return
+        if (!locationsNames.contains(location)) return
+        if (locations.any { it.name == location }) return
 
         val serverId = LorenzUtils.skyBlockServerId
         val uuid = LorenzUtils.getPlayerUuid()
@@ -215,8 +216,6 @@ class CrystalHollowsSharedLocations {
     }
 
     private fun update(location: String, coordinate: LorenzVec) {
-        if (!locationsNames.contains(location)) return
-        if (locations.any { it.name == location }) return
         SkyHanniMod.coroutineScope.launch {
             addUser()
             getLocations()
