@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -101,8 +102,10 @@ class CrystalHollowsSharedLocations {
             }
 
         } catch (e: Exception) {
-            println("url: '$url'")
-            e.printStackTrace()
+            CopyErrorCommand.logError(
+                Exception("Error in getLocations with url: '$url'", e),
+                "Error while fetching ch waypoints from api.dragon99z.de"
+            )
         }
     }
 
@@ -121,8 +124,10 @@ class CrystalHollowsSharedLocations {
             }
 
         } catch (e: Exception) {
-            println("url: '$url'")
-            e.printStackTrace()
+            CopyErrorCommand.logError(
+                Exception("Error in addUser with url '$url'", e),
+                "Error while trying to add the user for ch waypoints to api.dragon99z.de"
+            )
         }
     }
 
@@ -140,8 +145,10 @@ class CrystalHollowsSharedLocations {
             }
 
         } catch (e: Exception) {
-            println("url: '$url'")
-            e.printStackTrace()
+            CopyErrorCommand.logError(
+                Exception("Error in removeUser with uuid: '$uuid', url: '$url'", e),
+                "Error while trying to remove the user for ch waypoints to api.dragon99z.de"
+            )
         }
     }
 
@@ -169,8 +176,13 @@ class CrystalHollowsSharedLocations {
                 logger.log("Successful send $location to the server")
             }
         } catch (e: Exception) {
-            println("url: '$url'")
-            e.printStackTrace()
+            CopyErrorCommand.logError(
+                Exception(
+                    "Error in addCoordinates with location: '$location', coordinate: '$coordinate', url: '$url'",
+                    e
+                ),
+                "Error while trying to share a ch waypoint to api.dragon99z.de"
+            )
         }
     }
 
@@ -195,8 +207,10 @@ class CrystalHollowsSharedLocations {
                 logger.log("Successful removed $location from the server")
             }
         } catch (e: Exception) {
-            println("url: '$url'")
-            e.printStackTrace()
+            CopyErrorCommand.logError(
+                Exception("Error in removeLocation with location: '$location', url: '$url'", e),
+                "Error while trying remove a ch waypoint in api.dragon99z.de"
+            )
         }
     }
 
