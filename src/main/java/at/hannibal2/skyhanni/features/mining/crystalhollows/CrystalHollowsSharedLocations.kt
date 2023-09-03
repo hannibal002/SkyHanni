@@ -79,6 +79,7 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun getLocations() {
+        LorenzUtils.debug("CH sharing getLocations")
         if (!isEnabled()) return
         if (!userAdded) return
         val serverId = LorenzUtils.skyBlockServerId
@@ -112,6 +113,7 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun addUser() {
+        LorenzUtils.debug("CH sharing addUser")
         if (!isEnabled()) return
         if (userAdded) return
         val serverId = LorenzUtils.skyBlockServerId
@@ -134,6 +136,7 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun removeUser() {
+        LorenzUtils.debug("CH sharing removeUser")
         if (!userAdded) return
         val serverId = LorenzUtils.skyBlockServerId
         val uuid = LorenzUtils.getPlayerUuid()
@@ -155,6 +158,7 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun addCoordinates(location: String, coordinate: LorenzVec) {
+        LorenzUtils.debug("CH sharing addCoordinates")
         if (!isEnabled()) return
         if (!userAdded) return
 
@@ -187,6 +191,7 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun removeLocation(location: String) {
+        LorenzUtils.debug("CH sharing removeLocation")
         if (!isEnabled()) return
         if (!userAdded) return
         if (!locationsNames.contains(location)) return
