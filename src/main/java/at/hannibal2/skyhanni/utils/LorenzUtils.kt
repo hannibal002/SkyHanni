@@ -428,17 +428,25 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inIsland(this)
 
-    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N): N {
-        val old = this[item] ?: 0
-        val new = when (old) {
-            is Double -> old + amount.toDouble()
-            is Float -> old + amount.toFloat()
-            is Long -> old + amount.toLong()
-            else -> old.toInt() + amount.toInt()
-        }
-        @Suppress("UNCHECKED_CAST")
-        this[item] = new as N
-        return new
+    fun <K> MutableMap<K, Int>.addOrPut(key: K, number: Int): Int {
+        val currentValue = this[key] ?: 0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
+    fun <K> MutableMap<K, Long>.addOrPut(key: K, number: Long): Long {
+        val currentValue = this[key] ?: 0L
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
+    }
+
+    fun <K> MutableMap<K, Double>.addOrPut(key: K, number: Double): Double {
+        val currentValue = this[key] ?: 0.0
+        val newValue = currentValue + number
+        this[key] = newValue
+        return newValue
     }
 
     fun <K, N : Number> MutableMap<K, N>.sumAllValues(): Double {
