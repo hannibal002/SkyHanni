@@ -315,12 +315,11 @@ class CrystalHollowsSharedLocations {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (locations.toMutableList().isNotEmpty()) {
-            for ((location, name) in locations.toMutableList()) {
-                event.drawColor(location, LorenzColor.DARK_BLUE, alpha = 0.5f)
-                event.drawWaypointFilled(location, LorenzColor.BLUE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawString(location.add(0.5, 0.5, 0.5), "§b$name", true)
-            }
+        if (!isEnabled()) return
+        for ((location, name) in locations) {
+            event.drawColor(location, LorenzColor.DARK_BLUE, alpha = 0.5f)
+            event.drawWaypointFilled(location, LorenzColor.BLUE.toColor(), seeThroughBlocks = true, beacon = true)
+            event.drawString(location.add(0.5, 0.5, 0.5), "§b$name", true)
         }
     }
 
@@ -334,7 +333,9 @@ class CrystalHollowsSharedLocations {
         }
         locationsEntitySkins.forEach { it.found = false }
         balFound = false
-        logger.log("Reset everything (world change)")
+        if (config.crystalHollowsShareLocations) {
+            logger.log("Reset everything (world change)")
+        }
     }
 
     data class CrystalHollowLocations(val location: LorenzVec, val name: String)
