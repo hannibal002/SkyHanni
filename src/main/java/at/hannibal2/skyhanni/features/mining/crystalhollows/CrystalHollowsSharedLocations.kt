@@ -39,24 +39,13 @@ class CrystalHollowsSharedLocations {
         "Dragon's Lair"
     )
 
-    private var locationsEntitySkins = mutableListOf(
-        CrystalHollowNPCSkins(
-            "ewogICJ0aW1lc3RhbXAiIDogMTYyNTY3OTY3MTE1MCwKICAicHJvZmlsZUlkIiA6ICJmNDY0NTcxNDNkMTU0ZmEwOTkxNjBlNGJmNzI3ZGNiOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJSZWxhcGFnbzA1IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM0MDZlM2Q4OWM1MGFjNzIwZTRiNDVlYWVlNTBkMzBlNDE2YTdkNmU5YWY2MmVkNDg2M2QzY2FmYjFlODBkYjkiCiAgICB9CiAgfQp9",
-            false
-        ), //mines of divan keeper skin
-        CrystalHollowNPCSkins(
-            "ewogICJ0aW1lc3RhbXAiIDogMTYyNDU0NjE4NTExNCwKICAicHJvZmlsZUlkIiA6ICIwZjczMDA3NjEyNGU0NGM3YWYxMTE1NDY5YzQ5OTY3OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJPcmVfTWluZXIxMjMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzU2MTIxMGUyMzY5NzdmMmY0ZTJiNDVhNDY0YjZiNGQ0OTI2NGJhMTRlNGVhZTgyZjI1YWMzMDlkYTYyMjhkNCIKICAgIH0KICB9Cn0=",
-            false
-        ), //king Yolkar skin
-        CrystalHollowNPCSkins(
-            "ewogICJ0aW1lc3RhbXAiIDogMTYxOTE4MzY4ODY1MSwKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJJb3lhbCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kNjU4NzA2MTliMGMyZGI4MjI0NzlkMmNiMzgyMTI2YmQ3OTljNTgyMzc4YjViMWRmOTNlNzViN2QwMTU1MWI3IgogICAgfQogIH0KfQ==",
-            false
-        ), //temple guardian skin
-        CrystalHollowNPCSkins(
-            "ewogICJ0aW1lc3RhbXAiIDogMTYyNTY3OTYyNDMzMCwKICAicHJvZmlsZUlkIiA6ICI3NTE0NDQ4MTkxZTY0NTQ2OGM5NzM5YTZlMzk1N2JlYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJUaGFua3NNb2phbmciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWRhZWNkMTJhMTdiZTQ0YmUwYTNlZDI4NWYyM2MzYTMwODdiNWVkOWM4NGQzMzAxOWU2ZTVhNjhmYjc3ODVlMiIKICAgIH0KICB9Cn0=",
-            false
-        ), //prof robot skin
-    )
+    enum class CrystalHollowNPCSkins(val skin: String, var found: Boolean = false) {
+        MINES_OF_DIVAN_KEEPER("ewogICJ0aW1lc3RhbXAiIDogMTYyNTY3OTY3MTE1MCwKICAicHJvZmlsZUlkIiA6ICJmNDY0NTcxNDNkMTU0ZmEwOTkxNjBlNGJmNzI3ZGNiOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJSZWxhcGFnbzA1IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM0MDZlM2Q4OWM1MGFjNzIwZTRiNDVlYWVlNTBkMzBlNDE2YTdkNmU5YWY2MmVkNDg2M2QzY2FmYjFlODBkYjkiCiAgICB9CiAgfQp9"),
+        KING_YOLKAR("ewogICJ0aW1lc3RhbXAiIDogMTYyNDU0NjE4NTExNCwKICAicHJvZmlsZUlkIiA6ICIwZjczMDA3NjEyNGU0NGM3YWYxMTE1NDY5YzQ5OTY3OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJPcmVfTWluZXIxMjMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzU2MTIxMGUyMzY5NzdmMmY0ZTJiNDVhNDY0YjZiNGQ0OTI2NGJhMTRlNGVhZTgyZjI1YWMzMDlkYTYyMjhkNCIKICAgIH0KICB9Cn0="),
+        TEMPLE_GUARDIAN("ewogICJ0aW1lc3RhbXAiIDogMTYxOTE4MzY4ODY1MSwKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJJb3lhbCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kNjU4NzA2MTliMGMyZGI4MjI0NzlkMmNiMzgyMTI2YmQ3OTljNTgyMzc4YjViMWRmOTNlNzViN2QwMTU1MWI3IgogICAgfQogIH0KfQ=="),
+        PROF_ROBOT("ewogICJ0aW1lc3RhbXAiIDogMTYyNTY3OTYyNDMzMCwKICAicHJvZmlsZUlkIiA6ICI3NTE0NDQ4MTkxZTY0NTQ2OGM5NzM5YTZlMzk1N2JlYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJUaGFua3NNb2phbmciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWRhZWNkMTJhMTdiZTQ0YmUwYTNlZDI4NWYyM2MzYTMwODdiNWVkOWM4NGQzMzAxOWU2ZTVhNjhmYjc3ODVlMiIKICAgIH0KICB9Cn0="),
+        ;
+    }
 
     private var userAdded = false
 
@@ -243,7 +232,7 @@ class CrystalHollowsSharedLocations {
                 SkyHanniMod.coroutineScope.launch {
                     removeUser()
                 }
-                locationsEntitySkins.forEach { it.found = false }
+                CrystalHollowNPCSkins.entries.forEach { it.found = false }
                 balFound = false
             }
             return
@@ -260,37 +249,37 @@ class CrystalHollowsSharedLocations {
         when (val entity = event.entity) {
             is EntityOtherPlayerMP -> {
                 when (entity.getSkinTexture().toString()) {
-                    locationsEntitySkins[0].skin -> {
-                        if (!locationsEntitySkins[0].found) {
+                    CrystalHollowNPCSkins.MINES_OF_DIVAN_KEEPER.skin -> {
+                        if (!CrystalHollowNPCSkins.MINES_OF_DIVAN_KEEPER.found) {
                             tryRemoving("Mines of Divan")
 
                             update("Mines of Divan", entity.getLorenzVec().add(33, 18, 3))
-                            locationsEntitySkins[0].found = true
+                            CrystalHollowNPCSkins.MINES_OF_DIVAN_KEEPER.found = true
                         }
                     }
 
-                    locationsEntitySkins[1].skin -> {
-                        if (!locationsEntitySkins[1].found) {
+                    CrystalHollowNPCSkins.KING_YOLKAR.skin -> {
+                        if (!CrystalHollowNPCSkins.KING_YOLKAR.found) {
                             update("King's Scent", entity.getLorenzVec())
-                            locationsEntitySkins[1].found = true
+                            CrystalHollowNPCSkins.KING_YOLKAR.found = true
                         }
                     }
 
-                    locationsEntitySkins[2].skin -> {
-                        if (!locationsEntitySkins[2].found) {
+                    CrystalHollowNPCSkins.TEMPLE_GUARDIAN.skin -> {
+                        if (!CrystalHollowNPCSkins.TEMPLE_GUARDIAN.found) {
                             tryRemoving("Jungle Temple")
 
                             update("Jungle Temple", entity.getLorenzVec())
-                            locationsEntitySkins[2].found = true
+                            CrystalHollowNPCSkins.TEMPLE_GUARDIAN.found = true
                         }
                     }
 
-                    locationsEntitySkins[3].skin -> {
-                        if (!locationsEntitySkins[3].found) {
+                    CrystalHollowNPCSkins.PROF_ROBOT.skin -> {
+                        if (!CrystalHollowNPCSkins.PROF_ROBOT.found) {
                             tryRemoving("Lost Precursor City")
 
                             update("Lost Precursor City", entity.getLorenzVec())
-                            locationsEntitySkins[3].found = true
+                            CrystalHollowNPCSkins.PROF_ROBOT.found = true
                         }
                     }
                 }
@@ -336,7 +325,7 @@ class CrystalHollowsSharedLocations {
                 removeUser()
             }
         }
-        locationsEntitySkins.forEach { it.found = false }
+        CrystalHollowNPCSkins.entries.forEach { it.found = false }
         balFound = false
         if (config.crystalHollowsShareLocations) {
             logger.log("Reset everything (world change)")
@@ -344,7 +333,6 @@ class CrystalHollowsSharedLocations {
     }
 
     data class CrystalHollowLocations(val location: LorenzVec, val name: String)
-    data class CrystalHollowNPCSkins(val skin: String, var found: Boolean)
 
     fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.crystalHollowsShareLocations
 
