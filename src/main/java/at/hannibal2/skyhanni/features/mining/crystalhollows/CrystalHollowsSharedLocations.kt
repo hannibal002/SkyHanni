@@ -155,8 +155,6 @@ class CrystalHollowsSharedLocations {
     private suspend fun addCoordinates(location: String, coordinate: LorenzVec) {
         if (!isEnabled()) return
         if (!userAdded) return
-        if (!locationsNames.contains(location)) return
-        if (locations.any { it.name == location }) return
 
         val serverId = LorenzUtils.skyBlockServerId
         val uuid = LorenzUtils.getPlayerUuid()
@@ -221,6 +219,8 @@ class CrystalHollowsSharedLocations {
     }
 
     private fun update(location: String, coordinate: LorenzVec) {
+        if (!locationsNames.contains(location)) return
+        if (locations.any { it.name == location }) return
         SkyHanniMod.coroutineScope.launch {
             addUser()
             getLocations()
@@ -238,8 +238,8 @@ class CrystalHollowsSharedLocations {
                 }
                 locationsEntitySkins.forEach { it.found = false }
                 balFound = false
-                return
             }
+            return
         }
         val location = LorenzUtils.skyBlockArea
         update(location, LocationUtils.playerLocation())
