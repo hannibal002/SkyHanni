@@ -57,9 +57,9 @@ class CrystalHollowsSharedLocations {
         ), //prof robot skin
     )
 
-    var userAdded = false
+    private var userAdded = false
 
-    var baseAddress = "https://api.dragon99z.de"
+    private var baseAddress = "https://api.dragon99z.de"
     private var apiKey = "379f3118-wlgt-0649-ni38-9fa5477e1b05"
 
     private suspend fun coordinationToURL(x: Double, y: Double, z: Double): String {
@@ -245,7 +245,7 @@ class CrystalHollowsSharedLocations {
         update(location, LocationUtils.playerLocation())
     }
 
-    var balFound = false
+    private var balFound = false
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
@@ -293,8 +293,8 @@ class CrystalHollowsSharedLocations {
             }
 
             is EntityMagmaCube -> {
-                if(LorenzUtils.skyBlockArea == "Khazad-dûm"){
-                    if(entity.slimeSize == 27 && !balFound){
+                if (LorenzUtils.skyBlockArea == "Khazad-dûm") {
+                    if (entity.slimeSize == 27 && !balFound) {
                         if (locations.removeIf { it.name == "Khazad-dûm" })
                             remove("Khazad-dûm")
 
