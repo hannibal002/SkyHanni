@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.CopyErrorCommand
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets
 
 
 object APIUtil {
-    private val parser = JsonParser()
     private var showApiErrors = false
 
     private val builder: HttpClientBuilder =
@@ -44,7 +43,7 @@ object APIUtil {
                 if (entity != null) {
                     val retSrc = EntityUtils.toString(entity)
                     try {
-                        return parser.parse(retSrc) as JsonObject
+                        return ConfigManager.gson.fromJson<JsonObject>(retSrc)
                     } catch (e: JsonSyntaxException) {
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
                             println("MalformedJsonException: Use JsonReader.setLenient(true)")

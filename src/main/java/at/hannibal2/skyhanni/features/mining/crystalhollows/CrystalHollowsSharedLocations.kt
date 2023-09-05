@@ -67,7 +67,7 @@ class CrystalHollowsSharedLocations {
         return encodedCoordinate
     }
 
-    private suspend fun getLocations() {
+    private suspend fun fetchLocations() {
         if (!isEnabled()) return
         if (!userAdded) return
         val serverId = LorenzUtils.skyBlockServerId
@@ -78,16 +78,15 @@ class CrystalHollowsSharedLocations {
                 val coordinatesArray = coordinatesEntry.asJsonObject
                 if (!coordinatesArray["coords"].isJsonNull && !coordinatesArray["location"].isJsonNull) {
                     val coordinates = coordinatesArray["coords"].asJsonObject
-                    val name = coordinatesArray["location"].asString
-                    val location =
-                        LorenzVec(coordinates["x"].asDouble, coordinates["y"].asDouble, coordinates["z"].asDouble)
-                    if (locations.isNotEmpty()) {
-                        if (!locations.any { it.name != name }) {
-                            return
-                        }
+                    val locationName = coordinatesArray["location"].asString
+                    val (x, y, z) = listOf(coordinates["x"], coordinates["y"], coordinates["z"]).map { it.asDouble }
+                    val location = LorenzVec(x, y, z)
+                    if (locations.any { it.name == locationName }) {
+                        return
                     }
+                    LorenzUtils.debug("CH sharing got new location: $locationName at $location")
                     locations = locations.editCopy {
-                        add(CrystalHollowLocations(location, name))
+                        add(CrystalHollowLocations(location, locationName))
                     }
                 }
             }
@@ -101,9 +100,9 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun addUser() {
-        LorenzUtils.debug("CH sharing addUser")
         if (!isEnabled()) return
         if (userAdded) return
+        LorenzUtils.debug("CH sharing addUser")
         val serverId = LorenzUtils.skyBlockServerId
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "$baseAddress/api/addUser?serverId=$serverId&userId=$uuid&Key=$apiKey"
@@ -124,8 +123,8 @@ class CrystalHollowsSharedLocations {
     }
 
     private suspend fun removeUser() {
-        LorenzUtils.debug("CH sharing removeUser")
         if (!userAdded) return
+        LorenzUtils.debug("CH sharing removeUser")
         val serverId = LorenzUtils.skyBlockServerId
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "$baseAddress/api/removeUser?serverId=$serverId&userId=$uuid&Key=$apiKey"
@@ -145,17 +144,20 @@ class CrystalHollowsSharedLocations {
         }
     }
 
-    private suspend fun addCoordinates(location: String, coordinate: LorenzVec) {
-        LorenzUtils.debug("CH sharing addCoordinates")
+    private suspend fun shareLocation(locationName: String, coordinate: LorenzVec) {
         if (!isEnabled()) return
         if (!userAdded) return
-        if (!locationsNames.contains(location)) return
-        if (locations.any { it.name == location }) return
+        if (!locationsNames.contains(locationName)) return
+        if (locations.any { it.name == locationName }) return
 
         val serverId = LorenzUtils.skyBlockServerId
         val uuid = LorenzUtils.getPlayerUuid()
         val encodedLocation = withContext(Dispatchers.IO) {
-            URLEncoder.encode(location, "UTF-8")
+            URLEncoder.encode(locationName, "UTF-8")
+        }
+
+        locations = locations.editCopy {
+            add(CrystalHollowLocations(coordinate, locationName))
         }
 
         val url = "$baseAddress/api/addLocation?serverId=$serverId&userId=$uuid&location=$encodedLocation&coordinates=${
@@ -167,12 +169,13 @@ class CrystalHollowsSharedLocations {
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
             val success = result["success"].asBoolean
             if (success) {
-                logger.log("Successful send $location to the server")
+                logger.log("Successful send $locationName to the server")
+                LorenzUtils.debug("CH share location $locationName at $coordinate")
             }
         } catch (e: Exception) {
             CopyErrorCommand.logError(
                 Exception(
-                    "Error in addCoordinates with location: '$location', coordinate: '$coordinate', url: '$url'",
+                    "Error in addCoordinates with location: '$locationName', coordinate: '$coordinate', url: '$url'",
                     e
                 ),
                 "Error while trying to share a ch waypoint to api.dragon99z.de"
@@ -180,17 +183,16 @@ class CrystalHollowsSharedLocations {
         }
     }
 
-    private suspend fun removeLocation(location: String) {
-        LorenzUtils.debug("CH sharing removeLocation")
+    private suspend fun removeLocation(locationName: String) {
         if (!isEnabled()) return
         if (!userAdded) return
-        if (!locationsNames.contains(location)) return
-        if (locations.any { it.name != location }) return
+        if (!locationsNames.contains(locationName)) return
+        if (locations.any { it.name != locationName }) return
 
         val serverId = LorenzUtils.skyBlockServerId
         val uuid = LorenzUtils.getPlayerUuid()
         val encodedLocation = withContext(Dispatchers.IO) {
-            URLEncoder.encode(location, "UTF-8")
+            URLEncoder.encode(locationName, "UTF-8")
         }
 
         val url =
@@ -199,27 +201,28 @@ class CrystalHollowsSharedLocations {
             val result = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
             val success = result["success"].asBoolean
             if (success) {
-                logger.log("Successful removed $location from the server")
+                logger.log("Successful removed $locationName from the server")
+                LorenzUtils.debug("CH sharing remove location $locationName")
             }
         } catch (e: Exception) {
             CopyErrorCommand.logError(
-                Exception("Error in removeLocation with location: '$location', url: '$url'", e),
+                Exception("Error in removeLocation with location: '$locationName', url: '$url'", e),
                 "Error while trying remove a ch waypoint in api.dragon99z.de"
             )
         }
     }
 
-    private fun remove(location: String) {
+    private fun remove(locationName: String) {
         SkyHanniMod.coroutineScope.launch {
-            removeLocation(location)
+            removeLocation(locationName)
         }
     }
 
-    private fun update(location: String, coordinate: LorenzVec) {
+    private fun update(locationName: String, coordinate: LorenzVec) {
         SkyHanniMod.coroutineScope.launch {
             addUser()
-            getLocations()
-            addCoordinates(location, coordinate)
+            fetchLocations()
+            shareLocation(locationName, coordinate.roundLocationToBlock())
         }
     }
 
@@ -236,8 +239,7 @@ class CrystalHollowsSharedLocations {
             }
             return
         }
-        val location = LorenzUtils.skyBlockArea
-        update(location, LocationUtils.playerLocation())
+        update(LorenzUtils.skyBlockArea, LocationUtils.playerLocation())
     }
 
     private var balFound = false
@@ -297,11 +299,11 @@ class CrystalHollowsSharedLocations {
         }
     }
 
-    private fun tryRemoving(location: String) {
-        if (locations.any { it.name == location }) {
-            remove(location)
+    private fun tryRemoving(locationName: String) {
+        if (locations.any { it.name == locationName }) {
+            remove(locationName)
             locations = locations.editCopy {
-                removeIf { it.name == location }
+                removeIf { it.name == locationName }
             }
         }
     }
@@ -309,10 +311,10 @@ class CrystalHollowsSharedLocations {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!isEnabled()) return
-        for ((location, name) in locations) {
-            event.drawColor(location, LorenzColor.DARK_BLUE, alpha = 0.5f)
-            event.drawWaypointFilled(location, LorenzColor.BLUE.toColor(), seeThroughBlocks = true, beacon = true)
-            event.drawString(location.add(0.5, 0.5, 0.5), "§b$name", true)
+        for ((locationName, name) in locations) {
+            event.drawColor(locationName, LorenzColor.DARK_BLUE, alpha = 0.5f)
+            event.drawWaypointFilled(locationName, LorenzColor.BLUE.toColor(), seeThroughBlocks = true, beacon = true)
+            event.drawDynamicText(locationName.add(0, 1, 0), "§b$name §ffrom SkyHanni", 1.5)
         }
     }
 
@@ -331,7 +333,7 @@ class CrystalHollowsSharedLocations {
         }
     }
 
-    data class CrystalHollowLocations(val location: LorenzVec, val name: String)
+    data class CrystalHollowLocations(val locationName: LorenzVec, val name: String)
 
     fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.crystalHollowsShareLocations
 
