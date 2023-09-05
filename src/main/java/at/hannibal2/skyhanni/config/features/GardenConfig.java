@@ -1118,6 +1118,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 17)
+    @FeatureToggle
     public boolean composterDisplayOutsideGarden = false;
 
     @Expose

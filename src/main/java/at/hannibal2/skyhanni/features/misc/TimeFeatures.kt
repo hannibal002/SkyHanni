@@ -16,7 +16,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class TimeFeatures {
-    private val config get() = SkyHanniMod.feature.misc.time
+    private val config get() = SkyHanniMod.feature.misc.timeConfigs
 
     private val format = SimpleDateFormat("HH:mm:ss")
 

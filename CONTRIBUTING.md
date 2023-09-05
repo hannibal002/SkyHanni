@@ -63,9 +63,11 @@ For more information, see https://github.com/NotEnoughUpdates/MoulConfig
 
 ## Elite Farmers API
 
-SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for some farming features.
+SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for
+some farming features.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience. All data sent is anonymonized and opt-in. 
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience.
+All data sent is anonymonized and opt-in.
 
 ## Mixin
 
@@ -90,7 +92,6 @@ Specifically, we use [TirelessTraveler's Fork](https://github.com/ILikePlayingGa
 the [original](https://github.com/jagrosh/DiscordIPC).
 For info on usage, look
 at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
-
 
 ## Auto Updater
 
@@ -120,6 +121,10 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
 - Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
+- Try to avoid using kotlin's `!!` (catch if not null) feature.
+    - Replace it with `?:` (ff null return this).
+    - This will most likely not be possible to avoid when working with obects from java.
+- Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 
 # Additional Useful Developement Tools
 
