@@ -105,6 +105,7 @@ import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.*
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.utils.EntityOutlineRenderer
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
@@ -142,6 +143,7 @@ class SkyHanniMod {
         loadModule(HypixelData())
         loadModule(DungeonData())
         loadModule(ScoreboardData())
+        loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
         loadModule(ItemRenderBackground())
         loadModule(EntityData())
@@ -172,6 +174,7 @@ class SkyHanniMod {
         loadModule(TitleData())
         loadModule(BlockData())
         loadModule(DefaultConfigFeatures)
+        loadModule(EntityOutlineRenderer)
 
         // APIs
         loadModule(BazaarApi())
