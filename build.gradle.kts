@@ -19,7 +19,7 @@ java {
 }
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/java/main"))
+    output.setResourcesDir(file("$buildDir/classes/kotlin/main"))
 }
 
 repositories {

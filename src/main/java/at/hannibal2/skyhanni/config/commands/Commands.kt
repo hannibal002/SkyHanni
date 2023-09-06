@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.bingo.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
+import at.hannibal2.skyhanni.features.event.anniversary.ActivePlayerTimer
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.command.*
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.TimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
 import net.minecraft.event.ClickEvent
@@ -247,6 +249,10 @@ object Commands {
             "shtestmessage",
             "Sends a custom chat message client side in the chat"
         ) { TestChatCommand.command(it) }
+        // TODO: remove for commit
+        registerCommand("shtestcenturytimer", "bleh") {
+            ActivePlayerTimer.lastTimerReceived = TimeMark(System.currentTimeMillis() - 19 * 60 * 1000L - 40 * 1000L)
+        }
     }
 
     private fun internalCommands() {
