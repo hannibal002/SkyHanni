@@ -68,6 +68,11 @@
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
++ Added Anniversary Event Active Player Ticket Timer. - nea
+    + Option to play a sound as well.
++ Added highlight and outline feature for rare sea creatures. - Cad
++ Added Price Website button. - hannibal2
+    + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
 
 ### Changes
 
@@ -115,6 +120,7 @@
     + This has no effect right now but allows Kaeso to change the values easier in the future.
 + Slightly changed the FF guide tab colors to make more sense. - Obsidian
 + Changed the bingo tips description to show the actual data source.
++ Added Fire Fury Staff support to to item ability cooldown feature. - Cad
 
 ### Fixes
 
@@ -176,6 +182,9 @@
 + Hopefully fixed a rare chat error. - hannibal2
 + Fixed duration format in non-god-potion display. - appable0
 + Fixed various typos. - pretz
++ Fixed minion nametag not getting removed after picking it up. - Cad
++ Fixed 3k hp spiders being falsely highlighted as Arachne's Keepers. - oofy
++ Fixed a bug in GhostCounter for the 48th time. - HiZe
 
 ### Removed Features
 

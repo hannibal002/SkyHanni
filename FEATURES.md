@@ -142,10 +142,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 ## Bazaar
 
-- Showing colors in the order inventory for outbid or fully bought/sold items.
-- Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
-- Saves missing items from canceled buy orders to clipboard for faster re-entry.
-- Update Timer showing when the next api data update happens.
++ Showing colors in the order inventory for outbid or fully bought/sold items.
++ Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
++ Saves missing items from canceled buy orders to clipboard for faster re-entry.
++ Update Timer showing when the next api data update happens.
++ Added Price Website button. - hannibal2
+    + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
 
 ## Fishing
 
@@ -175,6 +177,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the name tags of Chum/Chumcap Bucket from other players.
     + Hide the Chum/Chumcap Bucket.
     + Hides your own Chum/Chumcap Bucket.
++ Highlight and outline feature for rare sea creatures. - Cad
 
 ## Damage Indicator
 
@@ -480,12 +483,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlight Mobs that are part of active commissions
 + Show the names of the **4 areas** while in the center of **crystal Hollows**.
 + **Powder Grinding Tracker** - HiZe
-  + Shows the Mithril/Gemstone Powder gained, the number of chests opened, if Double Powder is active, and the items
-    collected.
-  + Change between current session and total (open the inventory and click on Display Mode).
-  + Fully customizable: change what items or stats to show.
-  + Has support for the maxed Great Explorer perk.
-  + Option to hide while not grinding powder.
+    + Shows the Mithril/Gemstone Powder gained, the number of chests opened, if Double Powder is active, and the items
+      collected.
+    + Change between current session and total (open the inventory and click on Display Mode).
+    + Fully customizable: change what items or stats to show.
+    + Has support for the maxed Great Explorer perk.
+    + Option to hide while not grinding powder.
 
 ## Commands
 
@@ -600,6 +603,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show alert when reaching max super-pairs clicks. - pretz
     + Plays a beep sound and sends a message in chat when the player reaches the maximum number of clicks gained for
       super-pairs minigames.
++ Anniversary Event Active Player Ticket Timer. - nea
+    + Option to play a sound as well.
 
 ## Cosmetics
 
