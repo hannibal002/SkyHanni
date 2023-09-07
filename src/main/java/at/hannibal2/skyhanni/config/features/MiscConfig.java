@@ -1037,4 +1037,28 @@ public class MiscConfig {
 
     @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
+
+
+    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
+    @Accordion
+    @Expose
+    public Century century = new Century();
+
+    public static class Century {
+
+        @ConfigOption(name = "Enable Active Player Timer", desc = "Show a HUD telling you how much longer you have to wait to be eligible for another free ticket")
+        @Expose
+        @ConfigEditorBoolean
+        public boolean enableActiveTimer = true;
+
+        @Expose
+        public Position activeTimerPosition = new Position(100, 100, false, true);
+
+        @ConfigOption(name = "Enable Active Player Alert", desc = "Loudly proclaim when it is time to break some wheat")
+        @Expose
+        @ConfigEditorBoolean
+        public boolean enableActiveAlert = false;
+    }
+
+
 }
