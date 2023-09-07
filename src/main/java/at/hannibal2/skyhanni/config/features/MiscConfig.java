@@ -1049,6 +1049,7 @@ public class MiscConfig {
         @ConfigOption(name = "Enable Active Player Timer", desc = "Show a HUD telling you how much longer you have to wait to be eligible for another free ticket")
         @Expose
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean enableActiveTimer = true;
 
         @Expose
