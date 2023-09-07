@@ -421,7 +421,6 @@ public class MiscConfig {
 
     public static class TrevorTheTrapper {
 
-        @FeatureToggle
         @Expose
         @ConfigOption(
                 name = "Enable Data Tracker",
@@ -429,6 +428,7 @@ public class MiscConfig {
                         "Shows based on the setting below"
         )
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean dataTracker = true;
 
         @Expose
