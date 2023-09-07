@@ -421,6 +421,7 @@ public class MiscConfig {
 
     public static class TrevorTheTrapper {
 
+        @FeatureToggle
         @Expose
         @ConfigOption(
                 name = "Enable Data Tracker",
@@ -486,6 +487,7 @@ public class MiscConfig {
         @Expose
         @ConfigOption(name = "Accept Trapper Quest", desc = "Click this key after the chat prompt to accept Trevor's quest.")
         @ConfigEditorBoolean
+        @FeatureToggle
         public boolean acceptQuest = false;
 
         @Expose
