@@ -38,7 +38,7 @@ class Translator {
         if (!messageContentRegex.matches(message.removeColor())) return
 
         val clickStyle = createClickStyle(message)
-        chatComponent.setChatStyle(clickStyle)
+        chatComponent.siblings.last().setChatStyle(clickStyle)
     }
 
     private fun createClickStyle(message: String): ChatStyle {
