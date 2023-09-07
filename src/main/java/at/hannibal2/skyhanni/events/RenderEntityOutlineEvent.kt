@@ -30,7 +30,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      *
      * This will modify {@param potentialEntities} internally, so make a copy before passing it if necessary.
      *
-     * @param theType           of the event (see [Type]
+     * @param theType of the event (see [Type]
      */
     init {
         type = theType

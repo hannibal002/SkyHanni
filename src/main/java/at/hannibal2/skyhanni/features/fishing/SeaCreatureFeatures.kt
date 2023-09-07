@@ -7,27 +7,18 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.monster.EntityGuardian
-import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraft.scoreboard.Team.EnumVisible
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 
 class SeaCreatureFeatures {
@@ -78,15 +69,17 @@ class SeaCreatureFeatures {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
 
-    private val getEntityOutlineColor: (entity: Entity) -> Int? = { e ->
-        if (EntityLivingBase::class.java.isInstance(e) && e in rareSeaCreatures && e.distanceToPlayer() < 30) {
+    private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
+        if (EntityLivingBase::class.java.isInstance(entity) && entity in rareSeaCreatures && entity.distanceToPlayer() < 30) {
             LorenzColor.GREEN.toColor().rgb
-        } else {
-            null
-        }
+        } else null
     }
 
-    enum class RareSeaCreatureType(val clazz: Class<out EntityLivingBase>, val nametag: String, vararg val health: Int) {
+    enum class RareSeaCreatureType(
+        val clazz: Class<out EntityLivingBase>,
+        val nametag: String,
+        vararg val health: Int
+    ) {
         WATER_HYDRA(EntityZombie::class.java, "Water Hydra", 500_000, 1_500_000),
         SEA_EMPEROR(EntityGuardian::class.java, "The Sea Emperors", 750_000, 800_000, 2_250_000, 2_400_000),
         ZOMBIE_MINER(EntityPlayer::class.java, "", 2_000_000, 6_000_000),

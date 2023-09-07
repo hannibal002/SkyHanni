@@ -192,7 +192,7 @@ public class FishingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Rare Sea Creature Highlight", desc = "Highlight rare sea creatures in blue color.")
+    @ConfigOption(name = "Highlight Rare", desc = "Highlight rare sea creatures in blue color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean rareSeaCreatureHighlight = false;

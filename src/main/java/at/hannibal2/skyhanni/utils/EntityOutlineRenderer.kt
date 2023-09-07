@@ -14,11 +14,8 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL30
@@ -33,7 +30,7 @@ import java.lang.reflect.Method
  * https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/EntityOutlines/EntityOutlineRenderer.java
  *
  */
- object EntityOutlineRenderer {
+object EntityOutlineRenderer {
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
     private var stopLookingForOptifine = false
     private var isFastRender: Method? = null
@@ -286,11 +283,18 @@ import java.lang.reflect.Method
     private fun shouldRender(camera: ICamera, entity: Entity, vector: LorenzVec): Boolean =
         // Only render the view entity when sleeping or in 3rd person mode
         if (entity === mc.renderViewEntity &&
-                !(mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                        mc.gameSettings.thirdPersonView != 0)) {
+            !(mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
+                    mc.gameSettings.thirdPersonView != 0)
+        ) {
             false
-        } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (mc.renderManager.shouldRender(entity, camera, vector.x, vector.y, vector.z) || entity.riddenByEntity === mc.thePlayer)
-        // Only render if renderManager would render and the world is loaded at the entity
+        } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (mc.renderManager.shouldRender(
+            entity,
+            camera,
+            vector.x,
+            vector.y,
+            vector.z
+        ) || entity.riddenByEntity === mc.thePlayer)
+    // Only render if renderManager would render and the world is loaded at the entity
 
     private fun outlineColor(color: Int) {
         BUF_FLOAT_4.put(0, (color shr 16 and 255).toFloat() / 255.0f)
@@ -318,9 +322,11 @@ import java.lang.reflect.Method
         if (OpenGlHelper.isFramebufferEnabled()) {
             OpenGlHelper.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, frameToCopy!!.framebufferObject)
             OpenGlHelper.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, frameToPaste!!.framebufferObject)
-            GL30.glBlitFramebuffer(0, 0, frameToCopy.framebufferWidth, frameToCopy.framebufferHeight,
-                    0, 0, frameToPaste.framebufferWidth, frameToPaste.framebufferHeight,
-                    buffersToCopy, GL11.GL_NEAREST)
+            GL30.glBlitFramebuffer(
+                0, 0, frameToCopy.framebufferWidth, frameToCopy.framebufferHeight,
+                0, 0, frameToPaste.framebufferWidth, frameToPaste.framebufferHeight,
+                buffersToCopy, GL11.GL_NEAREST
+            )
         }
     }
 
@@ -353,10 +359,13 @@ import java.lang.reflect.Method
                 // These events need to be called in this specific order for the xray to have priority over the no xray
                 // Get all entities to render xray outlines
                 val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
-                MinecraftForge.EVENT_BUS.post(xrayOutlineEvent)
+                xrayOutlineEvent.postAndCatch()
                 // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
-                val noxrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.NO_XRAY, xrayOutlineEvent.entitiesToChooseFrom)
-                MinecraftForge.EVENT_BUS.post(noxrayOutlineEvent)
+                val noxrayOutlineEvent = RenderEntityOutlineEvent(
+                    RenderEntityOutlineEvent.Type.NO_XRAY,
+                    xrayOutlineEvent.entitiesToChooseFrom
+                )
+                noxrayOutlineEvent.postAndCatch()
                 // Cache the entities for future use
                 entityRenderCache.xrayCache = xrayOutlineEvent.entitiesToOutline
                 entityRenderCache.noXrayCache = noxrayOutlineEvent.entitiesToOutline
@@ -379,5 +388,9 @@ import java.lang.reflect.Method
         }
     }
 
-    private class CachedInfo(var xrayCache: HashMap<Entity, Int>?, var noXrayCache: HashMap<Entity, Int>?, var noOutlineCache: HashSet<Entity>?)
+    private class CachedInfo(
+        var xrayCache: HashMap<Entity, Int>?,
+        var noXrayCache: HashMap<Entity, Int>?,
+        var noOutlineCache: HashSet<Entity>?
+    )
 }
