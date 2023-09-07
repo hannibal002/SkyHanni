@@ -228,7 +228,7 @@ import java.lang.reflect.Method
         }
 
         // Main toggle for outlines features
-        if (!config.enableEntityOutlines) {
+        if (!isEnabled()) {
             return false
         }
 
@@ -264,6 +264,13 @@ import java.lang.reflect.Method
             }
         }
         return !isFastRenderValue && !isShadersValue && !isAntialiasingValue
+    }
+
+    // Add new features that need the entity outline logic here
+    private fun isEnabled(): Boolean {
+        if (SkyHanniMod.feature.fishing.rareSeaCreatureHighlight) return true
+
+        return false
     }
 
     /**
