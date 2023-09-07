@@ -33,6 +33,14 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**; just follow this guide:
 https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md
 
+## Creating a Pull Request
+
+(An explanation how to use intellij and branches will follow here soon)
+
+Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
+
+You can write in the description of the pr the wording for the changelog as well (optional).
+
 # Software Used in SkyHanni
 
 ## Core
