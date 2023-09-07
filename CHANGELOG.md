@@ -211,8 +211,8 @@
     + Highlight larvas on trees in Wyld Woods while holding a Larva Hook in the hand
     + Customize the color
 + Added **Odonatas Highlighter**
-    + Highlight the small Odonatas flying around the trees while holding a Empty Odonata Bottle in the hand.
-    + Customize the color
+    + Highlight the small Odonatas flying around the trees while holding an Empty Odonata Bottle in the hand.
+    + Customize the color.
 + Added **Agaricus Cap** countdown
     + Counts down the time until Agaricus Cap (Mushroom) changes color from brown to red and is breakable.
 + Added **Leech Supreme** to Damage Indicator
@@ -279,8 +279,8 @@
     + Option to only show the helper while standing on Farmland blocks
     + Option to hide the wilted berberis particles
 + Added **Vampire Slayer** features in Damage Indicator
-    + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
-    + Show a timer until the boss leaves the invicible Mania Circles state.
+    + Show the amount of HP missing until the steak can be used on the vampire slayer on top of the boss.
+    + Show a timer until the boss leaves the invincible Mania Circles state.
     + Show the percentage of HP next to the HP.
 + Added **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.

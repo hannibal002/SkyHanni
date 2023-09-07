@@ -196,8 +196,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     - Show the time it takes to kill the Slayer boss.
 
 + **Vampire Slayer**
-    + Show the amount of HP miss1ing untill the steak can be used on the vampire slayer on top of the boss.
-    + Show a timer until the boss leaves the invicible Mania Circles state.
+    + Show the amount of HP missing until the steak can be used on the vampire slayer on top of the boss.
+    + Show a timer until the boss leaves the invincible Mania Circles state.
     + Show the percentage of HP next to the HP.
 
 ## Slayer
