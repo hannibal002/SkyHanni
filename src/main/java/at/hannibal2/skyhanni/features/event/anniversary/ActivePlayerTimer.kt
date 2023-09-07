@@ -21,10 +21,10 @@ import kotlin.time.Duration.Companion.seconds
 
 object ActivePlayerTimer {
 
-    var lastTimerReceived = TimeMark.never()
-    var lastTimeAlerted = TimeMark.never()
+    private var lastTimerReceived = TimeMark.never()
+    private var lastTimeAlerted = TimeMark.never()
 
-    var overlay: List<List<Any?>>? = null
+    private var overlay: List<List<Any?>>? = null
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
