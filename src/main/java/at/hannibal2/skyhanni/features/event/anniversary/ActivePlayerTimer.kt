@@ -6,10 +6,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.init.Items
@@ -20,11 +21,12 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object ActivePlayerTimer {
+    val displayItem by lazy { NEUItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
 
     private var lastTimerReceived = TimeMark.never()
     private var lastTimeAlerted = TimeMark.never()
 
-    private var overlay: List<List<Any?>>? = null
+    private var overlay: List<Any>? = null
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -42,7 +44,7 @@ object ActivePlayerTimer {
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.GameOverlayRenderEvent) {
-        SkyHanniMod.feature.misc.century.activeTimerPosition.renderStringsAndItems(
+        SkyHanniMod.feature.misc.century.activeTimerPosition.renderSingleLineWithItems(
             overlay ?: return,
             posLabel = "300þ Anniversary Active Timer"
         )
@@ -64,13 +66,10 @@ object ActivePlayerTimer {
             SoundUtils.centuryActiveTimerAlert.playSound()
             lastTimeAlerted = TimeMark.now()
         }
-        overlay =
-            listOf(
-                listOf(
-                    Renderable.itemStack(NEUItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock)),
-                    Renderable.string("§eTime Left: $timeLeft")
-                )
-            )
+        overlay = listOf(
+            Renderable.itemStack(displayItem),
+            Renderable.string("§eTime Left: ${timeLeft.format()}")
+        )
     }
 
 
