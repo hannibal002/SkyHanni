@@ -13,6 +13,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
+import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MobHighlight {
