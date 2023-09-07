@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class WrongFungiCutterWarning {
     private var mode = FungiMode.UNKNOWN
@@ -48,7 +49,7 @@ class WrongFungiCutterWarning {
     private fun notifyWrong() {
         if (!SkyHanniMod.feature.garden.fungiCutterWarn) return
 
-        TitleUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2_000)
+        TitleUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2.seconds)
         if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
             lastPlaySoundTime = System.currentTimeMillis()
             SoundUtils.playBeepSound()

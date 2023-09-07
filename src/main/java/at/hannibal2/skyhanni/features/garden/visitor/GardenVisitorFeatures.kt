@@ -44,6 +44,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.round
+import kotlin.time.Duration.Companion.seconds
 
 private val config get() = SkyHanniMod.feature.garden
 
@@ -258,7 +259,7 @@ class GardenVisitorFeatures {
     }
 
     @SubscribeEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventorItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
             MinecraftExecutor.OnThread.execute {
                 update()
@@ -535,7 +536,7 @@ class GardenVisitorFeatures {
         logger.log("New visitor detected: '$name'")
 
         if (config.visitorNotificationTitle && System.currentTimeMillis() > LorenzUtils.lastWorldSwitch + 2_000) {
-            TitleUtils.sendTitle("§eNew Visitor", 5_000)
+            TitleUtils.sendTitle("§eNew Visitor", 5.seconds)
         }
         if (config.visitorNotificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)

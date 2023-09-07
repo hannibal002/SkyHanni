@@ -44,6 +44,35 @@
     + After enabling, click on any chat message sent by another player to translate it to English.
 + Show the progress bar until maxed crop milestone in the crop milestone inventory. - hannibal2
 + Show a line to the enderman slayer beacon. - hannibal2
++ Added **Default Option Settings:** - nea
+    + Enables or disables all features at once, or per category.
+    + Sends a chat message on first SkyHanni startup (starting with this feature, so this version everyone will see this
+      message).
+    + Shows new features after an update (starting with the next beta, not this one).
+    + Allows to change those settings anytime again with /shdefaultoptions.
++ While on the Winter Island, show a timer until Jerry's Workshop closes. - hannibal2
++ Added Reindrake support to the Damage Indicator. - hannibal2
++ Added visual garden plot borders. - VixidDev
+    + Press F3 + G to enable/disable the view.
++ Added **Following Line** Cosmetic - hannibal2
+    + Draws a colored line behind the player.
+    + Change the color, width, and duration of the line.
++ Show alert when reaching max super-pairs clicks. - pretz
+    + Plays a beep sound and sends a message in chat when the player reaches the maximum number of clicks gained for
+      super-pairs minigames.
++ Added gemstone slot unlock costs to the Estimated Item Value. - Fix3dll
++ **Powder Grinding Tracker** - HiZe
+    + Shows the Mithril/Gemstone Powder gained, the number of chests opened, if Double Powder is active, and the items
+      collected.
+    + Change between current session and total (open the inventory and click on Display Mode).
+    + Fully customizable: change what items or stats to show.
+    + Has support for the maxed Great Explorer perk.
+    + Option to hide while not grinding powder.
++ Added Anniversary Event Active Player Ticket Timer. - nea
+    + Option to play a sound as well.
++ Added highlight and outline feature for rare sea creatures. - Cad
++ Added Price Website button. - hannibal2
+    + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
 
 ### Changes
 
@@ -84,6 +113,14 @@
 + Added support for the new fixed inquisitor spawn message from Hypixel for the detection. - hannibal2
 + Added option to hide the off-screen drop chat message. - hannibal2
 + Now hides the farming weight display by default when below 200 weight (can be disabled). - hannibal2
++ Added option to change the Enderman Slayer beacon color. - hannibal2
++ Added option to show a line to every slayer mini boss around you. - hannibal2
++ Added options to ignore the wizard and the crypt warp for Diana.
++ Loading farming weight values directly from elitebot.dev. - CalMWolfs
+    + This has no effect right now but allows Kaeso to change the values easier in the future.
++ Slightly changed the FF guide tab colors to make more sense. - Obsidian
++ Changed the bingo tips description to show the actual data source.
++ Added Fire Fury Staff support to to item ability cooldown feature. - Cad
 
 ### Fixes
 
@@ -131,9 +168,23 @@
     + Reward items no longer impact the visitor drop coins spent data negatively.
     + Copper per coin price now respects the reward item profit as well.
     + Now showing the NPC price for items without ah/bazaar data (looking at pet candy).
-+ Now correctly ignoring the minis from tier 2 Arachne in the Damage Indicator. - hannibal2
 + Fixed highlight in the main bestiary menu. - HiZe
 + Fixed maxed farming fortune possible in /ff - CalMWolfs
++ Fixed negative coins per copper price in visitor inventory. - hannibal2
++ Fixed rare error message while farming. - hannibal2
++ Fixed a rare error message while showing the lore of a farming tool. - hannibal2
++ Fixed estimated item value doesn't detect master stars in Auction House. - hannibal2
++ Fixed enderman slayer beacon warning only visible for a very short amount of time. - hannibal2
++ Fixed enderman slayer line to beacon only shows when beacon highlight is enabled. - hannibal2
++ Fixed major composter profit calculation with multi-drop. - pretz
++ Garden Money Per Hour: Fixed the wrong NPC price when Merge Seeds is enabled. - hannibal2
++ Hopefully fixed error messages in bingo around collection values. - hannibal2
++ Hopefully fixed a rare chat error. - hannibal2
++ Fixed duration format in non-god-potion display. - appable0
++ Fixed various typos. - pretz
++ Fixed minion nametag not getting removed after picking it up. - Cad
++ Fixed 3k hp spiders being falsely highlighted as Arachne's Keepers. - oofy
++ Fixed a bug in GhostCounter for the 48th time. - HiZe
 
 ### Removed Features
 
@@ -448,9 +499,9 @@
     + Config toggles and GUI elements stay synced between all profiles
 + Reworked Hide Armor
     + More options
-      = Fixed Movement bugs with Depth Strider enchantment
-      = Fixed compatibility issues with other mods
-      Note: The hide armor config got reset, if you want to use it, you have to enable it again)
+        + Fixed Movement bugs with Depth Strider enchantment
+        + Fixed compatibility issues with other mods
+        + Note: The hide armor config got reset, if you want to use it, you have to enable it again)
 + Added support for maxed out crop milestones
 + Showing total price for visitor items needed
 + Warning when BPS in Jacob contest ff needed display is below 1

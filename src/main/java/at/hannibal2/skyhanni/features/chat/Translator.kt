@@ -34,13 +34,11 @@ class Translator {
         if (e.type != 0.toByte()) return // If this is not a player-sent message, return
 
         val chatComponent = e.message
-        // If you want to help me debug, experience the bug while this line is uncommented (spams logs)
-//        consoleLog(chatComponent.toString())
         val message = chatComponent.unformattedText
         if (!messageContentRegex.matches(message.removeColor())) return
 
         val clickStyle = createClickStyle(message)
-        chatComponent.setChatStyle(clickStyle)
+        chatComponent.siblings.last().setChatStyle(clickStyle)
     }
 
     private fun createClickStyle(message: String): ChatStyle {
@@ -180,7 +178,7 @@ class Translator {
                 val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
                 messageToSend = "$messageToSend$sentenceWithoutQuotes"
             } // The first translated sentence only has 1 extra char at the end, but sentences after it need 1 at the front and 1 at the end removed in the substring
-            messageToSend = messageToSend.substring(1, messageToSend.length - 1)
+            messageToSend = messageToSend.substring(1, messageToSend.length)
             return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
         }
 
@@ -210,7 +208,7 @@ class Translator {
             }
 
             val translation = getTranslationFromEnglish(message, language)
-            LorenzUtils.chat("§6[SkyHanni] §eCopied translation to clipboard: $translation")
+            LorenzUtils.chat("§e[SkyHanni] Copied translation to clipboard: $translation")
             OSUtils.copyToClipboard(translation)
         }
     }

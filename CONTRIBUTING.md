@@ -57,15 +57,19 @@ For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
 
 ## Config
 
-SkyHanni uses the config system from NEU.
+SkyHanni stores the config (settings and user data) as a json object in a single text file.
+For rendering the /sh config (categories, toggles, search, etc.),
+SkyHanni uses **MoulConfig**, the same config system as NotEnoughUpdates.
 
 For more information, see https://github.com/NotEnoughUpdates/MoulConfig
 
 ## Elite Farmers API
 
-SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for some farming features.
+SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for
+some farming features.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience. All data sent is anonymonized and opt-in. 
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for conviencience.
+All data sent is anonymonized and opt-in.
 
 ## Mixin
 
@@ -91,7 +95,6 @@ the [original](https://github.com/jagrosh/DiscordIPC).
 For info on usage, look
 at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
-
 ## Auto Updater
 
 We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libautoupdate) from nea.
@@ -102,11 +105,11 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Do not copy features from other mods. Exceptions:
-    - Paid only mods.
-    - Mods that have reached the end of life. (Rip SBA, Dulkir and Soopy)
-    - The mod has, according to Hypixel rules, illegal features ("cheat mod").
+    - Mods that are paid to use.
+    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy)
+    - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
-- All classes should be written in Kotlin, with a few exceptions:
+- All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
     - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
@@ -120,6 +123,12 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
 - Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
+- Try to avoid using kotlin's `!!` (catch if not null) feature.
+    - Replace it with `?:` (ff null return this).
+    - This will most likely not be possible to avoid when working with obects from java.
+- Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
+- Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
+- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 
 # Additional Useful Developement Tools
 

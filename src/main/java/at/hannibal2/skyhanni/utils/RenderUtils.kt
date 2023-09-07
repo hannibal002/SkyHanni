@@ -59,6 +59,15 @@ object RenderUtils {
         beacon: Boolean = false,
         alpha: Float = -1f,
     ) {
+        drawColor(location, color.toColor(), beacon, alpha)
+    }
+
+    fun RenderWorldLastEvent.drawColor(
+        location: LorenzVec,
+        color: Color,
+        beacon: Boolean = false,
+        alpha: Float = -1f,
+    ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
         val y = location.y - viewerY
@@ -73,11 +82,11 @@ object RenderUtils {
         GlStateManager.disableCull()
         drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
-            color.toColor(),
+            color,
             realAlpha
         )
         GlStateManager.disableTexture2D()
-        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.toColor().rgb, 1.0f, partialTicks)
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()
@@ -670,7 +679,6 @@ object RenderUtils {
     }
 
     fun RenderWorldLastEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
         val render = Minecraft.getMinecraft().renderViewEntity
@@ -708,8 +716,12 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
-    fun RenderWorldLastEvent.exactLocation(entity: Entity): LorenzVec {
-        return exactLocation(entity, partialTicks)
+    fun RenderWorldLastEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
+
+    fun RenderWorldLastEvent.exactPlayerEyeLocation(): LorenzVec {
+        val player = Minecraft.getMinecraft().thePlayer
+        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        return exactLocation(player).add(add)
     }
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
