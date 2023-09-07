@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="at.hannibal2.skyhanni.test.ItemModifierTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-08-30T22:20:37" hostname="DESKTOP-NJGS7GR" time="0.621">
-  <properties/>
-  <testcase name="testUpgradeLevelMasterStars()" classname="at.hannibal2.skyhanni.test.ItemModifierTest" time="0.621"/>
-  <system-out><![CDATA[2023-08-31 00:20:36,171 Test worker WARN Plugin [terminalconsole] is already mapped to class net.minecrell.terminalconsole.TerminalConsoleAppender, ignoring class net.minecraftforge.server.console.TerminalConsoleAppender
-2023-08-31 00:20:36,335 Test worker WARN Unable to instantiate org.fusesource.jansi.WindowsAnsiOutputStream
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
