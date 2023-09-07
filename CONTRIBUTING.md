@@ -57,7 +57,9 @@ For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
 
 ## Config
 
-SkyHanni uses the config system from NEU.
+SkyHanni stores the config (settings and user data) as a json object in a single text file.
+For rendering the /sh config (categories, toggles, search, etc.),
+SkyHanni uses **MoulConfig**, the same config system as NotEnoughUpdates.
 
 For more information, see https://github.com/NotEnoughUpdates/MoulConfig
 
@@ -103,11 +105,11 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Do not copy features from other mods. Exceptions:
-    - Paid only mods.
-    - Mods that have reached the end of life. (Rip SBA, Dulkir and Soopy)
-    - The mod has, according to Hypixel rules, illegal features ("cheat mod").
+    - Mods that are paid to use.
+    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy)
+    - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
-- All classes should be written in Kotlin, with a few exceptions:
+- All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
     - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.utils.jsonobjects`
@@ -125,6 +127,8 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
     - Replace it with `?:` (ff null return this).
     - This will most likely not be possible to avoid when working with obects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
+- Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
+- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 
 # Additional Useful Developement Tools
 

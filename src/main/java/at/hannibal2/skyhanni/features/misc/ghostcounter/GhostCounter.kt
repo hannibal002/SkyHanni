@@ -41,7 +41,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.text.NumberFormat
@@ -452,7 +451,8 @@ object GhostCounter {
         val stacks = event.inventoryItems
         val ghostStack = stacks[10] ?: return
         val bestiaryNextLevel =
-            if (ghostStack.displayName == "§cGhost") 1 else ghostStack.displayName.substring(8).romanToDecimal() + 1
+            if ("§\\wGhost".toRegex().matches(ghostStack.displayName)) 1 else ghostStack.displayName.substring(8)
+                .romanToDecimal() + 1
         hidden?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         var kills = 0.0
         for (line in ghostStack.getLore()) {
