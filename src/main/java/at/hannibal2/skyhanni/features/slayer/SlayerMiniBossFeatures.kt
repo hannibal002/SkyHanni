@@ -55,6 +55,7 @@ class SlayerMiniBossFeatures {
         if (!config.slayerMinibossLine) return
         for (mob in miniBosses) {
             if (mob.health <= 0) continue
+            if (mob.isDead) continue
             if (mob.distanceToPlayer() > 10) continue
 
             event.draw3DLine(
