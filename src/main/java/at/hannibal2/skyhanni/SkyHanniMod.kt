@@ -8,10 +8,7 @@ import at.hannibal2.skyhanni.data.*
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.bazaar.BazaarBestSellMethod
-import at.hannibal2.skyhanni.features.bazaar.BazaarCancelledBuyOrderClipboard
-import at.hannibal2.skyhanni.features.bazaar.BazaarOrderHelper
+import at.hannibal2.skyhanni.features.bazaar.*
 import at.hannibal2.skyhanni.features.bingo.*
 import at.hannibal2.skyhanni.features.chat.*
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
@@ -207,6 +204,7 @@ class SkyHanniMod {
         loadModule(TrophyFishFillet())
         loadModule(TrophyFishMessages())
         loadModule(BazaarBestSellMethod())
+        loadModule(BazaarOpenPriceWebsite())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
         //        registerEvent(new GriffinBurrowFinder());
