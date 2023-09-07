@@ -128,6 +128,7 @@ We use the [auto update library](https://repo.nea.moe/#/releases/moe/nea/libauto
     - This will most likely not be possible to avoid when working with obects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
+- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
 
 # Additional Useful Developement Tools
 
