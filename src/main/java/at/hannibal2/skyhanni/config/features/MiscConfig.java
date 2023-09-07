@@ -838,6 +838,7 @@ public class MiscConfig {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§b§lPowder Tracker",
+                        "§7Display Mode: §a[Total] §e[This Session]",
                         "§d852 Total chests Picked §7(950/h)",
                         "§bx2 Powder: §aActive!",
                         "§b250,420 §aMithril Powder §7(350,000/h)",

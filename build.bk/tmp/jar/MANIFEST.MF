@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+FMLCorePluginContainsFMLMod: true
+ForceLoadAsMod: true
+Main-Class: SkyHanniInstallerFrame
+TweakClass: org.spongepowered.asm.launch.MixinTweaker
+MixinConfigs: mixins.skyhanni.json
+

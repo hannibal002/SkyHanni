@@ -1,0 +1,6 @@
+v1	named	intermediary
+FIELD	at/hannibal2/skyhanni/mixins/transformers/gui/MixinGuiContainer	Lnet/minecraft/inventory/Slot;	theSlot	field_147006_u
+FIELD	at/hannibal2/skyhanni/mixins/transformers/MixinGuiChat	Lnet/minecraft/client/gui/GuiTextField;	inputField	field_146415_a
+FIELD	at/hannibal2/skyhanni/mixins/transformers/MixinGuiChat	Z	waitingOnAutocomplete	field_146414_r
+FIELD	at/hannibal2/skyhanni/mixins/transformers/MixinGuiChat	Z	playerNamesFound	field_146417_i
+FIELD	at/hannibal2/skyhanni/mixins/transformers/MixinGuiChat	Ljava/util/List;	foundPlayerNames	field_146412_t

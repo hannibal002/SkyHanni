@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "skyhanni",
+    "name": "SkyHanni",
+    "description": "Hypixel Skyblock Mod",
+    "version": "0.20.Beta.16",
+    "mcversion": "1.8.9",
+    "url": "",
+    "updateUrl": "",
+    "authorList": ["hannibal2"],
+    "credits": "Alea1337 & Eisengolem",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": ["NotEnoughUpdates"]
+  }
+]
