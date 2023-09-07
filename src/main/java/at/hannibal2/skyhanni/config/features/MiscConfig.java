@@ -1036,6 +1036,12 @@ public class MiscConfig {
     public boolean configButtonOnPause = true;
 
     @Expose
+    @ConfigOption(name = "Entity Outlines", desc = "Enable entity outlines for applicable features.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enableEntityOutlines = true;
+
+    @Expose
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
 
