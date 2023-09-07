@@ -32,7 +32,6 @@ class BlobbercystsHighlight {
         }
     }
 
-
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (!isEnabled()) return
