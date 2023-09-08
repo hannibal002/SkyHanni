@@ -155,6 +155,10 @@ object ItemUtils {
     fun ItemStack.getItemRarity() = getItemRarityOrNull() ?: error("item rarity not detected for item '$name'")
 
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
+        if (isPet(cleanName())) {
+            return getPetRarity(this)
+        }
+
         return when (this.getLore().lastOrNull()?.take(4)) {
             "§f§l" -> LorenzRarity.COMMON
             "§a§l" -> LorenzRarity.UNCOMMON
@@ -235,10 +239,15 @@ object ItemUtils {
         return getItemStack().nameWithEnchantment ?: error("Could not find item name for $this")
     }
 
+    // TODO: Replace entirely some day
     fun getPetRarityOld(petStack: ItemStack?): Int {
-        val petInternalName = petStack?.getInternalName_old()
-        if (petInternalName == "NONE" || petInternalName == null) return -1
-        val split = petInternalName.split(";")
-        return split.last().toInt()
+        val rarity = petStack?.getItemRarityOrNull() ?: return -1
+
+        return rarity.id
+    }
+
+    private fun getPetRarity(pet: ItemStack): LorenzRarity? {
+        val rarityId = pet.getInternalName().asString().split(";").last().toInt()
+        return LorenzRarity.getById(rarityId)
     }
 }

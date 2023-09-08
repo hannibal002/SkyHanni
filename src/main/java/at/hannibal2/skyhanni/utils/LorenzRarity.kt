@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 
+// TODO: replace id with ordinal
 enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     COMMON(LorenzColor.WHITE, 0),
     UNCOMMON(LorenzColor.GREEN, 1),
@@ -12,5 +13,9 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     SUPREME(LorenzColor.DARK_RED, 7),
     SPECIAL(LorenzColor.RED, 8),
     ;
+
+    companion object {
+        fun getById(id: Int) = entries.firstOrNull { it.id == id }
+    }
 
 }
