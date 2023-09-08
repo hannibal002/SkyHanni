@@ -131,6 +131,20 @@ public class InventoryConfig {
     public boolean jacobFarmingContestRealTime = true;
 
     @Expose
+    @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this contest. " +
+            "§eIf you use a texture pack for this you should continue to use that.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    @FeatureToggle
+    public boolean jacobFarmingContestMedalIcon = true;
+
+    @Expose
+    @ConfigOption(name = "Finnegan Icon", desc = "Uses a different indicator for when the contest happened during Mayor Finnegan.")
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 3)
+    public boolean jacobFarmingContestFinneganIcon = true;
+
+    @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
     public SackDisplay sackDisplay = new SackDisplay();
