@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -50,13 +51,13 @@ class MinionFeatures {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND) return
-        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
+        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
 
-        val lookingAt = event.pos.offset(event.face)
+        val lookingAt = event.pos.offset(event.face).toLorenzVec()
         val equipped = InventoryUtils.getItemInHand() ?: return
 
-        if (equipped.displayName.contains(" Minion ") && event.world.getBlockState(lookingAt).block == Blocks.air) {
-            newMinion = lookingAt.toLorenzVec().add(0.5, 0.0, 0.5)
+        if (equipped.displayName.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.air) {
+            newMinion = lookingAt.add(0.5, 0.0, 0.5)
             newMinionName = getMinionName(equipped.cleanName())
         } else {
             newMinion = null
