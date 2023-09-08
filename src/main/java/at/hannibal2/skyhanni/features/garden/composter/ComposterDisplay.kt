@@ -16,6 +16,7 @@ import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlin.math.floor
 
 class ComposterDisplay {
     private val config get() = SkyHanniMod.feature.garden
@@ -69,8 +70,8 @@ class ComposterDisplay {
         val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
         val fuelRequired = ComposterAPI.fuelRequiredPer(null)
 
-        val organicMatterRemaining = organicMatter / organicMatterRequired
-        val fuelRemaining = fuel / fuelRequired
+        val organicMatterRemaining = floor(organicMatter / organicMatterRequired)
+        val fuelRemaining = floor(fuel / fuelRequired)
 
         val endOfOrganicMatter = timePerCompost * organicMatterRemaining
         val endOfFuel = timePerCompost * fuelRemaining

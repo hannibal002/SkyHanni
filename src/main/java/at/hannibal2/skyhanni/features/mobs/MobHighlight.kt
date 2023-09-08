@@ -13,6 +13,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
+import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MobHighlight {
@@ -40,7 +41,7 @@ class MobHighlight {
         val entity = event.entity
         val maxHealth = event.maxHealth
         if (config.arachneKeeperHighlight) {
-            if (maxHealth == 3_000 && entity is EntitySpider) {
+            if (maxHealth == 3_000 && entity is EntityCaveSpider) {
                 RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.DARK_BLUE.toColor().withAlpha(127))
                 { config.arachneKeeperHighlight }
                 RenderLivingEntityHelper.setNoHurtTime(entity) { config.arachneKeeperHighlight }

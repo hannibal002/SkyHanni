@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
+import at.hannibal2.skyhanni.utils.LorenzUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -419,7 +420,7 @@ class HideNotClickableItems {
     }
 
     private fun hideSalvage(chestName: String, stack: ItemStack): Boolean {
-        if (chestName != "Salvage Item") return false
+        if (!chestName.equalsOneOf("Salvage Item", "Salvage Items")) return false
         reverseColor = true
 
         if (ItemUtils.isRecombobulated(stack)) {

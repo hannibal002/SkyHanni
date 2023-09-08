@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.misc.EnderNode;
 import at.hannibal2.skyhanni.features.misc.FrozenTreasure;
 import at.hannibal2.skyhanni.features.misc.ghostcounter.GhostData;
+import at.hannibal2.skyhanni.features.misc.powdertracker.PowderChestReward;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.KloonTerminal;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -270,6 +271,17 @@ public class Storage {
             @Expose
             public int configUpdateVersion = 0;
 
+        }
+
+        @Expose
+        public Map<Integer, PowderTracker> powderTracker = new HashMap<>();
+
+        public static class PowderTracker {
+            @Expose
+            public int totalChestPicked = 0;
+
+            @Expose
+            public Map<PowderChestReward, Long> rewards = new HashMap<>();
         }
 
         @Expose
