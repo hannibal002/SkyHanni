@@ -115,7 +115,12 @@ public class MiscConfig {
     public boolean potionEffects = false;
 
     @Expose
-    @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the god pot.")
+    @ConfigOption(
+            name = "Non God Pot Effects",
+            desc = "Display the active potion effects that are not part of the god pot.",
+            searchTags = {"Smoldering Polarization", "Mushed Glowy Tonic", "Wisp's Ice-Flavored Water", "King's Scent",
+                    "Zombie Brain", "Spider Egg", "Wolf Fur", "Mixin",
+            "End Portal Fumes", "Gabagoey", "Deepterror"})
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 5)
     @FeatureToggle
