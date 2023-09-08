@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.command
 
-import at.hannibal2.skyhanni.test.SkyHanniTestCommand
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName_old
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -32,7 +32,7 @@ object CopyItemCommand {
                     resultList.add("")
                     resultList.add("ExtraAttributes")
                     val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-                    SkyHanniTestCommand.runn(extraAttributes, "  .  ")
+                    SkyHanniDebugsAndTests.runn(extraAttributes, "  .  ")
                 }
             }
 

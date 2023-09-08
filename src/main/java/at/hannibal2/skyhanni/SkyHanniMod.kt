@@ -400,7 +400,7 @@ class SkyHanniMod {
         init()
 
         // test stuff
-        loadModule(SkyHanniTestCommand())
+        loadModule(SkyHanniDebugsAndTests())
         loadModule(CopyNearbyParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest())

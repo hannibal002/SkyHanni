@@ -22,7 +22,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 
-class SkyHanniTestCommand {
+class SkyHanniDebugsAndTests {
 
     companion object {
         private val config get() = SkyHanniMod.feature.dev
