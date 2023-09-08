@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -26,20 +27,13 @@ class ItemTipHelper {
 
         if (itemTipEvent.renderObjects.isEmpty()) return
 
-        GlStateManager.disableLighting()
-        GlStateManager.disableDepth()
-        GlStateManager.disableBlend()
-
         for (renderObject in itemTipEvent.renderObjects) {
-            val fontRenderer = event.fontRenderer
             val text = renderObject.text
-            val x = event.x + 17 - fontRenderer.getStringWidth(text) + renderObject.offsetX
+            val x = event.x + 17 + renderObject.offsetX
             val y = event.y + 9 + renderObject.offsetY
-            fontRenderer.drawStringWithShadow(text, x.toFloat(), y.toFloat(), 16777215)
-        }
 
-        GlStateManager.enableLighting()
-        GlStateManager.enableDepth()
+            event.drawSlotText(x, y, text, 1f)
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

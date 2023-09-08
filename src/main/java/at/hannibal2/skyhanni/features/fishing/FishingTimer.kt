@@ -71,11 +71,14 @@ class FishingTimer {
         }.sum()
 
     private fun isRightLocation(): Boolean {
+        inHollows = false
+
+        if (config.barnTimerForStranded && LorenzUtils.isStrandedProfile) return true
+
         if (config.barnTimerCrystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             inHollows = true
             return true
         }
-        inHollows = false
 
         if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
             return LocationUtils.playerLocation().distance(barnLocation) < 50

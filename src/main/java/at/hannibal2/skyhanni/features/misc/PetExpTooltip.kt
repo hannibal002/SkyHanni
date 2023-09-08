@@ -1,15 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarity
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
-import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -44,8 +42,10 @@ class PetExpTooltip {
             event.toolTip.add(index, "§7Total experience: §e${NumberUtil.format(petExperience)}")
         } else {
             val progressBar = StringUtils.progressBar(percentage)
+            val isBelowLEgendary = itemStack.getItemRarity() < LorenzRarity.LEGENDARY
+            val addLegendaryColor = if (isBelowLEgendary) "§6" else ""
             event.toolTip.add(index, "$progressBar §e${petExperience.addSeparators()}§6/§e${NumberUtil.format(maxXp)}")
-            event.toolTip.add(index, "§7Progress to Level $maxLevel: §e$percentageFormat")
+            event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
         }
     }
 

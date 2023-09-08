@@ -14,6 +14,8 @@
 + **Ender Node Tracker** - pretz
     + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
 + **Fishing timer** now works in **Crystal Hollows** as well. (Worm fishing)
++ Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
++ Added barn fishing timer support for stranded. - hannibal2
 + Option to shorten the **bestiary level-up message**.
 + **Bestiary overlay** - HiZe
     + Options for change number format, display time, number type and hide maxed.
@@ -23,7 +25,6 @@
     + Shows a list of all items and their price when inside a chest on your private island.
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
-+ Added keybind to manually reset the barn/worm fishing timer. - CarsCupcake
 + Added timer till shared inquisitors will despawn. - hannibal2
 + Account upgrade complete reminder. - appable0
 + Chat message how many places you dropped in the farming weight lb when joining garden.
@@ -32,6 +33,8 @@
 + Pet Experience Tooltip
     + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over a pet while pressing
       shift key.
+    + Highlight the level 100 text in gold for pets below legendary. - hannibal2
+      (This is to better indicate that the pet exp bar in the item tooltip is calculating with legendary.)
 + Anita Extra Farming Fortune:
     + Show current tier and cost to max out in the item tooltip.
 + Sync Jacob Contests - Kaeso + CalMWolfs
@@ -73,6 +76,9 @@
 + Added highlight and outline feature for rare sea creatures. - Cad
 + Added Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
++ Add feature to outline dropped items. - Cad
++ Added icons for the medals received in a contest. - CalMWolfs
+    + Different symbol for when it was a Finnegan contest.
 
 ### Changes
 
@@ -185,6 +191,18 @@
 + Fixed minion nametag not getting removed after picking it up. - Cad
 + Fixed 3k hp spiders being falsely highlighted as Arachne's Keepers. - oofy
 + Fixed a bug in GhostCounter for the 48th time. - HiZe
++ Fixed typo of effigy in the rift blood effigies display. - Vahvl
++ Fixed potential bug in salvage inventory with "hide not clickable items" on the alpha. - hannibal2
++ Fixed small typos in config. - hannibal2
++ Fixed maxed pet exp progress bar is wrong for bingo pet. - hannibal2
++ Hopefully fixed bug that opening a visitor too quickly causes detection problems. - hannibal2
++ Added nametags for minions as soon as they are placed. - Cad
++ Fixed wrong display offset in Powder Tracker. - Hize
++ Fixed some features not working correctly because of broken location detection for wrong Hypixel area names. - Cad
++ This includes:
++ Wilted Berberis Helper (in the Rift, Dreadfarm)
++ Slayer Profit Tracker (in the Park, Howling Cave)
++ End Node profit Tracker (in the End)
 
 ### Removed Features
 

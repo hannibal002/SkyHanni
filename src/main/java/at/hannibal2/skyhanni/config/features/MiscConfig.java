@@ -838,6 +838,7 @@ public class MiscConfig {
         @ConfigEditorDraggableList(
                 exampleText = {
                         "§b§lPowder Tracker",
+                        "§7Display Mode: §a[Total] §e[This Session]",
                         "§d852 Total chests Picked §7(950/h)",
                         "§bx2 Powder: §aActive!",
                         "§b250,420 §aMithril Powder §7(350,000/h)",
@@ -919,6 +920,32 @@ public class MiscConfig {
             @ConfigEditorBoolean
             public boolean behindBlocks = false;
         }
+    }
+
+
+    @Expose
+    @ConfigOption(name = "Glowing Dropped Items", desc = "")
+    @Accordion
+    public GlowingDroppedItems glowingDroppedItems = new GlowingDroppedItems();
+
+    public static class GlowingDroppedItems {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Draws a glowing outline around all dropped items on the ground.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Showcase Items", desc = "Draws a glowing outline around showcase items.")
+        @ConfigEditorBoolean
+        public boolean highlightShowcase = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Fishing Bait", desc = "Draws a glowing outline around fishing bait.")
+        @ConfigEditorBoolean
+        public boolean highlightFishingBait = false;
+
     }
 
     @Expose

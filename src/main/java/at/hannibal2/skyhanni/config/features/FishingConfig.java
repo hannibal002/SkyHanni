@@ -119,8 +119,16 @@ public class FishingConfig {
     )
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 2)
-    @FeatureToggle
     public boolean barnTimerCrystalHollows = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Stranded Fishing",
+            desc = "Show the barn fishing timer even on all the different islands stranded players can visit."
+    )
+    @ConfigEditorBoolean
+    @ConfigAccordionId(id = 2)
+    public boolean barnTimerForStranded = true;
 
     @Expose
     @ConfigOption(

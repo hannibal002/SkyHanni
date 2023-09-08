@@ -170,6 +170,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Works in crystal hollows too (worm fishing)
     + Keybind to manually reset the barn/worm fishing timer. - CarsCupcake
     + Warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
+    + Has support for the gamemode Stranded. - hannibal2
 + **Shark Fish Counter** - Counts how many sharks have been caught.
 + **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + Showing fished item names
@@ -592,6 +593,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Pet Experience Tooltip
     + Show the full pet exp and the progress to level 100 (ignoring rarity) when hovering over an pet while pressing
       shift key.
+    + Highlight the level 100 text in gold for pets below legendary. - hannibal2
+      (This is to better indicate that the pet exp bar in the item tooltip is calculating with legendary.)
 + **SkyHanni Installer** - NetheriteMiner
     + Double-clicking the mod jar file will open a window that asks you where to move the mod into.
 + **Default Option Settings:** - nea

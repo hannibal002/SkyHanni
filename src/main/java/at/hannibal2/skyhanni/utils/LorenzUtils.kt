@@ -55,6 +55,8 @@ object LorenzUtils {
 
     val noTradeMode get() = HypixelData.noTrade
 
+    val isStrandedProfile get() = HypixelData.stranded
+
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
