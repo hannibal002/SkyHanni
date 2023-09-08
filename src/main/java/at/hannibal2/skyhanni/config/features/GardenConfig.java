@@ -551,7 +551,7 @@ public class GardenConfig {
     public boolean keybind = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the hand. §cOnly updates after scrolling in the hotbar.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or daedalus axe in the hand.")
     @ConfigEditorBoolean
     @ConfigAccordionId(id = 8)
     @FeatureToggle
