@@ -23,6 +23,6 @@ class PetCandyUsedDisplay {
         val x = event.x + 13
         val y = event.y + 1
 
-        RenderUtils.drawSlotText(x, y, stackTip)
+        RenderUtils.drawSlotText(x, y, stackTip, .9f)
     }
 }

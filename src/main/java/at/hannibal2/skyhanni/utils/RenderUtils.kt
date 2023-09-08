@@ -971,7 +971,7 @@ object RenderUtils {
         )
     }
 
-    fun drawSlotText(xPos: Int, yPos: Int, text: String, scale: Float = 0.9f) {
+    fun drawSlotText(xPos: Int, yPos: Int, text: String, scale: Float) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.disableLighting()
