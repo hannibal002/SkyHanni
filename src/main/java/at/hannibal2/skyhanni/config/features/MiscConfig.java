@@ -923,22 +923,22 @@ public class MiscConfig {
 
 
     @Expose
-    @ConfigOption(name = "Items", desc = "")
+    @ConfigOption(name = "Glowing Dropped Items", desc = "")
     @Accordion
-    public ItemConfig itemConfig = new ItemConfig();
+    public GlowingDroppedItems glowingDroppedItems = new GlowingDroppedItems();
 
-    public static class ItemConfig {
+    public static class GlowingDroppedItems {
 
         @Expose
-        @ConfigOption(name = "Highlight Dropped Items", desc = "Draws a glowing outline around all dropped items on the ground.")
+        @ConfigOption(name = "Enabled", desc = "Draws a glowing outline around all dropped items on the ground.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean highlightDroppedItems = false;
+        public boolean enabled = false;
 
         @Expose
         @ConfigOption(name = "Highlight Showcase Items", desc = "Draws a glowing outline around showcase items.")
         @ConfigEditorBoolean
-        public boolean highlightShowcaseItems = false;
+        public boolean highlightShowcase = false;
 
         @Expose
         @ConfigOption(name = "Highlight Fishing Bait", desc = "Draws a glowing outline around fishing bait.")

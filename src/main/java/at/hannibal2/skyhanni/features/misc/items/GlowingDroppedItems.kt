@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GlowingDroppedItems {
 
-    private val config get() = SkyHanniMod.feature.misc.itemConfig
+    private val config get() = SkyHanniMod.feature.misc.glowingDroppedItems
 
     /**
      * List of skyblock locations where we might see items in showcases
@@ -31,7 +31,7 @@ class GlowingDroppedItems {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.highlightDroppedItems
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         if (EntityItem::class.java.isInstance(entity) && !shouldHideShowcaseItem(entity as EntityItem)) {
@@ -52,7 +52,7 @@ class GlowingDroppedItems {
                 )
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {
-        if (!isShowcaseArea() || config.highlightShowcaseItems) return false
+        if (!isShowcaseArea() || config.highlightShowcase) return false
 
         for (entityArmorStand in entity.worldObj.getEntitiesWithinAABB(
             EntityArmorStand::class.java,
