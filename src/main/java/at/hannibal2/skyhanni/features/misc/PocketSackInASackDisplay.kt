@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -25,7 +25,7 @@ class PocketSackInASackDisplay {
         val x = event.x + 13
         val y = event.y + 1
 
-        RenderUtils.drawSlotText(x, y, stackTip, .9f)
+        event.drawSlotText(x, y, stackTip, .9f)
     }
 
     @SubscribeEvent

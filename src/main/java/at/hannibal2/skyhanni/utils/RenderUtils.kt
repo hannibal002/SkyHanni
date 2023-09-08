@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
+import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
@@ -971,7 +972,7 @@ object RenderUtils {
         )
     }
 
-    fun drawSlotText(xPos: Int, yPos: Int, text: String, scale: Float) {
+    fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(xPos: Int, yPos: Int, text: String, scale: Float) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.disableLighting()

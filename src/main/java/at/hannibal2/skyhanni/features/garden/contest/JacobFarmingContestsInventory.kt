@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -169,7 +169,7 @@ class JacobFarmingContestsInventory {
                     scale = 1.3f
                 }
 
-                RenderUtils.drawSlotText(x, y, stackTip, scale)
+                event.drawSlotText(x, y, stackTip, scale)
             }
         }
     }

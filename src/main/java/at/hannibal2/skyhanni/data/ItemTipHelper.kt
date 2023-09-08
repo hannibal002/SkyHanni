@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
@@ -32,7 +32,7 @@ class ItemTipHelper {
             val x = event.x + 17 + renderObject.offsetX
             val y = event.y + 9 + renderObject.offsetY
 
-            RenderUtils.drawSlotText(x, y, text, 1f)
+            event.drawSlotText(x, y, text, 1f)
         }
     }
 
