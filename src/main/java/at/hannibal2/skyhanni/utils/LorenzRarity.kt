@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 
-enum class LorenzRarity(public val color: LorenzColor, public val id: Int) {
+enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     COMMON(LorenzColor.WHITE, 0),
     UNCOMMON(LorenzColor.GREEN, 1),
     RARE(LorenzColor.BLUE, 2),
@@ -11,7 +11,6 @@ enum class LorenzRarity(public val color: LorenzColor, public val id: Int) {
     DIVINE(LorenzColor.AQUA, 6),
     SUPREME(LorenzColor.DARK_RED, 7),
     SPECIAL(LorenzColor.RED, 8),
-    UNKNOWN(LorenzColor.BLACK, -1)
     ;
 
 }

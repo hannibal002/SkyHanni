@@ -152,8 +152,9 @@ object ItemUtils {
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
 
-    fun ItemStack.getItemRarity(): LorenzRarity {
-        //todo make into an enum in future
+    fun ItemStack.getItemRarity() = getItemRarityOrNull() ?: error("item rarity not detected for ")
+
+    fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
         return when (this.getLore().lastOrNull()?.take(4)) {
             "§f§l" -> LorenzRarity.COMMON
             "§a§l" -> LorenzRarity.UNCOMMON
@@ -164,7 +165,7 @@ object ItemUtils {
             "§b§l" -> LorenzRarity.DIVINE
             "§4§l" -> LorenzRarity.SUPREME
             "§c§l" -> LorenzRarity.SPECIAL
-            else -> LorenzRarity.UNKNOWN
+            else -> null
         }
     }
 
