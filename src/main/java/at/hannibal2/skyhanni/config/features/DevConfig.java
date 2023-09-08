@@ -121,6 +121,9 @@ public class DevConfig {
     public Position debugPos = new Position(10, 10, false, true);
 
     @Expose
+    public Position debugLocationPos = new Position(1, 160, false, true);
+
+    @Expose
     @ConfigOption(name = "Minecraft Console", desc = "")
     @ConfigEditorAccordion(id = 1)
     public boolean minecraftConsole = false;

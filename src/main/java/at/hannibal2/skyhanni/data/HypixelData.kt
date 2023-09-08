@@ -1,17 +1,25 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.client.Minecraft
+import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 class HypixelData {
+    private val config get() = SkyHanniMod.feature.dev
     private val tabListProfilePattern = "§e§lProfile: §r§a(?<profile>.*)".toPattern()
+    private val westVillageFarmArea = AxisAlignedBB(-54.0, 69.0, -115.0, -40.0, 75.0, -127.0)
+    private val howlingCaveArea = AxisAlignedBB(-401.0, 50.0, -104.0, -337.0, 90.0, 36.0)
+    private val zealotBruiserHideoutFixArea = AxisAlignedBB(-520.0, 66.0, -332.0, -558.0, 85.0, -280.0)
 
     companion object {
         var hypixelLive = false
@@ -66,6 +74,13 @@ class HypixelData {
     }
 
     @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GameOverlayRenderEvent) {
+        if (LorenzUtils.inSkyBlock && Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+            config.debugLocationPos.renderString("Current Area: $skyBlockArea", posLabel = "SkyBlock Area (Debug)")
+        }
+    }
+
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (event.isMod(2)) {
             if (LorenzUtils.inSkyBlock) {
@@ -73,6 +88,11 @@ class HypixelData {
                     .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
                     ?.substring(5)?.removeColor()
                     ?: "?"
+
+                if (skyBlockIsland == IslandType.THE_RIFT && westVillageFarmArea.isPlayerInside()) skyBlockArea = "Dreadfarm"
+                if (skyBlockIsland == IslandType.THE_PARK && howlingCaveArea.isPlayerInside()) skyBlockArea = "Howling Cave"
+                if (skyBlockIsland == IslandType.THE_END && zealotBruiserHideoutFixArea.isPlayerInside()) skyBlockArea = "The End"
+
                 checkProfileName()
             }
         }
