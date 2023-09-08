@@ -970,4 +970,25 @@ object RenderUtils {
             )
         )
     }
+
+    fun drawSlotText(xPos: Int, yPos: Int, text: String, scale: Float) {
+        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.disableBlend()
+
+        GlStateManager.pushMatrix()
+        GlStateManager.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 0f)
+        GlStateManager.scale(scale, scale, 1f)
+        fontRenderer.drawStringWithShadow(text, 0f, 0f, 16777215)
+
+        val reverseScale = 1 / scale
+
+        GlStateManager.scale(reverseScale, reverseScale, 1f)
+        GlStateManager.popMatrix()
+
+        GlStateManager.enableLighting()
+        GlStateManager.enableDepth()
+    }
 }
