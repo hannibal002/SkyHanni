@@ -34,7 +34,7 @@ class GlowingDroppedItems {
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
-        if (EntityItem::class.java.isInstance(entity) && !shouldHideShowcaseItem(entity as EntityItem)) {
+        if (entity is EntityItem && !shouldHideShowcaseItem(entity)) {
             val rarity = entity.entityItem.getItemRarityOrNull()
 
             if (config.highlightFishingBait || entity.entityItem.name?.endsWith(" Bait") != true) {
