@@ -540,6 +540,12 @@ public class MiscConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean vipVisits = true;
+
+        @Expose
+        @ConfigOption(name = "/gfs Sack", desc = "Tab complete /gfs sack items.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean gfsSack = true;
     }
 
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
