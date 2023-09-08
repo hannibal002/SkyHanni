@@ -921,6 +921,32 @@ public class MiscConfig {
         }
     }
 
+
+    @Expose
+    @ConfigOption(name = "Glowing Dropped Items", desc = "")
+    @Accordion
+    public GlowingDroppedItems glowingDroppedItems = new GlowingDroppedItems();
+
+    public static class GlowingDroppedItems {
+
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Draws a glowing outline around all dropped items on the ground.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Showcase Items", desc = "Draws a glowing outline around showcase items.")
+        @ConfigEditorBoolean
+        public boolean highlightShowcase = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Fishing Bait", desc = "Draws a glowing outline around fishing bait.")
+        @ConfigEditorBoolean
+        public boolean highlightFishingBait = false;
+
+    }
+
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
     @ConfigEditorBoolean

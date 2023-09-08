@@ -266,6 +266,7 @@ object EntityOutlineRenderer {
     // Add new features that need the entity outline logic here
     private fun isEnabled(): Boolean {
         if (SkyHanniMod.feature.fishing.rareSeaCreatureHighlight) return true
+        if (SkyHanniMod.feature.misc.glowingDroppedItems.enabled) return true
 
         return false
     }

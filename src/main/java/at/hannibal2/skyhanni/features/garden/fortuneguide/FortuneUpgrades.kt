@@ -254,7 +254,7 @@ object FortuneUpgrades {
         } ?: return
 
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity() + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getItemRarity().id + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(
             FortuneUpgrade("§7Recombobulate your ${item.displayName}", null, "RECOMBOBULATOR_3000", 1, increase)
         )
@@ -267,7 +267,7 @@ object FortuneUpgrades {
         copperPrice: Int? = null
     ) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarity(), FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increase = reforge[item.getItemRarity().id, FarmingFortuneDisplay.reforgeFortune] ?: return
         list.add(
             FortuneUpgrade(
                 "§7Reforge your ${item.displayName} §7to ${reforge.reforgeName}",
